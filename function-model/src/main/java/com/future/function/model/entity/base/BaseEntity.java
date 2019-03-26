@@ -1,4 +1,4 @@
-package com.future.function.entity.base;
+package com.future.function.model.entity.base;
 
 import java.util.Date;
 
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public abstract class BaseEntity {
+public class BaseEntity {
 
   private Date createdAt;
 

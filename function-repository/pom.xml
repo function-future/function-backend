@@ -18,7 +18,7 @@
     <!-- function dependencies -->
     <dependency>
       <groupId>com.future.function</groupId>
-      <artifactId>function-entity</artifactId>
+      <artifactId>function-model</artifactId>
       <version>${project.parent.version}</version>
       <scope>compile</scope>
     </dependency>

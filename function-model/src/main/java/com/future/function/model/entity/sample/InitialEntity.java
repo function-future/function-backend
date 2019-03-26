@@ -1,9 +1,9 @@
-package com.future.function.entity.sample;
+package com.future.function.model.entity.sample;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import com.future.function.entity.base.BaseEntity;
-import com.future.function.entity.util.DocumentName;
+import com.future.function.model.entity.base.BaseEntity;
+import com.future.function.model.util.DocumentName;
 import com.future.function.validation.annotation.InitialValidationAnnotation;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

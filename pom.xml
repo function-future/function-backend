@@ -18,7 +18,7 @@
 
   <modules>
     <module>function-app</module>
-    <module>function-entity</module>
+    <module>function-model</module>
     <module>function-repository</module>
     <module>function-validation</module>
     <module>function-service-api</module>
