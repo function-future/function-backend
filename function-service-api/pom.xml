@@ -13,4 +13,22 @@
 
   <artifactId>function-service-api</artifactId>
 
+  <dependencies>
+
+    <!-- function dependencies -->
+    <dependency>
+      <groupId>com.future.function</groupId>
+      <artifactId>function-model</artifactId>
+      <version>${project.parent.version}</version>
+      <scope>compile</scope>
+    </dependency>
+
+    <!-- spring dependencies -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+
+  </dependencies>
+
 </project>
