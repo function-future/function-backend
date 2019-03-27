@@ -18,4 +18,5 @@ public class Paging {
   private long totalPages;
 
   private long totalRecords;
+
 }

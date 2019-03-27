@@ -1,18 +1,28 @@
 package com.future.function.web.model.base;
 
+import java.util.List;
+
 import com.future.function.web.model.base.paging.Paging;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 
 @Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class PagingResponse<T> extends DataResponse<T> {
+public class PagingResponse<T> extends BaseResponse {
+
+  private List<T> data;
 
   private Paging paging;
+
+  public PagingResponse() {}
+
+  @Builder
+  public PagingResponse(int code, String status, List<T> data, Paging paging) {
+
+    super(code, status);
+    this.data = data;
+    this.paging = paging;
+  }
+
 }
