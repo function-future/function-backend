@@ -15,8 +15,6 @@ public class BaseEntity {
 
   private String createdBy;
 
-  private boolean deleted;
-
   private Date updatedAt;
 
   private String updatedBy;

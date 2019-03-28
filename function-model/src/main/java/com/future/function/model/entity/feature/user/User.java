@@ -57,6 +57,8 @@ public class User extends BaseEntity implements UserData {
 
   private String university;
 
+  private boolean deleted;
+
   @Override
   public Long getBatchNumber() {
 
