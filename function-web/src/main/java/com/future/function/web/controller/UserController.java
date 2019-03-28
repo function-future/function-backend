@@ -53,7 +53,7 @@ public class UserController {
   public BaseResponse deleteUser(@PathVariable String email) {
 
     userService.deleteUser(email);
-    return ResponseHelper.getBaseResponse();
+    return ResponseHelper.toBaseResponse(HttpStatus.OK);
   }
 
   @ResponseStatus(HttpStatus.OK)

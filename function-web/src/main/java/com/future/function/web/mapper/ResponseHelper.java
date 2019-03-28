@@ -6,9 +6,9 @@ import com.future.function.web.model.base.BaseResponse;
 
 public class ResponseHelper {
 
-  public static BaseResponse getBaseResponse() {
+  public static BaseResponse toBaseResponse(HttpStatus httpStatus) {
 
-    return new BaseResponse(HttpStatus.OK.value(), HttpStatus.OK.getReasonPhrase());
+    return new BaseResponse(httpStatus.value(), httpStatus.getReasonPhrase());
   }
 
 }
