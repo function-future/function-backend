@@ -21,8 +21,8 @@ public class BatchServiceImpl implements BatchService {
   @Override
   public Batch findByNumber(long number) {
 
-    return batchRepository.findByNumber(number).get();
-//        .orElseThrow(() -> new RuntimeException("Not Found"));
+    return batchRepository.findByNumber(number)
+        .orElseThrow(() -> new RuntimeException("Not Found"));
   }
 
 }
