@@ -64,13 +64,13 @@ public class UserRepositoryTest {
   @Test
   public void testGivenRoleAndPageableByFindingUsersByRoleAndPageableReturnPageOfUsers() {
 
-    Page<User> foundUsersPage1 = userRepository.findAllByRole(Role.ADMIN, new PageRequest(0, 5).first());
+    Page<User> foundUsersPage1 = userRepository.findAllByRole(Role.ADMIN, PageRequest.of(0, 5));
 
     assertThat(foundUsersPage1).isNotNull();
     assertThat(foundUsersPage1.getContent()).isNotEmpty();
     assertThat(foundUsersPage1.getNumberOfElements()).isEqualTo(1);
 
-    Page<User> foundUsersPage2 = userRepository.findAllByRole(Role.JUDGE, new PageRequest(0, 5).first());
+    Page<User> foundUsersPage2 = userRepository.findAllByRole(Role.JUDGE, PageRequest.of(0, 5));
 
     assertThat(foundUsersPage2).isNotNull();
     assertThat(foundUsersPage2.getContent()).isEmpty();
