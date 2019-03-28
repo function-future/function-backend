@@ -32,7 +32,7 @@ public class UserRepositoryTest {
   private static final String EMAIL_2 = "email-2";
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
 
     user1 = User.builder().role(Role.ADMIN).email(EMAIL_1).build();
     user2 = User.builder().role(Role.STUDENT).email(EMAIL_2).build();
@@ -42,7 +42,7 @@ public class UserRepositoryTest {
   }
 
   @After
-  public void tearDown() throws Exception {
+  public void tearDown() {
 
     userRepository.deleteAll();
   }
@@ -64,13 +64,13 @@ public class UserRepositoryTest {
   @Test
   public void testGivenRoleAndPageableByFindingUsersByRoleAndPageableReturnPageOfUsers() {
 
-    Page<User> foundUsersPage1 = userRepository.findAllByRole(Role.ADMIN, PageRequest.of(0, 5));
+    Page<User> foundUsersPage1 = userRepository.findAllByRole(Role.ADMIN, new PageRequest(0, 5));
 
     assertThat(foundUsersPage1).isNotNull();
     assertThat(foundUsersPage1.getContent()).isNotEmpty();
     assertThat(foundUsersPage1.getNumberOfElements()).isEqualTo(1);
 
-    Page<User> foundUsersPage2 = userRepository.findAllByRole(Role.JUDGE, PageRequest.of(0, 5));
+    Page<User> foundUsersPage2 = userRepository.findAllByRole(Role.JUDGE, new PageRequest(0, 5));
 
     assertThat(foundUsersPage2).isNotNull();
     assertThat(foundUsersPage2.getContent()).isEmpty();
