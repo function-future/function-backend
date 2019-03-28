@@ -18,9 +18,6 @@ public class OnlyStudentCanHaveBatchAndUniversityValidator implements Constraint
     Long batchNumber = value.getBatchNumber();
     String address = value.getUniversity();
 
-    System.out.println("Enter isValid");
-    System.out.println();
-
     if (role.equals("STUDENT")) {
       return batchNumber != null && address != null;
     } else {
