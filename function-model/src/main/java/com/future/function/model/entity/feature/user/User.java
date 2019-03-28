@@ -44,7 +44,6 @@ public class User extends BaseEntity implements UserData {
   @NotNull
   private Role role;
 
-  @NotNull
   private FileInfo picture;
 
   private String phone;

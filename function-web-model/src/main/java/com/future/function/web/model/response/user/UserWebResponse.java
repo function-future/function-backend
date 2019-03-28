@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonInclude(value = JsonInclude.Include.NON_NULL)
 public class UserWebResponse {
 
   private String role;
@@ -24,10 +25,8 @@ public class UserWebResponse {
 
   private String pictureUrl;
 
-  @JsonInclude(value = JsonInclude.Include.NON_NULL)
-  private long batch;
+  private Long batch;
 
-  @JsonInclude(value = JsonInclude.Include.NON_NULL)
   private String university;
 
 }
