@@ -23,12 +23,12 @@ public class UserResponseMapper {
         .name(user.getName())
         .phone(user.getPhone())
         .address(user.getAddress())
-//        .pictureUrl(user.getPicture()
-//            .getFileUrl())
+        //        .pictureUrl(user.getPicture()
+        //            .getFileUrl())
         .batch(Optional.of(user)
             .map(User::getBatch)
-            .orElse(Batch.builder().build())
-            .getNumber())
+            .map(Batch::getNumber)
+            .orElse(null))
         .university(user.getUniversity())
         .build();
   }

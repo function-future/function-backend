@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.future.function.common.ObjectValidator;
 import com.future.function.model.entity.feature.batch.Batch;
 import com.future.function.model.entity.feature.user.User;
 import com.future.function.model.util.constant.Role;
@@ -19,10 +20,13 @@ public class UserRequestMapper {
 
   private ObjectMapper objectMapper;
 
+  private ObjectValidator validator;
+
   @Autowired
-  private UserRequestMapper(ObjectMapper objectMapper) {
+  private UserRequestMapper(ObjectMapper objectMapper, ObjectValidator validator) {
 
     this.objectMapper = objectMapper;
+    this.validator = validator;
   }
 
   public User toUser(String data) {
@@ -35,7 +39,7 @@ public class UserRequestMapper {
       throw new RuntimeException("Bad Request");
     }
 
-    return User.builder()
+    return validator.validate(User.builder()
         .role(Role.valueOf(request.getRole()))
         .email(request.getEmail())
         .name(request.getName())
@@ -50,7 +54,7 @@ public class UserRequestMapper {
         .university(Optional.of(request)
             .map(UserWebRequest::getUniversity)
             .orElse(null))
-        .build();
+        .build());
   }
 
 }
