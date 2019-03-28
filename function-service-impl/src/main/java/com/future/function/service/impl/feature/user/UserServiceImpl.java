@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import javax.validation.Valid;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -65,7 +66,10 @@ public class UserServiceImpl implements UserService {
   public User updateUser(@Valid User user, MultipartFile image) {
 
     userRepository.findByEmail(user.getEmail())
-        .map(userRepository::save)
+        .map(foundUser -> {
+          BeanUtils.copyProperties(user, foundUser);
+          return userRepository.save(foundUser);
+        })
         .orElseThrow(() -> new RuntimeException("Update User Not Found"));
 
     //TODO save image
