@@ -37,7 +37,6 @@
     <java.version>1.8</java.version>
 
     <spring-security-test.version>5.1.4.RELEASE</spring-security-test.version>
-    <spring-data-commons.version>2.1.5.RELEASE</spring-data-commons.version>
 
     <jackson-annotations.version>2.8.0</jackson-annotations.version>
   </properties>
@@ -57,12 +56,6 @@
         <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-annotations</artifactId>
         <version>${jackson-annotations.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.springframework.data</groupId>
-        <artifactId>spring-data-commons</artifactId>
-        <version>${spring-data-commons.version}</version>
       </dependency>
 
     </dependencies>

@@ -15,6 +15,13 @@
 
   <dependencies>
 
+    <!-- function dependencies -->
+    <dependency>
+      <groupId>com.future.function</groupId>
+      <artifactId>function-validation</artifactId>
+      <version>${project.parent.version}</version>
+    </dependency>
+
     <!-- spring dependencies -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
