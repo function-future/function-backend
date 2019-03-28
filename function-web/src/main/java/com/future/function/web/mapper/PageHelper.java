@@ -10,7 +10,7 @@ public class PageHelper {
 
   public static Pageable toPage(int page, int size) {
 
-    return new PageRequest(page - 1, size).first();
+    return PageRequest.of(page - 1, size);
   }
 
   public static <T> Paging toPaging(Page<T> data) {
