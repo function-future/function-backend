@@ -7,6 +7,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import javax.validation.Constraint;
+import javax.validation.Payload;
 
 import com.future.function.validation.validator.OnlyStudentCanHaveBatchAndUniversityValidator;
 
@@ -19,6 +20,8 @@ public @interface OnlyStudentCanHaveBatchAndUniversity {
   Class<?>[] groups() default {};
 
   String message() default "OnlyStudentCanHaveBatchAndUniversity";
+
+  Class<? extends Payload>[] payload() default {};
 
   String value() default "";
 

@@ -6,7 +6,8 @@ import javax.validation.ConstraintValidatorContext;
 import com.future.function.common.UserData;
 import com.future.function.validation.annotation.OnlyStudentCanHaveBatchAndUniversity;
 
-public class OnlyStudentCanHaveBatchAndUniversityValidator implements ConstraintValidator<OnlyStudentCanHaveBatchAndUniversity, UserData> {
+public class OnlyStudentCanHaveBatchAndUniversityValidator implements
+    ConstraintValidator<OnlyStudentCanHaveBatchAndUniversity, UserData> {
 
   @Override
   public void initialize(OnlyStudentCanHaveBatchAndUniversity constraintAnnotation) {}
