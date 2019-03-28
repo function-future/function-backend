@@ -2,14 +2,11 @@ package com.future.function.service.impl.feature.user;
 
 import java.util.Optional;
 
-import javax.validation.Valid;
-
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.future.function.model.entity.feature.user.User;
@@ -17,10 +14,8 @@ import com.future.function.model.util.constant.Role;
 import com.future.function.repository.feature.user.UserRepository;
 import com.future.function.service.api.feature.batch.BatchService;
 import com.future.function.service.api.feature.user.UserService;
-import com.future.function.validation.validator.OnlyStudentCanHaveBatchAndUniversityValidator;
 
 @Service
-@Validated(value = {OnlyStudentCanHaveBatchAndUniversityValidator.class})
 public class UserServiceImpl implements UserService {
 
   private BatchService batchService;
@@ -48,7 +43,7 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public User createUser(@Valid User user, MultipartFile image) {
+  public User createUser(User user, MultipartFile image) {
 
     if (user.getBatch() != null) {
       user.setBatch(batchService.findByNumber(user.getBatch()
@@ -63,7 +58,7 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
-  public User updateUser(@Valid User user, MultipartFile image) {
+  public User updateUser(User user, MultipartFile image) {
 
     userRepository.findByEmail(user.getEmail())
         .map(foundUser -> {

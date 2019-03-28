@@ -48,7 +48,7 @@ public class UserServiceImplTest {
       .number(NUMBER)
       .build();
 
-  private static final Pageable PAGEABLE = PageRequest.of(0, 10);
+  private static final Pageable PAGEABLE = new PageRequest(0, 10);
 
   private static final String PHONE = "phone";
 
