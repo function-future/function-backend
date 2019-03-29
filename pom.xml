@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
@@ -8,7 +7,7 @@
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
     <version>1.5.19.RELEASE</version>
-    <relativePath/>
+    <relativePath />
   </parent>
 
   <groupId>com.future.function</groupId>
@@ -16,22 +15,21 @@
   <version>0.0.0</version>
   <packaging>pom</packaging>
 
-  <modules>
-    <module>function-app</module>
-    <module>function-model</module>
-    <module>function-repository</module>
-    <module>function-validation</module>
-    <module>function-service-api</module>
-    <module>function-service-impl</module>
-    <module>function-web</module>
-    <module>function-web-model</module>
-    <module>function-common</module>
-  </modules>
-
   <name>function</name>
   <description>Function is an application designed by Blibli.com FUTURE Program participants as phase 2 project. The
-    application is designed for upcoming FUTURE Program participants.
-  </description>
+    application is designed for upcoming FUTURE Program participants.</description>
+
+  <modules>
+    <module>function-app</module>
+    <module>function-common</module>
+    <module>function-model</module>
+    <module>function-repository</module>
+    <module>function-service-api</module>
+    <module>function-service-impl</module>
+    <module>function-validation</module>
+    <module>function-web</module>
+    <module>function-web-model</module>
+  </modules>
 
   <properties>
     <java.version>1.8</java.version>
@@ -46,16 +44,16 @@
     <dependencies>
 
       <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-annotations</artifactId>
+        <version>${jackson-annotations.version}</version>
+      </dependency>
+
+      <dependency>
         <groupId>org.springframework.security</groupId>
         <artifactId>spring-security-test</artifactId>
         <version>${spring-security-test.version}</version>
         <scope>test</scope>
-      </dependency>
-
-      <dependency>
-        <groupId>com.fasterxml.jackson.core</groupId>
-        <artifactId>jackson-annotations</artifactId>
-        <version>${jackson-annotations.version}</version>
       </dependency>
 
     </dependencies>
@@ -77,5 +75,37 @@
     </dependency>
 
   </dependencies>
+
+  <build>
+
+    <plugins>
+
+      <plugin>
+        <groupId>com.github.ekryd.sortpom</groupId>
+        <artifactId>sortpom-maven-plugin</artifactId>
+        <version>2.8.0</version>
+        <configuration>
+          <predefinedSortOrder>recommended_2008_06</predefinedSortOrder>
+          <sortDependencies>groupId,artifactId,version,scope,exclusions</sortDependencies>
+          <sortPlugins>groupId,artifactId,version,configuration,executions</sortPlugins>
+          <sortProperties>false</sortProperties>
+          <sortModules>true</sortModules>
+          <createBackupFile>false</createBackupFile>
+          <expandEmptyElements>false</expandEmptyElements>
+          <keepBlankLines>true</keepBlankLines>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>sort</goal>
+            </goals>
+            <phase>verify</phase>
+          </execution>
+        </executions>
+      </plugin>
+
+    </plugins>
+
+  </build>
 
 </project>

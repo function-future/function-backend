@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xmlns="http://maven.apache.org/POM/4.0.0"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <artifactId>function</artifactId>
     <groupId>com.future.function</groupId>
+    <artifactId>function</artifactId>
     <version>0.0.0</version>
   </parent>
 
@@ -16,6 +14,13 @@
   <dependencies>
 
     <!-- function dependencies -->
+    <dependency>
+      <groupId>com.future.function</groupId>
+      <artifactId>function-repository</artifactId>
+      <version>${project.parent.version}</version>
+      <scope>compile</scope>
+    </dependency>
+
     <dependency>
       <groupId>com.future.function</groupId>
       <artifactId>function-service-api</artifactId>
@@ -31,13 +36,6 @@
           <artifactId>spring-tx</artifactId>
         </exclusion>
       </exclusions>
-    </dependency>
-
-    <dependency>
-      <groupId>com.future.function</groupId>
-      <artifactId>function-repository</artifactId>
-      <version>${project.parent.version}</version>
-      <scope>compile</scope>
     </dependency>
 
     <!-- spring dependencies -->
