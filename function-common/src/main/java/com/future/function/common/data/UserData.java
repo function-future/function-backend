@@ -1,4 +1,4 @@
-package com.future.function.common;
+package com.future.function.common.data;
 
 public interface UserData {
 

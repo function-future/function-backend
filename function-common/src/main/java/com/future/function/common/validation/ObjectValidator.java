@@ -1,4 +1,4 @@
-package com.future.function.common;
+package com.future.function.common.validation;
 
 import java.util.Set;
 
@@ -24,11 +24,7 @@ public class ObjectValidator {
 
     Set<ConstraintViolation<T>> violations = validator.validate(data);
     if (!violations.isEmpty()) {
-      StringBuilder sb = new StringBuilder();
-      for (ConstraintViolation<T> constraintViolation : violations) {
-        sb.append(constraintViolation.getMessage());
-      }
-      throw new ConstraintViolationException(sb.toString(), violations);
+      throw new ConstraintViolationException(violations.toString(), violations);
     } else {
       return data;
     }
