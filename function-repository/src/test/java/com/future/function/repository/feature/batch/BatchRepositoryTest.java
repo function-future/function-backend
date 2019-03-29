@@ -44,7 +44,7 @@ public class BatchRepositoryTest {
   @Test
   public void testGivenBatchNumberByFindingBatchByNumberReturnBatchObject() {
 
-    Optional<Batch> foundBatch = batchRepository.findByNumber(NUMBER);
+    Optional<Batch> foundBatch = batchRepository.findByNumberAndDeletedIsFalse(NUMBER);
 
     assertThat(foundBatch).isNotEqualTo(Optional.empty());
     assertThat(foundBatch.get().getNumber()).isEqualTo(NUMBER);
