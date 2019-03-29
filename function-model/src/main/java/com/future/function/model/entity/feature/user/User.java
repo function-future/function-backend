@@ -3,11 +3,12 @@ package com.future.function.model.entity.feature.user;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.Email;
+import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import com.future.function.common.UserData;
+import com.future.function.common.data.UserData;
 import com.future.function.model.entity.base.BaseEntity;
 import com.future.function.model.entity.feature.batch.Batch;
 import com.future.function.model.entity.feature.file.FileInfo;
@@ -35,24 +36,25 @@ public class User extends BaseEntity implements UserData {
   @Id
   private String id;
 
-  @Email
+  @Email(message = "Email")
+  @NotBlank(message = "NotBlank")
   private String email;
 
-  @NotNull
+  @NotBlank(message = "NotBlank")
   private String name;
 
-  @NotNull
+  @NotNull(message = "NotNull")
   private Role role;
 
   private FileInfo picture;
 
   private String phone;
 
+  @NotBlank(message = "NotBlank")
+  private String address;
+
   @DBRef(lazy = true)
   private Batch batch;
-
-  @NotNull
-  private String address;
 
   private String university;
 
