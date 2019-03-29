@@ -97,7 +97,7 @@ public class UserServiceImplTest {
         .deleted(false)
         .build();
 
-    when(batchService.findByNumber(NUMBER)).thenReturn(BATCH);
+    when(batchService.getBatch(NUMBER)).thenReturn(BATCH);
     when(userRepository.findByEmail(EMAIL_MENTOR)).thenReturn(Optional.of(userMentor));
     when(userRepository.findByEmail(EMAIL_STUDENT)).thenReturn(Optional.of(userStudent));
   }

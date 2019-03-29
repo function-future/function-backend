@@ -46,7 +46,7 @@ public class UserServiceImpl implements UserService {
   public User createUser(User user, MultipartFile image) {
 
     if (user.getBatch() != null) {
-      user.setBatch(batchService.findByNumber(user.getBatch()
+      user.setBatch(batchService.getBatch(user.getBatch()
           .getNumber()));
     }
 

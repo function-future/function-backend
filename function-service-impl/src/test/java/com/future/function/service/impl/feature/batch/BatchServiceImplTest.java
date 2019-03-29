@@ -39,7 +39,7 @@ public class BatchServiceImplTest {
         .number(NUMBER)
         .build();
 
-    when(batchRepository.findByNumber(NUMBER)).thenReturn(Optional.of(batch));
+    when(batchRepository.findByNumberAndDeletedIsFalse(NUMBER)).thenReturn(Optional.of(batch));
   }
 
   @After
@@ -51,25 +51,25 @@ public class BatchServiceImplTest {
   @Test
   public void testGivenExistingBatchInDatabaseByFindingBatchByNumberReturnBatchObject() {
 
-    Batch foundBatch = batchService.findByNumber(NUMBER);
+    Batch foundBatch = batchService.getBatch(NUMBER);
 
     assertThat(foundBatch).isNotNull();
     assertThat(foundBatch).isEqualTo(batch);
 
-    verify(batchRepository, times(1)).findByNumber(NUMBER);
+    verify(batchRepository, times(1)).findByNumberAndDeletedIsFalse(NUMBER);
   }
 
   @Test
   public void testGivenNonExistingBatchInDatabaseByFindingBatchByNumberReturnNull() {
 
     try {
-      batchService.findByNumber(NUMBER);
+      batchService.getBatch(NUMBER);
     } catch (Exception e) {
       assertThat(e).isInstanceOf(RuntimeException.class);
       assertThat(e.getMessage()).isEqualTo("Not Found");
     }
 
-    verify(batchRepository, times(1)).findByNumber(NUMBER);
+    verify(batchRepository, times(1)).findByNumberAndDeletedIsFalse(NUMBER);
   }
 
 }
