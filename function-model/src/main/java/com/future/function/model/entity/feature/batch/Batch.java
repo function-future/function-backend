@@ -24,4 +24,6 @@ public class Batch extends BaseEntity {
 
   private long number;
 
+  private boolean deleted;
+
 }

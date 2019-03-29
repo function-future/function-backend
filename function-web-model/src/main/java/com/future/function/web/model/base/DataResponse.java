@@ -13,7 +13,7 @@ public class DataResponse<T> extends BaseResponse {
   public DataResponse() {}
 
   @Builder
-  public DataResponse(int code, String status, T data) {
+  private DataResponse(int code, String status, T data) {
 
     super(code, status);
     this.data = data;

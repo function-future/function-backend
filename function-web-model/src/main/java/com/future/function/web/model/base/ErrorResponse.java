@@ -16,7 +16,7 @@ public class ErrorResponse extends BaseResponse {
   public ErrorResponse() {}
 
   @Builder
-  public ErrorResponse(int code, String status, Map<String, List<String>> errors) {
+  private ErrorResponse(int code, String status, Map<String, List<String>> errors) {
 
     super(code, status);
     this.errors = errors;
