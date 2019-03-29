@@ -23,6 +23,6 @@ public @interface OnlyStudentCanHaveBatchAndUniversity {
 
   Class<? extends Payload>[] payload() default {};
 
-  String value() default "";
+  String field() default "role";
 
 }

@@ -3,7 +3,7 @@ package com.future.function.validation.validator;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-import com.future.function.common.UserData;
+import com.future.function.common.data.UserData;
 import com.future.function.validation.annotation.OnlyStudentCanHaveBatchAndUniversity;
 
 public class OnlyStudentCanHaveBatchAndUniversityValidator implements

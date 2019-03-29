@@ -14,7 +14,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import com.future.function.common.UserData;
+import com.future.function.common.data.UserData;
 
 @RunWith(MockitoJUnitRunner.class)
 public class OnlyStudentCanHaveBatchAndUniversityValidatorTest {
