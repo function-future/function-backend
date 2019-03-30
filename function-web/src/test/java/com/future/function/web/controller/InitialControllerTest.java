@@ -9,6 +9,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -21,9 +22,8 @@ import com.future.function.web.TestApplication;
 /**
  * Use {@code @AutoConfigureMockMvc} to auto configure the MVC mock.
  */
-@AutoConfigureMockMvc
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = TestApplication.class)
+@WebMvcTest(InitialController.class)
 public class InitialControllerTest {
 
   private static final String RETURNED_STRING = "Hello";
