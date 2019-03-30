@@ -44,12 +44,6 @@
     <dependencies>
 
       <dependency>
-        <groupId>com.fasterxml.jackson.core</groupId>
-        <artifactId>jackson-annotations</artifactId>
-        <version>${jackson-annotations.version}</version>
-      </dependency>
-
-      <dependency>
         <groupId>org.springframework.security</groupId>
         <artifactId>spring-security-test</artifactId>
         <version>${spring-security-test.version}</version>
