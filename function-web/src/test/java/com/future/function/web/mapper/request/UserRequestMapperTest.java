@@ -1,13 +1,11 @@
 package com.future.function.web.mapper.request;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
-
-import java.io.IOException;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.future.function.common.validation.ObjectValidator;
+import com.future.function.model.entity.feature.batch.Batch;
+import com.future.function.model.entity.feature.user.User;
+import com.future.function.model.util.constant.Role;
+import com.future.function.web.model.request.user.UserWebRequest;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,12 +14,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.future.function.common.validation.ObjectValidator;
-import com.future.function.model.entity.feature.batch.Batch;
-import com.future.function.model.entity.feature.user.User;
-import com.future.function.model.util.constant.Role;
-import com.future.function.web.model.request.user.UserWebRequest;
+import java.io.IOException;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class UserRequestMapperTest {
@@ -42,76 +38,99 @@ public class UserRequestMapperTest {
 
   private static final String UNIVERSITY = "university";
 
-  private static final User STUDENT = User.builder()
-      .role(Role.STUDENT)
-      .email(STUDENT_EMAIL)
-      .name(NAME)
-      .phone(PHONE)
-      .address(ADDRESS)
-      .batch(Batch.builder()
-          .number(NUMBER)
-          .build())
-      .university(UNIVERSITY)
-      .build();
+  private static final User STUDENT =
+      User.builder()
+          .role(Role.STUDENT)
+          .email(STUDENT_EMAIL)
+          .name(NAME)
+          .phone(PHONE)
+          .address(ADDRESS)
+          .batch(Batch.builder().number(NUMBER).build())
+          .university(UNIVERSITY)
+          .build();
 
   private static final String STUDENT_JSON =
-      "{\n" + "    \"role\": \"STUDENT\",\n" + "    \"email\": \"" + ADMIN_EMAIL + "\",\n" + "    \"name\": \"" + NAME +
-          "\",\n" + "    \"phone\": \"" + PHONE + "\",\n" + "    \"address\": \"" + ADDRESS + "\",\n" +
-          "    \"batch\": " + NUMBER + ",\n" + "    \"university\": \"" + UNIVERSITY + "\"\n" + "}";
+      "{\n"
+          + "    \"role\": \"STUDENT\",\n"
+          + "    \"email\": \""
+          + ADMIN_EMAIL
+          + "\",\n"
+          + "    \"name\": \""
+          + NAME
+          + "\",\n"
+          + "    \"phone\": \""
+          + PHONE
+          + "\",\n"
+          + "    \"address\": \""
+          + ADDRESS
+          + "\",\n"
+          + "    \"batch\": "
+          + NUMBER
+          + ",\n"
+          + "    \"university\": \""
+          + UNIVERSITY
+          + "\"\n"
+          + "}";
 
   private static final UserWebRequest STUDENT_WEB_REQUEST =
-      new UserWebRequest(Role.STUDENT.name(), STUDENT_EMAIL, NAME, PHONE, ADDRESS, NUMBER, UNIVERSITY);
+      UserWebRequest.builder()
+          .role(Role.STUDENT.name())
+          .email(STUDENT_EMAIL)
+          .name(NAME)
+          .phone(PHONE)
+          .address(ADDRESS)
+          .batch(NUMBER)
+          .university(UNIVERSITY)
+          .build();
 
-  private static final User INVALID_ADMIN = User.builder()
-      .role(Role.ADMIN)
-      .email(ADMIN_EMAIL)
-      .name(NAME)
-      .phone(PHONE)
-      .address(ADDRESS)
-      .batch(Batch.builder()
-          .number(NUMBER)
-          .build())
-      .university(UNIVERSITY)
-      .build();
-
-  private static final String INVALID_ADMIN_JSON =
-      "{\n" + "    \"role\": \"ADMIN\",\n" + "    \"email\": \"" + ADMIN_EMAIL + "\",\n" + "    \"name\": \"" + NAME +
-          "\",\n" + "    \"phone\": \"" + PHONE + "\",\n" + "    \"address\": \"" + ADDRESS + "\",\n" +
-          "    \"batch\": " + NUMBER + ",\n" + "    \"university\": \"" + UNIVERSITY + "\"\n" + "}";
-
-  private static final UserWebRequest INVALID_ADMIN_WEB_REQUEST =
-      new UserWebRequest(Role.ADMIN.name(), ADMIN_EMAIL, NAME, PHONE, ADDRESS, NUMBER, UNIVERSITY);
-
-  private static final User VALID_ADMIN = User.builder()
-      .role(Role.ADMIN)
-      .email(ADMIN_EMAIL)
-      .name(NAME)
-      .phone(PHONE)
-      .address(ADDRESS)
-      .build();
+  private static final User VALID_ADMIN =
+      User.builder()
+          .role(Role.ADMIN)
+          .email(ADMIN_EMAIL)
+          .name(NAME)
+          .phone(PHONE)
+          .address(ADDRESS)
+          .build();
 
   private static final String VALID_ADMIN_JSON =
-      "{\n" + "    \"role\": \"ADMIN\",\n" + "    \"email\": \"" + ADMIN_EMAIL + "\",\n" + "    \"name\": \"" + NAME +
-          "\",\n" + "    \"phone\": \"" + PHONE + "\",\n" + "    \"address\": \"" + ADDRESS + "\"\n" + "}";
+      "{\n"
+          + "    \"role\": \"ADMIN\",\n"
+          + "    \"email\": \""
+          + ADMIN_EMAIL
+          + "\",\n"
+          + "    \"name\": \""
+          + NAME
+          + "\",\n"
+          + "    \"phone\": \""
+          + PHONE
+          + "\",\n"
+          + "    \"address\": \""
+          + ADDRESS
+          + "\"\n"
+          + "}";
 
   private static final UserWebRequest VALID_ADMIN_WEB_REQUEST =
-      new UserWebRequest(Role.ADMIN.name(), ADMIN_EMAIL, NAME, PHONE, ADDRESS, null, null);
+      UserWebRequest.builder()
+          .role(Role.ADMIN.name())
+          .email(ADMIN_EMAIL)
+          .name(NAME)
+          .phone(PHONE)
+          .address(ADDRESS)
+          .build();
 
-  @Mock
-  private ObjectMapper objectMapper;
+  @Mock private ObjectMapper objectMapper;
 
-  @InjectMocks
-  private UserRequestMapper userRequestMapper;
+  @InjectMocks private UserRequestMapper userRequestMapper;
 
-  @Mock
-  private ObjectValidator validator;
+  @Mock private ObjectValidator validator;
 
   @Before
   public void setUp() throws Exception {
 
-    when(objectMapper.readValue(STUDENT_JSON, UserWebRequest.class)).thenReturn(STUDENT_WEB_REQUEST);
-    when(objectMapper.readValue(INVALID_ADMIN_JSON, UserWebRequest.class)).thenReturn(INVALID_ADMIN_WEB_REQUEST);
-    when(objectMapper.readValue(VALID_ADMIN_JSON, UserWebRequest.class)).thenReturn(VALID_ADMIN_WEB_REQUEST);
+    when(objectMapper.readValue(STUDENT_JSON, UserWebRequest.class))
+        .thenReturn(STUDENT_WEB_REQUEST);
+    when(objectMapper.readValue(VALID_ADMIN_JSON, UserWebRequest.class))
+        .thenReturn(VALID_ADMIN_WEB_REQUEST);
     when(objectMapper.readValue(BAD_JSON, UserWebRequest.class)).thenThrow(new IOException());
     when(validator.validate(STUDENT)).thenReturn(STUDENT);
     when(validator.validate(VALID_ADMIN)).thenReturn(VALID_ADMIN);
@@ -125,7 +144,8 @@ public class UserRequestMapperTest {
   }
 
   @Test
-  public void testGivenJsonDataWithInvalidFormatAsStringByParsingToUserClassReturnRuntimeException() throws Exception {
+  public void testGivenJsonDataWithInvalidFormatAsStringByParsingToUserClassReturnRuntimeException()
+      throws Exception {
 
     try {
       userRequestMapper.toUser(BAD_JSON);
@@ -153,10 +173,4 @@ public class UserRequestMapperTest {
     verify(validator, times(1)).validate(STUDENT);
     verify(validator, times(1)).validate(VALID_ADMIN);
   }
-
-  @Test
-  public void testGivenJsonDataAsStringWithInvalidDataByParsingToUserClassReturnConstraintViolationException() {
-
-  }
-
 }
