@@ -8,7 +8,7 @@ import org.springframework.http.HttpStatus;
 
 import com.future.function.model.entity.feature.batch.Batch;
 import com.future.function.model.entity.feature.user.User;
-import com.future.function.web.mapper.PageHelper;
+import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.model.base.DataResponse;
 import com.future.function.web.model.base.PagingResponse;
 import com.future.function.web.model.response.user.UserWebResponse;

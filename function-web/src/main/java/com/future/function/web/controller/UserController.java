@@ -16,8 +16,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.future.function.model.util.constant.Role;
 import com.future.function.service.api.feature.user.UserService;
-import com.future.function.web.mapper.PageHelper;
-import com.future.function.web.mapper.ResponseHelper;
+import com.future.function.web.mapper.helper.PageHelper;
+import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.mapper.request.UserRequestMapper;
 import com.future.function.web.mapper.response.UserResponseMapper;
 import com.future.function.web.model.base.BaseResponse;

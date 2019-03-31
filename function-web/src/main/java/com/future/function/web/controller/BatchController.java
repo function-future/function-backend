@@ -1,7 +1,7 @@
 package com.future.function.web.controller;
 
 import com.future.function.service.api.feature.batch.BatchService;
-import com.future.function.web.mapper.ResponseHelper;
+import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.mapper.response.BatchResponseMapper;
 import com.future.function.web.model.base.BaseResponse;
 import com.future.function.web.model.base.DataResponse;
