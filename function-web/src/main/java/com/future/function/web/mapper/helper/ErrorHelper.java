@@ -40,9 +40,9 @@ public class ErrorHelper {
     return Optional.ofNullable(violation.getPropertyPath())
       .map(String::valueOf)
       .filter(s -> !s.equals(""))
-      .orElse(String.valueOf(violation.getConstraintDescriptor()
-                               .getAttributes()
-                               .get("field")));
+      .orElseGet(() -> String.valueOf(violation.getConstraintDescriptor()
+                                        .getAttributes()
+                                        .get("field")));
   }
   
 }
