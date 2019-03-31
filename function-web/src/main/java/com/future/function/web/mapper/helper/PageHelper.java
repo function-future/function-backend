@@ -16,7 +16,7 @@ public class PageHelper {
     
     return Paging.builder()
       .currentPage(data.getNumber())
-      .pageSize(data.getNumberOfElements())
+      .pageSize(data.getSize())
       .totalPages(data.getTotalPages())
       .totalRecords(data.getTotalElements())
       .build();
