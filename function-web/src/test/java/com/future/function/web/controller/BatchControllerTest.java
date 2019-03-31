@@ -18,79 +18,93 @@ import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(BatchController.class)
 public class BatchControllerTest {
-
+  
   private static final Long FIRST_BATCH_NUMBER = 1L;
-
+  
   private static final Long SECOND_BATCH_NUMBER = 2L;
-
-  private static final Batch FIRST_BATCH =
-      Batch.builder().number(FIRST_BATCH_NUMBER).deleted(false).build();
-
-  private static final Batch SECOND_BATCH =
-      Batch.builder().number(SECOND_BATCH_NUMBER).deleted(false).build();
-
-  @Autowired private MockMvc mockMvc;
-
-  @MockBean private BatchService batchService;
-
+  
+  private static final Batch FIRST_BATCH = Batch.builder()
+    .number(FIRST_BATCH_NUMBER)
+    .deleted(false)
+    .build();
+  
+  private static final Batch SECOND_BATCH = Batch.builder()
+    .number(SECOND_BATCH_NUMBER)
+    .deleted(false)
+    .build();
+  
+  @Autowired
+  private MockMvc mockMvc;
+  
+  @MockBean
+  private BatchService batchService;
+  
   @Before
   public void setUp() {}
-
+  
   @After
   public void tearDown() {
-
+    
     verifyNoMoreInteractions(batchService);
   }
-
+  
   @Test
-  public void
-      testGivenCallToBatchesApiByFindingUndeletedBatchesFromBatchServiceReturnListOfBatchNumbers()
-          throws Exception {
-
-    given(batchService.getBatches()).willReturn(Arrays.asList(FIRST_BATCH, SECOND_BATCH));
-
-    MockHttpServletResponse response =
-        mockMvc.perform(get("/api/core/batches")).andReturn().getResponse();
-
+  public void testGivenCallToBatchesApiByFindingUndeletedBatchesFromBatchServiceReturnListOfBatchNumbers()
+    throws Exception {
+    
+    given(batchService.getBatches()).willReturn(
+      Arrays.asList(FIRST_BATCH, SECOND_BATCH));
+    
+    MockHttpServletResponse response = mockMvc.perform(get("/api/core/batches"))
+      .andReturn()
+      .getResponse();
+    
     assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
     assertThat(response.getContentAsString()).isNotBlank();
-
+    
     verify(batchService, times(1)).getBatches();
   }
-
+  
   @Test
-  public void testGivenCallToBatchesApiByCreatingBatchReturnNewBatchResponse() throws Exception {
-
+  public void testGivenCallToBatchesApiByCreatingBatchReturnNewBatchResponse()
+    throws Exception {
+    
     given(batchService.createBatch()).willReturn(FIRST_BATCH);
-
-    MockHttpServletResponse response =
-        mockMvc.perform(post("/api/core/batches")).andReturn().getResponse();
-
+    
+    MockHttpServletResponse response = mockMvc.perform(
+      post("/api/core/batches"))
+      .andReturn()
+      .getResponse();
+    
     assertThat(response.getStatus()).isEqualTo(HttpStatus.CREATED.value());
     assertThat(response.getContentAsString()).isNotBlank();
-
+    
     verify(batchService, times(1)).createBatch();
   }
-
+  
   @Test
   public void testGivenBatchNumberFromPathVariableByDeletingBatchReturnBaseResponseOK()
-      throws Exception {
-
-    MockHttpServletResponse response =
-        mockMvc
-            .perform(delete("/api/core/batches/" + SECOND_BATCH_NUMBER))
-            .andReturn()
-            .getResponse();
-
+    throws Exception {
+    
+    MockHttpServletResponse response = mockMvc.perform(
+      delete("/api/core/batches/" + SECOND_BATCH_NUMBER))
+      .andReturn()
+      .getResponse();
+    
     assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
     assertThat(response.getContentAsString()).isNotBlank();
-
+    
     verify(batchService, times(1)).deleteBatch(SECOND_BATCH_NUMBER);
   }
+  
 }

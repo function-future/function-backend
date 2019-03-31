@@ -1,13 +1,13 @@
 package com.future.function.service.impl.helper;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(MockitoJUnitRunner.class)
 public class InitialServiceImplTest {
@@ -43,4 +43,5 @@ public class InitialServiceImplTest {
     String s = null;
     assertThat(s).isNull();
   }
+
 }

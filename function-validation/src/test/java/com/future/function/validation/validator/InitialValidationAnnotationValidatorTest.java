@@ -52,10 +52,12 @@ public class InitialValidationAnnotationValidatorTest {
   }
 
   /**
-   * For {@code initialize()} method, simply name the test method as {@code testInitialize()}.
+   * For {@code initialize()} method, simply name the test method as {@code
+   * testInitialize()}.
    */
   @Test
   public void testInitialize() {
 
   }
+
 }

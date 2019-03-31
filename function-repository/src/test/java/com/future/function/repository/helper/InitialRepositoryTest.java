@@ -1,7 +1,7 @@
 package com.future.function.repository.helper;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
+import com.future.function.model.entity.sample.InitialEntity;
+import com.future.function.repository.TestApplication;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -10,11 +10,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import com.future.function.model.entity.sample.InitialEntity;
-import com.future.function.repository.TestApplication;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * For repository test, we will use embedded MongoDB from de.flapdoodle.embed.mongo.
+ * For repository test, we will use embedded MongoDB from de.flapdoodle.embed
+ * .mongo.
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = TestApplication.class)
@@ -30,7 +30,7 @@ public class InitialRepositoryTest {
   public void setUp() throws Exception {
 
     initialRepository.save(InitialEntity.builder()
-        .build());
+                             .build());
   }
 
   /**
@@ -54,4 +54,5 @@ public class InitialRepositoryTest {
     String s = null;
     assertThat(s).isNull();
   }
+
 }

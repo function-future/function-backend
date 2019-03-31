@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class BatchWebResponse {
-
-    private long batchNumber;
-
+  
+  private long batchNumber;
+  
 }

@@ -5,12 +5,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Use {@code @RestController} and {@code @RequestMapping(value = API_PATH)} annotations before class name
+ * Use {@code @RestController} and {@code @RequestMapping(value = API_PATH)}
+ * annotations before class name
  */
 @RestController
 @RequestMapping(value = "/api/test")
 public class InitialController {
-
+  
   /**
    * Specify method for mapping.
    * <p>
@@ -20,7 +21,8 @@ public class InitialController {
    */
   @GetMapping
   public String test() {
-
+    
     return "Hello";
   }
+  
 }
