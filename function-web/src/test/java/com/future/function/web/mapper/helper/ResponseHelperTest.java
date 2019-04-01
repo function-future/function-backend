@@ -1,6 +1,6 @@
 package com.future.function.web.mapper.helper;
 
-import com.future.function.web.model.base.BaseResponse;
+import com.future.function.web.model.response.base.BaseResponse;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

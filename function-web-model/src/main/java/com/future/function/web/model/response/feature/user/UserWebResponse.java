@@ -1,4 +1,4 @@
-package com.future.function.web.model.response.user;
+package com.future.function.web.model.response.feature.user;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;

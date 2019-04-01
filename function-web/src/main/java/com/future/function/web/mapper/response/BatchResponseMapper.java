@@ -1,9 +1,9 @@
 package com.future.function.web.mapper.response;
 
 import com.future.function.model.entity.feature.batch.Batch;
-import com.future.function.web.model.base.DataResponse;
-import com.future.function.web.model.base.PagingResponse;
-import com.future.function.web.model.response.batch.BatchWebResponse;
+import com.future.function.web.model.response.base.DataResponse;
+import com.future.function.web.model.response.base.PagingResponse;
+import com.future.function.web.model.response.feature.batch.BatchWebResponse;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;

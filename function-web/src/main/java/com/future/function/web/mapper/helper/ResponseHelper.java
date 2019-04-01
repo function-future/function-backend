@@ -1,6 +1,6 @@
 package com.future.function.web.mapper.helper;
 
-import com.future.function.web.model.base.BaseResponse;
+import com.future.function.web.model.response.base.BaseResponse;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;

@@ -1,4 +1,4 @@
-package com.future.function.web.model.response.batch;
+package com.future.function.web.model.response.feature.batch;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

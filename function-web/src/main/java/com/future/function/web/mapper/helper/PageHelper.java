@@ -1,6 +1,6 @@
 package com.future.function.web.mapper.helper;
 
-import com.future.function.web.model.base.paging.Paging;
+import com.future.function.web.model.response.base.paging.Paging;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.data.domain.Page;

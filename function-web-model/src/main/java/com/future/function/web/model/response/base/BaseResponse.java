@@ -1,4 +1,4 @@
-package com.future.function.web.model.base;
+package com.future.function.web.model.response.base;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

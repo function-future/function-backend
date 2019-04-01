@@ -1,6 +1,6 @@
-package com.future.function.web.model.base;
+package com.future.function.web.model.response.base;
 
-import com.future.function.web.model.base.paging.Paging;
+import com.future.function.web.model.response.base.paging.Paging;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

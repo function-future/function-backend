@@ -1,4 +1,4 @@
-package com.future.function.web.model.base.paging;
+package com.future.function.web.model.response.base.paging;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

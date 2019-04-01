@@ -2,7 +2,7 @@ package com.future.function.web.controller;
 
 import com.future.function.web.mapper.helper.ErrorHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
-import com.future.function.web.model.base.ErrorResponse;
+import com.future.function.web.model.response.base.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
