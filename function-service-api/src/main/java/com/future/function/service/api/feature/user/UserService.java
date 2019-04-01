@@ -6,6 +6,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
+/**
+ * Service interface class for user logic operations declaration.
+ */
 public interface UserService {
   
   User getUser(String email);

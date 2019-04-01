@@ -1,7 +1,7 @@
 package com.future.function.model.entity.sample;
 
 import com.future.function.model.entity.base.BaseEntity;
-import com.future.function.model.util.DocumentName;
+import com.future.function.model.util.constant.DocumentName;
 import com.future.function.validation.annotation.InitialValidationAnnotation;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

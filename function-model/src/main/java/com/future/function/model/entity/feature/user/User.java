@@ -4,7 +4,7 @@ import com.future.function.common.data.UserData;
 import com.future.function.model.entity.base.BaseEntity;
 import com.future.function.model.entity.feature.batch.Batch;
 import com.future.function.model.entity.feature.file.FileInfo;
-import com.future.function.model.util.DocumentName;
+import com.future.function.model.util.constant.DocumentName;
 import com.future.function.model.util.constant.Role;
 import com.future.function.validation.annotation.OnlyStudentCanHaveBatchAndUniversity;
 import lombok.AllArgsConstructor;
@@ -21,7 +21,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import javax.validation.constraints.NotNull;
 
 /**
- * Entity representation for users
+ * Entity representation for users.
  */
 @Data
 @Builder

@@ -37,6 +37,14 @@
     <spring-security-test.version>5.1.4.RELEASE</spring-security-test.version>
 
     <jackson-annotations.version>2.8.0</jackson-annotations.version>
+
+    <?SORTPOM IGNORE?>
+    <sonar.coverage.exclusions>
+      **/FunctionApplication.java,
+      **/model/**,
+      **/service/api/**
+    </sonar.coverage.exclusions>
+    <?SORTPOM RESUME?>
   </properties>
 
   <dependencyManagement>
@@ -72,6 +80,20 @@
 
   <build>
 
+    <pluginManagement>
+
+      <plugins>
+
+        <plugin>
+          <groupId>org.jacoco</groupId>
+          <artifactId>jacoco-maven-plugin</artifactId>
+          <version>0.7.8</version>
+        </plugin>
+
+      </plugins>
+
+    </pluginManagement>
+
     <plugins>
 
       <plugin>
@@ -80,8 +102,24 @@
         <version>2.8.0</version>
         <configuration>
           <predefinedSortOrder>recommended_2008_06</predefinedSortOrder>
-          <sortDependencies>groupId,artifactId,version,scope,exclusions</sortDependencies>
-          <sortPlugins>groupId,artifactId,version,configuration,executions</sortPlugins>
+          <?SORTPOM IGNORE?>
+          <sortDependencies>
+            groupId,
+            artifactId,
+            version,
+            scope,
+            exclusions
+          </sortDependencies>
+          <?SORTPOM RESUME?>
+          <?SORTPOM IGNORE?>
+          <sortPlugins>
+            groupId,
+            artifactId,
+            version,
+            configuration,
+            executions
+          </sortPlugins>
+          <?SORTPOM RESUME?>
           <sortProperties>false</sortProperties>
           <sortModules>true</sortModules>
           <createBackupFile>false</createBackupFile>
@@ -96,6 +134,37 @@
             <phase>verify</phase>
           </execution>
         </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <configuration>
+          <rules>
+            <rule implementation="org.jacoco.maven.RuleConfiguration">
+              <element>BUNDLE</element>
+              <limits>
+                <limit implementation="org.jacoco.report.check.Limit">
+                  <counter>INSTRUCTION</counter>
+                  <value>COVEREDRATIO</value>
+                  <minimum>0.9</minimum>
+                </limit>
+                <limit implementation="org.jacoco.report.check.Limit">
+                  <counter>LINE</counter>
+                  <value>COVEREDRATIO</value>
+                  <minimum>0.9</minimum>
+                </limit>
+              </limits>
+            </rule>
+          </rules>
+          <?SORTPOM IGNORE?>
+          <excludes>
+            <exclude>**/FunctionApplication.java,</exclude>
+            <exclude>**/model/**,</exclude>
+            <exclude>**/service/api/**</exclude>
+          </excludes>
+          <?SORTPOM RESUME?>
+        </configuration>
       </plugin>
 
     </plugins>

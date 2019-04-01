@@ -4,11 +4,14 @@ import com.future.function.model.entity.feature.batch.Batch;
 import com.future.function.web.model.base.DataResponse;
 import com.future.function.web.model.base.PagingResponse;
 import com.future.function.web.model.response.batch.BatchWebResponse;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class BatchResponseMapper {
   
   public static DataResponse<BatchWebResponse> toBatchDataResponse(

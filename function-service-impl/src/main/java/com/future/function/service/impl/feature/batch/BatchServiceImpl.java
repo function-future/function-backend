@@ -1,5 +1,6 @@
 package com.future.function.service.impl.feature.batch;
 
+import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.batch.Batch;
 import com.future.function.repository.feature.batch.BatchRepository;
 import com.future.function.service.api.feature.batch.BatchService;
@@ -9,10 +10,13 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Service implementation class for batch logic operations implementation.
+ */
 @Service
 public class BatchServiceImpl implements BatchService {
   
-  private BatchRepository batchRepository;
+  private final BatchRepository batchRepository;
   
   @Autowired
   public BatchServiceImpl(BatchRepository batchRepository) {
@@ -30,7 +34,7 @@ public class BatchServiceImpl implements BatchService {
   public Batch getBatch(long number) {
     
     return batchRepository.findByNumberAndDeletedIsFalse(number)
-      .orElseThrow(() -> new RuntimeException("Not Found"));
+      .orElseThrow(() -> new NotFoundException("Get Batch Not Found"));
   }
   
   @Override
@@ -69,7 +73,7 @@ public class BatchServiceImpl implements BatchService {
       batchNumber);
     
     if (!targetBatch.isPresent()) {
-      throw new RuntimeException("Delete Batch Not Found");
+      throw new NotFoundException("Delete Batch Not Found");
     } else {
       markBatch(targetBatch.get(), true);
     }

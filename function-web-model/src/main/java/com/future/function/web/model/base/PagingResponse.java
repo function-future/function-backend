@@ -7,6 +7,9 @@ import lombok.EqualsAndHashCode;
 
 import java.util.List;
 
+/**
+ * Model representation for data response with paging.
+ */
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class PagingResponse<T> extends BaseResponse {

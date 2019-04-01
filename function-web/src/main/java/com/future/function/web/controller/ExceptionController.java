@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import javax.validation.ConstraintViolationException;
 
+/**
+ * Controller advice class for exception handling purposes.
+ */
 @RestControllerAdvice
 public class ExceptionController {
   

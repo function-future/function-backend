@@ -1,5 +1,8 @@
 package com.future.function.web.mapper.helper;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
 import javax.validation.ConstraintViolation;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,6 +11,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ErrorHelper {
   
   public static Map<String, List<String>> toErrors(

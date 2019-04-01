@@ -19,29 +19,29 @@ import static org.assertj.core.api.Assertions.assertThat;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = TestApplication.class)
 public class InitialRepositoryTest {
-
+  
   @Autowired
   private InitialRepository initialRepository;
-
+  
   /**
    * Define setUp before any test, if none required keep it empty.
    */
   @Before
   public void setUp() throws Exception {
-
+    
     initialRepository.save(InitialEntity.builder()
                              .build());
   }
-
+  
   /**
    * Define tearDown after any test, always empty the database.
    */
   @After
   public void tearDown() throws Exception {
-
+    
     initialRepository.deleteAll();
   }
-
+  
   /**
    * Use the following test naming convention:
    * {@code public void testGiven(Condition)By(ExpectedBehavior)Return(Result)}
@@ -50,9 +50,9 @@ public class InitialRepositoryTest {
    */
   @Test
   public void testExampleGivenDetailedProperNamingConventionInfoByWritingUnitTestReturnValidTestName() {
-
+    
     String s = null;
     assertThat(s).isNull();
   }
-
+  
 }

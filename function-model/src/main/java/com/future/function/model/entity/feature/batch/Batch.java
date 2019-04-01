@@ -1,7 +1,7 @@
 package com.future.function.model.entity.feature.batch;
 
 import com.future.function.model.entity.base.BaseEntity;
-import com.future.function.model.util.DocumentName;
+import com.future.function.model.util.constant.DocumentName;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,6 +10,9 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+/**
+ * Entity representation for batches.
+ */
 @Data
 @Builder
 @NoArgsConstructor

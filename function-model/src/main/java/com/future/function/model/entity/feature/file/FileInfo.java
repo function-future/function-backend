@@ -7,6 +7,9 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotNull;
 
+/**
+ * Class representation of files.
+ */
 @Data
 @Builder
 @NoArgsConstructor

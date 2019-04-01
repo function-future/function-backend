@@ -1,8 +1,11 @@
 package com.future.function.web.mapper.helper;
 
 import com.future.function.web.model.base.BaseResponse;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ResponseHelper {
   
   public static BaseResponse toBaseResponse(HttpStatus httpStatus) {

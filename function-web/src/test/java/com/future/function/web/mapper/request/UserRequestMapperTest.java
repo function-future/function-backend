@@ -1,6 +1,7 @@
 package com.future.function.web.mapper.request;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.future.function.common.exception.BadRequestException;
 import com.future.function.common.validation.ObjectValidator;
 import com.future.function.model.entity.feature.batch.Batch;
 import com.future.function.model.entity.feature.user.User;
@@ -24,23 +25,23 @@ import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class UserRequestMapperTest {
-
+  
   private static final String ADDRESS = "address";
-
+  
   private static final String ADMIN_EMAIL = "admin@test.com";
-
+  
   private static final String BAD_JSON = "{}";
-
+  
   private static final String NAME = "name";
-
+  
   private static final Long NUMBER = 1L;
-
+  
   private static final String PHONE = "081212341234";
-
+  
   private static final String STUDENT_EMAIL = "student@test.com";
-
+  
   private static final String UNIVERSITY = "university";
-
+  
   private static final User STUDENT = User.builder()
     .role(Role.STUDENT)
     .email(STUDENT_EMAIL)
@@ -52,14 +53,14 @@ public class UserRequestMapperTest {
              .build())
     .university(UNIVERSITY)
     .build();
-
+  
   private static final String STUDENT_JSON =
     "{\n" + "    \"role\": \"STUDENT\",\n" + "    \"email\": \"" + ADMIN_EMAIL +
     "\",\n" + "    \"name\": \"" + NAME + "\",\n" + "    \"phone\": \"" +
     PHONE + "\",\n" + "    \"address\": \"" + ADDRESS + "\",\n" +
     "    \"batch\": " + NUMBER + ",\n" + "    \"university\": \"" + UNIVERSITY +
     "\"\n" + "}";
-
+  
   private static final UserWebRequest STUDENT_WEB_REQUEST =
     UserWebRequest.builder()
       .role(Role.STUDENT.name())
@@ -70,7 +71,7 @@ public class UserRequestMapperTest {
       .batch(NUMBER)
       .university(UNIVERSITY)
       .build();
-
+  
   private static final User VALID_ADMIN = User.builder()
     .role(Role.ADMIN)
     .email(ADMIN_EMAIL)
@@ -78,12 +79,12 @@ public class UserRequestMapperTest {
     .phone(PHONE)
     .address(ADDRESS)
     .build();
-
+  
   private static final String VALID_ADMIN_JSON =
     "{\n" + "    \"role\": \"ADMIN\",\n" + "    \"email\": \"" + ADMIN_EMAIL +
     "\",\n" + "    \"name\": \"" + NAME + "\",\n" + "    \"phone\": \"" +
     PHONE + "\",\n" + "    \"address\": \"" + ADDRESS + "\"\n" + "}";
-
+  
   private static final UserWebRequest VALID_ADMIN_WEB_REQUEST =
     UserWebRequest.builder()
       .role(Role.ADMIN.name())
@@ -92,19 +93,19 @@ public class UserRequestMapperTest {
       .phone(PHONE)
       .address(ADDRESS)
       .build();
-
+  
   @Mock
   private ObjectMapper objectMapper;
-
+  
   @InjectMocks
   private UserRequestMapper userRequestMapper;
-
+  
   @Mock
   private ObjectValidator validator;
-
+  
   @Before
   public void setUp() throws Exception {
-
+    
     when(objectMapper.readValue(STUDENT_JSON, UserWebRequest.class)).thenReturn(
       STUDENT_WEB_REQUEST);
     when(objectMapper.readValue(VALID_ADMIN_JSON,
@@ -115,40 +116,40 @@ public class UserRequestMapperTest {
     when(validator.validate(STUDENT)).thenReturn(STUDENT);
     when(validator.validate(VALID_ADMIN)).thenReturn(VALID_ADMIN);
   }
-
+  
   @After
   public void tearDown() {
-
+    
     verifyNoMoreInteractions(objectMapper);
     verifyNoMoreInteractions(validator);
   }
-
+  
   @Test
   public void testGivenJsonDataWithInvalidFormatAsStringByParsingToUserClassReturnRuntimeException()
     throws Exception {
-
+    
     try {
       userRequestMapper.toUser(BAD_JSON);
     } catch (Exception e) {
-      assertThat(e).isInstanceOf(RuntimeException.class);
+      assertThat(e).isInstanceOf(BadRequestException.class);
       assertThat(e.getMessage()).isEqualTo("Bad Request");
     }
-
+    
     verify(objectMapper, times(1)).readValue(BAD_JSON, UserWebRequest.class);
   }
-
+  
   @Test
   public void testGivenJsonDataAsStringByParsingToUserClassReturnUserObject()
     throws Exception {
-
+    
     User parsedStudent = userRequestMapper.toUser(STUDENT_JSON);
-
+    
     assertThat(parsedStudent).isEqualTo(STUDENT);
-
+    
     User parsedAdmin = userRequestMapper.toUser(VALID_ADMIN_JSON);
-
+    
     assertThat(parsedAdmin).isEqualTo(VALID_ADMIN);
-
+    
     verify(objectMapper, times(1)).readValue(
       STUDENT_JSON, UserWebRequest.class);
     verify(objectMapper, times(1)).readValue(
@@ -156,5 +157,5 @@ public class UserRequestMapperTest {
     verify(validator, times(1)).validate(STUDENT);
     verify(validator, times(1)).validate(VALID_ADMIN);
   }
-
+  
 }

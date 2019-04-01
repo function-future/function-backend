@@ -7,6 +7,10 @@ import lombok.EqualsAndHashCode;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Model representation for error response; specifically
+ * {@link com.future.function.common.exception.BadRequestException}.
+ */
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class ErrorResponse extends BaseResponse {

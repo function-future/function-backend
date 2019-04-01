@@ -1,6 +1,7 @@
 package com.future.function.web.mapper.request;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.future.function.common.exception.BadRequestException;
 import com.future.function.common.validation.ObjectValidator;
 import com.future.function.model.entity.feature.batch.Batch;
 import com.future.function.model.entity.feature.user.User;
@@ -37,7 +38,7 @@ public class UserRequestMapper {
       request = objectMapper.readValue(data, UserWebRequest.class);
     } catch (IOException e) {
       log.error("IOException occurred on parsing request, exception: {}", e);
-      throw new RuntimeException("Bad Request");
+      throw new BadRequestException("Bad Request");
     }
     
     return validator.validate(User.builder()

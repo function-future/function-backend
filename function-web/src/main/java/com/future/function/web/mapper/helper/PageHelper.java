@@ -1,10 +1,13 @@
 package com.future.function.web.mapper.helper;
 
 import com.future.function.web.model.base.paging.Paging;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class PageHelper {
   
   public static Pageable toPage(int page, int size) {

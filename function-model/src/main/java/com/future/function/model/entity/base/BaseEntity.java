@@ -6,6 +6,9 @@ import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
+/**
+ * Base entity, to be used in auditing and to be extended by other entities.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

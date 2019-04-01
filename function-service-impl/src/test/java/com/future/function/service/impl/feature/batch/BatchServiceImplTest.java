@@ -1,5 +1,6 @@
 package com.future.function.service.impl.feature.batch;
 
+import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.batch.Batch;
 import com.future.function.repository.feature.batch.BatchRepository;
 import org.junit.After;
@@ -168,8 +169,8 @@ public class BatchServiceImplTest {
     try {
       batchService.getBatch(FIRST_BATCH_NUMBER);
     } catch (Exception e) {
-      assertThat(e).isInstanceOf(RuntimeException.class);
-      assertThat(e.getMessage()).isEqualTo("Not Found");
+      assertThat(e).isInstanceOf(NotFoundException.class);
+      assertThat(e.getMessage()).isEqualTo("Get Batch Not Found");
     }
     
     verify(batchRepository, times(1)).findByNumberAndDeletedIsFalse(
@@ -185,7 +186,7 @@ public class BatchServiceImplTest {
     try {
       batchService.deleteBatch(SECOND_BATCH_NUMBER);
     } catch (Exception e) {
-      assertThat(e).isInstanceOf(RuntimeException.class);
+      assertThat(e).isInstanceOf(NotFoundException.class);
       assertThat(e.getMessage()).isEqualTo("Delete Batch Not Found");
     }
     

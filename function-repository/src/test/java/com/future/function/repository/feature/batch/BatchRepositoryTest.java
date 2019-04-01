@@ -17,38 +17,38 @@ import static org.assertj.core.api.Assertions.assertThat;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = TestApplication.class)
 public class BatchRepositoryTest {
-
+  
   private static final Long NUMBER = 1L;
-
+  
   @Autowired
   private BatchRepository batchRepository;
-
+  
   private Batch batch;
-
+  
   @Before
   public void setUp() throws Exception {
-
+    
     batch = Batch.builder()
       .number(NUMBER)
       .build();
     batchRepository.save(batch);
   }
-
+  
   @After
   public void tearDown() throws Exception {
-
+    
     batchRepository.deleteAll();
   }
-
+  
   @Test
   public void testGivenBatchNumberByFindingBatchByNumberReturnBatchObject() {
-
+    
     Optional<Batch> foundBatch = batchRepository.findByNumberAndDeletedIsFalse(
       NUMBER);
-
+    
     assertThat(foundBatch).isNotEqualTo(Optional.empty());
     assertThat(foundBatch.get()
                  .getNumber()).isEqualTo(NUMBER);
   }
-
+  
 }

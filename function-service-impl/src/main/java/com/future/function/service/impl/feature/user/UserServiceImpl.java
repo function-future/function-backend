@@ -1,5 +1,6 @@
 package com.future.function.service.impl.feature.user;
 
+import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.user.User;
 import com.future.function.model.util.constant.Role;
 import com.future.function.repository.feature.user.UserRepository;
@@ -14,12 +15,15 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Optional;
 
+/**
+ * Service implementation class for user logic operations implementation.
+ */
 @Service
 public class UserServiceImpl implements UserService {
   
-  private BatchService batchService;
+  private final BatchService batchService;
   
-  private UserRepository userRepository;
+  private final UserRepository userRepository;
   
   @Autowired
   public UserServiceImpl(
@@ -34,7 +38,7 @@ public class UserServiceImpl implements UserService {
   public User getUser(String email) {
     
     return userRepository.findByEmail(email)
-      .orElseThrow(() -> new RuntimeException("Get User Not Found"));
+      .orElseThrow(() -> new NotFoundException("Get User Not Found"));
   }
   
   @Override
@@ -66,7 +70,7 @@ public class UserServiceImpl implements UserService {
         BeanUtils.copyProperties(user, foundUser);
         return userRepository.save(foundUser);
       })
-      .orElseThrow(() -> new RuntimeException("Update User Not Found"));
+      .orElseThrow(() -> new NotFoundException("Update User Not Found"));
     
     //TODO save image
     
@@ -80,7 +84,7 @@ public class UserServiceImpl implements UserService {
     Optional<User> targetUser = userRepository.findByEmail(email);
     
     if (!targetUser.isPresent()) {
-      throw new RuntimeException("Delete User Not Found");
+      throw new NotFoundException("Delete User Not Found");
     } else {
       targetUser.get()
         .setDeleted(true);

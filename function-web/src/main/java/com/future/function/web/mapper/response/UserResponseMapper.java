@@ -6,12 +6,15 @@ import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.model.base.DataResponse;
 import com.future.function.web.model.base.PagingResponse;
 import com.future.function.web.model.response.user.UserWebResponse;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UserResponseMapper {
   
   public static DataResponse<UserWebResponse> toUserDataResponse(User user) {

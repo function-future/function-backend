@@ -5,6 +5,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Model representation for paging.
+ */
 @Data
 @Builder
 @NoArgsConstructor

@@ -5,7 +5,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Use {@code @RestController} and {@code @RequestMapping(value = API_PATH)}
+ * Use {@link org.springframework.web.bind.annotation.RestController} and
+ * {@code @RequestMapping(value = API_PATH)}
  * annotations before class name
  */
 @RestController

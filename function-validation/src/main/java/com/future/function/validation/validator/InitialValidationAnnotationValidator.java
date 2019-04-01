@@ -6,8 +6,7 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
 /**
- * Must implement {@code ConstraintValidator<Annotation, EvaluatedObject>}
- * interface
+ * Must implement {@link javax.validation.ConstraintValidator} interface
  */
 public class InitialValidationAnnotationValidator
   implements ConstraintValidator<InitialValidationAnnotation, String> {
