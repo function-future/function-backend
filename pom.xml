@@ -41,6 +41,7 @@
     <?SORTPOM IGNORE?>
     <sonar.coverage.exclusions>
       **/FunctionApplication.java,
+      **/exception/**,
       **/model/**,
       **/service/api/**
     </sonar.coverage.exclusions>

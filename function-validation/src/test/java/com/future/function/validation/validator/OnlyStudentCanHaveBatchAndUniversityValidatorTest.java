@@ -1,6 +1,7 @@
 package com.future.function.validation.validator;
 
 import com.future.function.common.data.UserData;
+import com.future.function.validation.annotation.OnlyStudentCanHaveBatchAndUniversity;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,12 +30,16 @@ public class OnlyStudentCanHaveBatchAndUniversityValidatorTest {
   @Mock
   private UserData userData;
   
+  @Mock
+  private OnlyStudentCanHaveBatchAndUniversity annotation;
+  
   @InjectMocks
   private OnlyStudentCanHaveBatchAndUniversityValidator validator;
   
   @Before
   public void setUp() {
   
+    validator.initialize(annotation);
   }
   
   @After
