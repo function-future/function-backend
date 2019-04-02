@@ -160,6 +160,7 @@
           <?SORTPOM IGNORE?>
           <excludes>
             <exclude>**/FunctionApplication.java,</exclude>
+            <exclude>**/exception/**,</exclude>
             <exclude>**/model/**,</exclude>
             <exclude>**/service/api/**</exclude>
           </excludes>
