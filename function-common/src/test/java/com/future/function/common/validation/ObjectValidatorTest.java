@@ -36,9 +36,6 @@ public class ObjectValidatorTest {
   
   private DummyData dummyData;
   
-  @Before
-  public void setUp() {}
-  
   @BeforeClass
   public static void setUpClass() {
     
@@ -46,16 +43,19 @@ public class ObjectValidatorTest {
     realValidator = validatorFactory.getValidator();
   }
   
-  @After
-  public void tearDown() {
-  
-    verifyNoMoreInteractions(validator);
-  }
-  
   @AfterClass
   public static void tearDownClass() {
     
     validatorFactory.close();
+  }
+  
+  @Before
+  public void setUp() {}
+  
+  @After
+  public void tearDown() {
+    
+    verifyNoMoreInteractions(validator);
   }
   
   @Test
@@ -66,14 +66,15 @@ public class ObjectValidatorTest {
       .string("String")
       .build();
     
-    when(validator.validate(dummyData)).thenReturn(realValidator.validate(dummyData));
+    when(validator.validate(dummyData)).thenReturn(
+      realValidator.validate(dummyData));
     
     DummyData validatedDummyData = objectValidator.validate(dummyData);
     
     assertThat(validatedDummyData).isNotNull();
     assertThat(validatedDummyData.getNumber()).isEqualTo(11);
     assertThat(validatedDummyData.getString()).isEqualTo("String");
-  
+    
     verify(validator, times(1)).validate(dummyData);
   }
   
@@ -84,8 +85,9 @@ public class ObjectValidatorTest {
       .number(7)
       .string("")
       .build();
-  
-    when(validator.validate(dummyData)).thenReturn(realValidator.validate(dummyData));
+    
+    when(validator.validate(dummyData)).thenReturn(
+      realValidator.validate(dummyData));
     
     try {
       objectValidator.validate(dummyData);
