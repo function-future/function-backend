@@ -2,13 +2,14 @@ package com.future.function.common.exception;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
+import java.util.Collections;
 import java.util.Set;
 
 public class BadRequestException extends ConstraintViolationException {
   
   public BadRequestException(String message) {
     
-    this(message, null);
+    this(message, Collections.emptySet());
   }
   
   public <T> BadRequestException(

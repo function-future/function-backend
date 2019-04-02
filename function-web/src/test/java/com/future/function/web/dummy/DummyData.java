@@ -1,4 +1,4 @@
-package com.future.function.web;
+package com.future.function.web.dummy;
 
 import lombok.NoArgsConstructor;
 
