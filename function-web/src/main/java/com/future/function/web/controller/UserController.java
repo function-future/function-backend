@@ -1,6 +1,6 @@
 package com.future.function.web.controller;
 
-import com.future.function.model.util.constant.Role;
+import com.future.function.common.enumeration.Role;
 import com.future.function.service.api.feature.user.UserService;
 import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;

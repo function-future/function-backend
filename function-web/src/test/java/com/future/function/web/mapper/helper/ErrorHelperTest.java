@@ -2,7 +2,7 @@ package com.future.function.web.mapper.helper;
 
 import com.future.function.model.entity.feature.batch.Batch;
 import com.future.function.model.entity.feature.user.User;
-import com.future.function.model.util.constant.Role;
+import com.future.function.common.enumeration.Role;
 import com.future.function.web.dummy.DummyData;
 import org.junit.After;
 import org.junit.AfterClass;

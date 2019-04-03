@@ -2,9 +2,9 @@ package com.future.function.service.impl.feature.user;
 
 import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.batch.Batch;
-import com.future.function.model.entity.feature.file.FileInfo;
+import com.future.function.model.entity.feature.file.File;
 import com.future.function.model.entity.feature.user.User;
-import com.future.function.model.util.constant.Role;
+import com.future.function.common.enumeration.Role;
 import com.future.function.repository.feature.user.UserRepository;
 import com.future.function.service.api.feature.batch.BatchService;
 import org.junit.After;
@@ -52,7 +52,7 @@ public class UserServiceImplTest {
   
   private static final String PHONE = "phone";
   
-  private static final FileInfo PICTURE = FileInfo.builder()
+  private static final File PICTURE = File.builder()
     .build();
   
   private static final String UNIVERSITY = "university";

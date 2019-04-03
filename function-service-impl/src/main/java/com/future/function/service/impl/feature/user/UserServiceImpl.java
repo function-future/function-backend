@@ -2,7 +2,7 @@ package com.future.function.service.impl.feature.user;
 
 import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.user.User;
-import com.future.function.model.util.constant.Role;
+import com.future.function.common.enumeration.Role;
 import com.future.function.repository.feature.user.UserRepository;
 import com.future.function.service.api.feature.batch.BatchService;
 import com.future.function.service.api.feature.user.UserService;

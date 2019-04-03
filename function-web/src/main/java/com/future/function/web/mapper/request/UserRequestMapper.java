@@ -5,7 +5,7 @@ import com.future.function.common.exception.BadRequestException;
 import com.future.function.common.validation.ObjectValidator;
 import com.future.function.model.entity.feature.batch.Batch;
 import com.future.function.model.entity.feature.user.User;
-import com.future.function.model.util.constant.Role;
+import com.future.function.common.enumeration.Role;
 import com.future.function.web.model.request.user.UserWebRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
