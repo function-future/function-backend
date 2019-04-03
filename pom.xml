@@ -36,6 +36,8 @@
 
     <spring-security-test.version>5.1.4.RELEASE</spring-security-test.version>
 
+    <commons-io.version>2.6</commons-io.version>
+
     <jackson-annotations.version>2.8.0</jackson-annotations.version>
 
     <?SORTPOM IGNORE?>
@@ -51,6 +53,12 @@
   <dependencyManagement>
 
     <dependencies>
+
+      <dependency>
+        <groupId>commons-io</groupId>
+        <artifactId>commons-io</artifactId>
+        <version>${commons-io.version}</version>
+      </dependency>
 
       <dependency>
         <groupId>org.springframework.security</groupId>

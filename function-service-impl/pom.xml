@@ -38,6 +38,12 @@
       </exclusions>
     </dependency>
 
+    <!-- other dependencies -->
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+    </dependency>
+
     <!-- spring dependencies -->
     <dependency>
       <groupId>org.springframework.boot</groupId>

@@ -5,9 +5,9 @@ package com.future.function.model.util.constant;
  */
 public abstract class DocumentName {
   
-  public static final String INITIAL_ENTITY = "initial_entities";
-  
   public static final String BATCH = "batches";
+  
+  public static final String FILE = "files";
   
   public static final String USER = "users";
   
