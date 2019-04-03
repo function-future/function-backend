@@ -1,10 +1,12 @@
 package com.future.function.service.impl.feature.user;
 
+import com.future.function.common.enumeration.FileOrigin;
+import com.future.function.common.enumeration.Role;
 import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.user.User;
-import com.future.function.common.enumeration.Role;
 import com.future.function.repository.feature.user.UserRepository;
 import com.future.function.service.api.feature.batch.BatchService;
+import com.future.function.service.api.feature.file.FileService;
 import com.future.function.service.api.feature.user.UserService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,15 +25,19 @@ public class UserServiceImpl implements UserService {
   
   private final BatchService batchService;
   
+  private final FileService fileService;
+  
   private final UserRepository userRepository;
   
   @Autowired
   public UserServiceImpl(
-    UserRepository userRepository, BatchService batchService
+    BatchService batchService, FileService fileService,
+    UserRepository userRepository
   ) {
     
-    this.userRepository = userRepository;
     this.batchService = batchService;
+    this.fileService = fileService;
+    this.userRepository = userRepository;
   }
   
   @Override
@@ -55,9 +61,9 @@ public class UserServiceImpl implements UserService {
                                             .getNumber()));
     }
     
-    userRepository.save(user);
+    user.setPicture(fileService.storeFile(image, FileOrigin.USER));
     
-    //TODO save image
+    userRepository.save(user);
     
     return user;
   }
@@ -67,15 +73,22 @@ public class UserServiceImpl implements UserService {
     
     userRepository.findByEmail(user.getEmail())
       .map(foundUser -> {
+        resetUserPicture(user, image, foundUser);
         BeanUtils.copyProperties(user, foundUser);
         return userRepository.save(foundUser);
       })
       .orElseThrow(() -> new NotFoundException("Update User Not Found"));
     
-    //TODO save image
     
     return userRepository.findByEmail(user.getEmail())
       .orElse(null);
+  }
+  
+  private void resetUserPicture(User user, MultipartFile image, User foundUser) {
+    
+    fileService.deleteFile(foundUser.getPicture()
+                             .getId());
+    user.setPicture(fileService.storeFile(image, FileOrigin.USER));
   }
   
   @Override

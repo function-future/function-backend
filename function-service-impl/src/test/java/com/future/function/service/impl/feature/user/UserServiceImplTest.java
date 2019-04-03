@@ -1,12 +1,14 @@
 package com.future.function.service.impl.feature.user;
 
+import com.future.function.common.enumeration.FileOrigin;
+import com.future.function.common.enumeration.Role;
 import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.batch.Batch;
 import com.future.function.model.entity.feature.file.File;
 import com.future.function.model.entity.feature.user.User;
-import com.future.function.common.enumeration.Role;
 import com.future.function.repository.feature.user.UserRepository;
 import com.future.function.service.api.feature.batch.BatchService;
+import com.future.function.service.api.feature.file.FileService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,6 +20,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.mock.web.MockMultipartFile;
 
 import java.util.Arrays;
 import java.util.List;
@@ -57,12 +60,18 @@ public class UserServiceImplTest {
   
   private static final String UNIVERSITY = "university";
   
+  private static final MockMultipartFile MOCK_MULTIPARTFILE =
+    new MockMultipartFile("mock", "mock.png", "image/png", new byte[] {});
+  
   private User additionalUser;
+  
+  private User userMentor;
   
   @Mock
   private BatchService batchService;
   
-  private User userMentor;
+  @Mock
+  private FileService fileService;
   
   @Mock
   private UserRepository userRepository;
@@ -98,6 +107,10 @@ public class UserServiceImplTest {
       .build();
     
     when(batchService.getBatch(NUMBER)).thenReturn(BATCH);
+    when(fileService.storeFile(MOCK_MULTIPARTFILE, FileOrigin.USER)).thenReturn(
+      File.builder()
+        .asResource(true)
+        .build());
     when(userRepository.findByEmail(EMAIL_MENTOR)).thenReturn(
       Optional.of(userMentor));
     when(userRepository.findByEmail(EMAIL_STUDENT)).thenReturn(
@@ -107,8 +120,7 @@ public class UserServiceImplTest {
   @After
   public void tearDown() {
     
-    verifyNoMoreInteractions(userRepository);
-    verifyNoMoreInteractions(batchService);
+    verifyNoMoreInteractions(batchService, fileService, userRepository);
   }
   
   @Test
@@ -124,8 +136,8 @@ public class UserServiceImplTest {
     assertThat(foundUserStudent).isNotNull();
     assertThat(foundUserStudent).isEqualTo(userStudent);
     
-    verify(userRepository, times(1)).findByEmail(EMAIL_MENTOR);
-    verify(userRepository, times(1)).findByEmail(EMAIL_STUDENT);
+    verify(userRepository).findByEmail(EMAIL_MENTOR);
+    verify(userRepository).findByEmail(EMAIL_STUDENT);
   }
   
   @Test
@@ -141,7 +153,7 @@ public class UserServiceImplTest {
       assertThat(e.getMessage()).isEqualTo("Delete User Not Found");
     }
     
-    verify(userRepository, times(1)).findByEmail(NON_EXISTING_USER_EMAIL);
+    verify(userRepository).findByEmail(NON_EXISTING_USER_EMAIL);
   }
   
   @Test
@@ -176,7 +188,7 @@ public class UserServiceImplTest {
       assertThat(e.getMessage()).isEqualTo("Get User Not Found");
     }
     
-    verify(userRepository, times(1)).findByEmail(NON_EXISTING_USER_EMAIL);
+    verify(userRepository).findByEmail(NON_EXISTING_USER_EMAIL);
   }
   
   @Test
@@ -226,8 +238,44 @@ public class UserServiceImplTest {
     assertThat(foundUserStudentsPage).isNotNull();
     assertThat(foundUserStudentsPage.getContent()).isEqualTo(studentsList);
     
-    verify(userRepository, times(1)).findAllByRole(Role.MENTOR, PAGEABLE);
-    verify(userRepository, times(1)).findAllByRole(Role.STUDENT, PAGEABLE);
+    verify(userRepository).findAllByRole(Role.MENTOR, PAGEABLE);
+    verify(userRepository).findAllByRole(Role.STUDENT, PAGEABLE);
+  }
+  
+  @Test
+  public void testGivenUserDataByCreatingUserReturnUserObject() {
+    
+    userMentor.setPicture(File.builder()
+                            .asResource(true)
+                            .build());
+    User createdUserMentor = userService.createUser(
+      userMentor, MOCK_MULTIPARTFILE);
+    
+    assertThat(createdUserMentor).isNotNull();
+    assertThat(createdUserMentor.getPicture()).isEqualTo(File.builder()
+                                                           .asResource(true)
+                                                           .build());
+    
+    verify(fileService).storeFile(MOCK_MULTIPARTFILE, FileOrigin.USER);
+    verify(userRepository).save(userMentor);
+    
+    userStudent.setPicture(File.builder()
+                             .asResource(true)
+                             .build());
+    User createdUserStudent = userService.createUser(
+      userStudent, MOCK_MULTIPARTFILE);
+    
+    assertThat(createdUserStudent).isNotNull();
+    assertThat(createdUserStudent.getPicture()).isEqualTo(File.builder()
+                                                            .asResource(true)
+                                                            .build());
+    
+    verify(batchService).getBatch(NUMBER);
+    verify(fileService, times(2)).storeFile(MOCK_MULTIPARTFILE,
+                                            FileOrigin.USER
+    );
+    verify(userRepository).save(userMentor);
+    verify(userRepository).save(userStudent);
   }
   
 }
