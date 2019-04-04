@@ -7,6 +7,7 @@ import com.future.function.model.entity.feature.file.File;
 import com.future.function.repository.feature.file.FileRepository;
 import com.future.function.service.api.feature.file.FileService;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,17 +21,18 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
 public class FileServiceImpl implements FileService {
   
   private static final List<String> IMAGE_EXTENSIONS = Arrays.asList(
-    "jpg", "jpeg", "png");
+    ".jpg", ".jpeg", ".png");
   
-  private static final String BASE_URL = "http://localhost:8080/resource";
+  private static final String BASE_URL = "http://localhost:8080/files/resource";
   
-  private static final String BASE_PATH = "C:\\function\\images";
+  private static final String BASE_PATH = "C:\\function\\files\\static";
   
   private static final String URL_SEPARATOR = "/";
   
@@ -49,14 +51,43 @@ public class FileServiceImpl implements FileService {
   }
   
   @Override
-  public File getFile(String id, FileOrigin fileOrigin) {
+  public byte[] getFileAsByteArray(String fileName, FileOrigin fileOrigin) {
     
-    return fileRepository.findByIdAndAsResource(id, fileOrigin.isAsResource())
+    return fileRepository.findByIdAndAsResource(getFileId(fileName),
+                                                fileOrigin.isAsResource()
+    )
+      .map(file -> getFileOrThumbnail(file, fileName))
+      .map(this::getBytesFromJavaIoFile)
       .orElseThrow(() -> new NotFoundException("Get File Not Found"));
   }
   
+  private String getFileId(String fileName) {
+    
+    return fileName.substring(0, 36);
+  }
+  
+  private byte[] getBytesFromJavaIoFile(java.io.File ioFile) {
+    
+    try {
+      return IOUtils.toByteArray(ioFile.toURI());
+    } catch (IOException e) {
+      throw new BadRequestException("Unsupported Operation");
+    }
+  }
+  
+  private java.io.File getFileOrThumbnail(File file, String fileName) {
+    
+    int maxNonThumbnailFilenameLength =
+      36 + DOT.length() + FilenameUtils.getExtension(fileName)
+        .length();
+    return Optional.of(fileName)
+      .filter(name -> name.length() > maxNonThumbnailFilenameLength)
+      .map(result -> new java.io.File(file.getThumbnailPath()))
+      .orElseGet(() -> new java.io.File(file.getFilePath()));
+  }
+  
   @Override
-  public File storeFile(MultipartFile multipartFile, FileOrigin origin) {
+  public File storeFile(MultipartFile multipartFile, FileOrigin fileOrigin) {
     
     String id = UUID.randomUUID()
       .toString();
@@ -65,14 +96,14 @@ public class FileServiceImpl implements FileService {
       .toLowerCase();
     
     String folderPath = constructPathOrUrl(BASE_PATH, PATH_SEPARATOR,
-                                           origin.name()
+                                           fileOrigin.name()
                                              .toLowerCase(), PATH_SEPARATOR, id
     );
     
     Image thumbnailImage;
     String thumbnailPath;
     String thumbnailUrl;
-    switch (origin) {
+    switch (fileOrigin) {
       case USER:
         if (!IMAGE_EXTENSIONS.contains(extension)) {
           throw new BadRequestException("Invalid Extension");
@@ -81,16 +112,18 @@ public class FileServiceImpl implements FileService {
         thumbnailImage = toThumbnailImage(multipartFile);
         thumbnailPath = constructPathOrUrl(
           folderPath, PATH_SEPARATOR, id, THUMBNAIL_SUFFIX, extension);
-        thumbnailUrl = constructPathOrUrl(BASE_URL, URL_SEPARATOR, id,
-                                          THUMBNAIL_SUFFIX, extension
-        );
+        thumbnailUrl = constructPathOrUrl(
+          BASE_URL + URL_SEPARATOR + fileOrigin.name()
+            .toLowerCase(), URL_SEPARATOR, id, THUMBNAIL_SUFFIX, extension);
         break;
       default:
         throw new BadRequestException("Invalid File Origin");
     }
     
-    if (!Files.exists(Paths.get(folderPath))) {
-      new java.io.File(folderPath).mkdir();
+    java.io.File folder = Paths.get(folderPath)
+      .toFile();
+    if (!folder.exists()) {
+      folder.mkdirs();
     }
     
     String filePath = constructPathOrUrl(
@@ -109,17 +142,19 @@ public class FileServiceImpl implements FileService {
       throw new BadRequestException("Unsupported Operation");
     }
     
-    String fileUrl = constructPathOrUrl(BASE_URL, URL_SEPARATOR, id, extension);
+    String fileUrl = constructPathOrUrl(
+      BASE_URL + URL_SEPARATOR + fileOrigin.name()
+        .toLowerCase(), URL_SEPARATOR, id, extension);
     
-    return File.builder()
-      .id(id)
-      .filePath(filePath)
-      .fileUrl(fileUrl)
-      .thumbnailPath(thumbnailPath)
-      .thumbnailUrl(thumbnailUrl)
-      .asResource(origin.isAsResource())
-      .markFolder(false)
-      .build();
+    return fileRepository.save(File.builder()
+                                 .id(id)
+                                 .filePath(filePath)
+                                 .fileUrl(fileUrl)
+                                 .thumbnailPath(thumbnailPath)
+                                 .thumbnailUrl(thumbnailUrl)
+                                 .asResource(fileOrigin.isAsResource())
+                                 .markFolder(false)
+                                 .build());
   }
   
   @Override
