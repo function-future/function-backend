@@ -5,6 +5,7 @@ import javax.validation.ConstraintViolationException;
 import java.util.Collections;
 import java.util.Set;
 
+@SuppressWarnings("squid:MaximumInheritanceDepth")
 public class BadRequestException extends ConstraintViolationException {
   
   public BadRequestException(String message) {
