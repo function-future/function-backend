@@ -16,6 +16,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -218,8 +219,8 @@ public class UserServiceImplTest {
   @Test
   public void testGivenStudentDataByCreatingUserReturnStudent() {
     
-    userStudent.setPicture(PICTURE);
-    
+    when(userRepository.findByEmail(EMAIL_STUDENT)).thenReturn(
+      Optional.empty());
     when(batchService.getBatch(NUMBER)).thenReturn(BATCH);
     when(fileService.storeFile(MOCK_MULTIPARTFILE, FileOrigin.USER)).thenReturn(
       PICTURE);
@@ -235,6 +236,7 @@ public class UserServiceImplTest {
     assertThat(createdUserStudent.getPicture()).isNotNull();
     assertThat(createdUserStudent.getPicture()).isEqualTo(PICTURE);
     
+    verify(userRepository).findByEmail(EMAIL_STUDENT);
     verify(batchService).getBatch(NUMBER);
     verify(fileService).storeFile(MOCK_MULTIPARTFILE, FileOrigin.USER);
     verify(fileService).getFile(PICTURE_ID);
@@ -244,8 +246,7 @@ public class UserServiceImplTest {
   @Test
   public void testGivenMentorDataByCreatingUserReturnMentor() {
     
-    userMentor.setPicture(PICTURE);
-    
+    when(userRepository.findByEmail(EMAIL_MENTOR)).thenReturn(Optional.empty());
     when(userRepository.save(userMentor)).thenReturn(userMentor);
     when(fileService.storeFile(MOCK_MULTIPARTFILE, FileOrigin.USER)).thenReturn(
       PICTURE);
@@ -258,9 +259,57 @@ public class UserServiceImplTest {
     assertThat(createdUserMentor.getPicture()).isNotNull();
     assertThat(createdUserMentor.getPicture()).isEqualTo(PICTURE);
     
+    verify(userRepository).findByEmail(EMAIL_MENTOR);
     verify(userRepository).save(userMentor);
     verify(fileService).storeFile(MOCK_MULTIPARTFILE, FileOrigin.USER);
     verify(fileService).getFile(PICTURE_ID);
+  }
+  
+  @Test
+  public void testGivenDeletedStudentDataByCreatingUserReturnStudent() {
+    
+    when(batchService.getBatch(NUMBER)).thenReturn(BATCH);
+    
+    userStudent.setDeleted(true);
+    
+    when(userRepository.findByEmail(EMAIL_STUDENT)).thenReturn(
+      Optional.of(userStudent));
+    
+    User savedUserStudent;
+    BeanUtils.copyProperties(userStudent, savedUserStudent = new User());
+    savedUserStudent.setDeleted(false);
+    when(userRepository.save(savedUserStudent)).thenReturn(savedUserStudent);
+    
+    User createdUserStudent = userService.createUser(
+      userStudent, MOCK_MULTIPARTFILE);
+    
+    assertThat(createdUserStudent).isNotNull();
+    
+    verify(batchService).getBatch(NUMBER);
+    verify(userRepository).findByEmail(EMAIL_STUDENT);
+    verify(userRepository, times(2)).save(savedUserStudent);
+  }
+  
+  @Test
+  public void testGivenDeletedMentorDataByCreatingUserReturnMentor() {
+    
+    userMentor.setDeleted(true);
+    
+    when(userRepository.findByEmail(EMAIL_MENTOR)).thenReturn(
+      Optional.of(userMentor));
+    
+    User savedUserMentor;
+    BeanUtils.copyProperties(userMentor, savedUserMentor = new User());
+    savedUserMentor.setDeleted(false);
+    when(userRepository.save(savedUserMentor)).thenReturn(savedUserMentor);
+    
+    User createdUserMentor = userService.createUser(
+      userMentor, MOCK_MULTIPARTFILE);
+    
+    assertThat(createdUserMentor).isNotNull();
+    
+    verify(userRepository).findByEmail(EMAIL_MENTOR);
+    verify(userRepository, times(2)).save(savedUserMentor);
   }
   
   @Test

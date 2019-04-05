@@ -62,6 +62,21 @@ public class UserServiceImpl implements UserService {
                                             .getNumber()));
     }
     
+    return userRepository.findByEmail(user.getEmail())
+      .filter(User::isDeleted)
+      .map(foundUser -> markDeleted(foundUser, false))
+      .map(foundUser -> copyPropertiesAndSaveUser(user, foundUser))
+      .orElseGet(() -> createNewUser(user, image));
+  }
+  
+  private User copyPropertiesAndSaveUser(User user, User foundUser) {
+    
+    BeanUtils.copyProperties(user, foundUser);
+    return userRepository.save(foundUser);
+  }
+  
+  private User createNewUser(User user, MultipartFile image) {
+    
     return Optional.of(user)
       .map(newUser -> setUserPicture(newUser, image))
       .map(userRepository::save)
@@ -82,7 +97,7 @@ public class UserServiceImpl implements UserService {
   
   @Override
   public User updateUser(User user, MultipartFile image) {
-  
+    
     if (user.getBatch() != null) {
       user.setBatch(batchService.getBatch(user.getBatch()
                                             .getNumber()));
@@ -91,10 +106,7 @@ public class UserServiceImpl implements UserService {
     return userRepository.findByEmail(user.getEmail())
       .map(this::deleteUserPicture)
       .map(foundUser -> setUserPicture(user, image))
-      .map(foundUser -> {
-        BeanUtils.copyProperties(user, foundUser);
-        return userRepository.save(foundUser);
-      })
+      .map(foundUser -> copyPropertiesAndSaveUser(user, foundUser))
       .orElseThrow(() -> new NotFoundException("Update User Not Found"));
   }
   
@@ -118,10 +130,15 @@ public class UserServiceImpl implements UserService {
     if (!targetUser.isPresent()) {
       throw new NotFoundException("Delete User Not Found");
     } else {
-      targetUser.get()
-        .setDeleted(true);
-      userRepository.save(targetUser.get());
+      markDeleted(targetUser.get(), true);
     }
+  }
+  
+  private User markDeleted(User user, boolean deleted) {
+    
+    user.setDeleted(deleted);
+    
+    return userRepository.save(user);
   }
   
 }
