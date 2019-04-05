@@ -100,6 +100,8 @@ public class UserController {
               consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
               produces = MediaType.APPLICATION_JSON_VALUE)
   public DataResponse<UserWebResponse> updateUser(
+    @PathVariable
+      String email,
     @RequestParam
       String data,
     @RequestParam(required = false)
@@ -107,7 +109,7 @@ public class UserController {
   ) {
     
     return UserResponseMapper.toUserDataResponse(
-      userService.updateUser(userRequestMapper.toUser(data), image));
+      userService.updateUser(userRequestMapper.toUser(email, data), image));
   }
   
 }

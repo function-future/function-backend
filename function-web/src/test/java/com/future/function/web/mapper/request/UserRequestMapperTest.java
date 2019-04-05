@@ -1,11 +1,11 @@
 package com.future.function.web.mapper.request;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.future.function.common.enumeration.Role;
 import com.future.function.common.exception.BadRequestException;
 import com.future.function.common.validation.ObjectValidator;
 import com.future.function.model.entity.feature.batch.Batch;
 import com.future.function.model.entity.feature.user.User;
-import com.future.function.common.enumeration.Role;
 import com.future.function.web.model.request.user.UserWebRequest;
 import org.junit.After;
 import org.junit.Before;
@@ -125,7 +125,7 @@ public class UserRequestMapperTest {
   }
   
   @Test
-  public void testGivenJsonDataWithInvalidFormatAsStringByParsingToUserClassReturnRuntimeException()
+  public void testGivenJsonDataWithInvalidFormatAsStringByParsingToUserClassReturnBadRequestException()
     throws Exception {
     
     try {
@@ -135,7 +135,7 @@ public class UserRequestMapperTest {
       assertThat(e.getMessage()).isEqualTo("Bad Request");
     }
     
-    verify(objectMapper, times(1)).readValue(BAD_JSON, UserWebRequest.class);
+    verify(objectMapper).readValue(BAD_JSON, UserWebRequest.class);
   }
   
   @Test
@@ -150,12 +150,12 @@ public class UserRequestMapperTest {
     
     assertThat(parsedAdmin).isEqualTo(VALID_ADMIN);
     
-    verify(objectMapper, times(1)).readValue(
+    verify(objectMapper, times(2)).readValue(
       STUDENT_JSON, UserWebRequest.class);
-    verify(objectMapper, times(1)).readValue(
+    verify(objectMapper, times(2)).readValue(
       VALID_ADMIN_JSON, UserWebRequest.class);
-    verify(validator, times(1)).validate(STUDENT);
-    verify(validator, times(1)).validate(VALID_ADMIN);
+    verify(validator).validate(STUDENT);
+    verify(validator).validate(VALID_ADMIN);
   }
   
 }

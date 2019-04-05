@@ -33,17 +33,23 @@ public class UserRequestMapper {
   
   public User toUser(String data) {
     
-    UserWebRequest request;
-    try {
-      request = objectMapper.readValue(data, UserWebRequest.class);
-    } catch (IOException e) {
-      log.error("IOException occurred on parsing request, exception: '{}'", e);
-      throw new BadRequestException("Bad Request");
-    }
+    UserWebRequest request = toUserWebRequest(data);
+    
+    return toUser(request.getEmail(), data);
+  }
+  
+  public User toUser(String email, String data) {
+    
+    UserWebRequest request = toUserWebRequest(data);
+    
+    return toUser(email, request);
+  }
+  
+  private User toUser(String email, UserWebRequest request) {
     
     User user = User.builder()
       .role(Role.toRole(request.getRole()))
-      .email(request.getEmail())
+      .email(email)
       .name(request.getName())
       .phone(request.getPhone())
       .address(request.getAddress())
@@ -69,6 +75,18 @@ public class UserRequestMapper {
         .number(batchNumber)
         .build())
       .orElse(null);
+  }
+  
+  private UserWebRequest toUserWebRequest(String data) {
+    
+    UserWebRequest request;
+    try {
+      request = objectMapper.readValue(data, UserWebRequest.class);
+    } catch (IOException e) {
+      log.error("IOException occurred on parsing request, exception: '{}'", e);
+      throw new BadRequestException("Bad Request");
+    }
+    return request;
   }
   
 }
