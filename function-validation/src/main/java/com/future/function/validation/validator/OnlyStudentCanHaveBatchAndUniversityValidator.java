@@ -36,6 +36,11 @@ public class OnlyStudentCanHaveBatchAndUniversityValidator implements
   public boolean isValid(UserData value, ConstraintValidatorContext context) {
     
     String role = value.getRoleAsString();
+    
+    if (role.equals("UNKNOWN")) {
+      return false;
+    }
+    
     Long batchNumber = value.getBatchNumber();
     String address = value.getUniversity();
     

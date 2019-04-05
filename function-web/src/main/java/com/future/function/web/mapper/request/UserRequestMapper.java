@@ -1,11 +1,11 @@
 package com.future.function.web.mapper.request;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.future.function.common.enumeration.Role;
 import com.future.function.common.exception.BadRequestException;
 import com.future.function.common.validation.ObjectValidator;
 import com.future.function.model.entity.feature.batch.Batch;
 import com.future.function.model.entity.feature.user.User;
-import com.future.function.common.enumeration.Role;
 import com.future.function.web.model.request.user.UserWebRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,27 +37,38 @@ public class UserRequestMapper {
     try {
       request = objectMapper.readValue(data, UserWebRequest.class);
     } catch (IOException e) {
-      log.error("IOException occurred on parsing request, exception: {}", e);
+      log.error("IOException occurred on parsing request, exception: '{}'", e);
       throw new BadRequestException("Bad Request");
     }
     
-    return validator.validate(User.builder()
-                                .role(Role.valueOf(request.getRole()))
-                                .email(request.getEmail())
-                                .name(request.getName())
-                                .phone(request.getPhone())
-                                .address(request.getAddress())
-                                .batch(Optional.of(request)
-                                         .map(UserWebRequest::getBatch)
-                                         .map(batchNumber -> Batch.builder()
-                                           .number(batchNumber)
-                                           .build())
-                                         .orElse(null))
-                                .university(Optional.of(request)
-                                              .map(
-                                                UserWebRequest::getUniversity)
-                                              .orElse(null))
-                                .build());
+    User user = User.builder()
+      .role(Role.toRole(request.getRole()))
+      .email(request.getEmail())
+      .name(request.getName())
+      .phone(request.getPhone())
+      .address(request.getAddress())
+      .batch(toBatch(request))
+      .university(toUniversity(request))
+      .build();
+    
+    return validator.validate(user);
+  }
+  
+  private String toUniversity(UserWebRequest request) {
+    
+    return Optional.of(request)
+      .map(UserWebRequest::getUniversity)
+      .orElse(null);
+  }
+  
+  private Batch toBatch(UserWebRequest request) {
+    
+    return Optional.of(request)
+      .map(UserWebRequest::getBatch)
+      .map(batchNumber -> Batch.builder()
+        .number(batchNumber)
+        .build())
+      .orElse(null);
   }
   
 }

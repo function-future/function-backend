@@ -11,7 +11,6 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -20,6 +19,8 @@ import static org.mockito.Mockito.when;
 public class OnlyStudentCanHaveBatchAndUniversityValidatorTest {
   
   private static final String NONSTUDENT = "NONSTUDENT";
+  
+  private static final String UNKNOWN = "UNKNOWN";
   
   private static final String STUDENT = "STUDENT";
   
@@ -45,10 +46,6 @@ public class OnlyStudentCanHaveBatchAndUniversityValidatorTest {
   @After
   public void tearDown() {
     
-    verify(userData, times(1)).getRoleAsString();
-    verify(userData, times(1)).getBatchNumber();
-    verify(userData, times(1)).getUniversity();
-    
     verifyNoMoreInteractions(userData);
   }
   
@@ -60,6 +57,20 @@ public class OnlyStudentCanHaveBatchAndUniversityValidatorTest {
     when(userData.getUniversity()).thenReturn(UNIVERSITY);
     
     assertThat(validator.isValid(userData, null)).isFalse();
+  
+    verify(userData).getRoleAsString();
+    verify(userData).getBatchNumber();
+    verify(userData).getUniversity();
+  }
+  
+  @Test
+  public void testGivenRoleUnknownAndNotNullBatchAndNotNullUniversityByValidatingUserObjectReturnFalse() {
+    
+    when(userData.getRoleAsString()).thenReturn(UNKNOWN);
+    
+    assertThat(validator.isValid(userData, null)).isFalse();
+  
+    verify(userData).getRoleAsString();
   }
   
   @Test
@@ -70,6 +81,10 @@ public class OnlyStudentCanHaveBatchAndUniversityValidatorTest {
     when(userData.getUniversity()).thenReturn(null);
     
     assertThat(validator.isValid(userData, null)).isFalse();
+  
+    verify(userData).getRoleAsString();
+    verify(userData).getBatchNumber();
+    verify(userData).getUniversity();
   }
   
   @Test
@@ -80,6 +95,10 @@ public class OnlyStudentCanHaveBatchAndUniversityValidatorTest {
     when(userData.getUniversity()).thenReturn(UNIVERSITY);
     
     assertThat(validator.isValid(userData, null)).isFalse();
+  
+    verify(userData).getRoleAsString();
+    verify(userData).getBatchNumber();
+    verify(userData).getUniversity();
   }
   
   @Test
@@ -90,6 +109,10 @@ public class OnlyStudentCanHaveBatchAndUniversityValidatorTest {
     when(userData.getUniversity()).thenReturn(null);
     
     assertThat(validator.isValid(userData, null)).isTrue();
+  
+    verify(userData).getRoleAsString();
+    verify(userData).getBatchNumber();
+    verify(userData).getUniversity();
   }
   
   @Test
@@ -100,6 +123,10 @@ public class OnlyStudentCanHaveBatchAndUniversityValidatorTest {
     when(userData.getUniversity()).thenReturn(UNIVERSITY);
     
     assertThat(validator.isValid(userData, null)).isTrue();
+  
+    verify(userData).getRoleAsString();
+    verify(userData).getBatchNumber();
+    verify(userData).getUniversity();
   }
   
   @Test
@@ -110,6 +137,10 @@ public class OnlyStudentCanHaveBatchAndUniversityValidatorTest {
     when(userData.getUniversity()).thenReturn(null);
     
     assertThat(validator.isValid(userData, null)).isFalse();
+  
+    verify(userData).getRoleAsString();
+    verify(userData).getBatchNumber();
+    verify(userData).getUniversity();
   }
   
   @Test
@@ -120,6 +151,10 @@ public class OnlyStudentCanHaveBatchAndUniversityValidatorTest {
     when(userData.getUniversity()).thenReturn(UNIVERSITY);
     
     assertThat(validator.isValid(userData, null)).isFalse();
+  
+    verify(userData).getRoleAsString();
+    verify(userData).getBatchNumber();
+    verify(userData).getUniversity();
   }
   
   @Test
@@ -130,6 +165,10 @@ public class OnlyStudentCanHaveBatchAndUniversityValidatorTest {
     when(userData.getUniversity()).thenReturn(null);
     
     assertThat(validator.isValid(userData, null)).isFalse();
+  
+    verify(userData).getRoleAsString();
+    verify(userData).getBatchNumber();
+    verify(userData).getUniversity();
   }
   
 }

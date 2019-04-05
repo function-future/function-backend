@@ -92,7 +92,7 @@ public class UserController {
   ) {
     
     return UserResponseMapper.toUsersPagingResponse(
-      userService.getUsers(Role.valueOf(role), PageHelper.toPage(page, 10)));
+      userService.getUsers(Role.toRole(role), PageHelper.toPage(page, 10)));
   }
   
   @ResponseStatus(HttpStatus.OK)
