@@ -6,6 +6,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface FileService {
   
+  File getFile(String id);
+  
   byte[] getFileAsByteArray(String fileName, FileOrigin fileOrigin);
   
   File storeFile(MultipartFile multipartFile, FileOrigin fileOrigin);

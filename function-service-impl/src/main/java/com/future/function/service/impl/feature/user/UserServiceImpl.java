@@ -3,6 +3,7 @@ package com.future.function.service.impl.feature.user;
 import com.future.function.common.enumeration.FileOrigin;
 import com.future.function.common.enumeration.Role;
 import com.future.function.common.exception.NotFoundException;
+import com.future.function.model.entity.feature.file.File;
 import com.future.function.model.entity.feature.user.User;
 import com.future.function.repository.feature.user.UserRepository;
 import com.future.function.service.api.feature.batch.BatchService;
@@ -61,34 +62,52 @@ public class UserServiceImpl implements UserService {
                                             .getNumber()));
     }
     
-    user.setPicture(fileService.storeFile(image, FileOrigin.USER));
+    return Optional.of(user)
+      .map(newUser -> setUserPicture(newUser, image))
+      .map(userRepository::save)
+      .orElseGet(() -> userRepository.save(user));
+  }
+  
+  private User setUserPicture(User user, MultipartFile image) {
     
-    userRepository.save(user);
-    
-    return user;
+    return Optional.ofNullable(image)
+      .map(img -> fileService.storeFile(img, FileOrigin.USER))
+      .map(file -> fileService.getFile(file.getId()))
+      .map(file -> {
+        user.setPicture(file);
+        return user;
+      })
+      .orElse(user);
   }
   
   @Override
   public User updateUser(User user, MultipartFile image) {
+  
+    if (user.getBatch() != null) {
+      user.setBatch(batchService.getBatch(user.getBatch()
+                                            .getNumber()));
+    }
     
-    userRepository.findByEmail(user.getEmail())
+    return userRepository.findByEmail(user.getEmail())
+      .map(this::deleteUserPicture)
+      .map(foundUser -> setUserPicture(user, image))
       .map(foundUser -> {
-        resetUserPicture(user, image, foundUser);
         BeanUtils.copyProperties(user, foundUser);
         return userRepository.save(foundUser);
       })
       .orElseThrow(() -> new NotFoundException("Update User Not Found"));
-    
-    
-    return userRepository.findByEmail(user.getEmail())
-      .orElse(null);
   }
   
-  private void resetUserPicture(User user, MultipartFile image, User foundUser) {
+  private User deleteUserPicture(User user) {
     
-    fileService.deleteFile(foundUser.getPicture()
-                             .getId());
-    user.setPicture(fileService.storeFile(image, FileOrigin.USER));
+    return Optional.of(user)
+      .map(User::getPicture)
+      .map(File::getId)
+      .map(id -> {
+        fileService.deleteFile(id);
+        return user;
+      })
+      .orElse(user);
   }
   
   @Override
@@ -101,6 +120,7 @@ public class UserServiceImpl implements UserService {
     } else {
       targetUser.get()
         .setDeleted(true);
+      userRepository.save(targetUser.get());
     }
   }
   

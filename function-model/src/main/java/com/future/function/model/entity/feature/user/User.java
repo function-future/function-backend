@@ -1,11 +1,11 @@
 package com.future.function.model.entity.feature.user;
 
 import com.future.function.common.data.UserData;
+import com.future.function.common.enumeration.Role;
 import com.future.function.model.entity.base.BaseEntity;
 import com.future.function.model.entity.feature.batch.Batch;
 import com.future.function.model.entity.feature.file.File;
 import com.future.function.model.util.constant.DocumentName;
-import com.future.function.common.enumeration.Role;
 import com.future.function.validation.annotation.OnlyStudentCanHaveBatchAndUniversity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -45,6 +45,7 @@ public class User extends BaseEntity implements UserData {
   @NotNull(message = "NotNull")
   private Role role;
   
+  @DBRef(lazy = true)
   private File picture;
   
   private String phone;

@@ -51,6 +51,13 @@ public class FileServiceImpl implements FileService {
   }
   
   @Override
+  public File getFile(String id) {
+    
+    return Optional.ofNullable(fileRepository.findOne(id))
+      .orElseThrow(() -> new NotFoundException("Get File Not Found"));
+  }
+  
+  @Override
   public byte[] getFileAsByteArray(String fileName, FileOrigin fileOrigin) {
     
     return fileRepository.findByIdAndAsResource(getFileId(fileName),
@@ -96,8 +103,8 @@ public class FileServiceImpl implements FileService {
       .toLowerCase();
     
     String folderPath = constructPathOrUrl(BASE_PATH, PATH_SEPARATOR,
-                                           fileOrigin.name()
-                                             .toLowerCase(), PATH_SEPARATOR, id
+                                           fileOrigin.lowCaseValue(),
+                                           PATH_SEPARATOR, id
     );
     
     Image thumbnailImage;
@@ -113,8 +120,9 @@ public class FileServiceImpl implements FileService {
         thumbnailPath = constructPathOrUrl(
           folderPath, PATH_SEPARATOR, id, THUMBNAIL_SUFFIX, extension);
         thumbnailUrl = constructPathOrUrl(
-          BASE_URL + URL_SEPARATOR + fileOrigin.name()
-            .toLowerCase(), URL_SEPARATOR, id, THUMBNAIL_SUFFIX, extension);
+          BASE_URL + URL_SEPARATOR + fileOrigin.lowCaseValue(), URL_SEPARATOR,
+          id, THUMBNAIL_SUFFIX, extension
+        );
         break;
       default:
         throw new BadRequestException("Invalid File Origin");
@@ -129,32 +137,35 @@ public class FileServiceImpl implements FileService {
     String filePath = constructPathOrUrl(
       folderPath, PATH_SEPARATOR, id, extension);
     
-    java.io.File file = new java.io.File(filePath);
-    java.io.File thumbnailFile = new java.io.File(thumbnailPath);
+    java.io.File ioFile = new java.io.File(filePath);
+    java.io.File thumbnailIoFile = new java.io.File(thumbnailPath);
     
     try {
-      multipartFile.transferTo(file);
+      multipartFile.transferTo(ioFile);
       
       ImageIO.write(toBufferedThumbnailImage(thumbnailImage),
-                    extension.substring(1), thumbnailFile
+                    extension.substring(1), thumbnailIoFile
       );
     } catch (IOException e) {
       throw new BadRequestException("Unsupported Operation");
     }
     
     String fileUrl = constructPathOrUrl(
-      BASE_URL + URL_SEPARATOR + fileOrigin.name()
-        .toLowerCase(), URL_SEPARATOR, id, extension);
+      BASE_URL + URL_SEPARATOR + fileOrigin.lowCaseValue(), URL_SEPARATOR, id,
+      extension
+    );
     
-    return fileRepository.save(File.builder()
-                                 .id(id)
-                                 .filePath(filePath)
-                                 .fileUrl(fileUrl)
-                                 .thumbnailPath(thumbnailPath)
-                                 .thumbnailUrl(thumbnailUrl)
-                                 .asResource(fileOrigin.isAsResource())
-                                 .markFolder(false)
-                                 .build());
+    File file = File.builder()
+      .id(id)
+      .filePath(filePath)
+      .fileUrl(fileUrl)
+      .thumbnailPath(thumbnailPath)
+      .thumbnailUrl(thumbnailUrl)
+      .asResource(fileOrigin.isAsResource())
+      .markFolder(false)
+      .build();
+    
+    return fileRepository.save(file);
   }
   
   @Override
