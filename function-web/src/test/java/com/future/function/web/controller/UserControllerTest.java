@@ -17,6 +17,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -31,6 +32,8 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(UserController.class)
@@ -66,6 +69,13 @@ public class UserControllerTest {
              .build())
     .university(UNIVERSITY)
     .build();
+  
+  private static final String STUDENT_JSON =
+    "{\n" + "    \"role\": \"STUDENT\",\n" + "    \"email\": \"" +
+    STUDENT_EMAIL + "\",\n" + "    \"name\": \"" + NAME + "\",\n" +
+    "    \"phone\": \"" + PHONE + "\",\n" + "    \"address\": \"" + ADDRESS +
+    "\",\n" + "    \"batch\": " + NUMBER + ",\n" + "    \"university\": \"" +
+    UNIVERSITY + "\"\n" + "}";
   
   private static final Pageable PAGEABLE = new PageRequest(0, 10);
   
@@ -140,6 +150,76 @@ public class UserControllerTest {
     
     verify(userService).getUser(STUDENT_EMAIL);
     verifyZeroInteractions(userRequestMapper);
+  }
+  
+  @Test
+  public void testGivenUserDataAsStringAndImageByCreatingUserReturnDataResponseUser()
+    throws Exception {
+    
+    User student = User.builder()
+      .role(Role.STUDENT)
+      .email(STUDENT_EMAIL)
+      .name(NAME)
+      .phone(PHONE)
+      .address(ADDRESS)
+      .batch(Batch.builder()
+               .number(NUMBER)
+               .build())
+      .university(UNIVERSITY)
+      .build();
+    
+    given(userRequestMapper.toUser(STUDENT_JSON)).willReturn(student);
+    given(userService.createUser(student, null)).willReturn(STUDENT);
+    
+    MockHttpServletResponse response = mockMvc.perform(post(
+      "/api/core/users").contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
+                                                         .param("data",
+                                                                STUDENT_JSON
+                                                         )
+                                                         .param("image", ""))
+      .andReturn()
+      .getResponse();
+    
+    assertThat(response.getStatus()).isEqualTo(HttpStatus.CREATED.value());
+    assertThat(response.getContentAsString()).isNotBlank();
+    
+    verify(userService).createUser(student, null);
+    verify(userRequestMapper).toUser(STUDENT_JSON);
+  }
+  
+  @Test
+  public void testGivenEmailFromPathVariableAndUserDataAsStringaAndImageByUpdatingUserReturnDataResponseUser()
+    throws Exception {
+    
+    User student = User.builder()
+      .role(Role.STUDENT)
+      .email(STUDENT_EMAIL)
+      .name(NAME)
+      .phone(PHONE)
+      .address(ADDRESS)
+      .batch(Batch.builder()
+               .number(NUMBER)
+               .build())
+      .university(UNIVERSITY)
+      .build();
+  
+    given(userRequestMapper.toUser(STUDENT_EMAIL, STUDENT_JSON)).willReturn(student);
+    given(userService.updateUser(student, null)).willReturn(STUDENT);
+  
+    MockHttpServletResponse response = mockMvc.perform(put(
+      "/api/core/users/" + STUDENT_EMAIL).contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
+                                                         .param("data",
+                                                                STUDENT_JSON
+                                                         )
+                                                         .param("image", ""))
+      .andReturn()
+      .getResponse();
+  
+    assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+    assertThat(response.getContentAsString()).isNotBlank();
+  
+    verify(userService).updateUser(student, null);
+    verify(userRequestMapper).toUser(STUDENT_EMAIL, STUDENT_JSON);
   }
   
 }
