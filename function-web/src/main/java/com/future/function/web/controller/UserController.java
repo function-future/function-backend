@@ -55,7 +55,9 @@ public class UserController {
   ) {
     
     return UserResponseMapper.toUserDataResponse(
-      userService.createUser(userRequestMapper.toUser(data), image));
+      HttpStatus.CREATED,
+      userService.createUser(userRequestMapper.toUser(data), image)
+    );
   }
   
   @ResponseStatus(HttpStatus.OK)

@@ -26,7 +26,6 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -79,15 +78,14 @@ public class UserControllerTest {
   @MockBean
   private UserRequestMapper userRequestMapper;
   
+  @Before
+  public void setUp() {}
+  
   @After
   public void tearDown() {
     
-    verifyNoMoreInteractions(userService);
-    verifyNoMoreInteractions(userRequestMapper);
+    verifyNoMoreInteractions(userService, userRequestMapper);
   }
-  
-  @Before
-  public void setUp() {}
   
   @Test
   public void testGivenCallToUsersApiByGettingUsersFromUserServiceReturnPagingResponseOfUsers()
@@ -106,7 +104,7 @@ public class UserControllerTest {
     assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
     assertThat(response.getContentAsString()).isNotBlank();
     
-    verify(userService, times(1)).getUsers(Role.STUDENT, PAGEABLE);
+    verify(userService).getUsers(Role.STUDENT, PAGEABLE);
     verifyZeroInteractions(userRequestMapper);
   }
   
@@ -122,7 +120,7 @@ public class UserControllerTest {
     assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
     assertThat(response.getContentAsString()).isNotBlank();
     
-    verify(userService, times(1)).deleteUser(STUDENT_EMAIL);
+    verify(userService).deleteUser(STUDENT_EMAIL);
     verifyZeroInteractions(userRequestMapper);
   }
   
@@ -140,7 +138,7 @@ public class UserControllerTest {
     assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
     assertThat(response.getContentAsString()).isNotBlank();
     
-    verify(userService, times(1)).getUser(STUDENT_EMAIL);
+    verify(userService).getUser(STUDENT_EMAIL);
     verifyZeroInteractions(userRequestMapper);
   }
   

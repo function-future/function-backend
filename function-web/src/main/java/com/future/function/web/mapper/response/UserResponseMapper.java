@@ -3,6 +3,7 @@ package com.future.function.web.mapper.response;
 import com.future.function.model.entity.feature.batch.Batch;
 import com.future.function.model.entity.feature.user.User;
 import com.future.function.web.mapper.helper.PageHelper;
+import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.feature.user.UserWebResponse;
@@ -19,8 +20,13 @@ public class UserResponseMapper {
   
   public static DataResponse<UserWebResponse> toUserDataResponse(User user) {
     
-    return DataResponse.<UserWebResponse>builder().code(HttpStatus.OK.value())
-      .status(HttpStatus.OK.getReasonPhrase())
+    return toUserDataResponse(HttpStatus.OK, user);
+  }
+  
+  public static DataResponse<UserWebResponse> toUserDataResponse(HttpStatus httpStatus, User user) {
+    
+    return DataResponse.<UserWebResponse>builder().code(httpStatus.value())
+      .status(ResponseHelper.toProperStatusFormat(httpStatus.getReasonPhrase()))
       .data(buildUserWebResponse(user))
       .build();
   }
@@ -35,6 +41,8 @@ public class UserResponseMapper {
       .address(user.getAddress())
       .pictureUrl(user.getPicture()
                     .getFileUrl())
+      .thumbnailUrl(user.getPicture()
+                    .getThumbnailUrl())
       .batch(Optional.of(user)
                .map(User::getBatch)
                .map(Batch::getNumber)

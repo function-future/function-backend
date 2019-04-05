@@ -28,6 +28,8 @@ public class UserWebResponse {
   
   private String pictureUrl;
   
+  private String thumbnailUrl;
+  
   private Long batch;
   
   private String university;
