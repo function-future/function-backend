@@ -1,8 +1,9 @@
 package com.future.function.web.controller;
 
-import com.future.function.model.entity.feature.batch.Batch;
-import com.future.function.model.entity.feature.user.User;
 import com.future.function.common.enumeration.Role;
+import com.future.function.model.entity.feature.batch.Batch;
+import com.future.function.model.entity.feature.file.File;
+import com.future.function.model.entity.feature.user.User;
 import com.future.function.service.api.feature.user.UserService;
 import com.future.function.web.mapper.request.UserRequestMapper;
 import org.junit.After;
@@ -48,12 +49,19 @@ public class UserControllerTest {
   
   private static final String UNIVERSITY = "university";
   
+  private static final String PICTURE_URL = "picture-url";
+  
+  private static final File PICTURE = File.builder()
+    .fileUrl(PICTURE_URL)
+    .build();
+  
   private static final User STUDENT = User.builder()
     .role(Role.STUDENT)
     .email(STUDENT_EMAIL)
     .name(NAME)
     .phone(PHONE)
     .address(ADDRESS)
+    .picture(PICTURE)
     .batch(Batch.builder()
              .number(NUMBER)
              .build())
