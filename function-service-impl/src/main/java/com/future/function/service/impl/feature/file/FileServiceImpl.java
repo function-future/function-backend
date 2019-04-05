@@ -16,7 +16,7 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
@@ -169,17 +169,21 @@ public class FileServiceImpl implements FileService {
   }
   
   @Override
+  @SuppressWarnings({"squid:S899", "squid:S3958", "squid:S4042"})
   public void deleteFile(String id) {
     
-    String path = constructPathOrUrl(BASE_PATH, PATH_SEPARATOR, id);
+    String pathString = constructPathOrUrl(BASE_PATH, PATH_SEPARATOR, id);
+    Path path = Paths.get(pathString);
     
-    if (Files.exists(Paths.get(path))) {
+    if (path.toFile().exists()) {
       
-      java.io.File folder = new java.io.File(path);
+      java.io.File folder = new java.io.File(pathString);
       
+      //noinspection ResultOfMethodCallIgnored
       Arrays.stream(Objects.requireNonNull(folder.listFiles()))
         .map(java.io.File::delete);
-      
+  
+      //noinspection ResultOfMethodCallIgnored
       folder.delete();
     }
     
