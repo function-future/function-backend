@@ -23,7 +23,9 @@ public class UserResponseMapper {
     return toUserDataResponse(HttpStatus.OK, user);
   }
   
-  public static DataResponse<UserWebResponse> toUserDataResponse(HttpStatus httpStatus, User user) {
+  public static DataResponse<UserWebResponse> toUserDataResponse(
+    HttpStatus httpStatus, User user
+  ) {
     
     return DataResponse.<UserWebResponse>builder().code(httpStatus.value())
       .status(ResponseHelper.toProperStatusFormat(httpStatus.getReasonPhrase()))
@@ -42,7 +44,7 @@ public class UserResponseMapper {
       .pictureUrl(user.getPicture()
                     .getFileUrl())
       .thumbnailUrl(user.getPicture()
-                    .getThumbnailUrl())
+                      .getThumbnailUrl())
       .batch(Optional.of(user)
                .map(User::getBatch)
                .map(Batch::getNumber)
