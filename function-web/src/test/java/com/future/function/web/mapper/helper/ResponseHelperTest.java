@@ -58,9 +58,10 @@ public class ResponseHelperTest {
     
     ErrorResponse errorResponse = ResponseHelper.toErrorResponse(
       HttpStatus.BAD_REQUEST, Collections.emptySet());
-  
+    
     assertThat(errorResponse).isNotNull();
-    assertThat(errorResponse.getCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+    assertThat(errorResponse.getCode()).isEqualTo(
+      HttpStatus.BAD_REQUEST.value());
     assertThat(errorResponse.getStatus()).isEqualTo("BAD_REQUEST");
     assertThat(errorResponse).isEqualTo(ERROR_RESPONSE);
   }

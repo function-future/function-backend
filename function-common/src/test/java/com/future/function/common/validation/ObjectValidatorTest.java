@@ -1,5 +1,6 @@
 package com.future.function.common.validation;
 
+import com.future.function.common.dummy.DummyData;
 import com.future.function.common.exception.BadRequestException;
 import org.junit.After;
 import org.junit.AfterClass;

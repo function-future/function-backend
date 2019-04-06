@@ -1,9 +1,9 @@
 package com.future.function.web.mapper.helper;
 
-import com.future.function.model.entity.feature.batch.Batch;
-import com.future.function.model.entity.feature.user.User;
-import com.future.function.common.enumeration.Role;
-import com.future.function.web.dummy.DummyData;
+import com.future.function.common.enumeration.core.Role;
+import com.future.function.model.entity.feature.core.Batch;
+import com.future.function.model.entity.feature.core.User;
+import com.future.function.web.dummy.data.DummyData;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -89,7 +89,7 @@ public class ErrorHelperTest {
     } catch (ConstraintViolationException e) {
       Set<ConstraintViolation<?>> violations = e.getConstraintViolations();
       Map<String, List<String>> errors = ErrorHelper.toErrors(violations);
-  
+      
       assertThat(errors).isNotEmpty();
       assertThat(errors.keySet()
                    .size()).isEqualTo(1);
