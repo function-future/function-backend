@@ -10,6 +10,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.FileSystemUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
@@ -20,7 +21,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -73,15 +73,6 @@ public class FileServiceImpl implements FileService {
     return fileName.substring(0, 36);
   }
   
-  private byte[] getBytesFromJavaIoFile(java.io.File ioFile) {
-    
-    try {
-      return IOUtils.toByteArray(ioFile.toURI());
-    } catch (IOException e) {
-      throw new BadRequestException("Unsupported Operation");
-    }
-  }
-  
   private java.io.File getFileOrThumbnail(File file, String fileName) {
     
     int maxNonThumbnailFilenameLength =
@@ -119,9 +110,9 @@ public class FileServiceImpl implements FileService {
         thumbnailImage = toThumbnailImage(multipartFile);
         thumbnailPath = constructPathOrUrl(
           folderPath, PATH_SEPARATOR, id, THUMBNAIL_SUFFIX, extension);
-        thumbnailUrl = constructPathOrUrl(
-          BASE_URL + URL_SEPARATOR + fileOrigin.lowCaseValue(), URL_SEPARATOR,
-          id, THUMBNAIL_SUFFIX, extension
+        thumbnailUrl = constructPathOrUrl(toOriginFolderName(fileOrigin),
+                                          URL_SEPARATOR, id, THUMBNAIL_SUFFIX,
+                                          extension
         );
         break;
       default:
@@ -150,9 +141,8 @@ public class FileServiceImpl implements FileService {
       throw new BadRequestException("Unsupported Operation");
     }
     
-    String fileUrl = constructPathOrUrl(
-      BASE_URL + URL_SEPARATOR + fileOrigin.lowCaseValue(), URL_SEPARATOR, id,
-      extension
+    String fileUrl = constructPathOrUrl(toOriginFolderName(fileOrigin),
+                                        URL_SEPARATOR, id, extension
     );
     
     File file = File.builder()
@@ -168,33 +158,22 @@ public class FileServiceImpl implements FileService {
     return fileRepository.save(file);
   }
   
-  @Override
-  @SuppressWarnings({"squid:S899", "squid:S3958", "squid:S4042"})
-  public void deleteFile(String id) {
+  private String toOriginFolderName(FileOrigin fileOrigin) {
     
-    String pathString = constructPathOrUrl(BASE_PATH, PATH_SEPARATOR, id);
-    Path path = Paths.get(pathString);
-    
-    if (path.toFile().exists()) {
-      
-      java.io.File folder = new java.io.File(pathString);
-      
-      //noinspection ResultOfMethodCallIgnored
-      Arrays.stream(Objects.requireNonNull(folder.listFiles()))
-        .map(java.io.File::delete);
-  
-      //noinspection ResultOfMethodCallIgnored
-      folder.delete();
-    }
-    
-    fileRepository.delete(id);
+    return BASE_URL + URL_SEPARATOR + fileOrigin.lowCaseValue();
   }
   
-  private String constructPathOrUrl(
-    String base, String separator, String id
-  ) {
+  @Override
+  @SuppressWarnings("unused")
+  public void deleteFile(String id) {
     
-    return constructPathOrUrl(base, separator, id, "");
+    boolean deleted = Optional.of(id)
+      .filter(this::deleteFileFromDisk)
+      .map(result -> {
+        fileRepository.delete(id);
+        return true;
+      })
+      .orElse(false);
   }
   
   private String constructPathOrUrl(
@@ -233,6 +212,31 @@ public class FileServiceImpl implements FileService {
         .getScaledInstance(150, 150, BufferedImage.SCALE_SMOOTH);
     } catch (IOException e) {
       throw new BadRequestException("Unacceptable File for Thumbnail");
+    }
+  }
+  
+  private String constructPathOrUrl(String id) {
+    
+    return constructPathOrUrl(BASE_PATH, PATH_SEPARATOR, id, "");
+  }
+  
+  private boolean deleteFileFromDisk(String id) {
+    
+    return Optional.of(id)
+      .map(this::constructPathOrUrl)
+      .map(Paths::get)
+      .map(Path::toFile)
+      .filter(java.io.File::exists)
+      .map(FileSystemUtils::deleteRecursively)
+      .orElseThrow(() -> new BadRequestException("Invalid Path Given"));
+  }
+  
+  private byte[] getBytesFromJavaIoFile(java.io.File ioFile) {
+    
+    try {
+      return IOUtils.toByteArray(ioFile.toURI());
+    } catch (IOException e) {
+      throw new BadRequestException("Unsupported Operation");
     }
   }
   
