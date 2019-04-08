@@ -13,9 +13,7 @@ import java.lang.annotation.Target;
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.TYPE, ElementType.TYPE_USE })
-@Constraint(validatedBy = {
-  OnlyStudentCanHaveBatchAndUniversityValidator.class
-})
+@Constraint(validatedBy = OnlyStudentCanHaveBatchAndUniversityValidator.class)
 public @interface OnlyStudentCanHaveBatchAndUniversity {
   
   Class<?>[] groups() default {};
