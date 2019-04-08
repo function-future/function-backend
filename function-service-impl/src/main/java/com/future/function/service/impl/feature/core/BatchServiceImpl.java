@@ -69,14 +69,9 @@ public class BatchServiceImpl implements BatchService {
   @Override
   public void deleteBatch(long batchNumber) {
     
-    Optional<Batch> targetBatch = batchRepository.findByNumberAndDeletedIsFalse(
-      batchNumber);
-    
-    if (!targetBatch.isPresent()) {
-      throw new NotFoundException("Delete Batch Not Found");
-    } else {
-      markBatch(targetBatch.get(), true);
-    }
+    batchRepository.findByNumberAndDeletedIsFalse(batchNumber)
+      .map(batch -> markBatch(batch, true))
+      .orElseThrow(() -> new NotFoundException("Delete Batch Not Found"));
   }
   
   private Batch markBatch(Batch batch, boolean deleted) {
