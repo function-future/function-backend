@@ -1,6 +1,6 @@
 package com.future.function.web.controller;
 
-import com.future.function.web.dummy.BadController;
+import com.future.function.web.dummy.controller.BadController;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

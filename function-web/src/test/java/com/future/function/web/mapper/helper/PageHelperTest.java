@@ -1,6 +1,6 @@
 package com.future.function.web.mapper.helper;
 
-import com.future.function.web.dummy.DummyData;
+import com.future.function.web.dummy.data.DummyData;
 import com.future.function.web.model.response.base.paging.Paging;
 import org.junit.After;
 import org.junit.Before;
