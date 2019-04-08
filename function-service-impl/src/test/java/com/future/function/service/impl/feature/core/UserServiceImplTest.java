@@ -374,15 +374,20 @@ public class UserServiceImplTest {
     
     when(userRepository.findByEmail(EMAIL_STUDENT)).thenReturn(
       Optional.of(userStudent));
+  
+    User deletedUserStudent = new User();
+    BeanUtils.copyProperties(userStudent, deletedUserStudent);
+    deletedUserStudent.setDeleted(true);
+    when(userRepository.save(deletedUserStudent)).thenReturn(deletedUserStudent);
     
     userService.deleteUser(EMAIL_STUDENT);
-    User deletedUserStudent = userService.getUser(EMAIL_STUDENT);
+    User markedDeletedUserStudent = userService.getUser(EMAIL_STUDENT);
     
-    assertThat(deletedUserStudent).isNotNull();
-    assertThat(deletedUserStudent.isDeleted()).isTrue();
+    assertThat(markedDeletedUserStudent).isNotNull();
+    assertThat(markedDeletedUserStudent.isDeleted()).isTrue();
     
     verify(userRepository, times(2)).findByEmail(EMAIL_STUDENT);
-    verify(userRepository).save(deletedUserStudent);
+    verify(userRepository).save(markedDeletedUserStudent);
   }
   
   @Test
