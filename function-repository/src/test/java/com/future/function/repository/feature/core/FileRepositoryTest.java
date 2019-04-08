@@ -24,12 +24,7 @@ public class FileRepositoryTest {
   
   private static final String FILE_URL = "file-url";
   
-  private static final File FILE = File.builder()
-    .id(FILE_ID)
-    .filePath(FILE_PATH)
-    .fileUrl(FILE_URL)
-    .asResource(true)
-    .build();
+  private File file;
   
   @Autowired
   private FileRepository fileRepository;
@@ -37,7 +32,14 @@ public class FileRepositoryTest {
   @Before
   public void setUp() {
     
-    fileRepository.save(FILE);
+    file = File.builder()
+      .id(FILE_ID)
+      .filePath(FILE_PATH)
+      .fileUrl(FILE_URL)
+      .asResource(true)
+      .build();
+    
+    fileRepository.save(file);
   }
   
   @After
@@ -54,7 +56,7 @@ public class FileRepositoryTest {
     );
     
     assertThat(foundFile).isNotEqualTo(Optional.empty());
-    assertThat(foundFile.get()).isEqualTo(FILE);
+    assertThat(foundFile.get()).isEqualTo(file);
   }
   
 }
