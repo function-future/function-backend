@@ -75,13 +75,18 @@ public class FileServiceImpl implements FileService {
   
   private java.io.File getFileOrThumbnail(File file, String fileName) {
     
-    int maxNonThumbnailFilenameLength =
-      36 + DOT.length() + FilenameUtils.getExtension(fileName)
-        .length();
     return Optional.of(fileName)
-      .filter(name -> name.length() > maxNonThumbnailFilenameLength)
+      .filter(this::isThumbnailName)
       .map(result -> new java.io.File(file.getThumbnailPath()))
       .orElseGet(() -> new java.io.File(file.getFilePath()));
+  }
+  
+  private boolean isThumbnailName(String name) {
+    
+    int maxNonThumbnailFilenameLength =
+      36 + DOT.length() + FilenameUtils.getExtension(name)
+        .length();
+    return name.length() > maxNonThumbnailFilenameLength;
   }
   
   @Override
@@ -176,6 +181,22 @@ public class FileServiceImpl implements FileService {
       .orElse(false);
   }
   
+  private boolean deleteFileFromDisk(String id) {
+    
+    return Optional.of(id)
+      .map(this::constructPathOrUrl)
+      .map(Paths::get)
+      .map(Path::toFile)
+      .filter(java.io.File::exists)
+      .map(FileSystemUtils::deleteRecursively)
+      .orElseThrow(() -> new BadRequestException("Invalid Path Given"));
+  }
+  
+  private String constructPathOrUrl(String id) {
+    
+    return constructPathOrUrl(BASE_PATH, PATH_SEPARATOR, id, "");
+  }
+  
   private String constructPathOrUrl(
     String base, String separator, String id, String extension
   ) {
@@ -213,22 +234,6 @@ public class FileServiceImpl implements FileService {
     } catch (IOException e) {
       throw new BadRequestException("Unacceptable File for Thumbnail");
     }
-  }
-  
-  private String constructPathOrUrl(String id) {
-    
-    return constructPathOrUrl(BASE_PATH, PATH_SEPARATOR, id, "");
-  }
-  
-  private boolean deleteFileFromDisk(String id) {
-    
-    return Optional.of(id)
-      .map(this::constructPathOrUrl)
-      .map(Paths::get)
-      .map(Path::toFile)
-      .filter(java.io.File::exists)
-      .map(FileSystemUtils::deleteRecursively)
-      .orElseThrow(() -> new BadRequestException("Invalid Path Given"));
   }
   
   private byte[] getBytesFromJavaIoFile(java.io.File ioFile) {
