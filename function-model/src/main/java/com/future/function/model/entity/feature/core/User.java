@@ -47,6 +47,7 @@ public class User extends BaseEntity implements UserData {
   private Role role;
   
   @DBRef(lazy = true)
+  @NotNull(message = "NotNull")
   private File picture;
   
   @Phone

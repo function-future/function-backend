@@ -37,10 +37,8 @@ public class File extends BaseEntity {
   @Builder.Default
   private String thumbnailUrl = "";
   
-  @Builder.Default
-  private boolean markFolder = false;
+  private boolean markFolder;
   
-  @Builder.Default
-  private boolean asResource = false;
+  private boolean asResource;
   
 }
