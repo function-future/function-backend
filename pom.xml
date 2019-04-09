@@ -44,6 +44,7 @@
     <sonar.coverage.exclusions>
       **/FunctionApplication.java,
       **/exception/**,
+      **/properties/**,
       **/model/**,
       **/service/api/**
     </sonar.coverage.exclusions>
@@ -76,6 +77,12 @@
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
+      <optional>true</optional>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-configuration-processor</artifactId>
       <optional>true</optional>
     </dependency>
 
@@ -170,6 +177,7 @@
           <excludes>
             <exclude>**/FunctionApplication.java,</exclude>
             <exclude>**/exception/**,</exclude>
+            <exclude>**/properties/**,</exclude>
             <exclude>**/model/**,</exclude>
             <exclude>**/service/api/**</exclude>
           </excludes>
