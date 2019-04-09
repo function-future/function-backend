@@ -4,7 +4,9 @@ import com.future.function.common.data.core.UserData;
 import com.future.function.common.enumeration.core.Role;
 import com.future.function.model.entity.base.BaseEntity;
 import com.future.function.model.util.constant.DocumentName;
+import com.future.function.validation.annotation.core.Name;
 import com.future.function.validation.annotation.core.OnlyStudentCanHaveBatchAndUniversity;
+import com.future.function.validation.annotation.core.Phone;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -37,6 +39,7 @@ public class User extends BaseEntity implements UserData {
   @NotBlank(message = "NotBlank")
   private String email;
   
+  @Name
   @NotBlank(message = "NotBlank")
   private String name;
   
@@ -46,6 +49,7 @@ public class User extends BaseEntity implements UserData {
   @DBRef(lazy = true)
   private File picture;
   
+  @Phone
   private String phone;
   
   @NotBlank(message = "NotBlank")

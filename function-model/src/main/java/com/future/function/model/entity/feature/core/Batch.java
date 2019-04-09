@@ -10,6 +10,8 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.validation.constraints.Min;
+
 /**
  * Entity representation for batches.
  */
@@ -24,6 +26,8 @@ public class Batch extends BaseEntity {
   @Id
   private String id;
   
+  @Min(value = 1,
+       message = "Min")
   private long number;
   
   private boolean deleted;
