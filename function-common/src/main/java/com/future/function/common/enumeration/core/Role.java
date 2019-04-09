@@ -17,24 +17,17 @@ public enum Role {
   public static Role toRole(String name) {
     
     return Optional.ofNullable(name)
-      .map(Role::compareWithRoles)
+      .filter(Role::isNameEqualsAnyRole)
+      .map(Role::valueOf)
       .orElse(UNKNOWN);
   }
   
-  private static Role compareWithRoles(String name) {
+  private static boolean isNameEqualsAnyRole(String name) {
     
-    return Optional.of(Role.values())
-      .map(Role::toListValues)
-      .filter(roleNames -> roleNames.contains(name))
-      .map(roleNames -> Role.valueOf(name))
-      .orElse(UNKNOWN);
-  }
-  
-  private static List<String> toListValues(Role[] values) {
-    
-    return Stream.of(values)
-           .map(Enum::name)
-           .collect(Collectors.toList());
+    return Stream.of(Role.values())
+             .filter(role -> name.equals(role.name()))
+             .collect(Collectors.toList())
+             .size() > 0;
   }
   
 }
