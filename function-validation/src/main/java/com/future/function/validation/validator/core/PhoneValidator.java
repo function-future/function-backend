@@ -1,6 +1,6 @@
 package com.future.function.validation.validator.core;
 
-import com.future.function.validation.annotation.core.Name;
+import com.future.function.validation.annotation.core.Phone;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
@@ -8,7 +8,7 @@ import javax.validation.ConstraintValidatorContext;
 /**
  * Must implement {@link ConstraintValidator} interface.
  */
-public class PhoneValidator implements ConstraintValidator<Name, String> {
+public class PhoneValidator implements ConstraintValidator<Phone, String> {
   
   /**
    * Do initialization related to the annotation here.
@@ -16,7 +16,7 @@ public class PhoneValidator implements ConstraintValidator<Name, String> {
    * @param constraintAnnotation - The annotation that uses this validator.
    */
   @Override
-  public void initialize(Name constraintAnnotation) {
+  public void initialize(Phone constraintAnnotation) {
     // No initialization needed for this validator.
   }
   
