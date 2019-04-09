@@ -34,18 +34,11 @@ public class UserRequestMapper {
   public User toUser(String data) {
     
     UserWebRequest request = toUserWebRequest(data);
-    
-    return toUser(request.getEmail(), data);
+  
+    return toValidatedUser(request.getEmail(), request);
   }
   
-  public User toUser(String email, String data) {
-    
-    UserWebRequest request = toUserWebRequest(data);
-    
-    return toUser(email, request);
-  }
-  
-  private User toUser(String email, UserWebRequest request) {
+  private User toValidatedUser(String email, UserWebRequest request) {
     
     User user = User.builder()
       .role(Role.toRole(request.getRole()))
@@ -54,17 +47,24 @@ public class UserRequestMapper {
       .phone(request.getPhone())
       .address(request.getAddress())
       .batch(toBatch(request))
-      .university(toUniversity(request))
+      .university(getUniversity(request))
       .build();
     
     return validator.validate(user);
   }
   
-  private String toUniversity(UserWebRequest request) {
+  private String getUniversity(UserWebRequest request) {
     
     return Optional.of(request)
       .map(UserWebRequest::getUniversity)
       .orElse(null);
+  }
+  
+  public User toUser(String email, String data) {
+    
+    UserWebRequest request = toUserWebRequest(data);
+    
+    return toValidatedUser(email, request);
   }
   
   private Batch toBatch(UserWebRequest request) {
