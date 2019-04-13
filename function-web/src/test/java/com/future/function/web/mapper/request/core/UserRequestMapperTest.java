@@ -18,6 +18,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.io.IOException;
 
+import static com.googlecode.catchexception.CatchException.catchException;
+import static com.googlecode.catchexception.CatchException.caughtException;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -132,13 +134,12 @@ public class UserRequestMapperTest {
   @Test
   public void testGivenJsonDataWithInvalidFormatAsStringByParsingToUserClassReturnBadRequestException()
     throws Exception {
-    
-    try {
-      userRequestMapper.toUser(BAD_JSON);
-    } catch (Exception e) {
-      assertThat(e).isInstanceOf(BadRequestException.class);
-      assertThat(e.getMessage()).isEqualTo("Bad Request");
-    }
+  
+    catchException(() -> userRequestMapper.toUser(BAD_JSON));
+  
+    assertThat(caughtException().getClass()).isEqualTo(
+      BadRequestException.class);
+    assertThat(caughtException().getMessage()).isEqualTo("Bad Request");
     
     verify(objectMapper).readValue(BAD_JSON, UserWebRequest.class);
   }

@@ -39,7 +39,7 @@ public class BatchServiceImpl implements BatchService {
   @Override
   public Batch getBatch(long number) {
   
-    return Optional.of(batchRepository.findOne(number))
+    return Optional.ofNullable(batchRepository.findOne(number))
       .orElseThrow(() -> new NotFoundException("Get Batch Not Found"));
   }
   

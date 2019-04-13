@@ -17,6 +17,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import static com.googlecode.catchexception.CatchException.catchException;
+import static com.googlecode.catchexception.CatchException.caughtException;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -47,7 +49,6 @@ public class BatchServiceImplTest {
       .number(FIRST_BATCH_NUMBER)
       .build();
   
-    when(batchRepository.findOne(FIRST_BATCH_NUMBER)).thenReturn(batch);
   }
   
   @After
@@ -86,13 +87,12 @@ public class BatchServiceImplTest {
       batchRepository.findFirstByNumberIsNotNullOrderByUpdatedAtDesc()).thenThrow(
       new NotFoundException("Saved Batch Not Found"));
   
-    try {
-      batchService.createBatch();
-    } catch (Exception e) {
-      assertThat(e).isInstanceOf(NotFoundException.class);
-      assertThat(e.getMessage()).isEqualTo("Saved Batch Not Found");
-    }
+    catchException(() -> batchService.createBatch());
   
+    assertThat(caughtException().getClass()).isEqualTo(NotFoundException.class);
+    assertThat(caughtException().getMessage()).isEqualTo(
+      "Saved Batch Not Found");
+    
     verify(sequenceGenerator).increment(Batch.SEQUENCE_NAME);
     verify(batchRepository).save(new Batch(FIRST_BATCH_NUMBER));
     verify(batchRepository).findFirstByNumberIsNotNullOrderByUpdatedAtDesc();
@@ -100,6 +100,8 @@ public class BatchServiceImplTest {
   
   @Test
   public void testGivenExistingBatchInDatabaseByFindingBatchByNumberReturnBatchObject() {
+  
+    when(batchRepository.findOne(FIRST_BATCH_NUMBER)).thenReturn(batch);
     
     Batch foundBatch = batchService.getBatch(FIRST_BATCH_NUMBER);
     
@@ -111,13 +113,13 @@ public class BatchServiceImplTest {
   
   @Test
   public void testGivenNonExistingBatchInDatabaseByFindingBatchByNumberReturnNull() {
-    
-    try {
-      batchService.getBatch(FIRST_BATCH_NUMBER);
-    } catch (Exception e) {
-      assertThat(e).isInstanceOf(NotFoundException.class);
-      assertThat(e.getMessage()).isEqualTo("Get Batch Not Found");
-    }
+  
+    when(batchRepository.findOne(FIRST_BATCH_NUMBER)).thenReturn(null);
+  
+    catchException(() -> batchService.getBatch(FIRST_BATCH_NUMBER));
+  
+    assertThat(caughtException().getClass()).isEqualTo(NotFoundException.class);
+    assertThat(caughtException().getMessage()).isEqualTo("Get Batch Not Found");
     
     verify(batchRepository).findOne(FIRST_BATCH_NUMBER);
   }

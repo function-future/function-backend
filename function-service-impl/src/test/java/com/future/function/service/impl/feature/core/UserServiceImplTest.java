@@ -27,6 +27,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import static com.googlecode.catchexception.CatchException.catchException;
+import static com.googlecode.catchexception.CatchException.caughtException;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -153,13 +155,11 @@ public class UserServiceImplTest {
     
     when(userRepository.findByEmail(NON_EXISTING_USER_EMAIL)).thenReturn(
       Optional.empty());
-    
-    try {
-      userService.getUser(NON_EXISTING_USER_EMAIL);
-    } catch (Exception e) {
-      assertThat(e).isInstanceOf(NotFoundException.class);
-      assertThat(e.getMessage()).isEqualTo("Get User Not Found");
-    }
+  
+    catchException(() -> userService.getUser(NON_EXISTING_USER_EMAIL));
+  
+    assertThat(caughtException().getClass()).isEqualTo(NotFoundException.class);
+    assertThat(caughtException().getMessage()).isEqualTo("Get User Not Found");
     
     verify(userRepository).findByEmail(NON_EXISTING_USER_EMAIL);
   }
@@ -423,13 +423,12 @@ public class UserServiceImplTest {
     
     when(userRepository.findByEmail(NON_EXISTING_USER_EMAIL)).thenReturn(
       Optional.empty());
-    
-    try {
-      userService.deleteUser(NON_EXISTING_USER_EMAIL);
-    } catch (Exception e) {
-      assertThat(e).isInstanceOf(NotFoundException.class);
-      assertThat(e.getMessage()).isEqualTo("Delete User Not Found");
-    }
+  
+    catchException(() -> userService.deleteUser(NON_EXISTING_USER_EMAIL));
+  
+    assertThat(caughtException().getClass()).isEqualTo(NotFoundException.class);
+    assertThat(caughtException().getMessage()).isEqualTo(
+      "Delete User Not Found");
     
     verify(userRepository).findByEmail(NON_EXISTING_USER_EMAIL);
   }
