@@ -161,4 +161,22 @@ public class UserRequestMapperTest {
     verify(validator).validate(VALID_ADMIN);
   }
   
+  @Test
+  public void testGivenEmailAndJsonDataAsStringByParsingToUserClassReturnUserObject()
+    throws Exception {
+    
+    User parsedStudent = userRequestMapper.toUser(STUDENT_EMAIL, STUDENT_JSON);
+    
+    assertThat(parsedStudent).isEqualTo(STUDENT);
+    
+    User parsedAdmin = userRequestMapper.toUser(ADMIN_EMAIL, VALID_ADMIN_JSON);
+    
+    assertThat(parsedAdmin).isEqualTo(VALID_ADMIN);
+    
+    verify(objectMapper).readValue(STUDENT_JSON, UserWebRequest.class);
+    verify(objectMapper).readValue(VALID_ADMIN_JSON, UserWebRequest.class);
+    verify(validator).validate(STUDENT);
+    verify(validator).validate(VALID_ADMIN);
+  }
+  
 }

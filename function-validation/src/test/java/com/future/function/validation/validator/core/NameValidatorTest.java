@@ -10,6 +10,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 @RunWith(MockitoJUnitRunner.class)
 public class NameValidatorTest {
@@ -31,7 +32,10 @@ public class NameValidatorTest {
   }
   
   @After
-  public void tearDown() {}
+  public void tearDown() {
+  
+    verifyNoMoreInteractions(annotation);
+  }
   
   @Test
   public void testGivenValidStringAsNameByValidatingNameReturnTrue() {
