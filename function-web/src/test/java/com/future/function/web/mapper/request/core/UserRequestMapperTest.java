@@ -5,6 +5,7 @@ import com.future.function.common.enumeration.core.Role;
 import com.future.function.common.exception.BadRequestException;
 import com.future.function.common.validation.ObjectValidator;
 import com.future.function.model.entity.feature.core.Batch;
+import com.future.function.model.entity.feature.core.File;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.web.model.request.core.UserWebRequest;
 import org.junit.After;
@@ -18,7 +19,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -34,6 +34,8 @@ public class UserRequestMapperTest {
   
   private static final String NAME = "name";
   
+  private static final String PASSWORD = "namefunctionapp";
+  
   private static final Long NUMBER = 1L;
   
   private static final String PHONE = "081212341234";
@@ -46,8 +48,10 @@ public class UserRequestMapperTest {
     .role(Role.STUDENT)
     .email(STUDENT_EMAIL)
     .name(NAME)
+    .password(PASSWORD)
     .phone(PHONE)
     .address(ADDRESS)
+    .picture(new File())
     .batch(Batch.builder()
              .number(NUMBER)
              .build())
@@ -76,8 +80,10 @@ public class UserRequestMapperTest {
     .role(Role.ADMIN)
     .email(ADMIN_EMAIL)
     .name(NAME)
+    .password(PASSWORD)
     .phone(PHONE)
     .address(ADDRESS)
+    .picture(new File())
     .build();
   
   private static final String VALID_ADMIN_JSON =
@@ -119,9 +125,8 @@ public class UserRequestMapperTest {
   
   @After
   public void tearDown() {
-    
-    verifyNoMoreInteractions(objectMapper);
-    verifyNoMoreInteractions(validator);
+  
+    verifyNoMoreInteractions(objectMapper, validator);
   }
   
   @Test
@@ -149,11 +154,9 @@ public class UserRequestMapperTest {
     User parsedAdmin = userRequestMapper.toUser(VALID_ADMIN_JSON);
     
     assertThat(parsedAdmin).isEqualTo(VALID_ADMIN);
-    
-    verify(objectMapper, times(2)).readValue(
-      STUDENT_JSON, UserWebRequest.class);
-    verify(objectMapper, times(2)).readValue(
-      VALID_ADMIN_JSON, UserWebRequest.class);
+  
+    verify(objectMapper).readValue(STUDENT_JSON, UserWebRequest.class);
+    verify(objectMapper).readValue(VALID_ADMIN_JSON, UserWebRequest.class);
     verify(validator).validate(STUDENT);
     verify(validator).validate(VALID_ADMIN);
   }
