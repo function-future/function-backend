@@ -18,6 +18,16 @@ public interface BatchRepository extends MongoRepository<Batch, Long> {
    * @return {@code Optional<Batch>} - Batch found in database, if any exists;
    * otherwise returns {@code Optional.empty()}.
    */
-  Optional<Batch> findFirstByNumberIsNotNullOrderByUpdatedAtDesc();
+  Optional<Batch> findFirstByIdIsNotNullOrderByUpdatedAtDesc();
+  
+  /**
+   * Finds a specific batch, given parameter number.
+   *
+   * @param number - Number of batch to be found.
+   *
+   * @return {@code Optional<Batch>} - Batch found in database, if any exists;
+   * otherwise returns {@code Optional.empty()}.
+   */
+  Optional<Batch> findByNumber(long number);
   
 }

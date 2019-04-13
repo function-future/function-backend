@@ -48,7 +48,6 @@ public class BatchServiceImplTest {
     batch = Batch.builder()
       .number(FIRST_BATCH_NUMBER)
       .build();
-  
   }
   
   @After
@@ -64,7 +63,7 @@ public class BatchServiceImplTest {
       FIRST_BATCH_NUMBER);
     when(batchRepository.save(new Batch(FIRST_BATCH_NUMBER))).thenReturn(batch);
     when(
-      batchRepository.findFirstByNumberIsNotNullOrderByUpdatedAtDesc()).thenReturn(
+      batchRepository.findFirstByIdIsNotNullOrderByUpdatedAtDesc()).thenReturn(
       Optional.of(batch));
     
     Batch createdBatch = batchService.createBatch();
@@ -74,7 +73,7 @@ public class BatchServiceImplTest {
   
     verify(sequenceGenerator).increment(Batch.SEQUENCE_NAME);
     verify(batchRepository).save(new Batch(FIRST_BATCH_NUMBER));
-    verify(batchRepository).findFirstByNumberIsNotNullOrderByUpdatedAtDesc();
+    verify(batchRepository).findFirstByIdIsNotNullOrderByUpdatedAtDesc();
   }
   
   @Test
@@ -84,7 +83,7 @@ public class BatchServiceImplTest {
       FIRST_BATCH_NUMBER);
     when(batchRepository.save(new Batch(FIRST_BATCH_NUMBER))).thenReturn(batch);
     when(
-      batchRepository.findFirstByNumberIsNotNullOrderByUpdatedAtDesc()).thenThrow(
+      batchRepository.findFirstByIdIsNotNullOrderByUpdatedAtDesc()).thenThrow(
       new NotFoundException("Saved Batch Not Found"));
   
     catchException(() -> batchService.createBatch());
@@ -95,33 +94,35 @@ public class BatchServiceImplTest {
     
     verify(sequenceGenerator).increment(Batch.SEQUENCE_NAME);
     verify(batchRepository).save(new Batch(FIRST_BATCH_NUMBER));
-    verify(batchRepository).findFirstByNumberIsNotNullOrderByUpdatedAtDesc();
+    verify(batchRepository).findFirstByIdIsNotNullOrderByUpdatedAtDesc();
   }
   
   @Test
   public void testGivenExistingBatchInDatabaseByFindingBatchByNumberReturnBatchObject() {
   
-    when(batchRepository.findOne(FIRST_BATCH_NUMBER)).thenReturn(batch);
+    when(batchRepository.findByNumber(FIRST_BATCH_NUMBER)).thenReturn(
+      Optional.of(batch));
     
     Batch foundBatch = batchService.getBatch(FIRST_BATCH_NUMBER);
     
     assertThat(foundBatch).isNotNull();
     assertThat(foundBatch).isEqualTo(batch);
   
-    verify(batchRepository).findOne(FIRST_BATCH_NUMBER);
+    verify(batchRepository).findByNumber(FIRST_BATCH_NUMBER);
   }
   
   @Test
   public void testGivenNonExistingBatchInDatabaseByFindingBatchByNumberReturnNull() {
   
-    when(batchRepository.findOne(FIRST_BATCH_NUMBER)).thenReturn(null);
-  
+    when(batchRepository.findByNumber(FIRST_BATCH_NUMBER)).thenReturn(
+      Optional.empty());
+    
     catchException(() -> batchService.getBatch(FIRST_BATCH_NUMBER));
   
     assertThat(caughtException().getClass()).isEqualTo(NotFoundException.class);
     assertThat(caughtException().getMessage()).isEqualTo("Get Batch Not Found");
-    
-    verify(batchRepository).findOne(FIRST_BATCH_NUMBER);
+  
+    verify(batchRepository).findByNumber(FIRST_BATCH_NUMBER);
   }
   
   @Test

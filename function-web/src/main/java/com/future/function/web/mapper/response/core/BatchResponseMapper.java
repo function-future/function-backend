@@ -1,6 +1,7 @@
 package com.future.function.web.mapper.response.core;
 
 import com.future.function.model.entity.feature.core.Batch;
+import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.feature.core.BatchWebResponse;
 import lombok.AccessLevel;
@@ -19,7 +20,8 @@ public class BatchResponseMapper {
     
     return DataResponse.<BatchWebResponse>builder().code(
       HttpStatus.CREATED.value())
-      .status(HttpStatus.CREATED.getReasonPhrase())
+      .status(ResponseHelper.toProperStatusFormat(
+        HttpStatus.CREATED.getReasonPhrase()))
       .data(new BatchWebResponse(batch.getNumber()))
       .build();
   }

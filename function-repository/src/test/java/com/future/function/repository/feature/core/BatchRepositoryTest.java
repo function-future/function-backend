@@ -36,10 +36,20 @@ public class BatchRepositoryTest {
   }
   
   @Test
-  public void testGivenBatchNumberByFindingFirstBatchByNumberReturnBatchObject() {
-  
+  public void testGivenMethodCallByFindingFirstBatchReturnBatchObject() {
+    
     Optional<Batch> foundBatch =
-      batchRepository.findFirstByNumberIsNotNullOrderByUpdatedAtDesc();
+      batchRepository.findFirstByIdIsNotNullOrderByUpdatedAtDesc();
+  
+    assertThat(foundBatch).isNotEqualTo(Optional.empty());
+    assertThat(foundBatch.get()
+                 .getNumber()).isEqualTo(NUMBER);
+  }
+  
+  @Test
+  public void testGivenBatchNumberByFindingBatchByNumberReturnBatchObject() {
+    
+    Optional<Batch> foundBatch = batchRepository.findByNumber(NUMBER);
     
     assertThat(foundBatch).isNotEqualTo(Optional.empty());
     assertThat(foundBatch.get()

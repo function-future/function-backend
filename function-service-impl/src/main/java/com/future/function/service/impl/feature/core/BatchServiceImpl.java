@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Service implementation class for batch logic operations implementation.
@@ -39,7 +38,7 @@ public class BatchServiceImpl implements BatchService {
   @Override
   public Batch getBatch(long number) {
   
-    return Optional.ofNullable(batchRepository.findOne(number))
+    return batchRepository.findByNumber(number)
       .orElseThrow(() -> new NotFoundException("Get Batch Not Found"));
   }
   
@@ -49,7 +48,7 @@ public class BatchServiceImpl implements BatchService {
     batchRepository.save(
       new Batch(sequenceGenerator.increment(Batch.SEQUENCE_NAME)));
   
-    return batchRepository.findFirstByNumberIsNotNullOrderByUpdatedAtDesc()
+    return batchRepository.findFirstByIdIsNotNullOrderByUpdatedAtDesc()
       .orElseThrow(() -> new NotFoundException("Saved Batch Not Found"));
   }
   

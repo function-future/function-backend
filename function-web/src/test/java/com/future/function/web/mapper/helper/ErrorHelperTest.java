@@ -40,7 +40,7 @@ public class ErrorHelperTest {
     .address("address")
     .role(Role.JUDGE)
     .batch(Batch.builder()
-             .number(1)
+             .number(1L)
              .build())
     .university("university")
     .build();
