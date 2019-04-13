@@ -3,6 +3,7 @@ package com.future.function.service.impl.feature.core;
 import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.repository.feature.core.BatchRepository;
+import com.future.function.repository.feature.core.SequenceGenerator;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,7 +18,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -34,6 +34,9 @@ public class BatchServiceImplTest {
   @Mock
   private BatchRepository batchRepository;
   
+  @Mock
+  private SequenceGenerator sequenceGenerator;
+  
   @InjectMocks
   private BatchServiceImpl batchService;
   
@@ -42,79 +45,57 @@ public class BatchServiceImplTest {
     
     batch = Batch.builder()
       .number(FIRST_BATCH_NUMBER)
-      .deleted(false)
       .build();
-    
-    when(batchRepository.findByNumberAndDeletedIsFalse(
-      FIRST_BATCH_NUMBER)).thenReturn(Optional.of(batch));
+  
+    when(batchRepository.findOne(FIRST_BATCH_NUMBER)).thenReturn(batch);
   }
   
   @After
   public void tearDown() {
-    
-    verifyNoMoreInteractions(batchRepository);
+  
+    verifyNoMoreInteractions(batchRepository, sequenceGenerator);
   }
   
   @Test
-  public void testGivenMethodCallToCreateBatchWhileNoBatchExistedBeforeByCreatingBatchReturnNewBatchObject() {
-    
-    when(
-      batchRepository.findFirstByIdIsNotNullOrderByUpdatedAtDesc()).thenReturn(
-      Optional.empty());
-    when(batchRepository.save(batch)).thenReturn(batch);
-    
-    Batch createdBatch = batchService.createBatch();
-    
-    assertThat(createdBatch).isEqualTo(batch);
-    
-    verify(
-      batchRepository, times(1)).findFirstByIdIsNotNullOrderByUpdatedAtDesc();
-    verify(batchRepository, times(1)).save(batch);
-  }
+  public void testGivenMethodCallToCreateBatchByCreatingBatchReturnNewBatchObject() {
   
-  @Test
-  public void testGivenMethodCallToCreateBatchWhileAUndeletedBatchExistedBeforeByCreatingBatchReturnNewBatchObject() {
-    
+    when(sequenceGenerator.increment(Batch.SEQUENCE_NAME)).thenReturn(
+      FIRST_BATCH_NUMBER);
+    when(batchRepository.save(new Batch(FIRST_BATCH_NUMBER))).thenReturn(batch);
     when(
-      batchRepository.findFirstByIdIsNotNullOrderByUpdatedAtDesc()).thenReturn(
+      batchRepository.findFirstByNumberIsNotNullOrderByUpdatedAtDesc()).thenReturn(
       Optional.of(batch));
     
-    Batch secondBatch = Batch.builder()
-      .number(SECOND_BATCH_NUMBER)
-      .deleted(false)
-      .build();
-    
-    when(batchRepository.save(secondBatch)).thenReturn(secondBatch);
-    
     Batch createdBatch = batchService.createBatch();
-    
-    assertThat(createdBatch).isEqualTo(secondBatch);
-    
-    verify(
-      batchRepository, times(1)).findFirstByIdIsNotNullOrderByUpdatedAtDesc();
-    verify(batchRepository, times(1)).save(secondBatch);
+  
+    assertThat(createdBatch).isNotNull();
+    assertThat(createdBatch).isEqualTo(batch);
+  
+    verify(sequenceGenerator).increment(Batch.SEQUENCE_NAME);
+    verify(batchRepository).save(new Batch(FIRST_BATCH_NUMBER));
+    verify(batchRepository).findFirstByNumberIsNotNullOrderByUpdatedAtDesc();
   }
   
   @Test
-  public void testGivenMethodCallToCreateBatchWhileADeletedBatchExistedBeforeByCreatingBatchReturnNewBatchObject() {
-    
-    batch.setDeleted(true);
-    
+  public void testGivenMethodCallToCreateBatchButSomehowFailedInDatabaseProcessingByCreatingBatchReturnNotFoundException() {
+  
+    when(sequenceGenerator.increment(Batch.SEQUENCE_NAME)).thenReturn(
+      FIRST_BATCH_NUMBER);
+    when(batchRepository.save(new Batch(FIRST_BATCH_NUMBER))).thenReturn(batch);
     when(
-      batchRepository.findFirstByIdIsNotNullOrderByUpdatedAtDesc()).thenReturn(
-      Optional.of(batch));
-    
-    batch.setNumber(SECOND_BATCH_NUMBER);
-    
-    when(batchRepository.save(batch)).thenReturn(batch);
-    
-    Batch createdBatch = batchService.createBatch();
-    
-    assertThat(createdBatch).isEqualTo(batch);
-    
-    verify(
-      batchRepository, times(1)).findFirstByIdIsNotNullOrderByUpdatedAtDesc();
-    verify(batchRepository, times(1)).save(batch);
+      batchRepository.findFirstByNumberIsNotNullOrderByUpdatedAtDesc()).thenThrow(
+      new NotFoundException("Saved Batch Not Found"));
+  
+    try {
+      batchService.createBatch();
+    } catch (Exception e) {
+      assertThat(e).isInstanceOf(NotFoundException.class);
+      assertThat(e.getMessage()).isEqualTo("Saved Batch Not Found");
+    }
+  
+    verify(sequenceGenerator).increment(Batch.SEQUENCE_NAME);
+    verify(batchRepository).save(new Batch(FIRST_BATCH_NUMBER));
+    verify(batchRepository).findFirstByNumberIsNotNullOrderByUpdatedAtDesc();
   }
   
   @Test
@@ -124,43 +105,8 @@ public class BatchServiceImplTest {
     
     assertThat(foundBatch).isNotNull();
     assertThat(foundBatch).isEqualTo(batch);
-    
-    verify(batchRepository, times(1)).findByNumberAndDeletedIsFalse(
-      FIRST_BATCH_NUMBER);
-  }
   
-  @Test
-  public void testGivenExistingBatchesInDatabaseByFindingBatchesReturnListOfBatch() {
-    
-    Batch secondBatch = Batch.builder()
-      .number(SECOND_BATCH_NUMBER)
-      .deleted(false)
-      .build();
-    
-    List<Batch> batchList = Arrays.asList(batch, secondBatch);
-    
-    when(batchRepository.findAllByDeletedIsFalse()).thenReturn(batchList);
-    
-    List<Batch> foundBatchList = batchService.getBatches();
-    
-    assertThat(foundBatchList).isNotEmpty();
-    assertThat(foundBatchList).isEqualTo(batchList);
-    
-    verify(batchRepository, times(1)).findAllByDeletedIsFalse();
-  }
-  
-  @Test
-  public void testGivenNoExistingBatchInDatabaseByFindingBatchesReturnEmptyList() {
-    
-    List<Batch> batchList = Collections.emptyList();
-    
-    when(batchRepository.findAllByDeletedIsFalse()).thenReturn(batchList);
-    
-    List<Batch> foundBatchList = batchService.getBatches();
-    
-    assertThat(foundBatchList).isEmpty();
-    
-    verify(batchRepository, times(1)).findAllByDeletedIsFalse();
+    verify(batchRepository).findOne(FIRST_BATCH_NUMBER);
   }
   
   @Test
@@ -173,41 +119,40 @@ public class BatchServiceImplTest {
       assertThat(e.getMessage()).isEqualTo("Get Batch Not Found");
     }
     
-    verify(batchRepository, times(1)).findByNumberAndDeletedIsFalse(
-      FIRST_BATCH_NUMBER);
+    verify(batchRepository).findOne(FIRST_BATCH_NUMBER);
   }
   
   @Test
-  public void testGivenNonExistingBatchInDatabaseByDeletingBatchByNumberReturnRuntimeException() {
+  public void testGivenExistingBatchesInDatabaseByFindingBatchesReturnListOfBatch() {
     
-    when(batchRepository.findByNumberAndDeletedIsFalse(
-      SECOND_BATCH_NUMBER)).thenReturn(Optional.empty());
+    Batch secondBatch = Batch.builder()
+      .number(SECOND_BATCH_NUMBER)
+      .build();
     
-    try {
-      batchService.deleteBatch(SECOND_BATCH_NUMBER);
-    } catch (Exception e) {
-      assertThat(e).isInstanceOf(NotFoundException.class);
-      assertThat(e.getMessage()).isEqualTo("Delete Batch Not Found");
-    }
+    List<Batch> batchList = Arrays.asList(batch, secondBatch);
+  
+    when(batchRepository.findAll()).thenReturn(batchList);
     
-    verify(batchRepository, times(1)).findByNumberAndDeletedIsFalse(
-      SECOND_BATCH_NUMBER);
+    List<Batch> foundBatchList = batchService.getBatches();
+    
+    assertThat(foundBatchList).isNotEmpty();
+    assertThat(foundBatchList).isEqualTo(batchList);
+  
+    verify(batchRepository).findAll();
   }
   
   @Test
-  public void testGivenExistingBatchInDatabaseByDeletingBatchByNumberReturnSuccessfulDeletion() {
+  public void testGivenNoExistingBatchInDatabaseByFindingBatchesReturnEmptyList() {
     
-    when(batchRepository.findByNumberAndDeletedIsFalse(
-      FIRST_BATCH_NUMBER)).thenReturn(Optional.of(batch));
+    List<Batch> batchList = Collections.emptyList();
+  
+    when(batchRepository.findAll()).thenReturn(batchList);
     
-    batch.setDeleted(true);
-    when(batchRepository.save(batch)).thenReturn(batch);
+    List<Batch> foundBatchList = batchService.getBatches();
     
-    batchService.deleteBatch(FIRST_BATCH_NUMBER);
-    
-    verify(batchRepository, times(1)).findByNumberAndDeletedIsFalse(
-      FIRST_BATCH_NUMBER);
-    verify(batchRepository, times(1)).save(batch);
+    assertThat(foundBatchList).isEmpty();
+  
+    verify(batchRepository).findAll();
   }
   
 }

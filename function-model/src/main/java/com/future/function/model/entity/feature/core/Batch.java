@@ -8,9 +8,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
-
-import javax.validation.constraints.Min;
 
 /**
  * Entity representation for batches.
@@ -23,13 +22,10 @@ import javax.validation.constraints.Min;
 @Document(collection = DocumentName.BATCH)
 public class Batch extends BaseEntity {
   
+  @Transient
+  public static final String SEQUENCE_NAME = "batches_sequence";
+  
   @Id
-  private String id;
-  
-  @Min(value = 1,
-       message = "Min")
   private long number;
-  
-  private boolean deleted;
   
 }

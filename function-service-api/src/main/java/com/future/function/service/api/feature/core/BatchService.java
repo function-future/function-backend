@@ -15,6 +15,4 @@ public interface BatchService {
   
   Batch createBatch();
   
-  void deleteBatch(long batchNumber);
-  
 }

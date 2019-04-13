@@ -5,6 +5,7 @@ import com.future.function.common.enumeration.core.Role;
 import com.future.function.common.exception.BadRequestException;
 import com.future.function.common.validation.ObjectValidator;
 import com.future.function.model.entity.feature.core.Batch;
+import com.future.function.model.entity.feature.core.File;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.web.model.request.core.UserWebRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -44,8 +45,10 @@ public class UserRequestMapper {
       .role(Role.toRole(request.getRole()))
       .email(email)
       .name(request.getName())
+      .password(getDefaultPassword(request.getName()))
       .phone(request.getPhone())
       .address(request.getAddress())
+      .picture(new File())
       .batch(toBatch(request))
       .university(getUniversity(request))
       .build();
@@ -60,13 +63,6 @@ public class UserRequestMapper {
       .orElse(null);
   }
   
-  public User toUser(String email, String data) {
-    
-    UserWebRequest request = toUserWebRequest(data);
-    
-    return toValidatedUser(email, request);
-  }
-  
   private Batch toBatch(UserWebRequest request) {
     
     return Optional.of(request)
@@ -74,6 +70,15 @@ public class UserRequestMapper {
       .map(batchNumber -> Batch.builder()
         .number(batchNumber)
         .build())
+      .orElse(null);
+  }
+  
+  private String getDefaultPassword(String name) {
+    
+    return Optional.ofNullable(name)
+      .map(String::toLowerCase)
+      .map(n -> n.replace(" ", ""))
+      .map(n -> n.concat("functionapp"))
       .orElse(null);
   }
   
@@ -87,6 +92,11 @@ public class UserRequestMapper {
       throw new BadRequestException("Bad Request");
     }
     return request;
+  }
+  
+  public User toUser(String email, String data) {
+    
+    return toValidatedUser(email, toUserWebRequest(data));
   }
   
 }

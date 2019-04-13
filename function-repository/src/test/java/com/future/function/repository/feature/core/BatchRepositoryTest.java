@@ -23,15 +23,10 @@ public class BatchRepositoryTest {
   @Autowired
   private BatchRepository batchRepository;
   
-  private Batch batch;
-  
   @Before
   public void setUp() {
-    
-    batch = Batch.builder()
-      .number(NUMBER)
-      .build();
-    batchRepository.save(batch);
+  
+    batchRepository.save(new Batch(NUMBER));
   }
   
   @After
@@ -41,10 +36,10 @@ public class BatchRepositoryTest {
   }
   
   @Test
-  public void testGivenBatchNumberByFindingBatchByNumberReturnBatchObject() {
-    
-    Optional<Batch> foundBatch = batchRepository.findByNumberAndDeletedIsFalse(
-      NUMBER);
+  public void testGivenBatchNumberByFindingFirstBatchByNumberReturnBatchObject() {
+  
+    Optional<Batch> foundBatch =
+      batchRepository.findFirstByNumberIsNotNullOrderByUpdatedAtDesc();
     
     assertThat(foundBatch).isNotEqualTo(Optional.empty());
     assertThat(foundBatch.get()

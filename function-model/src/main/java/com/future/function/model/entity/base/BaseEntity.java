@@ -4,8 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
-
 /**
  * Base entity, to be used in auditing and to be extended by other entities.
  */
@@ -14,12 +12,14 @@ import java.util.Date;
 @AllArgsConstructor
 public class BaseEntity {
   
-  private Date createdAt;
+  private Long createdAt;
   
   private String createdBy;
   
-  private Date updatedAt;
+  private Long updatedAt;
   
   private String updatedBy;
+  
+  private boolean deleted;
   
 }

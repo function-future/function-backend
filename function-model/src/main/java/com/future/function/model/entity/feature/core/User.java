@@ -43,6 +43,9 @@ public class User extends BaseEntity implements UserData {
   @NotBlank(message = "NotBlank")
   private String name;
   
+  @NotBlank(message = "NotBlank")
+  private String password;
+  
   @NotNull(message = "NotNull")
   private Role role;
   
@@ -60,8 +63,6 @@ public class User extends BaseEntity implements UserData {
   private Batch batch;
   
   private String university;
-  
-  private boolean deleted;
   
   @Override
   public String getRoleAsString() {

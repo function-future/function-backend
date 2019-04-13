@@ -44,6 +44,8 @@ public class UserServiceImplTest {
   
   private static final String NAME = "test-name";
   
+  private static final String PASSWORD = "password";
+  
   private static final String NON_EXISTING_USER_EMAIL = "email@email.com";
   
   private static final Long NUMBER = 1L;
@@ -91,23 +93,25 @@ public class UserServiceImplTest {
       .role(Role.STUDENT)
       .email(EMAIL_STUDENT)
       .name(NAME)
+      .password(PASSWORD)
       .phone(PHONE)
       .address(ADDRESS)
       .picture(PICTURE)
       .batch(BATCH)
       .university(UNIVERSITY)
-      .deleted(false)
       .build();
+    userStudent.setDeleted(false);
     
     userMentor = User.builder()
       .role(Role.MENTOR)
       .email(EMAIL_MENTOR)
       .name(NAME)
+      .password(PASSWORD)
       .phone(PHONE)
       .address(ADDRESS)
       .picture(PICTURE)
-      .deleted(false)
       .build();
+    userMentor.setDeleted(false);
   }
   
   @After
@@ -167,13 +171,14 @@ public class UserServiceImplTest {
       .role(Role.STUDENT)
       .email(EMAIL_STUDENT)
       .name(NAME)
+      .password(PASSWORD)
       .phone(PHONE)
       .address(ADDRESS)
       .picture(PICTURE)
       .batch(BATCH)
       .university(UNIVERSITY)
-      .deleted(false)
       .build();
+    additionalUser.setDeleted(false);
     
     List<User> studentsList = Arrays.asList(userStudent, additionalUser);
     
@@ -196,11 +201,12 @@ public class UserServiceImplTest {
       .role(Role.MENTOR)
       .email(EMAIL_MENTOR)
       .name(NAME)
+      .password(PASSWORD)
       .phone(PHONE)
       .address(ADDRESS)
       .picture(PICTURE)
-      .deleted(false)
       .build();
+    additionalUser.setDeleted(false);
     
     List<User> mentorsList = Arrays.asList(userMentor, additionalUser);
     
@@ -378,7 +384,8 @@ public class UserServiceImplTest {
     User deletedUserStudent = new User();
     BeanUtils.copyProperties(userStudent, deletedUserStudent);
     deletedUserStudent.setDeleted(true);
-    when(userRepository.save(deletedUserStudent)).thenReturn(deletedUserStudent);
+    when(userRepository.save(deletedUserStudent)).thenReturn(
+      deletedUserStudent);
     
     userService.deleteUser(EMAIL_STUDENT);
     User markedDeletedUserStudent = userService.getUser(EMAIL_STUDENT);

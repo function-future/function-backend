@@ -78,6 +78,7 @@ public class UserServiceImpl implements UserService {
   private User createNewUser(User user, MultipartFile image) {
     
     return Optional.of(user)
+      .map(this::setDefaultEncryptedPassword)
       .map(newUser -> setUserPicture(newUser, image))
       .map(userRepository::save)
       .orElseGet(() -> userRepository.save(user));
@@ -123,6 +124,12 @@ public class UserServiceImpl implements UserService {
     user.setDeleted(deleted);
     
     return userRepository.save(user);
+  }
+  
+  private User setDefaultEncryptedPassword(User user) {
+    
+    // TODO encrypt password when auth is developed
+    return user;
   }
   
   private User deleteUserPicture(User user) {
