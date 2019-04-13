@@ -15,13 +15,12 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Arrays;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
@@ -35,12 +34,10 @@ public class BatchControllerTest {
   
   private static final Batch FIRST_BATCH = Batch.builder()
     .number(FIRST_BATCH_NUMBER)
-    .deleted(false)
     .build();
   
   private static final Batch SECOND_BATCH = Batch.builder()
     .number(SECOND_BATCH_NUMBER)
-    .deleted(false)
     .build();
   
   @Autowired
@@ -59,11 +56,11 @@ public class BatchControllerTest {
   }
   
   @Test
-  public void testGivenCallToBatchesApiByFindingUndeletedBatchesFromBatchServiceReturnListOfBatchNumbers()
+  public void testGivenCallToBatchesApiByFindingBatchesFromBatchServiceReturnListOfBatchNumbers()
     throws Exception {
-    
-    given(batchService.getBatches()).willReturn(
-      Arrays.asList(FIRST_BATCH, SECOND_BATCH));
+  
+    List<Batch> batches = Arrays.asList(FIRST_BATCH, SECOND_BATCH);
+    given(batchService.getBatches()).willReturn(batches);
     
     MockHttpServletResponse response = mockMvc.perform(get("/api/core/batches"))
       .andReturn()
@@ -71,8 +68,8 @@ public class BatchControllerTest {
     
     assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
     assertThat(response.getContentAsString()).isNotBlank();
-    
-    verify(batchService, times(1)).getBatches();
+  
+    verify(batchService).getBatches();
   }
   
   @Test
@@ -88,23 +85,8 @@ public class BatchControllerTest {
     
     assertThat(response.getStatus()).isEqualTo(HttpStatus.CREATED.value());
     assertThat(response.getContentAsString()).isNotBlank();
-    
-    verify(batchService, times(1)).createBatch();
-  }
   
-  @Test
-  public void testGivenBatchNumberFromPathVariableByDeletingBatchReturnBaseResponseOK()
-    throws Exception {
-    
-    MockHttpServletResponse response = mockMvc.perform(
-      delete("/api/core/batches/" + SECOND_BATCH_NUMBER))
-      .andReturn()
-      .getResponse();
-    
-    assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
-    assertThat(response.getContentAsString()).isNotBlank();
-    
-    verify(batchService, times(1)).deleteBatch(SECOND_BATCH_NUMBER);
+    verify(batchService).createBatch();
   }
   
 }

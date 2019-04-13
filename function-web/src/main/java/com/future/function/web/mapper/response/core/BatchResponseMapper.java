@@ -2,7 +2,6 @@ package com.future.function.web.mapper.response.core;
 
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.web.model.response.base.DataResponse;
-import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.feature.core.BatchWebResponse;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -25,11 +24,11 @@ public class BatchResponseMapper {
       .build();
   }
   
-  public static PagingResponse<Long> toBatchesPagingResponse(
+  public static DataResponse<List<Long>> toBatchesDataResponse(
     List<Batch> batches
   ) {
     
-    return PagingResponse.<Long>builder().code(HttpStatus.OK.value())
+    return DataResponse.<List<Long>>builder().code(HttpStatus.OK.value())
       .status(HttpStatus.OK.getReasonPhrase())
       .data(batches.stream()
               .map(Batch::getNumber)

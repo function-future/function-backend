@@ -1,21 +1,18 @@
 package com.future.function.web.controller.core;
 
 import com.future.function.service.api.feature.core.BatchService;
-import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.mapper.response.core.BatchResponseMapper;
-import com.future.function.web.model.response.base.BaseResponse;
 import com.future.function.web.model.response.base.DataResponse;
-import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.feature.core.BatchWebResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 /**
  * Controller class for batch APIs.
@@ -34,10 +31,9 @@ public class BatchController {
   
   @ResponseStatus(HttpStatus.OK)
   @GetMapping
-  public PagingResponse<Long> getBatches() {
-    
-    return BatchResponseMapper.toBatchesPagingResponse(
-      batchService.getBatches());
+  public DataResponse<List<Long>> getBatches() {
+  
+    return BatchResponseMapper.toBatchesDataResponse(batchService.getBatches());
   }
   
   @ResponseStatus(HttpStatus.CREATED)
@@ -45,17 +41,6 @@ public class BatchController {
   public DataResponse<BatchWebResponse> createBatch() {
     
     return BatchResponseMapper.toBatchDataResponse(batchService.createBatch());
-  }
-  
-  @ResponseStatus(HttpStatus.OK)
-  @DeleteMapping(value = "/{batchNumber}")
-  public BaseResponse deleteBatch(
-    @PathVariable
-      long batchNumber
-  ) {
-    
-    batchService.deleteBatch(batchNumber);
-    return ResponseHelper.toBaseResponse(HttpStatus.OK);
   }
   
 }
