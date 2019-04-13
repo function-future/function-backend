@@ -41,6 +41,7 @@ public class UserResponseMapper {
       .name(user.getName())
       .phone(user.getPhone())
       .address(user.getAddress())
+      .deleted(user.isDeleted())
       .pictureUrl(user.getPicture()
                     .getFileUrl())
       .thumbnailUrl(user.getPicture()

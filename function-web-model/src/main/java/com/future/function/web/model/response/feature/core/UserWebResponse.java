@@ -25,6 +25,8 @@ public class UserWebResponse {
   
   private String address;
   
+  private boolean deleted;
+  
   private String pictureUrl;
   
   private String thumbnailUrl;
