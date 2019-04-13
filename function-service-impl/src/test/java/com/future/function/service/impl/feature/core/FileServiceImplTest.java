@@ -1,6 +1,7 @@
 package com.future.function.service.impl.feature.core;
 
 import com.future.function.common.exception.NotFoundException;
+import com.future.function.common.properties.core.FileProperties;
 import com.future.function.model.entity.feature.core.File;
 import com.future.function.repository.feature.core.FileRepository;
 import org.junit.After;
@@ -13,6 +14,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.util.FileSystemUtils;
 
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -49,11 +52,20 @@ public class FileServiceImplTest {
   @Mock
   private FileRepository fileRepository;
   
+  @Mock
+  private FileProperties fileProperties;
+  
   @InjectMocks
   private FileServiceImpl fileService;
   
   @Before
   public void setUp() {
+  
+    List<String> imageExtensions = Arrays.asList(".jpg", ".jpeg", ".png");
+    when(fileProperties.getImageExtensions()).thenReturn(imageExtensions);
+    when(fileProperties.getUrlPrefix()).thenReturn(BASE_URL);
+    when(fileProperties.getStoragePath()).thenReturn(BASE_PATH);
+    when(fileProperties.getThumbnailSuffix()).thenReturn("-thumbnail");
     
     file = File.builder()
       .id(ID)
