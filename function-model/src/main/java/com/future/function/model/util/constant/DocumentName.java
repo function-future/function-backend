@@ -14,4 +14,6 @@ public abstract class DocumentName {
   
   public static final String USER = "users";
   
+  public static final String STICKY_NOTE = "sticky-notes";
+  
 }
