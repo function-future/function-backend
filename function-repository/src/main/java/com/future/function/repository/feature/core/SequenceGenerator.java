@@ -13,6 +13,9 @@ import static org.springframework.data.mongodb.core.FindAndModifyOptions.options
 import static org.springframework.data.mongodb.core.query.Criteria.where;
 import static org.springframework.data.mongodb.core.query.Query.query;
 
+/**
+ * Sequence generator class for generating sequence of a given sequence name.
+ */
 @Component
 public class SequenceGenerator {
   
@@ -24,6 +27,13 @@ public class SequenceGenerator {
     this.mongoOperations = mongoOperations;
   }
   
+  /**
+   * Increments a sequence's value given its name.
+   *
+   * @param sequenceName Name of the sequence to be incremented
+   *
+   * @return {@code long} - The incremented value of the specified sequence.
+   */
   public long increment(String sequenceName) {
     
     Sequence sequence = mongoOperations.findAndModify(

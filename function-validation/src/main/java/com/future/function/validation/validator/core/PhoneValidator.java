@@ -6,14 +6,17 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
 /**
- * Must implement {@link ConstraintValidator} interface.
+ * Validator of the
+ * {@link com.future.function.validation.annotation.core.Phone} annotation.
+ * Implements  {@link javax.validation.ConstraintValidator} interface with
+ * the second type being String as the validated data is String object.
  */
 public class PhoneValidator implements ConstraintValidator<Phone, String> {
   
   /**
    * Do initialization related to the annotation here.
    *
-   * @param constraintAnnotation - The annotation that uses this validator.
+   * @param constraintAnnotation The annotation that uses this validator.
    */
   @Override
   public void initialize(Phone constraintAnnotation) {
@@ -21,10 +24,11 @@ public class PhoneValidator implements ConstraintValidator<Phone, String> {
   }
   
   /**
-   * Do logic for validation here
+   * Checks whether the String object is not null and matches the specified
+   * regex pattern for only numerical characters or with one + sign.
    *
-   * @param value   - Value of data to be validated.
-   * @param context - Context of annotation.
+   * @param value   Value of data to be validated.
+   * @param context Context of annotation.
    *
    * @return {@code boolean} - Result of validation.
    */

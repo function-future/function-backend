@@ -41,6 +41,13 @@ public class UserServiceImpl implements UserService {
     this.userRepository = userRepository;
   }
   
+  /**
+   * {@inheritDoc}
+   *
+   * @param email Email of user to be retrieved.
+   *
+   * @return {@code User} - The user object found in database.
+   */
   @Override
   public User getUser(String email) {
     
@@ -48,12 +55,29 @@ public class UserServiceImpl implements UserService {
       .orElseThrow(() -> new NotFoundException("Get User Not Found"));
   }
   
+  /**
+   * {@inheritDoc}
+   *
+   * @param role     Role enum of to-be-retrieved users
+   * @param pageable Pageable object for paging data
+   *
+   * @return {@code Page<User>} - Page of users found in database.
+   */
   @Override
   public Page<User> getUsers(Role role, Pageable pageable) {
     
     return userRepository.findAllByRole(role, pageable);
   }
   
+  /**
+   * {@inheritDoc}
+   *
+   * @param user  User data of new user.
+   * @param image Profile image of the new user. May be null, but will be
+   *              replaced with default picture.
+   *
+   * @return {@code User} - The user object of the saved data.
+   */
   @Override
   public User createUser(User user, MultipartFile image) {
     
@@ -96,6 +120,15 @@ public class UserServiceImpl implements UserService {
       .orElse(user);
   }
   
+  /**
+   * {@inheritDoc}
+   *
+   * @param user  User data of existing user.
+   * @param image Profile image of the new user. May be null, but will be
+   *              replaced with default picture.
+   *
+   * @return {@code User} - The user object of the saved data.
+   */
   @Override
   public User updateUser(User user, MultipartFile image) {
     
@@ -111,6 +144,11 @@ public class UserServiceImpl implements UserService {
       .orElseThrow(() -> new NotFoundException("Update User Not Found"));
   }
   
+  /**
+   * {@inheritDoc}
+   *
+   * @param email Email of user to be deleted.
+   */
   @Override
   public void deleteUser(String email) {
     

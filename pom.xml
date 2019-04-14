@@ -110,6 +110,18 @@
       <plugins>
 
         <plugin>
+          <groupId>com.github.ekryd.sortpom</groupId>
+          <artifactId>sortpom-maven-plugin</artifactId>
+          <version>2.8.0</version>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <version>3.1.0</version>
+        </plugin>
+
+        <plugin>
           <groupId>org.jacoco</groupId>
           <artifactId>jacoco-maven-plugin</artifactId>
           <version>0.7.8</version>
@@ -124,7 +136,6 @@
       <plugin>
         <groupId>com.github.ekryd.sortpom</groupId>
         <artifactId>sortpom-maven-plugin</artifactId>
-        <version>2.8.0</version>
         <configuration>
           <predefinedSortOrder>recommended_2008_06</predefinedSortOrder>
           <?SORTPOM IGNORE?>
@@ -157,6 +168,25 @@
               <goal>sort</goal>
             </goals>
             <phase>verify</phase>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <configuration>
+          <sourceFileExcludes>**/**Test**.java</sourceFileExcludes>
+          <sourceFileExcludes>**/Dummy**.java</sourceFileExcludes>
+          <sourceFileExcludes>**/BadController.java</sourceFileExcludes>
+        </configuration>
+        <executions>
+          <execution>
+            <id>aggregate</id>
+            <goals>
+              <goal>aggregate</goal>
+            </goals>
+            <phase>site</phase>
           </execution>
         </executions>
       </plugin>

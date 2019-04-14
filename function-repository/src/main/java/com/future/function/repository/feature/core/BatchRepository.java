@@ -15,18 +15,18 @@ public interface BatchRepository extends MongoRepository<Batch, Long> {
   /**
    * Finds first (latest) batch in database based on {@code updatedAt} field.
    *
-   * @return {@code Optional<Batch>} - Batch found in database, if any exists;
-   * otherwise returns {@code Optional.empty()}.
+   * @return {@code Optional<Batch>} - Batch found in database, if any
+   * exists; otherwise returns {@link java.util.Optional#empty()}.
    */
   Optional<Batch> findFirstByIdIsNotNullOrderByUpdatedAtDesc();
   
   /**
    * Finds a specific batch, given parameter number.
    *
-   * @param number - Number of batch to be found.
+   * @param number Number of batch to be found.
    *
    * @return {@code Optional<Batch>} - Batch found in database, if any exists;
-   * otherwise returns {@code Optional.empty()}.
+   * otherwise returns {@link java.util.Optional#empty()}.
    */
   Optional<Batch> findByNumber(long number);
   

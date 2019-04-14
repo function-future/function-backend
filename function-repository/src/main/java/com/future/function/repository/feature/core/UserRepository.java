@@ -18,10 +18,10 @@ public interface UserRepository extends MongoRepository<User, String> {
   /**
    * Finds specific user by email.
    *
-   * @param email - Email of user to be found.
+   * @param email Email of user to be found.
    *
    * @return {@code Optional<User>} - Optional of user found, if any exists;
-   * otherwise return {@code Optional.empty()}
+   * otherwise return {@link java.util.Optional#empty()}
    */
   Optional<User> findByEmail(String email);
   
@@ -29,8 +29,8 @@ public interface UserRepository extends MongoRepository<User, String> {
    * Finds users by role and page data
    * ({@link org.springframework.data.domain.Pageable}).
    *
-   * @param role     - Enum of available roles.
-   * @param pageable - Pageable object for paging data.
+   * @param role Enum of available roles.
+   * @param pageable Pageable object for paging data.
    *
    * @return {@code Page<User>} - Page of users found in database.
    */
