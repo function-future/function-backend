@@ -28,7 +28,7 @@ public class UserResponseMapper {
    *
    * @param user User data to be converted to response.
    *
-   * @return {@code DataResponse<UserWebResponse} - The converted user data,
+   * @return {@code DataResponse<UserWebResponse>} - The converted user data,
    * wrapped in
    * {@link com.future.function.web.model.response.base.DataResponse} and
    * {@link com.future.function.web.model.response.feature.core.UserWebResponse}
@@ -45,7 +45,7 @@ public class UserResponseMapper {
    * @param httpStatus Http status to be shown in the response.
    * @param user       User data to be converted to response.
    *
-   * @return {@code DataResponse<UserWebResponse} - The converted user data,
+   * @return {@code DataResponse<UserWebResponse>} - The converted user data,
    * wrapped in
    * {@link com.future.function.web.model.response.base.DataResponse} and
    * {@link com.future.function.web.model.response.feature.core.UserWebResponse}
