@@ -29,13 +29,28 @@ public class BatchController {
     this.batchService = batchService;
   }
   
+  /**
+   * Retrieves list of batches' number in database.
+   *
+   * @return {@code DataResponse<List<Long>>} - Batches' number found in
+   * database, wrapped in
+   * {@link com.future.function.web.model.response.base.DataResponse}.
+   */
   @ResponseStatus(HttpStatus.OK)
   @GetMapping
   public DataResponse<List<Long>> getBatches() {
-  
+    
     return BatchResponseMapper.toBatchesDataResponse(batchService.getBatches());
   }
   
+  /**
+   * Saves a new batch to database.
+   *
+   * @return {@code DataResponse<BatchWebResponse} - The created batch data,
+   * wrapped in
+   * {@link com.future.function.web.model.response.base.DataResponse} and
+   * {@link com.future.function.web.model.response.feature.core.BatchWebResponse}
+   */
   @ResponseStatus(HttpStatus.CREATED)
   @PostMapping
   public DataResponse<BatchWebResponse> createBatch() {
