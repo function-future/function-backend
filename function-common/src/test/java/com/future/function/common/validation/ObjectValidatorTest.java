@@ -16,6 +16,8 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
+import static com.googlecode.catchexception.CatchException.catchException;
+import static com.googlecode.catchexception.CatchException.caughtException;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -89,15 +91,17 @@ public class ObjectValidatorTest {
     
     when(validator.validate(dummyData)).thenReturn(
       realValidator.validate(dummyData));
-    
-    try {
-      objectValidator.validate(dummyData);
-    } catch (BadRequestException e) {
-      assertThat(e.getMessage()).isNotBlank();
-      assertThat(e.getConstraintViolations()).isNotEmpty();
-      assertThat(e.getConstraintViolations()
-                   .size()).isEqualTo(2);
-    }
+  
+    catchException(() -> objectValidator.validate(dummyData));
+  
+    assertThat(caughtException().getClass()).isEqualTo(
+      BadRequestException.class);
+    assertThat(caughtException().getMessage()).isNotBlank();
+    assertThat(caughtException(
+      BadRequestException.class).getConstraintViolations()).isNotEmpty();
+    assertThat(caughtException(
+      BadRequestException.class).getConstraintViolations()
+                 .size()).isEqualTo(2);
     
     verify(validator, times(1)).validate(dummyData);
   }

@@ -41,6 +41,13 @@ public class UserServiceImpl implements UserService {
     this.userRepository = userRepository;
   }
   
+  /**
+   * {@inheritDoc}
+   *
+   * @param email Email of user to be retrieved.
+   *
+   * @return {@code User} - The user object found in database.
+   */
   @Override
   public User getUser(String email) {
     
@@ -48,12 +55,29 @@ public class UserServiceImpl implements UserService {
       .orElseThrow(() -> new NotFoundException("Get User Not Found"));
   }
   
+  /**
+   * {@inheritDoc}
+   *
+   * @param role     Role enum of to-be-retrieved users
+   * @param pageable Pageable object for paging data
+   *
+   * @return {@code Page<User>} - Page of users found in database.
+   */
   @Override
   public Page<User> getUsers(Role role, Pageable pageable) {
     
     return userRepository.findAllByRole(role, pageable);
   }
   
+  /**
+   * {@inheritDoc}
+   *
+   * @param user  User data of new user.
+   * @param image Profile image of the new user. May be null, but will be
+   *              replaced with default picture.
+   *
+   * @return {@code User} - The user object of the saved data.
+   */
   @Override
   public User createUser(User user, MultipartFile image) {
     
@@ -78,6 +102,7 @@ public class UserServiceImpl implements UserService {
   private User createNewUser(User user, MultipartFile image) {
     
     return Optional.of(user)
+      .map(this::setDefaultEncryptedPassword)
       .map(newUser -> setUserPicture(newUser, image))
       .map(userRepository::save)
       .orElseGet(() -> userRepository.save(user));
@@ -95,6 +120,15 @@ public class UserServiceImpl implements UserService {
       .orElse(user);
   }
   
+  /**
+   * {@inheritDoc}
+   *
+   * @param user  User data of existing user.
+   * @param image Profile image of the new user. May be null, but will be
+   *              replaced with default picture.
+   *
+   * @return {@code User} - The user object of the saved data.
+   */
   @Override
   public User updateUser(User user, MultipartFile image) {
     
@@ -110,16 +144,17 @@ public class UserServiceImpl implements UserService {
       .orElseThrow(() -> new NotFoundException("Update User Not Found"));
   }
   
+  /**
+   * {@inheritDoc}
+   *
+   * @param email Email of user to be deleted.
+   */
   @Override
   public void deleteUser(String email) {
     
-    Optional<User> targetUser = userRepository.findByEmail(email);
-    
-    if (!targetUser.isPresent()) {
-      throw new NotFoundException("Delete User Not Found");
-    } else {
-      markDeleted(targetUser.get(), true);
-    }
+    userRepository.findByEmail(email)
+      .map(user -> markDeleted(user, true))
+      .orElseThrow(() -> new NotFoundException("Delete User Not Found"));
   }
   
   private User markDeleted(User user, boolean deleted) {
@@ -127,6 +162,12 @@ public class UserServiceImpl implements UserService {
     user.setDeleted(deleted);
     
     return userRepository.save(user);
+  }
+  
+  private User setDefaultEncryptedPassword(User user) {
+    
+    // TODO encrypt password when auth is developed
+    return user;
   }
   
   private User deleteUserPicture(User user) {

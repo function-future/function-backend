@@ -12,7 +12,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
- * Class representation of files.
+ * Entity representation for files.
  */
 @Data
 @Builder
@@ -37,10 +37,8 @@ public class File extends BaseEntity {
   @Builder.Default
   private String thumbnailUrl = "";
   
-  @Builder.Default
-  private boolean markFolder = false;
+  private boolean markFolder;
   
-  @Builder.Default
-  private boolean asResource = false;
+  private boolean asResource;
   
 }

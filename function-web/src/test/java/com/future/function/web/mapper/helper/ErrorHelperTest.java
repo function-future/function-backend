@@ -2,6 +2,7 @@ package com.future.function.web.mapper.helper;
 
 import com.future.function.common.enumeration.core.Role;
 import com.future.function.model.entity.feature.core.Batch;
+import com.future.function.model.entity.feature.core.File;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.web.dummy.data.DummyData;
 import org.junit.After;
@@ -20,6 +21,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static com.googlecode.catchexception.CatchException.catchException;
+import static com.googlecode.catchexception.CatchException.caughtException;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ErrorHelperTest {
@@ -32,10 +35,12 @@ public class ErrorHelperTest {
   private static final User USER = User.builder()
     .email("email@email.com")
     .name("name")
+    .password("password")
+    .picture(new File())
     .address("address")
     .role(Role.JUDGE)
     .batch(Batch.builder()
-             .number(1)
+             .number(1L)
              .build())
     .university("university")
     .build();
@@ -65,37 +70,41 @@ public class ErrorHelperTest {
   
   @Test
   public void testGivenSetOfConstraintViolationsByMappingErrorsReturnMapOfErrors() {
+  
+    catchException(() -> throwConstraintViolationException(DUMMY_DATA));
+  
+    Set<ConstraintViolation<?>> violations = caughtException(
+      ConstraintViolationException.class).getConstraintViolations();
+    Map<String, List<String>> errors = ErrorHelper.toErrors(violations);
+  
+    assertThat(errors).isNotEmpty();
+    assertThat(errors.keySet()
+                 .size()).isEqualTo(2);
+    assertThat(errors.get("number")).isEqualTo(
+      Collections.singletonList("Min"));
+    assertThat(errors.get("email")).contains("NotBlank", "Email");
     
-    try {
-      throw new ConstraintViolationException(validator.validate(DUMMY_DATA));
-    } catch (ConstraintViolationException e) {
-      Set<ConstraintViolation<?>> violations = e.getConstraintViolations();
-      Map<String, List<String>> errors = ErrorHelper.toErrors(violations);
-      
-      assertThat(errors).isNotEmpty();
-      assertThat(errors.keySet()
-                   .size()).isEqualTo(2);
-      assertThat(errors.get("number")).isEqualTo(
-        Collections.singletonList("Min"));
-      assertThat(errors.get("email")).contains("NotBlank", "Email");
-    }
+  }
+  
+  private void throwConstraintViolationException(Object object) {
+    
+    throw new ConstraintViolationException(validator.validate(object));
   }
   
   @Test
   public void testGivenSetOfConstraintViolationsWithNotBlankPropertyPathByMappingErrorsReturnMapOfErrorsWithGettingFieldValue() {
-    
-    try {
-      throw new ConstraintViolationException(validator.validate(USER));
-    } catch (ConstraintViolationException e) {
-      Set<ConstraintViolation<?>> violations = e.getConstraintViolations();
-      Map<String, List<String>> errors = ErrorHelper.toErrors(violations);
-      
-      assertThat(errors).isNotEmpty();
-      assertThat(errors.keySet()
-                   .size()).isEqualTo(1);
-      assertThat(errors.get("role")).isEqualTo(
-        Collections.singletonList("OnlyStudentCanHaveBatchAndUniversity"));
-    }
+  
+    catchException(() -> throwConstraintViolationException(USER));
+  
+    Set<ConstraintViolation<?>> violations = caughtException(
+      ConstraintViolationException.class).getConstraintViolations();
+    Map<String, List<String>> errors = ErrorHelper.toErrors(violations);
+  
+    assertThat(errors).isNotEmpty();
+    assertThat(errors.keySet()
+                 .size()).isEqualTo(1);
+    assertThat(errors.get("role")).isEqualTo(
+      Collections.singletonList("OnlyStudentCanHaveBatchAndUniversity"));
   }
   
 }

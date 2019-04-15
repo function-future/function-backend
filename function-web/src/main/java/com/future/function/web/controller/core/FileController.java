@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * Controller class for file APIs
+ */
 @RestController
 @RequestMapping(value = "/files")
 public class FileController {
@@ -22,6 +25,14 @@ public class FileController {
     this.fileService = fileService;
   }
   
+  /**
+   * Retrieves byte array data of the specified file from given parameters.
+   *
+   * @param origin   Origin of file to be retrieved in file storage.
+   * @param fileName Name of file to be retrieved.
+   *
+   * @return {@code byte[]} - Byte array of the file.
+   */
   @ResponseStatus(HttpStatus.OK)
   @GetMapping(value = "/resource/{origin}/{fileName:.+}")
   public byte[] getFileAsByteArray(

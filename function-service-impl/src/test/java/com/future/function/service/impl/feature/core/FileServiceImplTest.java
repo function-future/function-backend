@@ -1,6 +1,7 @@
 package com.future.function.service.impl.feature.core;
 
 import com.future.function.common.exception.NotFoundException;
+import com.future.function.common.properties.core.FileProperties;
 import com.future.function.model.entity.feature.core.File;
 import com.future.function.repository.feature.core.FileRepository;
 import org.junit.After;
@@ -13,8 +14,12 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.util.FileSystemUtils;
 
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
+import static com.googlecode.catchexception.CatchException.catchException;
+import static com.googlecode.catchexception.CatchException.caughtException;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -49,11 +54,20 @@ public class FileServiceImplTest {
   @Mock
   private FileRepository fileRepository;
   
+  @Mock
+  private FileProperties fileProperties;
+  
   @InjectMocks
   private FileServiceImpl fileService;
   
   @Before
   public void setUp() {
+  
+    List<String> imageExtensions = Arrays.asList(".jpg", ".jpeg", ".png");
+    when(fileProperties.getImageExtensions()).thenReturn(imageExtensions);
+    when(fileProperties.getUrlPrefix()).thenReturn(BASE_URL);
+    when(fileProperties.getStoragePath()).thenReturn(BASE_PATH);
+    when(fileProperties.getThumbnailSuffix()).thenReturn("-thumbnail");
     
     file = File.builder()
       .id(ID)
@@ -91,13 +105,11 @@ public class FileServiceImplTest {
   public void testGivenFileWithNonExistingIdByGettingFileObjectReturnNotFoundException() {
     
     when(fileRepository.findOne(ID)).thenReturn(null);
-    
-    try {
-      fileService.getFile(ID);
-    } catch (Exception e) {
-      assertThat(e).isInstanceOf(NotFoundException.class);
-      assertThat(e.getMessage()).isEqualTo("Get File Not Found");
-    }
+  
+    catchException(() -> fileService.getFile(ID));
+  
+    assertThat(caughtException().getClass()).isEqualTo(NotFoundException.class);
+    assertThat(caughtException().getMessage()).isEqualTo("Get File Not Found");
     
     verify(fileRepository).findOne(ID);
   }

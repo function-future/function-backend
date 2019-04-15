@@ -13,7 +13,6 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonInclude(value = JsonInclude.Include.NON_NULL)
 public class UserWebResponse {
   
   private String role;
@@ -26,12 +25,16 @@ public class UserWebResponse {
   
   private String address;
   
+  private boolean deleted;
+  
   private String pictureUrl;
   
   private String thumbnailUrl;
   
+  @JsonInclude(value = JsonInclude.Include.NON_NULL)
   private Long batch;
   
+  @JsonInclude(value = JsonInclude.Include.NON_NULL)
   private String university;
   
 }

@@ -45,8 +45,8 @@ public class OnlyStudentCanHaveBatchAndUniversityValidatorTest {
   
   @After
   public void tearDown() {
-    
-    verifyNoMoreInteractions(userData);
+  
+    verifyNoMoreInteractions(annotation, userData);
   }
   
   @Test

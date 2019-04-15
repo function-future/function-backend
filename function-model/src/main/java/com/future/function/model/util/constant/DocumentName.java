@@ -6,6 +6,8 @@ package com.future.function.model.util.constant;
 @SuppressWarnings("squid:S1118")
 public abstract class DocumentName {
   
+  public static final String SEQUENCE = "sequences";
+  
   public static final String BATCH = "batches";
   
   public static final String FILE = "files";

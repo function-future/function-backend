@@ -27,6 +27,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import static com.googlecode.catchexception.CatchException.catchException;
+import static com.googlecode.catchexception.CatchException.caughtException;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -43,6 +45,8 @@ public class UserServiceImplTest {
   private static final String EMAIL_STUDENT = "student@test.com";
   
   private static final String NAME = "test-name";
+  
+  private static final String PASSWORD = "password";
   
   private static final String NON_EXISTING_USER_EMAIL = "email@email.com";
   
@@ -91,23 +95,25 @@ public class UserServiceImplTest {
       .role(Role.STUDENT)
       .email(EMAIL_STUDENT)
       .name(NAME)
+      .password(PASSWORD)
       .phone(PHONE)
       .address(ADDRESS)
       .picture(PICTURE)
       .batch(BATCH)
       .university(UNIVERSITY)
-      .deleted(false)
       .build();
+    userStudent.setDeleted(false);
     
     userMentor = User.builder()
       .role(Role.MENTOR)
       .email(EMAIL_MENTOR)
       .name(NAME)
+      .password(PASSWORD)
       .phone(PHONE)
       .address(ADDRESS)
       .picture(PICTURE)
-      .deleted(false)
       .build();
+    userMentor.setDeleted(false);
   }
   
   @After
@@ -149,13 +155,11 @@ public class UserServiceImplTest {
     
     when(userRepository.findByEmail(NON_EXISTING_USER_EMAIL)).thenReturn(
       Optional.empty());
-    
-    try {
-      userService.getUser(NON_EXISTING_USER_EMAIL);
-    } catch (Exception e) {
-      assertThat(e).isInstanceOf(NotFoundException.class);
-      assertThat(e.getMessage()).isEqualTo("Get User Not Found");
-    }
+  
+    catchException(() -> userService.getUser(NON_EXISTING_USER_EMAIL));
+  
+    assertThat(caughtException().getClass()).isEqualTo(NotFoundException.class);
+    assertThat(caughtException().getMessage()).isEqualTo("Get User Not Found");
     
     verify(userRepository).findByEmail(NON_EXISTING_USER_EMAIL);
   }
@@ -167,13 +171,14 @@ public class UserServiceImplTest {
       .role(Role.STUDENT)
       .email(EMAIL_STUDENT)
       .name(NAME)
+      .password(PASSWORD)
       .phone(PHONE)
       .address(ADDRESS)
       .picture(PICTURE)
       .batch(BATCH)
       .university(UNIVERSITY)
-      .deleted(false)
       .build();
+    additionalUser.setDeleted(false);
     
     List<User> studentsList = Arrays.asList(userStudent, additionalUser);
     
@@ -196,11 +201,12 @@ public class UserServiceImplTest {
       .role(Role.MENTOR)
       .email(EMAIL_MENTOR)
       .name(NAME)
+      .password(PASSWORD)
       .phone(PHONE)
       .address(ADDRESS)
       .picture(PICTURE)
-      .deleted(false)
       .build();
+    additionalUser.setDeleted(false);
     
     List<User> mentorsList = Arrays.asList(userMentor, additionalUser);
     
@@ -374,15 +380,21 @@ public class UserServiceImplTest {
     
     when(userRepository.findByEmail(EMAIL_STUDENT)).thenReturn(
       Optional.of(userStudent));
+  
+    User deletedUserStudent = new User();
+    BeanUtils.copyProperties(userStudent, deletedUserStudent);
+    deletedUserStudent.setDeleted(true);
+    when(userRepository.save(deletedUserStudent)).thenReturn(
+      deletedUserStudent);
     
     userService.deleteUser(EMAIL_STUDENT);
-    User deletedUserStudent = userService.getUser(EMAIL_STUDENT);
+    User markedDeletedUserStudent = userService.getUser(EMAIL_STUDENT);
     
-    assertThat(deletedUserStudent).isNotNull();
-    assertThat(deletedUserStudent.isDeleted()).isTrue();
+    assertThat(markedDeletedUserStudent).isNotNull();
+    assertThat(markedDeletedUserStudent.isDeleted()).isTrue();
     
     verify(userRepository, times(2)).findByEmail(EMAIL_STUDENT);
-    verify(userRepository).save(deletedUserStudent);
+    verify(userRepository).save(markedDeletedUserStudent);
   }
   
   @Test
@@ -391,14 +403,19 @@ public class UserServiceImplTest {
     when(userRepository.findByEmail(EMAIL_MENTOR)).thenReturn(
       Optional.of(userMentor));
     
-    userService.deleteUser(EMAIL_MENTOR);
-    User deletedUserMentor = userService.getUser(EMAIL_MENTOR);
+    User deletedUserMentor = new User();
+    BeanUtils.copyProperties(userMentor, deletedUserMentor);
+    deletedUserMentor.setDeleted(true);
+    when(userRepository.save(deletedUserMentor)).thenReturn(deletedUserMentor);
     
-    assertThat(deletedUserMentor).isNotNull();
-    assertThat(deletedUserMentor.isDeleted()).isTrue();
+    userService.deleteUser(EMAIL_MENTOR);
+    User markedDeletedUserMentor = userService.getUser(EMAIL_MENTOR);
+    
+    assertThat(markedDeletedUserMentor).isNotNull();
+    assertThat(markedDeletedUserMentor.isDeleted()).isTrue();
     
     verify(userRepository, times(2)).findByEmail(EMAIL_MENTOR);
-    verify(userRepository).save(deletedUserMentor);
+    verify(userRepository).save(markedDeletedUserMentor);
   }
   
   @Test
@@ -406,13 +423,12 @@ public class UserServiceImplTest {
     
     when(userRepository.findByEmail(NON_EXISTING_USER_EMAIL)).thenReturn(
       Optional.empty());
-    
-    try {
-      userService.deleteUser(NON_EXISTING_USER_EMAIL);
-    } catch (Exception e) {
-      assertThat(e).isInstanceOf(NotFoundException.class);
-      assertThat(e.getMessage()).isEqualTo("Delete User Not Found");
-    }
+  
+    catchException(() -> userService.deleteUser(NON_EXISTING_USER_EMAIL));
+  
+    assertThat(caughtException().getClass()).isEqualTo(NotFoundException.class);
+    assertThat(caughtException().getMessage()).isEqualTo(
+      "Delete User Not Found");
     
     verify(userRepository).findByEmail(NON_EXISTING_USER_EMAIL);
   }

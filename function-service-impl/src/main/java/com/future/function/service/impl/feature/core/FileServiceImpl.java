@@ -3,6 +3,7 @@ package com.future.function.service.impl.feature.core;
 import com.future.function.common.enumeration.core.FileOrigin;
 import com.future.function.common.exception.BadRequestException;
 import com.future.function.common.exception.NotFoundException;
+import com.future.function.common.properties.core.FileProperties;
 import com.future.function.model.entity.feature.core.File;
 import com.future.function.repository.feature.core.FileRepository;
 import com.future.function.service.api.feature.core.FileService;
@@ -19,37 +20,52 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Service implementation class for file logic operations definition.
+ */
 @Service
 public class FileServiceImpl implements FileService {
-  
-  private static final List<String> IMAGE_EXTENSIONS = Arrays.asList(
-    ".jpg", ".jpeg", ".png");
-  
-  private static final String BASE_URL = "http://localhost:8080/files/resource";
-  
-  private static final String BASE_PATH = "C:\\function\\files\\static";
   
   private static final String URL_SEPARATOR = "/";
   
   private static final String PATH_SEPARATOR = java.io.File.separator;
   
-  private static final String THUMBNAIL_SUFFIX = "-thumbnail";
-  
   private static final String DOT = ".";
   
   private final FileRepository fileRepository;
   
+  private final List<String> imageExtensions;
+  
+  private final String urlPrefix;
+  
+  private final String storagePath;
+  
+  private final String thumbnailSuffix;
+  
   @Autowired
-  public FileServiceImpl(FileRepository fileRepository) {
+  public FileServiceImpl(
+    FileRepository fileRepository, FileProperties fileProperties
+  ) {
     
     this.fileRepository = fileRepository;
+    
+    imageExtensions = fileProperties.getImageExtensions();
+    urlPrefix = fileProperties.getUrlPrefix();
+    storagePath = fileProperties.getStoragePath();
+    thumbnailSuffix = fileProperties.getThumbnailSuffix();
   }
   
+  /**
+   * {@inheritDoc}
+   *
+   * @param id Id of file to be retrieved.
+   *
+   * @return {@code File} - The file object found in database.
+   */
   @Override
   public File getFile(String id) {
     
@@ -57,6 +73,15 @@ public class FileServiceImpl implements FileService {
       .orElseThrow(() -> new NotFoundException("Get File Not Found"));
   }
   
+  /**
+   * {@inheritDoc}
+   *
+   * @param fileName   Name of the file to be obtained.
+   * @param fileOrigin Origin of the file, which in this case specifies at
+   *                   which folder does the file reside in the file storage.
+   *
+   * @return {@code byte[]} - The byte array of the file.
+   */
   @Override
   public byte[] getFileAsByteArray(String fileName, FileOrigin fileOrigin) {
     
@@ -75,15 +100,22 @@ public class FileServiceImpl implements FileService {
   
   private java.io.File getFileOrThumbnail(File file, String fileName) {
     
-    int maxNonThumbnailFilenameLength =
-      36 + DOT.length() + FilenameUtils.getExtension(fileName)
-        .length();
     return Optional.of(fileName)
-      .filter(name -> name.length() > maxNonThumbnailFilenameLength)
+      .filter(this::isThumbnailName)
       .map(result -> new java.io.File(file.getThumbnailPath()))
       .orElseGet(() -> new java.io.File(file.getFilePath()));
   }
   
+  /**
+   * {@inheritDoc}
+   *
+   * @param multipartFile The original file sent from client side.
+   * @param fileOrigin    Origin of the file, which in this case specifies at
+   *                      which folder the file will reside in the file
+   *                      storage.
+   *
+   * @return {@code File} - The file object of the saved data.
+   */
   @Override
   public File storeFile(MultipartFile multipartFile, FileOrigin fileOrigin) {
     
@@ -93,7 +125,7 @@ public class FileServiceImpl implements FileService {
       multipartFile.getOriginalFilename())
       .toLowerCase();
     
-    String folderPath = constructPathOrUrl(BASE_PATH, PATH_SEPARATOR,
+    String folderPath = constructPathOrUrl(storagePath, PATH_SEPARATOR,
                                            fileOrigin.lowCaseValue(),
                                            PATH_SEPARATOR, id
     );
@@ -103,15 +135,15 @@ public class FileServiceImpl implements FileService {
     String thumbnailUrl;
     switch (fileOrigin) {
       case USER:
-        if (!IMAGE_EXTENSIONS.contains(extension)) {
+        if (!imageExtensions.contains(extension)) {
           throw new BadRequestException("Invalid Extension");
         }
         
         thumbnailImage = toThumbnailImage(multipartFile);
         thumbnailPath = constructPathOrUrl(
-          folderPath, PATH_SEPARATOR, id, THUMBNAIL_SUFFIX, extension);
+          folderPath, PATH_SEPARATOR, id, thumbnailSuffix, extension);
         thumbnailUrl = constructPathOrUrl(toOriginFolderName(fileOrigin),
-                                          URL_SEPARATOR, id, THUMBNAIL_SUFFIX,
+                                          URL_SEPARATOR, id, thumbnailSuffix,
                                           extension
         );
         break;
@@ -134,8 +166,9 @@ public class FileServiceImpl implements FileService {
     try {
       multipartFile.transferTo(ioFile);
       
-      ImageIO.write(toBufferedThumbnailImage(thumbnailImage),
-                    extension.substring(1), thumbnailIoFile
+      ImageIO.write(
+        toBufferedThumbnailImage(thumbnailImage), extension.substring(1),
+        thumbnailIoFile
       );
     } catch (IOException e) {
       throw new BadRequestException("Unsupported Operation");
@@ -160,9 +193,14 @@ public class FileServiceImpl implements FileService {
   
   private String toOriginFolderName(FileOrigin fileOrigin) {
     
-    return BASE_URL + URL_SEPARATOR + fileOrigin.lowCaseValue();
+    return urlPrefix + URL_SEPARATOR + fileOrigin.lowCaseValue();
   }
   
+  /**
+   * {@inheritDoc}
+   *
+   * @param id Id of the file to be deleted.
+   */
   @Override
   @SuppressWarnings("unused")
   public void deleteFile(String id) {
@@ -215,9 +253,12 @@ public class FileServiceImpl implements FileService {
     }
   }
   
-  private String constructPathOrUrl(String id) {
+  private boolean isThumbnailName(String name) {
     
-    return constructPathOrUrl(BASE_PATH, PATH_SEPARATOR, id, "");
+    int maxNonThumbnailFilenameLength =
+      36 + DOT.length() + FilenameUtils.getExtension(name)
+        .length();
+    return name.length() > maxNonThumbnailFilenameLength;
   }
   
   private boolean deleteFileFromDisk(String id) {
@@ -229,6 +270,11 @@ public class FileServiceImpl implements FileService {
       .filter(java.io.File::exists)
       .map(FileSystemUtils::deleteRecursively)
       .orElseThrow(() -> new BadRequestException("Invalid Path Given"));
+  }
+  
+  private String constructPathOrUrl(String id) {
+    
+    return constructPathOrUrl(storagePath, PATH_SEPARATOR, id, "");
   }
   
   private byte[] getBytesFromJavaIoFile(java.io.File ioFile) {

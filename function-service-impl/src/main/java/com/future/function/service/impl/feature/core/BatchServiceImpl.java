@@ -3,12 +3,12 @@ package com.future.function.service.impl.feature.core;
 import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.repository.feature.core.BatchRepository;
+import com.future.function.repository.feature.core.SequenceGenerator;
 import com.future.function.service.api.feature.core.BatchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Service implementation class for batch logic operations implementation.
@@ -18,72 +18,55 @@ public class BatchServiceImpl implements BatchService {
   
   private final BatchRepository batchRepository;
   
+  private final SequenceGenerator sequenceGenerator;
+  
   @Autowired
-  public BatchServiceImpl(BatchRepository batchRepository) {
+  public BatchServiceImpl(
+    BatchRepository batchRepository, SequenceGenerator sequenceGenerator
+  ) {
     
     this.batchRepository = batchRepository;
+    this.sequenceGenerator = sequenceGenerator;
   }
   
+  /**
+   * {@inheritDoc}
+   *
+   * @return {@code Batch} - Batches found in database.
+   */
   @Override
   public List<Batch> getBatches() {
     
-    return batchRepository.findAllByDeletedIsFalse();
+    return batchRepository.findAll();
   }
   
+  /**
+   * {@inheritDoc}
+   *
+   * @param number Number of the batch to be retrieved.
+   *
+   * @return {@code Batch} - The batch object found in database.
+   */
   @Override
   public Batch getBatch(long number) {
     
-    return batchRepository.findByNumberAndDeletedIsFalse(number)
+    return batchRepository.findByNumber(number)
       .orElseThrow(() -> new NotFoundException("Get Batch Not Found"));
   }
   
+  /**
+   * {@inheritDoc}
+   *
+   * @return {@code Batch} - The batch object of the saved data.
+   */
   @Override
   public Batch createBatch() {
     
-    Optional<Batch> latestBatch =
-      batchRepository.findFirstByIdIsNotNullOrderByUpdatedAtDesc();
+    batchRepository.save(
+      new Batch(sequenceGenerator.increment(Batch.SEQUENCE_NAME)));
     
-    if (latestBatch.isPresent()) {
-      return latestBatch.filter(Batch::isDeleted)
-        .map(batch -> markBatch(batch, false))
-        .orElseGet(() -> createNewBatch(latestBatch.get()
-                                          .getNumber()));
-    }
-    return createNewBatch();
-  }
-  
-  private Batch createNewBatch() {
-    
-    return createNewBatch(0);
-  }
-  
-  private Batch createNewBatch(long number) {
-    
-    Batch newBatch = Batch.builder()
-      .number(number + 1)
-      .deleted(false)
-      .build();
-    return batchRepository.save(newBatch);
-  }
-  
-  @Override
-  public void deleteBatch(long batchNumber) {
-    
-    Optional<Batch> targetBatch = batchRepository.findByNumberAndDeletedIsFalse(
-      batchNumber);
-    
-    if (!targetBatch.isPresent()) {
-      throw new NotFoundException("Delete Batch Not Found");
-    } else {
-      markBatch(targetBatch.get(), true);
-    }
-  }
-  
-  private Batch markBatch(Batch batch, boolean deleted) {
-    
-    batch.setDeleted(deleted);
-    
-    return batchRepository.save(batch);
+    return batchRepository.findFirstByIdIsNotNullOrderByUpdatedAtDesc()
+      .orElseThrow(() -> new NotFoundException("Saved Batch Not Found"));
   }
   
 }
