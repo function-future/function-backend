@@ -31,13 +31,9 @@ public class BatchResponseMapper {
   public static DataResponse<BatchWebResponse> toBatchDataResponse(
     Batch batch
   ) {
-    
-    return DataResponse.<BatchWebResponse>builder().code(
-      HttpStatus.CREATED.value())
-      .status(ResponseHelper.toProperStatusFormat(
-        HttpStatus.CREATED.getReasonPhrase()))
-      .data(new BatchWebResponse(batch.getNumber()))
-      .build();
+  
+    return ResponseHelper.toDataResponse(
+      HttpStatus.CREATED, new BatchWebResponse(batch.getNumber()));
   }
   
   /**
@@ -53,13 +49,16 @@ public class BatchResponseMapper {
   public static DataResponse<List<Long>> toBatchesDataResponse(
     List<Batch> batches
   ) {
+  
+    return ResponseHelper.toDataResponse(
+      HttpStatus.OK, toBatchNumberList(batches));
+  }
+  
+  private static List<Long> toBatchNumberList(List<Batch> batches) {
     
-    return DataResponse.<List<Long>>builder().code(HttpStatus.OK.value())
-      .status(HttpStatus.OK.getReasonPhrase())
-      .data(batches.stream()
-              .map(Batch::getNumber)
-              .collect(Collectors.toList()))
-      .build();
+    return batches.stream()
+      .map(Batch::getNumber)
+      .collect(Collectors.toList());
   }
   
 }

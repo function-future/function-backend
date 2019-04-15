@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -52,11 +53,9 @@ public class UserResponseMapper {
   public static DataResponse<UserWebResponse> toUserDataResponse(
     HttpStatus httpStatus, User user
   ) {
-    
-    return DataResponse.<UserWebResponse>builder().code(httpStatus.value())
-      .status(ResponseHelper.toProperStatusFormat(httpStatus.getReasonPhrase()))
-      .data(buildUserWebResponse(user))
-      .build();
+  
+    return ResponseHelper.toDataResponse(
+      httpStatus, buildUserWebResponse(user));
   }
   
   private static UserWebResponse buildUserWebResponse(User user) {
@@ -72,12 +71,17 @@ public class UserResponseMapper {
                     .getFileUrl())
       .thumbnailUrl(user.getPicture()
                       .getThumbnailUrl())
-      .batch(Optional.of(user)
-               .map(User::getBatch)
-               .map(Batch::getNumber)
-               .orElse(null))
+      .batch(getBatch(user))
       .university(user.getUniversity())
       .build();
+  }
+  
+  private static Long getBatch(User user) {
+    
+    return Optional.of(user)
+      .map(User::getBatch)
+      .map(Batch::getNumber)
+      .orElse(null);
   }
   
   /**
@@ -94,15 +98,17 @@ public class UserResponseMapper {
   public static PagingResponse<UserWebResponse> toUsersPagingResponse(
     Page<User> data
   ) {
+  
+    return ResponseHelper.toPagingResponse(
+      HttpStatus.OK, toUserWebResponseList(data), PageHelper.toPaging(data));
+  }
+  
+  private static List<UserWebResponse> toUserWebResponseList(Page<User> data) {
     
-    return PagingResponse.<UserWebResponse>builder().code(HttpStatus.OK.value())
-      .status(HttpStatus.OK.getReasonPhrase())
-      .data(data.getContent()
-              .stream()
-              .map(UserResponseMapper::buildUserWebResponse)
-              .collect(Collectors.toList()))
-      .paging(PageHelper.toPaging(data))
-      .build();
+    return data.getContent()
+      .stream()
+      .map(UserResponseMapper::buildUserWebResponse)
+      .collect(Collectors.toList());
   }
   
 }
