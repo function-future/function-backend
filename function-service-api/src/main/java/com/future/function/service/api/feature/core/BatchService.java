@@ -10,7 +10,8 @@ import java.util.List;
 public interface BatchService {
   
   /**
-   * Retrieves batches from database.
+   * Retrieves batches from database in descending order, based on last
+   * inserted ({@code updatedAt}) information.
    *
    * @return {@code List<Batch>} - Batches found in database.
    */

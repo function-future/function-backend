@@ -36,8 +36,8 @@ public class BatchServiceImpl implements BatchService {
    */
   @Override
   public List<Batch> getBatches() {
-    
-    return batchRepository.findAll();
+  
+    return batchRepository.findAllByIdIsNotNullOrderByUpdatedAtDesc();
   }
   
   /**
