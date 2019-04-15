@@ -5,14 +5,17 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Model representation for sticky note web request.
+ */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class StickyNoteWebRequest {
   
-  private String title;
+  private String noteTitle;
   
-  private String description;
+  private String noteDescription;
   
 }

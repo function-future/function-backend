@@ -14,9 +14,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class StickyNoteWebResponse {
   
-  private String title;
+  private String noteTitle;
   
-  private String description;
+  private String noteDescription;
   
   private Long updatedAt;
   

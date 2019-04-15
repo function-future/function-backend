@@ -13,10 +13,9 @@ Accessible for all user. Get <b>latest</b> sticky note, if available; otherwise,
             "code": 200,
             "status": "OK",
             "data": {
-                "title": "Sticky Note Title",
-                "description": "Note description goes here. Length is 
-                undetermined.",
-                "updatedAt": "2017-08-04T13:32:54Z"
+                "noteTitle": "Sticky Note Title",
+                "noteDescription": "Note noteDescription goes here. Length is undetermined.",
+                "updatedAt": "1555333551046"
             }
         }
         
@@ -41,8 +40,8 @@ response is returned.
     + Body
 
             {
-                "title": "Sticky Note Title",
-                "description": "Note description goes here. Length is 
+                "noteTitle": "Sticky Note Title",
+                "noteDescription": "Note description goes here. Length is 
                 undetermined."
             }
             
@@ -52,10 +51,9 @@ response is returned.
             "code": 201,
             "status": "CREATED",
             "data": {
-                "title": "Sticky Note Title",
-                "description": "Note description goes here. Length is 
-                undetermined.",
-                "updatedAt": "2017-08-04T13:32:54Z"
+                "noteTitle": "Sticky Note Title",
+                "noteDescription": "Note description goes here. Length is undetermined.",
+                "updatedAt": "1555333551046"
             }
         }
 
@@ -68,7 +66,7 @@ response is returned.
                 "title": [
                     "NotBlank"
                 ],
-                "noteDescription": [
+                "description": [
                    "NotBlank"
                ]
             }

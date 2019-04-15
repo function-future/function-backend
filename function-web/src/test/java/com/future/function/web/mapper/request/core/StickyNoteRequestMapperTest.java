@@ -30,15 +30,16 @@ public class StickyNoteRequestMapperTest {
   private static final String DESCRIPTION = "description";
   
   private static final String VALID_JSON =
-    "{\"title\":\"" + TITLE + "\"," + "\"description\":\"" + DESCRIPTION +
+    "{\"noteTitle\":\"" + TITLE + "\"," + "\"noteDescription\":\"" +
+    DESCRIPTION +
     "\"}";
   
   private static final String INVALID_JSON = "{}";
   
   private static final StickyNoteWebRequest STICKY_NOTE_WEB_REQUEST =
     StickyNoteWebRequest.builder()
-      .title(TITLE)
-      .description(DESCRIPTION)
+      .noteTitle(TITLE)
+      .noteDescription(DESCRIPTION)
       .build();
   
   private static final StickyNote STICKY_NOTE = StickyNote.builder()

@@ -46,8 +46,8 @@ public class StickyNoteRequestMapper {
   private StickyNote toValidatedStickyNote(StickyNoteWebRequest request) {
     
     StickyNote stickyNote = StickyNote.builder()
-      .title(request.getTitle())
-      .description(request.getDescription())
+      .title(request.getNoteTitle())
+      .description(request.getNoteDescription())
       .build();
     
     return validator.validate(stickyNote);

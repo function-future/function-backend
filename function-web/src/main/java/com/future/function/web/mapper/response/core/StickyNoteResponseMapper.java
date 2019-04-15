@@ -8,9 +8,23 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
 
+/**
+ * Mapper class for sticky note web response.
+ */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class StickyNoteResponseMapper {
   
+  /**
+   * Converts a sticky note data to {@code StickyNoteWebResponse}, wrapped in
+   * {@code DataResponse}.
+   *
+   * @param stickyNote Sticky note data to be converted to response.
+   *
+   * @return {@code DataResponse<StickyNoteWebResponse>} - The converted sticky
+   * note data, wrapped in
+   * {@link com.future.function.web.model.response.base.DataResponse} and
+   * {@link com.future.function.web.model.response.feature.core.StickyNoteWebResponse}
+   */
   public static DataResponse<StickyNoteWebResponse> toStickyNoteDataResponse(
     StickyNote stickyNote
   ) {
@@ -18,12 +32,23 @@ public class StickyNoteResponseMapper {
     return toStickyNoteDataResponse(HttpStatus.OK, stickyNote);
   }
   
+  /**
+   * Converts a sticky note data to {@code StickyNoteWebResponse}, wrapped in
+   * {@code DataResponse}.
+   *
+   * @param httpStatus Http status to be shown in the response.
+   * @param stickyNote Sticky note data to be converted to response.
+   *
+   * @return {@code DataResponse<StickyNoteWebResponse>} - The converted sticky
+   * note data, wrapped in
+   * {@link com.future.function.web.model.response.base.DataResponse} and
+   * {@link com.future.function.web.model.response.feature.core.StickyNoteWebResponse}
+   */
   public static DataResponse<StickyNoteWebResponse> toStickyNoteDataResponse(
     HttpStatus httpStatus, StickyNote stickyNote
   ) {
     
-    return DataResponse.<StickyNoteWebResponse>builder().code(
-      httpStatus.value())
+    return DataResponse.<StickyNoteWebResponse>builder().code(httpStatus.value())
       .status(ResponseHelper.toProperStatusFormat(httpStatus.getReasonPhrase()))
       .data(buildStickyNoteWebResponse(stickyNote))
       .build();
@@ -34,8 +59,8 @@ public class StickyNoteResponseMapper {
   ) {
     
     return StickyNoteWebResponse.builder()
-      .title(stickyNote.getTitle())
-      .description(stickyNote.getDescription())
+      .noteTitle(stickyNote.getTitle())
+      .noteDescription(stickyNote.getDescription())
       .updatedAt(stickyNote.getUpdatedAt())
       .build();
   }

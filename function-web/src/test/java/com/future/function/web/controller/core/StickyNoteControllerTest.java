@@ -3,7 +3,6 @@ package com.future.function.web.controller.core;
 import com.future.function.model.entity.feature.core.StickyNote;
 import com.future.function.service.api.feature.core.StickyNoteService;
 import com.future.function.web.mapper.request.core.StickyNoteRequestMapper;
-import com.future.function.web.model.request.core.StickyNoteWebRequest;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,12 +34,6 @@ public class StickyNoteControllerTest {
   private static final String VALID_JSON =
     "{\"title\":\"" + TITLE + "\"," + "\"description\":\"" + DESCRIPTION +
     "\"}";
-  
-  private static final StickyNoteWebRequest STICKY_NOTE_WEB_REQUEST =
-    StickyNoteWebRequest.builder()
-      .title(TITLE)
-      .description(DESCRIPTION)
-      .build();
   
   private static final StickyNote STICKY_NOTE = StickyNote.builder()
     .title(TITLE)
