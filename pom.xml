@@ -22,6 +22,7 @@
   <modules>
     <module>function-app</module>
     <module>function-common</module>
+    <module>function-data-migration</module>
     <module>function-model</module>
     <module>function-repository</module>
     <module>function-service-api</module>
@@ -40,11 +41,13 @@
     <jackson-annotations.version>2.8.0</jackson-annotations.version>
     <java.version>1.8</java.version>
 
-    <spring-security-test.version>5.1.4.RELEASE</spring-security-test.version>
+    <mongobee.version>0.13</mongobee.version>
 
+    <spring-security-test.version>5.1.4.RELEASE</spring-security-test.version>
     <?SORTPOM IGNORE?>
     <sonar.coverage.exclusions>
       **/FunctionApplication.java,
+      **/migration/**,
       **/exception/**,
       **/properties/**,
       **/model/**,
@@ -56,6 +59,18 @@
   <dependencyManagement>
 
     <dependencies>
+
+      <dependency>
+        <groupId>com.github.mongobee</groupId>
+        <artifactId>mongobee</artifactId>
+        <version>${mongobee.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongo-java-driver</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
 
       <dependency>
         <groupId>commons-io</groupId>
@@ -215,6 +230,7 @@
           <?SORTPOM IGNORE?>
           <excludes>
             <exclude>**/FunctionApplication.java,</exclude>
+            <exclude>**/migration/**,</exclude>
             <exclude>**/exception/**,</exclude>
             <exclude>**/properties/**,</exclude>
             <exclude>**/model/**,</exclude>
