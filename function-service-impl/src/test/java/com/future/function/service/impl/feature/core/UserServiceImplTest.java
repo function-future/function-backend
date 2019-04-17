@@ -17,11 +17,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.beans.BeanUtils;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Arrays;
 import java.util.List;
@@ -30,6 +33,7 @@ import java.util.Optional;
 import static com.googlecode.catchexception.CatchException.catchException;
 import static com.googlecode.catchexception.CatchException.caughtException;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -85,6 +89,9 @@ public class UserServiceImplTest {
   @Mock
   private UserRepository userRepository;
   
+  @Mock
+  private ResourceLoader resourceLoader;
+  
   @InjectMocks
   private UserServiceImpl userService;
   
@@ -119,7 +126,8 @@ public class UserServiceImplTest {
   @After
   public void tearDown() {
     
-    verifyNoMoreInteractions(batchService, fileService, userRepository);
+    verifyNoMoreInteractions(
+      batchService, fileService, userRepository, resourceLoader);
   }
   
   @Test
@@ -155,9 +163,9 @@ public class UserServiceImplTest {
     
     when(userRepository.findByEmail(NON_EXISTING_USER_EMAIL)).thenReturn(
       Optional.empty());
-  
+    
     catchException(() -> userService.getUser(NON_EXISTING_USER_EMAIL));
-  
+    
     assertThat(caughtException().getClass()).isEqualTo(NotFoundException.class);
     assertThat(caughtException().getMessage()).isEqualTo("Get User Not Found");
     
@@ -272,6 +280,33 @@ public class UserServiceImplTest {
   }
   
   @Test
+  public void testGivenMentorDataWithoutImageByCreatingUserReturnMentor() {
+    
+    when(userRepository.findByEmail(EMAIL_MENTOR)).thenReturn(Optional.empty());
+    when(userRepository.save(userMentor)).thenReturn(userMentor);
+    when(
+      resourceLoader.getResource("classpath:default-profile.png")).thenReturn(
+      new ClassPathResource("default-profile.png"));
+    when(fileService.storeFile(any(MultipartFile.class),
+                               any(FileOrigin.class)
+    )).thenReturn(PICTURE);
+    when(fileService.getFile(PICTURE_ID)).thenReturn(PICTURE);
+    
+    User createdUserMentor = userService.createUser(userMentor, null);
+    
+    assertThat(createdUserMentor).isNotNull();
+    assertThat(createdUserMentor.getPicture()).isNotNull();
+    assertThat(createdUserMentor.getPicture()).isEqualTo(PICTURE);
+    
+    verify(userRepository).findByEmail(EMAIL_MENTOR);
+    verify(userRepository).save(userMentor);
+    verify(resourceLoader).getResource("classpath:default-profile.png");
+    verify(fileService).storeFile(
+      any(MultipartFile.class), any(FileOrigin.class));
+    verify(fileService).getFile(PICTURE_ID);
+  }
+  
+  @Test
   public void testGivenDeletedStudentDataByCreatingUserReturnStudent() {
     
     when(batchService.getBatch(NUMBER)).thenReturn(BATCH);
@@ -380,7 +415,7 @@ public class UserServiceImplTest {
     
     when(userRepository.findByEmail(EMAIL_STUDENT)).thenReturn(
       Optional.of(userStudent));
-  
+    
     User deletedUserStudent = new User();
     BeanUtils.copyProperties(userStudent, deletedUserStudent);
     deletedUserStudent.setDeleted(true);
@@ -423,9 +458,9 @@ public class UserServiceImplTest {
     
     when(userRepository.findByEmail(NON_EXISTING_USER_EMAIL)).thenReturn(
       Optional.empty());
-  
+    
     catchException(() -> userService.deleteUser(NON_EXISTING_USER_EMAIL));
-  
+    
     assertThat(caughtException().getClass()).isEqualTo(NotFoundException.class);
     assertThat(caughtException().getMessage()).isEqualTo(
       "Delete User Not Found");

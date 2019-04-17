@@ -7,8 +7,8 @@ import com.future.function.common.properties.core.FileProperties;
 import com.future.function.model.entity.feature.core.File;
 import com.future.function.repository.feature.core.FileRepository;
 import com.future.function.service.api.feature.core.FileService;
+import com.future.function.service.impl.helper.ByteArrayHelper;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileSystemUtils;
@@ -89,7 +89,7 @@ public class FileServiceImpl implements FileService {
                                                 fileOrigin.isAsResource()
     )
       .map(file -> getFileOrThumbnail(file, fileName))
-      .map(this::getBytesFromJavaIoFile)
+      .map(ByteArrayHelper::getBytesFromJavaIoFile)
       .orElseThrow(() -> new NotFoundException("Get File Not Found"));
   }
   
@@ -142,7 +142,7 @@ public class FileServiceImpl implements FileService {
         thumbnailImage = toThumbnailImage(multipartFile);
         thumbnailPath = constructPathOrUrl(
           folderPath, PATH_SEPARATOR, id, thumbnailSuffix, extension);
-        thumbnailUrl = constructPathOrUrl(toOriginFolderName(fileOrigin),
+        thumbnailUrl = constructPathOrUrl(toDetailedUrlPrefix(fileOrigin),
                                           URL_SEPARATOR, id, thumbnailSuffix,
                                           extension
         );
@@ -166,15 +166,14 @@ public class FileServiceImpl implements FileService {
     try {
       multipartFile.transferTo(ioFile);
       
-      ImageIO.write(
-        toBufferedThumbnailImage(thumbnailImage), extension.substring(1),
-        thumbnailIoFile
+      ImageIO.write(toBufferedThumbnailImage(thumbnailImage),
+                    extension.substring(1), thumbnailIoFile
       );
     } catch (IOException e) {
       throw new BadRequestException("Unsupported Operation");
     }
     
-    String fileUrl = constructPathOrUrl(toOriginFolderName(fileOrigin),
+    String fileUrl = constructPathOrUrl(toDetailedUrlPrefix(fileOrigin),
                                         URL_SEPARATOR, id, extension
     );
     
@@ -191,7 +190,7 @@ public class FileServiceImpl implements FileService {
     return fileRepository.save(file);
   }
   
-  private String toOriginFolderName(FileOrigin fileOrigin) {
+  private String toDetailedUrlPrefix(FileOrigin fileOrigin) {
     
     return urlPrefix + URL_SEPARATOR + fileOrigin.lowCaseValue();
   }
@@ -275,15 +274,6 @@ public class FileServiceImpl implements FileService {
   private String constructPathOrUrl(String id) {
     
     return constructPathOrUrl(storagePath, PATH_SEPARATOR, id, "");
-  }
-  
-  private byte[] getBytesFromJavaIoFile(java.io.File ioFile) {
-    
-    try {
-      return IOUtils.toByteArray(ioFile.toURI());
-    } catch (IOException e) {
-      throw new BadRequestException("Unsupported Operation");
-    }
   }
   
 }

@@ -13,6 +13,12 @@
 
   <dependencies>
 
+    <dependency>
+      <groupId>com.future.function</groupId>
+      <artifactId>function-data-migration</artifactId>
+      <version>${project.parent.version}</version>
+    </dependency>
+
     <!-- function dependencies -->
     <dependency>
       <groupId>com.future.function</groupId>
@@ -31,12 +37,6 @@
       <artifactId>function-web</artifactId>
       <version>${project.parent.version}</version>
     </dependency>
-
-      <dependency>
-          <groupId>com.future.function</groupId>
-          <artifactId>function-data-migration</artifactId>
-          <version>${project.parent.version}</version>
-      </dependency>
 
   </dependencies>
 

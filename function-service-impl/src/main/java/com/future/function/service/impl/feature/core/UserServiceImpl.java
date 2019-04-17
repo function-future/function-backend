@@ -9,13 +9,18 @@ import com.future.function.repository.feature.core.UserRepository;
 import com.future.function.service.api.feature.core.BatchService;
 import com.future.function.service.api.feature.core.FileService;
 import com.future.function.service.api.feature.core.UserService;
+import com.future.function.service.impl.helper.ByteArrayHelper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Optional;
 
 /**
@@ -30,15 +35,18 @@ public class UserServiceImpl implements UserService {
   
   private final UserRepository userRepository;
   
+  private final ResourceLoader resourceLoader;
+  
   @Autowired
   public UserServiceImpl(
     BatchService batchService, FileService fileService,
-    UserRepository userRepository
+    UserRepository userRepository, ResourceLoader webApplicationContext
   ) {
     
     this.batchService = batchService;
     this.fileService = fileService;
     this.userRepository = userRepository;
+    this.resourceLoader = webApplicationContext;
   }
   
   /**
@@ -113,10 +121,36 @@ public class UserServiceImpl implements UserService {
     return Optional.ofNullable(image)
       .map(img -> fileService.storeFile(img, FileOrigin.USER))
       .map(file -> fileService.getFile(file.getId()))
-      .map(file -> {
-        user.setPicture(file);
-        return user;
-      })
+      .map(file -> setUserPicture(user, file))
+      .orElseGet(() -> setDefaultUserPicture(user));
+  }
+  
+  private User setUserPicture(User user, File file) {
+    
+    user.setPicture(file);
+    return user;
+  }
+  
+  private User setDefaultUserPicture(User user) {
+    
+    java.io.File defaultPicture;
+    try {
+      defaultPicture = resourceLoader.getResource(
+        "classpath:default-profile.png")
+        .getFile();
+    } catch (IOException e) {
+      defaultPicture = null;
+    }
+    
+    return Optional.ofNullable(defaultPicture)
+      .map(ByteArrayHelper::getBytesFromJavaIoFile)
+      .map(bytes -> new MockMultipartFile("default-profile.png",
+                                          "default-profile.png",
+                                          MediaType.IMAGE_PNG_VALUE, bytes
+      ))
+      .map(img -> fileService.storeFile(img, FileOrigin.USER))
+      .map(file -> fileService.getFile(file.getId()))
+      .map(file -> setUserPicture(user, file))
       .orElse(user);
   }
   
