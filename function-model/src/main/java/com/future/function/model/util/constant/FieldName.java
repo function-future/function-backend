@@ -4,13 +4,12 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 /**
- * Abstract class containing name of fields in database.
+ * Interface class containing name of fields in database.
  */
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public abstract class FieldName {
+public interface FieldName {
   
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
-  public static abstract class BaseEntity {
+  abstract class BaseEntity {
     
     public static final String CREATED_AT = "createdAt";
     
@@ -25,7 +24,7 @@ public abstract class FieldName {
   }
   
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
-  public static abstract class User {
+  abstract class User {
     
     public static final String EMAIL = "email";
     
@@ -48,14 +47,14 @@ public abstract class FieldName {
   }
   
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
-  public static abstract class Batch {
+  abstract class Batch {
     
     public static final String NUMBER = "number";
     
   }
   
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
-  public static abstract class File {
+  abstract class File {
     
     public static final String FILE_PATH = "filePath";
     
@@ -72,7 +71,7 @@ public abstract class FieldName {
   }
   
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
-  public static abstract class Sequence {
+  abstract class Sequence {
     
     public static final String SEQUENCE_NUMBER = "sequence_number";
     

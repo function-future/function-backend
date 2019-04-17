@@ -46,6 +46,7 @@
       **/migration/**,
       **/exception/**,
       **/properties/**,
+      **/configuration/**,
       **/model/**,
       **/service/api/**
     </sonar.coverage.exclusions>
@@ -240,6 +241,7 @@
             <exclude>**/migration/**,</exclude>
             <exclude>**/exception/**,</exclude>
             <exclude>**/properties/**,</exclude>
+            <exclude>**/configuration/**,</exclude>
             <exclude>**/model/**,</exclude>
             <exclude>**/service/api/**</exclude>
           </excludes>
