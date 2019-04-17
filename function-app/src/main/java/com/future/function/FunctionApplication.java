@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.data.mongodb.config.EnableMongoAuditing;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 /**
  * Main class of the application.
@@ -15,6 +16,7 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
  * requirements are also included and declared here.
  */
 @SpringBootApplication
+@EnableSwagger2
 @EnableMongoAuditing
 @EnableMongoRepositories
 @EnableConfigurationProperties(FileProperties.class)

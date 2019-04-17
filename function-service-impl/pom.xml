@@ -13,7 +13,6 @@
 
   <dependencies>
 
-    <!-- function dependencies -->
     <dependency>
       <groupId>com.future.function</groupId>
       <artifactId>function-repository</artifactId>
@@ -38,7 +37,6 @@
       </exclusions>
     </dependency>
 
-    <!-- other dependencies -->
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
@@ -50,7 +48,6 @@
       <scope>test</scope>
     </dependency>
 
-    <!-- spring dependencies -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter</artifactId>

@@ -5,6 +5,7 @@ import com.future.function.model.entity.feature.Sequence;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.File;
 import com.future.function.model.util.constant.DocumentName;
+import com.future.function.model.util.constant.FieldName;
 import com.github.mongobee.changeset.ChangeLog;
 import com.github.mongobee.changeset.ChangeSet;
 import com.mongodb.BasicDBObject;
@@ -14,7 +15,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import static org.springframework.data.mongodb.core.query.Criteria.where;
 import static org.springframework.data.mongodb.core.query.Query.query;
 
-@ChangeLog
+@ChangeLog(order = "001")
 public class FunctionChangeLog {
   
   private static final long ONE = 1;
@@ -54,16 +55,16 @@ public class FunctionChangeLog {
     
     BasicDBObject student = new BasicDBObject();
     student.append("email", "student@student.com");
-    student.append("name", "Student");
-    student.append("role", Role.STUDENT);
-    student.append("password", "studentfunctionapp");
-    student.append("phone", "081212341234");
-    student.append("address", "Student Address");
-    student.append("picture", new File());
-    student.append("batch", batchRef);
-    student.append("university", "University");
-    student.append("createdAt", System.currentTimeMillis());
-    student.append("updatedAt", System.currentTimeMillis());
+    student.append(FieldName.User.NAME, "Student");
+    student.append(FieldName.User.ROLE, Role.STUDENT);
+    student.append(FieldName.User.PASSWORD, "studentfunctionapp");
+    student.append(FieldName.User.PHONE, "081212341234");
+    student.append(FieldName.User.ADDRESS, "Student Address");
+    student.append(FieldName.User.PICTURE, new File());
+    student.append(FieldName.User.BATCH, batchRef);
+    student.append(FieldName.User.UNIVERSITY, "University");
+    student.append(FieldName.BaseEntity.CREATED_AT, System.currentTimeMillis());
+    student.append(FieldName.BaseEntity.UPDATED_AT, System.currentTimeMillis());
     
     mongoTemplate.insert(student, DocumentName.USER);
   }
@@ -74,15 +75,15 @@ public class FunctionChangeLog {
   public void insertAdmin(MongoTemplate mongoTemplate) {
     
     BasicDBObject admin = new BasicDBObject();
-    admin.append("email", "admin@admin.com");
-    admin.append("name", "Admin Istrator");
-    admin.append("role", Role.ADMIN);
-    admin.append("password", "administratorfunctionapp");
-    admin.append("phone", "+6281212341234");
-    admin.append("address", "Admin Address");
-    admin.append("picture", new File());
-    admin.append("createdAt", System.currentTimeMillis());
-    admin.append("updatedAt", System.currentTimeMillis());
+    admin.append(FieldName.User.EMAIL, "admin@admin.com");
+    admin.append(FieldName.User.NAME, "Admin Istrator");
+    admin.append(FieldName.User.ROLE, Role.ADMIN);
+    admin.append(FieldName.User.PASSWORD, "administratorfunctionapp");
+    admin.append(FieldName.User.PHONE, "+6281212341234");
+    admin.append(FieldName.User.ADDRESS, "Admin Address");
+    admin.append(FieldName.User.PICTURE, new File());
+    admin.append(FieldName.BaseEntity.CREATED_AT, System.currentTimeMillis());
+    admin.append(FieldName.BaseEntity.UPDATED_AT, System.currentTimeMillis());
     
     mongoTemplate.insert(admin, DocumentName.USER);
   }
@@ -93,15 +94,15 @@ public class FunctionChangeLog {
   public void insertMentor(MongoTemplate mongoTemplate) {
     
     BasicDBObject mentor = new BasicDBObject();
-    mentor.append("email", "mentor@mentor.com");
-    mentor.append("name", "Mentor");
-    mentor.append("role", Role.MENTOR);
-    mentor.append("password", "mentorfunctionapp");
-    mentor.append("phone", "+628121234123");
-    mentor.append("address", "Mentor Address");
-    mentor.append("picture", new File());
-    mentor.append("createdAt", System.currentTimeMillis());
-    mentor.append("updatedAt", System.currentTimeMillis());
+    mentor.append(FieldName.User.EMAIL, "mentor@mentor.com");
+    mentor.append(FieldName.User.NAME, "Mentor");
+    mentor.append(FieldName.User.ROLE, Role.MENTOR);
+    mentor.append(FieldName.User.PASSWORD, "mentorfunctionapp");
+    mentor.append(FieldName.User.PHONE, "+628121234123");
+    mentor.append(FieldName.User.ADDRESS, "Mentor Address");
+    mentor.append(FieldName.User.PICTURE, new File());
+    mentor.append(FieldName.BaseEntity.CREATED_AT, System.currentTimeMillis());
+    mentor.append(FieldName.BaseEntity.UPDATED_AT, System.currentTimeMillis());
     
     mongoTemplate.insert(mentor, DocumentName.USER);
   }
@@ -112,15 +113,15 @@ public class FunctionChangeLog {
   public void insertJudge(MongoTemplate mongoTemplate) {
     
     BasicDBObject judge = new BasicDBObject();
-    judge.append("email", "judge@judge.com");
-    judge.append("name", "Judge");
-    judge.append("role", Role.JUDGE);
-    judge.append("password", "judgefunctionapp");
-    judge.append("phone", "+62812123412345");
-    judge.append("address", "Judge Address");
-    judge.append("picture", new File());
-    judge.append("createdAt", System.currentTimeMillis());
-    judge.append("updatedAt", System.currentTimeMillis());
+    judge.append(FieldName.User.EMAIL, "judge@judge.com");
+    judge.append(FieldName.User.NAME, "Judge");
+    judge.append(FieldName.User.ROLE, Role.JUDGE);
+    judge.append(FieldName.User.PASSWORD, "judgefunctionapp");
+    judge.append(FieldName.User.PHONE, "+62812123412345");
+    judge.append(FieldName.User.ADDRESS, "Judge Address");
+    judge.append(FieldName.User.PICTURE, new File());
+    judge.append(FieldName.BaseEntity.CREATED_AT, System.currentTimeMillis());
+    judge.append(FieldName.BaseEntity.UPDATED_AT, System.currentTimeMillis());
     
     mongoTemplate.insert(judge, DocumentName.USER);
   }

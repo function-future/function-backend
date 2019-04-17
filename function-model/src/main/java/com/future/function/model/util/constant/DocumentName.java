@@ -1,9 +1,12 @@
 package com.future.function.model.util.constant;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
 /**
  * Abstract class containing name of documents in database.
  */
-@SuppressWarnings("squid:S1118")
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public abstract class DocumentName {
   
   public static final String SEQUENCE = "sequences";

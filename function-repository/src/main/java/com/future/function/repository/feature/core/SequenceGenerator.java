@@ -38,7 +38,8 @@ public class SequenceGenerator {
     
     Sequence sequence = mongoOperations.findAndModify(
       query(where("_id").is(sequenceName)),
-      new Update().inc(FieldName.SEQUENCE_NUMBER, 1), options().returnNew(true)
+      new Update().inc(FieldName.Sequence.SEQUENCE_NUMBER, 1),
+      options().returnNew(true)
         .upsert(true), Sequence.class
     );
     
