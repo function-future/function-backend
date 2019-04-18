@@ -51,123 +51,123 @@ public class OnlyStudentCanHaveBatchAndUniversityValidatorTest {
   
   @Test
   public void testGivenRoleNonStudentAndNotNullBatchAndNotNullUniversityByValidatingUserObjectReturnFalse() {
-    
-    when(userData.getRoleAsString()).thenReturn(NONSTUDENT);
-    when(userData.getBatchNumber()).thenReturn(BATCH);
+  
+    when(userData.getRole()).thenReturn(NONSTUDENT);
+    when(userData.getBatch()).thenReturn(BATCH);
     when(userData.getUniversity()).thenReturn(UNIVERSITY);
     
     assertThat(validator.isValid(userData, null)).isFalse();
-    
-    verify(userData).getRoleAsString();
-    verify(userData).getBatchNumber();
+  
+    verify(userData).getRole();
+    verify(userData).getBatch();
     verify(userData).getUniversity();
   }
   
   @Test
   public void testGivenRoleUnknownAndNotNullBatchAndNotNullUniversityByValidatingUserObjectReturnFalse() {
-    
-    when(userData.getRoleAsString()).thenReturn(UNKNOWN);
+  
+    when(userData.getRole()).thenReturn(UNKNOWN);
     
     assertThat(validator.isValid(userData, null)).isFalse();
-    
-    verify(userData).getRoleAsString();
+  
+    verify(userData).getRole();
   }
   
   @Test
   public void testGivenRoleNonStudentAndNotNullBatchAndNullUniversityByValidatingUserObjectReturnFalse() {
-    
-    when(userData.getRoleAsString()).thenReturn(NONSTUDENT);
-    when(userData.getBatchNumber()).thenReturn(BATCH);
+  
+    when(userData.getRole()).thenReturn(NONSTUDENT);
+    when(userData.getBatch()).thenReturn(BATCH);
     when(userData.getUniversity()).thenReturn(null);
     
     assertThat(validator.isValid(userData, null)).isFalse();
-    
-    verify(userData).getRoleAsString();
-    verify(userData).getBatchNumber();
+  
+    verify(userData).getRole();
+    verify(userData).getBatch();
     verify(userData).getUniversity();
   }
   
   @Test
   public void testGivenRoleNonStudentAndNullBatchAndNotNullUniversityByValidatingUserObjectReturnFalse() {
-    
-    when(userData.getRoleAsString()).thenReturn(NONSTUDENT);
-    when(userData.getBatchNumber()).thenReturn(null);
+  
+    when(userData.getRole()).thenReturn(NONSTUDENT);
+    when(userData.getBatch()).thenReturn(null);
     when(userData.getUniversity()).thenReturn(UNIVERSITY);
     
     assertThat(validator.isValid(userData, null)).isFalse();
-    
-    verify(userData).getRoleAsString();
-    verify(userData).getBatchNumber();
+  
+    verify(userData).getRole();
+    verify(userData).getBatch();
     verify(userData).getUniversity();
   }
   
   @Test
   public void testGivenRoleNonStudentAndNullBatchAndNullUniversityByValidatingUserObjectReturnTrue() {
-    
-    when(userData.getRoleAsString()).thenReturn(NONSTUDENT);
-    when(userData.getBatchNumber()).thenReturn(null);
+  
+    when(userData.getRole()).thenReturn(NONSTUDENT);
+    when(userData.getBatch()).thenReturn(null);
     when(userData.getUniversity()).thenReturn(null);
     
     assertThat(validator.isValid(userData, null)).isTrue();
-    
-    verify(userData).getRoleAsString();
-    verify(userData).getBatchNumber();
+  
+    verify(userData).getRole();
+    verify(userData).getBatch();
     verify(userData).getUniversity();
   }
   
   @Test
   public void testGivenRoleStudentAndNotNullBatchAndNotNullUniversityByValidatingUserObjectReturnTrue() {
-    
-    when(userData.getRoleAsString()).thenReturn(STUDENT);
-    when(userData.getBatchNumber()).thenReturn(BATCH);
+  
+    when(userData.getRole()).thenReturn(STUDENT);
+    when(userData.getBatch()).thenReturn(BATCH);
     when(userData.getUniversity()).thenReturn(UNIVERSITY);
     
     assertThat(validator.isValid(userData, null)).isTrue();
-    
-    verify(userData).getRoleAsString();
-    verify(userData).getBatchNumber();
+  
+    verify(userData).getRole();
+    verify(userData).getBatch();
     verify(userData).getUniversity();
   }
   
   @Test
   public void testGivenRoleStudentAndNotNullBatchAndNullUniversityByValidatingUserObjectReturnFalse() {
-    
-    when(userData.getRoleAsString()).thenReturn(STUDENT);
-    when(userData.getBatchNumber()).thenReturn(BATCH);
+  
+    when(userData.getRole()).thenReturn(STUDENT);
+    when(userData.getBatch()).thenReturn(BATCH);
     when(userData.getUniversity()).thenReturn(null);
     
     assertThat(validator.isValid(userData, null)).isFalse();
-    
-    verify(userData).getRoleAsString();
-    verify(userData).getBatchNumber();
+  
+    verify(userData).getRole();
+    verify(userData).getBatch();
     verify(userData).getUniversity();
   }
   
   @Test
   public void testGivenRoleStudentAndNullBatchAndNotNullUniversityByValidatingUserObjectReturnFalse() {
-    
-    when(userData.getRoleAsString()).thenReturn(STUDENT);
-    when(userData.getBatchNumber()).thenReturn(null);
+  
+    when(userData.getRole()).thenReturn(STUDENT);
+    when(userData.getBatch()).thenReturn(null);
     when(userData.getUniversity()).thenReturn(UNIVERSITY);
     
     assertThat(validator.isValid(userData, null)).isFalse();
-    
-    verify(userData).getRoleAsString();
-    verify(userData).getBatchNumber();
+  
+    verify(userData).getRole();
+    verify(userData).getBatch();
     verify(userData).getUniversity();
   }
   
   @Test
   public void testGivenRoleStudentAndNullBatchAndNullUniversityByValidatingUserObjectReturnFalse() {
-    
-    when(userData.getRoleAsString()).thenReturn(STUDENT);
-    when(userData.getBatchNumber()).thenReturn(null);
+  
+    when(userData.getRole()).thenReturn(STUDENT);
+    when(userData.getBatch()).thenReturn(null);
     when(userData.getUniversity()).thenReturn(null);
     
     assertThat(validator.isValid(userData, null)).isFalse();
-    
-    verify(userData).getRoleAsString();
-    verify(userData).getBatchNumber();
+  
+    verify(userData).getRole();
+    verify(userData).getBatch();
     verify(userData).getUniversity();
   }
   

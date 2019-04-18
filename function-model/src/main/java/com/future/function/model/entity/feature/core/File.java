@@ -8,7 +8,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
@@ -28,11 +27,9 @@ public class File extends BaseEntity {
   private String id;
   
   @Field(FieldName.File.FILE_PATH)
-  @NotBlank(message = "NotBlank")
   private String filePath;
   
   @Field(FieldName.File.FILE_URL)
-  @NotBlank(message = "NotBlank")
   private String fileUrl;
   
   @Field(FieldName.File.THUMBNAIL_PATH)
