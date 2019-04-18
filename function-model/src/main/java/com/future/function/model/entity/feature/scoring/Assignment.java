@@ -17,7 +17,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
- * Entity representation for users.
+ * Entity representation for assignments.
  */
 @Data
 @Builder
@@ -25,7 +25,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @Document(collection = DocumentName.ASSIGNMENT)
-@OnlyStudentCanHaveBatchAndUniversity
 public class Assignment extends BaseEntity {
 
   @Id
