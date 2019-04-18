@@ -61,13 +61,17 @@ public class UserRepositoryTest {
     
     assertThat(foundUser1).isNotEqualTo(Optional.empty());
     assertThat(foundUser1.get()
-                 .getRoleAsString()).isEqualTo(user1.getRoleAsString());
+                 .getRole()
+                 .name()).isEqualTo(user1.getRole()
+                                      .name());
     
     Optional<User> foundUser2 = userRepository.findByEmail(EMAIL_2);
     
     assertThat(foundUser2).isNotEqualTo(Optional.empty());
     assertThat(foundUser2.get()
-                 .getRoleAsString()).isEqualTo(user2.getRoleAsString());
+                 .getRole()
+                 .name()).isEqualTo(user2.getRole()
+                                      .name());
   }
   
   @Test

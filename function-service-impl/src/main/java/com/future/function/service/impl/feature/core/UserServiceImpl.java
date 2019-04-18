@@ -185,10 +185,10 @@ public class UserServiceImpl implements UserService {
    */
   @Override
   public void deleteUser(String email) {
-    
-    userRepository.findByEmail(email)
-      .map(user -> markDeleted(user, true))
-      .orElseThrow(() -> new NotFoundException("Delete User Not Found"));
+  
+    Optional.ofNullable(email)
+      .map(this::getUser)
+      .map(user -> markDeleted(user, true));
   }
   
   private User markDeleted(User user, boolean deleted) {

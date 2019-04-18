@@ -203,14 +203,10 @@ public class FileServiceImpl implements FileService {
   @Override
   @SuppressWarnings("unused")
   public void deleteFile(String id) {
-    
-    boolean deleted = Optional.of(id)
+  
+    Optional.of(id)
       .filter(this::deleteFileFromDisk)
-      .map(result -> {
-        fileRepository.delete(id);
-        return true;
-      })
-      .orElse(false);
+      .ifPresent(fileRepository::delete);
   }
   
   private String constructPathOrUrl(
