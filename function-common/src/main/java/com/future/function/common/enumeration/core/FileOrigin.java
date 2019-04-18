@@ -8,7 +8,8 @@ package com.future.function.common.enumeration.core;
  * as the name of root folder for a file in the file storage.
  */
 public enum FileOrigin {
-  USER(true);
+  USER(true),
+  ASSIGNMENT(true);
   
   private String lowCaseValue;
   

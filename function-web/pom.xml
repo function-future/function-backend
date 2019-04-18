@@ -34,7 +34,12 @@
       <scope>test</scope>
     </dependency>
 
-    <!-- spring dependencies -->
+      <dependency>
+          <groupId>commons-fileupload</groupId>
+          <artifactId>commons-fileupload</artifactId>
+      </dependency>
+
+      <!-- spring dependencies -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>

@@ -13,5 +13,7 @@ public abstract class DocumentName {
   public static final String FILE = "files";
   
   public static final String USER = "users";
+
+  public static final String ASSIGNMENT = "assignments";
   
 }

@@ -71,7 +71,7 @@ public class AssignmentController {
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
   public DataResponse<AssignmentWebResponse> createAssignment(
           @RequestParam String data,
-          @RequestParam MultipartFile file
+          @RequestParam(required = false, name = "file") MultipartFile file
   ) {
     return AssignmentResponseMapper
             .toAssignmentDataResponse(
@@ -89,7 +89,7 @@ public class AssignmentController {
   @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
   public DataResponse<AssignmentWebResponse> updateAssignment(
           @RequestParam String data,
-          @RequestParam MultipartFile file
+          @RequestParam(required = false, name = "file") MultipartFile file
   ) {
     return AssignmentResponseMapper
             .toAssignmentDataResponse(

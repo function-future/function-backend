@@ -6,7 +6,6 @@ import com.future.function.model.entity.feature.core.File;
 import com.future.function.model.entity.feature.scoring.Assignment;
 import com.future.function.repository.feature.scoring.AssignmentRepository;
 import com.future.function.service.api.feature.core.FileService;
-import com.future.function.service.api.feature.scoring.AssignmentService;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -24,6 +23,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.mock.web.MockMultipartFile;
 
+import static com.googlecode.catchexception.CatchException.catchException;
+import static com.googlecode.catchexception.CatchException.caughtException;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
@@ -51,7 +52,7 @@ public class AssignmentServiceImplTest {
   private List<Assignment> assignmentList;
 
   @InjectMocks
-  private AssignmentService assignmentService;
+  private AssignmentServiceImpl assignmentService;
 
   @Mock
   private AssignmentRepository assignmentRepository;
@@ -104,7 +105,7 @@ public class AssignmentServiceImplTest {
   public void testFindAllAssignmentWithPageable() {
     Page<Assignment> result = assignmentService.findAllBuPageable(pageable);
     assertThat(result).isNotNull();
-    assertThat(result.getTotalElements()).isEqualTo(1);
+    assertThat(result.getContent().size()).isEqualTo(1);
     assertThat(result.getContent()).isEqualTo(assignmentList);
     verify(assignmentRepository).findAll(eq(pageable));
   }
@@ -119,13 +120,56 @@ public class AssignmentServiceImplTest {
 
   @Test
   public void testFindByIdNull() {
-    assertThat(assignmentService.findById(null)).isEqualTo(new NotFoundException(ERROR_MSG_NOT_FOUND));
+    catchException(() -> assignmentService.findById(null));
+    assertThat(caughtException().getClass()).isEqualTo(NotFoundException.class);
+    assertThat(caughtException().getMessage()).isEqualTo(ERROR_MSG_NOT_FOUND);
   }
 
   @Test
   public void testDeleteByIdSuccess() {
     assignmentService.deleteById(assignment.getId());
     verify(assignmentRepository).findByIdAndDeletedFalse(eq(assignment.getId()));
-    verify(assignmentRepository).delete(eq(assignment));
+    assignment.setDeleted(true);
+    verify(assignmentRepository).save(eq(assignment));
+  }
+
+  @Test
+  public void testCreateAssignmentSuccess() {
+    Assignment actual = assignmentService.createAssignment(assignment, multipartFile);
+    assertThat(actual.getFile()).isEqualTo(file);
+    assertThat(actual).isEqualTo(assignment);
+    verify(fileService).getFile(eq(FILE_ID));
+    verify(fileService).storeFile(multipartFile, FileOrigin.ASSIGNMENT);
+    verify(assignmentRepository).save(eq(assignment));
+  }
+
+  @Test
+  public void testCreateAssignmentFailedStoreFile() {
+    Assignment actual = assignmentService.createAssignment(assignment, null);
+    assertThat(actual.getFile()).isEqualTo(null);
+    assertThat(actual).isEqualTo(assignment);
+    verify(assignmentRepository).save(eq(assignment));
+  }
+
+  @Test
+  public void testUpdateAssignmentSuccess() {
+    Assignment assignmentWithFile = assignment;
+    assignmentWithFile.setFile(file);
+    when(assignmentRepository.save(assignmentWithFile))
+            .thenReturn(assignmentWithFile);
+    Assignment actual = assignmentService.updateAssignment(assignment, multipartFile);
+    assertThat(actual.getFile()).isEqualTo(file);
+    assertThat(actual).isEqualTo(assignment);
+    verify(fileService).getFile(eq(FILE_ID));
+    verify(fileService).storeFile(multipartFile, FileOrigin.ASSIGNMENT);
+    verify(assignmentRepository).save(eq(assignment));
+  }
+
+  @Test
+  public void testUpdateAssignmentFailedStoreFile() {
+    Assignment actual = assignmentService.updateAssignment(assignment, null);
+    assertThat(actual.getFile()).isEqualTo(null);
+    assertThat(actual).isEqualTo(assignment);
+    verify(assignmentRepository).save(eq(assignment));
   }
 }
