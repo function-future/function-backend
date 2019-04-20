@@ -25,6 +25,13 @@ public class AnnouncementRequestMapper {
     this.requestMapper = requestMapper;
   }
   
+  /**
+   * Converts JSON data to {@code Announcement} object.
+   *
+   * @param data JSON data (in form of String) to be converted.
+   *
+   * @return {@code Announcement} - Converted announcement object.
+   */
   public Announcement toAnnouncement(String data) {
     
     AnnouncementWebRequest request = requestMapper.toWebRequestObject(
@@ -52,6 +59,15 @@ public class AnnouncementRequestMapper {
     return announcement;
   }
   
+  /**
+   * Converts JSON data to {@code Announcement} object. This method is used for
+   * update announcement purposes.
+   *
+   * @param announcementId Id of announcement to be updated.
+   * @param data           JSON data (in form of String) to be converted.
+   *
+   * @return {@code Announcement} - Converted announcement object.
+   */
   public Announcement toAnnouncement(String announcementId, String data) {
     
     return toValidatedAnnouncement(

@@ -40,6 +40,14 @@ public class AnnouncementController {
     this.announcementRequestMapper = announcementRequestMapper;
   }
   
+  /**
+   * Retrieves announcements based on given parameters.
+   *
+   * @return {@code PagingResponse<AnnouncementWebResponse} - The retrieved
+   * announcements data, wrapped in
+   * {@link com.future.function.web.model.response.base.PagingResponse} and
+   * {@link com.future.function.web.model.response.feature.core.AnnouncementWebResponse}
+   */
   @ResponseStatus(HttpStatus.OK)
   @GetMapping
   public PagingResponse<AnnouncementWebResponse> getAnnouncements(
@@ -53,6 +61,16 @@ public class AnnouncementController {
       announcementService.getAnnouncements(PageHelper.toPage(page, size)));
   }
   
+  /**
+   * Retrieves a announcement based on given parameter.
+   *
+   * @param announcementId Id of announcement to be retrieved.
+   *
+   * @return {@code DataResponse<AnnouncementWebResponse} - The retrieved
+   * announcement data, wrapped in
+   * {@link com.future.function.web.model.response.base.DataResponse} and
+   * {@link com.future.function.web.model.response.feature.core.AnnouncementWebResponse}
+   */
   @ResponseStatus(HttpStatus.OK)
   @GetMapping(value = "/{announcementId}")
   public DataResponse<AnnouncementWebResponse> getAnnouncement(
@@ -64,6 +82,17 @@ public class AnnouncementController {
       announcementService.getAnnouncement(announcementId));
   }
   
+  /**
+   * Creates new announcement in database.
+   *
+   * @param data Data of new announcement in JSON format.
+   * @param file File of the new announcement.
+   *
+   * @return {@code DataResponse<AnnouncementWebResponse} - The created
+   * announcement data, wrapped in
+   * {@link com.future.function.web.model.response.base.DataResponse} and
+   * {@link com.future.function.web.model.response.feature.core.AnnouncementWebResponse}
+   */
   @ResponseStatus(HttpStatus.CREATED)
   @PostMapping
   public DataResponse<AnnouncementWebResponse> createAnnouncement(
@@ -78,6 +107,17 @@ public class AnnouncementController {
         announcementRequestMapper.toAnnouncement(data), file));
   }
   
+  /**
+   * Updates existing announcement in database.
+   *
+   * @param data Data of existing announcement in JSON format.
+   * @param file New file of the existing announcement.
+   *
+   * @return {@code DataResponse<AnnouncementWebResponse} - The updated
+   * announcement data, wrapped in
+   * {@link com.future.function.web.model.response.base.DataResponse} and
+   * {@link com.future.function.web.model.response.feature.core.AnnouncementWebResponse}
+   */
   @ResponseStatus(HttpStatus.OK)
   @PutMapping(value = "/{announcementId}")
   public DataResponse<AnnouncementWebResponse> updateAnnouncement(
@@ -91,9 +131,17 @@ public class AnnouncementController {
     
     return AnnouncementResponseMapper.toAnnouncementDataResponse(
       HttpStatus.OK, announcementService.updateAnnouncement(
-        announcementRequestMapper.toAnnouncement(announcementId, data), file));
+        announcementRequestMapper.toAnnouncement(
+          announcementId, data), file));
   }
   
+  /**
+   * Deletes announcement from database.
+   *
+   * @param announcementId Id of to be deleted announcement.
+   *
+   * @return {@code BaseResponse} - Indicating successful deletion.
+   */
   @ResponseStatus(HttpStatus.OK)
   @DeleteMapping(value = "/{announcementId}")
   public BaseResponse deleteAnnouncement(

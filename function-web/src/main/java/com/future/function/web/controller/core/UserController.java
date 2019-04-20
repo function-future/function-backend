@@ -136,8 +136,8 @@ public class UserController {
   /**
    * Updates existing user in database.
    *
-   * @param data  New data of existing user in JSON format.
-   * @param image New profile image of the new user.
+   * @param data  Data of existing user in JSON format.
+   * @param image New profile image of the existing user.
    *
    * @return {@code DataResponse<UserWebResponse} - The updated user data,
    * wrapped in
