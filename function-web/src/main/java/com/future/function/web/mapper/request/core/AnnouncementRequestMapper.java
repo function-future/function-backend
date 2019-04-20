@@ -8,31 +8,27 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Objects;
-import java.util.Optional;
-
 @Slf4j
 @Component
 public class AnnouncementRequestMapper {
   
   private final ObjectValidator validator;
   
-  private final WebRequestMapper<AnnouncementWebRequest> requestMapper;
+  private final WebRequestMapper requestMapper;
   
   @Autowired
   public AnnouncementRequestMapper(
-    ObjectValidator validator,
-    WebRequestMapper<AnnouncementWebRequest> requestMapper
+    ObjectValidator validator, WebRequestMapper requestMapper
   ) {
     
     this.validator = validator;
     this.requestMapper = requestMapper;
-    requestMapper.setType(AnnouncementWebRequest.class);
   }
   
   public Announcement toAnnouncement(String data) {
     
-    AnnouncementWebRequest request = requestMapper.toWebRequestObject(data);
+    AnnouncementWebRequest request = requestMapper.toWebRequestObject(
+      AnnouncementWebRequest.class, data);
     
     return toValidatedAnnouncement(null, request);
   }
@@ -59,7 +55,9 @@ public class AnnouncementRequestMapper {
   public Announcement toAnnouncement(String announcementId, String data) {
     
     return toValidatedAnnouncement(
-      announcementId, requestMapper.toWebRequestObject(data));
+      announcementId,
+      requestMapper.toWebRequestObject(AnnouncementWebRequest.class, data)
+    );
   }
   
 }

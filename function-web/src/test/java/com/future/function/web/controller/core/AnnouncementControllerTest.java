@@ -1,0 +1,244 @@
+package com.future.function.web.controller.core;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.future.function.model.entity.feature.core.Announcement;
+import com.future.function.model.entity.feature.core.File;
+import com.future.function.service.api.feature.core.AnnouncementService;
+import com.future.function.web.mapper.helper.ResponseHelper;
+import com.future.function.web.mapper.request.core.AnnouncementRequestMapper;
+import com.future.function.web.mapper.response.core.AnnouncementResponseMapper;
+import com.future.function.web.model.response.base.BaseResponse;
+import com.future.function.web.model.response.base.DataResponse;
+import com.future.function.web.model.response.base.PagingResponse;
+import com.future.function.web.model.response.feature.core.AnnouncementWebResponse;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.json.JacksonTester;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.Collections;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+
+@RunWith(SpringRunner.class)
+@WebMvcTest(AnnouncementController.class)
+public class AnnouncementControllerTest {
+  
+  private static final String ID = "id";
+  
+  private static final String TITLE = "title";
+  
+  private static final String SUMMARY = "summary";
+  
+  private static final String DESCRIPTION_HTML = "description-html";
+  
+  private static final Long CREATED_AT = 1L;
+  
+  private static final Long UPDATED_AT = 2L;
+  
+  private static final Pageable PAGEABLE = new PageRequest(0, 4);
+  
+  private static final BaseResponse DELETED_BASE_RESPONSE =
+    ResponseHelper.toBaseResponse(HttpStatus.OK);
+  
+  private static final String DATA =
+    "{\"announcementTitle\":" + TITLE + "," + "\"announcementSummary\":" +
+    SUMMARY + ",\"announcementDescriptionHtml\":" + DESCRIPTION_HTML + "}";
+  
+  private Announcement announcement;
+  
+  private PagingResponse<AnnouncementWebResponse> pagingResponse;
+  
+  private Page<Announcement> announcementPage;
+  
+  private DataResponse<AnnouncementWebResponse> retrievedDataResponse;
+  
+  private DataResponse<AnnouncementWebResponse> createdDataResponse;
+  
+  private JacksonTester<PagingResponse<AnnouncementWebResponse>>
+    pagingResponseJacksonTester;
+  
+  private JacksonTester<DataResponse<AnnouncementWebResponse>>
+    dataResponseJacksonTester;
+  
+  private JacksonTester<BaseResponse> baseResponseJacksonTester;
+  
+  @Autowired
+  private MockMvc mockMvc;
+  
+  @MockBean
+  private AnnouncementService announcementService;
+  
+  @MockBean
+  private AnnouncementRequestMapper announcementRequestMapper;
+  
+  @Before
+  public void setUp() {
+    
+    JacksonTester.initFields(this, new ObjectMapper());
+    
+    announcement = Announcement.builder()
+      .id(ID)
+      .title(TITLE)
+      .summary(SUMMARY)
+      .descriptionHtml(DESCRIPTION_HTML)
+      .file(new File())
+      .build();
+    
+    announcement.setCreatedAt(CREATED_AT);
+    announcement.setUpdatedAt(UPDATED_AT);
+    
+    announcementPage = new PageImpl<>(Collections.singletonList(announcement),
+                                      PAGEABLE, 1
+    );
+    
+    pagingResponse = AnnouncementResponseMapper.toAnnouncementsPagingResponse(
+      announcementPage);
+    
+    retrievedDataResponse =
+      AnnouncementResponseMapper.toAnnouncementDataResponse(announcement);
+    
+    createdDataResponse = AnnouncementResponseMapper.toAnnouncementDataResponse(
+      HttpStatus.CREATED, announcement);
+  }
+  
+  @After
+  public void tearDown() {
+    
+    verifyNoMoreInteractions(announcementService, announcementRequestMapper);
+  }
+  
+  @Test
+  public void testGivenCallToAnnouncementsApiByGettingAnnouncementsFromAnnouncementServiceReturnPagingResponseOfAnnouncements()
+    throws Exception {
+    
+    List<Announcement> announcementList = Collections.singletonList(
+      announcement);
+    
+    given(announcementService.getAnnouncements(PAGEABLE)).willReturn(
+      new PageImpl<>(announcementList, PAGEABLE, announcementList.size()));
+    
+    MockHttpServletResponse response = mockMvc.perform(get(
+      "/api/core/announcements").param("page", "1")
+                                                         .param("size", "4"))
+      .andReturn()
+      .getResponse();
+    
+    assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+    assertThat(response.getContentAsString()).isEqualTo(
+      pagingResponseJacksonTester.write(pagingResponse)
+        .getJson());
+    
+    verify(announcementService).getAnnouncements(PAGEABLE);
+  }
+  
+  @Test
+  public void testGivenAnnouncementIdByGettingAnnouncementFromAnnouncementServiceReturnDataResponse()
+    throws Exception {
+    
+    given(announcementService.getAnnouncement(ID)).willReturn(announcement);
+    
+    MockHttpServletResponse response = mockMvc.perform(
+      get("/api/core/announcements/" + ID))
+      .andReturn()
+      .getResponse();
+    
+    assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+    assertThat(response.getContentAsString()).isEqualTo(
+      dataResponseJacksonTester.write(retrievedDataResponse)
+        .getJson());
+    
+    verify(announcementService).getAnnouncement(ID);
+  }
+  
+  @Test
+  public void testGivenAnnouncementIdByDeletingAnnouncementFromAnnouncementServiceReturnBaseResponse()
+    throws Exception {
+    
+    MockHttpServletResponse response = mockMvc.perform(
+      delete("/api/core/announcements/" + ID))
+      .andReturn()
+      .getResponse();
+    
+    assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+    assertThat(response.getContentAsString()).isEqualTo(
+      baseResponseJacksonTester.write(DELETED_BASE_RESPONSE)
+        .getJson());
+    
+    verify(announcementService).deleteAnnouncement(ID);
+  }
+  
+  @Test
+  public void testGivenAnnouncementDataByCreatingAnnouncementReturnDataResponse()
+    throws Exception {
+    
+    given(
+      announcementService.createAnnouncement(announcement, null)).willReturn(
+      announcement);
+    given(announcementRequestMapper.toAnnouncement(DATA)).willReturn(
+      announcement);
+    
+    MockHttpServletResponse response = mockMvc.perform(post(
+      "/api/core/announcements").contentType(MediaType.MULTIPART_FORM_DATA)
+                                                         .param("data", DATA)
+                                                         .param("file", ""))
+      .andReturn()
+      .getResponse();
+    
+    assertThat(response.getStatus()).isEqualTo(HttpStatus.CREATED.value());
+    assertThat(response.getContentAsString()).isEqualTo(
+      dataResponseJacksonTester.write(createdDataResponse)
+        .getJson());
+    
+    verify(announcementService).createAnnouncement(announcement, null);
+    verify(announcementRequestMapper).toAnnouncement(DATA);
+  }
+  
+  @Test
+  public void testGivenAnnouncementDataByUpdatingAnnouncementReturnDataResponse()
+    throws Exception {
+    
+    given(announcementService.updateAnnouncement(announcement, null)).
+      willReturn(announcement);
+    given(announcementRequestMapper.toAnnouncement(ID, DATA)).willReturn(
+      announcement);
+    
+    MockHttpServletResponse response = mockMvc.perform(put(
+      "/api/core/announcements/" + ID).contentType(
+      MediaType.MULTIPART_FORM_DATA_VALUE)
+                                                         .param("data", DATA)
+                                                         .param("file", ""))
+      .andReturn()
+      .getResponse();
+    
+    assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+    assertThat(response.getContentAsString()).isEqualTo(
+      dataResponseJacksonTester.write(retrievedDataResponse)
+        .getJson());
+    
+    verify(announcementService).updateAnnouncement(announcement, null);
+    verify(announcementRequestMapper).toAnnouncement(ID, DATA);
+  }
+  
+}

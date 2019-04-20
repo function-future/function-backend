@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -39,6 +40,7 @@ public class AnnouncementController {
     this.announcementRequestMapper = announcementRequestMapper;
   }
   
+  @ResponseStatus(HttpStatus.OK)
   @GetMapping
   public PagingResponse<AnnouncementWebResponse> getAnnouncements(
     @RequestParam(defaultValue = "1")
@@ -51,6 +53,7 @@ public class AnnouncementController {
       announcementService.getAnnouncements(PageHelper.toPage(page, size)));
   }
   
+  @ResponseStatus(HttpStatus.OK)
   @GetMapping(value = "/{announcementId}")
   public DataResponse<AnnouncementWebResponse> getAnnouncement(
     @PathVariable
@@ -61,6 +64,7 @@ public class AnnouncementController {
       announcementService.getAnnouncement(announcementId));
   }
   
+  @ResponseStatus(HttpStatus.CREATED)
   @PostMapping
   public DataResponse<AnnouncementWebResponse> createAnnouncement(
     @RequestParam
@@ -74,6 +78,7 @@ public class AnnouncementController {
         announcementRequestMapper.toAnnouncement(data), file));
   }
   
+  @ResponseStatus(HttpStatus.OK)
   @PutMapping(value = "/{announcementId}")
   public DataResponse<AnnouncementWebResponse> updateAnnouncement(
     @PathVariable
@@ -89,6 +94,7 @@ public class AnnouncementController {
         announcementRequestMapper.toAnnouncement(announcementId, data), file));
   }
   
+  @ResponseStatus(HttpStatus.OK)
   @DeleteMapping(value = "/{announcementId}")
   public BaseResponse deleteAnnouncement(
     @PathVariable

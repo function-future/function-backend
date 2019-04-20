@@ -28,27 +28,27 @@ import java.util.Optional;
  */
 @Service
 public class UserServiceImpl implements UserService {
-  
+
   private final BatchService batchService;
-  
+
   private final FileService fileService;
-  
+
   private final UserRepository userRepository;
-  
+
   private final ResourceLoader resourceLoader;
-  
+
   @Autowired
   public UserServiceImpl(
     BatchService batchService, FileService fileService,
     UserRepository userRepository, ResourceLoader webApplicationContext
   ) {
-    
+
     this.batchService = batchService;
     this.fileService = fileService;
     this.userRepository = userRepository;
     this.resourceLoader = webApplicationContext;
   }
-  
+
   /**
    * {@inheritDoc}
    *
@@ -58,11 +58,11 @@ public class UserServiceImpl implements UserService {
    */
   @Override
   public User getUser(String email) {
-    
+
     return userRepository.findByEmail(email)
       .orElseThrow(() -> new NotFoundException("Get User Not Found"));
   }
-  
+
   /**
    * {@inheritDoc}
    *
@@ -73,10 +73,10 @@ public class UserServiceImpl implements UserService {
    */
   @Override
   public Page<User> getUsers(Role role, Pageable pageable) {
-    
+
     return userRepository.findAllByRole(role, pageable);
   }
-  
+
   /**
    * {@inheritDoc}
    *
@@ -88,51 +88,51 @@ public class UserServiceImpl implements UserService {
    */
   @Override
   public User createUser(User user, MultipartFile image) {
-    
+
     if (user.getBatch() != null) {
       user.setBatch(batchService.getBatch(user.getBatch()
                                             .getNumber()));
     }
-    
+
     return userRepository.findByEmail(user.getEmail())
       .filter(User::isDeleted)
       .map(foundUser -> markDeleted(foundUser, false))
       .map(foundUser -> copyPropertiesAndSaveUser(user, foundUser))
       .orElseGet(() -> createNewUser(user, image));
   }
-  
+
   private User copyPropertiesAndSaveUser(User user, User foundUser) {
-    
+
     BeanUtils.copyProperties(user, foundUser);
     return userRepository.save(foundUser);
   }
-  
+
   private User createNewUser(User user, MultipartFile image) {
-    
+
     return Optional.of(user)
       .map(this::setDefaultEncryptedPassword)
       .map(newUser -> setUserPicture(newUser, image))
       .map(userRepository::save)
       .orElseGet(() -> userRepository.save(user));
   }
-  
+
   private User setUserPicture(User user, MultipartFile image) {
-    
+
     return Optional.ofNullable(image)
       .map(img -> fileService.storeFile(img, FileOrigin.USER))
       .map(file -> fileService.getFile(file.getId()))
       .map(file -> setUserPicture(user, file))
       .orElseGet(() -> setDefaultUserPicture(user));
   }
-  
+
   private User setUserPicture(User user, File file) {
-    
+
     user.setPicture(file);
     return user;
   }
-  
+
   private User setDefaultUserPicture(User user) {
-    
+
     java.io.File defaultPicture;
     try {
       defaultPicture = resourceLoader.getResource(
@@ -141,7 +141,7 @@ public class UserServiceImpl implements UserService {
     } catch (IOException e) {
       defaultPicture = null;
     }
-    
+
     return Optional.ofNullable(defaultPicture)
       .map(ByteArrayHelper::getBytesFromJavaIoFile)
       .map(bytes -> new MockMultipartFile("default-profile.png",
@@ -153,7 +153,7 @@ public class UserServiceImpl implements UserService {
       .map(file -> setUserPicture(user, file))
       .orElse(user);
   }
-  
+
   /**
    * {@inheritDoc}
    *
@@ -165,19 +165,19 @@ public class UserServiceImpl implements UserService {
    */
   @Override
   public User updateUser(User user, MultipartFile image) {
-    
+
     if (user.getBatch() != null) {
       user.setBatch(batchService.getBatch(user.getBatch()
                                             .getNumber()));
     }
-    
+
     return userRepository.findByEmail(user.getEmail())
       .map(this::deleteUserPicture)
       .map(foundUser -> setUserPicture(user, image))
       .map(foundUser -> copyPropertiesAndSaveUser(user, foundUser))
       .orElseThrow(() -> new NotFoundException("Update User Not Found"));
   }
-  
+
   /**
    * {@inheritDoc}
    *
@@ -185,27 +185,27 @@ public class UserServiceImpl implements UserService {
    */
   @Override
   public void deleteUser(String email) {
-  
+
     Optional.ofNullable(email)
       .map(this::getUser)
-      .map(user -> markDeleted(user, true));
+      .ifPresent(user -> markDeleted(user, true));
   }
-  
+
   private User markDeleted(User user, boolean deleted) {
-    
+
     user.setDeleted(deleted);
-    
+
     return userRepository.save(user);
   }
-  
+
   private User setDefaultEncryptedPassword(User user) {
-    
+
     // TODO encrypt password when auth is developed
     return user;
   }
-  
+
   private User deleteUserPicture(User user) {
-    
+
     return Optional.of(user)
       .map(User::getPicture)
       .map(File::getId)
@@ -215,5 +215,5 @@ public class UserServiceImpl implements UserService {
       })
       .orElse(user);
   }
-  
+
 }

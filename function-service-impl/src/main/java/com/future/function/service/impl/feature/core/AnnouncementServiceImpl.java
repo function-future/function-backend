@@ -97,7 +97,7 @@ public class AnnouncementServiceImpl implements AnnouncementService {
     
     return Optional.of(announcement)
       .map(Announcement::getId)
-      .map(this::getAnnouncement)
+      .map(announcementRepository::findOne)
       .map(foundAnnouncement -> copyPropertiesAndSaveAnnouncement(announcement,
                                                                   foundAnnouncement
       ))
