@@ -21,6 +21,8 @@ public interface FieldName {
     
     public static final String DELETED = "deleted";
     
+    public static final String VERSION = "version";
+    
   }
   
   @NoArgsConstructor(access = AccessLevel.PRIVATE)

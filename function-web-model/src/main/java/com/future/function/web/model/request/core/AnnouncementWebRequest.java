@@ -6,8 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.NotBlank;
 
-import javax.validation.constraints.Max;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 /**
  * Model representation for announcement web request.
@@ -21,8 +21,8 @@ public class AnnouncementWebRequest {
   @NotBlank(message = "NotBlank")
   private String announcementTitle;
   
-  @Max(value = 70,
-       message = "Max")
+  @Size(max = 70,
+        message = "Size")
   private String announcementSummary;
   
   @NotNull(message = "NotNull")
