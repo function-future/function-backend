@@ -43,6 +43,9 @@ public class AnnouncementController {
   /**
    * Retrieves announcements based on given parameters.
    *
+   * @param page Current page of data.
+   * @param size Size of data to be displayed per page.
+   *
    * @return {@code PagingResponse<AnnouncementWebResponse} - The retrieved
    * announcements data, wrapped in
    * {@link com.future.function.web.model.response.base.PagingResponse} and
@@ -110,6 +113,7 @@ public class AnnouncementController {
   /**
    * Updates existing announcement in database.
    *
+   * @param announcementId Id of to-be-updated announcement.
    * @param data Data of existing announcement in JSON format.
    * @param file New file of the existing announcement.
    *
