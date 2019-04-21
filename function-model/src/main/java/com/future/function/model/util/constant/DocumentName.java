@@ -11,10 +11,14 @@ public abstract class DocumentName {
   
   public static final String SEQUENCE = "sequences";
   
-  public static final String BATCH = "batches";
+  public static final String BATCH = "batchNumbers";
   
   public static final String FILE = "files";
   
   public static final String USER = "users";
+  
+  public static final String COURSE = "courses";
+  
+  public static final String SHARING_COURSE = "sharing-courses";
   
 }

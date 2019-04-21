@@ -16,8 +16,18 @@
     <dependency>
       <groupId>com.future.function</groupId>
       <artifactId>function-common</artifactId>
-      <version>0.0.0</version>
-      <scope>compile</scope>
+      <version>${project.parent.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.future.function</groupId>
+      <artifactId>function-repository</artifactId>
+      <version>${project.parent.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
     </dependency>
 
     <dependency>

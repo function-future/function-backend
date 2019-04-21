@@ -77,4 +77,24 @@ public interface FieldName {
     
   }
   
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  abstract class Course {
+    
+    public static final String TITLE = "title";
+  
+    public static final String DESCRIPTION = "description";
+  
+    public static final String FILE = "file";
+    
+  }
+  
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  abstract class SharingCourse {
+    
+    public static final String BATCH = "batch";
+  
+    public static final String COURSE = "course";
+    
+  }
+  
 }
