@@ -21,24 +21,24 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @EqualsAndHashCode(callSuper = true)
 @Document(collection = DocumentName.FILE)
 public class File extends BaseEntity {
-  
+
   @Id
   private String id;
-  
+
   @NotBlank(message = "NotBlank")
   private String filePath;
-  
+
   @NotBlank(message = "NotBlank")
   private String fileUrl;
-  
+
   @Builder.Default
   private String thumbnailPath = "";
-  
+
   @Builder.Default
   private String thumbnailUrl = "";
-  
+
   private boolean markFolder;
-  
+
   private boolean asResource;
-  
+
 }

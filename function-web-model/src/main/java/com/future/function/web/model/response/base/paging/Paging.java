@@ -13,13 +13,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Paging {
-  
+
   private long currentPage;
-  
+
   private long pageSize;
-  
+
   private long totalPages;
-  
+
   private long totalRecords;
-  
+
 }

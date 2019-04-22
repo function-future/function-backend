@@ -3,7 +3,6 @@ package com.future.function.model.entity.feature.scoring;
 import com.future.function.model.entity.base.BaseEntity;
 import com.future.function.model.entity.feature.core.File;
 import com.future.function.model.util.constant.DocumentName;
-import com.future.function.validation.annotation.core.OnlyStudentCanHaveBatchAndUniversity;
 import java.util.UUID;
 import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;

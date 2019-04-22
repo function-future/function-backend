@@ -7,7 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface AssignmentService {
 
-  Page<Assignment> findAllBuPageable(Pageable pageable);
+  Page<Assignment> findAllByPageableAndFilterAndSearch(Pageable pageable, String filter, String search);
 
   Assignment findById(String id);
 

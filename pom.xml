@@ -1,239 +1,241 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-  <modelVersion>4.0.0</modelVersion>
+    <modelVersion>4.0.0</modelVersion>
 
-  <parent>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-parent</artifactId>
-    <version>1.5.19.RELEASE</version>
-    <relativePath />
-  </parent>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>1.5.19.RELEASE</version>
+        <relativePath/>
+    </parent>
 
-  <groupId>com.future.function</groupId>
-  <artifactId>function</artifactId>
-  <version>0.0.0</version>
-  <packaging>pom</packaging>
+    <groupId>com.future.function</groupId>
+    <artifactId>function</artifactId>
+    <version>0.0.0</version>
+    <packaging>pom</packaging>
 
-  <name>function</name>
-  <description>Function is an application designed by Blibli.com FUTURE Program participants as phase 2 project. The
-    application is designed for upcoming FUTURE Program participants.</description>
+    <name>function</name>
+    <description>Function is an application designed by Blibli.com FUTURE Program participants as phase 2 project. The
+        application is designed for upcoming FUTURE Program participants.
+    </description>
 
-  <modules>
-    <module>function-app</module>
-    <module>function-common</module>
-    <module>function-model</module>
-    <module>function-repository</module>
-    <module>function-service-api</module>
-    <module>function-service-impl</module>
-    <module>function-validation</module>
-    <module>function-web</module>
-    <module>function-web-model</module>
-  </modules>
+    <modules>
+        <module>function-app</module>
+        <module>function-common</module>
+        <module>function-model</module>
+        <module>function-repository</module>
+        <module>function-service-api</module>
+        <module>function-service-impl</module>
+        <module>function-validation</module>
+        <module>function-web</module>
+        <module>function-web-model</module>
+    </modules>
 
-  <properties>
+    <properties>
 
-    <catch-exception.version>2.0</catch-exception.version>
+        <catch-exception.version>2.0</catch-exception.version>
 
-    <commons-io.version>2.6</commons-io.version>
+        <commons-fileupload.version>1.3.1</commons-fileupload.version>
 
-      <commons-fileupload.version>1.3.1</commons-fileupload.version>
+        <commons-io.version>2.6</commons-io.version>
 
-      <jackson-annotations.version>2.8.0</jackson-annotations.version>
-    <java.version>1.8</java.version>
+        <jackson-annotations.version>2.8.0</jackson-annotations.version>
+        <java.version>1.8</java.version>
 
-    <spring-security-test.version>5.1.4.RELEASE</spring-security-test.version>
+        <spring-security-test.version>5.1.4.RELEASE</spring-security-test.version>
 
-    <?SORTPOM IGNORE?>
-    <sonar.coverage.exclusions>
-      **/FunctionApplication.java,
-      **/exception/**,
-      **/properties/**,
-      **/model/**,
-      **/service/api/**
-    </sonar.coverage.exclusions>
-    <?SORTPOM RESUME?>
-  </properties>
+        <?SORTPOM IGNORE?>
+        <sonar.coverage.exclusions>
+            **/FunctionApplication.java,
+            **/exception/**,
+            **/properties/**,
+            **/model/**,
+            **/service/api/**
+        </sonar.coverage.exclusions>
+        <?SORTPOM RESUME?>
+    </properties>
 
-  <dependencyManagement>
+    <dependencyManagement>
+
+        <dependencies>
+
+            <dependency>
+                <groupId>commons-fileupload</groupId>
+                <artifactId>commons-fileupload</artifactId>
+                <version>${commons-fileupload.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>${commons-io.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>eu.codearte.catch-exception</groupId>
+                <artifactId>catch-exception</artifactId>
+                <version>${catch-exception.version}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework.security</groupId>
+                <artifactId>spring-security-test</artifactId>
+                <version>${spring-security-test.version}</version>
+                <scope>test</scope>
+            </dependency>
+
+        </dependencies>
+
+    </dependencyManagement>
 
     <dependencies>
 
-      <dependency>
-        <groupId>commons-io</groupId>
-        <artifactId>commons-io</artifactId>
-        <version>${commons-io.version}</version>
-      </dependency>
-
         <dependency>
-            <groupId>commons-fileupload</groupId>
-            <artifactId>commons-fileupload</artifactId>
-            <version>${commons-fileupload.version}</version>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
         </dependency>
 
-      <dependency>
-        <groupId>eu.codearte.catch-exception</groupId>
-        <artifactId>catch-exception</artifactId>
-        <version>${catch-exception.version}</version>
-        <scope>test</scope>
-      </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
 
-      <dependency>
-        <groupId>org.springframework.security</groupId>
-        <artifactId>spring-security-test</artifactId>
-        <version>${spring-security-test.version}</version>
-        <scope>test</scope>
-      </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
 
     </dependencies>
 
-  </dependencyManagement>
+    <build>
 
-  <dependencies>
+        <pluginManagement>
 
-    <dependency>
-      <groupId>org.projectlombok</groupId>
-      <artifactId>lombok</artifactId>
-      <optional>true</optional>
-    </dependency>
+            <plugins>
 
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-configuration-processor</artifactId>
-      <optional>true</optional>
-    </dependency>
+                <plugin>
+                    <groupId>com.github.ekryd.sortpom</groupId>
+                    <artifactId>sortpom-maven-plugin</artifactId>
+                    <version>2.8.0</version>
+                </plugin>
 
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-test</artifactId>
-      <scope>test</scope>
-    </dependency>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <version>3.1.0</version>
+                </plugin>
 
-  </dependencies>
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>0.7.8</version>
+                </plugin>
 
-  <build>
+            </plugins>
 
-    <pluginManagement>
+        </pluginManagement>
 
-      <plugins>
+        <plugins>
 
-        <plugin>
-          <groupId>com.github.ekryd.sortpom</groupId>
-          <artifactId>sortpom-maven-plugin</artifactId>
-          <version>2.8.0</version>
-        </plugin>
+            <plugin>
+                <groupId>com.github.ekryd.sortpom</groupId>
+                <artifactId>sortpom-maven-plugin</artifactId>
+                <configuration>
+                    <predefinedSortOrder>recommended_2008_06</predefinedSortOrder>
+                    <?SORTPOM IGNORE?>
+                    <sortDependencies>
+                        groupId,
+                        artifactId,
+                        version,
+                        scope,
+                        exclusions
+                    </sortDependencies>
+                    <?SORTPOM RESUME?>
+                    <?SORTPOM IGNORE?>
+                    <sortPlugins>
+                        groupId,
+                        artifactId,
+                        version,
+                        configuration,
+                        executions
+                    </sortPlugins>
+                    <?SORTPOM RESUME?>
+                    <sortProperties>true</sortProperties>
+                    <sortModules>true</sortModules>
+                    <createBackupFile>false</createBackupFile>
+                    <expandEmptyElements>false</expandEmptyElements>
+                    <keepBlankLines>true</keepBlankLines>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>sort</goal>
+                        </goals>
+                        <phase>verify</phase>
+                    </execution>
+                </executions>
+            </plugin>
 
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-javadoc-plugin</artifactId>
-          <version>3.1.0</version>
-        </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <sourceFileExcludes>**/**Test**.java</sourceFileExcludes>
+                    <sourceFileExcludes>**/Dummy**.java</sourceFileExcludes>
+                    <sourceFileExcludes>**/BadController.java</sourceFileExcludes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>aggregate</id>
+                        <goals>
+                            <goal>aggregate</goal>
+                        </goals>
+                        <phase>site</phase>
+                    </execution>
+                </executions>
+            </plugin>
 
-        <plugin>
-          <groupId>org.jacoco</groupId>
-          <artifactId>jacoco-maven-plugin</artifactId>
-          <version>0.7.8</version>
-        </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <configuration>
+                    <rules>
+                        <rule implementation="org.jacoco.maven.RuleConfiguration">
+                            <element>BUNDLE</element>
+                            <limits>
+                                <limit implementation="org.jacoco.report.check.Limit">
+                                    <counter>INSTRUCTION</counter>
+                                    <value>COVEREDRATIO</value>
+                                    <minimum>0.9</minimum>
+                                </limit>
+                                <limit implementation="org.jacoco.report.check.Limit">
+                                    <counter>LINE</counter>
+                                    <value>COVEREDRATIO</value>
+                                    <minimum>0.9</minimum>
+                                </limit>
+                            </limits>
+                        </rule>
+                    </rules>
+                    <?SORTPOM IGNORE?>
+                    <excludes>
+                        <exclude>**/FunctionApplication.java,</exclude>
+                        <exclude>**/exception/**,</exclude>
+                        <exclude>**/properties/**,</exclude>
+                        <exclude>**/model/**,</exclude>
+                        <exclude>**/service/api/**</exclude>
+                    </excludes>
+                    <?SORTPOM RESUME?>
+                </configuration>
+            </plugin>
 
-      </plugins>
+        </plugins>
 
-    </pluginManagement>
-
-    <plugins>
-
-      <plugin>
-        <groupId>com.github.ekryd.sortpom</groupId>
-        <artifactId>sortpom-maven-plugin</artifactId>
-        <configuration>
-          <predefinedSortOrder>recommended_2008_06</predefinedSortOrder>
-          <?SORTPOM IGNORE?>
-          <sortDependencies>
-            groupId,
-            artifactId,
-            version,
-            scope,
-            exclusions
-          </sortDependencies>
-          <?SORTPOM RESUME?>
-          <?SORTPOM IGNORE?>
-          <sortPlugins>
-            groupId,
-            artifactId,
-            version,
-            configuration,
-            executions
-          </sortPlugins>
-          <?SORTPOM RESUME?>
-          <sortProperties>true</sortProperties>
-          <sortModules>true</sortModules>
-          <createBackupFile>false</createBackupFile>
-          <expandEmptyElements>false</expandEmptyElements>
-          <keepBlankLines>true</keepBlankLines>
-        </configuration>
-        <executions>
-          <execution>
-            <goals>
-              <goal>sort</goal>
-            </goals>
-            <phase>verify</phase>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <configuration>
-          <sourceFileExcludes>**/**Test**.java</sourceFileExcludes>
-          <sourceFileExcludes>**/Dummy**.java</sourceFileExcludes>
-          <sourceFileExcludes>**/BadController.java</sourceFileExcludes>
-        </configuration>
-        <executions>
-          <execution>
-            <id>aggregate</id>
-            <goals>
-              <goal>aggregate</goal>
-            </goals>
-            <phase>site</phase>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
-        <groupId>org.jacoco</groupId>
-        <artifactId>jacoco-maven-plugin</artifactId>
-        <configuration>
-          <rules>
-            <rule implementation="org.jacoco.maven.RuleConfiguration">
-              <element>BUNDLE</element>
-              <limits>
-                <limit implementation="org.jacoco.report.check.Limit">
-                  <counter>INSTRUCTION</counter>
-                  <value>COVEREDRATIO</value>
-                  <minimum>0.9</minimum>
-                </limit>
-                <limit implementation="org.jacoco.report.check.Limit">
-                  <counter>LINE</counter>
-                  <value>COVEREDRATIO</value>
-                  <minimum>0.9</minimum>
-                </limit>
-              </limits>
-            </rule>
-          </rules>
-          <?SORTPOM IGNORE?>
-          <excludes>
-            <exclude>**/FunctionApplication.java,</exclude>
-            <exclude>**/exception/**,</exclude>
-            <exclude>**/properties/**,</exclude>
-            <exclude>**/model/**,</exclude>
-            <exclude>**/service/api/**</exclude>
-          </excludes>
-          <?SORTPOM RESUME?>
-        </configuration>
-      </plugin>
-
-    </plugins>
-
-  </build>
+    </build>
 
 </project>

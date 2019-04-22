@@ -1,50 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-  <modelVersion>4.0.0</modelVersion>
+    <modelVersion>4.0.0</modelVersion>
 
-  <parent>
-    <groupId>com.future.function</groupId>
-    <artifactId>function</artifactId>
-    <version>0.0.0</version>
-  </parent>
+    <parent>
+        <groupId>com.future.function</groupId>
+        <artifactId>function</artifactId>
+        <version>0.0.0</version>
+    </parent>
 
-  <artifactId>function-app</artifactId>
+    <artifactId>function-app</artifactId>
 
-  <dependencies>
+    <dependencies>
 
-    <!-- function dependencies -->
-    <dependency>
-      <groupId>com.future.function</groupId>
-      <artifactId>function-repository</artifactId>
-      <version>${project.parent.version}</version>
-    </dependency>
+        <!-- function dependencies -->
+        <dependency>
+            <groupId>com.future.function</groupId>
+            <artifactId>function-repository</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
 
-    <dependency>
-      <groupId>com.future.function</groupId>
-      <artifactId>function-service-impl</artifactId>
-      <version>${project.parent.version}</version>
-    </dependency>
+        <dependency>
+            <groupId>com.future.function</groupId>
+            <artifactId>function-service-impl</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
 
-    <dependency>
-      <groupId>com.future.function</groupId>
-      <artifactId>function-web</artifactId>
-      <version>${project.parent.version}</version>
-    </dependency>
+        <dependency>
+            <groupId>com.future.function</groupId>
+            <artifactId>function-web</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
 
-  </dependencies>
+    </dependencies>
 
-  <build>
+    <build>
 
-    <plugins>
+        <plugins>
 
-      <plugin>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-maven-plugin</artifactId>
-      </plugin>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
 
-    </plugins>
+        </plugins>
 
-  </build>
+    </build>
 
 </project>

@@ -28,6 +28,8 @@ import static com.googlecode.catchexception.CatchException.caughtException;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -43,6 +45,8 @@ public class AssignmentServiceImplTest {
 
   private static final String FILE_PATH = "file-path";
   private static final String FILE_ID = "file-id";
+
+  private static final String STRING_EMPTY = "";
 
   private Assignment assignment;
   private File file;
@@ -99,11 +103,13 @@ public class AssignmentServiceImplTest {
 
   @After
   public void tearDown() throws Exception {
+    verifyNoMoreInteractions(assignmentRepository);
+    verifyNoMoreInteractions(fileService);
   }
 
   @Test
   public void testFindAllAssignmentWithPageable() {
-    Page<Assignment> result = assignmentService.findAllBuPageable(pageable);
+    Page<Assignment> result = assignmentService.findAllByPageableAndFilterAndSearch(pageable, STRING_EMPTY, STRING_EMPTY);
     assertThat(result).isNotNull();
     assertThat(result.getContent().size()).isEqualTo(1);
     assertThat(result.getContent()).isEqualTo(assignmentList);
@@ -123,6 +129,7 @@ public class AssignmentServiceImplTest {
     catchException(() -> assignmentService.findById(null));
     assertThat(caughtException().getClass()).isEqualTo(NotFoundException.class);
     assertThat(caughtException().getMessage()).isEqualTo(ERROR_MSG_NOT_FOUND);
+    verifyZeroInteractions(assignmentRepository);
   }
 
   @Test
@@ -163,6 +170,7 @@ public class AssignmentServiceImplTest {
     verify(fileService).getFile(eq(FILE_ID));
     verify(fileService).storeFile(multipartFile, FileOrigin.ASSIGNMENT);
     verify(assignmentRepository).save(eq(assignment));
+    verify(assignmentRepository).findByIdAndDeletedFalse(eq(assignmentWithFile.getId()));
   }
 
   @Test
@@ -171,5 +179,6 @@ public class AssignmentServiceImplTest {
     assertThat(actual.getFile()).isEqualTo(null);
     assertThat(actual).isEqualTo(assignment);
     verify(assignmentRepository).save(eq(assignment));
+    verify(assignmentRepository).findByIdAndDeletedFalse(eq(assignment.getId()));
   }
 }

@@ -29,7 +29,8 @@ public class AssignmentServiceImpl implements AssignmentService {
 
 
   @Override
-  public Page<Assignment> findAllBuPageable(Pageable pageable) {
+  public Page<Assignment> findAllByPageableAndFilterAndSearch(Pageable pageable, String filter, String search) {
+    //TODO using filter and search to find the asssignment page
     return assignmentRepository.findAll(pageable);
   }
 
@@ -44,6 +45,7 @@ public class AssignmentServiceImpl implements AssignmentService {
 
   @Override
   public Assignment createAssignment(Assignment request, MultipartFile file) {
+    //TODO save batch to shared assignment entity
     Assignment assignment = storeAssignmentFile(request, file);
     return assignmentRepository.save(assignment);
   }
@@ -61,6 +63,7 @@ public class AssignmentServiceImpl implements AssignmentService {
 
   @Override
   public Assignment updateAssignment(Assignment request, MultipartFile file) {
+    //TODO save batch to shared assignment entity
     Assignment oldAssignment = this.findById(request.getId());
     Assignment newAssignment = new Assignment();
     BeanUtils.copyProperties(oldAssignment, newAssignment);
@@ -70,6 +73,7 @@ public class AssignmentServiceImpl implements AssignmentService {
 
   @Override
   public void deleteById(String id) {
+    //TODO delete file associated with the assignment
     Optional.ofNullable(id)
             .map(this::findById)
             .ifPresent(val -> {

@@ -22,39 +22,41 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @RunWith(SpringRunner.class)
 @WebMvcTest(FileController.class)
 public class FileControllerTest {
-  
+
   @Autowired
   private MockMvc mockMvc;
-  
+
   @MockBean
   private FileService fileService;
-  
+
   @Before
-  public void setUp() {}
-  
+  public void setUp() {
+  }
+
   @After
-  public void tearDown() {}
-  
+  public void tearDown() {
+  }
+
   @Test
   public void testGivenCallToGetFileApiByGettingFileByOriginAndFilenameReturnByteArray()
-    throws Exception {
-    
+          throws Exception {
+
     String fileName = "name.png";
     String origin = "user";
     byte[] bytes = new byte[100];
-    
+
     given(fileService.getFileAsByteArray(fileName, FileOrigin.USER)).willReturn(
-      bytes);
-    
+            bytes);
+
     MockHttpServletResponse response = mockMvc.perform(
-      get("/files/resource/" + origin + "/" + fileName))
-      .andReturn()
-      .getResponse();
-    
+            get("/files/resource/" + origin + "/" + fileName))
+            .andReturn()
+            .getResponse();
+
     assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
     assertThat(response.getContentAsByteArray()).isEqualTo(bytes);
-    
+
     verify(fileService).getFileAsByteArray(fileName, FileOrigin.USER);
   }
-  
+
 }

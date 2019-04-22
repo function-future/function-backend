@@ -16,34 +16,33 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping(value = "/files")
 public class FileController {
-  
+
   private final FileService fileService;
-  
+
   @Autowired
   public FileController(FileService fileService) {
-    
+
     this.fileService = fileService;
   }
-  
+
   /**
    * Retrieves byte array data of the specified file from given parameters.
    *
    * @param origin   Origin of file to be retrieved in file storage.
    * @param fileName Name of file to be retrieved.
-   *
    * @return {@code byte[]} - Byte array of the file.
    */
   @ResponseStatus(HttpStatus.OK)
   @GetMapping(value = "/resource/{origin}/{fileName:.+}")
   public byte[] getFileAsByteArray(
-    @PathVariable
-      String origin,
-    @PathVariable
-      String fileName
+          @PathVariable
+                  String origin,
+          @PathVariable
+                  String fileName
   ) {
-    
+
     return fileService.getFileAsByteArray(fileName, FileOrigin.valueOf(
-      origin.toUpperCase()));
+            origin.toUpperCase()));
   }
-  
+
 }

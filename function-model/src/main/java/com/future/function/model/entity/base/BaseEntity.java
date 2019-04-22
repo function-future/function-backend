@@ -23,19 +23,19 @@ import org.springframework.data.annotation.LastModifiedDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BaseEntity {
-  
+
   @CreatedDate
   private Long createdAt;
-  
+
   @CreatedBy
   private String createdBy;
-  
+
   @LastModifiedDate
   private Long updatedAt;
-  
+
   @LastModifiedBy
   private String updatedBy;
-  
+
   private boolean deleted;
-  
+
 }

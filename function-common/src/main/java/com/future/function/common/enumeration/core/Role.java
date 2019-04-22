@@ -19,7 +19,7 @@ public enum Role {
   MENTOR,
   STUDENT,
   UNKNOWN;
-  
+
   /**
    * Converts a String to a specific role. Customized to prevent
    * {@link IllegalStateException} from being thrown when using
@@ -29,33 +29,31 @@ public enum Role {
    *
    * @param name The name of the role (in form of String) to be converted
    *             to Role enum value.
-   *
    * @return {@link Role} - The Role enum value of the given parameter.
    */
   public static Role toRole(String name) {
-    
+
     return Optional.ofNullable(name)
-      .filter(Role::isNameEqualsAnyRole)
-      .map(Role::valueOf)
-      .orElse(UNKNOWN);
+            .filter(Role::isNameEqualsAnyRole)
+            .map(Role::valueOf)
+            .orElse(UNKNOWN);
   }
-  
+
   /**
    * Compares whether the given name is equal to any Role enum in this enum
    * class.
    *
    * @param name The name of the role (in form of String) to be converted
    *             to Role enum value.
-   *
    * @return {@code boolean} - Result of whether any role is equal to the
    * given parameter.
    */
   private static boolean isNameEqualsAnyRole(String name) {
-    
+
     return Stream.of(Role.values())
-             .filter(role -> name.equals(role.name()))
-             .collect(Collectors.toList())
-             .size() > 0;
+            .filter(role -> name.equals(role.name()))
+            .collect(Collectors.toList())
+            .size() > 0;
   }
-  
+
 }

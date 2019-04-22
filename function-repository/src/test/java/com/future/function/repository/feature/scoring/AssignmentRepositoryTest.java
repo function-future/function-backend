@@ -42,7 +42,7 @@ public class AssignmentRepositoryTest {
 
   @After
   public void tearDown() throws Exception {
-
+    assignmentRepository.deleteAll();
   }
 
   @Test

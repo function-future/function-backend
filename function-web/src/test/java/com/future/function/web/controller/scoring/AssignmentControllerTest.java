@@ -29,6 +29,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -105,7 +106,7 @@ public class AssignmentControllerTest {
 
     multipartFile = new MockMultipartFile(ASSIGNMENT_FILE, new byte[]{});
 
-    when(assignmentService.findAllBuPageable(pageable))
+    when(assignmentService.findAllByPageableAndFilterAndSearch(pageable, , ))
             .thenReturn(assignmentPage);
     when(assignmentService.createAssignment(assignment, multipartFile))
             .thenReturn(assignmentWithFile);
@@ -123,6 +124,8 @@ public class AssignmentControllerTest {
 
   @After
   public void tearDown() throws Exception {
+    verifyNoMoreInteractions(assignmentService);
+    verifyNoMoreInteractions(assignmentRequestMapper);
   }
 
   @Test
@@ -220,7 +223,7 @@ public class AssignmentControllerTest {
     assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
     assertThat(response.getContentAsString()).isNotBlank();
 
-    verify(assignmentService).findAllBuPageable(eq(pageable));
+    verify(assignmentService).findAllByPageableAndFilterAndSearch(eq(pageable), , );
     verifyZeroInteractions(assignmentRequestMapper);
   }
 }

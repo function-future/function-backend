@@ -7,7 +7,7 @@ package com.future.function.common.data.core;
  * java.lang.annotation.ElementType#TYPE}.
  */
 public interface UserData {
-  
+
   /**
    * Method to get role of a user object, which is actually an enum, but
    * returned as String.
@@ -17,7 +17,7 @@ public interface UserData {
    * to String object.
    */
   String getRoleAsString();
-  
+
   /**
    * Method to get batch of a user object, which is actually another
    * interface, available only for user with role STUDENT.
@@ -26,7 +26,7 @@ public interface UserData {
    * whether batch exists in user object or not.
    */
   Long getBatchNumber();
-  
+
   /**
    * Method to get university name of a user object, available only for user
    * with role STUDENT.
@@ -34,5 +34,5 @@ public interface UserData {
    * @return {@code String} - String value of university.
    */
   String getUniversity();
-  
+
 }

@@ -5,7 +5,7 @@ package com.future.function.model.util.constant;
  */
 @SuppressWarnings("squid:S1118")
 public abstract class FieldName {
-  
+
   public static final String SEQUENCE_NUMBER = "sequence_number";
-  
+
 }

@@ -48,9 +48,11 @@ public class AssignmentController {
     return AssignmentResponseMapper
             .toAssignmentsPagingResponse(
                     assignmentService
-                            .findAllBuPageable(
+                            .findAllByPageableAndFilterAndSearch(
                                     PageHelper
-                                            .toPage(page, size)
+                                            .toPage(page, size),
+                                    filter,
+                                    search
                             )
             );
   }

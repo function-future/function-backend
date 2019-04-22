@@ -19,7 +19,7 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 @EnableMongoRepositories
 @EnableConfigurationProperties(FileProperties.class)
 public class FunctionApplication {
-  
+
   /**
    * The {@code main} function to be executed.
    *
@@ -27,8 +27,8 @@ public class FunctionApplication {
    *             application.
    */
   public static void main(String[] args) {
-    
+
     SpringApplication.run(FunctionApplication.class, args);
   }
-  
+
 }

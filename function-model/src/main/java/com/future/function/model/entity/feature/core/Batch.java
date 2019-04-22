@@ -24,14 +24,14 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @EqualsAndHashCode(callSuper = true)
 @Document(collection = DocumentName.BATCH)
 public class Batch extends BaseEntity {
-  
+
   @Transient
   public static final String SEQUENCE_NAME = "batches_sequence";
-  
+
   @Id
   private String id;
-  
+
   @NonNull
   private Long number;
-  
+
 }

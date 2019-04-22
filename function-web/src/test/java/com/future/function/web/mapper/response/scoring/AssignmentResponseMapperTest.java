@@ -26,10 +26,6 @@ public class AssignmentResponseMapperTest {
   private static final String ASSIGNMENT_DESCRIPTION = "assignment-description";
   private static final String ASSIGNMENT_QUESTION = "assignment-question";
   private static final long ASSIGNMENT_DEADLINE = new Date().getTime();
-  private static final String ASSIGNMENT_BATCH = "[2, 3]";
-  private static final String ASSIGNMENT_FILE_PATH = "assignment-file-path";
-  private static final String ASSIGNMENT_FILE = "file";
-  private static String ASSIGNMENT_ID;
   private Paging paging;
   private Pageable pageable;
   private Assignment assignment;

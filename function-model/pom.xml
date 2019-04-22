@@ -1,39 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-  <modelVersion>4.0.0</modelVersion>
+    <modelVersion>4.0.0</modelVersion>
 
-  <parent>
-    <groupId>com.future.function</groupId>
-    <artifactId>function</artifactId>
-    <version>0.0.0</version>
-  </parent>
+    <parent>
+        <groupId>com.future.function</groupId>
+        <artifactId>function</artifactId>
+        <version>0.0.0</version>
+    </parent>
 
-  <artifactId>function-model</artifactId>
+    <artifactId>function-model</artifactId>
 
-  <dependencies>
+    <dependencies>
 
-    <!-- function dependencies-->
-    <dependency>
-      <groupId>com.future.function</groupId>
-      <artifactId>function-common</artifactId>
-      <version>${project.parent.version}</version>
-      <scope>compile</scope>
-    </dependency>
+        <!-- function dependencies-->
+        <dependency>
+            <groupId>com.future.function</groupId>
+            <artifactId>function-common</artifactId>
+            <version>${project.parent.version}</version>
+            <scope>compile</scope>
+        </dependency>
 
-    <dependency>
-      <groupId>com.future.function</groupId>
-      <artifactId>function-validation</artifactId>
-      <version>${project.parent.version}</version>
-      <scope>compile</scope>
-    </dependency>
+        <dependency>
+            <groupId>com.future.function</groupId>
+            <artifactId>function-validation</artifactId>
+            <version>${project.parent.version}</version>
+            <scope>compile</scope>
+        </dependency>
 
-    <!-- spring dependencies -->
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-data-mongodb</artifactId>
-    </dependency>
+        <!-- spring dependencies -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-mongodb</artifactId>
+        </dependency>
 
-  </dependencies>
+    </dependencies>
 
 </project>
