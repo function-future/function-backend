@@ -462,8 +462,7 @@ public class UserServiceImplTest {
     catchException(() -> userService.deleteUser(NON_EXISTING_USER_EMAIL));
     
     assertThat(caughtException().getClass()).isEqualTo(NotFoundException.class);
-    assertThat(caughtException().getMessage()).isEqualTo(
-      "Delete User Not Found");
+    assertThat(caughtException().getMessage()).isEqualTo("Get User Not Found");
     
     verify(userRepository).findByEmail(NON_EXISTING_USER_EMAIL);
   }

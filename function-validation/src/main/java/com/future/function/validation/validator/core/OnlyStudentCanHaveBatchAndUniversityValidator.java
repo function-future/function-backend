@@ -40,14 +40,14 @@ public class OnlyStudentCanHaveBatchAndUniversityValidator implements
    */
   @Override
   public boolean isValid(UserData value, ConstraintValidatorContext context) {
-    
-    String role = value.getRoleAsString();
+  
+    String role = value.getRole();
     
     if (role.equals("UNKNOWN")) {
       return false;
     }
-    
-    Long batchNumber = value.getBatchNumber();
+  
+    Long batchNumber = value.getBatch();
     String university = value.getUniversity();
     
     if (role.equals("STUDENT")) {

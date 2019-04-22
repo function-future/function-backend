@@ -20,6 +20,8 @@ public interface FieldName {
     public static final String UPDATED_BY = "updatedBy";
     
     public static final String DELETED = "deleted";
+  
+    public static final String VERSION = "version";
     
   }
   

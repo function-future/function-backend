@@ -51,11 +51,11 @@ public enum Role {
    * given parameter.
    */
   private static boolean isNameEqualsAnyRole(String name) {
-    
-    return Stream.of(Role.values())
+  
+    return !Stream.of(Role.values())
              .filter(role -> name.equals(role.name()))
              .collect(Collectors.toList())
-             .size() > 0;
+      .isEmpty();
   }
   
 }

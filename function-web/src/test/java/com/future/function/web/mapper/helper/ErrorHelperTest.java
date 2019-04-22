@@ -1,10 +1,7 @@
 package com.future.function.web.mapper.helper;
 
-import com.future.function.common.enumeration.core.Role;
-import com.future.function.model.entity.feature.core.Batch;
-import com.future.function.model.entity.feature.core.File;
-import com.future.function.model.entity.feature.core.User;
 import com.future.function.web.dummy.data.DummyData;
+import com.future.function.web.model.request.core.UserWebRequest;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -26,22 +23,18 @@ import static com.googlecode.catchexception.CatchException.caughtException;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ErrorHelperTest {
-  
+
   private static final DummyData DUMMY_DATA = DummyData.builder()
     .number(7)
     .email(" ")
     .build();
   
-  private static final User USER = User.builder()
+  private static final UserWebRequest USER = UserWebRequest.builder()
     .email("email@email.com")
     .name("name")
-    .password("password")
-    .picture(new File())
     .address("address")
-    .role(Role.JUDGE)
-    .batch(Batch.builder()
-             .number(1L)
-             .build())
+    .role("JUDGE")
+    .batch(1L)
     .university("university")
     .build();
   
@@ -85,9 +78,9 @@ public class ErrorHelperTest {
     assertThat(errors.get("email")).contains("NotBlank", "Email");
     
   }
-  
+
   private void throwConstraintViolationException(Object object) {
-    
+  
     throw new ConstraintViolationException(validator.validate(object));
   }
   

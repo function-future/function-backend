@@ -61,7 +61,8 @@ public class UserResponseMapper {
   private static UserWebResponse buildUserWebResponse(User user) {
     
     return UserWebResponse.builder()
-      .role(user.getRoleAsString())
+      .role(user.getRole()
+              .name())
       .email(user.getEmail())
       .name(user.getName())
       .phone(user.getPhone())
@@ -86,7 +87,7 @@ public class UserResponseMapper {
   
   /**
    * Converts users data to {@code UserWebResponse} given {@code HttpStatus},
-   * wrapped in {@code DataResponse}.
+   * wrapped in {@code PagingResponse}.
    *
    * @param data Users data to be converted to response.
    *

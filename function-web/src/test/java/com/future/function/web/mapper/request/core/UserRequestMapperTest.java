@@ -121,8 +121,10 @@ public class UserRequestMapperTest {
     )).thenReturn(VALID_ADMIN_WEB_REQUEST);
     when(objectMapper.readValue(BAD_JSON, UserWebRequest.class)).thenThrow(
       new IOException());
-    when(validator.validate(STUDENT)).thenReturn(STUDENT);
-    when(validator.validate(VALID_ADMIN)).thenReturn(VALID_ADMIN);
+    when(validator.validate(STUDENT_WEB_REQUEST)).thenReturn(
+      STUDENT_WEB_REQUEST);
+    when(validator.validate(VALID_ADMIN_WEB_REQUEST)).thenReturn(
+      VALID_ADMIN_WEB_REQUEST);
   }
   
   @After
@@ -158,8 +160,8 @@ public class UserRequestMapperTest {
   
     verify(objectMapper).readValue(STUDENT_JSON, UserWebRequest.class);
     verify(objectMapper).readValue(VALID_ADMIN_JSON, UserWebRequest.class);
-    verify(validator).validate(STUDENT);
-    verify(validator).validate(VALID_ADMIN);
+    verify(validator).validate(STUDENT_WEB_REQUEST);
+    verify(validator).validate(VALID_ADMIN_WEB_REQUEST);
   }
   
   @Test
@@ -176,8 +178,8 @@ public class UserRequestMapperTest {
     
     verify(objectMapper).readValue(STUDENT_JSON, UserWebRequest.class);
     verify(objectMapper).readValue(VALID_ADMIN_JSON, UserWebRequest.class);
-    verify(validator).validate(STUDENT);
-    verify(validator).validate(VALID_ADMIN);
+    verify(validator).validate(STUDENT_WEB_REQUEST);
+    verify(validator).validate(VALID_ADMIN_WEB_REQUEST);
   }
   
 }

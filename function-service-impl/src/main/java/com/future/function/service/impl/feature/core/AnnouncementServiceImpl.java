@@ -2,8 +2,10 @@ package com.future.function.service.impl.feature.core;
 
 import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.core.Announcement;
+import com.future.function.model.util.constant.FieldName;
 import com.future.function.repository.feature.core.AnnouncementRepository;
 import com.future.function.service.api.feature.core.AnnouncementService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -91,11 +93,27 @@ public class AnnouncementServiceImpl implements AnnouncementService {
     Announcement announcement, MultipartFile file
   ) {
     
-    announcementRepository.save(announcement);
-    
     //TODO Save attached file
+  
+    return Optional.of(announcement)
+      .map(Announcement::getId)
+      .map(announcementRepository::findOne)
+      .map(foundAnnouncement -> copyPropertiesAndSaveAnnouncement(announcement,
+                                                                  foundAnnouncement
+      ))
+      .orElseThrow(
+        () -> new NotFoundException("Update Announcement Not Found"));
+  }
+  
+  private Announcement copyPropertiesAndSaveAnnouncement(
+    Announcement announcement, Announcement foundAnnouncement
+  ) {
     
-    return announcementRepository.findOne(announcement.getId());
+    BeanUtils.copyProperties(announcement, foundAnnouncement,
+                             FieldName.BaseEntity.CREATED_AT,
+                             FieldName.BaseEntity.VERSION
+    );
+    return announcementRepository.save(foundAnnouncement);
   }
   
   /**
@@ -107,6 +125,7 @@ public class AnnouncementServiceImpl implements AnnouncementService {
   public void deleteAnnouncement(String announcementId) {
     
     Optional.ofNullable(announcementId)
+      .map(this::getAnnouncement)
       .ifPresent(announcementRepository::delete);
   }
   

@@ -28,7 +28,7 @@ import java.util.Optional;
  */
 @Service
 public class UserServiceImpl implements UserService {
-  
+
   private final BatchService batchService;
   
   private final FileService fileService;
@@ -58,7 +58,7 @@ public class UserServiceImpl implements UserService {
    */
   @Override
   public User getUser(String email) {
-    
+  
     return userRepository.findByEmail(email)
       .orElseThrow(() -> new NotFoundException("Get User Not Found"));
   }
@@ -73,7 +73,7 @@ public class UserServiceImpl implements UserService {
    */
   @Override
   public Page<User> getUsers(Role role, Pageable pageable) {
-    
+  
     return userRepository.findAllByRole(role, pageable);
   }
   
@@ -88,12 +88,12 @@ public class UserServiceImpl implements UserService {
    */
   @Override
   public User createUser(User user, MultipartFile image) {
-    
+  
     if (user.getBatch() != null) {
       user.setBatch(batchService.getBatch(user.getBatch()
                                             .getNumber()));
     }
-    
+  
     return userRepository.findByEmail(user.getEmail())
       .filter(User::isDeleted)
       .map(foundUser -> markDeleted(foundUser, false))
@@ -165,12 +165,12 @@ public class UserServiceImpl implements UserService {
    */
   @Override
   public User updateUser(User user, MultipartFile image) {
-    
+  
     if (user.getBatch() != null) {
       user.setBatch(batchService.getBatch(user.getBatch()
                                             .getNumber()));
     }
-    
+  
     return userRepository.findByEmail(user.getEmail())
       .map(this::deleteUserPicture)
       .map(foundUser -> setUserPicture(user, image))
@@ -185,16 +185,16 @@ public class UserServiceImpl implements UserService {
    */
   @Override
   public void deleteUser(String email) {
-    
-    userRepository.findByEmail(email)
-      .map(user -> markDeleted(user, true))
-      .orElseThrow(() -> new NotFoundException("Delete User Not Found"));
-  }
   
+    Optional.ofNullable(email)
+      .map(this::getUser)
+      .ifPresent(user -> markDeleted(user, true));
+  }
+
   private User markDeleted(User user, boolean deleted) {
-    
+  
     user.setDeleted(deleted);
-    
+  
     return userRepository.save(user);
   }
   

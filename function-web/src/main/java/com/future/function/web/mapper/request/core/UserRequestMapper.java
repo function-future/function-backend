@@ -50,8 +50,10 @@ public class UserRequestMapper {
   }
   
   private User toValidatedUser(String email, UserWebRequest request) {
-    
-    User user = User.builder()
+  
+    validator.validate(request);
+  
+    return User.builder()
       .role(Role.toRole(request.getRole()))
       .email(email)
       .name(request.getName())
@@ -62,8 +64,6 @@ public class UserRequestMapper {
       .batch(toBatch(request))
       .university(getUniversity(request))
       .build();
-    
-    return validator.validate(user);
   }
   
   private String getUniversity(UserWebRequest request) {
