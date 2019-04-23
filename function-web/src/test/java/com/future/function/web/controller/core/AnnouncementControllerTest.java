@@ -25,14 +25,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Collections;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -40,6 +38,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(AnnouncementController.class)
@@ -138,17 +138,13 @@ public class AnnouncementControllerTest {
     
     given(announcementService.getAnnouncements(PAGEABLE)).willReturn(
       new PageImpl<>(announcementList, PAGEABLE, announcementList.size()));
-    
-    MockHttpServletResponse response = mockMvc.perform(get(
-      "/api/core/announcements").param("page", "1")
-                                                         .param("size", "4"))
-      .andReturn()
-      .getResponse();
-    
-    assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
-    assertThat(response.getContentAsString()).isEqualTo(
-      pagingResponseJacksonTester.write(pagingResponse)
-        .getJson());
+  
+    mockMvc.perform(get("/api/core/announcements").param("page", "1")
+                      .param("size", "4"))
+      .andExpect(status().isOk())
+      .andExpect(content().json(
+        pagingResponseJacksonTester.write(pagingResponse)
+          .getJson()));
     
     verify(announcementService).getAnnouncements(PAGEABLE);
   }
@@ -158,16 +154,12 @@ public class AnnouncementControllerTest {
     throws Exception {
     
     given(announcementService.getAnnouncement(ID)).willReturn(announcement);
-    
-    MockHttpServletResponse response = mockMvc.perform(
-      get("/api/core/announcements/" + ID))
-      .andReturn()
-      .getResponse();
-    
-    assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
-    assertThat(response.getContentAsString()).isEqualTo(
-      dataResponseJacksonTester.write(retrievedDataResponse)
-        .getJson());
+  
+    mockMvc.perform(get("/api/core/announcements/" + ID))
+      .andExpect(status().isOk())
+      .andExpect(content().json(
+        dataResponseJacksonTester.write(retrievedDataResponse)
+          .getJson()));
     
     verify(announcementService).getAnnouncement(ID);
   }
@@ -175,16 +167,12 @@ public class AnnouncementControllerTest {
   @Test
   public void testGivenAnnouncementIdByDeletingAnnouncementFromAnnouncementServiceReturnBaseResponse()
     throws Exception {
-    
-    MockHttpServletResponse response = mockMvc.perform(
-      delete("/api/core/announcements/" + ID))
-      .andReturn()
-      .getResponse();
-    
-    assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
-    assertThat(response.getContentAsString()).isEqualTo(
-      baseResponseJacksonTester.write(DELETED_BASE_RESPONSE)
-        .getJson());
+  
+    mockMvc.perform(delete("/api/core/announcements/" + ID))
+      .andExpect(status().isOk())
+      .andExpect(content().json(
+        baseResponseJacksonTester.write(DELETED_BASE_RESPONSE)
+          .getJson()));
     
     verify(announcementService).deleteAnnouncement(ID);
   }
@@ -198,18 +186,15 @@ public class AnnouncementControllerTest {
       announcement);
     given(announcementRequestMapper.toAnnouncement(DATA)).willReturn(
       announcement);
-    
-    MockHttpServletResponse response = mockMvc.perform(post(
-      "/api/core/announcements").contentType(MediaType.MULTIPART_FORM_DATA)
-                                                         .param("data", DATA)
-                                                         .param("file", ""))
-      .andReturn()
-      .getResponse();
-    
-    assertThat(response.getStatus()).isEqualTo(HttpStatus.CREATED.value());
-    assertThat(response.getContentAsString()).isEqualTo(
-      dataResponseJacksonTester.write(createdDataResponse)
-        .getJson());
+  
+    mockMvc.perform(post("/api/core/announcements").contentType(
+      MediaType.MULTIPART_FORM_DATA)
+                      .param("data", DATA)
+                      .param("file", ""))
+      .andExpect(status().isCreated())
+      .andExpect(content().json(
+        dataResponseJacksonTester.write(createdDataResponse)
+          .getJson()));
     
     verify(announcementService).createAnnouncement(announcement, null);
     verify(announcementRequestMapper).toAnnouncement(DATA);
@@ -223,19 +208,15 @@ public class AnnouncementControllerTest {
       willReturn(announcement);
     given(announcementRequestMapper.toAnnouncement(ID, DATA)).willReturn(
       announcement);
-    
-    MockHttpServletResponse response = mockMvc.perform(put(
-      "/api/core/announcements/" + ID).contentType(
+  
+    mockMvc.perform(put("/api/core/announcements/" + ID).contentType(
       MediaType.MULTIPART_FORM_DATA_VALUE)
-                                                         .param("data", DATA)
-                                                         .param("file", ""))
-      .andReturn()
-      .getResponse();
-    
-    assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
-    assertThat(response.getContentAsString()).isEqualTo(
-      dataResponseJacksonTester.write(retrievedDataResponse)
-        .getJson());
+                      .param("data", DATA)
+                      .param("file", ""))
+      .andExpect(status().isOk())
+      .andExpect(content().json(
+        dataResponseJacksonTester.write(retrievedDataResponse)
+          .getJson()));
     
     verify(announcementService).updateAnnouncement(announcement, null);
     verify(announcementRequestMapper).toAnnouncement(ID, DATA);
