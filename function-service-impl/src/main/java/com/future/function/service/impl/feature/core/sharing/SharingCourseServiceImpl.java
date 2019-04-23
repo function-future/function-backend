@@ -62,7 +62,6 @@ public class SharingCourseServiceImpl extends CourseServiceImpl
   ) {
     
     List<Course> courses = toCourseList(sharingCourses);
-    
     return new PageImpl<>(courses, pageable, sharingCourses.getTotalElements());
   }
   
@@ -82,7 +81,7 @@ public class SharingCourseServiceImpl extends CourseServiceImpl
         batchService.getBatch(originBatchNumber));
     
     List<SharingCourse> targetBatchSharedCourses = originBatchSharedCourses.map(
-      sharedCourse -> toDeepCopySharingCourse(targetBatchNumber, sharedCourse))
+      sharedCourse -> toSharingCourse(sharedCourse, targetBatchNumber))
       .collect(Collectors.toList());
     
     sharingCourseRepository.save(targetBatchSharedCourses);
@@ -92,33 +91,55 @@ public class SharingCourseServiceImpl extends CourseServiceImpl
   public Course createCourse(
     Course course, MultipartFile file, long batchNumber
   ) {
-    
-    Course createdCourse = super.createCourse(course, file);
-    
-    SharingCourse sharingCourse = SharingCourse.builder()
-      .course(createdCourse)
-      .batch(batchService.getBatch(batchNumber))
-      .build();
-    sharingCourseRepository.save(sharingCourse);
-    
-    return createdCourse;
+  
+    return Optional.of(course)
+      .map(c -> super.createCourse(c, file))
+      .map(c -> this.buildSharingCourse(batchNumber, c))
+      .map(sharingCourseRepository::save)
+      .map(SharingCourse::getCourse)
+      .orElseThrow(() -> new NotFoundException("Create Course Not Found"));
   }
   
   @Override
   public Course updateCourse(
     Course course, MultipartFile file, long batchNumber
   ) {
-    
-    return null;
+  
+    return Optional.of(batchNumber)
+      .flatMap(number -> sharingCourseRepository.findByCourseIdAndBatchNumber(
+        course.getId(), number))
+      .filter(sharedCourse -> sharedCourse.getBatch()
+                                .getNumber() != batchNumber)
+      .map(sharedCourse -> this.updateAndSaveSharingCourse(sharedCourse,
+                                                           batchNumber
+      ))
+      .map(SharingCourse::getCourse)
+      .map(c -> super.updateCourse(c, file))
+      .orElseThrow(() -> new NotFoundException("Update Course Not Found"));
   }
   
-  private SharingCourse toDeepCopySharingCourse(
-    long targetBatch, SharingCourse sharingCourse
+  private SharingCourse updateAndSaveSharingCourse(
+    SharingCourse sharedCourse, long batchNumber
+  ) {
+    
+    sharedCourse.setBatch(batchService.getBatch(batchNumber));
+    return sharingCourseRepository.save(sharedCourse);
+  }
+  
+  private SharingCourse toSharingCourse(
+    SharingCourse sharingCourse, long targetBatchNumber
+  ) {
+    
+    return buildSharingCourse(targetBatchNumber, sharingCourse.getCourse());
+  }
+  
+  private SharingCourse buildSharingCourse(
+    long batchNumber, Course createdCourse
   ) {
     
     return SharingCourse.builder()
-      .course(sharingCourse.getCourse())
-      .batch(batchService.getBatch(targetBatch))
+      .course(createdCourse)
+      .batch(batchService.getBatch(batchNumber))
       .build();
   }
   

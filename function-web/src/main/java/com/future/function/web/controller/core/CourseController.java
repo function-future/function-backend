@@ -46,11 +46,13 @@ public class CourseController {
     @RequestParam(defaultValue = "1")
       int page,
     @RequestParam(defaultValue = "5")
-      int size
+      int size,
+    @RequestParam(defaultValue = "1")
+      long batch
   ) {
     
     return CourseResponseMapper.toCoursesPagingResponse(
-      sharingCourseService.getCourses(PageHelper.toPage(page, size), 1));
+      sharingCourseService.getCourses(PageHelper.toPage(page, size), batch));
   }
   
   @ResponseStatus(HttpStatus.CREATED)
