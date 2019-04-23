@@ -2,6 +2,7 @@ package com.future.function.web.model.request.core;
 
 import com.future.function.common.data.core.CourseData;
 import com.future.function.validation.annotation.core.BatchesMustBeDistinct;
+import com.future.function.validation.annotation.core.BatchesMustExist;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,6 +19,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@BatchesMustExist
 @BatchesMustBeDistinct
 public class CourseWebRequest implements CourseData {
   

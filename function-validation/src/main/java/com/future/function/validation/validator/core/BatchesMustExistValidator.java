@@ -3,7 +3,6 @@ package com.future.function.validation.validator.core;
 import com.future.function.common.data.core.CourseData;
 import com.future.function.repository.feature.core.BatchRepository;
 import com.future.function.validation.annotation.core.BatchesMustExist;
-import com.google.common.collect.Iterables;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.validation.ConstraintValidator;
@@ -53,9 +52,16 @@ public class BatchesMustExistValidator
   }
   
   private boolean eachHasBatchInDatabase(List<Long> batchNumbers) {
+  
+    return countFoundBatchInDatabase(batchNumbers) == batchNumbers.size();
+  }
+  
+  private long countFoundBatchInDatabase(List<Long> batchNumbers) {
     
-    int iterableSize = Iterables.size(batchRepository.findAll(batchNumbers));
-    return iterableSize == batchNumbers.size();
+    return batchNumbers.stream()
+      .filter(number -> !batchRepository.findByNumber(number)
+        .equals(Optional.empty()))
+      .count();
   }
   
 }

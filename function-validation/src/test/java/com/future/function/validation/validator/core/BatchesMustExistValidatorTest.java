@@ -13,8 +13,8 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
@@ -29,9 +29,6 @@ public class BatchesMustExistValidatorTest {
   
   private static final List<Long> BATCH_NUMBERS_WITH_NULL = Arrays.asList(
     2L, null);
-  
-  private static final Iterable<Batch> BATCH_ITERABLE = Arrays.asList(
-    new Batch(1L), new Batch(2L));
   
   @Mock
   private CourseData courseData;
@@ -61,12 +58,16 @@ public class BatchesMustExistValidatorTest {
   public void testGivenListOfBatchNumberOfExistingBatchByCheckingExistingBatchInDatabaseReturnTrue() {
     
     when(courseData.getBatchNumbers()).thenReturn(BATCH_NUMBERS);
-    when(batchRepository.findAll(BATCH_NUMBERS)).thenReturn(BATCH_ITERABLE);
+    when(batchRepository.findByNumber(BATCH_NUMBERS.get(0))).thenReturn(
+      Optional.of(new Batch(BATCH_NUMBERS.get(0))));
+    when(batchRepository.findByNumber(BATCH_NUMBERS.get(1))).thenReturn(
+      Optional.of(new Batch(BATCH_NUMBERS.get(1))));
     
     assertThat(validator.isValid(courseData, null)).isTrue();
     
     verify(courseData).getBatchNumbers();
-    verify(batchRepository).findAll(BATCH_NUMBERS);
+    verify(batchRepository).findByNumber(BATCH_NUMBERS.get(0));
+    verify(batchRepository).findByNumber(BATCH_NUMBERS.get(1));
     verifyZeroInteractions(annotation);
   }
   
@@ -74,13 +75,16 @@ public class BatchesMustExistValidatorTest {
   public void testGivenListOfBatchNumberOfNonExistingBatchesByCheckingExistingBatchInDatabaseReturnFalse() {
     
     when(courseData.getBatchNumbers()).thenReturn(BATCH_NUMBERS);
-    when(batchRepository.findAll(BATCH_NUMBERS)).thenReturn(
-      Collections.singletonList(new Batch(1L)));
+    when(batchRepository.findByNumber(BATCH_NUMBERS.get(0))).thenReturn(
+      Optional.of(new Batch(BATCH_NUMBERS.get(0))));
+    when(batchRepository.findByNumber(BATCH_NUMBERS.get(1))).thenReturn(
+      Optional.empty());
     
     assertThat(validator.isValid(courseData, null)).isFalse();
     
     verify(courseData).getBatchNumbers();
-    verify(batchRepository).findAll(BATCH_NUMBERS);
+    verify(batchRepository).findByNumber(BATCH_NUMBERS.get(0));
+    verify(batchRepository).findByNumber(BATCH_NUMBERS.get(1));
     verifyZeroInteractions(annotation);
   }
   

@@ -33,4 +33,12 @@ public @interface BatchesMustBeDistinct {
   
   Class<? extends Payload>[] payload() default {};
   
+  /**
+   * Declares which field of an object that causes this annotation's
+   * validator to mark the object as invalid.
+   *
+   * @return {@code String} - The name of the field.
+   */
+  String field() default "batchNumbers";
+  
 }
