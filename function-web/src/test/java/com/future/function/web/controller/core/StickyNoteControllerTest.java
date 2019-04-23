@@ -1,27 +1,30 @@
 package com.future.function.web.controller.core;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.future.function.model.entity.feature.core.StickyNote;
 import com.future.function.service.api.feature.core.StickyNoteService;
 import com.future.function.web.mapper.request.core.StickyNoteRequestMapper;
+import com.future.function.web.model.response.base.DataResponse;
+import com.future.function.web.model.response.feature.core.StickyNoteWebResponse;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(StickyNoteController.class)
@@ -40,6 +43,30 @@ public class StickyNoteControllerTest {
     .description(DESCRIPTION)
     .build();
   
+  private static final StickyNoteWebResponse STICKY_NOTE_WEB_RESPONSE =
+    StickyNoteWebResponse.builder()
+      .noteTitle(TITLE)
+      .noteDescription(DESCRIPTION)
+      .updatedAt(null)
+      .build();
+  
+  private static final DataResponse<StickyNoteWebResponse>
+    RETRIEVED_DATA_RESPONSE =
+    DataResponse.<StickyNoteWebResponse>builder().code(200)
+      .status("OK")
+      .data(STICKY_NOTE_WEB_RESPONSE)
+      .build();
+  
+  private static final DataResponse<StickyNoteWebResponse>
+    CREATED_DATA_RESPONSE = DataResponse.<StickyNoteWebResponse>builder().code(
+    201)
+    .status("CREATED")
+    .data(STICKY_NOTE_WEB_RESPONSE)
+    .build();
+  
+  private JacksonTester<DataResponse<StickyNoteWebResponse>>
+    dataResponseJacksonTester;
+  
   @Autowired
   private MockMvc mockMvc;
   
@@ -50,7 +77,10 @@ public class StickyNoteControllerTest {
   private StickyNoteRequestMapper stickyNoteRequestMapper;
   
   @Before
-  public void setUp() {}
+  public void setUp() {
+  
+    JacksonTester.initFields(this, new ObjectMapper());
+  }
   
   @After
   public void tearDown() {
@@ -63,14 +93,12 @@ public class StickyNoteControllerTest {
     throws Exception {
     
     given(stickyNoteService.getStickyNote()).willReturn(STICKY_NOTE);
-    
-    MockHttpServletResponse response = mockMvc.perform(
-      get("/api/core/sticky-notes"))
-      .andReturn()
-      .getResponse();
-    
-    assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
-    assertThat(response.getContentAsString()).isNotBlank();
+  
+    mockMvc.perform(get("/api/core/sticky-notes"))
+      .andExpect(status().isOk())
+      .andExpect(content().json(
+        dataResponseJacksonTester.write(RETRIEVED_DATA_RESPONSE)
+          .getJson()));
     
     verify(stickyNoteService).getStickyNote();
   }
@@ -83,15 +111,14 @@ public class StickyNoteControllerTest {
       STICKY_NOTE);
     given(stickyNoteService.createStickyNote(STICKY_NOTE)).willReturn(
       STICKY_NOTE);
-    
-    MockHttpServletResponse response = mockMvc.perform(post(
-      "/api/core/sticky-notes").contentType(MediaType.APPLICATION_JSON_VALUE)
-                                                         .content(VALID_JSON))
-      .andReturn()
-      .getResponse();
-    
-    assertThat(response.getStatus()).isEqualTo(HttpStatus.CREATED.value());
-    assertThat(response.getContentAsString()).isNotBlank();
+  
+    mockMvc.perform(post("/api/core/sticky-notes").contentType(
+      MediaType.APPLICATION_JSON_VALUE)
+                      .content(VALID_JSON))
+      .andExpect(status().isCreated())
+      .andExpect(content().json(
+        dataResponseJacksonTester.write(CREATED_DATA_RESPONSE)
+          .getJson()));
     
     verify(stickyNoteRequestMapper).toStickyNote(VALID_JSON);
     verify(stickyNoteService).createStickyNote(STICKY_NOTE);
