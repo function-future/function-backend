@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.future.function.model.entity.feature.core.StickyNote;
 import com.future.function.service.api.feature.core.StickyNoteService;
 import com.future.function.web.mapper.request.core.StickyNoteRequestMapper;
+import com.future.function.web.mapper.response.core.StickyNoteResponseMapper;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.feature.core.StickyNoteWebResponse;
 import org.junit.After;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -43,26 +45,13 @@ public class StickyNoteControllerTest {
     .description(DESCRIPTION)
     .build();
   
-  private static final StickyNoteWebResponse STICKY_NOTE_WEB_RESPONSE =
-    StickyNoteWebResponse.builder()
-      .noteTitle(TITLE)
-      .noteDescription(DESCRIPTION)
-      .updatedAt(null)
-      .build();
+  private static final DataResponse<StickyNoteWebResponse>
+    RETRIEVED_DATA_RESPONSE = StickyNoteResponseMapper.toStickyNoteDataResponse(
+    STICKY_NOTE);
   
   private static final DataResponse<StickyNoteWebResponse>
-    RETRIEVED_DATA_RESPONSE =
-    DataResponse.<StickyNoteWebResponse>builder().code(200)
-      .status("OK")
-      .data(STICKY_NOTE_WEB_RESPONSE)
-      .build();
-  
-  private static final DataResponse<StickyNoteWebResponse>
-    CREATED_DATA_RESPONSE = DataResponse.<StickyNoteWebResponse>builder().code(
-    201)
-    .status("CREATED")
-    .data(STICKY_NOTE_WEB_RESPONSE)
-    .build();
+    CREATED_DATA_RESPONSE = StickyNoteResponseMapper.toStickyNoteDataResponse(
+    HttpStatus.CREATED, STICKY_NOTE);
   
   private JacksonTester<DataResponse<StickyNoteWebResponse>>
     dataResponseJacksonTester;
