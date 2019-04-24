@@ -7,6 +7,8 @@ import com.future.function.service.api.feature.core.StickyNoteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class StickyNoteServiceImpl implements StickyNoteService {
   
@@ -39,10 +41,11 @@ public class StickyNoteServiceImpl implements StickyNoteService {
    */
   @Override
   public StickyNote createStickyNote(StickyNote stickyNote) {
-    
-    stickyNoteRepository.save(stickyNote);
-    
-    return getStickyNote();
+  
+    return Optional.of(stickyNote)
+      .map(stickyNoteRepository::save)
+      .map(ignored -> this.getStickyNote())
+      .orElseGet(this::getStickyNote);
   }
   
 }
