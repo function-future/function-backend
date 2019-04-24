@@ -70,8 +70,6 @@ public class AnnouncementControllerTest {
   
   private PagingResponse<AnnouncementWebResponse> pagingResponse;
   
-  private Page<Announcement> announcementPage;
-  
   private DataResponse<AnnouncementWebResponse> retrievedDataResponse;
   
   private DataResponse<AnnouncementWebResponse> createdDataResponse;
@@ -108,10 +106,9 @@ public class AnnouncementControllerTest {
     
     announcement.setCreatedAt(CREATED_AT);
     announcement.setUpdatedAt(UPDATED_AT);
-    
-    announcementPage = new PageImpl<>(Collections.singletonList(announcement),
-                                      PAGEABLE, 1
-    );
+  
+    Page<Announcement> announcementPage = new PageImpl<>(
+      Collections.singletonList(announcement), PAGEABLE, 1);
     
     pagingResponse = AnnouncementResponseMapper.toAnnouncementsPagingResponse(
       announcementPage);
@@ -141,6 +138,25 @@ public class AnnouncementControllerTest {
   
     mockMvc.perform(get("/api/core/announcements").param("page", "1")
                       .param("size", "4"))
+      .andExpect(status().isOk())
+      .andExpect(content().json(
+        pagingResponseJacksonTester.write(pagingResponse)
+          .getJson()));
+    
+    verify(announcementService).getAnnouncements(PAGEABLE);
+  }
+  
+  @Test
+  public void testGivenCallToAnnouncementsApiWithoutRequestParamsByGettingAnnouncementsFromAnnouncementServiceReturnPagingResponseOfAnnouncements()
+    throws Exception {
+    
+    List<Announcement> announcementList = Collections.singletonList(
+      announcement);
+    
+    given(announcementService.getAnnouncements(PAGEABLE)).willReturn(
+      new PageImpl<>(announcementList, PAGEABLE, announcementList.size()));
+    
+    mockMvc.perform(get("/api/core/announcements"))
       .andExpect(status().isOk())
       .andExpect(content().json(
         pagingResponseJacksonTester.write(pagingResponse)

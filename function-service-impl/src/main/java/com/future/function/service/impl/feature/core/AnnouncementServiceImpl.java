@@ -73,11 +73,12 @@ public class AnnouncementServiceImpl implements AnnouncementService {
     Announcement announcement, MultipartFile file
   ) {
     
-    announcementRepository.save(announcement);
-    
     //TODO Save attached file
-    
-    return announcementRepository.findOne(announcement.getId());
+  
+    return Optional.of(announcement)
+      .map(announcementRepository::save)
+      .map(a -> this.getAnnouncement(a.getId()))
+      .orElseGet(() -> this.getAnnouncement(announcement.getId()));
   }
   
   /**
