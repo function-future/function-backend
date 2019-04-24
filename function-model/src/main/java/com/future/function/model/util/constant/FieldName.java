@@ -89,7 +89,7 @@ public interface FieldName {
   }
   
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
-  abstract class SharingCourse {
+  abstract class SharedCourse {
     
     public static final String BATCH = "batch";
   

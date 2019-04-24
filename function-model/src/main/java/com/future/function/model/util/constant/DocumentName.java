@@ -19,6 +19,6 @@ public abstract class DocumentName {
   
   public static final String COURSE = "courses";
   
-  public static final String SHARING_COURSE = "sharing-courses";
+  public static final String SHARED_COURSE = "shared-courses";
   
 }

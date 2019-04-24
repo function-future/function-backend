@@ -29,7 +29,7 @@ public class BatchesMustBeDistinctValidator
   }
   
   /**
-   * Checks whether the object of {@code SharingCourseData} contains duplicate
+   * Checks whether the object of {@code SharedCourseData} contains duplicate
    * batch numbers or not.
    *
    * @param data    Value of data to be validated.

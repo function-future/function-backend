@@ -3,7 +3,7 @@ package com.future.function.common.data.core;
 import java.util.List;
 
 /**
- * Interface for accessing data of object of {@code SharingCourseWebRequest}
+ * Interface for accessing data of object of {@code SharedCourseWebRequest}
  * class type.
  * <p>
  * Useful in validation layer for validation purposes of level {@link

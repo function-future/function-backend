@@ -33,7 +33,7 @@ public class BatchesMustExistValidator
   }
   
   /**
-   * Checks whether the object of {@code SharingCourseData} contains existing
+   * Checks whether the object of {@code SharedCourseData} contains existing
    * batch numbers or not.
    *
    * @param data    Value of data to be validated.

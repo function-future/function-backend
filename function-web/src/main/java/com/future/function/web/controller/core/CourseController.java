@@ -1,11 +1,11 @@
 package com.future.function.web.controller.core;
 
-import com.future.function.service.api.feature.core.sharing.SharingCourseService;
+import com.future.function.service.api.feature.core.shared.SharedCourseService;
 import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.mapper.request.core.CourseRequestMapper;
 import com.future.function.web.mapper.response.core.CourseResponseMapper;
-import com.future.function.web.model.request.core.SharingCourseWebRequest;
+import com.future.function.web.model.request.core.shared.SharedCourseWebRequest;
 import com.future.function.web.model.response.base.BaseResponse;
 import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.feature.core.CourseWebResponse;
@@ -26,17 +26,17 @@ import java.util.List;
 @RequestMapping(value = "/api/core/courses")
 public class CourseController {
   
-  private final SharingCourseService sharingCourseService;
+  private final SharedCourseService sharedCourseService;
   
   private final CourseRequestMapper courseRequestMapper;
   
   @Autowired
   public CourseController(
-    SharingCourseService sharingCourseService,
+    SharedCourseService sharedCourseService,
     CourseRequestMapper courseRequestMapper
   ) {
-    
-    this.sharingCourseService = sharingCourseService;
+  
+    this.sharedCourseService = sharedCourseService;
     this.courseRequestMapper = courseRequestMapper;
   }
   
@@ -52,7 +52,7 @@ public class CourseController {
   ) {
     
     return CourseResponseMapper.toCoursesPagingResponse(
-      sharingCourseService.getCourses(PageHelper.toPage(page, size), batch));
+      sharedCourseService.getCourses(PageHelper.toPage(page, size), batch));
   }
   
   @ResponseStatus(HttpStatus.CREATED)
@@ -61,11 +61,11 @@ public class CourseController {
                consumes = MediaType.APPLICATION_JSON_VALUE)
   public BaseResponse copyCourses(
     @RequestBody
-      SharingCourseWebRequest request
+      SharedCourseWebRequest request
   ) {
     
     List<Long> batchNumbers = courseRequestMapper.toCopyCoursesData(request);
-    sharingCourseService.copyCourses(batchNumbers.get(0), batchNumbers.get(1));
+    sharedCourseService.copyCourses(batchNumbers.get(0), batchNumbers.get(1));
     return ResponseHelper.toBaseResponse(HttpStatus.CREATED);
   }
   

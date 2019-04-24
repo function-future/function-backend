@@ -1,12 +1,12 @@
-package com.future.function.service.impl.feature.core.sharing;
+package com.future.function.service.impl.feature.core.shared;
 
 import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.core.Course;
-import com.future.function.model.entity.feature.core.sharing.SharingCourse;
-import com.future.function.repository.feature.core.sharing.SharingCourseRepository;
+import com.future.function.model.entity.feature.core.shared.SharedCourse;
+import com.future.function.repository.feature.core.shared.SharedCourseRepository;
 import com.future.function.service.api.feature.core.BatchService;
 import com.future.function.service.api.feature.core.CourseService;
-import com.future.function.service.api.feature.core.sharing.SharingCourseService;
+import com.future.function.service.api.feature.core.shared.SharedCourseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -20,31 +20,31 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
-public class SharingCourseServiceImpl implements SharingCourseService {
+public class SharedCourseServiceImpl implements SharedCourseService {
   
-  private final SharingCourseRepository sharingCourseRepository;
+  private final SharedCourseRepository sharedCourseRepository;
   
   private final BatchService batchService;
   
   private final CourseService courseService;
   
   @Autowired
-  public SharingCourseServiceImpl(
-    SharingCourseRepository sharingCourseRepository, BatchService batchService,
+  public SharedCourseServiceImpl(
+    SharedCourseRepository sharedCourseRepository, BatchService batchService,
     CourseService courseService
   ) {
-    
-    this.sharingCourseRepository = sharingCourseRepository;
+  
+    this.sharedCourseRepository = sharedCourseRepository;
     this.batchService = batchService;
     this.courseService = courseService;
   }
   
   @Override
   public Course getCourse(String courseId, long batchNumber) {
-    
-    return sharingCourseRepository.findByCourseIdAndBatchNumber(
+  
+    return sharedCourseRepository.findByCourseIdAndBatchNumber(
       courseId, batchNumber)
-      .map(SharingCourse::getCourse)
+      .map(SharedCourse::getCourse)
       .orElseThrow(() -> new NotFoundException("Get Course Not Found"));
   }
   
@@ -52,39 +52,39 @@ public class SharingCourseServiceImpl implements SharingCourseService {
   public Page<Course> getCourses(Pageable pageable, long batchNumber) {
     
     return Optional.of(batchService.getBatch(batchNumber))
-      .map(batch -> sharingCourseRepository.findAllByBatch(batch, pageable))
+      .map(batch -> sharedCourseRepository.findAllByBatch(batch, pageable))
       .map(sharedCourses -> toPageCourse(sharedCourses, pageable))
       .orElseThrow(() -> new NotFoundException("Get Courses Not Found"));
   }
   
   private Page<Course> toPageCourse(
-    Page<SharingCourse> sharedCourses, Pageable pageable
+    Page<SharedCourse> sharedCourses, Pageable pageable
   ) {
   
     List<Course> courses = toCourseList(sharedCourses);
     return new PageImpl<>(courses, pageable, sharedCourses.getTotalElements());
   }
   
-  private List<Course> toCourseList(Page<SharingCourse> sharedCourses) {
+  private List<Course> toCourseList(Page<SharedCourse> sharedCourses) {
     
     return sharedCourses.getContent()
       .stream()
-      .map(SharingCourse::getCourse)
+      .map(SharedCourse::getCourse)
       .collect(Collectors.toList());
   }
   
   @Override
   public void copyCourses(long originBatchNumber, long targetBatchNumber) {
-    
-    Stream<SharingCourse> originBatchSharedCourses =
-      sharingCourseRepository.findAllByBatch(
+  
+    Stream<SharedCourse> originBatchSharedCourses =
+      sharedCourseRepository.findAllByBatch(
         batchService.getBatch(originBatchNumber));
-    
-    List<SharingCourse> targetBatchSharedCourses = originBatchSharedCourses.map(
-      sharedCourse -> toSharingCourse(sharedCourse, targetBatchNumber))
+  
+    List<SharedCourse> targetBatchSharedCourses = originBatchSharedCourses.map(
+      sharedCourse -> toSharedCourse(sharedCourse, targetBatchNumber))
       .collect(Collectors.toList());
-    
-    sharingCourseRepository.save(targetBatchSharedCourses);
+  
+    sharedCourseRepository.save(targetBatchSharedCourses);
   }
   
   @Override
@@ -94,9 +94,9 @@ public class SharingCourseServiceImpl implements SharingCourseService {
   
     return Optional.of(course)
       .map(c -> courseService.createCourse(c, file))
-      .map(c -> this.buildSharingCourse(batchNumber, c))
-      .map(sharingCourseRepository::save)
-      .map(SharingCourse::getCourse)
+      .map(c -> this.buildSharedCourse(batchNumber, c))
+      .map(sharedCourseRepository::save)
+      .map(SharedCourse::getCourse)
       .orElseThrow(() -> new NotFoundException("Create Course Not Found"));
   }
   
@@ -106,30 +106,30 @@ public class SharingCourseServiceImpl implements SharingCourseService {
   ) {
   
     return Optional.of(batchNumber)
-      .flatMap(number -> sharingCourseRepository.findByCourseIdAndBatchNumber(
+      .flatMap(number -> sharedCourseRepository.findByCourseIdAndBatchNumber(
         course.getId(), number))
       .filter(sharedCourse -> isBatchNumberMatch(sharedCourse, batchNumber))
-      .map(sharedCourse -> this.updateSharingCourseBatchAndSaveSharingCourse(
+      .map(sharedCourse -> this.updateSharedCourseBatchAndSaveSharedCourse(
         sharedCourse, batchNumber))
-      .map(SharingCourse::getCourse)
+      .map(SharedCourse::getCourse)
       .map(c -> courseService.updateCourse(c, file))
       .orElseThrow(() -> new NotFoundException("Update Course Not Found"));
   }
   
   private boolean isBatchNumberMatch(
-    SharingCourse sharedCourse, long batchNumber
+    SharedCourse sharedCourse, long batchNumber
   ) {
     
     return sharedCourse.getBatch()
              .getNumber() != batchNumber;
   }
   
-  private SharingCourse updateSharingCourseBatchAndSaveSharingCourse(
-    SharingCourse sharedCourse, long batchNumber
+  private SharedCourse updateSharedCourseBatchAndSaveSharedCourse(
+    SharedCourse sharedCourse, long batchNumber
   ) {
     
     sharedCourse.setBatch(batchService.getBatch(batchNumber));
-    return sharingCourseRepository.save(sharedCourse);
+    return sharedCourseRepository.save(sharedCourse);
   }
   
   @Override
@@ -139,18 +139,18 @@ public class SharingCourseServiceImpl implements SharingCourseService {
       .ifPresent(courseService::deleteCourse);
   }
   
-  private SharingCourse toSharingCourse(
-    SharingCourse sharingCourse, long targetBatchNumber
+  private SharedCourse toSharedCourse(
+    SharedCourse sharedCourse, long targetBatchNumber
   ) {
     
-    return buildSharingCourse(targetBatchNumber, sharingCourse.getCourse());
+    return buildSharedCourse(targetBatchNumber, sharedCourse.getCourse());
   }
   
-  private SharingCourse buildSharingCourse(
+  private SharedCourse buildSharedCourse(
     long batchNumber, Course createdCourse
   ) {
     
-    return SharingCourse.builder()
+    return SharedCourse.builder()
       .course(createdCourse)
       .batch(batchService.getBatch(batchNumber))
       .build();
