@@ -58,16 +58,16 @@ public class SharingCourseServiceImpl implements SharingCourseService {
   }
   
   private Page<Course> toPageCourse(
-    Page<SharingCourse> sharingCourses, Pageable pageable
+    Page<SharingCourse> sharedCourses, Pageable pageable
   ) {
-    
-    List<Course> courses = toCourseList(sharingCourses);
-    return new PageImpl<>(courses, pageable, sharingCourses.getTotalElements());
+  
+    List<Course> courses = toCourseList(sharedCourses);
+    return new PageImpl<>(courses, pageable, sharedCourses.getTotalElements());
   }
   
-  private List<Course> toCourseList(Page<SharingCourse> sharingCourses) {
+  private List<Course> toCourseList(Page<SharingCourse> sharedCourses) {
     
-    return sharingCourses.getContent()
+    return sharedCourses.getContent()
       .stream()
       .map(SharingCourse::getCourse)
       .collect(Collectors.toList());
@@ -108,17 +108,23 @@ public class SharingCourseServiceImpl implements SharingCourseService {
     return Optional.of(batchNumber)
       .flatMap(number -> sharingCourseRepository.findByCourseIdAndBatchNumber(
         course.getId(), number))
-      .filter(sharedCourse -> sharedCourse.getBatch()
-                                .getNumber() != batchNumber)
-      .map(sharedCourse -> this.updateAndSaveSharingCourse(sharedCourse,
-                                                           batchNumber
-      ))
+      .filter(sharedCourse -> isBatchNumberMatch(sharedCourse, batchNumber))
+      .map(sharedCourse -> this.updateSharingCourseBatchAndSaveSharingCourse(
+        sharedCourse, batchNumber))
       .map(SharingCourse::getCourse)
       .map(c -> courseService.updateCourse(c, file))
       .orElseThrow(() -> new NotFoundException("Update Course Not Found"));
   }
   
-  private SharingCourse updateAndSaveSharingCourse(
+  private boolean isBatchNumberMatch(
+    SharingCourse sharedCourse, long batchNumber
+  ) {
+    
+    return sharedCourse.getBatch()
+             .getNumber() != batchNumber;
+  }
+  
+  private SharingCourse updateSharingCourseBatchAndSaveSharingCourse(
     SharingCourse sharedCourse, long batchNumber
   ) {
     
@@ -128,8 +134,9 @@ public class SharingCourseServiceImpl implements SharingCourseService {
   
   @Override
   public void deleteCourse(String courseId, long batchNumber) {
-    
-    courseService.deleteCourse(courseId);
+  
+    Optional.ofNullable(courseId)
+      .ifPresent(courseService::deleteCourse);
   }
   
   private SharingCourse toSharingCourse(
