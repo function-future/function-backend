@@ -3,11 +3,10 @@ package com.future.function.service.impl.feature.core.sharing;
 import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.core.Course;
 import com.future.function.model.entity.feature.core.sharing.SharingCourse;
-import com.future.function.repository.feature.core.CourseRepository;
 import com.future.function.repository.feature.core.sharing.SharingCourseRepository;
 import com.future.function.service.api.feature.core.BatchService;
+import com.future.function.service.api.feature.core.CourseService;
 import com.future.function.service.api.feature.core.sharing.SharingCourseService;
-import com.future.function.service.impl.feature.core.CourseServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -21,22 +20,23 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
-public class SharingCourseServiceImpl extends CourseServiceImpl
-  implements SharingCourseService {
+public class SharingCourseServiceImpl implements SharingCourseService {
   
   private final SharingCourseRepository sharingCourseRepository;
   
   private final BatchService batchService;
   
+  private final CourseService courseService;
+  
   @Autowired
   public SharingCourseServiceImpl(
-    CourseRepository courseRepository,
-    SharingCourseRepository sharingCourseRepository, BatchService batchService
+    SharingCourseRepository sharingCourseRepository, BatchService batchService,
+    CourseService courseService
   ) {
     
-    super(courseRepository);
     this.sharingCourseRepository = sharingCourseRepository;
     this.batchService = batchService;
+    this.courseService = courseService;
   }
   
   @Override
@@ -93,7 +93,7 @@ public class SharingCourseServiceImpl extends CourseServiceImpl
   ) {
   
     return Optional.of(course)
-      .map(c -> super.createCourse(c, file))
+      .map(c -> courseService.createCourse(c, file))
       .map(c -> this.buildSharingCourse(batchNumber, c))
       .map(sharingCourseRepository::save)
       .map(SharingCourse::getCourse)
@@ -114,7 +114,7 @@ public class SharingCourseServiceImpl extends CourseServiceImpl
                                                            batchNumber
       ))
       .map(SharingCourse::getCourse)
-      .map(c -> super.updateCourse(c, file))
+      .map(c -> courseService.updateCourse(c, file))
       .orElseThrow(() -> new NotFoundException("Update Course Not Found"));
   }
   
@@ -124,6 +124,12 @@ public class SharingCourseServiceImpl extends CourseServiceImpl
     
     sharedCourse.setBatch(batchService.getBatch(batchNumber));
     return sharingCourseRepository.save(sharedCourse);
+  }
+  
+  @Override
+  public void deleteCourse(String courseId, long batchNumber) {
+    
+    courseService.deleteCourse(courseId);
   }
   
   private SharingCourse toSharingCourse(
