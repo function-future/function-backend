@@ -20,7 +20,7 @@ public class WebRequestMapper {
     this.objectMapper = objectMapper;
   }
   
-  public <T> T toWebRequestObject(Class<T> type, String data) {
+  public <T> T toWebRequestObject(String data, Class<T> type) {
     
     T request;
     try {

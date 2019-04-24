@@ -35,7 +35,7 @@ public class AnnouncementRequestMapper {
   public Announcement toAnnouncement(String data) {
     
     AnnouncementWebRequest request = requestMapper.toWebRequestObject(
-      AnnouncementWebRequest.class, data);
+      data, AnnouncementWebRequest.class);
     
     return toValidatedAnnouncement(null, request);
   }
@@ -72,7 +72,7 @@ public class AnnouncementRequestMapper {
     
     return toValidatedAnnouncement(
       announcementId,
-      requestMapper.toWebRequestObject(AnnouncementWebRequest.class, data)
+      requestMapper.toWebRequestObject(data, AnnouncementWebRequest.class)
     );
   }
   

@@ -52,7 +52,7 @@ public class WebRequestMapperTest {
       DUMMY_DATA);
     
     assertThat(
-      requestMapper.toWebRequestObject(DummyData.class, VALID_JSON)).isEqualTo(
+      requestMapper.toWebRequestObject(VALID_JSON, DummyData.class)).isEqualTo(
       DUMMY_DATA);
     
     verify(objectMapper).readValue(VALID_JSON, DummyData.class);
@@ -66,7 +66,7 @@ public class WebRequestMapperTest {
       new IOException());
     
     catchException(
-      () -> requestMapper.toWebRequestObject(DummyData.class, INVALID_JSON));
+      () -> requestMapper.toWebRequestObject(INVALID_JSON, DummyData.class));
     
     assertThat(caughtException().getClass()).isEqualTo(
       BadRequestException.class);

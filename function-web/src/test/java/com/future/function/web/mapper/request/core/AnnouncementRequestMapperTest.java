@@ -72,9 +72,8 @@ public class AnnouncementRequestMapperTest {
   
   @Test
   public void testGivenDataByParsingToAnnouncementClassReturnAnnouncementObject() {
-    
-    when(requestMapper.toWebRequestObject(AnnouncementWebRequest.class,
-                                          DATA
+  
+    when(requestMapper.toWebRequestObject(DATA, AnnouncementWebRequest.class
     )).thenReturn(REQUEST);
     
     Announcement parsedAnnouncement = announcementRequestMapper.toAnnouncement(
@@ -90,15 +89,14 @@ public class AnnouncementRequestMapperTest {
       ANNOUNCEMENT_WITHOUT_ID.getDescriptionHtml());
     
     verify(requestMapper).toWebRequestObject(
-      AnnouncementWebRequest.class, DATA);
+      DATA, AnnouncementWebRequest.class);
     verify(validator).validate(REQUEST);
   }
   
   @Test
   public void testGivenIdAndDataByParsingToAnnouncementClassReturnAnnouncementObject() {
-    
-    when(requestMapper.toWebRequestObject(AnnouncementWebRequest.class,
-                                          DATA
+  
+    when(requestMapper.toWebRequestObject(DATA, AnnouncementWebRequest.class
     )).thenReturn(REQUEST);
     
     Announcement parsedAnnouncement = announcementRequestMapper.toAnnouncement(
@@ -108,7 +106,7 @@ public class AnnouncementRequestMapperTest {
     assertThat(parsedAnnouncement).isEqualTo(ANNOUNCEMENT_WITH_ID);
     
     verify(requestMapper).toWebRequestObject(
-      AnnouncementWebRequest.class, DATA);
+      DATA, AnnouncementWebRequest.class);
     verify(validator).validate(REQUEST);
   }
   
