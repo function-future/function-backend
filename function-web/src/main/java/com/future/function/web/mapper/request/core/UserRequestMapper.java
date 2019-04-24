@@ -1,18 +1,16 @@
 package com.future.function.web.mapper.request.core;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.future.function.common.enumeration.core.Role;
-import com.future.function.common.exception.BadRequestException;
 import com.future.function.common.validation.ObjectValidator;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.File;
 import com.future.function.model.entity.feature.core.User;
+import com.future.function.web.mapper.request.WebRequestMapper;
 import com.future.function.web.model.request.core.UserWebRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.util.Optional;
 
 /**
@@ -22,16 +20,16 @@ import java.util.Optional;
 @Component
 public class UserRequestMapper {
   
-  private ObjectMapper objectMapper;
+  private WebRequestMapper requestMapper;
   
   private ObjectValidator validator;
   
   @Autowired
   private UserRequestMapper(
-    ObjectMapper objectMapper, ObjectValidator validator
+    WebRequestMapper requestMapper, ObjectValidator validator
   ) {
-    
-    this.objectMapper = objectMapper;
+  
+    this.requestMapper = requestMapper;
     this.validator = validator;
   }
   
@@ -43,8 +41,10 @@ public class UserRequestMapper {
    * @return {@code User} - Converted user object.
    */
   public User toUser(String data) {
-    
-    UserWebRequest request = toUserWebRequest(data);
+  
+    UserWebRequest request = requestMapper.toWebRequestObject(data,
+                                                              UserWebRequest.class
+    );
     
     return toValidatedUser(request.getEmail(), request);
   }
@@ -92,18 +92,6 @@ public class UserRequestMapper {
       .orElse(null);
   }
   
-  private UserWebRequest toUserWebRequest(String data) {
-    
-    UserWebRequest request;
-    try {
-      request = objectMapper.readValue(data, UserWebRequest.class);
-    } catch (IOException e) {
-      log.error("IOException occurred on parsing request, exception: '{}'", e);
-      throw new BadRequestException("Bad Request");
-    }
-    return request;
-  }
-  
   /**
    * Converts JSON data to {@code User} object. This method is used for
    * update user purposes.
@@ -114,8 +102,10 @@ public class UserRequestMapper {
    * @return {@code User} - Converted user object.
    */
   public User toUser(String email, String data) {
-    
-    return toValidatedUser(email, toUserWebRequest(data));
+  
+    return toValidatedUser(email, requestMapper.toWebRequestObject(data,
+                                                                   UserWebRequest.class
+    ));
   }
   
 }
