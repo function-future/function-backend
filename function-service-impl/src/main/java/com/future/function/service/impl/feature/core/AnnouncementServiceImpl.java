@@ -97,12 +97,11 @@ public class AnnouncementServiceImpl implements AnnouncementService {
   
     return Optional.of(announcement)
       .map(Announcement::getId)
-      .map(announcementRepository::findOne)
+      .map(this::getAnnouncement)
       .map(foundAnnouncement -> copyPropertiesAndSaveAnnouncement(announcement,
                                                                   foundAnnouncement
       ))
-      .orElseThrow(
-        () -> new NotFoundException("Update Announcement Not Found"));
+      .orElseGet(() -> this.getAnnouncement(null));
   }
   
   private Announcement copyPropertiesAndSaveAnnouncement(

@@ -166,7 +166,7 @@ public class AnnouncementServiceImplTest {
     
     assertThat(caughtException().getClass()).isEqualTo(NotFoundException.class);
     assertThat(caughtException().getMessage()).isEqualTo(
-      "Update Announcement Not Found");
+      "Get Announcement Not Found");
     
     verify(announcementRepository).findOne(ID);
   }
