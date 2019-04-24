@@ -8,6 +8,7 @@ import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.annotation.Version;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 /**
@@ -44,5 +45,9 @@ public class BaseEntity {
   
   @Field(FieldName.BaseEntity.DELETED)
   private boolean deleted;
+  
+  @Field(FieldName.BaseEntity.VERSION)
+  @Version
+  private Long version;
   
 }

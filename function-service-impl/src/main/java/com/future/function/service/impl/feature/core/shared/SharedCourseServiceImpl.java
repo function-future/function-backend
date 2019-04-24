@@ -42,16 +42,19 @@ public class SharedCourseServiceImpl implements SharedCourseService {
   @Override
   public Course getCourse(String courseId, long batchNumber) {
   
-    return sharedCourseRepository.findByCourseIdAndBatchNumber(
-      courseId, batchNumber)
+    return Optional.of(batchNumber)
+      .map(batchService::getBatch)
+      .flatMap(
+        batch -> sharedCourseRepository.findByCourseIdAndBatch(courseId, batch))
       .map(SharedCourse::getCourse)
       .orElseThrow(() -> new NotFoundException("Get Course Not Found"));
   }
   
   @Override
   public Page<Course> getCourses(Pageable pageable, long batchNumber) {
-    
-    return Optional.of(batchService.getBatch(batchNumber))
+  
+    return Optional.of(batchNumber)
+      .map(batchService::getBatch)
       .map(batch -> sharedCourseRepository.findAllByBatch(batch, pageable))
       .map(sharedCourses -> toPageCourse(sharedCourses, pageable))
       .orElseThrow(() -> new NotFoundException("Get Courses Not Found"));
@@ -106,8 +109,11 @@ public class SharedCourseServiceImpl implements SharedCourseService {
   ) {
   
     return Optional.of(batchNumber)
-      .flatMap(number -> sharedCourseRepository.findByCourseIdAndBatchNumber(
-        course.getId(), number))
+      .map(batchService::getBatch)
+      .flatMap(
+        batch -> sharedCourseRepository.findByCourseIdAndBatch(course.getId(),
+                                                               batch
+        ))
       .filter(sharedCourse -> isBatchNumberMatch(sharedCourse, batchNumber))
       .map(sharedCourse -> this.updateSharedCourseBatchAndSaveSharedCourse(
         sharedCourse, batchNumber))
@@ -121,7 +127,7 @@ public class SharedCourseServiceImpl implements SharedCourseService {
   ) {
     
     return sharedCourse.getBatch()
-             .getNumber() != batchNumber;
+             .getNumber() == batchNumber;
   }
   
   private SharedCourse updateSharedCourseBatchAndSaveSharedCourse(
@@ -136,7 +142,20 @@ public class SharedCourseServiceImpl implements SharedCourseService {
   public void deleteCourse(String courseId, long batchNumber) {
   
     Optional.ofNullable(courseId)
-      .ifPresent(courseService::deleteCourse);
+      .map(id -> batchNumber)
+      .map(batchService::getBatch)
+      .flatMap(
+        batch -> sharedCourseRepository.findByCourseIdAndBatch(courseId, batch))
+      .ifPresent(
+        sharedCourse -> deleteSharedCourseAndCourse(sharedCourse, courseId));
+  }
+  
+  private void deleteSharedCourseAndCourse(
+    SharedCourse sharedCourse, String courseId
+  ) {
+    
+    sharedCourseRepository.delete(sharedCourse);
+    courseService.deleteCourse(courseId);
   }
   
   private SharedCourse toSharedCourse(

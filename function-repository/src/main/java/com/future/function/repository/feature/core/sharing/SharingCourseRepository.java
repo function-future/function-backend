@@ -1,7 +1,7 @@
 package com.future.function.repository.feature.core.sharing;
 
 import com.future.function.model.entity.feature.core.Batch;
-import com.future.function.model.entity.feature.core.sharing.SharingCourse;
+import com.future.function.model.entity.feature.core.sharing.SharedCourse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
@@ -15,14 +15,14 @@ import java.util.stream.Stream;
  */
 @Repository
 public interface SharingCourseRepository
-  extends MongoRepository<SharingCourse, String> {
+  extends MongoRepository<SharedCourse, String> {
   
-  Optional<SharingCourse> findByCourseIdAndBatchNumber(
+  Optional<SharedCourse> findByCourseIdAndBatchNumber(
     String courseId, long batchNumber
   );
   
-  Page<SharingCourse> findAllByBatch(Batch batch, Pageable pageable);
+  Page<SharedCourse> findAllByBatch(Batch batch, Pageable pageable);
   
-  Stream<SharingCourse> findAllByBatch(Batch batch);
+  Stream<SharedCourse> findAllByBatch(Batch batch);
   
 }

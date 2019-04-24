@@ -11,7 +11,7 @@ public abstract class DocumentName {
   
   public static final String SEQUENCE = "sequences";
   
-  public static final String BATCH = "batchNumbers";
+  public static final String BATCH = "batches";
   
   public static final String FILE = "files";
   

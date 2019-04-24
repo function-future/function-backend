@@ -23,17 +23,17 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@Document(collection = DocumentName.SHARING_COURSE)
-public class SharingCourse extends BaseEntity {
+@Document(collection = DocumentName.SHARED_COURSE)
+public class SharedCourse extends BaseEntity {
   
   @Id
   private String id;
   
-  @Field(FieldName.SharingCourse.BATCH)
+  @Field(FieldName.SharedCourse.BATCH)
   @DBRef(lazy = true)
   private Batch batch;
   
-  @Field(FieldName.SharingCourse.COURSE)
+  @Field(FieldName.SharedCourse.COURSE)
   @DBRef(lazy = true)
   private Course course;
   

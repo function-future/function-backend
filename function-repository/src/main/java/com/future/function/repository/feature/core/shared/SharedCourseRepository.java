@@ -17,9 +17,7 @@ import java.util.stream.Stream;
 public interface SharedCourseRepository
   extends MongoRepository<SharedCourse, String> {
   
-  Optional<SharedCourse> findByCourseIdAndBatchNumber(
-    String courseId, long batchNumber
-  );
+  Optional<SharedCourse> findByCourseIdAndBatch(String courseId, Batch batch);
   
   Page<SharedCourse> findAllByBatch(Batch batch, Pageable pageable);
   
