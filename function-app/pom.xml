@@ -13,7 +13,12 @@
 
   <dependencies>
 
-    <!-- function dependencies -->
+    <dependency>
+      <groupId>com.future.function</groupId>
+      <artifactId>function-data-migration</artifactId>
+      <version>${project.parent.version}</version>
+    </dependency>
+
     <dependency>
       <groupId>com.future.function</groupId>
       <artifactId>function-repository</artifactId>
@@ -30,6 +35,16 @@
       <groupId>com.future.function</groupId>
       <artifactId>function-web</artifactId>
       <version>${project.parent.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>io.springfox</groupId>
+      <artifactId>springfox-swagger-ui</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>io.springfox</groupId>
+      <artifactId>springfox-swagger2</artifactId>
     </dependency>
 
   </dependencies>

@@ -1,24 +1,18 @@
 package com.future.function.model.entity.feature.core;
 
-import com.future.function.common.data.core.UserData;
 import com.future.function.common.enumeration.core.Role;
 import com.future.function.model.entity.base.BaseEntity;
 import com.future.function.model.util.constant.DocumentName;
-import com.future.function.validation.annotation.core.Name;
-import com.future.function.validation.annotation.core.OnlyStudentCanHaveBatchAndUniversity;
-import com.future.function.validation.annotation.core.Phone;
+import com.future.function.model.util.constant.FieldName;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.hibernate.validator.constraints.Email;
-import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
-
-import javax.validation.constraints.NotNull;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 /**
  * Entity representation for users.
@@ -29,57 +23,38 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @Document(collection = DocumentName.USER)
-@OnlyStudentCanHaveBatchAndUniversity
-public class User extends BaseEntity implements UserData {
+public class User extends BaseEntity {
   
   @Id
   private String id;
   
-  @Email(message = "Email")
-  @NotBlank(message = "NotBlank")
+  @Field(FieldName.User.EMAIL)
   private String email;
   
-  @Name
-  @NotBlank(message = "NotBlank")
+  @Field(FieldName.User.NAME)
   private String name;
   
-  @NotBlank(message = "NotBlank")
+  @Field(FieldName.User.PASSWORD)
   private String password;
   
-  @NotNull(message = "NotNull")
+  @Field(FieldName.User.ROLE)
   private Role role;
   
+  @Field(FieldName.User.PICTURE)
   @DBRef(lazy = true)
-  @NotNull(message = "NotNull")
   private File picture;
   
-  @Phone
+  @Field(FieldName.User.PHONE)
   private String phone;
   
-  @NotBlank(message = "NotBlank")
+  @Field(FieldName.User.ADDRESS)
   private String address;
   
+  @Field(FieldName.User.BATCH)
   @DBRef(lazy = true)
   private Batch batch;
   
+  @Field(FieldName.User.UNIVERSITY)
   private String university;
-  
-  @Override
-  public String getRoleAsString() {
-    
-    return this.role.name();
-  }
-  
-  @Override
-  public Long getBatchNumber() {
-    
-    return this.batch != null ? this.batch.getNumber() : null;
-  }
-  
-  @Override
-  public String getUniversity() {
-    
-    return this.university;
-  }
   
 }

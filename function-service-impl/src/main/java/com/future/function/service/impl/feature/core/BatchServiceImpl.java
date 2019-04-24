@@ -29,25 +29,42 @@ public class BatchServiceImpl implements BatchService {
     this.sequenceGenerator = sequenceGenerator;
   }
   
+  /**
+   * {@inheritDoc}
+   *
+   * @return {@code Batch} - Batches found in database.
+   */
   @Override
   public List<Batch> getBatches() {
   
-    return batchRepository.findAll();
+    return batchRepository.findAllByIdIsNotNullOrderByUpdatedAtDesc();
   }
   
+  /**
+   * {@inheritDoc}
+   *
+   * @param number Number of the batch to be retrieved.
+   *
+   * @return {@code Batch} - The batch object found in database.
+   */
   @Override
   public Batch getBatch(long number) {
-  
+    
     return batchRepository.findByNumber(number)
       .orElseThrow(() -> new NotFoundException("Get Batch Not Found"));
   }
   
+  /**
+   * {@inheritDoc}
+   *
+   * @return {@code Batch} - The batch object of the saved data.
+   */
   @Override
   public Batch createBatch() {
-  
+    
     batchRepository.save(
       new Batch(sequenceGenerator.increment(Batch.SEQUENCE_NAME)));
-  
+    
     return batchRepository.findFirstByIdIsNotNullOrderByUpdatedAtDesc()
       .orElseThrow(() -> new NotFoundException("Saved Batch Not Found"));
   }

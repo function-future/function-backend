@@ -131,17 +131,18 @@ public class BatchServiceImplTest {
     Batch secondBatch = Batch.builder()
       .number(SECOND_BATCH_NUMBER)
       .build();
-    
-    List<Batch> batchList = Arrays.asList(batch, secondBatch);
   
-    when(batchRepository.findAll()).thenReturn(batchList);
+    List<Batch> batchList = Arrays.asList(secondBatch, batch);
+  
+    when(batchRepository.findAllByIdIsNotNullOrderByUpdatedAtDesc()).thenReturn(
+      batchList);
     
     List<Batch> foundBatchList = batchService.getBatches();
     
     assertThat(foundBatchList).isNotEmpty();
     assertThat(foundBatchList).isEqualTo(batchList);
   
-    verify(batchRepository).findAll();
+    verify(batchRepository).findAllByIdIsNotNullOrderByUpdatedAtDesc();
   }
   
   @Test
@@ -149,13 +150,14 @@ public class BatchServiceImplTest {
     
     List<Batch> batchList = Collections.emptyList();
   
-    when(batchRepository.findAll()).thenReturn(batchList);
+    when(batchRepository.findAllByIdIsNotNullOrderByUpdatedAtDesc()).thenReturn(
+      batchList);
     
     List<Batch> foundBatchList = batchService.getBatches();
     
     assertThat(foundBatchList).isEmpty();
   
-    verify(batchRepository).findAll();
+    verify(batchRepository).findAllByIdIsNotNullOrderByUpdatedAtDesc();
   }
   
 }

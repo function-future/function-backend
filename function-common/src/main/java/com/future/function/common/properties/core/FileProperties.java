@@ -9,6 +9,13 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+/**
+ * Properties class for getting properties from {@code application
+ * .properties} file, section {@literal # File Properties}.
+ * <p>
+ * Useful when a class requires values specified in the {@code application
+ * .properties} file for the class' operation(s).
+ */
 @Data
 @Builder
 @Component

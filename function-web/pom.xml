@@ -13,7 +13,6 @@
 
   <dependencies>
 
-    <!-- function dependencies -->
     <dependency>
       <groupId>com.future.function</groupId>
       <artifactId>function-service-api</artifactId>
@@ -34,7 +33,16 @@
       <scope>test</scope>
     </dependency>
 
-    <!-- spring dependencies -->
+    <dependency>
+      <groupId>io.springfox</groupId>
+      <artifactId>springfox-swagger-ui</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>io.springfox</groupId>
+      <artifactId>springfox-swagger2</artifactId>
+    </dependency>
+
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
