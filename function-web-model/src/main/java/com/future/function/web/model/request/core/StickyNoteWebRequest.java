@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.NotBlank;
 
 /**
  * Model representation for sticky note web request.
@@ -14,8 +15,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class StickyNoteWebRequest {
   
+  @NotBlank(message = "NotBlank")
   private String noteTitle;
   
+  @NotBlank(message = "NotBlank")
   private String noteDescription;
   
 }

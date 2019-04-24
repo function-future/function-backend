@@ -1,10 +1,7 @@
 package com.future.function.web.mapper.helper;
 
-import com.future.function.common.enumeration.core.Role;
-import com.future.function.model.entity.feature.core.Batch;
-import com.future.function.model.entity.feature.core.File;
-import com.future.function.model.entity.feature.core.User;
 import com.future.function.web.dummy.data.DummyData;
+import com.future.function.web.model.request.core.UserWebRequest;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -32,16 +29,12 @@ public class ErrorHelperTest {
     .email(" ")
     .build();
   
-  private static final User USER = User.builder()
+  private static final UserWebRequest USER = UserWebRequest.builder()
     .email("email@email.com")
     .name("name")
-    .password("password")
-    .picture(new File())
     .address("address")
-    .role(Role.JUDGE)
-    .batch(Batch.builder()
-             .number(1L)
-             .build())
+    .role("JUDGE")
+    .batch(1L)
     .university("university")
     .build();
   

@@ -7,7 +7,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -22,10 +21,8 @@ public class StickyNote extends BaseEntity {
   @Id
   private String id;
   
-  @NotBlank(message = "NotBlank")
   private String title;
   
-  @NotBlank(message = "NotBlank")
   private String description;
   
 }
