@@ -1,12 +1,12 @@
 package com.future.function.web.mapper.request.core;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.future.function.common.enumeration.core.Role;
 import com.future.function.common.exception.BadRequestException;
 import com.future.function.common.validation.ObjectValidator;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.File;
 import com.future.function.model.entity.feature.core.User;
+import com.future.function.web.mapper.request.WebRequestMapper;
 import com.future.function.web.model.request.core.UserWebRequest;
 import org.junit.After;
 import org.junit.Before;
@@ -15,8 +15,6 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import java.io.IOException;
 
 import static com.googlecode.catchexception.CatchException.catchException;
 import static com.googlecode.catchexception.CatchException.caughtException;
@@ -103,7 +101,7 @@ public class UserRequestMapperTest {
       .build();
   
   @Mock
-  private ObjectMapper objectMapper;
+  private WebRequestMapper requestMapper;
   
   @InjectMocks
   private UserRequestMapper userRequestMapper;
@@ -112,15 +110,16 @@ public class UserRequestMapperTest {
   private ObjectValidator validator;
   
   @Before
-  public void setUp() throws Exception {
-    
-    when(objectMapper.readValue(STUDENT_JSON, UserWebRequest.class)).thenReturn(
-      STUDENT_WEB_REQUEST);
-    when(objectMapper.readValue(VALID_ADMIN_JSON,
-                                UserWebRequest.class
+  public void setUp() {
+  
+    when(requestMapper.toWebRequestObject(STUDENT_JSON,
+                                          UserWebRequest.class
+    )).thenReturn(STUDENT_WEB_REQUEST);
+    when(requestMapper.toWebRequestObject(VALID_ADMIN_JSON, UserWebRequest.class
     )).thenReturn(VALID_ADMIN_WEB_REQUEST);
-    when(objectMapper.readValue(BAD_JSON, UserWebRequest.class)).thenThrow(
-      new IOException());
+    when(requestMapper.toWebRequestObject(BAD_JSON,
+                                          UserWebRequest.class
+    )).thenThrow(new BadRequestException("Bad Request"));
     when(validator.validate(STUDENT_WEB_REQUEST)).thenReturn(
       STUDENT_WEB_REQUEST);
     when(validator.validate(VALID_ADMIN_WEB_REQUEST)).thenReturn(
@@ -130,25 +129,23 @@ public class UserRequestMapperTest {
   @After
   public void tearDown() {
   
-    verifyNoMoreInteractions(objectMapper, validator);
+    verifyNoMoreInteractions(requestMapper, validator);
   }
   
   @Test
-  public void testGivenJsonDataWithInvalidFormatAsStringByParsingToUserClassReturnBadRequestException()
-    throws Exception {
-  
+  public void testGivenJsonDataWithInvalidFormatAsStringByParsingToUserClassReturnBadRequestException() {
+    
     catchException(() -> userRequestMapper.toUser(BAD_JSON));
   
     assertThat(caughtException().getClass()).isEqualTo(
       BadRequestException.class);
     assertThat(caughtException().getMessage()).isEqualTo("Bad Request");
-    
-    verify(objectMapper).readValue(BAD_JSON, UserWebRequest.class);
+  
+    verify(requestMapper).toWebRequestObject(BAD_JSON, UserWebRequest.class);
   }
   
   @Test
-  public void testGivenJsonDataAsStringByParsingToUserClassReturnUserObject()
-    throws Exception {
+  public void testGivenJsonDataAsStringByParsingToUserClassReturnUserObject() {
     
     User parsedStudent = userRequestMapper.toUser(STUDENT_JSON);
     
@@ -158,15 +155,16 @@ public class UserRequestMapperTest {
     
     assertThat(parsedAdmin).isEqualTo(VALID_ADMIN);
   
-    verify(objectMapper).readValue(STUDENT_JSON, UserWebRequest.class);
-    verify(objectMapper).readValue(VALID_ADMIN_JSON, UserWebRequest.class);
+    verify(requestMapper).toWebRequestObject(
+      STUDENT_JSON, UserWebRequest.class);
+    verify(requestMapper).toWebRequestObject(
+      VALID_ADMIN_JSON, UserWebRequest.class);
     verify(validator).validate(STUDENT_WEB_REQUEST);
     verify(validator).validate(VALID_ADMIN_WEB_REQUEST);
   }
   
   @Test
-  public void testGivenEmailAndJsonDataAsStringByParsingToUserClassReturnUserObject()
-    throws Exception {
+  public void testGivenEmailAndJsonDataAsStringByParsingToUserClassReturnUserObject() {
     
     User parsedStudent = userRequestMapper.toUser(STUDENT_EMAIL, STUDENT_JSON);
     
@@ -175,9 +173,11 @@ public class UserRequestMapperTest {
     User parsedAdmin = userRequestMapper.toUser(ADMIN_EMAIL, VALID_ADMIN_JSON);
     
     assertThat(parsedAdmin).isEqualTo(VALID_ADMIN);
-    
-    verify(objectMapper).readValue(STUDENT_JSON, UserWebRequest.class);
-    verify(objectMapper).readValue(VALID_ADMIN_JSON, UserWebRequest.class);
+  
+    verify(requestMapper).toWebRequestObject(
+      STUDENT_JSON, UserWebRequest.class);
+    verify(requestMapper).toWebRequestObject(
+      VALID_ADMIN_JSON, UserWebRequest.class);
     verify(validator).validate(STUDENT_WEB_REQUEST);
     verify(validator).validate(VALID_ADMIN_WEB_REQUEST);
   }
