@@ -12,6 +12,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Optional;
 
+/**
+ * Service implementation class for course logic operations implementation.
+ */
 @Service
 public class CourseServiceImpl implements CourseService {
   
@@ -23,39 +26,69 @@ public class CourseServiceImpl implements CourseService {
     this.courseRepository = courseRepository;
   }
   
+  /**
+   * {@inheritDoc}
+   *
+   * @param course Course data of new course.
+   * @param file   File to be attached to course. May be null.
+   *
+   * @return {@code Course} - The course object of the saved data.
+   */
   @Override
   public Course createCourse(Course course, MultipartFile file) {
-  
+    
     // TODO Store file
-    courseRepository.save(course);
-  
-    return courseRepository.findOne(course.getId());
+    return Optional.of(course)
+      .map(courseRepository::save)
+      .map(c -> this.getCourse(c.getId()))
+      .orElseGet(() -> this.getCourse(course.getId()));
   }
   
+  private Course getCourse(String courseId) {
+    
+    return Optional.ofNullable(courseId)
+      .map(courseRepository::findOne)
+      .orElseThrow(() -> new NotFoundException("Get Course Not Found"));
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @param course Course data of new course.
+   * @param file   File to be attached to course. May be null.
+   *
+   * @return {@code Course} - The course object of the saved data.
+   */
   @Override
   public Course updateCourse(Course course, MultipartFile file) {
-  
+    
     // TODO Store file
-    return Optional.of(course.getId())
+    return Optional.of(course)
+      .map(Course::getId)
       .map(courseRepository::findOne)
       .map(foundCourse -> copyPropertiesAndSaveCourse(course, foundCourse))
-      .orElseThrow(() -> new NotFoundException("Update Course Not Found"));
+      .orElseGet(() -> this.getCourse(null));
   }
   
   private Course copyPropertiesAndSaveCourse(
     Course course, Course foundCourse
   ) {
     
-    BeanUtils.copyProperties(course, foundCourse,
-                             FieldName.BaseEntity.CREATED_BY,
-                             FieldName.BaseEntity.CREATED_AT
+    BeanUtils.copyProperties(course, foundCourse, FieldName.BaseEntity.CREATED_BY,
+                             FieldName.BaseEntity.CREATED_AT,
+                             FieldName.BaseEntity.VERSION
     );
     return courseRepository.save(foundCourse);
   }
   
+  /**
+   * {@inheritDoc}
+   *
+   * @param courseId Id of course to be deleted.
+   */
   @Override
   public void deleteCourse(String courseId) {
-  
+    
     // TODO Delete file associated with course
     Optional.ofNullable(courseId)
       .ifPresent(courseRepository::delete);
