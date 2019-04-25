@@ -23,7 +23,7 @@ import static com.googlecode.catchexception.CatchException.caughtException;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ErrorHelperTest {
-  
+
   private static final DummyData DUMMY_DATA = DummyData.builder()
     .number(7)
     .email(" ")
@@ -78,9 +78,9 @@ public class ErrorHelperTest {
     assertThat(errors.get("email")).contains("NotBlank", "Email");
     
   }
-  
+
   private void throwConstraintViolationException(Object object) {
-    
+  
     throw new ConstraintViolationException(validator.validate(object));
   }
   

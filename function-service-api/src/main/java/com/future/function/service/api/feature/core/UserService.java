@@ -23,12 +23,10 @@ public interface UserService {
   User getUser(String email);
   
   /**
-   * Retrieves users from database given the file's id. If not found,
-   * then throw {@link com.future.function.common.exception.NotFoundException}
-   * exception.
+   * Retrieves users from database given role.
    *
-   * @param role     Role enum of to-be-retrieved users
-   * @param pageable Pageable object for paging data
+   * @param role     Role enum of to-be-retrieved users.
+   * @param pageable Pageable object for paging data.
    *
    * @return {@code Page<User>} - Page of users found in database.
    */

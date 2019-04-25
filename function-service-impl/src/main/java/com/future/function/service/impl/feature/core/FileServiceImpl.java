@@ -205,6 +205,8 @@ public class FileServiceImpl implements FileService {
   public void deleteFile(String id) {
   
     Optional.of(id)
+      .map(this::getFile)
+      .map(File::getFilePath)
       .filter(this::deleteFileFromDisk)
       .ifPresent(fileRepository::delete);
   }
@@ -256,20 +258,14 @@ public class FileServiceImpl implements FileService {
     return name.length() > maxNonThumbnailFilenameLength;
   }
   
-  private boolean deleteFileFromDisk(String id) {
+  private boolean deleteFileFromDisk(String path) {
     
-    return Optional.of(id)
-      .map(this::constructPathOrUrl)
+    return Optional.of(path)
       .map(Paths::get)
       .map(Path::toFile)
       .filter(java.io.File::exists)
       .map(FileSystemUtils::deleteRecursively)
       .orElseThrow(() -> new BadRequestException("Invalid Path Given"));
-  }
-  
-  private String constructPathOrUrl(String id) {
-    
-    return constructPathOrUrl(storagePath, PATH_SEPARATOR, id, "");
   }
   
 }
