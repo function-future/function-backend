@@ -17,10 +17,40 @@ import java.util.stream.Stream;
 public interface SharedCourseRepository
   extends MongoRepository<SharedCourse, String> {
   
+  /**
+   * Finds shared course in database based on {@code courseId} and {@code
+   * batch} parameters.
+   *
+   * @param courseId Id of existing course to be searched.
+   * @param batch    Batch object reference of request's batch number.
+   *
+   * @return {@code Optional<SharedCourse>} - SharedCourse object found in
+   * database, if any exists; otherwise returns
+   * {@link java.util.Optional#empty()}.
+   */
   Optional<SharedCourse> findByCourseIdAndBatch(String courseId, Batch batch);
   
+  /**
+   * Finds shared courses in database based on {@code batch} amd {@code
+   * pageable} parameters.
+   *
+   * @param batch    Batch object reference of request's batch number.
+   * @param pageable Pageable object for paging data.
+   *
+   * @return {@code Page<SharedCourse>} - SharedCourse objects found in
+   * database, if any exists; otherwise returns
+   * {@link java.util.Optional#empty()}.
+   */
   Page<SharedCourse> findAllByBatch(Batch batch, Pageable pageable);
   
+  /**
+   * Finds shared courses based on {@code batch} parameter.
+   *
+   * @param batch Batch object reference of request's batch number.
+   *
+   * @return {@code Stream<SharedCourse>} - SharedCourse objects as stream,
+   * if any exists; otherwise returns {@link java.util.stream.Stream#empty()}.
+   */
   Stream<SharedCourse> findAllByBatch(Batch batch);
   
 }
