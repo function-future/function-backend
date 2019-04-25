@@ -4,14 +4,12 @@ import com.future.function.model.entity.feature.core.StickyNote;
 import com.future.function.validation.RequestValidator;
 import com.future.function.web.mapper.request.WebRequestMapper;
 import com.future.function.web.model.request.core.StickyNoteWebRequest;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
  * Mapper class for incoming request for sticky note feature.
  */
-@Slf4j
 @Component
 public class StickyNoteRequestMapper {
   

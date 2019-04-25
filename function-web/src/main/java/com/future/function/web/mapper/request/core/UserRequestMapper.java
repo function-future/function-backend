@@ -7,7 +7,6 @@ import com.future.function.model.entity.feature.core.User;
 import com.future.function.validation.RequestValidator;
 import com.future.function.web.mapper.request.WebRequestMapper;
 import com.future.function.web.model.request.core.UserWebRequest;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -16,7 +15,6 @@ import java.util.Optional;
 /**
  * Mapper class for incoming request for user feature.
  */
-@Slf4j
 @Component
 public class UserRequestMapper {
   

@@ -4,11 +4,12 @@ import com.future.function.model.entity.feature.core.Announcement;
 import com.future.function.validation.RequestValidator;
 import com.future.function.web.mapper.request.WebRequestMapper;
 import com.future.function.web.model.request.core.AnnouncementWebRequest;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-@Slf4j
+/**
+ * Mapper class for incoming request for announcement feature.
+ */
 @Component
 public class AnnouncementRequestMapper {
   

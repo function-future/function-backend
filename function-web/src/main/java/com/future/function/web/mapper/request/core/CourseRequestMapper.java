@@ -12,6 +12,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Mapper class for incoming request for course feature.
+ */
 @Component
 public class CourseRequestMapper {
   
