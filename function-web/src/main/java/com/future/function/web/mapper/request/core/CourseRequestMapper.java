@@ -28,6 +28,15 @@ public class CourseRequestMapper {
     this.requestMapper = requestMapper;
   }
   
+  /**
+   * Converts {@code SharedCourseWebRequest} object to {@code List<Long>}
+   * object containing batch numbers in the request object.
+   *
+   * @param request Object data (in form of {@code SharedCourseWebRequest})
+   *                to be converted.
+   *
+   * @return {@code List<Long>} - Converted list object.
+   */
   public List<Long> toCopyCoursesData(SharedCourseWebRequest request) {
     
     validator.validate(request);
@@ -35,15 +44,30 @@ public class CourseRequestMapper {
     return request.getBatchNumbers();
   }
   
+  /**
+   * Converts JSON data to {@code Course} object.
+   *
+   * @param data JSON data (in form of String) to be converted.
+   *
+   * @return {@code Course} - Converted course object.
+   */
   public Course toCourse(String data) {
     
     return toCourse(null, data);
   }
   
+  /**
+   * Converts JSON data to {@code Course} object. This method is used for
+   * update course purposes.
+   *
+   * @param courseId Id of course to be updated.
+   * @param data     JSON data (in form of String) to be converted.
+   *
+   * @return {@code Course} - Converted course object.
+   */
   public Course toCourse(String courseId, String data) {
     
-    return toValidatedCourse(
-      courseId, requestMapper.toWebRequestObject(data, CourseWebRequest.class));
+    return toValidatedCourse(courseId, requestMapper.toWebRequestObject(data, CourseWebRequest.class));
   }
   
   private Course toValidatedCourse(String courseId, CourseWebRequest request) {

@@ -16,24 +16,17 @@ import java.util.stream.Collectors;
 
 public class CourseResponseMapper {
   
-  public static PagingResponse<CourseWebResponse> toCoursesPagingResponse(
-    Page<Course> data
-  ) {
-    
-    return ResponseHelper.toPagingResponse(
-      HttpStatus.OK, toCourseWebResponseList(data), PageHelper.toPaging(data));
-  }
-  
-  private static List<CourseWebResponse> toCourseWebResponseList(
-    Page<Course> data
-  ) {
-    
-    return data.getContent()
-      .stream()
-      .map(CourseResponseMapper::buildCourseWebResponse)
-      .collect(Collectors.toList());
-  }
-  
+  /**
+   * Converts a course data to {@code CourseWebResponse}, wrapped in {@code
+   * DataResponse}.
+   *
+   * @param course Course data to be converted to response.
+   *
+   * @return {@code DataResponse<CourseWebResponse>} - The converted course
+   * data, wrapped in
+   * {@link com.future.function.web.model.response.base.DataResponse} and
+   * {@link com.future.function.web.model.response.feature.core.CourseWebResponse}
+   */
   public static DataResponse<CourseWebResponse> toCourseDataResponse(
     Course course
   ) {
@@ -41,6 +34,18 @@ public class CourseResponseMapper {
     return toCourseDataResponse(HttpStatus.OK, course);
   }
   
+  /**
+   * Converts a course data to {@code CourseWebResponse} given {@code
+   * HttpStatus}, wrapped in {@code DataResponse}.
+   *
+   * @param httpStatus Http status to be shown in the response.
+   * @param course     Course data to be converted to response.
+   *
+   * @return {@code DataResponse<CourseWebResponse>} - The converted course
+   * data, wrapped in
+   * {@link com.future.function.web.model.response.base.DataResponse} and
+   * {@link com.future.function.web.model.response.feature.core.CourseWebResponse}
+   */
   public static DataResponse<CourseWebResponse> toCourseDataResponse(
     HttpStatus httpStatus, Course course
   ) {
@@ -73,6 +78,35 @@ public class CourseResponseMapper {
     return Optional.ofNullable(course.getFile())
       .map(File::getFileUrl)
       .orElse(null);
+  }
+  
+  /**
+   * Converts courses data to {@code CourseWebResponse} given {@code
+   * HttpStatus}, wrapped in {@code PagingResponse}.
+   *
+   * @param data Courses data to be converted to response.
+   *
+   * @return {@code PagingResponse<CourseWebResponse} - The converted course
+   * data, wrapped in
+   * {@link com.future.function.web.model.response.base.PagingResponse} and
+   * {@link com.future.function.web.model.response.feature.core.CourseWebResponse}
+   */
+  public static PagingResponse<CourseWebResponse> toCoursesPagingResponse(
+    Page<Course> data
+  ) {
+    
+    return ResponseHelper.toPagingResponse(
+      HttpStatus.OK, toCourseWebResponseList(data), PageHelper.toPaging(data));
+  }
+  
+  private static List<CourseWebResponse> toCourseWebResponseList(
+    Page<Course> data
+  ) {
+    
+    return data.getContent()
+      .stream()
+      .map(CourseResponseMapper::buildCourseWebResponse)
+      .collect(Collectors.toList());
   }
   
 }
