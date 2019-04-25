@@ -1,10 +1,10 @@
 package com.future.function.web.mapper.request.core;
 
 import com.future.function.common.enumeration.core.Role;
-import com.future.function.common.validation.ObjectValidator;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.File;
 import com.future.function.model.entity.feature.core.User;
+import com.future.function.validation.RequestValidator;
 import com.future.function.web.mapper.request.WebRequestMapper;
 import com.future.function.web.model.request.core.UserWebRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -22,11 +22,11 @@ public class UserRequestMapper {
   
   private WebRequestMapper requestMapper;
   
-  private ObjectValidator validator;
+  private RequestValidator validator;
   
   @Autowired
   private UserRequestMapper(
-    WebRequestMapper requestMapper, ObjectValidator validator
+    WebRequestMapper requestMapper, RequestValidator validator
   ) {
   
     this.requestMapper = requestMapper;

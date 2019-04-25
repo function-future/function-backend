@@ -2,10 +2,10 @@ package com.future.function.web.mapper.request.core;
 
 import com.future.function.common.enumeration.core.Role;
 import com.future.function.common.exception.BadRequestException;
-import com.future.function.common.validation.ObjectValidator;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.File;
 import com.future.function.model.entity.feature.core.User;
+import com.future.function.validation.RequestValidator;
 import com.future.function.web.mapper.request.WebRequestMapper;
 import com.future.function.web.model.request.core.UserWebRequest;
 import org.junit.After;
@@ -107,7 +107,7 @@ public class UserRequestMapperTest {
   private UserRequestMapper userRequestMapper;
   
   @Mock
-  private ObjectValidator validator;
+  private RequestValidator validator;
   
   @Before
   public void setUp() {

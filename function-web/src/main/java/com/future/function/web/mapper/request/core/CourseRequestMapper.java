@@ -1,7 +1,7 @@
 package com.future.function.web.mapper.request.core;
 
-import com.future.function.common.validation.ObjectValidator;
 import com.future.function.model.entity.feature.core.Course;
+import com.future.function.validation.RequestValidator;
 import com.future.function.web.mapper.request.WebRequestMapper;
 import com.future.function.web.model.request.core.CourseWebRequest;
 import com.future.function.web.model.request.core.shared.SharedCourseWebRequest;
@@ -17,11 +17,11 @@ public class CourseRequestMapper {
   
   private final WebRequestMapper requestMapper;
   
-  private final ObjectValidator validator;
+  private final RequestValidator validator;
   
   @Autowired
   public CourseRequestMapper(
-    ObjectValidator validator, WebRequestMapper requestMapper
+    RequestValidator validator, WebRequestMapper requestMapper
   ) {
     
     this.validator = validator;
