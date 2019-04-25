@@ -22,6 +22,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+/**
+ * Controller class for announcement APIs.
+ */
 @RestController
 @RequestMapping(value = "/api/core/announcements")
 public class AnnouncementController {
@@ -32,8 +35,7 @@ public class AnnouncementController {
   
   @Autowired
   public AnnouncementController(
-    AnnouncementService announcementService,
-    AnnouncementRequestMapper announcementRequestMapper
+    AnnouncementService announcementService, AnnouncementRequestMapper announcementRequestMapper
   ) {
     
     this.announcementService = announcementService;
@@ -46,7 +48,7 @@ public class AnnouncementController {
    * @param page Current page of data.
    * @param size Size of data to be displayed per page.
    *
-   * @return {@code PagingResponse<AnnouncementWebResponse} - The retrieved
+   * @return {@code PagingResponse<AnnouncementWebResponse>} - The retrieved
    * announcements data, wrapped in
    * {@link com.future.function.web.model.response.base.PagingResponse} and
    * {@link com.future.function.web.model.response.feature.core.AnnouncementWebResponse}
@@ -69,7 +71,7 @@ public class AnnouncementController {
    *
    * @param announcementId Id of announcement to be retrieved.
    *
-   * @return {@code DataResponse<AnnouncementWebResponse} - The retrieved
+   * @return {@code DataResponse<AnnouncementWebResponse>} - The retrieved
    * announcement data, wrapped in
    * {@link com.future.function.web.model.response.base.DataResponse} and
    * {@link com.future.function.web.model.response.feature.core.AnnouncementWebResponse}
@@ -91,7 +93,7 @@ public class AnnouncementController {
    * @param data Data of new announcement in JSON format.
    * @param file File of the new announcement.
    *
-   * @return {@code DataResponse<AnnouncementWebResponse} - The created
+   * @return {@code DataResponse<AnnouncementWebResponse>} - The created
    * announcement data, wrapped in
    * {@link com.future.function.web.model.response.base.DataResponse} and
    * {@link com.future.function.web.model.response.feature.core.AnnouncementWebResponse}
@@ -105,9 +107,8 @@ public class AnnouncementController {
       MultipartFile file
   ) {
     
-    return AnnouncementResponseMapper.toAnnouncementDataResponse(
-      HttpStatus.CREATED, announcementService.createAnnouncement(
-        announcementRequestMapper.toAnnouncement(data), file));
+    return AnnouncementResponseMapper.toAnnouncementDataResponse(HttpStatus.CREATED, announcementService.createAnnouncement(
+      announcementRequestMapper.toAnnouncement(data), file));
   }
   
   /**
@@ -117,7 +118,7 @@ public class AnnouncementController {
    * @param data           Data of existing announcement in JSON format.
    * @param file           New file of the existing announcement.
    *
-   * @return {@code DataResponse<AnnouncementWebResponse} - The updated
+   * @return {@code DataResponse<AnnouncementWebResponse>} - The updated
    * announcement data, wrapped in
    * {@link com.future.function.web.model.response.base.DataResponse} and
    * {@link com.future.function.web.model.response.feature.core.AnnouncementWebResponse}
@@ -133,10 +134,8 @@ public class AnnouncementController {
       MultipartFile file
   ) {
     
-    return AnnouncementResponseMapper.toAnnouncementDataResponse(
-      HttpStatus.OK, announcementService.updateAnnouncement(
-        announcementRequestMapper.toAnnouncement(
-          announcementId, data), file));
+    return AnnouncementResponseMapper.toAnnouncementDataResponse(HttpStatus.OK, announcementService.updateAnnouncement(
+      announcementRequestMapper.toAnnouncement(announcementId, data), file));
   }
   
   /**

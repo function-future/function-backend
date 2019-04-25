@@ -35,14 +35,31 @@ public class StickyNoteController {
     this.stickyNoteRequestMapper = stickyNoteRequestMapper;
   }
   
+  /**
+   * Retrieves last inserted sticky note in database.
+   *
+   * @return {@code DataResponse<StickyNoteWebResponse>} - The retrieved
+   * sticky note data, wrapped in
+   * {@link com.future.function.web.model.response.base.DataResponse} and
+   * {@link com.future.function.web.model.response.feature.core.StickyNoteWebResponse}
+   */
   @ResponseStatus(HttpStatus.OK)
   @GetMapping
   public DataResponse<StickyNoteWebResponse> getStickyNote() {
     
-    return StickyNoteResponseMapper.toStickyNoteDataResponse(
-      stickyNoteService.getStickyNote());
+    return StickyNoteResponseMapper.toStickyNoteDataResponse(stickyNoteService.getStickyNote());
   }
   
+  /**
+   * Creates new sticky note in database.
+   *
+   * @param data Data of new sticky note in JSON format.
+   *
+   * @return {@code DataResponse<StickyNoteWebResponse>} - The created
+   * sticky note data, wrapped in
+   * {@link com.future.function.web.model.response.base.DataResponse} and
+   * {@link com.future.function.web.model.response.feature.core.StickyNoteWebResponse}
+   */
   @ResponseStatus(HttpStatus.CREATED)
   @PostMapping
   public DataResponse<StickyNoteWebResponse> createStickyNote(
