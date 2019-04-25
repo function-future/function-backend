@@ -74,8 +74,21 @@ public interface FieldName {
   
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
   abstract class Sequence {
+  
+    public static final String SEQUENCE_NUMBER = "sequenceNumber";
+  
+  }
+  
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  abstract class Announcement {
     
-    public static final String SEQUENCE_NUMBER = "sequence_number";
+    public static final String TITLE = "title";
+    
+    public static final String SUMMARY = "summary";
+    
+    public static final String DESCRIPTION_HTML = "descriptionHtml";
+    
+    public static final String FILE = "file";
     
   }
   

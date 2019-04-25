@@ -114,6 +114,9 @@ public class UserController {
   /**
    * Retrieves users based on given parameters.
    *
+   * @param role Specified role for data to be retrieved.
+   * @param page Current page of data.
+   *
    * @return {@code PagingResponse<UserWebResponse} - The retrieved users data,
    * wrapped in
    * {@link com.future.function.web.model.response.base.PagingResponse} and
@@ -136,8 +139,9 @@ public class UserController {
   /**
    * Updates existing user in database.
    *
-   * @param data  New data of existing user in JSON format.
-   * @param image New profile image of the new user.
+   * @param email Email of to-be-updated user.
+   * @param data  Data of existing user in JSON format.
+   * @param image New profile image of the existing user.
    *
    * @return {@code DataResponse<UserWebResponse} - The updated user data,
    * wrapped in

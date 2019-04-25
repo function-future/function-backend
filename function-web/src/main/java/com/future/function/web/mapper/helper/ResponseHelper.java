@@ -103,7 +103,7 @@ public class ResponseHelper {
    *
    * @param httpStatus Http status to be shown in the response.
    * @param data       Data to be wrapped in {@code PagingResponse}, must be of
-   *                   type {@link java.util.List<T>}.
+   *                   type {@code java.util.List<T>}.
    * @param <T>        Type of class of the specified data.
    * @param paging     Paging object to be wrapped in {@code PagingResponse}.
    *
