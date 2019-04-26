@@ -14,6 +14,7 @@ import com.future.function.web.model.response.scoring.AssignmentWebResponse;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -61,7 +62,7 @@ public class AssignmentControllerTest {
                   ASSIGNMENT_DESCRIPTION + "\",\n" + "    \"question\": \"" + ASSIGNMENT_QUESTION + "\",\n" +
                   "    \"deadline\": " + ASSIGNMENT_DEADLINE + ",\n" + "    \"batch\": " + ASSIGNMENT_BATCH +
                   "}";
-  private static String ASSIGNMENT_ID;
+  private static String ASSIGNMENT_ID = UUID.randomUUID().toString();
   private static final String ASSIGNMENT_UPDATE_REQUEST_JSON =
           "{\n" + "\"id\": \"" + ASSIGNMENT_ID + "\",\n" + "\"title\": \"" + ASSIGNMENT_TITLE + "\",\n" +
                   "    \"description\": \"" + ASSIGNMENT_DESCRIPTION + "\",\n" + "    \"question\": \"" +
@@ -104,6 +105,7 @@ public class AssignmentControllerTest {
 
     assignment = Assignment
             .builder()
+            .id(ASSIGNMENT_ID)
             .title(ASSIGNMENT_TITLE)
             .description(ASSIGNMENT_DESCRIPTION)
             .deadline(ASSIGNMENT_DEADLINE)
@@ -155,6 +157,7 @@ public class AssignmentControllerTest {
             .thenReturn(assignment);
     when(assignmentRequestMapper.toAssignment(ASSIGNMENT_UPDATE_REQUEST_JSON))
             .thenReturn(assignment);
+    when()
   }
 
   @After
