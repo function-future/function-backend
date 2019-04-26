@@ -87,11 +87,12 @@ public class AssignmentServiceImpl implements AssignmentService {
    * @return Assignment with / without the saved file
    */
   private Assignment storeAssignmentFile(Assignment request, MultipartFile file) {
+    //TODO uncomment when file service is ready
     return Optional.ofNullable(file)
-            .map(val -> fileService.storeFile(val, FileOrigin.ASSIGNMENT))
-            .map(val -> fileService.getFile(val.getId()))
+//            .map(val -> fileService.storeFile(val, FileOrigin.ASSIGNMENT))
+//            .map(val -> fileService.getFile(val.getId()))
             .map(val -> {
-              request.setFile(val);
+//              request.setFile(val);
               return request;
             })
             .orElse(request);
