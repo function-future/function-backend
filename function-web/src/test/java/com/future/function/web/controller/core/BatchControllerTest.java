@@ -1,8 +1,8 @@
 package com.future.function.web.controller.core;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.service.api.feature.core.BatchService;
+import com.future.function.web.JacksonTestHelper;
 import com.future.function.web.mapper.response.core.BatchResponseMapper;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.feature.core.BatchWebResponse;
@@ -12,7 +12,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -30,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(BatchController.class)
-public class BatchControllerTest {
+public class BatchControllerTest extends JacksonTestHelper {
   
   private static final Long FIRST_BATCH_NUMBER = 1L;
   
@@ -52,11 +51,6 @@ public class BatchControllerTest {
     FIRST_BATCH_DATA_RESPONSE = BatchResponseMapper.toBatchDataResponse(
     FIRST_BATCH);
   
-  private JacksonTester<DataResponse<List<Long>>> listDataResponseJacksonTester;
-  
-  private JacksonTester<DataResponse<BatchWebResponse>>
-    dataResponseJacksonTester;
-  
   @Autowired
   private MockMvc mockMvc;
   
@@ -66,7 +60,7 @@ public class BatchControllerTest {
   @Before
   public void setUp() {
   
-    JacksonTester.initFields(this, new ObjectMapper());
+    super.setUp();
   }
   
   @After
@@ -85,7 +79,7 @@ public class BatchControllerTest {
     mockMvc.perform(get("/api/core/batches"))
       .andExpect(status().isOk())
       .andExpect(content().json(
-        listDataResponseJacksonTester.write(BATCHES_DATA_RESPONSE)
+        dataResponseJacksonTester.write(BATCHES_DATA_RESPONSE)
           .getJson()));
     
     verify(batchService).getBatches();

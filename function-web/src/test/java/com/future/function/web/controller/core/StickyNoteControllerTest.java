@@ -1,8 +1,8 @@
 package com.future.function.web.controller.core;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.future.function.model.entity.feature.core.StickyNote;
 import com.future.function.service.api.feature.core.StickyNoteService;
+import com.future.function.web.JacksonTestHelper;
 import com.future.function.web.mapper.request.core.StickyNoteRequestMapper;
 import com.future.function.web.mapper.response.core.StickyNoteResponseMapper;
 import com.future.function.web.model.response.base.DataResponse;
@@ -13,7 +13,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -30,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(StickyNoteController.class)
-public class StickyNoteControllerTest {
+public class StickyNoteControllerTest extends JacksonTestHelper {
   
   private static final String TITLE = "title";
   
@@ -53,9 +52,6 @@ public class StickyNoteControllerTest {
     CREATED_DATA_RESPONSE = StickyNoteResponseMapper.toStickyNoteDataResponse(
     HttpStatus.CREATED, STICKY_NOTE);
   
-  private JacksonTester<DataResponse<StickyNoteWebResponse>>
-    dataResponseJacksonTester;
-  
   @Autowired
   private MockMvc mockMvc;
   
@@ -67,8 +63,8 @@ public class StickyNoteControllerTest {
   
   @Before
   public void setUp() {
-    
-    JacksonTester.initFields(this, new ObjectMapper());
+  
+    super.setUp();
   }
   
   @After
