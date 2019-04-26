@@ -12,6 +12,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.data.util.Pair;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -80,6 +81,7 @@ public class CourseRequestMapperTest {
     verifyNoMoreInteractions(requestMapper, validator);
   }
   
+  // TODO Remove when Pair is used
   @Test
   public void testGivenJsonDataAsStringByParsingToCourseClassReturnCourseObject() {
     
@@ -95,12 +97,48 @@ public class CourseRequestMapperTest {
   }
   
   @Test
+  public void testGivenJsonDataAsStringByParsingToCourseClassReturnPairObject() {
+    
+    Pair<Course, List<Long>> parsedData =
+      courseRequestMapper.toCourseAndBatchNumbers(JSON);
+    
+    assertThat(parsedData).isNotNull();
+    assertThat(parsedData.getFirst()
+                 .getId()).isNotBlank();
+    assertThat(parsedData.getFirst()
+                 .getTitle()).isEqualTo(TITLE);
+    assertThat(parsedData.getFirst()
+                 .getDescription()).isEqualTo(DESCRIPTION);
+    assertThat(parsedData.getSecond()).isEqualTo(
+      Collections.singletonList(ONE));
+    
+    verify(requestMapper).toWebRequestObject(JSON, CourseWebRequest.class);
+    verify(validator).validate(COURSE_WEB_REQUEST);
+  }
+  
+  // TODO Remove when Pair is used
+  @Test
   public void testGivenIdAndJsonDataAsStringByParsingToCourseClassReturnCourseObject() {
     
     Course parsedCourse = courseRequestMapper.toCourse(ID, JSON);
     
     assertThat(parsedCourse).isNotNull();
     assertThat(parsedCourse).isEqualTo(COURSE);
+    
+    verify(requestMapper).toWebRequestObject(JSON, CourseWebRequest.class);
+    verify(validator).validate(COURSE_WEB_REQUEST);
+  }
+  
+  @Test
+  public void testGivenIdAndJsonDataAsStringByParsingToCourseClassReturnPairObject() {
+    
+    Pair<Course, List<Long>> parsedData =
+      courseRequestMapper.toCourseAndBatchNumbers(ID, JSON);
+    
+    assertThat(parsedData).isNotNull();
+    assertThat(parsedData.getFirst()).isEqualTo(COURSE);
+    assertThat(parsedData.getSecond()).isEqualTo(
+      Collections.singletonList(ONE));
     
     verify(requestMapper).toWebRequestObject(JSON, CourseWebRequest.class);
     verify(validator).validate(COURSE_WEB_REQUEST);
