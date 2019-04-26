@@ -1,0 +1,180 @@
+package com.future.function.web.controller.core;
+
+import com.future.function.model.entity.feature.core.Course;
+import com.future.function.service.api.feature.core.shared.SharedCourseService;
+import com.future.function.web.JacksonTestHelper;
+import com.future.function.web.mapper.helper.ResponseHelper;
+import com.future.function.web.mapper.request.core.CourseRequestMapper;
+import com.future.function.web.mapper.response.core.CourseResponseMapper;
+import com.future.function.web.model.request.core.shared.SharedCourseWebRequest;
+import com.future.function.web.model.response.base.BaseResponse;
+import com.future.function.web.model.response.base.DataResponse;
+import com.future.function.web.model.response.base.PagingResponse;
+import com.future.function.web.model.response.feature.core.CourseWebResponse;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+@RunWith(SpringRunner.class)
+@WebMvcTest(CourseController.class)
+public class CourseControllerTest extends JacksonTestHelper {
+  
+  private static final BaseResponse OK_BASE_RESPONSE =
+    ResponseHelper.toBaseResponse(HttpStatus.OK);
+  
+  private static final BaseResponse CREATED_BASE_RESPONSE =
+    ResponseHelper.toBaseResponse(HttpStatus.CREATED);
+  
+  private static final String ID = "id";
+  
+  private static final String TITLE = "title";
+  
+  private static final String DESCRIPTION = "description";
+  
+  private static final long BATCH_NUMBER_1 = 1L;
+  
+  private static final long BATCH_NUMBER_2 = 2L;
+  
+  private static final SharedCourseWebRequest SHARED_COURSE_WEB_REQUEST =
+    new SharedCourseWebRequest(BATCH_NUMBER_1, BATCH_NUMBER_2);
+  
+  private static final String SHARED_COURSE_REQUEST_DATA =
+    "{\"originBatch" + "\":1,\"targetBatch\":2}";
+  
+  private static final Course COURSE = Course.builder()
+    .id(ID)
+    .title(TITLE)
+    .description(DESCRIPTION)
+    .build();
+  
+  private static final Pageable PAGEABLE = new PageRequest(0, 5);
+  
+  private static final Page<Course> COURSE_PAGE = new PageImpl<>(
+    Collections.singletonList(COURSE), PAGEABLE, 1);
+  
+  private static final PagingResponse<CourseWebResponse> PAGING_RESPONSE =
+    CourseResponseMapper.toCoursesPagingResponse(COURSE_PAGE);
+  
+  private static final DataResponse<CourseWebResponse>
+    RETRIEVED_COURSE_WEB_RESPONSE = CourseResponseMapper.toCourseDataResponse(
+    COURSE);
+  
+  @Autowired
+  private MockMvc mockMvc;
+  
+  @MockBean
+  private SharedCourseService sharedCourseService;
+  
+  @MockBean
+  private CourseRequestMapper courseRequestMapper;
+  
+  @Before
+  public void setUp() {
+    
+    super.setUp();
+  }
+  
+  @After
+  public void tearDown() {
+    
+    verifyNoMoreInteractions(sharedCourseService, courseRequestMapper);
+  }
+  
+  @Test
+  public void testGivenCourseIdAndBatchNumberByDeletingCourseReturnBaseResponseObject()
+    throws Exception {
+    
+    mockMvc.perform(delete("/api/core/courses/" + ID))
+      .andExpect(status().isOk())
+      .andExpect(content().json(
+        baseResponseJacksonTester.write(OK_BASE_RESPONSE)
+          .getJson()));
+    
+    verify(sharedCourseService).deleteCourse(ID, BATCH_NUMBER_1);
+    verifyZeroInteractions(courseRequestMapper);
+  }
+  
+  @Test
+  public void testGivenRequestBodyByCopyingCoursesReturnBaseResponseObject()
+    throws Exception {
+    
+    List<Long> batchNumbers = Arrays.asList(BATCH_NUMBER_1, BATCH_NUMBER_2);
+    when(courseRequestMapper.toCopyCoursesData(
+      SHARED_COURSE_WEB_REQUEST)).thenReturn(batchNumbers);
+    
+    mockMvc.perform(post("/api/core/courses/_copy").contentType(
+      MediaType.APPLICATION_JSON)
+                      .content(SHARED_COURSE_REQUEST_DATA))
+      .andExpect(status().isCreated())
+      .andExpect(content().json(
+        baseResponseJacksonTester.write(CREATED_BASE_RESPONSE)
+          .getJson()));
+    
+    verify(courseRequestMapper).toCopyCoursesData(SHARED_COURSE_WEB_REQUEST);
+    verify(sharedCourseService).copyCourses(
+      batchNumbers.get(0), batchNumbers.get(1));
+  }
+  
+  @Test
+  public void testGivenCourseIdAndBatchNumberByGettingCourseReturnDataResponseObject()
+    throws Exception {
+    
+    when(sharedCourseService.getCourse(ID, BATCH_NUMBER_1)).thenReturn(COURSE);
+    
+    mockMvc.perform(get("/api/core/courses/" + ID).param("batch",
+                                                         String.valueOf(
+                                                           BATCH_NUMBER_1)
+    ))
+      .andExpect(status().isOk())
+      .andExpect(content().json(
+        dataResponseJacksonTester.write(RETRIEVED_COURSE_WEB_RESPONSE)
+          .getJson()));
+    
+    verify(sharedCourseService).getCourse(ID, BATCH_NUMBER_1);
+  }
+  
+  @Test
+  public void testGivenPageAndSizeAndBatchNumberByGettingCoursesReturnPagingResponseObject()
+    throws Exception {
+    
+    when(sharedCourseService.getCourses(PAGEABLE, BATCH_NUMBER_1)).thenReturn(
+      COURSE_PAGE);
+    
+    mockMvc.perform(get("/api/core/courses").param("page", "1")
+                      .param("size", "5")
+                      .param("batch", String.valueOf(BATCH_NUMBER_1)))
+      .andExpect(status().isOk())
+      .andExpect(content().json(
+        pagingResponseJacksonTester.write(PAGING_RESPONSE)
+          .getJson()));
+    
+    verify(sharedCourseService).getCourses(PAGEABLE, BATCH_NUMBER_1);
+  }
+  
+}
