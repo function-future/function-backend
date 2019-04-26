@@ -5,6 +5,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Represent the assignment in the web as AssignmentWebResponse
+ */
 @Data
 @Builder
 @NoArgsConstructor

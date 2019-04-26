@@ -14,6 +14,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+/**
+ * Service class used to manipulate Assignment Entity
+ * Used AssignmentRepository and FileService to support manipulation of Assignment Entity
+ */
 @Service
 public class AssignmentServiceImpl implements AssignmentService {
 
@@ -27,13 +31,31 @@ public class AssignmentServiceImpl implements AssignmentService {
     this.fileService = fileService;
   }
 
-
+  /**
+   * Used to find All Assignment Object from Repository With Paging, Filtering, And Search Keyword
+   *
+   * @param pageable (Pageable Object)
+   * @param filter   (String)
+   * @param search   (String)
+   * @return Page<Assignment>
+   */
   @Override
   public Page<Assignment> findAllByPageableAndFilterAndSearch(Pageable pageable, String filter, String search) {
+    filter = Optional.ofNullable(filter)
+            .orElse("");
+    search = Optional.ofNullable(search)
+            .orElse("");
     //TODO using filter and search to find the asssignment page
     return assignmentRepository.findAll(pageable);
   }
 
+  /**
+   * Used to Find Assignment Object From Repository With Passed Id and Not Deleted
+   *
+   * @param id (String)
+   * @return Assignment Object
+   * @throws NotFoundException if Assignment Object is not found or the id is null
+   */
   @Override
   public Assignment findById(String id) {
     return Optional.ofNullable(id)
@@ -43,6 +65,13 @@ public class AssignmentServiceImpl implements AssignmentService {
             .orElseThrow(() -> new NotFoundException("Assignment Not Found"));
   }
 
+  /**
+   * Used to create new Assignment Data in Repository With / Without file
+   *
+   * @param request (Assignment Object)
+   * @param file    (MultipartFile Object)
+   * @return Saved Assignment Object
+   */
   @Override
   public Assignment createAssignment(Assignment request, MultipartFile file) {
     //TODO save batch to shared assignment entity
@@ -50,6 +79,13 @@ public class AssignmentServiceImpl implements AssignmentService {
     return assignmentRepository.save(assignment);
   }
 
+  /**
+   * Used to store Multipart File by using FileService which sent with Assignment object
+   *
+   * @param request (Assignment Object)
+   * @param file    (MultipartFile Object)
+   * @return Assignment with / without the saved file
+   */
   private Assignment storeAssignmentFile(Assignment request, MultipartFile file) {
     return Optional.ofNullable(file)
             .map(val -> fileService.storeFile(val, FileOrigin.ASSIGNMENT))
@@ -61,6 +97,13 @@ public class AssignmentServiceImpl implements AssignmentService {
             .orElse(request);
   }
 
+  /**
+   * Used to update existed Assignment in Repository with Assignment Object request and / no Multipart File
+   *
+   * @param request (Assignment Object)
+   * @param file    (MultipartFile Object)
+   * @return Saved Assignment Object
+   */
   @Override
   public Assignment updateAssignment(Assignment request, MultipartFile file) {
     //TODO save batch to shared assignment entity
@@ -71,6 +114,11 @@ public class AssignmentServiceImpl implements AssignmentService {
     return assignmentRepository.save(newAssignment);
   }
 
+  /**
+   * Used to delete existing Assignment From Repository With passed id
+   *
+   * @param id (String)
+   */
   @Override
   public void deleteById(String id) {
     //TODO delete file associated with the assignment

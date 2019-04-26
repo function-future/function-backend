@@ -6,7 +6,8 @@ import org.springframework.boot.autoconfigure.data.mongo.MongoRepositoriesAutoCo
 import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
 
 @SpringBootApplication(exclude = {
-  MongoAutoConfiguration.class, MongoDataAutoConfiguration.class,
-  MongoRepositoriesAutoConfiguration.class
+        MongoAutoConfiguration.class, MongoDataAutoConfiguration.class,
+        MongoRepositoriesAutoConfiguration.class
 })
-public class TestApplication {}
+public class TestApplication {
+}

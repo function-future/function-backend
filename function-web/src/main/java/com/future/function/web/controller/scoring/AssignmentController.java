@@ -23,6 +23,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+/**
+ * Controller class used to serve and received data from the Web in manipulation of Assignment Entity
+ */
 @RestController
 @RequestMapping(value = "/api/scoring/assignments")
 public class AssignmentController {
@@ -37,6 +40,15 @@ public class AssignmentController {
     this.assignmentRequestMapper = assignmentRequestMapper;
   }
 
+  /**
+   * Used to retrieve List of Assignment with Paging, Filtering, And Search Keyword
+   *
+   * @param page   (Int)
+   * @param size   (Int)
+   * @param filter (String) (Not Required)
+   * @param search (String) (Not Required)
+   * @return PagingResponse<AssignmentWebResponse> contains List of Assignment and the Paging Information
+   */
   @ResponseStatus(value = HttpStatus.OK)
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   public PagingResponse<AssignmentWebResponse> findAllAssignment(
@@ -57,6 +69,12 @@ public class AssignmentController {
             );
   }
 
+  /**
+   * Used to retrieve specific Assignment Object By Passing the Assignment Id In PathVariable
+   *
+   * @param id (String)
+   * @return DataResponse<AssignmentWebResponse> contains the specific Assignment Object
+   */
   @ResponseStatus(value = HttpStatus.OK)
   @GetMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
   public DataResponse<AssignmentWebResponse> findAssignmentById(
@@ -69,6 +87,13 @@ public class AssignmentController {
             );
   }
 
+  /**
+   * Used to create new {@code Assignment) by passing the JSON containing Assignment Attributes and Uploaded File
+   *
+   * @param data (JSON)
+   * @param file (MultipartFile) (Not Required)
+   * @return DataResponse<AssignmentWebResponse> containing created Assignment
+   */
   @ResponseStatus(value = HttpStatus.CREATED)
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
   public DataResponse<AssignmentWebResponse> createAssignment(
@@ -87,9 +112,17 @@ public class AssignmentController {
             );
   }
 
+  /**
+   * Used to update existing Assignment By Passing the id, JSON containing Assignment attributes, and Uploaded File
+   *
+   * @param data (JSON)
+   * @param file (MultipartFile) (Not Required)
+   * @return DataResponse<AssignmentWebResponse> containing updated Assignment
+   */
   @ResponseStatus(value = HttpStatus.OK)
-  @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+  @PutMapping(path = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
   public DataResponse<AssignmentWebResponse> updateAssignment(
+          @PathVariable String id,
           @RequestParam String data,
           @RequestParam(required = false, name = "file") MultipartFile file
   ) {
@@ -98,12 +131,18 @@ public class AssignmentController {
                     assignmentService
                             .updateAssignment(
                                     assignmentRequestMapper
-                                            .toAssignment(data),
+                                            .toAssignmentWithId(id, data),
                                     file
                             )
             );
   }
 
+  /**
+   * Used to delete specific Assignment by Passing Assignment Id in PathVariable
+   *
+   * @param id (JSON)
+   * @return BaseResponse with status OK
+   */
   @ResponseStatus(value = HttpStatus.OK)
   @DeleteMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
   public BaseResponse deleteAssignmentById(

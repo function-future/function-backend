@@ -1,9 +1,16 @@
 package com.future.function.web.controller.scoring;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.future.function.model.entity.feature.core.File;
 import com.future.function.model.entity.feature.scoring.Assignment;
 import com.future.function.service.api.feature.scoring.AssignmentService;
+import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.mapper.request.scoring.AssignmentRequestMapper;
+import com.future.function.web.mapper.response.scoring.AssignmentResponseMapper;
+import com.future.function.web.model.response.base.BaseResponse;
+import com.future.function.web.model.response.base.DataResponse;
+import com.future.function.web.model.response.base.PagingResponse;
+import com.future.function.web.model.response.scoring.AssignmentWebResponse;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -14,6 +21,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -21,13 +29,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -37,6 +42,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(AssignmentController.class)
@@ -67,6 +74,20 @@ public class AssignmentControllerTest {
   private MockMultipartFile multipartFile;
   private List<Assignment> assignmentList;
   private Page<Assignment> assignmentPage;
+
+  private DataResponse<AssignmentWebResponse> DATA_RESPONSE;
+  private DataResponse<AssignmentWebResponse> CREATED_DATA_RESPONSE;
+
+  private PagingResponse<AssignmentWebResponse> PAGING_RESPONSE;
+
+  private BaseResponse BASE_RESPONSE;
+
+  private JacksonTester<DataResponse<AssignmentWebResponse>> dataResponseJacksonTester;
+
+  private JacksonTester<PagingResponse<AssignmentWebResponse>> pagingResponseJacksonTester;
+
+  private JacksonTester<BaseResponse> baseResponseJacksonTester;
+
   @Autowired
   private MockMvc mockMvc;
 
@@ -78,6 +99,9 @@ public class AssignmentControllerTest {
 
   @Before
   public void setUp() throws Exception {
+
+    JacksonTester.initFields(this, new ObjectMapper());
+
     assignment = Assignment
             .builder()
             .title(ASSIGNMENT_TITLE)
@@ -106,7 +130,18 @@ public class AssignmentControllerTest {
 
     multipartFile = new MockMultipartFile(ASSIGNMENT_FILE, new byte[]{});
 
-    when(assignmentService.findAllByPageableAndFilterAndSearch(pageable, , ))
+    DATA_RESPONSE = AssignmentResponseMapper
+            .toAssignmentDataResponse(this.assignment);
+
+    CREATED_DATA_RESPONSE = AssignmentResponseMapper
+            .toAssignmentDataResponse(HttpStatus.CREATED, this.assignment);
+
+    PAGING_RESPONSE = AssignmentResponseMapper
+            .toAssignmentsPagingResponse(assignmentPage);
+
+    BASE_RESPONSE = ResponseHelper.toBaseResponse(HttpStatus.OK);
+
+    when(assignmentService.findAllByPageableAndFilterAndSearch(pageable, null, null))
             .thenReturn(assignmentPage);
     when(assignmentService.createAssignment(assignment, multipartFile))
             .thenReturn(assignmentWithFile);
@@ -131,14 +166,12 @@ public class AssignmentControllerTest {
   @Test
   public void testFindAssignmentByIdDataResponseAssignment() throws Exception {
 
-    MockHttpServletResponse response = mockMvc.perform(
-            get("/api/scoring/assignments/" + ASSIGNMENT_ID)
-    )
-            .andReturn()
-            .getResponse();
-
-    assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
-    assertThat(response.getContentAsString()).isNotBlank();
+    mockMvc.perform(
+            get("/api/scoring/assignments/" + ASSIGNMENT_ID))
+            .andExpect(status().isOk())
+            .andExpect(content().json(
+                    dataResponseJacksonTester.write(DATA_RESPONSE)
+                            .getJson()));
 
     verify(assignmentService).findById(ASSIGNMENT_ID);
     verifyZeroInteractions(assignmentRequestMapper);
@@ -147,83 +180,76 @@ public class AssignmentControllerTest {
 
   @Test
   public void testDeleteAssignmentByIdBaseResponseOk() throws Exception {
-    MockHttpServletResponse response = mockMvc.perform(
-            delete("/api/scoring/assignments/" + ASSIGNMENT_ID)
-    )
-            .andReturn()
-            .getResponse();
+    mockMvc.perform(
+            delete("/api/scoring/assignments/" + ASSIGNMENT_ID))
+            .andExpect(status().isOk())
+            .andExpect(content().json(
+                    baseResponseJacksonTester.write(BASE_RESPONSE)
+                            .getJson()));
 
-    assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
     verify(assignmentService).deleteById(ASSIGNMENT_ID);
     verifyZeroInteractions(assignmentRequestMapper);
   }
 
   @Test
   public void testCreateAssignmentWithRequestJsonAndMultipartFile() throws Exception {
-    MockHttpServletResponse response = mockMvc.perform(
+    mockMvc.perform(
             fileUpload("/api/scoring/assignments")
                     .file(multipartFile)
                     .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
-                    .param("data", ASSIGNMENT_CREATE_REQUEST_JSON)
-    )
-            .andReturn()
-            .getResponse();
+                    .param("data", ASSIGNMENT_CREATE_REQUEST_JSON))
+            .andExpect(status().isCreated());
 
-    assertThat(response.getStatus()).isEqualTo(HttpStatus.CREATED.value());
-    assertThat(response.getContentAsString()).isNotBlank();
+    //TODO return json with file attribute not blank
+
     verify(assignmentService).createAssignment(assignment, multipartFile);
     verify(assignmentRequestMapper).toAssignment(ASSIGNMENT_CREATE_REQUEST_JSON);
   }
 
   @Test
   public void testCreateAssignmentWithRequestJsonWithoutMultipartFile() throws Exception {
-    MockHttpServletResponse response = mockMvc.perform(
+    mockMvc.perform(
             post("/api/scoring/assignments")
                     .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
                     .param("data", ASSIGNMENT_CREATE_REQUEST_JSON)
-                    .param("file", "")
-    )
-            .andReturn()
-            .getResponse();
+                    .param("file", ""))
+            .andExpect(status().isCreated())
+            .andExpect(content().json(
+                    dataResponseJacksonTester.write(CREATED_DATA_RESPONSE)
+                            .getJson()));
 
-    assertThat(response.getStatus()).isEqualTo(HttpStatus.CREATED.value());
-    assertThat(response.getContentAsString()).isNotBlank();
     verify(assignmentService).createAssignment(assignment, null);
     verify(assignmentRequestMapper).toAssignment(ASSIGNMENT_CREATE_REQUEST_JSON);
   }
 
   @Test
   public void testUpdateAssignmentWithRequestJsonWithoutMultipartFile() throws Exception {
-    MockHttpServletResponse response = mockMvc.perform(
-            put("/api/scoring/assignments")
+    mockMvc.perform(
+            put("/api/scoring/assignments/" + ASSIGNMENT_ID)
                     .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
                     .param("data", ASSIGNMENT_UPDATE_REQUEST_JSON)
-                    .param("file", "")
-    )
-            .andReturn()
-            .getResponse();
+                    .param("file", ""))
+            .andExpect(status().isOk())
+            .andExpect(content().json(
+                    dataResponseJacksonTester.write(DATA_RESPONSE)
+                            .getJson()));
 
-
-    assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
-    assertThat(response.getContentAsString()).isNotBlank();
     verify(assignmentService).updateAssignment(assignment, null);
     verify(assignmentRequestMapper).toAssignment(ASSIGNMENT_UPDATE_REQUEST_JSON);
   }
 
   @Test
   public void testFindAllAssignmentWithPagingParameters() throws Exception {
-    MockHttpServletResponse response = mockMvc.perform(
+    mockMvc.perform(
             get("/api/scoring/assignments")
                     .param("page", "1")
-                    .param("size", "10")
-    )
-            .andReturn()
-            .getResponse();
+                    .param("size", "10"))
+            .andExpect(status().isOk())
+            .andExpect(content().json(
+                    pagingResponseJacksonTester.write(PAGING_RESPONSE)
+                            .getJson()));
 
-    assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
-    assertThat(response.getContentAsString()).isNotBlank();
-
-    verify(assignmentService).findAllByPageableAndFilterAndSearch(eq(pageable), , );
+    verify(assignmentService).findAllByPageableAndFilterAndSearch(pageable, null, null);
     verifyZeroInteractions(assignmentRequestMapper);
   }
 }

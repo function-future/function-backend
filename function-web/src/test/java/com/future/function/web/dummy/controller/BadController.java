@@ -15,13 +15,11 @@ public class BadController {
 
   @GetMapping(value = "/bad-request")
   public String badRequest() {
-
     throw new BadRequestException(MESSAGE);
   }
 
   @GetMapping(value = "/bad-request-set")
   public String badRequestSet() {
-
     throw new BadRequestException(MESSAGE, Collections.emptySet());
   }
 

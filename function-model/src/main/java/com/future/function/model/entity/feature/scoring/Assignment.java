@@ -4,14 +4,11 @@ import com.future.function.model.entity.base.BaseEntity;
 import com.future.function.model.entity.feature.core.File;
 import com.future.function.model.util.constant.DocumentName;
 import java.util.UUID;
-import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.hibernate.validator.constraints.Email;
-import org.hibernate.validator.constraints.NotBlank;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -30,17 +27,12 @@ public class Assignment extends BaseEntity {
   @Builder.Default
   private String id = UUID.randomUUID().toString();
 
-  @Email(message = "Email")
-  @NotBlank(message = "NotBlank")
   private String title;
 
-  @NotBlank(message = "NotBlank")
   private String description;
 
-  @NotNull(message = "NotNull")
   private long deadline;
 
-  @NotBlank
   private String question;
 
   private File file;
