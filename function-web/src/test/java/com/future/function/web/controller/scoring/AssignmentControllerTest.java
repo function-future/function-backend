@@ -157,7 +157,8 @@ public class AssignmentControllerTest {
             .thenReturn(assignment);
     when(assignmentRequestMapper.toAssignment(ASSIGNMENT_UPDATE_REQUEST_JSON))
             .thenReturn(assignment);
-    when()
+    when(assignmentRequestMapper.toAssignmentWithId(ASSIGNMENT_ID, ASSIGNMENT_UPDATE_REQUEST_JSON))
+            .thenReturn(assignment);
   }
 
   @After
@@ -238,7 +239,7 @@ public class AssignmentControllerTest {
                             .getJson()));
 
     verify(assignmentService).updateAssignment(assignment, null);
-    verify(assignmentRequestMapper).toAssignment(ASSIGNMENT_UPDATE_REQUEST_JSON);
+    verify(assignmentRequestMapper).toAssignmentWithId(ASSIGNMENT_ID, ASSIGNMENT_UPDATE_REQUEST_JSON);
   }
 
   @Test
