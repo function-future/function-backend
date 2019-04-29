@@ -27,11 +27,11 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @EqualsAndHashCode(callSuper = true)
 @Document(collection = DocumentName.SEQUENCE)
 public class Sequence extends BaseEntity {
-
+  
   @Id
   private String id;
-
-  @Field(value = FieldName.SEQUENCE_NUMBER)
+  
+  @Field(value = FieldName.Sequence.SEQUENCE_NUMBER)
   private long sequenceNumber;
-
+  
 }
