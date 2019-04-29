@@ -3,6 +3,7 @@ package com.future.function.web.controller.core;
 import com.future.function.service.api.feature.core.StickyNoteService;
 import com.future.function.web.mapper.request.core.StickyNoteRequestMapper;
 import com.future.function.web.mapper.response.core.StickyNoteResponseMapper;
+import com.future.function.web.model.request.core.StickyNoteWebRequest;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.feature.core.StickyNoteWebResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +54,7 @@ public class StickyNoteController {
   /**
    * Creates new sticky note in database.
    *
-   * @param data Data of new sticky note in JSON format.
+   * @param request Data of new sticky note in JSON format.
    *
    * @return {@code DataResponse<StickyNoteWebResponse>} - The created
    * sticky note data, wrapped in
@@ -64,12 +65,12 @@ public class StickyNoteController {
   @PostMapping
   public DataResponse<StickyNoteWebResponse> createStickyNote(
     @RequestBody
-      String data
+      StickyNoteWebRequest request
   ) {
     
     return StickyNoteResponseMapper.toStickyNoteDataResponse(
       HttpStatus.CREATED, stickyNoteService.createStickyNote(
-        stickyNoteRequestMapper.toStickyNote(data)));
+        stickyNoteRequestMapper.toStickyNote(request)));
   }
   
 }
