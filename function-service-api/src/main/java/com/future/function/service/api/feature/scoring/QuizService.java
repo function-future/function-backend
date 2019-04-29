@@ -4,6 +4,9 @@ import com.future.function.model.entity.feature.scoring.Quiz;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+/**
+ * Interface to represent Quiz Service API
+ */
 public interface QuizService {
 
   Quiz findById(String id);

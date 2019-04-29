@@ -51,7 +51,7 @@ public class QuizResponseMapperTest {
             .deadline(DEADLINE)
             .timeLimit(QUIZ_TIME_LIMIT)
             .questionCount(QUIZ_QUESTION_COUNT)
-            .tries(3)
+            .tries(QUIZ_TRIES)
             .build();
 
     quizList = new ArrayList<>();

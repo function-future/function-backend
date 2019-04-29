@@ -11,20 +11,26 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+/**
+ * Bean class used to map web request for Quiz entity
+ */
 @Slf4j
 @Component
 public class QuizRequestMapper {
 
   private ObjectValidator validator;
 
-  private WebRequestMapper requestMapper;
-
   @Autowired
-  public QuizRequestMapper(ObjectValidator validator, WebRequestMapper requestMapper) {
+  public QuizRequestMapper(ObjectValidator validator) {
     this.validator = validator;
-    this.requestMapper = requestMapper;
   }
 
+  /**
+   * Used to map web request to quiz entity object with quiz id
+   * @param id (String)
+   * @param request (QuizWebRequest)
+   * @return Quiz object
+   */
   public Quiz toQuiz(String id, QuizWebRequest request) {
     Quiz quiz = Optional.ofNullable(id)
             .filter(val -> !val.isEmpty())
@@ -36,12 +42,23 @@ public class QuizRequestMapper {
     return toValidatedQuiz(request, quiz);
   }
 
+  /**
+   * Used to map web request to quiz entity object
+   * @param request (QuizWebRequest)
+   * @return Quiz object
+   */
   public Quiz toQuiz(QuizWebRequest request) {
     return toValidatedQuiz(request, new Quiz());
   }
 
+  /**
+   * Private method used to validate web request and map to quiz entity object
+   * @param request (QuizWebRequest)
+   * @param quiz (Quiz)
+   * @return Quiz object
+   */
   private Quiz toValidatedQuiz(QuizWebRequest request, Quiz quiz) {
-    return Optional.of(request)
+    return Optional.ofNullable(request)
             .map(validator::validate)
             .map(val -> {
               BeanUtils.copyProperties(val, quiz);
@@ -49,9 +66,4 @@ public class QuizRequestMapper {
             })
             .orElseThrow(() -> new BadRequestException("Bad Request"));
   }
-
-  //TODO verify if quiz controller will pass string data json or not
-//  private QuizWebRequest toQuizWebRequest(String data) {
-//    return requestMapper.toWebRequestObject(data, QuizWebRequest.class);
-//  }
 }

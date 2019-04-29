@@ -11,8 +11,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
+/**
+ * Service class used to manipulate Quiz Entity
+ * Used QuizRepository and QuestionBankService to help manipulate quiz entity
+ */
 @Service
 public class QuizServiceImpl implements QuizService {
 
@@ -25,6 +28,11 @@ public class QuizServiceImpl implements QuizService {
     this.quizRepository = quizRepository;
   }
 
+  /**
+   * Used to find quiz from repository by passing the quiz id
+   * @param id (String)
+   * @return Quiz object
+   */
   @Override
   public Quiz findById(String id) {
     return Optional.ofNullable(id)
@@ -35,15 +43,23 @@ public class QuizServiceImpl implements QuizService {
             .orElseThrow(() -> new NotFoundException("Quiz Not Found"));
   }
 
+  /**
+   * Used to find all quiz from repository in paging format by passing pageable, filter, and search parameter
+   * @param pageable (Pageable)
+   * @param filter (String)
+   * @param search (String)
+   * @return Page<Quiz> object
+   */
   @Override
   public Page<Quiz> findAllByPageableAndFilterAndSearch(Pageable pageable, String filter, String search) {
-    filter = Optional.ofNullable(filter)
-            .orElse("");
-    search = Optional.ofNullable(search)
-            .orElse("");
     return quizRepository.findAll(pageable);
   }
 
+  /**
+   * Used to create new quiz in repository by passing the requested quiz entity object
+   * @param request (Quiz)
+   * @return Quiz object
+   */
   @Override
   public Quiz createQuiz(Quiz request) {
     return Optional.of(request)
@@ -51,6 +67,11 @@ public class QuizServiceImpl implements QuizService {
             .orElseThrow(() -> new BadRequestException("Bad Request"));
   }
 
+  /**
+   * Used to update existing quiz from repository by passing the requested quiz entity object with its id
+   * @param request (Quiz)
+   * @return Quiz object
+   */
   @Override
   public Quiz updateQuiz(Quiz request) {
     return Optional.of(request)
@@ -64,6 +85,10 @@ public class QuizServiceImpl implements QuizService {
             .orElseThrow(() -> new BadRequestException("Bad Request"));
   }
 
+  /**
+   * Used to delete existing quiz from repository by passing the quiz id
+   * @param id (String)
+   */
   @Override
   public void deleteById(String id) {
     Optional.ofNullable(id)

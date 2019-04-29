@@ -9,8 +9,10 @@ import java.util.UUID;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.beans.BeanUtils;
 
 import static com.googlecode.catchexception.CatchException.catchException;
@@ -21,6 +23,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
+@RunWith(MockitoJUnitRunner.class)
 public class QuizRequestMapperTest {
 
   private String QUIZ_ID = UUID.randomUUID().toString();
@@ -39,9 +42,6 @@ public class QuizRequestMapperTest {
 
   @Mock
   private ObjectValidator validator;
-
-  @Mock
-  private WebRequestMapper webRequestMapper;
 
   @Before
   public void setUp() throws Exception {
@@ -64,15 +64,16 @@ public class QuizRequestMapperTest {
 
   @After
   public void tearDown() throws Exception {
-    verifyNoMoreInteractions(validator, webRequestMapper);
+    verifyNoMoreInteractions(validator);
   }
 
   @Test
   public void testToQuizWithQuizWebRequest() {
+    quiz.setId(null);
     Quiz actual = requestMapper.toQuiz(request);
     assertThat(actual).isEqualTo(quiz);
 
-    verify(validator).validate(eq(request));
+    verify(validator).validate(request);
   }
 
   @Test
@@ -87,7 +88,7 @@ public class QuizRequestMapperTest {
     Quiz actual = requestMapper.toQuiz(QUIZ_ID, request);
     assertThat(actual).isEqualTo(quiz);
 
-    verify(validator).validate(eq(request));
+    verify(validator).validate(request);
   }
 
   @Test
