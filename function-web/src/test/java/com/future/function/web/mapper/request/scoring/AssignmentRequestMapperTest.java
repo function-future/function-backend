@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.future.function.common.exception.BadRequestException;
 import com.future.function.common.validation.ObjectValidator;
 import com.future.function.model.entity.feature.scoring.Assignment;
+import com.future.function.web.mapper.request.WebRequestMapper;
 import com.future.function.web.model.request.scoring.AssignmentWebRequest;
 import java.io.IOException;
 import org.junit.After;
@@ -42,7 +43,7 @@ public class AssignmentRequestMapperTest {
   private AssignmentWebRequest assignmentWebRequest;
 
   @Mock
-  private ObjectMapper objectMapper;
+  private WebRequestMapper requestMapper;
 
   @InjectMocks
   private AssignmentRequestMapper assignmentRequestMapper;
@@ -51,7 +52,7 @@ public class AssignmentRequestMapperTest {
   private ObjectValidator validator;
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
     assignment = Assignment
             .builder()
             .id(null)
@@ -69,55 +70,33 @@ public class AssignmentRequestMapperTest {
 
     when(validator.validate(assignmentWebRequest))
             .thenReturn(assignmentWebRequest);
-    when(objectMapper.readValue(ASSIGNMENT_REQUEST_JSON, AssignmentWebRequest.class))
+    when(requestMapper.toWebRequestObject(ASSIGNMENT_REQUEST_JSON, AssignmentWebRequest.class))
             .thenReturn(assignmentWebRequest);
-    when(objectMapper.readValue(STRING_EMPTY, AssignmentWebRequest.class))
-            .thenThrow(new IOException());
-    when(objectMapper.readValue(NULL_VALUE, AssignmentWebRequest.class))
-            .thenThrow(new IOException());
   }
 
   @After
-  public void tearDown() throws Exception {
-    verifyNoMoreInteractions(objectMapper);
+  public void tearDown() {
+    verifyNoMoreInteractions(requestMapper);
     verifyNoMoreInteractions(validator);
   }
 
   @Test
-  public void testToAssignmentFromStringDataJson() throws IOException {
+  public void testToAssignmentFromStringDataJson() {
     Assignment actual = assignmentRequestMapper.toAssignment(ASSIGNMENT_REQUEST_JSON);
     assertThat(actual).isEqualTo(assignment);
 
     verify(validator).validate(assignmentWebRequest);
-    verify(objectMapper).readValue(ASSIGNMENT_REQUEST_JSON, AssignmentWebRequest.class);
+    verify(requestMapper).toWebRequestObject(ASSIGNMENT_REQUEST_JSON, AssignmentWebRequest.class);
   }
 
   @Test
-  public void testToAssignmentFromStringDataJsonBlank() throws IOException {
-    catchException(() -> assignmentRequestMapper.toAssignment(STRING_EMPTY));
-    assertThat(caughtException().getClass()).isEqualTo(BadRequestException.class);
-    assertThat(caughtException().getMessage()).isEqualTo(BAD_REQUEST_EXCEPTION_MSG);
-    verify(objectMapper).readValue(STRING_EMPTY, AssignmentWebRequest.class);
-    verifyZeroInteractions(validator);
-  }
-
-  @Test
-  public void testToAssignmentFromStringDataJsonNull() throws IOException {
-    catchException(() -> assignmentRequestMapper.toAssignment(NULL_VALUE));
-    assertThat(caughtException().getClass()).isEqualTo(BadRequestException.class);
-    assertThat(caughtException().getMessage()).isEqualTo(BAD_REQUEST_EXCEPTION_MSG);
-    verify(objectMapper).readValue(NULL_VALUE, AssignmentWebRequest.class);
-    verifyZeroInteractions(validator);
-  }
-
-  @Test
-  public void testToAssignmentFromStringDataJsonAndStringIdSuccess() throws IOException {
+  public void testToAssignmentFromStringDataJsonAndStringIdSuccess() {
     assignment.setId(ASSIGNMENT_ID);
     assignmentWebRequest.setId(ASSIGNMENT_ID);
     Assignment actual = assignmentRequestMapper.toAssignmentWithId(ASSIGNMENT_ID, ASSIGNMENT_REQUEST_JSON);
     assertThat(actual).isEqualTo(assignment);
 
     verify(validator).validate(assignmentWebRequest);
-    verify(objectMapper).readValue(ASSIGNMENT_REQUEST_JSON, AssignmentWebRequest.class);
+    verify(requestMapper).toWebRequestObject(ASSIGNMENT_REQUEST_JSON, AssignmentWebRequest.class);
   }
 }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.future.function.common.exception.BadRequestException;
 import com.future.function.common.validation.ObjectValidator;
 import com.future.function.model.entity.feature.scoring.Assignment;
+import com.future.function.web.mapper.request.WebRequestMapper;
 import com.future.function.web.model.request.scoring.AssignmentWebRequest;
 import java.io.IOException;
 import java.util.Optional;
@@ -19,13 +20,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class AssignmentRequestMapper {
 
-  private ObjectMapper objectMapper;
+  private WebRequestMapper requestMapper;
 
   private ObjectValidator validator;
 
   @Autowired
-  public AssignmentRequestMapper(ObjectMapper objectMapper, ObjectValidator validator) {
-    this.objectMapper = objectMapper;
+  public AssignmentRequestMapper(WebRequestMapper requestMapper, ObjectValidator validator) {
+    this.requestMapper = requestMapper;
     this.validator = validator;
   }
 
@@ -71,17 +72,12 @@ public class AssignmentRequestMapper {
   }
 
   /**
-   * used to convert json in string format to AssignmentWebRequest object with the help of ObjectMapper
+   * used to convert json in string format to AssignmentWebRequest object with the help of Web Request Mapper bean
    *
    * @param data (JSON)
    * @return AssignmentWebRequest object
    */
   private AssignmentWebRequest toAssignmentWebRequest(String data) {
-    try {
-      return objectMapper.readValue(data, AssignmentWebRequest.class);
-    } catch (IOException e) {
-      log.error("IOException occurred on parsing request, exception: '{}'", e);
-      throw new BadRequestException("Bad Request");
-    }
+      return requestMapper.toWebRequestObject(data, AssignmentWebRequest.class);
   }
 }
