@@ -8,15 +8,15 @@ package com.future.function.common.exception;
  * to be thrown in runtime.
  */
 public class UnauthorizedException extends RuntimeException {
-  
+
   public UnauthorizedException(String message) {
-    
+
     this(message, null);
   }
-  
+
   public UnauthorizedException(String message, Throwable cause) {
-    
+
     super(message, cause);
   }
-  
+
 }

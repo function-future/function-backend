@@ -32,8 +32,7 @@ public class Batch extends BaseEntity {
   
   @Id
   private String id;
-  
-  @Field(FieldName.Batch.NUMBER)
+@Field(FieldName.Batch.NUMBER)
   @NonNull
   private Long number;
   

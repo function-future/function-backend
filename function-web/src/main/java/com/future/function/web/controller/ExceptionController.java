@@ -19,78 +19,74 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @Slf4j
 @RestControllerAdvice
 public class ExceptionController {
-  
+
   /**
    * Handles {@link com.future.function.common.exception.BadRequestException}
    * exception thrown from service.
    *
    * @param e Exception that is thrown.
-   *
    * @return {@code ErrorResponse} - Response showing which fields causing
    * errors.
    */
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   @ExceptionHandler(BadRequestException.class)
   public ErrorResponse badRequestException(BadRequestException e) {
-    
+
     log.error(e.getMessage(), e.getCause(), e.getConstraintViolations());
-    
+
     return ResponseHelper.toErrorResponse(
-      HttpStatus.BAD_REQUEST, e.getConstraintViolations());
+            HttpStatus.BAD_REQUEST, e.getConstraintViolations());
   }
-  
+
   /**
    * Handles {@link com.future.function.common.exception.UnauthorizedException}
    * exception thrown from service.
    *
    * @param e Exception that is thrown.
-   *
    * @return {@link com.future.function.web.model.response.base.BaseResponse}
    * - Response showing 'unauthorized' message.
    */
   @ResponseStatus(HttpStatus.UNAUTHORIZED)
   @ExceptionHandler(UnauthorizedException.class)
   public BaseResponse unauthorizedException(UnauthorizedException e) {
-    
+
     log.error(e.getMessage(), e.getCause());
-    
+
     return ResponseHelper.toBaseResponse(HttpStatus.UNAUTHORIZED);
   }
-  
+
   /**
    * Handles {@link com.future.function.common.exception.ForbiddenException}
    * exception thrown from service.
    *
    * @param e Exception that is thrown.
-   *
    * @return {@link com.future.function.web.model.response.base.BaseResponse}
    * - Response showing 'forbidden' message.
    */
   @ResponseStatus(HttpStatus.FORBIDDEN)
   @ExceptionHandler(ForbiddenException.class)
   public BaseResponse forbiddenException(ForbiddenException e) {
-    
+
     log.error(e.getMessage(), e.getCause());
-    
+
     return ResponseHelper.toBaseResponse(HttpStatus.FORBIDDEN);
   }
-  
+
   /**
    * Handles {@link com.future.function.common.exception.NotFoundException}
    * exception thrown from service.
    *
    * @param e Exception that is thrown.
-   *
    * @return {@link com.future.function.web.model.response.base.BaseResponse}
    * - Response showing 'not found' message.
    */
   @ResponseStatus(HttpStatus.NOT_FOUND)
   @ExceptionHandler(NotFoundException.class)
   public BaseResponse notFoundException(NotFoundException e) {
-    
+
     log.error(e.getMessage(), e.getCause());
-    
+
     return ResponseHelper.toBaseResponse(HttpStatus.NOT_FOUND);
   }
-  
+
 }

@@ -11,9 +11,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BaseResponse {
-  
+
   private int code;
-  
+
   private String status;
-  
+
 }

@@ -8,19 +8,20 @@ package com.future.function.common.enumeration.core;
  * as the name of root folder for a file in the file storage.
  */
 public enum FileOrigin {
-  USER(true);
-  
+  USER(true),
+  ASSIGNMENT(true);
+
   private String lowCaseValue;
-  
+
   private boolean asResource;
-  
+
   FileOrigin(boolean asResource) {
-    
+
     this.lowCaseValue = this.name()
-      .toLowerCase();
+            .toLowerCase();
     this.asResource = asResource;
   }
-  
+
   /**
    * Returns the lower case value of {@link #name()} method of the selected
    * enum. Useful when creating folder for file operation purposes.
@@ -29,10 +30,10 @@ public enum FileOrigin {
    * method of the selected enum.
    */
   public String lowCaseValue() {
-    
+
     return this.lowCaseValue;
   }
-  
+
   /**
    * Returns the mark {@link #asResource} of the enum to mark whether this
    * enum will mark other objects as resource or as dynamic file.
@@ -40,8 +41,8 @@ public enum FileOrigin {
    * @return {@code boolean} - The mark as resource for the selected enum.
    */
   public boolean isAsResource() {
-    
+
     return this.asResource;
   }
-  
+
 }
