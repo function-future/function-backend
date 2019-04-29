@@ -1,9 +1,7 @@
 package com.future.function.web.mapper.request.core;
 
-import com.future.function.common.exception.BadRequestException;
 import com.future.function.model.entity.feature.core.StickyNote;
 import com.future.function.validation.RequestValidator;
-import com.future.function.web.mapper.request.WebRequestMapper;
 import com.future.function.web.model.request.core.StickyNoteWebRequest;
 import org.junit.After;
 import org.junit.Before;
@@ -13,8 +11,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import static com.googlecode.catchexception.CatchException.catchException;
-import static com.googlecode.catchexception.CatchException.caughtException;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -45,9 +41,6 @@ public class StickyNoteRequestMapperTest {
     .build();
   
   @Mock
-  private WebRequestMapper requestMapper;
-  
-  @Mock
   private RequestValidator validator;
   
   @InjectMocks
@@ -56,46 +49,25 @@ public class StickyNoteRequestMapperTest {
   @Before
   public void setUp() {
     
-    when(requestMapper.toWebRequestObject(VALID_JSON,
-                                          StickyNoteWebRequest.class
-    )).thenReturn(STICKY_NOTE_WEB_REQUEST);
-    when(requestMapper.toWebRequestObject(INVALID_JSON,
-                                          StickyNoteWebRequest.class
-    )).thenThrow(new BadRequestException("Bad Request"));
     when(validator.validate(STICKY_NOTE_WEB_REQUEST)).thenReturn(
       STICKY_NOTE_WEB_REQUEST);
   }
   
   @After
   public void tearDown() {
-    
-    verifyNoMoreInteractions(requestMapper, validator);
+  
+    verifyNoMoreInteractions(validator);
   }
   
   @Test
   public void testGivenJsonDataAsStringByParsingToStickyNoteClassReturnStickyNoteObject() {
     
     StickyNote parsedStickyNote = stickyNoteRequestMapper.toStickyNote(
-      VALID_JSON);
+      STICKY_NOTE_WEB_REQUEST);
     
     assertThat(parsedStickyNote).isEqualTo(STICKY_NOTE);
     
-    verify(requestMapper).toWebRequestObject(
-      VALID_JSON, StickyNoteWebRequest.class);
     verify(validator).validate(STICKY_NOTE_WEB_REQUEST);
-  }
-  
-  @Test
-  public void testGivenJsonDataWithInvalidFormatByParsingToStickyNoteClassReturnBadRequestException() {
-    
-    catchException(() -> stickyNoteRequestMapper.toStickyNote(INVALID_JSON));
-    
-    assertThat(caughtException().getClass()).isEqualTo(
-      BadRequestException.class);
-    assertThat(caughtException().getMessage()).isEqualTo("Bad Request");
-    
-    verify(requestMapper).toWebRequestObject(
-      INVALID_JSON, StickyNoteWebRequest.class);
   }
   
 }
