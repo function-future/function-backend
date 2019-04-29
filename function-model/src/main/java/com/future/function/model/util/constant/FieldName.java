@@ -91,5 +91,16 @@ public interface FieldName {
     public static final String FILE = "file";
 
   }
+
+  abstract class Quiz {
+
+    public static final String TITLE = "title";
+    public static final String DESCRIPTION = "description";
+    public static final String DEADLINE = "deadline";
+    public static final String TIME_LIMIT = "timeLimit";
+    public static final String TRIES = "tries";
+    public static final String QUESTION_BANK = "questionBank";
+    public static final String QUESTION_COUNT = "questionCount";
+  }
   
 }

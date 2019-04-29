@@ -23,4 +23,6 @@ public abstract class DocumentName {
 
   public static final String ASSIGNMENT = "assignments";
 
+  public static final String QUIZ = "quizzes";
+
 }
