@@ -27,7 +27,7 @@ public class AssignmentResponseMapper {
    * @return DataResponse<AssignmentWebResponse>
    */
   public static DataResponse<AssignmentWebResponse> toAssignmentDataResponse(Assignment assignment) {
-    return toAssignmentDataResponse(HttpStatus.OK, assignment);
+    return ResponseHelper.toDataResponse(HttpStatus.OK, buildAssignmentWebResponse(assignment));
   }
 
   /**
@@ -60,11 +60,13 @@ public class AssignmentResponseMapper {
    * @return PagingResponse<AssignmentWebResponse>
    */
   public static PagingResponse<AssignmentWebResponse> toAssignmentsPagingResponse(Page<Assignment> data) {
-    return ResponseHelper.toPagingResponse(HttpStatus.OK,
-            data.getContent()
-            .stream()
-            .map(AssignmentResponseMapper::buildAssignmentWebResponse)
-            .collect(Collectors.toList()),
+    return ResponseHelper.toPagingResponse(
+            HttpStatus.OK,
+            data
+              .getContent()
+              .stream()
+              .map(AssignmentResponseMapper::buildAssignmentWebResponse)
+              .collect(Collectors.toList()),
             PageHelper.toPaging(data));
   }
 

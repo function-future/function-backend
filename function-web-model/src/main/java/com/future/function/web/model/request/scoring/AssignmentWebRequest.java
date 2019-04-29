@@ -33,6 +33,6 @@ public class AssignmentWebRequest {
   @NotBlank(message = "NotBlank")
   private String question;
 
-  @NotEmpty
+  @NotEmpty(message = "NotEmpty")
   private List<Long> batch;
 }

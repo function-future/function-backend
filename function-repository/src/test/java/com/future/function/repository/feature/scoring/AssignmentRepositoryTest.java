@@ -23,21 +23,11 @@ public class AssignmentRepositoryTest {
   private static final long ASSIGNMENT_DEADLINE = new Date().getTime();
   private static final String ASSIGNMENT_QUESTION = "assignment-question";
 
-  private static Assignment assignment = Assignment
-          .builder()
-          .title(ASSIGNMENT_TITLE)
-          .description(ASSIGNMENT_DESCRIPTION)
-          .deadline(ASSIGNMENT_DEADLINE)
-          .question(ASSIGNMENT_QUESTION)
-          .build();
-
   @Autowired
   private AssignmentRepository assignmentRepository;
 
   @Before
   public void setUp() throws Exception {
-
-    assignmentRepository.save(assignment);
   }
 
   @After
@@ -47,6 +37,16 @@ public class AssignmentRepositoryTest {
 
   @Test
   public void findAssignmentByIdAndDeletedFalse() {
+    Assignment assignment = Assignment
+            .builder()
+            .title(ASSIGNMENT_TITLE)
+            .description(ASSIGNMENT_DESCRIPTION)
+            .deadline(ASSIGNMENT_DEADLINE)
+            .question(ASSIGNMENT_QUESTION)
+            .build();
+
+    assignmentRepository.save(assignment);
+
     Optional<Assignment> result = assignmentRepository.findByIdAndDeletedFalse(assignment.getId());
     assertTrue(result.isPresent());
     assertEquals(assignment, result.get());
