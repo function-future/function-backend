@@ -3,6 +3,7 @@ package com.future.function.service.impl.feature.scoring;
 import com.future.function.common.exception.BadRequestException;
 import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.scoring.Quiz;
+import com.future.function.model.util.constant.FieldName;
 import com.future.function.repository.feature.scoring.QuizRepository;
 import com.future.function.service.api.feature.scoring.QuizService;
 import java.util.Optional;
@@ -78,7 +79,13 @@ public class QuizServiceImpl implements QuizService {
             .map(Quiz::getId)
             .map(this::findById)
             .map(val -> {
-              BeanUtils.copyProperties(request, val);
+              BeanUtils.copyProperties(
+                      request,
+                      val,
+                      FieldName.BaseEntity.CREATED_AT,
+                      FieldName.BaseEntity.CREATED_BY,
+                      FieldName.BaseEntity.VERSION
+              );
               return val;
             })
             .map(quizRepository::save)

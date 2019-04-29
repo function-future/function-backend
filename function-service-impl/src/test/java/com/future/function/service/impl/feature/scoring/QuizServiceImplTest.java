@@ -5,6 +5,7 @@ import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.scoring.Quiz;
 import com.future.function.repository.feature.scoring.QuizRepository;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -69,8 +70,7 @@ public class QuizServiceImplTest {
             .questionCount(QUESTION_COUNT)
             .build();
 
-    quizList = new ArrayList<>();
-    quizList.add(quiz);
+    quizList = Collections.singletonList(quiz);
 
     pageable = new PageRequest(PAGE, TOTAL);
 

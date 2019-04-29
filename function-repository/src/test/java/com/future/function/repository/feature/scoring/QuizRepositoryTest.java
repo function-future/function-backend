@@ -2,6 +2,7 @@ package com.future.function.repository.feature.scoring;
 
 import com.future.function.model.entity.feature.scoring.Quiz;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -54,8 +55,7 @@ public class QuizRepositoryTest {
             .questionCount(QUESTION_COUNT)
             .build();
 
-    quizList = new ArrayList<>();
-    quizList.add(quiz);
+    quizList = Collections.singletonList(quiz);
 
     pageable = new PageRequest(PAGE, TOTAL);
 
