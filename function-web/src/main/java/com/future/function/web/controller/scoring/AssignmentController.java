@@ -52,10 +52,10 @@ public class AssignmentController {
   @ResponseStatus(value = HttpStatus.OK)
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   public PagingResponse<AssignmentWebResponse> findAllAssignment(
-          @RequestParam int page,
-          @RequestParam int size,
-          @RequestParam(required = false) String filter,
-          @RequestParam(required = false) String search
+          @RequestParam(required = false, defaultValue = "1") int page,
+          @RequestParam(required = false, defaultValue = "10") int size,
+          @RequestParam(required = false, defaultValue = "") String filter,
+          @RequestParam(required = false, defaultValue = "") String search
   ) {
     return AssignmentResponseMapper
             .toAssignmentsPagingResponse(
@@ -98,7 +98,7 @@ public class AssignmentController {
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
   public DataResponse<AssignmentWebResponse> createAssignment(
           @RequestParam String data,
-          @RequestParam(required = false, name = "file") MultipartFile file
+          @RequestParam(required = false) MultipartFile file
   ) {
     return AssignmentResponseMapper
             .toAssignmentDataResponse(
@@ -124,7 +124,7 @@ public class AssignmentController {
   public DataResponse<AssignmentWebResponse> updateAssignment(
           @PathVariable String id,
           @RequestParam String data,
-          @RequestParam(required = false, name = "file") MultipartFile file
+          @RequestParam(required = false) MultipartFile file
   ) {
     return AssignmentResponseMapper
             .toAssignmentDataResponse(

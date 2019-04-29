@@ -38,10 +38,7 @@ public class AssignmentResponseMapper {
    * @return DataResponse<AssignmentWebResponse> with specific HttpStatus
    */
   public static DataResponse<AssignmentWebResponse> toAssignmentDataResponse(HttpStatus httpStatus, Assignment assignment) {
-    return DataResponse.<AssignmentWebResponse>builder().code(httpStatus.value())
-            .status(ResponseHelper.toProperStatusFormat(httpStatus.getReasonPhrase()))
-            .data(buildAssignmentWebResponse(assignment))
-            .build();
+    return ResponseHelper.toDataResponse(httpStatus, buildAssignmentWebResponse(assignment));
   }
 
   /**
@@ -63,14 +60,12 @@ public class AssignmentResponseMapper {
    * @return PagingResponse<AssignmentWebResponse>
    */
   public static PagingResponse<AssignmentWebResponse> toAssignmentsPagingResponse(Page<Assignment> data) {
-    return PagingResponse.<AssignmentWebResponse>builder().code(HttpStatus.OK.value())
-            .status(HttpStatus.OK.getReasonPhrase())
-            .data(data.getContent()
-                    .stream()
-                    .map(AssignmentResponseMapper::buildAssignmentWebResponse)
-                    .collect(Collectors.toList()))
-            .paging(PageHelper.toPaging(data))
-            .build();
+    return ResponseHelper.toPagingResponse(HttpStatus.OK,
+            data.getContent()
+            .stream()
+            .map(AssignmentResponseMapper::buildAssignmentWebResponse)
+            .collect(Collectors.toList()),
+            PageHelper.toPaging(data));
   }
 
 }

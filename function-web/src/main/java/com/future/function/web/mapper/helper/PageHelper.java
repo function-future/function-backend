@@ -1,5 +1,6 @@
 package com.future.function.web.mapper.helper;
 
+import com.future.function.model.util.constant.FieldName;
 import com.future.function.web.model.response.base.paging.Paging;
 import java.util.Optional;
 import lombok.AccessLevel;
@@ -30,9 +31,8 @@ public class PageHelper {
   }
 
   public static Pageable toPage(int page, int size, String sortBy, String sortType) {
-    //TODO change hard code to fieldName.base entity.updatedAt
     sortBy = Optional.ofNullable(sortBy)
-            .orElse("updatedAt");
+            .orElse(FieldName.BaseEntity.UPDATED_AT);
     return new PageRequest(page - 1, size, toSort(sortBy, sortType));
   }
 

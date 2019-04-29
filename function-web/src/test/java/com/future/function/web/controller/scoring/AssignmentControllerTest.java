@@ -143,7 +143,7 @@ public class AssignmentControllerTest {
 
     BASE_RESPONSE = ResponseHelper.toBaseResponse(HttpStatus.OK);
 
-    when(assignmentService.findAllByPageableAndFilterAndSearch(pageable, null, null))
+    when(assignmentService.findAllByPageableAndFilterAndSearch(pageable, "", ""))
             .thenReturn(assignmentPage);
     when(assignmentService.createAssignment(assignment, multipartFile))
             .thenReturn(assignmentWithFile);
@@ -243,17 +243,30 @@ public class AssignmentControllerTest {
   }
 
   @Test
-  public void testFindAllAssignmentWithPagingParameters() throws Exception {
+  public void testFindAllAssignmentWithNoPagingParameters() throws Exception {
     mockMvc.perform(
-            get("/api/scoring/assignments")
-                    .param("page", "1")
-                    .param("size", "10"))
+            get("/api/scoring/assignments"))
             .andExpect(status().isOk())
             .andExpect(content().json(
                     pagingResponseJacksonTester.write(PAGING_RESPONSE)
                             .getJson()));
 
-    verify(assignmentService).findAllByPageableAndFilterAndSearch(pageable, null, null);
+    verify(assignmentService).findAllByPageableAndFilterAndSearch(pageable, "", "");
+    verifyZeroInteractions(assignmentRequestMapper);
+  }
+
+  @Test
+  public void testFindAllAssignmentWithPagingParameters() throws Exception {
+    mockMvc.perform(
+            get("/api/scoring/assignments")
+                .param("page", "1")
+                .param("size", "10"))
+            .andExpect(status().isOk())
+            .andExpect(content().json(
+                    pagingResponseJacksonTester.write(PAGING_RESPONSE)
+                            .getJson()));
+
+    verify(assignmentService).findAllByPageableAndFilterAndSearch(pageable, "", "");
     verifyZeroInteractions(assignmentRequestMapper);
   }
 }

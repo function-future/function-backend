@@ -41,10 +41,6 @@ public class AssignmentServiceImpl implements AssignmentService {
    */
   @Override
   public Page<Assignment> findAllByPageableAndFilterAndSearch(Pageable pageable, String filter, String search) {
-    filter = Optional.ofNullable(filter)
-            .orElse("");
-    search = Optional.ofNullable(search)
-            .orElse("");
     //TODO using filter and search to find the asssignment page
     return assignmentRepository.findAll(pageable);
   }
@@ -82,20 +78,20 @@ public class AssignmentServiceImpl implements AssignmentService {
   /**
    * Used to store Multipart File by using FileService which sent with Assignment object
    *
-   * @param request (Assignment Object)
+   * @param assignment (Assignment Object)
    * @param file    (MultipartFile Object)
    * @return Assignment with / without the saved file
    */
-  private Assignment storeAssignmentFile(Assignment request, MultipartFile file) {
+  private Assignment storeAssignmentFile(Assignment assignment, MultipartFile file) {
     //TODO uncomment when file service is ready
     return Optional.ofNullable(file)
 //            .map(val -> fileService.storeFile(val, FileOrigin.ASSIGNMENT))
 //            .map(val -> fileService.getFile(val.getId()))
             .map(val -> {
 //              request.setFile(val);
-              return request;
+              return assignment;
             })
-            .orElse(request);
+            .orElse(assignment);
   }
 
   /**

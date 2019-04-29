@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.NotBlank;
+import org.hibernate.validator.constraints.NotEmpty;
 
 /**
  * Represent the assignment request in the web as AssignmentWebRequest
@@ -18,7 +19,6 @@ import org.hibernate.validator.constraints.NotBlank;
 @AllArgsConstructor
 public class AssignmentWebRequest {
 
-  @JsonInclude(JsonInclude.Include.NON_NULL)
   private String id;
 
   @NotBlank(message = "NotBlank")
@@ -33,5 +33,6 @@ public class AssignmentWebRequest {
   @NotBlank(message = "NotBlank")
   private String question;
 
+  @NotEmpty
   private List<Long> batch;
 }

@@ -26,7 +26,6 @@ import org.springframework.mock.web.MockMultipartFile;
 import static com.googlecode.catchexception.CatchException.catchException;
 import static com.googlecode.catchexception.CatchException.caughtException;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -113,7 +112,7 @@ public class AssignmentServiceImplTest {
     assertThat(result).isNotNull();
     assertThat(result.getContent().size()).isEqualTo(1);
     assertThat(result.getContent()).isEqualTo(assignmentList);
-    verify(assignmentRepository).findAll(eq(pageable));
+    verify(assignmentRepository).findAll(pageable);
   }
 
   @Test
@@ -121,7 +120,7 @@ public class AssignmentServiceImplTest {
     Assignment result = assignmentService.findById(assignment.getId());
     assertThat(result).isNotNull();
     assertThat(result).isEqualTo(assignment);
-    verify(assignmentRepository).findByIdAndDeletedFalse(eq(assignment.getId()));
+    verify(assignmentRepository).findByIdAndDeletedFalse(assignment.getId());
   }
 
   @Test
@@ -135,9 +134,9 @@ public class AssignmentServiceImplTest {
   @Test
   public void testDeleteByIdSuccess() {
     assignmentService.deleteById(assignment.getId());
-    verify(assignmentRepository).findByIdAndDeletedFalse(eq(assignment.getId()));
+    verify(assignmentRepository).findByIdAndDeletedFalse(assignment.getId());
     assignment.setDeleted(true);
-    verify(assignmentRepository).save(eq(assignment));
+    verify(assignmentRepository).save(assignment);
   }
 
   @Test
@@ -147,7 +146,7 @@ public class AssignmentServiceImplTest {
     assertThat(actual).isEqualTo(assignment);
 //    verify(fileService).getFile(eq(FILE_ID));
 //    verify(fileService).storeFile(multipartFile, FileOrigin.ASSIGNMENT);
-    verify(assignmentRepository).save(eq(assignment));
+    verify(assignmentRepository).save(assignment);
   }
 
   @Test
@@ -155,7 +154,7 @@ public class AssignmentServiceImplTest {
     Assignment actual = assignmentService.createAssignment(assignment, null);
     assertThat(actual.getFile()).isEqualTo(null);
     assertThat(actual).isEqualTo(assignment);
-    verify(assignmentRepository).save(eq(assignment));
+    verify(assignmentRepository).save(assignment);
   }
 
   @Test
@@ -169,8 +168,8 @@ public class AssignmentServiceImplTest {
     assertThat(actual).isEqualTo(assignment);
 //    verify(fileService).getFile(eq(FILE_ID));
 //    verify(fileService).storeFile(multipartFile, FileOrigin.ASSIGNMENT);
-    verify(assignmentRepository).save(eq(assignment));
-    verify(assignmentRepository).findByIdAndDeletedFalse(eq(assignmentWithFile.getId()));
+    verify(assignmentRepository).save(assignment);
+    verify(assignmentRepository).findByIdAndDeletedFalse(assignmentWithFile.getId());
   }
 
   @Test
@@ -178,7 +177,7 @@ public class AssignmentServiceImplTest {
     Assignment actual = assignmentService.updateAssignment(assignment, null);
     assertThat(actual.getFile()).isEqualTo(null);
     assertThat(actual).isEqualTo(assignment);
-    verify(assignmentRepository).save(eq(assignment));
-    verify(assignmentRepository).findByIdAndDeletedFalse(eq(assignment.getId()));
+    verify(assignmentRepository).save(assignment);
+    verify(assignmentRepository).findByIdAndDeletedFalse(assignment.getId());
   }
 }

@@ -24,4 +24,6 @@ public class AssignmentWebResponse {
 
   private String question;
 
+  //TODO add file, batch, and rooms later
+
 }
