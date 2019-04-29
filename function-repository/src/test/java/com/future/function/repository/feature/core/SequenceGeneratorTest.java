@@ -17,40 +17,40 @@ import static org.assertj.core.api.Assertions.assertThat;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = TestApplication.class)
 public class SequenceGeneratorTest {
-  
+
   private static final String SEQUENCE_NAME = "test-sequence";
-  
+
   private static final long SEQUENCE_NUMBER = 2;
-  
+
   @Autowired
   private MongoOperations mongoOperations;
-  
+
   @Autowired
   private SequenceGenerator sequenceGenerator;
-  
+
   @Before
   public void setUp() {
-    
+
     Sequence sequence = Sequence.builder()
-      .id(SEQUENCE_NAME)
-      .sequenceNumber(SEQUENCE_NUMBER)
-      .build();
-    
+            .id(SEQUENCE_NAME)
+            .sequenceNumber(SEQUENCE_NUMBER)
+            .build();
+
     mongoOperations.save(sequence, DocumentName.SEQUENCE);
   }
-  
+
   @After
   public void tearDown() {
-    
+
     mongoOperations.dropCollection(DocumentName.SEQUENCE);
   }
-  
+
   @Test
   public void testGivenMethodCallToIncrementSequenceByIncrementingSequenceReturnIncrementedResult() {
-    
+
     long incrementedSequence = sequenceGenerator.increment(SEQUENCE_NAME);
-    
+
     assertThat(incrementedSequence).isEqualTo(SEQUENCE_NUMBER + 1);
   }
-  
+
 }

@@ -20,6 +20,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -43,20 +44,20 @@ public class BatchControllerTest {
   private static final Batch SECOND_BATCH = Batch.builder()
     .number(SECOND_BATCH_NUMBER)
     .build();
-  
+
   private static final DataResponse<List<Long>> BATCHES_DATA_RESPONSE =
     BatchResponseMapper.toBatchesDataResponse(
       Arrays.asList(FIRST_BATCH, SECOND_BATCH));
-  
+
   private static final DataResponse<BatchWebResponse>
     FIRST_BATCH_DATA_RESPONSE = BatchResponseMapper.toBatchDataResponse(
     FIRST_BATCH);
-  
+
   private JacksonTester<DataResponse<List<Long>>> listDataResponseJacksonTester;
-  
+
   private JacksonTester<DataResponse<BatchWebResponse>>
     dataResponseJacksonTester;
-  
+
   @Autowired
   private MockMvc mockMvc;
   
@@ -65,7 +66,7 @@ public class BatchControllerTest {
   
   @Before
   public void setUp() {
-  
+
     JacksonTester.initFields(this, new ObjectMapper());
   }
   
@@ -81,13 +82,13 @@ public class BatchControllerTest {
   
     List<Batch> batches = Arrays.asList(FIRST_BATCH, SECOND_BATCH);
     given(batchService.getBatches()).willReturn(batches);
-  
+
     mockMvc.perform(get("/api/core/batches"))
       .andExpect(status().isOk())
       .andExpect(content().json(
         listDataResponseJacksonTester.write(BATCHES_DATA_RESPONSE)
           .getJson()));
-    
+
     verify(batchService).getBatches();
   }
   
@@ -96,13 +97,13 @@ public class BatchControllerTest {
     throws Exception {
     
     given(batchService.createBatch()).willReturn(FIRST_BATCH);
-  
+
     mockMvc.perform(post("/api/core/batches"))
       .andExpect(status().isCreated())
       .andExpect(content().json(
         dataResponseJacksonTester.write(FIRST_BATCH_DATA_RESPONSE)
           .getJson()));
-    
+
     verify(batchService).createBatch();
   }
   
