@@ -1,5 +1,6 @@
 package com.future.function.web.controller.core;
 
+import com.future.function.model.entity.feature.core.Course;
 import com.future.function.service.api.feature.core.shared.SharedCourseService;
 import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
@@ -11,6 +12,7 @@ import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.feature.core.CourseWebResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -63,8 +65,7 @@ public class CourseController {
       int page,
     @RequestParam(defaultValue = "5")
       int size,
-    @RequestParam(required = false,
-                  defaultValue = "1")
+    @RequestParam
       long batch
   ) {
     
@@ -96,10 +97,8 @@ public class CourseController {
   /**
    * Creates new course in database.
    *
-   * @param batch Batch number of current user (student) OR selected batch
-   *              number (admin/judge/mentor).
-   * @param data  Data of new course in JSON format.
-   * @param file  File of the new course.
+   * @param data Data of new course in JSON format.
+   * @param file File of the new course.
    *
    * @return {@code DataResponse<CourseWebResponse>} - The created
    * course data, wrapped in
@@ -110,28 +109,23 @@ public class CourseController {
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
                produces = MediaType.APPLICATION_JSON_VALUE)
   public DataResponse<CourseWebResponse> createCourse(
-    @RequestParam(required = false,
-                  defaultValue = "1")
-      long batch,
     @RequestParam
       String data,
     @RequestParam(required = false)
       MultipartFile file
   ) {
-    
-    return CourseResponseMapper.toCourseDataResponse(HttpStatus.CREATED,
-                                                     sharedCourseService.createCourse(
-                                                       courseRequestMapper.toCourse(
-                                                         data), file, batch)
-    );
+  
+    Pair<Course, List<Long>> pair = courseRequestMapper.toCourseAndBatchNumbers(
+      data);
+    return CourseResponseMapper.toCourseDataResponse(
+      HttpStatus.CREATED, sharedCourseService.createCourse(
+        pair.getFirst(), file, pair.getSecond()));
   }
   
   /**
    * Updates existing course in database.
    *
    * @param courseId Id of to-be-updated course.
-   * @param batch    Batch number of current user (student) OR selected batch
-   *                 number (admin/judge/mentor).
    * @param data     Data of existing course in JSON format.
    * @param file     New file of the existing course.
    *
@@ -147,18 +141,18 @@ public class CourseController {
   public DataResponse<CourseWebResponse> updateCourse(
     @PathVariable
       String courseId,
-    @RequestParam(required = false,
-                  defaultValue = "1")
-      long batch,
     @RequestParam
       String data,
     @RequestParam(required = false)
       MultipartFile file
   ) {
   
+    Pair<Course, List<Long>> pair = courseRequestMapper.toCourseAndBatchNumbers(
+      courseId, data);
     return CourseResponseMapper.toCourseDataResponse(
-      sharedCourseService.updateCourse(
-        courseRequestMapper.toCourse(courseId, data), file, batch));
+      sharedCourseService.updateCourse(pair.getFirst(), file,
+                                       pair.getSecond()
+      ));
   }
   
   /**
@@ -179,8 +173,7 @@ public class CourseController {
   public DataResponse<CourseWebResponse> getCourse(
     @PathVariable
       String courseId,
-    @RequestParam(required = false,
-                  defaultValue = "1")
+    @RequestParam
       long batch
   ) {
     
@@ -192,8 +185,7 @@ public class CourseController {
    * Deletes course from database.
    *
    * @param courseId Id of to be deleted course.
-   * @param batch    Batch number of current user (student) OR selected batch
-   *                 number (admin/judge/mentor).
+   * @param batch    Batch number of of selected course.
    *
    * @return {@code BaseResponse} - Indicating successful deletion.
    */
@@ -203,8 +195,7 @@ public class CourseController {
   public BaseResponse deleteCourse(
     @PathVariable
       String courseId,
-    @RequestParam(required = false,
-                  defaultValue = "1")
+    @RequestParam
       long batch
   ) {
     

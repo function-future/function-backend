@@ -92,7 +92,7 @@ public class SharedCourseRepositoryTest {
   }
   
   @Test
-  public void testGivenBatchByFindingByCourseIdAndBatchReturnPageOfSharedCourses() {
+  public void testGivenBatchByFindingByBatchReturnPageOfSharedCourses() {
     
     String courseId = "course-id-2";
     courseRepository.save(buildCourse(courseId));
@@ -118,21 +118,43 @@ public class SharedCourseRepositoryTest {
   }
   
   @Test
-  public void testGivenBatchByFindingByCourseIdAndBatchReturnStreamOfSharedCourses() {
-    
+  public void testGivenBatchByFindingByBatchReturnStreamOfSharedCourses() {
+  
     String courseId = "course-id-3";
     courseRepository.save(buildCourse(courseId));
-    
+  
     long number = 3L;
+    batchRepository.save(new Batch(number));
+  
+    SharedCourse sharedCourse = buildSharedCourse(courseId, number);
+    sharedCourseRepository.save(sharedCourse);
+  
+    Batch foundBatch = getBatch(number);
+  
+    Stream<SharedCourse> foundSharedCourseStream =
+      sharedCourseRepository.findAllByBatch(foundBatch);
+  
+    Stream<SharedCourse> sharedCourseStream = Stream.of(sharedCourse);
+  
+    assertThat(foundSharedCourseStream).isNotEqualTo(Stream.empty());
+    assertThat(foundSharedCourseStream.collect(Collectors.toList())).isEqualTo(
+      sharedCourseStream.collect(Collectors.toList()));
+  }
+  
+  @Test
+  public void testGivenCourseIdByFindingByCourseIdReturnStreamOfSharedCourses() {
+    
+    String courseId = "course-id-4";
+    courseRepository.save(buildCourse(courseId));
+    
+    long number = 4L;
     batchRepository.save(new Batch(number));
     
     SharedCourse sharedCourse = buildSharedCourse(courseId, number);
     sharedCourseRepository.save(sharedCourse);
     
-    Batch foundBatch = getBatch(number);
-    
     Stream<SharedCourse> foundSharedCourseStream =
-      sharedCourseRepository.findAllByBatch(foundBatch);
+      sharedCourseRepository.findAllByCourseId(courseId);
     
     Stream<SharedCourse> sharedCourseStream = Stream.of(sharedCourse);
     

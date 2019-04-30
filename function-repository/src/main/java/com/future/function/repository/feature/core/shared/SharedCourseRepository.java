@@ -53,4 +53,14 @@ public interface SharedCourseRepository
    */
   Stream<SharedCourse> findAllByBatch(Batch batch);
   
+  /**
+   * Finds shared courses based on {@code courseId} parameter.
+   *
+   * @param courseId Id of course of shared courses to be fetched.
+   *
+   * @return {@code Stream<SharedCourse>} - SharedCourse objects as stream,
+   * if any exists; otherwise returns {@link java.util.stream.Stream#empty()}.
+   */
+  Stream<SharedCourse> findAllByCourseId(String courseId);
+  
 }

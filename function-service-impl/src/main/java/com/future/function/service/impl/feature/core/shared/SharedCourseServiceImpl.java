@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -107,22 +108,32 @@ public class SharedCourseServiceImpl implements SharedCourseService {
   /**
    * {@inheritDoc}
    *
-   * @param course      Course data of new course.
-   * @param file        File to be attached to course. May be null.
-   * @param batchNumber Batch number of current user (obtained from session).
+   * @param course       Course data of new course.
+   * @param file         File to be attached to course. May be null.
+   * @param batchNumbers Batch numbers of the new course.
    *
    * @return {@code Course} - The course object of the saved data.
    */
   @Override
   public Course createCourse(
-    Course course, MultipartFile file, long batchNumber
+    Course course, MultipartFile file, List<Long> batchNumbers
   ) {
     
     return Optional.of(course)
       .map(c -> courseService.createCourse(c, file))
-      .map(c -> this.buildSharedCourse(c, batchNumber))
-      .map(this::saveSharedCourseAndGetCourse)
-      .orElseThrow(() -> new NotFoundException("Create Course Not Found"));
+      .map(c -> createSharedCourses(c, batchNumbers))
+      .map(this::saveSharedCoursesAndGetCourse)
+      .orElseGet(Course::new);
+  }
+  
+  private Pair<Course, List<SharedCourse>> createSharedCourses(
+    Course course, List<Long> batchNumbers
+  ) {
+    
+    List<SharedCourse> sharedCourses = batchNumbers.stream()
+      .map(number -> this.buildSharedCourse(course, number))
+      .collect(Collectors.toList());
+    return Pair.of(course, sharedCourses);
   }
   
   private SharedCourse buildSharedCourse(Course course, long batchNumber) {
@@ -133,52 +144,79 @@ public class SharedCourseServiceImpl implements SharedCourseService {
       .build();
   }
   
-  private Course saveSharedCourseAndGetCourse(SharedCourse sharedCourse) {
-    
-    SharedCourse savedSharedCourse = sharedCourseRepository.save(sharedCourse);
-    return savedSharedCourse.getCourse();
-  }
-  
   /**
    * {@inheritDoc}
    *
-   * @param course      Course data of new course.
-   * @param file        File to be attached to course. May be null.
-   * @param batchNumber Batch number of current user (obtained from session).
+   * @param course       Course data of new course.
+   * @param file         File to be attached to course. May be null.
+   * @param batchNumbers Batch numbers of the new course.
    *
    * @return {@code Course} - The course object of the saved data.
    */
   @Override
   public Course updateCourse(
-    Course course, MultipartFile file, long batchNumber
+    Course course, MultipartFile file, List<Long> batchNumbers
   ) {
-    
-    return getSharedCourse(course.getId(), batchNumber).filter(
-      sharedCourse -> isBatchNumberMatch(sharedCourse.getBatch(), batchNumber))
-      .map(sharedCourse -> this.updateSharedCourseBatchAndSaveSharedCourse(
-        sharedCourse, batchNumber))
+  
+    Optional.of(course)
       .map(c -> courseService.updateCourse(c, file))
-      .orElseThrow(() -> new NotFoundException("Update Course Not Found"));
+      .map(c -> Pair.of(c, this.getBatchesData(c.getId(), batchNumbers)))
+      .ifPresent(this::updateSharedCourses);
+  
+    return course;
   }
   
-  private boolean isBatchNumberMatch(Batch batch, long batchNumber) {
-    
-    return batch.getNumber() == batchNumber;
-  }
-  
-  private Course updateSharedCourseBatchAndSaveSharedCourse(
-    SharedCourse sharedCourse, long batchNumber
+  private void updateSharedCourses(
+    Pair<Course, Pair<List<Batch>, List<Long>>> pair
   ) {
     
-    sharedCourse.setBatch(batchService.getBatch(batchNumber));
-    return this.saveSharedCourseAndGetCourse(sharedCourse);
+    Course course = pair.getFirst();
+    Pair<List<Batch>, List<Long>> batchDataPair = pair.getSecond();
+    
+    this.deleteSharedCoursesByBatch(course.getId(), batchDataPair.getFirst());
+    
+    this.saveSharedCoursesAndGetCourse(
+      this.createSharedCourses(course, batchDataPair.getSecond()));
+  }
+  
+  private void deleteSharedCoursesByBatch(
+    String courseId, List<Batch> batches
+  ) {
+    
+    batches.forEach(
+      batch -> sharedCourseRepository.findByCourseIdAndBatch(courseId, batch)
+        .ifPresent(sharedCourseRepository::delete));
+  }
+  
+  private Pair<List<Batch>, List<Long>> getBatchesData(
+    String courseId, List<Long> batchNumbers
+  ) {
+    
+    List<Long> batchNumbersInDatabase =
+      sharedCourseRepository.findAllByCourseId(courseId)
+        .map(SharedCourse::getBatch)
+        .map(Batch::getNumber)
+        .collect(Collectors.toList());
+    
+    List<Batch> batchesToDeleteFromSharedCourse =
+      batchNumbersInDatabase.stream()
+        .filter(number -> !batchNumbers.contains(number))
+        .map(batchService::getBatch)
+        .collect(Collectors.toList());
+    
+    List<Long> batchesToAddToSharedCourse = batchNumbers.stream()
+      .filter(number -> batchNumbersInDatabase.stream()
+        .noneMatch(n -> n.equals(number)))
+      .collect(Collectors.toList());
+    
+    return Pair.of(batchesToDeleteFromSharedCourse, batchesToAddToSharedCourse);
   }
   
   /**
    * {@inheritDoc}
    *
    * @param courseId    Id of course to be deleted.
-   * @param batchNumber Batch number of current user (obtained from session).
+   * @param batchNumber Batch number of selected course.
    */
   @Override
   public void deleteCourse(String courseId, long batchNumber) {
@@ -197,7 +235,11 @@ public class SharedCourseServiceImpl implements SharedCourseService {
   ) {
     
     sharedCourseRepository.delete(sharedCourse);
-    courseService.deleteCourse(courseId);
+  
+    Optional.of(courseId)
+      .map(sharedCourseRepository::findAllByCourseId)
+      .filter(stream -> stream.count() == 0)
+      .ifPresent(ignored -> courseService.deleteCourse(courseId));
   }
   
   /**
@@ -225,6 +267,14 @@ public class SharedCourseServiceImpl implements SharedCourseService {
   ) {
     
     return buildSharedCourse(sharedCourse.getCourse(), targetBatchNumber);
+  }
+  
+  private Course saveSharedCoursesAndGetCourse(
+    Pair<Course, List<SharedCourse>> pair
+  ) {
+    
+    sharedCourseRepository.save(pair.getSecond());
+    return pair.getFirst();
   }
   
 }

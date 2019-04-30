@@ -5,6 +5,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 /**
  * Service interface class for shared course logic operations declaration.
  */
@@ -35,32 +37,36 @@ public interface SharedCourseService {
   /**
    * Creates course object and saves any other data related to the course.
    *
-   * @param course      Course data of new course.
-   * @param file        File to be attached to course. May be null.
-   * @param batchNumber Batch number of current user (obtained from session).
+   * @param course       Course data of new course.
+   * @param file         File to be attached to course. May be null.
+   * @param batchNumbers Batch numbers of the new course.
    *
    * @return {@code Course} - The course object of the saved data.
    */
-  Course createCourse(Course course, MultipartFile file, long batchNumber);
+  Course createCourse(
+    Course course, MultipartFile file, List<Long> batchNumbers
+  );
   
   /**
    * Updates course object and saves any other data related to the
    * course. If not found, then throw
    * {@link com.future.function.common.exception.NotFoundException} exception.
    *
-   * @param course      Course data of new course.
-   * @param file        File to be attached to course. May be null.
-   * @param batchNumber Batch number of current user (obtained from session).
+   * @param course       Course data of new course.
+   * @param file         File to be attached to course. May be null.
+   * @param batchNumbers Batch numbers of the new course.
    *
    * @return {@code Course} - The course object of the saved data.
    */
-  Course updateCourse(Course course, MultipartFile file, long batchNumber);
+  Course updateCourse(
+    Course course, MultipartFile file, List<Long> batchNumbers
+  );
   
   /**
    * Deletes course object from database.
    *
    * @param courseId    Id of course to be deleted.
-   * @param batchNumber Batch number of current user (obtained from session).
+   * @param batchNumber Batch number of selected course.
    */
   void deleteCourse(String courseId, long batchNumber);
   
