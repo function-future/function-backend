@@ -41,7 +41,7 @@ public class CourseServiceImpl implements CourseService {
     return Optional.of(course)
       .map(courseRepository::save)
       .map(c -> this.getCourse(c.getId()))
-      .orElseGet(() -> this.getCourse(course.getId()));
+      .orElseGet(() -> this.getCourse(null));
   }
   
   private Course getCourse(String courseId) {
@@ -74,7 +74,8 @@ public class CourseServiceImpl implements CourseService {
     Course course, Course foundCourse
   ) {
     
-    BeanUtils.copyProperties(course, foundCourse, FieldName.BaseEntity.CREATED_BY,
+    BeanUtils.copyProperties(course, foundCourse,
+                             FieldName.BaseEntity.CREATED_BY,
                              FieldName.BaseEntity.CREATED_AT,
                              FieldName.BaseEntity.VERSION
     );

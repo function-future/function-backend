@@ -10,8 +10,6 @@ import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 
 /**
  * Mapper class for incoming request for course feature.
@@ -49,55 +47,6 @@ public class CourseRequestMapper {
   }
   
   /**
-   * Converts JSON data to {@code Course} object.
-   *
-   * @param data JSON data (in form of String) to be converted.
-   *
-   * @return {@code Course} - Converted course object.
-   *
-   * @deprecated
-   */
-  public Course toCourse(String data) {
-    
-    return toCourse(null, data);
-  }
-  
-  /**
-   * Converts JSON data to {@code Course} object. This method is used for
-   * update course purposes.
-   *
-   * @param courseId Id of course to be updated.
-   * @param data     JSON data (in form of String) to be converted.
-   *
-   * @return {@code Course} - Converted course object.
-   *
-   * @deprecated
-   */
-  public Course toCourse(String courseId, String data) {
-  
-    return toValidatedCourse(
-      courseId, requestMapper.toWebRequestObject(data, CourseWebRequest.class));
-  }
-  
-  private Course toValidatedCourse(String courseId, CourseWebRequest request) {
-    
-    validator.validate(request);
-    
-    return Course.builder()
-      .id(getOrNewCourseId(courseId))
-      .title(request.getCourseTitle())
-      .description(request.getCourseDescription())
-      .build();
-  }
-  
-  private String getOrNewCourseId(String courseId) {
-    
-    return Optional.ofNullable(courseId)
-      .orElseGet(() -> UUID.randomUUID()
-        .toString());
-  }
-  
-  /**
    * Converts JSON data to {@code Pair} of {@code Course} and {@code List<Long>}
    * object.
    *
@@ -123,8 +72,10 @@ public class CourseRequestMapper {
     String courseId, String data
   ) {
     
-    return toValidatedCourseAndBatchNumbers(
-      courseId, requestMapper.toWebRequestObject(data, CourseWebRequest.class));
+    return toValidatedCourseAndBatchNumbers(courseId,
+                                            requestMapper.toWebRequestObject(
+                                              data, CourseWebRequest.class)
+    );
   }
   
   private Pair<Course, List<Long>> toValidatedCourseAndBatchNumbers(
@@ -134,10 +85,13 @@ public class CourseRequestMapper {
     validator.validate(request);
     
     Course course = Course.builder()
-      .id(getOrNewCourseId(courseId))
       .title(request.getCourseTitle())
       .description(request.getCourseDescription())
       .build();
+    
+    if (courseId != null) {
+      course.setId(courseId);
+    }
     
     return Pair.of(course, request.getBatchNumbers());
   }

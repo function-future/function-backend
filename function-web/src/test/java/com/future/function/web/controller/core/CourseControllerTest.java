@@ -22,6 +22,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -38,6 +39,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -67,6 +69,10 @@ public class CourseControllerTest extends JacksonTestHelper {
   private static final String SHARED_COURSE_REQUEST_DATA =
     "{\"originBatch" + "\":1,\"targetBatch\":2}";
   
+  private static final String COURSE_REQUEST_DATA =
+    "{\"courseTitle" + "\":\"Course Title\"," + "\"courseDescription" +
+    "\":\"Course Description\"," + "\"batchNumbers\":[1]}";
+  
   private static final Course COURSE = Course.builder()
     .id(ID)
     .title(TITLE)
@@ -84,6 +90,10 @@ public class CourseControllerTest extends JacksonTestHelper {
   private static final DataResponse<CourseWebResponse>
     RETRIEVED_COURSE_WEB_RESPONSE = CourseResponseMapper.toCourseDataResponse(
     COURSE);
+  
+  private static final DataResponse<CourseWebResponse>
+    CREATED_COURSE_WEB_RESPONSE = CourseResponseMapper.toCourseDataResponse(
+    HttpStatus.CREATED, COURSE);
   
   @Autowired
   private MockMvc mockMvc;
@@ -110,7 +120,10 @@ public class CourseControllerTest extends JacksonTestHelper {
   public void testGivenCourseIdAndBatchNumberByDeletingCourseReturnBaseResponseObject()
     throws Exception {
     
-    mockMvc.perform(delete("/api/core/courses/" + ID))
+    mockMvc.perform(delete("/api/core/courses/" + ID).param("batch",
+                                                            String.valueOf(
+                                                              BATCH_NUMBER_1)
+    ))
       .andExpect(status().isOk())
       .andExpect(content().json(
         baseResponseJacksonTester.write(OK_BASE_RESPONSE)
@@ -175,6 +188,61 @@ public class CourseControllerTest extends JacksonTestHelper {
           .getJson()));
     
     verify(sharedCourseService).getCourses(PAGEABLE, BATCH_NUMBER_1);
+  }
+  
+  @Test
+  public void testGivenCourseDataAndFileByCreatingCourseReturnDataResponseObject()
+    throws Exception {
+    
+    List<Long> batchNumbers = Collections.singletonList(BATCH_NUMBER_1);
+    Pair<Course, List<Long>> pair = Pair.of(COURSE, batchNumbers);
+    
+    when(courseRequestMapper.toCourseAndBatchNumbers(
+      COURSE_REQUEST_DATA)).thenReturn(pair);
+    when(
+      sharedCourseService.createCourse(COURSE, null, batchNumbers)).thenReturn(
+      COURSE);
+    
+    mockMvc.perform(post("/api/core/courses").contentType(
+      MediaType.MULTIPART_FORM_DATA_VALUE)
+                      .param("data", COURSE_REQUEST_DATA)
+                      .param("file", ""))
+      .andExpect(status().isCreated())
+      .andExpect(content().json(
+        dataResponseJacksonTester.write(CREATED_COURSE_WEB_RESPONSE)
+          .getJson()));
+    
+    verify(courseRequestMapper).toCourseAndBatchNumbers(COURSE_REQUEST_DATA);
+    verify(sharedCourseService).createCourse(COURSE, null, batchNumbers);
+  }
+  
+  @Test
+  public void testGivenCourseIdAndDataAndFileByUpdatingCourseReturnDataResponseObject()
+    throws Exception {
+    
+    List<Long> batchNumbers = Arrays.asList(BATCH_NUMBER_1, BATCH_NUMBER_2);
+    Pair<Course, List<Long>> pair = Pair.of(COURSE, batchNumbers);
+    
+    when(courseRequestMapper.toCourseAndBatchNumbers(ID,
+                                                     COURSE_REQUEST_DATA
+    )).thenReturn(pair);
+    when(
+      sharedCourseService.updateCourse(COURSE, null, batchNumbers)).thenReturn(
+      COURSE);
+    
+    mockMvc.perform(put("/api/core/courses/" + ID).contentType(
+      MediaType.MULTIPART_FORM_DATA_VALUE)
+                      .param("data", COURSE_REQUEST_DATA)
+                      .param("file", ""))
+      .andExpect(status().isOk())
+      .andExpect(content().json(
+        dataResponseJacksonTester.write(RETRIEVED_COURSE_WEB_RESPONSE)
+          .getJson()));
+    
+    verify(courseRequestMapper).toCourseAndBatchNumbers(ID,
+                                                        COURSE_REQUEST_DATA
+    );
+    verify(sharedCourseService).updateCourse(COURSE, null, batchNumbers);
   }
   
 }

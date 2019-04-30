@@ -81,21 +81,6 @@ public class CourseRequestMapperTest {
     verifyNoMoreInteractions(requestMapper, validator);
   }
   
-  // TODO Remove when Pair is used
-  @Test
-  public void testGivenJsonDataAsStringByParsingToCourseClassReturnCourseObject() {
-    
-    Course parsedCourse = courseRequestMapper.toCourse(JSON);
-    
-    assertThat(parsedCourse).isNotNull();
-    assertThat(parsedCourse.getId()).isNotBlank();
-    assertThat(parsedCourse.getTitle()).isEqualTo(TITLE);
-    assertThat(parsedCourse.getDescription()).isEqualTo(DESCRIPTION);
-    
-    verify(requestMapper).toWebRequestObject(JSON, CourseWebRequest.class);
-    verify(validator).validate(COURSE_WEB_REQUEST);
-  }
-  
   @Test
   public void testGivenJsonDataAsStringByParsingToCourseClassReturnPairObject() {
     
@@ -111,19 +96,6 @@ public class CourseRequestMapperTest {
                  .getDescription()).isEqualTo(DESCRIPTION);
     assertThat(parsedData.getSecond()).isEqualTo(
       Collections.singletonList(ONE));
-    
-    verify(requestMapper).toWebRequestObject(JSON, CourseWebRequest.class);
-    verify(validator).validate(COURSE_WEB_REQUEST);
-  }
-  
-  // TODO Remove when Pair is used
-  @Test
-  public void testGivenIdAndJsonDataAsStringByParsingToCourseClassReturnCourseObject() {
-    
-    Course parsedCourse = courseRequestMapper.toCourse(ID, JSON);
-    
-    assertThat(parsedCourse).isNotNull();
-    assertThat(parsedCourse).isEqualTo(COURSE);
     
     verify(requestMapper).toWebRequestObject(JSON, CourseWebRequest.class);
     verify(validator).validate(COURSE_WEB_REQUEST);
