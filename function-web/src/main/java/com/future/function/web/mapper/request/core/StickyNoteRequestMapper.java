@@ -2,7 +2,6 @@ package com.future.function.web.mapper.request.core;
 
 import com.future.function.model.entity.feature.core.StickyNote;
 import com.future.function.validation.RequestValidator;
-import com.future.function.web.mapper.request.WebRequestMapper;
 import com.future.function.web.model.request.core.StickyNoteWebRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -13,30 +12,26 @@ import org.springframework.stereotype.Component;
 @Component
 public class StickyNoteRequestMapper {
   
-  private final WebRequestMapper requestMapper;
-  
   private final RequestValidator validator;
   
   @Autowired
   public StickyNoteRequestMapper(
-    WebRequestMapper requestMapper, RequestValidator validator
+    RequestValidator validator
   ) {
     
-    this.requestMapper = requestMapper;
     this.validator = validator;
   }
   
   /**
-   * Converts JSON data to {@code StickyNote} object.
+   * Converts Jackson-mapped JSON data to {@code StickyNote} object.
    *
-   * @param data JSON data (in form of String) to be converted.
+   * @param request JSON data (in form of StickyNoteWebRequest) to be converted.
    *
    * @return {@code StickyNote} - Converted sticky note object.
    */
-  public StickyNote toStickyNote(String data) {
-    
-    return toValidatedStickyNote(
-      requestMapper.toWebRequestObject(data, StickyNoteWebRequest.class));
+  public StickyNote toStickyNote(StickyNoteWebRequest request) {
+  
+    return toValidatedStickyNote(request);
   }
   
   private StickyNote toValidatedStickyNote(StickyNoteWebRequest request) {
