@@ -56,19 +56,9 @@ public class SharedCourseServiceImpl implements SharedCourseService {
   @Override
   public Course getCourse(String courseId, long batchNumber) {
     
-    return getSharedCourse(courseId, batchNumber).map(SharedCourse::getCourse)
+    return this.getSharedCourseOptional(courseId, batchNumber)
+      .map(SharedCourse::getCourse)
       .orElseThrow(() -> new NotFoundException("Get Course Not Found"));
-  }
-  
-  private Optional<SharedCourse> getSharedCourse(
-    String courseId, long batchNumber
-  ) {
-    
-    return Optional.of(batchNumber)
-      .map(batchService::getBatch)
-      .flatMap(batch -> sharedCourseRepository.findByCourseIdAndBatch(courseId,
-                                                                      batch
-      ));
   }
   
   /**
@@ -85,15 +75,16 @@ public class SharedCourseServiceImpl implements SharedCourseService {
     return Optional.of(batchNumber)
       .map(batchService::getBatch)
       .map(batch -> sharedCourseRepository.findAllByBatch(batch, pageable))
-      .map(sharedCourses -> toPageCourse(sharedCourses, pageable))
+      .map(sharedCourses -> toCoursePage(sharedCourses, pageable))
       .orElseThrow(() -> new NotFoundException("Get Courses Not Found"));
   }
   
-  private Page<Course> toPageCourse(
+  private Page<Course> toCoursePage(
     Page<SharedCourse> sharedCourses, Pageable pageable
   ) {
     
     List<Course> courses = toCourseList(sharedCourses);
+    
     return new PageImpl<>(courses, pageable, sharedCourses.getTotalElements());
   }
   
@@ -123,7 +114,8 @@ public class SharedCourseServiceImpl implements SharedCourseService {
       .map(c -> courseService.createCourse(c, file))
       .map(c -> createSharedCourses(c, batchNumbers))
       .map(this::saveSharedCoursesAndGetCourse)
-      .orElseGet(Course::new);
+      .orElseThrow(() -> new UnsupportedOperationException(
+        "Create Shared Course or Course Failed"));
   }
   
   private Pair<Course, List<SharedCourse>> createSharedCourses(
@@ -133,6 +125,7 @@ public class SharedCourseServiceImpl implements SharedCourseService {
     List<SharedCourse> sharedCourses = batchNumbers.stream()
       .map(number -> this.buildSharedCourse(course, number))
       .collect(Collectors.toList());
+    
     return Pair.of(course, sharedCourses);
   }
   
@@ -157,38 +150,16 @@ public class SharedCourseServiceImpl implements SharedCourseService {
   public Course updateCourse(
     Course course, MultipartFile file, List<Long> batchNumbers
   ) {
-  
-    Optional.of(course)
+    
+    return Optional.of(course)
       .map(c -> courseService.updateCourse(c, file))
-      .map(c -> Pair.of(c, this.getBatchesData(c.getId(), batchNumbers)))
-      .ifPresent(this::updateSharedCourses);
-  
-    return course;
+      .map(c -> Pair.of(c, this.getBatchesDataAsPair(c.getId(), batchNumbers)))
+      .map(this::updateSharedCoursesAndGetCourse)
+      .orElseThrow(() -> new UnsupportedOperationException(
+        "Update Shared Course or Course Failed"));
   }
   
-  private void updateSharedCourses(
-    Pair<Course, Pair<List<Batch>, List<Long>>> pair
-  ) {
-    
-    Course course = pair.getFirst();
-    Pair<List<Batch>, List<Long>> batchDataPair = pair.getSecond();
-    
-    this.deleteSharedCoursesByBatch(course.getId(), batchDataPair.getFirst());
-    
-    this.saveSharedCoursesAndGetCourse(
-      this.createSharedCourses(course, batchDataPair.getSecond()));
-  }
-  
-  private void deleteSharedCoursesByBatch(
-    String courseId, List<Batch> batches
-  ) {
-    
-    batches.forEach(
-      batch -> sharedCourseRepository.findByCourseIdAndBatch(courseId, batch)
-        .ifPresent(sharedCourseRepository::delete));
-  }
-  
-  private Pair<List<Batch>, List<Long>> getBatchesData(
+  private Pair<List<Batch>, List<Long>> getBatchesDataAsPair(
     String courseId, List<Long> batchNumbers
   ) {
     
@@ -198,18 +169,17 @@ public class SharedCourseServiceImpl implements SharedCourseService {
         .map(Batch::getNumber)
         .collect(Collectors.toList());
     
-    List<Batch> batchesToDeleteFromSharedCourse =
-      batchNumbersInDatabase.stream()
-        .filter(number -> !batchNumbers.contains(number))
-        .map(batchService::getBatch)
-        .collect(Collectors.toList());
+    List<Batch> toDeleteFromSharedCourseRepo = batchNumbersInDatabase.stream()
+      .filter(number -> !batchNumbers.contains(number))
+      .map(batchService::getBatch)
+      .collect(Collectors.toList());
     
-    List<Long> batchesToAddToSharedCourse = batchNumbers.stream()
+    List<Long> toAddToSharedCourseRepo = batchNumbers.stream()
       .filter(number -> batchNumbersInDatabase.stream()
         .noneMatch(n -> n.equals(number)))
       .collect(Collectors.toList());
     
-    return Pair.of(batchesToDeleteFromSharedCourse, batchesToAddToSharedCourse);
+    return Pair.of(toDeleteFromSharedCourseRepo, toAddToSharedCourseRepo);
   }
   
   /**
@@ -221,11 +191,7 @@ public class SharedCourseServiceImpl implements SharedCourseService {
   @Override
   public void deleteCourse(String courseId, long batchNumber) {
     
-    Optional.ofNullable(courseId)
-      .map(id -> batchNumber)
-      .map(batchService::getBatch)
-      .flatMap(
-        batch -> sharedCourseRepository.findByCourseIdAndBatch(courseId, batch))
+    this.getSharedCourseOptional(courseId, batchNumber)
       .ifPresent(
         sharedCourse -> deleteSharedCourseAndCourse(sharedCourse, courseId));
   }
@@ -235,7 +201,12 @@ public class SharedCourseServiceImpl implements SharedCourseService {
   ) {
     
     sharedCourseRepository.delete(sharedCourse);
+    
+    deleteCourseIfNoSharingFound(courseId);
+  }
   
+  private void deleteCourseIfNoSharingFound(String courseId) {
+    
     Optional.of(courseId)
       .map(sharedCourseRepository::findAllByCourseId)
       .filter(stream -> stream.count() == 0)
@@ -269,11 +240,45 @@ public class SharedCourseServiceImpl implements SharedCourseService {
     return buildSharedCourse(sharedCourse.getCourse(), targetBatchNumber);
   }
   
+  private Optional<SharedCourse> getSharedCourseOptional(
+    String courseId, long batchNumber
+  ) {
+    
+    return Optional.of(batchNumber)
+      .map(batchService::getBatch)
+      .flatMap(batch -> sharedCourseRepository.findByCourseIdAndBatch(courseId,
+                                                                      batch
+      ));
+  }
+  
+  private Course updateSharedCoursesAndGetCourse(
+    Pair<Course, Pair<List<Batch>, List<Long>>> pair
+  ) {
+    
+    Course course = pair.getFirst();
+    Pair<List<Batch>, List<Long>> batchDataPair = pair.getSecond();
+    
+    this.deleteSharedCoursesByBatches(course.getId(), batchDataPair.getFirst());
+    
+    return this.saveSharedCoursesAndGetCourse(
+      this.createSharedCourses(course, batchDataPair.getSecond()));
+  }
+  
+  private void deleteSharedCoursesByBatches(
+    String courseId, List<Batch> batches
+  ) {
+    
+    batches.forEach(
+      batch -> sharedCourseRepository.findByCourseIdAndBatch(courseId, batch)
+        .ifPresent(sharedCourseRepository::delete));
+  }
+  
   private Course saveSharedCoursesAndGetCourse(
     Pair<Course, List<SharedCourse>> pair
   ) {
     
     sharedCourseRepository.save(pair.getSecond());
+    
     return pair.getFirst();
   }
   
