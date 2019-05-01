@@ -93,4 +93,24 @@ public class ExceptionController {
     return ResponseHelper.toBaseResponse(HttpStatus.NOT_FOUND);
   }
   
+  /**
+   * Handles {@link UnsupportedOperationException} exception thrown from
+   * service.
+   *
+   * @param e Exception that is thrown.
+   *
+   * @return {@link com.future.function.web.model.response.base.BaseResponse}
+   * - Response showing 'unsupported operation' message.
+   */
+  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+  @ExceptionHandler(UnsupportedOperationException.class)
+  public BaseResponse unsupportedOperationException(
+    UnsupportedOperationException e
+  ) {
+    
+    log.error(e.getMessage(), e.getCause());
+    
+    return ResponseHelper.toBaseResponse(HttpStatus.INTERNAL_SERVER_ERROR);
+  }
+  
 }

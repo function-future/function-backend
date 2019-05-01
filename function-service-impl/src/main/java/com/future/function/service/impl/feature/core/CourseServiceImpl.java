@@ -41,7 +41,8 @@ public class CourseServiceImpl implements CourseService {
     return Optional.of(course)
       .map(courseRepository::save)
       .map(c -> this.getCourse(c.getId()))
-      .orElseGet(() -> this.getCourse(null));
+      .orElseThrow(
+        () -> new UnsupportedOperationException("Create Course Failed"));
   }
   
   private Course getCourse(String courseId) {
@@ -67,7 +68,8 @@ public class CourseServiceImpl implements CourseService {
       .map(Course::getId)
       .map(courseRepository::findOne)
       .map(foundCourse -> copyPropertiesAndSaveCourse(course, foundCourse))
-      .orElseGet(() -> this.getCourse(null));
+      .orElseThrow(
+        () -> new UnsupportedOperationException("Update Course Failed"));
   }
   
   private Course copyPropertiesAndSaveCourse(

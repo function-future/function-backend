@@ -34,6 +34,9 @@ public class ExceptionControllerTest extends JacksonTestHelper {
   private static final BaseResponse NOT_FOUND_RESPONSE =
     ResponseHelper.toBaseResponse(HttpStatus.NOT_FOUND);
   
+  private static final BaseResponse INTERNAL_SERVER_ERROR_RESPONSE =
+    ResponseHelper.toBaseResponse(HttpStatus.INTERNAL_SERVER_ERROR);
+  
   @Autowired
   private MockMvc mockMvc;
   
@@ -107,6 +110,22 @@ public class ExceptionControllerTest extends JacksonTestHelper {
       .andExpect(status().is4xxClientError())
       .andExpect(content().json(
         baseResponseJacksonTester.write(NOT_FOUND_RESPONSE)
+          .getJson()));
+  }
+  
+  @Test
+  public void givenUnsupportedOperationExceptionRaisedByExceptionHandlingReturnErrorResponse()
+    throws Exception {
+    
+    mockMvc.perform(get("/unsupported-operation"))
+      .andExpect(status().isInternalServerError())
+      .andExpect(content().json(
+        baseResponseJacksonTester.write(INTERNAL_SERVER_ERROR_RESPONSE)
+          .getJson()));
+    mockMvc.perform(get("/unsupported-operation-throwable"))
+      .andExpect(status().isInternalServerError())
+      .andExpect(content().json(
+        baseResponseJacksonTester.write(INTERNAL_SERVER_ERROR_RESPONSE)
           .getJson()));
   }
   

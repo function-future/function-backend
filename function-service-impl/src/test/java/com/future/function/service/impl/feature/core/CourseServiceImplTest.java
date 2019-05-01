@@ -65,15 +65,16 @@ public class CourseServiceImplTest {
   }
   
   @Test
-  public void testGivenInvalidCourseAndMultipartFileByCreatingCourseReturnNotFoundException() {
+  public void testGivenInvalidCourseAndMultipartFileByCreatingCourseReturnUnsupportedOperationException() {
     
     when(courseRepository.save(COURSE)).thenReturn(null);
     
     catchException(() -> courseService.createCourse(COURSE, null));
     
-    assertThat(caughtException().getClass()).isEqualTo(NotFoundException.class);
+    assertThat(caughtException().getClass()).isEqualTo(
+      UnsupportedOperationException.class);
     assertThat(caughtException().getMessage()).isEqualTo(
-      "Get Course Not Found");
+      "Create Course Failed");
     
     verify(courseRepository).save(COURSE);
   }
@@ -93,15 +94,15 @@ public class CourseServiceImplTest {
   }
   
   @Test
-  public void testGivenInvalidCourseAndMultipartFileByUpdatingCourseReturnNotFoundException() {
+  public void testGivenInvalidCourseAndMultipartFileByUpdatingCourseReturnUnsupportedOperationException() {
     
     when(courseRepository.findOne(ID)).thenReturn(null);
     
     catchException(() -> courseService.updateCourse(COURSE, null));
     
-    assertThat(caughtException().getClass()).isEqualTo(NotFoundException.class);
+    assertThat(caughtException().getClass()).isEqualTo(UnsupportedOperationException.class);
     assertThat(caughtException().getMessage()).isEqualTo(
-      "Get Course Not Found");
+      "Update Course Failed");
     
     verify(courseRepository).findOne(ID);
   }
