@@ -78,7 +78,7 @@ public class UserRequestMapper {
     return Optional.of(request)
       .map(UserWebRequest::getBatch)
       .map(batchNumber -> Batch.builder()
-        .number(batchNumber)
+        .code(batchNumber)
         .build())
       .orElse(null);
   }

@@ -91,7 +91,7 @@ public class UserServiceImpl implements UserService {
   
     if (user.getBatch() != null) {
       user.setBatch(batchService.getBatch(user.getBatch()
-                                            .getNumber()));
+                                            .getCode()));
     }
   
     return userRepository.findByEmail(user.getEmail())
@@ -168,7 +168,7 @@ public class UserServiceImpl implements UserService {
   
     if (user.getBatch() != null) {
       user.setBatch(batchService.getBatch(user.getBatch()
-                                            .getNumber()));
+                                            .getCode()));
     }
   
     return userRepository.findByEmail(user.getEmail())

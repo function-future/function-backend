@@ -37,11 +37,11 @@ public class BatchControllerTest {
   private static final Long SECOND_BATCH_NUMBER = 2L;
   
   private static final Batch FIRST_BATCH = Batch.builder()
-    .number(FIRST_BATCH_NUMBER)
+    .code(FIRST_BATCH_NUMBER)
     .build();
   
   private static final Batch SECOND_BATCH = Batch.builder()
-    .number(SECOND_BATCH_NUMBER)
+    .code(SECOND_BATCH_NUMBER)
     .build();
   
   private static final DataResponse<List<Long>> BATCHES_DATA_RESPONSE =

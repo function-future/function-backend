@@ -18,11 +18,11 @@ public interface BatchService {
   List<Batch> getBatches();
   
   /**
-   * Retrieves a batch from the database given the batch's number. If not
+   * Retrieves a batch from the database given the batch's code. If not
    * found, then throw
    * {@link com.future.function.common.exception.NotFoundException} exception.
    *
-   * @param number The number of the batch to be retrieved.
+   * @param number The code of the batch to be retrieved.
    *
    * @return {@code Batch} - The batch object found in database.
    */

@@ -53,9 +53,9 @@ public class BatchRepositoryTest {
     
     assertThat(foundBatch).isNotEqualTo(Collections.emptyList());
     assertThat(foundBatch.get(0)
-                 .getNumber()).isEqualTo(NUMBER_2);
+                 .getCode()).isEqualTo(NUMBER_2);
     assertThat(foundBatch.get(1)
-                 .getNumber()).isEqualTo(NUMBER_1);
+                 .getCode()).isEqualTo(NUMBER_1);
   }
   
   @Test
@@ -66,17 +66,17 @@ public class BatchRepositoryTest {
   
     assertThat(foundBatch).isNotEqualTo(Optional.empty());
     assertThat(foundBatch.get()
-                 .getNumber()).isEqualTo(NUMBER_2);
+                 .getCode()).isEqualTo(NUMBER_2);
   }
   
   @Test
   public void testGivenBatchNumberByFindingBatchByNumberReturnBatchObject() {
   
-    Optional<Batch> foundBatch = batchRepository.findByNumber(NUMBER_1);
+    Optional<Batch> foundBatch = batchRepository.findByCode(NUMBER_1);
     
     assertThat(foundBatch).isNotEqualTo(Optional.empty());
     assertThat(foundBatch.get()
-                 .getNumber()).isEqualTo(NUMBER_1);
+                 .getCode()).isEqualTo(NUMBER_1);
   }
   
 }

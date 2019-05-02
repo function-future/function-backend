@@ -30,9 +30,9 @@ public class BatchController {
   }
   
   /**
-   * Retrieves list of batches' number in database.
+   * Retrieves list of batches' code in database.
    *
-   * @return {@code DataResponse<List<Long>>} - Batches' number found in
+   * @return {@code DataResponse<List<Long>>} - Batches' code found in
    * database, wrapped in
    * {@link com.future.function.web.model.response.base.DataResponse}.
    */

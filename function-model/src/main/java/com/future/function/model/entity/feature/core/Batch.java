@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -27,14 +26,11 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @Document(collection = DocumentName.BATCH)
 public class Batch extends BaseEntity {
   
-  @Transient
-  public static final String SEQUENCE_NAME = "batches_sequence";
-  
   @Id
   private String id;
   
-  @Field(FieldName.Batch.NUMBER)
+  @Field(FieldName.Batch.CODE)
   @NonNull
-  private Long number;
+  private Long code;
   
 }

@@ -3,7 +3,6 @@ package com.future.function.service.impl.feature.core;
 import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.repository.feature.core.BatchRepository;
-import com.future.function.repository.feature.core.SequenceGenerator;
 import com.future.function.service.api.feature.core.BatchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,15 +17,12 @@ public class BatchServiceImpl implements BatchService {
   
   private final BatchRepository batchRepository;
   
-  private final SequenceGenerator sequenceGenerator;
-  
   @Autowired
   public BatchServiceImpl(
-    BatchRepository batchRepository, SequenceGenerator sequenceGenerator
+    BatchRepository batchRepository
   ) {
     
     this.batchRepository = batchRepository;
-    this.sequenceGenerator = sequenceGenerator;
   }
   
   /**
@@ -36,7 +32,7 @@ public class BatchServiceImpl implements BatchService {
    */
   @Override
   public List<Batch> getBatches() {
-  
+    
     return batchRepository.findAllByIdIsNotNullOrderByUpdatedAtDesc();
   }
   
@@ -50,7 +46,7 @@ public class BatchServiceImpl implements BatchService {
   @Override
   public Batch getBatch(long number) {
     
-    return batchRepository.findByNumber(number)
+    return batchRepository.findByCode(number)
       .orElseThrow(() -> new NotFoundException("Get Batch Not Found"));
   }
   
@@ -62,8 +58,7 @@ public class BatchServiceImpl implements BatchService {
   @Override
   public Batch createBatch() {
     
-    batchRepository.save(
-      new Batch(sequenceGenerator.increment(Batch.SEQUENCE_NAME)));
+    batchRepository.save(new Batch(1L));
     
     return batchRepository.findFirstByIdIsNotNullOrderByUpdatedAtDesc()
       .orElseThrow(() -> new NotFoundException("Saved Batch Not Found"));

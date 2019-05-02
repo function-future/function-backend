@@ -81,7 +81,7 @@ public class UserResponseMapper {
     
     return Optional.of(user)
       .map(User::getBatch)
-      .map(Batch::getNumber)
+      .map(Batch::getCode)
       .orElse(null);
   }
   

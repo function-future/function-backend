@@ -53,7 +53,7 @@ public class UserRequestMapperTest {
     .address(ADDRESS)
     .picture(new File())
     .batch(Batch.builder()
-             .number(NUMBER)
+             .code(NUMBER)
              .build())
     .university(UNIVERSITY)
     .build();

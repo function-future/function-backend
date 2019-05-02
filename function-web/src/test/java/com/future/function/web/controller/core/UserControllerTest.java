@@ -73,7 +73,7 @@ public class UserControllerTest {
     .address(ADDRESS)
     .picture(PICTURE)
     .batch(Batch.builder()
-             .number(NUMBER)
+             .code(NUMBER)
              .build())
     .university(UNIVERSITY)
     .build();
@@ -191,7 +191,7 @@ public class UserControllerTest {
       .phone(PHONE)
       .address(ADDRESS)
       .batch(Batch.builder()
-               .number(NUMBER)
+               .code(NUMBER)
                .build())
       .university(UNIVERSITY)
       .build();
@@ -223,7 +223,7 @@ public class UserControllerTest {
       .phone(PHONE)
       .address(ADDRESS)
       .batch(Batch.builder()
-               .number(NUMBER)
+               .code(NUMBER)
                .build())
       .university(UNIVERSITY)
       .build();

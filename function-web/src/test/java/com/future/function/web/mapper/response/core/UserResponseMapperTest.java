@@ -63,7 +63,7 @@ public class UserResponseMapperTest {
       .deleted(false)
       .pictureUrl(PICTURE.getFileUrl())
       .thumbnailUrl(PICTURE.getThumbnailUrl())
-      .batch(BATCH.getNumber())
+      .batch(BATCH.getCode())
       .university(UNIVERSITY)
       .build();
   

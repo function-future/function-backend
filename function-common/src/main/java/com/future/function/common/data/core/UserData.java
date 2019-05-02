@@ -22,8 +22,8 @@ public interface UserData {
    * Method to get batch of a user object, available only for user with role
    * STUDENT.
    *
-   * @return {@code Long} - Either batch number or null, depending on
-   * whether batch number exists in user web request object or not.
+   * @return {@code Long} - Either batch code or null, depending on
+   * whether batch code exists in user web request object or not.
    */
   Long getBatch();
   

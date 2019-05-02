@@ -33,7 +33,7 @@ public class BatchResponseMapper {
   ) {
   
     return ResponseHelper.toDataResponse(
-      HttpStatus.CREATED, new BatchWebResponse(batch.getNumber()));
+      HttpStatus.CREATED, new BatchWebResponse(batch.getCode()));
   }
   
   /**
@@ -42,7 +42,7 @@ public class BatchResponseMapper {
    *
    * @param batches Batches to be converted to response.
    *
-   * @return {@code DataResponse<List<Long>>} - Batches' number found in
+   * @return {@code DataResponse<List<Long>>} - Batches' code found in
    * database, wrapped in
    * {@link com.future.function.web.model.response.base.DataResponse}.
    */
@@ -57,7 +57,7 @@ public class BatchResponseMapper {
   private static List<Long> toBatchNumberList(List<Batch> batches) {
     
     return batches.stream()
-      .map(Batch::getNumber)
+      .map(Batch::getCode)
       .collect(Collectors.toList());
   }
   

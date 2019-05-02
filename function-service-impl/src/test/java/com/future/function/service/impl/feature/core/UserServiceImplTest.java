@@ -57,7 +57,7 @@ public class UserServiceImplTest {
   private static final Long NUMBER = 1L;
   
   private static final Batch BATCH = Batch.builder()
-    .number(NUMBER)
+    .code(NUMBER)
     .build();
   
   private static final String PHONE = "phone";
