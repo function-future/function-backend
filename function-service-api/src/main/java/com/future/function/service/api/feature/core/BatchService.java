@@ -33,6 +33,6 @@ public interface BatchService {
    *
    * @return {@code Batch} - The batch object of the saved data.
    */
-  Batch createBatch();
+  Batch createBatch(Batch batch);
   
 }
