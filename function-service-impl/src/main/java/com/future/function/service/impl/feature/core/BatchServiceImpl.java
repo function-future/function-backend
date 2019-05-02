@@ -58,7 +58,7 @@ public class BatchServiceImpl implements BatchService {
   @Override
   public Batch createBatch() {
     
-    batchRepository.save(new Batch(1L));
+    batchRepository.save(new Batch("id-1", "one", 1L));
     
     return batchRepository.findFirstByIdIsNotNullOrderByUpdatedAtDesc()
       .orElseThrow(() -> new NotFoundException("Saved Batch Not Found"));

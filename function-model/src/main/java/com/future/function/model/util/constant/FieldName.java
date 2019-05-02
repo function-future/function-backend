@@ -51,6 +51,8 @@ public interface FieldName {
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
   abstract class Batch {
     
+    public static final String NAME = "name";
+    
     public static final String CODE = "code";
     
   }

@@ -26,7 +26,7 @@ public class FunctionChangeLog {
              order = "002")
   public void insertFirstBatch(MongoTemplate mongoTemplate) {
     
-    Batch batch = new Batch(ONE);
+    Batch batch = new Batch("id-1", "one", ONE);
     
     mongoTemplate.save(batch, DocumentName.BATCH);
     

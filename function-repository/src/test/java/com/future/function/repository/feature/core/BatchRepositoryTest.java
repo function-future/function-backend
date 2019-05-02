@@ -30,12 +30,12 @@ public class BatchRepositoryTest {
   
   @Before
   public void setUp() {
-  
-    Batch firstBatch = new Batch(NUMBER_1);
+    
+    Batch firstBatch = new Batch("id-1", "name-1", NUMBER_1);
     firstBatch.setUpdatedAt(10L);
-    Batch secondBatch = new Batch(NUMBER_2);
+    Batch secondBatch = new Batch("id-2", "name-2", NUMBER_2);
     secondBatch.setUpdatedAt(20L);
-  
+    
     batchRepository.save(Arrays.asList(firstBatch, secondBatch));
   }
   
@@ -63,7 +63,7 @@ public class BatchRepositoryTest {
     
     Optional<Batch> foundBatch =
       batchRepository.findFirstByIdIsNotNullOrderByUpdatedAtDesc();
-  
+    
     assertThat(foundBatch).isNotEqualTo(Optional.empty());
     assertThat(foundBatch.get()
                  .getCode()).isEqualTo(NUMBER_2);
@@ -71,7 +71,7 @@ public class BatchRepositoryTest {
   
   @Test
   public void testGivenBatchNumberByFindingBatchByNumberReturnBatchObject() {
-  
+    
     Optional<Batch> foundBatch = batchRepository.findByCode(NUMBER_1);
     
     assertThat(foundBatch).isNotEqualTo(Optional.empty());

@@ -8,8 +8,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
@@ -21,7 +19,6 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@RequiredArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @Document(collection = DocumentName.BATCH)
 public class Batch extends BaseEntity {
@@ -29,8 +26,10 @@ public class Batch extends BaseEntity {
   @Id
   private String id;
   
+  @Field(FieldName.Batch.NAME)
+  private String name;
+  
   @Field(FieldName.Batch.CODE)
-  @NonNull
   private Long code;
   
 }

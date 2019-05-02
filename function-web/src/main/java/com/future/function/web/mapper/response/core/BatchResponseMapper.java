@@ -31,9 +31,18 @@ public class BatchResponseMapper {
   public static DataResponse<BatchWebResponse> toBatchDataResponse(
     Batch batch
   ) {
-  
+    
     return ResponseHelper.toDataResponse(
-      HttpStatus.CREATED, new BatchWebResponse(batch.getCode()));
+      HttpStatus.CREATED, buildBatchWebResponse(batch));
+  }
+  
+  private static BatchWebResponse buildBatchWebResponse(Batch batch) {
+    
+    return BatchWebResponse.builder()
+      .id(batch.getId())
+      .name(batch.getName())
+      .code(batch.getCode())
+      .build();
   }
   
   /**
@@ -49,7 +58,7 @@ public class BatchResponseMapper {
   public static DataResponse<List<Long>> toBatchesDataResponse(
     List<Batch> batches
   ) {
-  
+    
     return ResponseHelper.toDataResponse(
       HttpStatus.OK, toBatchNumberList(batches));
   }

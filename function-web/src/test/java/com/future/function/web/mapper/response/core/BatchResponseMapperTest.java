@@ -15,14 +15,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class BatchResponseMapperTest {
   
-  private static final Batch BATCH_1 = new Batch(1L);
+  private static final Batch BATCH_1 = new Batch("id-1", "name-1", 1L);
   
-  private static final Batch BATCH_2 = new Batch(2L);
+  private static final Batch BATCH_2 = new Batch("id-2", "name-2", 2L);
   
-  private static final Batch BATCH_3 = new Batch(3L);
+  private static final Batch BATCH_3 = new Batch("id-3", "name-3", 3L);
   
   private static final BatchWebResponse BATCH_WEB_RESPONSE =
-    new BatchWebResponse(1L);
+    BatchWebResponse.builder()
+      .id("id-1")
+      .name("name-1")
+      .code(1L)
+      .build();
   
   private static final List<Long> BATCH_NUMBERS = Arrays.asList(1L, 2L, 3L);
   

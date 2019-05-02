@@ -42,6 +42,8 @@ public class BatchServiceImplTest {
   public void setUp() {
     
     batch = Batch.builder()
+      .id("id-1")
+      .name("name-1")
       .code(FIRST_BATCH_NUMBER)
       .build();
   }
@@ -55,7 +57,8 @@ public class BatchServiceImplTest {
   @Test
   public void testGivenMethodCallToCreateBatchByCreatingBatchReturnNewBatchObject() {
     
-    when(batchRepository.save(new Batch(FIRST_BATCH_NUMBER))).thenReturn(batch);
+    when(batchRepository.save(
+      new Batch("id-1", "one", FIRST_BATCH_NUMBER))).thenReturn(batch);
     when(
       batchRepository.findFirstByIdIsNotNullOrderByUpdatedAtDesc()).thenReturn(
       Optional.of(batch));
@@ -65,14 +68,14 @@ public class BatchServiceImplTest {
     assertThat(createdBatch).isNotNull();
     assertThat(createdBatch).isEqualTo(batch);
     
-    verify(batchRepository).save(new Batch(FIRST_BATCH_NUMBER));
+    verify(batchRepository).save(new Batch("id-1", "one", FIRST_BATCH_NUMBER));
     verify(batchRepository).findFirstByIdIsNotNullOrderByUpdatedAtDesc();
   }
   
   @Test
   public void testGivenMethodCallToCreateBatchButSomehowFailedInDatabaseProcessingByCreatingBatchReturnNotFoundException() {
     
-    when(batchRepository.save(new Batch(FIRST_BATCH_NUMBER))).thenReturn(batch);
+    when(batchRepository.save(new Batch("id-1", "one", FIRST_BATCH_NUMBER))).thenReturn(batch);
     when(
       batchRepository.findFirstByIdIsNotNullOrderByUpdatedAtDesc()).thenThrow(
       new NotFoundException("Saved Batch Not Found"));
@@ -83,7 +86,7 @@ public class BatchServiceImplTest {
     assertThat(caughtException().getMessage()).isEqualTo(
       "Saved Batch Not Found");
     
-    verify(batchRepository).save(new Batch(FIRST_BATCH_NUMBER));
+    verify(batchRepository).save(new Batch("id-1", "one", FIRST_BATCH_NUMBER));
     verify(batchRepository).findFirstByIdIsNotNullOrderByUpdatedAtDesc();
   }
   
