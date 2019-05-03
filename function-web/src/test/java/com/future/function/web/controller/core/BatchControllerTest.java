@@ -7,6 +7,7 @@ import com.future.function.web.mapper.request.core.BatchRequestMapper;
 import com.future.function.web.mapper.response.core.BatchResponseMapper;
 import com.future.function.web.model.request.core.BatchWebRequest;
 import com.future.function.web.model.response.base.DataResponse;
+import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.feature.core.BatchWebResponse;
 import org.junit.After;
 import org.junit.Before;
@@ -16,12 +17,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Arrays;
-import java.util.List;
 
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
@@ -59,9 +63,13 @@ public class BatchControllerTest {
       .code(FIRST_BATCH_CODE)
       .build();
   
-  private static final DataResponse<List<Long>> BATCHES_DATA_RESPONSE =
-    BatchResponseMapper.toBatchesDataResponse(
-      Arrays.asList(FIRST_BATCH, SECOND_BATCH));
+  private static final Pageable PAGEABLE = new PageRequest(0, 10);
+  
+  private static final Page<Batch> BATCH_PAGE = new PageImpl<>(
+    Arrays.asList(FIRST_BATCH, SECOND_BATCH), PAGEABLE, 2);
+  
+  private static final PagingResponse<BatchWebResponse> BATCHES_DATA_RESPONSE =
+    BatchResponseMapper.toBatchesPagingResponse(BATCH_PAGE);
   
   private static final DataResponse<BatchWebResponse>
     FIRST_BATCH_DATA_RESPONSE = BatchResponseMapper.toBatchDataResponse(
@@ -69,7 +77,8 @@ public class BatchControllerTest {
   
   private JacksonTester<BatchWebRequest> batchWebRequestJacksonTester;
   
-  private JacksonTester<DataResponse<List<Long>>> listDataResponseJacksonTester;
+  private JacksonTester<PagingResponse<BatchWebResponse>>
+    pagingResponseJacksonTester;
   
   private JacksonTester<DataResponse<BatchWebResponse>>
     dataResponseJacksonTester;
@@ -99,16 +108,15 @@ public class BatchControllerTest {
   public void testGivenCallToBatchesApiByFindingBatchesFromBatchServiceReturnListOfBatchNumbers()
     throws Exception {
     
-    List<Batch> batches = Arrays.asList(FIRST_BATCH, SECOND_BATCH);
-    given(batchService.getBatches()).willReturn(batches);
+    given(batchService.getBatches(PAGEABLE)).willReturn(BATCH_PAGE);
     
     mockMvc.perform(get("/api/core/batches"))
       .andExpect(status().isOk())
       .andExpect(content().json(
-        listDataResponseJacksonTester.write(BATCHES_DATA_RESPONSE)
+        pagingResponseJacksonTester.write(BATCHES_DATA_RESPONSE)
           .getJson()));
     
-    verify(batchService).getBatches();
+    verify(batchService).getBatches(PAGEABLE);
   }
   
   @Test

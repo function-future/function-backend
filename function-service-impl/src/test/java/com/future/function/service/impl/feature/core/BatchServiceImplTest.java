@@ -10,10 +10,13 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 
 import static com.googlecode.catchexception.CatchException.catchException;
@@ -29,6 +32,8 @@ public class BatchServiceImplTest {
   private static final Long FIRST_BATCH_NUMBER = 1L;
   
   private static final Long SECOND_BATCH_NUMBER = 2L;
+  
+  private static final Pageable PAGEABLE = new PageRequest(0, 10);
   
   private Batch batch;
   
@@ -128,32 +133,35 @@ public class BatchServiceImplTest {
       .code(SECOND_BATCH_NUMBER)
       .build();
     
-    List<Batch> batchList = Arrays.asList(secondBatch, batch);
+    Page<Batch> batchPage = new PageImpl<>(
+      Arrays.asList(secondBatch, batch), PAGEABLE, 2);
     
-    when(batchRepository.findAllByIdIsNotNullOrderByUpdatedAtDesc()).thenReturn(
-      batchList);
+    when(batchRepository.findAllByIdIsNotNullOrderByUpdatedAtDesc(
+      PAGEABLE)).thenReturn(batchPage);
     
-    List<Batch> foundBatchList = batchService.getBatches();
+    Page<Batch> foundBatchPage = batchService.getBatches(PAGEABLE);
     
-    assertThat(foundBatchList).isNotEmpty();
-    assertThat(foundBatchList).isEqualTo(batchList);
+    assertThat(foundBatchPage.getContent()).isNotEmpty();
+    assertThat(foundBatchPage).isEqualTo(batchPage);
     
-    verify(batchRepository).findAllByIdIsNotNullOrderByUpdatedAtDesc();
+    verify(batchRepository).findAllByIdIsNotNullOrderByUpdatedAtDesc(PAGEABLE);
   }
   
   @Test
   public void testGivenNoExistingBatchInDatabaseByFindingBatchesReturnEmptyList() {
     
-    List<Batch> batchList = Collections.emptyList();
+    Page<Batch> batchPage = new PageImpl<>(Collections.emptyList(), PAGEABLE,
+                                           0
+    );
     
-    when(batchRepository.findAllByIdIsNotNullOrderByUpdatedAtDesc()).thenReturn(
-      batchList);
+    when(batchRepository.findAllByIdIsNotNullOrderByUpdatedAtDesc(
+      PAGEABLE)).thenReturn(batchPage);
     
-    List<Batch> foundBatchList = batchService.getBatches();
+    Page<Batch> foundBatchPage = batchService.getBatches(PAGEABLE);
     
-    assertThat(foundBatchList).isEmpty();
+    assertThat(foundBatchPage.getContent()).isEmpty();
     
-    verify(batchRepository).findAllByIdIsNotNullOrderByUpdatedAtDesc();
+    verify(batchRepository).findAllByIdIsNotNullOrderByUpdatedAtDesc(PAGEABLE);
   }
   
 }

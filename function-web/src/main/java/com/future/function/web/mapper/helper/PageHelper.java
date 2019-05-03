@@ -23,7 +23,7 @@ public class PageHelper {
    * {@link org.springframework.data.domain.PageRequest} as an implementation
    * of {@code Pageable} interface.
    */
-  public static Pageable toPage(int page, int size) {
+  public static Pageable toPageable(int page, int size) {
     
     return new PageRequest(page - 1, size);
   }

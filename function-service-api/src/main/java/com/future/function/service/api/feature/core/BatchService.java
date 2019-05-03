@@ -1,8 +1,8 @@
 package com.future.function.service.api.feature.core;
 
 import com.future.function.model.entity.feature.core.Batch;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 /**
  * Service interface class for batch logic operations declaration.
@@ -15,7 +15,7 @@ public interface BatchService {
    *
    * @return {@code List<Batch>} - Batches found in database.
    */
-  List<Batch> getBatches();
+  Page<Batch> getBatches(Pageable pageable);
   
   /**
    * Retrieves a batch from the database given the batch's code. If not

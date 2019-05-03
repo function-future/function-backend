@@ -5,9 +5,9 @@ import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.repository.feature.core.BatchRepository;
 import com.future.function.service.api.feature.core.BatchService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 /**
  * Service implementation class for batch logic operations implementation.
@@ -31,9 +31,9 @@ public class BatchServiceImpl implements BatchService {
    * @return {@code Batch} - Batches found in database.
    */
   @Override
-  public List<Batch> getBatches() {
+  public Page<Batch> getBatches(Pageable pageable) {
     
-    return batchRepository.findAllByIdIsNotNullOrderByUpdatedAtDesc();
+    return batchRepository.findAllByIdIsNotNullOrderByUpdatedAtDesc(pageable);
   }
   
   /**

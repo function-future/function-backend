@@ -1,11 +1,14 @@
 package com.future.function.web.mapper.response.core;
 
 import com.future.function.model.entity.feature.core.Batch;
+import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.model.response.base.DataResponse;
+import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.feature.core.BatchWebResponse;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 
 import java.util.List;
@@ -46,14 +49,14 @@ public class BatchResponseMapper {
   }
   
   /**
-   * Converts batches data to {@code List<Long>} object, wrapped in
-   * {@code DataResponse}.
-   *
    * @param batches Batches to be converted to response.
    *
    * @return {@code DataResponse<List<Long>>} - Batches' code found in
    * database, wrapped in
    * {@link com.future.function.web.model.response.base.DataResponse}.
+   *
+   * @deprecated Converts batches data to {@code List<Long>} object, wrapped in
+   * {@code DataResponse}.
    */
   public static DataResponse<List<Long>> toBatchesDataResponse(
     List<Batch> batches
@@ -67,6 +70,34 @@ public class BatchResponseMapper {
     
     return batches.stream()
       .map(Batch::getCode)
+      .collect(Collectors.toList());
+  }
+  
+  /**
+   * Converts batches data to {@code BatchWebResponse} object, wrapped in
+   * {@code PagingResponse}.
+   *
+   * @param data Batches to be converted to response.
+   *
+   * @return {@code PagingResponse<BatchWebResponse>} - Batches' code found in
+   * database, wrapped in
+   * {@link com.future.function.web.model.response.base.PagingResponse}.
+   */
+  public static PagingResponse<BatchWebResponse> toBatchesPagingResponse(
+    Page<Batch> data
+  ) {
+    
+    return ResponseHelper.toPagingResponse(
+      HttpStatus.OK, toBatchWebResponseList(data), PageHelper.toPaging(data));
+  }
+  
+  private static List<BatchWebResponse> toBatchWebResponseList(
+    Page<Batch> data
+  ) {
+    
+    return data.getContent()
+      .stream()
+      .map(BatchResponseMapper::buildBatchWebResponse)
       .collect(Collectors.toList());
   }
   

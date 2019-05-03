@@ -8,11 +8,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -24,6 +25,8 @@ public class BatchRepositoryTest {
   private static final Long NUMBER_1 = 1L;
   
   private static final Long NUMBER_2 = 2L;
+  
+  private static final Pageable PAGEABLE = new PageRequest(0, 10);
   
   @Autowired
   private BatchRepository batchRepository;
@@ -48,13 +51,12 @@ public class BatchRepositoryTest {
   @Test
   public void testGivenMethodCallByFindingBatchesReturnBatchObject() {
     
-    List<Batch> foundBatch =
-      batchRepository.findAllByIdIsNotNullOrderByUpdatedAtDesc();
+    Page<Batch> foundBatches =
+      batchRepository.findAllByIdIsNotNullOrderByUpdatedAtDesc(PAGEABLE);
     
-    assertThat(foundBatch).isNotEqualTo(Collections.emptyList());
-    assertThat(foundBatch.get(0)
+    assertThat(foundBatches.getContent().get(0)
                  .getCode()).isEqualTo(NUMBER_2);
-    assertThat(foundBatch.get(1)
+    assertThat(foundBatches.getContent().get(1)
                  .getCode()).isEqualTo(NUMBER_1);
   }
   
