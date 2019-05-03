@@ -16,8 +16,8 @@ public class NoSpaceValidator implements ConstraintValidator<NoSpace, String> {
   @Override
   public boolean isValid(String value, ConstraintValidatorContext context) {
     
-    return !Optional.ofNullable(value)
-      .filter(s -> s.contains(" "))
+    return Optional.ofNullable(value)
+      .filter(s -> !s.contains(" "))
       .isPresent();
   }
   

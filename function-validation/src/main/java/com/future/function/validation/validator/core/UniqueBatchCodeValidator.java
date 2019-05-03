@@ -20,10 +20,11 @@ public class UniqueBatchCodeValidator
   }
   
   @Override
-  public boolean isValid(String value, ConstraintValidatorContext context) {
+  public boolean isValid(String code, ConstraintValidatorContext context) {
     
-    return !Optional.ofNullable(value)
-      .flatMap(batchRepository::findByCode)
+    return Optional.ofNullable(code)
+      .filter(s -> !batchRepository.findByCode(s)
+        .isPresent())
       .isPresent();
   }
   
