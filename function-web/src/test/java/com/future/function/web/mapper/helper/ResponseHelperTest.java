@@ -38,9 +38,8 @@ public class ResponseHelperTest {
     "string-1", "string-2", "string-3");
   
   private static final Paging PAGING = Paging.builder()
-    .currentPage(0)
-    .pageSize(3)
-    .totalPages(1)
+    .page(0)
+    .size(3)
     .totalRecords(3)
     .build();
   
