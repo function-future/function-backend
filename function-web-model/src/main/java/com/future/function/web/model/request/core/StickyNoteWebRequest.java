@@ -16,9 +16,9 @@ import org.hibernate.validator.constraints.NotBlank;
 public class StickyNoteWebRequest {
   
   @NotBlank(message = "NotBlank")
-  private String noteTitle;
+  private String title;
   
   @NotBlank(message = "NotBlank")
-  private String noteDescription;
+  private String description;
   
 }

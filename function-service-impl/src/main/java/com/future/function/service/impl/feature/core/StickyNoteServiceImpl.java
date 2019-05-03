@@ -1,10 +1,11 @@
 package com.future.function.service.impl.feature.core;
 
-import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.core.StickyNote;
 import com.future.function.repository.feature.core.StickyNoteRepository;
 import com.future.function.service.api.feature.core.StickyNoteService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -26,10 +27,10 @@ public class StickyNoteServiceImpl implements StickyNoteService {
    * @return {@code StickyNote} - The sticky note object found in database
    */
   @Override
-  public StickyNote getStickyNote() {
+  public Page<StickyNote> getStickyNote(Pageable pageable) {
     
-    return stickyNoteRepository.findFirstByIdIsNotNullOrderByUpdatedAtDesc()
-      .orElseThrow(() -> new NotFoundException("Get Sticky Note Not Found"));
+    return stickyNoteRepository.findAllByIdIsNotNullOrderByUpdatedAtDesc(
+      pageable);
   }
   
   /**
@@ -41,11 +42,12 @@ public class StickyNoteServiceImpl implements StickyNoteService {
    */
   @Override
   public StickyNote createStickyNote(StickyNote stickyNote) {
-  
+    
     return Optional.of(stickyNote)
       .map(stickyNoteRepository::save)
-      .map(ignored -> this.getStickyNote())
-      .orElseGet(this::getStickyNote);
+      .flatMap(
+        ignored -> stickyNoteRepository.findFirstByIdIsNotNullOrderByUpdatedAtDesc())
+      .orElseGet(StickyNote::new);
   }
   
 }
