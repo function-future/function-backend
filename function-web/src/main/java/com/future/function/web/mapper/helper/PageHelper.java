@@ -40,9 +40,8 @@ public class PageHelper {
   public static <T> Paging toPaging(Page<T> data) {
     
     return Paging.builder()
-      .currentPage(data.getNumber())
-      .pageSize(data.getSize())
-      .totalPages(data.getTotalPages())
+      .page(data.getNumber())
+      .size(data.getSize())
       .totalRecords(data.getTotalElements())
       .build();
   }

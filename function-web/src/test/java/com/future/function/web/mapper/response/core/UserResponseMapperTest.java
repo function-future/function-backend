@@ -113,9 +113,8 @@ public class UserResponseMapperTest {
     USERS, PAGEABLE, USERS.size());
   
   private static final Paging PAGING = Paging.builder()
-    .currentPage(0)
-    .pageSize(2)
-    .totalPages(1)
+    .page(0)
+    .size(2)
     .totalRecords(2)
     .build();
   
