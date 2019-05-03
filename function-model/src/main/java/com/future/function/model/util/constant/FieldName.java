@@ -91,7 +91,7 @@ public interface FieldName {
     public static final String FILE = "file";
 
   }
-
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
   abstract class Quiz {
 
     public static final String TITLE = "title";
@@ -102,5 +102,14 @@ public interface FieldName {
     public static final String QUESTION_BANK = "questionBank";
     public static final String QUESTION_COUNT = "questionCount";
   }
-  
+
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  abstract class QuestionBank {
+
+    public static final String ID = "id";
+
+    public static final String DESCRIPTION = "description";
+
+  }
+
 }
