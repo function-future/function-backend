@@ -25,7 +25,7 @@ public interface UserData {
    * @return {@code Long} - Either batch code or null, depending on
    * whether batch code exists in user web request object or not.
    */
-  Long getBatch();
+  String getBatch();
   
   /**
    * Method to get university name of a user web request object, available only

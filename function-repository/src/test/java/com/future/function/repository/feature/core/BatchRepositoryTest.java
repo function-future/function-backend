@@ -22,9 +22,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(classes = TestApplication.class)
 public class BatchRepositoryTest {
   
-  private static final Long NUMBER_1 = 1L;
+  private static final String NUMBER_1 = "1";
   
-  private static final Long NUMBER_2 = 2L;
+  private static final String NUMBER_2 = "2";
   
   private static final Pageable PAGEABLE = new PageRequest(0, 10);
   

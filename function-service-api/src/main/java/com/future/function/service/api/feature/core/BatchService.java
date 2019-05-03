@@ -22,11 +22,11 @@ public interface BatchService {
    * found, then throw
    * {@link com.future.function.common.exception.NotFoundException} exception.
    *
-   * @param number The code of the batch to be retrieved.
+   * @param code The code of the batch to be retrieved.
    *
    * @return {@code Batch} - The batch object found in database.
    */
-  Batch getBatch(long number);
+  Batch getBatch(String code);
   
   /**
    * Saves a new batch to the database.

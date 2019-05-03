@@ -39,14 +39,14 @@ public class BatchServiceImpl implements BatchService {
   /**
    * {@inheritDoc}
    *
-   * @param number Number of the batch to be retrieved.
+   * @param code Number of the batch to be retrieved.
    *
    * @return {@code Batch} - The batch object found in database.
    */
   @Override
-  public Batch getBatch(long number) {
+  public Batch getBatch(String code) {
     
-    return batchRepository.findByCode(number)
+    return batchRepository.findByCode(code)
       .orElseThrow(() -> new NotFoundException("Get Batch Not Found"));
   }
   

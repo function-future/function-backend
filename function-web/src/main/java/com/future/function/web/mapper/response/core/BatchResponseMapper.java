@@ -49,31 +49,6 @@ public class BatchResponseMapper {
   }
   
   /**
-   * @param batches Batches to be converted to response.
-   *
-   * @return {@code DataResponse<List<Long>>} - Batches' code found in
-   * database, wrapped in
-   * {@link com.future.function.web.model.response.base.DataResponse}.
-   *
-   * @deprecated Converts batches data to {@code List<Long>} object, wrapped in
-   * {@code DataResponse}.
-   */
-  public static DataResponse<List<Long>> toBatchesDataResponse(
-    List<Batch> batches
-  ) {
-    
-    return ResponseHelper.toDataResponse(
-      HttpStatus.OK, toBatchNumberList(batches));
-  }
-  
-  private static List<Long> toBatchNumberList(List<Batch> batches) {
-    
-    return batches.stream()
-      .map(Batch::getCode)
-      .collect(Collectors.toList());
-  }
-  
-  /**
    * Converts batches data to {@code BatchWebResponse} object, wrapped in
    * {@code PagingResponse}.
    *

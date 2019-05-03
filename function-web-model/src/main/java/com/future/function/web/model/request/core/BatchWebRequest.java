@@ -1,5 +1,6 @@
 package com.future.function.web.model.request.core;
 
+import com.future.function.validation.annotation.core.NoSpace;
 import com.future.function.validation.annotation.core.UniqueBatchCode;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,8 +20,9 @@ public class BatchWebRequest {
   
   private String name;
   
+  @NoSpace
   @UniqueBatchCode
   @NotNull(message = "NotNull")
-  private Long code;
+  private String code;
   
 }

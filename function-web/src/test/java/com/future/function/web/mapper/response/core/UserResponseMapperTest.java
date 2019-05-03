@@ -38,7 +38,7 @@ public class UserResponseMapperTest {
   
   private static final File PICTURE = new File();
   
-  private static final Batch BATCH = new Batch("id-1", "name-1", 1L);
+  private static final Batch BATCH = new Batch("id-1", "name-1", "1");
   
   private static final String UNIVERSITY = "university";
   

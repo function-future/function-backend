@@ -38,6 +38,6 @@ public interface BatchRepository extends MongoRepository<Batch, Long> {
    * @return {@code Optional<Batch>} - Batch found in database, if any exists;
    * otherwise returns {@link java.util.Optional#empty()}.
    */
-  Optional<Batch> findByCode(long code);
+  Optional<Batch> findByCode(String code);
   
 }

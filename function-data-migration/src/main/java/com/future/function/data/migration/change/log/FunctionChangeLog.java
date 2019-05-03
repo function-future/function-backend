@@ -17,7 +17,7 @@ import static org.springframework.data.mongodb.core.query.Query.query;
 @ChangeLog(order = "001")
 public class FunctionChangeLog {
   
-  private static final long ONE = 1;
+  private static final String ONE = "1";
   
   private Batch savedFirstBatch;
   

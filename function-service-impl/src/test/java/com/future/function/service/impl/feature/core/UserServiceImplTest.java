@@ -54,7 +54,7 @@ public class UserServiceImplTest {
   
   private static final String NON_EXISTING_USER_EMAIL = "email@email.com";
   
-  private static final Long NUMBER = 1L;
+  private static final String NUMBER = "1";
   
   private static final Batch BATCH = Batch.builder()
     .code(NUMBER)

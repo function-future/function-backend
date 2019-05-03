@@ -20,6 +20,6 @@ public class BatchWebResponse {
   @JsonInclude(value = JsonInclude.Include.NON_NULL)
   private String name;
   
-  private long code;
+  private String code;
   
 }

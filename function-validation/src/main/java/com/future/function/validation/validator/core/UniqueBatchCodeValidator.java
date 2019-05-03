@@ -9,7 +9,7 @@ import javax.validation.ConstraintValidatorContext;
 import java.util.Optional;
 
 public class UniqueBatchCodeValidator
-  implements ConstraintValidator<UniqueBatchCode, Long> {
+  implements ConstraintValidator<UniqueBatchCode, String> {
   
   @Autowired
   private BatchRepository batchRepository;
@@ -20,7 +20,7 @@ public class UniqueBatchCodeValidator
   }
   
   @Override
-  public boolean isValid(Long value, ConstraintValidatorContext context) {
+  public boolean isValid(String value, ConstraintValidatorContext context) {
     
     return !Optional.ofNullable(value)
       .flatMap(batchRepository::findByCode)

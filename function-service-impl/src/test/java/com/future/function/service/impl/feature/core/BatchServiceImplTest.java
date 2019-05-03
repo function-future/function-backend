@@ -29,9 +29,9 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class BatchServiceImplTest {
   
-  private static final Long FIRST_BATCH_NUMBER = 1L;
+  private static final String FIRST_BATCH_NUMBER = "1";
   
-  private static final Long SECOND_BATCH_NUMBER = 2L;
+  private static final String SECOND_BATCH_NUMBER = "2";
   
   private static final Pageable PAGEABLE = new PageRequest(0, 10);
   

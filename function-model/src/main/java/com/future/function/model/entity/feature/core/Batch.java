@@ -30,6 +30,6 @@ public class Batch extends BaseEntity {
   private String name;
   
   @Field(FieldName.Batch.CODE)
-  private Long code;
+  private String code;
   
 }

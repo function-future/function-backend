@@ -39,11 +39,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(BatchController.class)
 public class BatchControllerTest {
   
-  private static final Long FIRST_BATCH_CODE = 1L;
+  private static final String FIRST_BATCH_CODE = "1";
   
   private static final String FIRST_BATCH_NAME = "name-1";
   
-  private static final Long SECOND_BATCH_CODE = 2L;
+  private static final String SECOND_BATCH_CODE = "2";
   
   private static final String SECOND_BATCH_NAME = "name-2";
   
