@@ -178,22 +178,7 @@ public class AnnouncementServiceImplTest {
     
     announcementService.deleteAnnouncement(ID);
     
-    verify(announcementRepository).findOne(ID);
-    verify(announcementRepository).delete(ANNOUNCEMENT);
-  }
-  
-  @Test
-  public void testGivenIdAndNonExistingAnnouncementInDatabaseByDeletingAnnouncementReturnNotFoundException() {
-    
-    when(announcementRepository.findOne(ID)).thenReturn(null);
-    
-    catchException(() -> announcementService.deleteAnnouncement(ID));
-    
-    assertThat(caughtException().getClass()).isEqualTo(NotFoundException.class);
-    assertThat(caughtException().getMessage()).isEqualTo(
-      "Get Announcement Not Found");
-    
-    verify(announcementRepository).findOne(ID);
+    verify(announcementRepository).delete(ID);
   }
   
 }

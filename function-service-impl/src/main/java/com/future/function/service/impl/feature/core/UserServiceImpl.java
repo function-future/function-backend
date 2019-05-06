@@ -175,7 +175,7 @@ public class UserServiceImpl implements UserService {
       .map(this::deleteUserPicture)
       .map(foundUser -> setUserPicture(user, image))
       .map(foundUser -> copyPropertiesAndSaveUser(user, foundUser))
-      .orElseThrow(() -> new NotFoundException("Update User Not Found"));
+      .orElse(user);
   }
   
   /**
@@ -187,7 +187,7 @@ public class UserServiceImpl implements UserService {
   public void deleteUser(String email) {
   
     Optional.ofNullable(email)
-      .map(this::getUser)
+      .flatMap(userRepository::findByEmail)
       .ifPresent(user -> markDeleted(user, true));
   }
 
