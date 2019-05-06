@@ -34,7 +34,6 @@ public class SharedCourse extends BaseEntity {
   private Batch batch;
   
   @Field(FieldName.SharedCourse.COURSE)
-  @DBRef(lazy = true)
   private Course course;
   
 }
