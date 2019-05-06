@@ -12,15 +12,15 @@ import org.springframework.web.multipart.MultipartFile;
 public interface UserService {
   
   /**
-   * Retrieves a user from database given the users's email. If not found,
+   * Retrieves a user from database given the users's userId. If not found,
    * then throw {@link com.future.function.common.exception.NotFoundException}
    * exception.
    *
-   * @param email Email of user to be retrieved.
+   * @param userId Id of user to be retrieved.
    *
    * @return {@code User} - The user object found in database.
    */
-  User getUser(String email);
+  User getUser(String userId);
   
   /**
    * Retrieves users from database given role.
@@ -60,8 +60,8 @@ public interface UserService {
    * Deletes user object from database. If not found, then throw
    * {@link com.future.function.common.exception.NotFoundException} exception.
    *
-   * @param email Email of user to be deleted.
+   * @param userId Id of user to be deleted.
    */
-  void deleteUser(String email);
+  void deleteUser(String userId);
   
 }
