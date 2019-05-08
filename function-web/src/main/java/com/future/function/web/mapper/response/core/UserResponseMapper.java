@@ -61,6 +61,7 @@ public class UserResponseMapper {
   private static UserWebResponse buildUserWebResponse(User user) {
     
     return UserWebResponse.builder()
+      .id(user.getId())
       .role(user.getRole()
               .name())
       .email(user.getEmail())
