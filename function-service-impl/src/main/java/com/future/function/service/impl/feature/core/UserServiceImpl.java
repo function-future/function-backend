@@ -180,7 +180,7 @@ public class UserServiceImpl implements UserService {
       .map(this::deleteUserPicture)
       .map(foundUser -> setUserPicture(user, image))
       .map(foundUser -> copyPropertiesAndSaveUser(user, foundUser))
-      .orElseThrow(() -> new NotFoundException("Update User Not Found"));
+      .orElse(user);
   }
   
   /**
@@ -191,8 +191,8 @@ public class UserServiceImpl implements UserService {
   @Override
   public void deleteUser(String userId) {
   
-    Optional.ofNullable(userId)
-      .map(this::getUser)
+    Optional.ofNullable(email)
+      .flatMap(userRepository::findByEmail)
       .ifPresent(user -> markDeleted(user, true));
   }
 
