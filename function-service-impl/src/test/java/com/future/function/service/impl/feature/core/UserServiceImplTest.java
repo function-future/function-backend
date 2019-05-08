@@ -448,17 +448,4 @@ public class UserServiceImplTest {
     verify(userRepository).save(markedDeletedUserMentor);
   }
   
-  @Test
-  public void testGivenEmailOfNonExistingUserByDeletingUserReturnNotFoundException() {
-    
-    when(userRepository.findOne(NON_EXISTING_USER_ID)).thenReturn(null);
-    
-    catchException(() -> userService.deleteUser(NON_EXISTING_USER_ID));
-    
-    assertThat(caughtException().getClass()).isEqualTo(NotFoundException.class);
-    assertThat(caughtException().getMessage()).isEqualTo("Get User Not Found");
-    
-    verify(userRepository).findOne(NON_EXISTING_USER_ID);
-  }
-  
 }
