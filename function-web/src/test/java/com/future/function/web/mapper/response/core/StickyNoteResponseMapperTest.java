@@ -1,12 +1,20 @@
 package com.future.function.web.mapper.response.core;
 
 import com.future.function.model.entity.feature.core.StickyNote;
+import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.model.response.base.DataResponse;
+import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.feature.core.StickyNoteWebResponse;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
+
+import java.util.Arrays;
+import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -22,9 +30,11 @@ public class StickyNoteResponseMapperTest {
   
   private StickyNoteWebResponse stickyNoteWebResponse;
   
+  private Page<StickyNote> stickyNotePage;
+  
   private DataResponse<StickyNoteWebResponse> createdDataResponse;
   
-  private DataResponse<StickyNoteWebResponse> retrievedDataResponse;
+  private PagingResponse<StickyNoteWebResponse> retrievedPagingResponse;
   
   @Before
   public void setUp() {
@@ -36,8 +46,8 @@ public class StickyNoteResponseMapperTest {
     stickyNote.setUpdatedAt(UPDATED_AT);
     
     stickyNoteWebResponse = StickyNoteWebResponse.builder()
-      .noteTitle(TITLE)
-      .noteDescription(DESCRIPTION)
+      .title(TITLE)
+      .description(DESCRIPTION)
       .updatedAt(UPDATED_AT)
       .build();
     
@@ -47,11 +57,14 @@ public class StickyNoteResponseMapperTest {
       .data(stickyNoteWebResponse)
       .build();
     
-    retrievedDataResponse = DataResponse.<StickyNoteWebResponse>builder().code(
-      200)
-      .status("OK")
-      .data(stickyNoteWebResponse)
-      .build();
+    stickyNotePage = new PageImpl<>(
+      Collections.singletonList(stickyNote), new PageRequest(0, 1), 1);
+    retrievedPagingResponse =
+      PagingResponse.<StickyNoteWebResponse>builder().code(200)
+        .status("OK")
+        .data(Arrays.asList(stickyNoteWebResponse))
+        .paging(PageHelper.toPaging(stickyNotePage))
+        .build();
   }
   
   @After
@@ -66,12 +79,16 @@ public class StickyNoteResponseMapperTest {
     
     assertThat(createdDataResponse).isNotNull();
     assertThat(createdDataResponse).isEqualTo(this.createdDataResponse);
+  }
+  
+  @Test
+  public void testGivenStickyNotePageByMappingToPagingResponseReturnPagingResponseObject() {
     
-    DataResponse<StickyNoteWebResponse> retrievedDataResponse =
-      StickyNoteResponseMapper.toStickyNoteDataResponse(stickyNote);
+    PagingResponse<StickyNoteWebResponse> retrievedPagingResponse =
+      StickyNoteResponseMapper.toStickyNotePagingResponse(stickyNotePage);
     
-    assertThat(retrievedDataResponse).isNotNull();
-    assertThat(retrievedDataResponse).isEqualTo(this.retrievedDataResponse);
+    assertThat(retrievedPagingResponse).isNotNull();
+    assertThat(retrievedPagingResponse).isEqualTo(this.retrievedPagingResponse);
   }
   
 }

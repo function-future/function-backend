@@ -46,8 +46,8 @@ public class StickyNoteRequestMapper {
     validator.validate(request);
   
     return StickyNote.builder()
-      .title(request.getNoteTitle())
-      .description(request.getNoteDescription())
+      .title(request.getTitle())
+      .description(request.getDescription())
       .build();
   }
   
