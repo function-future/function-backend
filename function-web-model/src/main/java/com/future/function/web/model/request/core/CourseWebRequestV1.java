@@ -13,7 +13,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 import java.util.List;
 
 /**
- * Model representation for course web request.
+ * @deprecated Model representation for course web request.
  */
 @Data
 @Builder
@@ -21,7 +21,7 @@ import java.util.List;
 @AllArgsConstructor
 @BatchesMustExist
 @BatchesMustBeDistinct
-public class CourseWebRequest implements CourseData {
+public class CourseWebRequestV1 implements CourseData {
   
   @NotBlank(message = "NotBlank")
   private String courseTitle;

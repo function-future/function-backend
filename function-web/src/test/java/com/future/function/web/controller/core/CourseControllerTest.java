@@ -1,12 +1,12 @@
 package com.future.function.web.controller.core;
 
 import com.future.function.model.entity.feature.core.Course;
-import com.future.function.service.api.feature.core.shared.SharedCourseService;
+import com.future.function.service.api.feature.core.CourseService;
 import com.future.function.web.JacksonTestHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
-import com.future.function.web.mapper.request.core.CourseRequestMapper;
+import com.future.function.web.mapper.request.core.CourseRequestMapperV2;
 import com.future.function.web.mapper.response.core.CourseResponseMapper;
-import com.future.function.web.model.request.core.shared.SharedCourseWebRequest;
+import com.future.function.web.model.request.core.CourseWebRequestV2;
 import com.future.function.web.model.response.base.BaseResponse;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
@@ -17,20 +17,18 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -50,34 +48,23 @@ public class CourseControllerTest extends JacksonTestHelper {
   private static final BaseResponse OK_BASE_RESPONSE =
     ResponseHelper.toBaseResponse(HttpStatus.OK);
   
-  private static final BaseResponse CREATED_BASE_RESPONSE =
-    ResponseHelper.toBaseResponse(HttpStatus.CREATED);
-  
   private static final String ID = "id";
   
   private static final String TITLE = "title";
   
   private static final String DESCRIPTION = "description";
   
-  private static final long BATCH_NUMBER_1 = 1L;
-  
-  private static final long BATCH_NUMBER_2 = 2L;
-  
-  private static final SharedCourseWebRequest SHARED_COURSE_WEB_REQUEST =
-    new SharedCourseWebRequest(BATCH_NUMBER_1, BATCH_NUMBER_2);
-  
-  private static final String SHARED_COURSE_REQUEST_DATA =
-    "{\"originBatch" + "\":1,\"targetBatch\":2}";
-  
-  private static final String COURSE_REQUEST_DATA =
-    "{\"courseTitle" + "\":\"Course Title\"," + "\"courseDescription" +
-    "\":\"Course Description\"," + "\"batchNumbers\":[1]}";
-  
   private static final Course COURSE = Course.builder()
     .id(ID)
     .title(TITLE)
     .description(DESCRIPTION)
     .build();
+  
+  private static final CourseWebRequestV2 COURSE_WEB_REQUEST =
+    CourseWebRequestV2.builder()
+      .title(TITLE)
+      .description(DESCRIPTION)
+      .build();
   
   private static final Pageable PAGEABLE = new PageRequest(0, 5);
   
@@ -95,14 +82,16 @@ public class CourseControllerTest extends JacksonTestHelper {
     CREATED_COURSE_WEB_RESPONSE = CourseResponseMapper.toCourseDataResponse(
     HttpStatus.CREATED, COURSE);
   
+  private JacksonTester<CourseWebRequestV2> courseWebRequestV2JacksonTester;
+  
   @Autowired
   private MockMvc mockMvc;
   
   @MockBean
-  private SharedCourseService sharedCourseService;
+  private CourseService courseService;
   
   @MockBean
-  private CourseRequestMapper courseRequestMapper;
+  private CourseRequestMapperV2 courseRequestMapperV2;
   
   @Before
   public void setUp() {
@@ -113,136 +102,97 @@ public class CourseControllerTest extends JacksonTestHelper {
   @After
   public void tearDown() {
     
-    verifyNoMoreInteractions(sharedCourseService, courseRequestMapper);
+    verifyNoMoreInteractions(courseService, courseRequestMapperV2);
   }
   
   @Test
-  public void testGivenCourseIdAndBatchNumberByDeletingCourseReturnBaseResponseObject()
+  public void testGivenApiCallByCreatingCourseReturnDataResponseObject()
     throws Exception {
     
-    mockMvc.perform(delete("/api/core/courses/" + ID).param("batch",
-                                                            String.valueOf(
-                                                              BATCH_NUMBER_1)
-    ))
-      .andExpect(status().isOk())
-      .andExpect(content().json(
-        baseResponseJacksonTester.write(OK_BASE_RESPONSE)
-          .getJson()));
-    
-    verify(sharedCourseService).deleteCourse(ID, BATCH_NUMBER_1);
-    verifyZeroInteractions(courseRequestMapper);
-  }
-  
-  @Test
-  public void testGivenRequestBodyByCopyingCoursesReturnBaseResponseObject()
-    throws Exception {
-    
-    List<Long> batchNumbers = Arrays.asList(BATCH_NUMBER_1, BATCH_NUMBER_2);
-    when(courseRequestMapper.toCopyCoursesData(
-      SHARED_COURSE_WEB_REQUEST)).thenReturn(batchNumbers);
-    
-    mockMvc.perform(post("/api/core/courses/_copy").contentType(
-      MediaType.APPLICATION_JSON)
-                      .content(SHARED_COURSE_REQUEST_DATA))
-      .andExpect(status().isCreated())
-      .andExpect(content().json(
-        baseResponseJacksonTester.write(CREATED_BASE_RESPONSE)
-          .getJson()));
-    
-    verify(courseRequestMapper).toCopyCoursesData(SHARED_COURSE_WEB_REQUEST);
-    verify(sharedCourseService).copyCourses(
-      batchNumbers.get(0), batchNumbers.get(1));
-  }
-  
-  @Test
-  public void testGivenCourseIdAndBatchNumberByGettingCourseReturnDataResponseObject()
-    throws Exception {
-    
-    when(sharedCourseService.getCourse(ID, BATCH_NUMBER_1)).thenReturn(COURSE);
-    
-    mockMvc.perform(get("/api/core/courses/" + ID).param("batch",
-                                                         String.valueOf(
-                                                           BATCH_NUMBER_1)
-    ))
-      .andExpect(status().isOk())
-      .andExpect(content().json(
-        dataResponseJacksonTester.write(RETRIEVED_COURSE_WEB_RESPONSE)
-          .getJson()));
-    
-    verify(sharedCourseService).getCourse(ID, BATCH_NUMBER_1);
-  }
-  
-  @Test
-  public void testGivenPageAndSizeAndBatchNumberByGettingCoursesReturnPagingResponseObject()
-    throws Exception {
-    
-    when(sharedCourseService.getCourses(PAGEABLE, BATCH_NUMBER_1)).thenReturn(
-      COURSE_PAGE);
-    
-    mockMvc.perform(get("/api/core/courses").param("page", "1")
-                      .param("size", "5")
-                      .param("batch", String.valueOf(BATCH_NUMBER_1)))
-      .andExpect(status().isOk())
-      .andExpect(content().json(
-        pagingResponseJacksonTester.write(PAGING_RESPONSE)
-          .getJson()));
-    
-    verify(sharedCourseService).getCourses(PAGEABLE, BATCH_NUMBER_1);
-  }
-  
-  @Test
-  public void testGivenCourseDataAndFileByCreatingCourseReturnDataResponseObject()
-    throws Exception {
-    
-    List<Long> batchNumbers = Collections.singletonList(BATCH_NUMBER_1);
-    Pair<Course, List<Long>> pair = Pair.of(COURSE, batchNumbers);
-    
-    when(courseRequestMapper.toCourseAndBatchNumbers(
-      COURSE_REQUEST_DATA)).thenReturn(pair);
-    when(
-      sharedCourseService.createCourse(COURSE, null, batchNumbers)).thenReturn(
-      COURSE);
+    when(courseRequestMapperV2.toCourse(COURSE_WEB_REQUEST)).thenReturn(COURSE);
+    when(courseService.createCourse(COURSE)).thenReturn(COURSE);
     
     mockMvc.perform(post("/api/core/courses").contentType(
-      MediaType.MULTIPART_FORM_DATA_VALUE)
-                      .param("data", COURSE_REQUEST_DATA)
-                      .param("file", ""))
+      MediaType.APPLICATION_JSON)
+                      .content(courseWebRequestV2JacksonTester.write(
+                        COURSE_WEB_REQUEST)
+                                 .getJson()))
       .andExpect(status().isCreated())
       .andExpect(content().json(
         dataResponseJacksonTester.write(CREATED_COURSE_WEB_RESPONSE)
           .getJson()));
     
-    verify(courseRequestMapper).toCourseAndBatchNumbers(COURSE_REQUEST_DATA);
-    verify(sharedCourseService).createCourse(COURSE, null, batchNumbers);
+    verify(courseRequestMapperV2).toCourse(COURSE_WEB_REQUEST);
+    verify(courseService).createCourse(COURSE);
   }
   
   @Test
-  public void testGivenCourseIdAndDataAndFileByUpdatingCourseReturnDataResponseObject()
+  public void testGivenApiCallAndCourseIdByUpdatingCourseReturnDataResponseObject()
     throws Exception {
     
-    List<Long> batchNumbers = Arrays.asList(BATCH_NUMBER_1, BATCH_NUMBER_2);
-    Pair<Course, List<Long>> pair = Pair.of(COURSE, batchNumbers);
-    
-    when(courseRequestMapper.toCourseAndBatchNumbers(ID,
-                                                     COURSE_REQUEST_DATA
-    )).thenReturn(pair);
-    when(
-      sharedCourseService.updateCourse(COURSE, null, batchNumbers)).thenReturn(
+    when(courseRequestMapperV2.toCourse(ID, COURSE_WEB_REQUEST)).thenReturn(
       COURSE);
+    when(courseService.updateCourse(COURSE)).thenReturn(COURSE);
     
     mockMvc.perform(put("/api/core/courses/" + ID).contentType(
-      MediaType.MULTIPART_FORM_DATA_VALUE)
-                      .param("data", COURSE_REQUEST_DATA)
-                      .param("file", ""))
+      MediaType.APPLICATION_JSON)
+                      .content(courseWebRequestV2JacksonTester.write(
+                        COURSE_WEB_REQUEST)
+                                 .getJson()))
       .andExpect(status().isOk())
       .andExpect(content().json(
         dataResponseJacksonTester.write(RETRIEVED_COURSE_WEB_RESPONSE)
           .getJson()));
     
-    verify(courseRequestMapper).toCourseAndBatchNumbers(ID,
-                                                        COURSE_REQUEST_DATA
-    );
-    verify(sharedCourseService).updateCourse(COURSE, null, batchNumbers);
+    verify(courseRequestMapperV2).toCourse(ID, COURSE_WEB_REQUEST);
+    verify(courseService).updateCourse(COURSE);
+  }
+  
+  @Test
+  public void testGivenApiCallAndCourseIdByDeletingCourseReturnBaseResponseObject()
+    throws Exception {
+    
+    mockMvc.perform(delete("/api/core/courses/" + ID))
+      .andExpect(status().isOk())
+      .andExpect(content().json(
+        baseResponseJacksonTester.write(OK_BASE_RESPONSE)
+          .getJson()));
+    
+    verify(courseService).deleteCourse(ID);
+    verifyZeroInteractions(courseRequestMapperV2);
+  }
+  
+  @Test
+  public void testGivenApiCallByGettingCourseReturnDataResponseObject()
+    throws Exception {
+    
+    when(courseService.getCourses(PAGEABLE)).thenReturn(COURSE_PAGE);
+    
+    mockMvc.perform(get("/api/core/courses").param("page", "1")
+                      .param("size", "5"))
+      .andExpect(status().isOk())
+      .andExpect(content().json(
+        pagingResponseJacksonTester.write(PAGING_RESPONSE)
+          .getJson()));
+    
+    verify(courseService).getCourses(PAGEABLE);
+    verifyZeroInteractions(courseRequestMapperV2);
+  }
+  
+  @Test
+  public void testGivenApiCallAndCourseIdByGettingCourseReturnDataResponseObject()
+    throws Exception {
+    
+    when(courseService.getCourse(ID)).thenReturn(COURSE);
+    
+    mockMvc.perform(get("/api/core/courses/" + ID))
+      .andExpect(status().isOk())
+      .andExpect(content().json(
+        dataResponseJacksonTester.write(RETRIEVED_COURSE_WEB_RESPONSE)
+          .getJson()));
+    
+    verify(courseService).getCourse(ID);
+    verifyZeroInteractions(courseRequestMapperV2);
   }
   
 }

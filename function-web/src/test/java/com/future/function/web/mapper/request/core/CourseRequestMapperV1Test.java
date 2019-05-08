@@ -3,7 +3,7 @@ package com.future.function.web.mapper.request.core;
 import com.future.function.model.entity.feature.core.Course;
 import com.future.function.validation.RequestValidator;
 import com.future.function.web.mapper.request.WebRequestMapper;
-import com.future.function.web.model.request.core.CourseWebRequest;
+import com.future.function.web.model.request.core.CourseWebRequestV1;
 import com.future.function.web.model.request.core.shared.SharedCourseWebRequest;
 import org.junit.After;
 import org.junit.Before;
@@ -24,7 +24,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class CourseRequestMapperTest {
+public class CourseRequestMapperV1Test {
   
   private static final String ID = "id";
   
@@ -44,8 +44,8 @@ public class CourseRequestMapperTest {
     .description(DESCRIPTION)
     .build();
   
-  private static final CourseWebRequest COURSE_WEB_REQUEST =
-    CourseWebRequest.builder()
+  private static final CourseWebRequestV1 COURSE_WEB_REQUEST =
+    CourseWebRequestV1.builder()
       .courseTitle(TITLE)
       .courseDescription(DESCRIPTION)
       .batchNumbers(Collections.singletonList(ONE))
@@ -64,13 +64,13 @@ public class CourseRequestMapperTest {
   private RequestValidator validator;
   
   @InjectMocks
-  private CourseRequestMapper courseRequestMapper;
+  private CourseRequestMapperV1 courseRequestMapperV1;
   
   @Before
   public void setUp() {
     
     when(requestMapper.toWebRequestObject(JSON,
-                                          CourseWebRequest.class
+                                          CourseWebRequestV1.class
     )).thenReturn(COURSE_WEB_REQUEST);
     when(validator.validate(COURSE_WEB_REQUEST)).thenReturn(COURSE_WEB_REQUEST);
   }
@@ -85,7 +85,7 @@ public class CourseRequestMapperTest {
   public void testGivenJsonDataAsStringByParsingToCourseClassReturnPairObject() {
     
     Pair<Course, List<Long>> parsedData =
-      courseRequestMapper.toCourseAndBatchNumbers(JSON);
+      courseRequestMapperV1.toCourseAndBatchNumbers(JSON);
     
     assertThat(parsedData).isNotNull();
     assertThat(parsedData.getFirst()
@@ -97,7 +97,7 @@ public class CourseRequestMapperTest {
     assertThat(parsedData.getSecond()).isEqualTo(
       Collections.singletonList(ONE));
     
-    verify(requestMapper).toWebRequestObject(JSON, CourseWebRequest.class);
+    verify(requestMapper).toWebRequestObject(JSON, CourseWebRequestV1.class);
     verify(validator).validate(COURSE_WEB_REQUEST);
   }
   
@@ -105,14 +105,14 @@ public class CourseRequestMapperTest {
   public void testGivenIdAndJsonDataAsStringByParsingToCourseClassReturnPairObject() {
     
     Pair<Course, List<Long>> parsedData =
-      courseRequestMapper.toCourseAndBatchNumbers(ID, JSON);
+      courseRequestMapperV1.toCourseAndBatchNumbers(ID, JSON);
     
     assertThat(parsedData).isNotNull();
     assertThat(parsedData.getFirst()).isEqualTo(COURSE);
     assertThat(parsedData.getSecond()).isEqualTo(
       Collections.singletonList(ONE));
     
-    verify(requestMapper).toWebRequestObject(JSON, CourseWebRequest.class);
+    verify(requestMapper).toWebRequestObject(JSON, CourseWebRequestV1.class);
     verify(validator).validate(COURSE_WEB_REQUEST);
   }
   
@@ -124,7 +124,7 @@ public class CourseRequestMapperTest {
     
     List<Long> batchNumbers = Arrays.asList(ONE, TWO);
     
-    List<Long> parsedBatchNumbers = courseRequestMapper.toCopyCoursesData(
+    List<Long> parsedBatchNumbers = courseRequestMapperV1.toCopyCoursesData(
       SHARED_COURSE_WEB_REQUEST);
     
     assertThat(parsedBatchNumbers).isNotNull();

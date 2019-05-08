@@ -1,24 +1,17 @@
 package com.future.function.web.controller.core;
 
-import com.future.function.model.entity.feature.core.Course;
-import com.future.function.service.api.feature.core.shared.SharedCourseService;
+import com.future.function.service.api.feature.core.CourseService;
 import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
-import com.future.function.web.mapper.request.core.CourseRequestMapper;
+import com.future.function.web.mapper.request.core.CourseRequestMapperV2;
 import com.future.function.web.mapper.response.core.CourseResponseMapper;
-import com.future.function.web.model.request.core.shared.SharedCourseWebRequest;
+import com.future.function.web.model.request.core.CourseWebRequestV2;
 import com.future.function.web.model.response.base.BaseResponse;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.feature.core.CourseWebResponse;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 
 /**
  * Controller class for course APIs.
@@ -27,179 +20,76 @@ import java.util.List;
 @RequestMapping(value = "/api/core/courses")
 public class CourseController {
   
-  // TODO When security is enabled, add parameter `Principal` to each method
-  //  parameter, and check if the `Principal` has batch number (possibly in
-  //  his authorities) or not. Otherwise, use parameter for `long batch`.
+  private final CourseService courseService;
   
-  private final SharedCourseService sharedCourseService;
+  private final CourseRequestMapperV2 courseRequestMapperV2;
   
-  private final CourseRequestMapper courseRequestMapper;
-  
-  @Autowired
   public CourseController(
-    SharedCourseService sharedCourseService,
-    CourseRequestMapper courseRequestMapper
+    CourseService courseService, CourseRequestMapperV2 courseRequestMapperV2
   ) {
     
-    this.sharedCourseService = sharedCourseService;
-    this.courseRequestMapper = courseRequestMapper;
+    this.courseService = courseService;
+    this.courseRequestMapperV2 = courseRequestMapperV2;
   }
   
-  /**
-   * Retrieves courses based on given parameters.
-   *
-   * @param page  Current page of data.
-   * @param size  Size of data to be displayed per page.
-   * @param batch Batch number of current user (student) OR selected batch
-   *              number (admin/judge/mentor).
-   *
-   * @return {@code PagingResponse<CourseWebResponse>} - The retrieved
-   * courses data, wrapped in
-   * {@link com.future.function.web.model.response.base.PagingResponse} and
-   * {@link com.future.function.web.model.response.feature.core.CourseWebResponse}
-   */
   @ResponseStatus(HttpStatus.OK)
   @GetMapping
   public PagingResponse<CourseWebResponse> getCourses(
     @RequestParam(defaultValue = "1")
       int page,
     @RequestParam(defaultValue = "5")
-      int size,
-    @RequestParam
-      long batch
+      int size
   ) {
     
     return CourseResponseMapper.toCoursesPagingResponse(
-      sharedCourseService.getCourses(PageHelper.toPage(page, size), batch));
+      courseService.getCourses(PageHelper.toPage(page, size)));
   }
   
-  /**
-   * Copies courses from a batch to another batch.
-   *
-   * @param request Request body containing origin batch and target batch.
-   *
-   * @return {@code BaseResponse} - Indicating successful copying.
-   */
-  @ResponseStatus(HttpStatus.CREATED)
-  @PostMapping(value = "/_copy",
-               produces = MediaType.APPLICATION_JSON_VALUE,
-               consumes = MediaType.APPLICATION_JSON_VALUE)
-  public BaseResponse copyCourses(
-    @RequestBody
-      SharedCourseWebRequest request
+  @ResponseStatus(HttpStatus.OK)
+  @GetMapping(value = "/{courseId}")
+  public DataResponse<CourseWebResponse> getCourse(
+    @PathVariable
+      String courseId
   ) {
     
-    List<Long> batchNumbers = courseRequestMapper.toCopyCoursesData(request);
-    sharedCourseService.copyCourses(batchNumbers.get(0), batchNumbers.get(1));
-    return ResponseHelper.toBaseResponse(HttpStatus.CREATED);
-  }
-  
-  /**
-   * Creates new course in database.
-   *
-   * @param data Data of new course in JSON format.
-   * @param file File of the new course.
-   *
-   * @return {@code DataResponse<CourseWebResponse>} - The created
-   * course data, wrapped in
-   * {@link com.future.function.web.model.response.base.DataResponse} and
-   * {@link com.future.function.web.model.response.feature.core.CourseWebResponse}
-   */
-  @ResponseStatus(HttpStatus.CREATED)
-  @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
-               produces = MediaType.APPLICATION_JSON_VALUE)
-  public DataResponse<CourseWebResponse> createCourse(
-    @RequestParam
-      String data,
-    @RequestParam(required = false)
-      MultipartFile file
-  ) {
-  
-    Pair<Course, List<Long>> pair = courseRequestMapper.toCourseAndBatchNumbers(
-      data);
     return CourseResponseMapper.toCourseDataResponse(
-      HttpStatus.CREATED, sharedCourseService.createCourse(
-        pair.getFirst(), file, pair.getSecond()));
+      courseService.getCourse(courseId));
   }
   
-  /**
-   * Updates existing course in database.
-   *
-   * @param courseId Id of to-be-updated course.
-   * @param data     Data of existing course in JSON format.
-   * @param file     New file of the existing course.
-   *
-   * @return {@code DataResponse<CourseWebResponse>} - The updated
-   * course data, wrapped in
-   * {@link com.future.function.web.model.response.base.DataResponse} and
-   * {@link com.future.function.web.model.response.feature.core.CourseWebResponse}
-   */
+  @ResponseStatus(HttpStatus.CREATED)
+  @PostMapping
+  public DataResponse<CourseWebResponse> createCourse(
+    @RequestBody
+      CourseWebRequestV2 request
+  ) {
+    
+    return CourseResponseMapper.toCourseDataResponse(
+      HttpStatus.CREATED,
+      courseService.createCourse(courseRequestMapperV2.toCourse(request))
+    );
+  }
+  
   @ResponseStatus(HttpStatus.OK)
-  @PutMapping(value = "/{courseId}",
-              consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
-              produces = MediaType.APPLICATION_JSON_VALUE)
+  @PutMapping("/{courseId}")
   public DataResponse<CourseWebResponse> updateCourse(
     @PathVariable
       String courseId,
-    @RequestParam
-      String data,
-    @RequestParam(required = false)
-      MultipartFile file
-  ) {
-  
-    Pair<Course, List<Long>> pair = courseRequestMapper.toCourseAndBatchNumbers(
-      courseId, data);
-    return CourseResponseMapper.toCourseDataResponse(
-      sharedCourseService.updateCourse(pair.getFirst(), file,
-                                       pair.getSecond()
-      ));
-  }
-  
-  /**
-   * Retrieves a course based on given parameter.
-   *
-   * @param courseId Id of course to be retrieved.
-   * @param batch    Batch number of current user (student) OR selected batch
-   *                 number (admin/judge/mentor).
-   *
-   * @return {@code DataResponse<CourseWebResponse>} - The retrieved
-   * course data, wrapped in
-   * {@link com.future.function.web.model.response.base.DataResponse} and
-   * {@link com.future.function.web.model.response.feature.core.CourseWebResponse}
-   */
-  @ResponseStatus(HttpStatus.OK)
-  @GetMapping(value = "/{courseId}",
-              produces = MediaType.APPLICATION_JSON_VALUE)
-  public DataResponse<CourseWebResponse> getCourse(
-    @PathVariable
-      String courseId,
-    @RequestParam
-      long batch
+    @RequestBody
+      CourseWebRequestV2 request
   ) {
     
-    return CourseResponseMapper.toCourseDataResponse(
-      sharedCourseService.getCourse(courseId, batch));
+    return CourseResponseMapper.toCourseDataResponse(courseService.updateCourse(
+      courseRequestMapperV2.toCourse(courseId, request)));
   }
   
-  /**
-   * Deletes course from database.
-   *
-   * @param courseId Id of to be deleted course.
-   * @param batch    Batch number of of selected course.
-   *
-   * @return {@code BaseResponse} - Indicating successful deletion.
-   */
   @ResponseStatus(HttpStatus.OK)
-  @DeleteMapping(value = "/{courseId}",
-                 produces = MediaType.APPLICATION_JSON_VALUE)
+  @DeleteMapping("/{courseId}")
   public BaseResponse deleteCourse(
     @PathVariable
-      String courseId,
-    @RequestParam
-      long batch
+      String courseId
   ) {
     
-    sharedCourseService.deleteCourse(courseId, batch);
+    courseService.deleteCourse(courseId);
     return ResponseHelper.toBaseResponse(HttpStatus.OK);
   }
   
