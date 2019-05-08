@@ -52,7 +52,7 @@ public class UserServiceImpl implements UserService {
   /**
    * {@inheritDoc}
    *
-   * @param userId Email of user to be retrieved.
+   * @param userId Id of user to be retrieved.
    *
    * @return {@code User} - The user object found in database.
    */
@@ -186,13 +186,13 @@ public class UserServiceImpl implements UserService {
   /**
    * {@inheritDoc}
    *
-   * @param userId Email of user to be deleted.
+   * @param userId Id of user to be deleted.
    */
   @Override
   public void deleteUser(String userId) {
   
-    Optional.ofNullable(email)
-      .flatMap(userRepository::findByEmail)
+    Optional.ofNullable(userId)
+      .map(userRepository::findOne)
       .ifPresent(user -> markDeleted(user, true));
   }
 
