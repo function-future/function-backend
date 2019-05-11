@@ -235,7 +235,7 @@ public class UserServiceImplTest {
     
     when(userRepository.findByEmail(EMAIL_STUDENT)).thenReturn(
       Optional.empty());
-    when(batchService.getBatch(NUMBER)).thenReturn(BATCH);
+    when(batchService.getBatchByCode(NUMBER)).thenReturn(BATCH);
     when(fileService.storeFile(MOCK_MULTIPARTFILE, FileOrigin.USER)).thenReturn(
       PICTURE);
     when(fileService.getFile(PICTURE_ID)).thenReturn(PICTURE);
@@ -251,7 +251,7 @@ public class UserServiceImplTest {
     assertThat(createdUserStudent.getPicture()).isEqualTo(PICTURE);
     
     verify(userRepository).findByEmail(EMAIL_STUDENT);
-    verify(batchService).getBatch(NUMBER);
+    verify(batchService).getBatchByCode(NUMBER);
     verify(fileService).storeFile(MOCK_MULTIPARTFILE, FileOrigin.USER);
     verify(fileService).getFile(PICTURE_ID);
     verify(userRepository).save(userStudent);
@@ -309,7 +309,7 @@ public class UserServiceImplTest {
   @Test
   public void testGivenDeletedStudentDataByCreatingUserReturnStudent() {
     
-    when(batchService.getBatch(NUMBER)).thenReturn(BATCH);
+    when(batchService.getBatchByCode(NUMBER)).thenReturn(BATCH);
     
     userStudent.setDeleted(true);
     
@@ -326,7 +326,7 @@ public class UserServiceImplTest {
     
     assertThat(createdUserStudent).isNotNull();
     
-    verify(batchService).getBatch(NUMBER);
+    verify(batchService).getBatchByCode(NUMBER);
     verify(userRepository).findByEmail(EMAIL_STUDENT);
     verify(userRepository, times(2)).save(savedUserStudent);
   }
@@ -358,7 +358,7 @@ public class UserServiceImplTest {
     
     userStudent.setPicture(PICTURE);
     
-    when(batchService.getBatch(NUMBER)).thenReturn(BATCH);
+    when(batchService.getBatchByCode(NUMBER)).thenReturn(BATCH);
     when(userRepository.findByEmail(EMAIL_STUDENT)).thenReturn(
       Optional.of(userStudent));
     when(fileService.storeFile(MOCK_MULTIPARTFILE, FileOrigin.USER)).thenReturn(
@@ -376,7 +376,7 @@ public class UserServiceImplTest {
     assertThat(updatedUserStudent.getPicture()).isNotNull();
     assertThat(updatedUserStudent.getPicture()).isEqualTo(PICTURE);
     
-    verify(batchService).getBatch(NUMBER);
+    verify(batchService).getBatchByCode(NUMBER);
     verify(userRepository).findByEmail(EMAIL_STUDENT);
     verify(fileService).deleteFile(PICTURE_ID);
     verify(fileService).storeFile(MOCK_MULTIPARTFILE, FileOrigin.USER);
