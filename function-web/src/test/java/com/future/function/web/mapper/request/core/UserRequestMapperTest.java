@@ -44,6 +44,23 @@ public class UserRequestMapperTest {
   
   private static final String UNIVERSITY = "university";
   
+  private static final String STUDENT_ID = "student-id";
+  
+  private static final User STUDENT_WITH_ID = User.builder()
+    .id(STUDENT_ID)
+    .role(Role.STUDENT)
+    .email(STUDENT_EMAIL)
+    .name(NAME)
+    .password(PASSWORD)
+    .phone(PHONE)
+    .address(ADDRESS)
+    .picture(new File())
+    .batch(Batch.builder()
+             .number(NUMBER)
+             .build())
+    .university(UNIVERSITY)
+    .build();
+  
   private static final User STUDENT = User.builder()
     .role(Role.STUDENT)
     .email(STUDENT_EMAIL)
@@ -75,6 +92,19 @@ public class UserRequestMapperTest {
       .batch(NUMBER)
       .university(UNIVERSITY)
       .build();
+  
+  private static final String VALID_ADMIN_ID = "valid-admin-id";
+  
+  private static final User VALID_ADMIN_WITH_ID = User.builder()
+    .id(VALID_ADMIN_ID)
+    .role(Role.ADMIN)
+    .email(ADMIN_EMAIL)
+    .name(NAME)
+    .password(PASSWORD)
+    .phone(PHONE)
+    .address(ADDRESS)
+    .picture(new File())
+    .build();
   
   private static final User VALID_ADMIN = User.builder()
     .role(Role.ADMIN)
@@ -164,15 +194,15 @@ public class UserRequestMapperTest {
   }
   
   @Test
-  public void testGivenEmailAndJsonDataAsStringByParsingToUserClassReturnUserObject() {
+  public void testGivenUserIdAndJsonDataAsStringByParsingToUserClassReturnUserObject() {
     
-    User parsedStudent = userRequestMapper.toUser(STUDENT_EMAIL, STUDENT_JSON);
+    User parsedStudent = userRequestMapper.toUser(STUDENT_ID, STUDENT_JSON);
     
-    assertThat(parsedStudent).isEqualTo(STUDENT);
+    assertThat(parsedStudent).isEqualTo(STUDENT_WITH_ID);
     
-    User parsedAdmin = userRequestMapper.toUser(ADMIN_EMAIL, VALID_ADMIN_JSON);
+    User parsedAdmin = userRequestMapper.toUser(VALID_ADMIN_ID, VALID_ADMIN_JSON);
     
-    assertThat(parsedAdmin).isEqualTo(VALID_ADMIN);
+    assertThat(parsedAdmin).isEqualTo(VALID_ADMIN_WITH_ID);
   
     verify(requestMapper).toWebRequestObject(
       STUDENT_JSON, UserWebRequest.class);
