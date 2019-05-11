@@ -15,6 +15,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class UserWebResponse {
   
+  private String id;
+  
   private String role;
   
   private String email;
