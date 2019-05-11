@@ -52,14 +52,15 @@ public class UserServiceImpl implements UserService {
   /**
    * {@inheritDoc}
    *
-   * @param email Email of user to be retrieved.
+   * @param userId Id of user to be retrieved.
    *
    * @return {@code User} - The user object found in database.
    */
   @Override
-  public User getUser(String email) {
+  public User getUser(String userId) {
   
-    return userRepository.findByEmail(email)
+    return Optional.ofNullable(userId)
+      .map(userRepository::findOne)
       .orElseThrow(() -> new NotFoundException("Get User Not Found"));
   }
   
@@ -94,7 +95,9 @@ public class UserServiceImpl implements UserService {
                                             .getNumber()));
     }
   
-    return userRepository.findByEmail(user.getEmail())
+    return Optional.of(user)
+      .map(User::getId)
+      .map(userRepository::findOne)
       .filter(User::isDeleted)
       .map(foundUser -> markDeleted(foundUser, false))
       .map(foundUser -> copyPropertiesAndSaveUser(user, foundUser))
@@ -171,23 +174,25 @@ public class UserServiceImpl implements UserService {
                                             .getNumber()));
     }
   
-    return userRepository.findByEmail(user.getEmail())
+    return Optional.of(user)
+      .map(User::getId)
+      .map(userRepository::findOne)
       .map(this::deleteUserPicture)
       .map(foundUser -> setUserPicture(user, image))
       .map(foundUser -> copyPropertiesAndSaveUser(user, foundUser))
-      .orElseThrow(() -> new NotFoundException("Update User Not Found"));
+      .orElse(user);
   }
   
   /**
    * {@inheritDoc}
    *
-   * @param email Email of user to be deleted.
+   * @param userId Id of user to be deleted.
    */
   @Override
-  public void deleteUser(String email) {
+  public void deleteUser(String userId) {
   
-    Optional.ofNullable(email)
-      .map(this::getUser)
+    Optional.ofNullable(userId)
+      .map(userRepository::findOne)
       .ifPresent(user -> markDeleted(user, true));
   }
 

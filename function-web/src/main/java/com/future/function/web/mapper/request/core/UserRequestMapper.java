@@ -26,7 +26,7 @@ public class UserRequestMapper {
   private UserRequestMapper(
     WebRequestMapper requestMapper, RequestValidator validator
   ) {
-  
+    
     this.requestMapper = requestMapper;
     this.validator = validator;
   }
@@ -39,21 +39,22 @@ public class UserRequestMapper {
    * @return {@code User} - Converted user object.
    */
   public User toUser(String data) {
-  
+    
     UserWebRequest request = requestMapper.toWebRequestObject(data,
                                                               UserWebRequest.class
     );
     
-    return toValidatedUser(request.getEmail(), request);
+    return toValidatedUser(null, request);
   }
   
-  private User toValidatedUser(String email, UserWebRequest request) {
-  
+  private User toValidatedUser(String userId, UserWebRequest request) {
+    
     validator.validate(request);
-  
-    return User.builder()
+    
+    User user = User.builder()
       .role(Role.toRole(request.getRole()))
-      .email(email)
+      .email(request.getEmail()
+               .toLowerCase())
       .name(request.getName())
       .password(getDefaultPassword(request.getName()))
       .phone(request.getPhone())
@@ -62,6 +63,12 @@ public class UserRequestMapper {
       .batch(toBatch(request))
       .university(getUniversity(request))
       .build();
+    
+    if (userId != null) {
+      user.setId(userId);
+    }
+    
+    return user;
   }
   
   private String getUniversity(UserWebRequest request) {
@@ -94,15 +101,15 @@ public class UserRequestMapper {
    * Converts JSON data to {@code User} object. This method is used for
    * update user purposes.
    *
-   * @param email Email of user to be updated.
-   * @param data  JSON data (in form of String) to be converted.
+   * @param userId Id of user to be updated.
+   * @param data   JSON data (in form of String) to be converted.
    *
    * @return {@code User} - Converted user object.
    */
-  public User toUser(String email, String data) {
-  
-    return toValidatedUser(email, requestMapper.toWebRequestObject(data,
-                                                                   UserWebRequest.class
+  public User toUser(String userId, String data) {
+    
+    return toValidatedUser(userId, requestMapper.toWebRequestObject(data,
+                                                                    UserWebRequest.class
     ));
   }
   

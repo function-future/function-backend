@@ -74,26 +74,26 @@ public class UserController {
   /**
    * Deletes user from database.
    *
-   * @param email Email of to be deleted user.
+   * @param userId Id of to be deleted user.
    *
    * @return {@code BaseResponse} - Indicating successful deletion.
    */
   @ResponseStatus(HttpStatus.OK)
-  @DeleteMapping(value = "/{email:.+}",
+  @DeleteMapping(value = "/{userId:.+}",
                  produces = MediaType.APPLICATION_JSON_VALUE)
   public BaseResponse deleteUser(
     @PathVariable
-      String email
+      String userId
   ) {
     
-    userService.deleteUser(email);
+    userService.deleteUser(userId);
     return ResponseHelper.toBaseResponse(HttpStatus.OK);
   }
   
   /**
    * Retrieves a user based on given parameter.
    *
-   * @param email Email of user to be retrieved.
+   * @param userId Id of user to be retrieved.
    *
    * @return {@code DataResponse<UserWebResponse>} - The retrieved user data,
    * wrapped in
@@ -101,14 +101,14 @@ public class UserController {
    * {@link com.future.function.web.model.response.feature.core.UserWebResponse}
    */
   @ResponseStatus(HttpStatus.OK)
-  @GetMapping(value = "/{email:.+}",
+  @GetMapping(value = "/{userId:.+}",
               produces = MediaType.APPLICATION_JSON_VALUE)
   public DataResponse<UserWebResponse> getUser(
     @PathVariable
-      String email
+      String userId
   ) {
     
-    return UserResponseMapper.toUserDataResponse(userService.getUser(email));
+    return UserResponseMapper.toUserDataResponse(userService.getUser(userId));
   }
   
   /**
@@ -139,7 +139,7 @@ public class UserController {
   /**
    * Updates existing user in database.
    *
-   * @param email Email of to-be-updated user.
+   * @param userId Id of to-be-updated user.
    * @param data  Data of existing user in JSON format.
    * @param image New profile image of the existing user.
    *
@@ -149,12 +149,12 @@ public class UserController {
    * {@link com.future.function.web.model.response.feature.core.UserWebResponse}
    */
   @ResponseStatus(HttpStatus.OK)
-  @PutMapping(value = "/{email:.+}",
+  @PutMapping(value = "/{userId:.+}",
               consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
               produces = MediaType.APPLICATION_JSON_VALUE)
   public DataResponse<UserWebResponse> updateUser(
     @PathVariable
-      String email,
+      String userId,
     @RequestParam
       String data,
     @RequestParam(required = false)
@@ -162,7 +162,7 @@ public class UserController {
   ) {
     
     return UserResponseMapper.toUserDataResponse(
-      userService.updateUser(userRequestMapper.toUser(email, data), image));
+      userService.updateUser(userRequestMapper.toUser(userId, data), image));
   }
   
 }

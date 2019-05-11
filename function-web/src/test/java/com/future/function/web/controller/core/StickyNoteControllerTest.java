@@ -7,6 +7,7 @@ import com.future.function.web.mapper.request.core.StickyNoteRequestMapper;
 import com.future.function.web.mapper.response.core.StickyNoteResponseMapper;
 import com.future.function.web.model.request.core.StickyNoteWebRequest;
 import com.future.function.web.model.response.base.DataResponse;
+import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.feature.core.StickyNoteWebResponse;
 import org.junit.After;
 import org.junit.Before;
@@ -16,10 +17,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.Collections;
 
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
@@ -48,13 +55,18 @@ public class StickyNoteControllerTest extends JacksonTestHelper {
   
   private static final StickyNoteWebRequest STICKY_NOTE_WEB_REQUEST =
     StickyNoteWebRequest.builder()
-      .noteTitle(TITLE)
-      .noteDescription(DESCRIPTION)
+      .title(TITLE)
+      .description(DESCRIPTION)
       .build();
   
-  private static final DataResponse<StickyNoteWebResponse>
-    RETRIEVED_DATA_RESPONSE = StickyNoteResponseMapper.toStickyNoteDataResponse(
-    STICKY_NOTE);
+  private static final Pageable PAGEABLE = new PageRequest(0, 1);
+  
+  private static final Page<StickyNote> STICKY_NOTE_PAGE = new PageImpl<>(
+    Collections.singletonList(STICKY_NOTE), PAGEABLE, 1);
+  
+  private static final PagingResponse<StickyNoteWebResponse>
+    RETRIEVED_PAGING_RESPONSE =
+    StickyNoteResponseMapper.toStickyNotePagingResponse(STICKY_NOTE_PAGE);
   
   private static final DataResponse<StickyNoteWebResponse>
     CREATED_DATA_RESPONSE = StickyNoteResponseMapper.toStickyNoteDataResponse(
@@ -87,15 +99,15 @@ public class StickyNoteControllerTest extends JacksonTestHelper {
   public void testGivenCallToStickyNoteApiByGettingStickyNoteReturnDataResponseOfStickyNote()
     throws Exception {
     
-    given(stickyNoteService.getStickyNote()).willReturn(STICKY_NOTE);
+    given(stickyNoteService.getStickyNote(PAGEABLE)).willReturn(STICKY_NOTE_PAGE);
     
     mockMvc.perform(get("/api/core/sticky-notes"))
       .andExpect(status().isOk())
       .andExpect(content().json(
-        dataResponseJacksonTester.write(RETRIEVED_DATA_RESPONSE)
+        pagingResponseJacksonTester.write(RETRIEVED_PAGING_RESPONSE)
           .getJson()));
     
-    verify(stickyNoteService).getStickyNote();
+    verify(stickyNoteService).getStickyNote(PAGEABLE);
   }
   
   @Test
@@ -107,7 +119,7 @@ public class StickyNoteControllerTest extends JacksonTestHelper {
       STICKY_NOTE);
     given(stickyNoteService.createStickyNote(STICKY_NOTE)).willReturn(
       STICKY_NOTE);
-    
+  
     mockMvc.perform(post("/api/core/sticky-notes").contentType(
       MediaType.APPLICATION_JSON_VALUE)
                       .content(stickyNoteWebRequestJacksonTester.write(

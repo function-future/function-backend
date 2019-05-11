@@ -102,7 +102,7 @@ public class AnnouncementServiceImpl implements AnnouncementService {
       .map(foundAnnouncement -> copyPropertiesAndSaveAnnouncement(announcement,
                                                                   foundAnnouncement
       ))
-      .orElseGet(() -> this.getAnnouncement(null));
+      .orElse(announcement);
   }
   
   private Announcement copyPropertiesAndSaveAnnouncement(
@@ -125,7 +125,6 @@ public class AnnouncementServiceImpl implements AnnouncementService {
   public void deleteAnnouncement(String announcementId) {
     
     Optional.ofNullable(announcementId)
-      .map(this::getAnnouncement)
       .ifPresent(announcementRepository::delete);
   }
   
