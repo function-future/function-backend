@@ -55,4 +55,27 @@ public class BatchRequestMapperTest {
     verify(validator).validate(request);
   }
   
+  @Test
+  public void testGivenIdAndBatchWebRequestByParsingToBatchReturnBatchObject() {
+    
+    BatchWebRequest request = BatchWebRequest.builder()
+      .name("name")
+      .code("code")
+      .build();
+    when(validator.validate(request)).thenReturn(request);
+    
+    String id = "id";
+    Batch batch = Batch.builder()
+      .id(id)
+      .name("name")
+      .code("code")
+      .build();
+    
+    Batch parsedBatch = batchRequestMapper.toBatch(id, request);
+    
+    assertThat(parsedBatch).isEqualTo(batch);
+    
+    verify(validator).validate(request);
+  }
+  
 }

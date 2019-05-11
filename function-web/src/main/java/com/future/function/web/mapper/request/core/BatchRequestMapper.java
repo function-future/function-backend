@@ -19,17 +19,23 @@ public class BatchRequestMapper {
   
   public Batch toBatch(BatchWebRequest request) {
     
-    return this.toValidatedBatch(request);
+    return this.toValidatedBatch(null, request);
   }
   
-  private Batch toValidatedBatch(BatchWebRequest request) {
+  private Batch toValidatedBatch(String id, BatchWebRequest request) {
     
     validator.validate(request);
     
     return Batch.builder()
+      .id(id)
       .name(request.getName())
       .code(request.getCode())
       .build();
+  }
+  
+  public Batch toBatch(String id, BatchWebRequest request) {
+    
+    return this.toValidatedBatch(id, request);
   }
   
 }
