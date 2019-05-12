@@ -7,6 +7,8 @@ import com.future.function.repository.feature.core.CourseRepository;
 import com.future.function.service.api.feature.core.CourseService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -45,11 +47,20 @@ public class CourseServiceImpl implements CourseService {
         () -> new UnsupportedOperationException("Create Course Failed"));
   }
   
-  private Course getCourse(String courseId) {
+  /**
+   * {@inheritDoc}
+   *
+   * @param course Course data of new course.
+   *
+   * @return {@code Course} - The course object of the saved data.
+   */
+  @Override
+  public Course createCourse(Course course) {
     
-    return Optional.ofNullable(courseId)
-      .map(courseRepository::findOne)
-      .orElseThrow(() -> new NotFoundException("Get Course Not Found"));
+    return Optional.of(course)
+      .map(courseRepository::save)
+      .map(c -> this.getCourse(c.getId()))
+      .orElseGet(() -> this.getCourse(course.getId()));
   }
   
   /**
@@ -72,16 +83,42 @@ public class CourseServiceImpl implements CourseService {
         () -> new UnsupportedOperationException("Update Course Failed"));
   }
   
-  private Course copyPropertiesAndSaveCourse(
-    Course course, Course foundCourse
-  ) {
+  /**
+   * {@inheritDoc}
+   *
+   * @param course Course data of new course.
+   *
+   * @return {@code Course} - The course object of the saved data.
+   */
+  @Override
+  public Course updateCourse(Course course) {
     
-    BeanUtils.copyProperties(course, foundCourse,
-                             FieldName.BaseEntity.CREATED_BY,
-                             FieldName.BaseEntity.CREATED_AT,
-                             FieldName.BaseEntity.VERSION
-    );
-    return courseRepository.save(foundCourse);
+    return Optional.of(course)
+      .map(Course::getId)
+      .map(courseRepository::findOne)
+      .map(foundCourse -> copyPropertiesAndSaveCourse(course, foundCourse))
+      .orElse(course);
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @param courseId Id of course to be retrieved
+   *
+   * @return {@code Course} - The retrieved course object.
+   */
+  @Override
+  public Course getCourse(String courseId) {
+    
+    return Optional.ofNullable(courseId)
+      .map(courseRepository::findOne)
+      .orElseThrow(() -> new NotFoundException("Get Course Not Found"));
+  }
+  
+  @Override
+  public Page<Course> getCourses(Pageable pageable) {
+    
+    return courseRepository.findAll(pageable);
   }
   
   /**
@@ -95,6 +132,18 @@ public class CourseServiceImpl implements CourseService {
     // TODO Delete file associated with course
     Optional.ofNullable(courseId)
       .ifPresent(courseRepository::delete);
+  }
+  
+  private Course copyPropertiesAndSaveCourse(
+    Course course, Course foundCourse
+  ) {
+    
+    BeanUtils.copyProperties(course, foundCourse,
+                             FieldName.BaseEntity.CREATED_BY,
+                             FieldName.BaseEntity.CREATED_AT,
+                             FieldName.BaseEntity.VERSION
+    );
+    return courseRepository.save(foundCourse);
   }
   
 }

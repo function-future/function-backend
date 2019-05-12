@@ -3,7 +3,7 @@ package com.future.function.web.mapper.request.core;
 import com.future.function.model.entity.feature.core.Course;
 import com.future.function.validation.RequestValidator;
 import com.future.function.web.mapper.request.WebRequestMapper;
-import com.future.function.web.model.request.core.CourseWebRequest;
+import com.future.function.web.model.request.core.CourseWebRequestV1;
 import com.future.function.web.model.request.core.shared.SharedCourseWebRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
@@ -15,14 +15,14 @@ import java.util.List;
  * Mapper class for incoming request for course feature.
  */
 @Component
-public class CourseRequestMapper {
+public class CourseRequestMapperV1 {
   
   private final WebRequestMapper requestMapper;
   
   private final RequestValidator validator;
   
   @Autowired
-  public CourseRequestMapper(
+  public CourseRequestMapperV1(
     RequestValidator validator, WebRequestMapper requestMapper
   ) {
     
@@ -74,12 +74,12 @@ public class CourseRequestMapper {
     
     return toValidatedCourseAndBatchNumbers(courseId,
                                             requestMapper.toWebRequestObject(
-                                              data, CourseWebRequest.class)
+                                              data, CourseWebRequestV1.class)
     );
   }
   
   private Pair<Course, List<Long>> toValidatedCourseAndBatchNumbers(
-    String courseId, CourseWebRequest request
+    String courseId, CourseWebRequestV1 request
   ) {
     
     validator.validate(request);
