@@ -1,7 +1,6 @@
 package com.future.function.web.controller.scoring;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.future.function.model.entity.feature.core.File;
 import com.future.function.model.entity.feature.scoring.Quiz;
 import com.future.function.service.api.feature.scoring.QuizService;
 import com.future.function.web.mapper.helper.ResponseHelper;
@@ -12,16 +11,10 @@ import com.future.function.web.model.response.base.BaseResponse;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.feature.scoring.QuizWebResponse;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -33,19 +26,15 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.util.StringUtils;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -156,7 +145,7 @@ public class QuizControllerTest {
   @Test
   public void testFindQuizById() throws Exception {
     mockMvc.perform(
-            get("/api/scoring/quiz/" + QUIZ_ID))
+            get("/api/scoring/quizzes/" + QUIZ_ID))
             .andExpect(status().isOk())
             .andExpect(content().json(
                     dataResponseJacksonTester.write(DATA_RESPONSE)
@@ -169,7 +158,7 @@ public class QuizControllerTest {
   @Test
   public void testDeleteQuizById() throws Exception {
     mockMvc.perform(
-            delete("/api/scoring/quiz/" + QUIZ_ID))
+            delete("/api/scoring/quizzes/" + QUIZ_ID))
             .andExpect(status().isOk())
             .andExpect(content().json(
                     baseResponseJacksonTester.write(BASE_RESPONSE)
@@ -182,7 +171,7 @@ public class QuizControllerTest {
   @Test
   public void testFindAllQuizByPagingParameters() throws Exception {
     mockMvc.perform(
-            get("/api/scoring/quiz")
+            get("/api/scoring/quizzes")
             .param("page", "1")
             .param("size", "10"))
             .andExpect(status().isOk())
@@ -197,7 +186,7 @@ public class QuizControllerTest {
   @Test
   public void testFindAllQuizWithoutPagingParameters() throws Exception {
     mockMvc.perform(
-            get("/api/scoring/quiz"))
+            get("/api/scoring/quizzes"))
             .andExpect(status().isOk())
             .andExpect(content().json(
                     pagingResponseJacksonTester.write(PAGING_RESPONSE)
@@ -210,7 +199,7 @@ public class QuizControllerTest {
   @Test
   public void testCreateQuizPassQuizWebRequest() throws Exception {
     mockMvc.perform(
-            post("/api/scoring/quiz")
+            post("/api/scoring/quizzes")
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .content(QUIZ_CREATE_REQUEST_JSON))
             .andExpect(status().isCreated())
@@ -226,7 +215,7 @@ public class QuizControllerTest {
   @Test
   public void testUpdateQuizPassQuizWebRequestAndId() throws Exception {
     mockMvc.perform(
-            put("/api/scoring/quiz/" + QUIZ_ID)
+            put("/api/scoring/quizzes/" + QUIZ_ID)
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .content(QUIZ_UPDATE_REQUEST_JSON))
             .andExpect(status().isOk())

@@ -7,16 +7,20 @@ import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.feature.scoring.QuizWebResponse;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 /**
  * Static class used to map quiz entity object to web response object
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class QuizResponseMapper {
 
   /**

@@ -5,10 +5,7 @@ import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.base.paging.Paging;
-import com.future.function.web.model.response.scoring.QuestionBankWebResponse;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import com.future.function.web.model.response.feature.scoring.QuestionBankWebResponse;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,6 +14,8 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+
+import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -99,6 +98,6 @@ public class QuestionBankResponseMapperTest {
   public void testToPagingQuestionBankResponseWithHttpStatusOk() {
     PagingResponse<QuestionBankWebResponse> actual = QuestionBankResponseMapper.toPagingQuestionBankWebResponse(questionBankPage);
     assertThat(actual.getPaging()).isEqualTo(paging);
-    assertThat(actual.getData()).isEqualTo(Collections.singletonList(questionBankWebResponsePagingResponse.getData()));
+      assertThat(actual.getData()).isEqualTo(questionBankWebResponsePagingResponse.getData());
   }
 }
