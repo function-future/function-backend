@@ -13,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,6 +40,21 @@ public class QuestionServiceImpl implements QuestionService {
                 .map(id -> questionRepository.findAllByQuestionBankId(id, pageable))
                 .map(this::findListFromQuestionPage)
                 .orElseThrow(() -> new NotFoundException("Question Bank is not found"));
+    }
+
+    @Override
+    public List<Question> findAllByMultipleQuestionBankId(List<String> questionBankIds) {
+        List<Question> questionList = new ArrayList<>();
+        return Optional.ofNullable(questionBankIds)
+                .filter(list -> !list.isEmpty())
+                .map(list -> {
+                    list
+                            .stream()
+                            .map(questionRepository::findAllByQuestionBankId)
+                            .forEach(questionList::addAll);
+                    return questionList;
+                })
+                .orElse(questionList);
     }
 
     private Page<Question> findListFromQuestionPage(Page<Question> page) {

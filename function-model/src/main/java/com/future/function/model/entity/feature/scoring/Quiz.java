@@ -3,7 +3,6 @@ package com.future.function.model.entity.feature.scoring;
 import com.future.function.model.entity.base.BaseEntity;
 import com.future.function.model.util.constant.DocumentName;
 import com.future.function.model.util.constant.FieldName;
-import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,6 +10,9 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
+
+import java.util.List;
+import java.util.UUID;
 
 @Data
 @Builder
@@ -37,10 +39,9 @@ public class Quiz extends BaseEntity {
   @Field(value = FieldName.Quiz.TRIES)
   private int tries;
 
-  //TODO uncomment this when question bank feature is complete
-//  @DBRef
-//    @Field(value = FieldName.Quiz.QUESTION_BANK)
-//  private QuestionBank questionBank;
+    @DBRef
+    @Field(value = FieldName.Quiz.QUESTION_BANK)
+    private List<QuestionBank> questionBanks;
 
   @Field(value = FieldName.Quiz.QUESTION_COUNT)
   private int questionCount;

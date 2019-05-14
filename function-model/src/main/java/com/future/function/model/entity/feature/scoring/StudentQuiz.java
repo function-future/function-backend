@@ -1,0 +1,37 @@
+package com.future.function.model.entity.feature.scoring;
+
+import com.future.function.model.entity.base.BaseEntity;
+import com.future.function.model.entity.feature.core.User;
+import com.future.function.model.util.constant.DocumentName;
+import com.future.function.model.util.constant.FieldName;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
+
+import java.util.UUID;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Document(collection = DocumentName.STUDENT_QUIZ)
+public class StudentQuiz extends BaseEntity {
+
+    @Field(FieldName.StudentQuiz.ID)
+    private String id = UUID.randomUUID().toString();
+
+    @Field(FieldName.StudentQuiz.STUDENT)
+    private User student;
+
+    @Field(FieldName.StudentQuiz.QUIZ)
+    private Quiz quiz;
+
+    @Field(FieldName.StudentQuiz.TRIALS)
+    private int trials;
+
+    @Field(FieldName.StudentQuiz.DONE)
+    private boolean done;
+}

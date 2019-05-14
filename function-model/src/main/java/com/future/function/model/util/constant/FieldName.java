@@ -99,7 +99,7 @@ public interface FieldName {
     public static final String DEADLINE = "deadline";
     public static final String TIME_LIMIT = "timeLimit";
     public static final String TRIES = "tries";
-    public static final String QUESTION_BANK = "questionBank";
+    public static final String QUESTION_BANK = "questionBanks";
     public static final String QUESTION_COUNT = "questionCount";
   }
 
@@ -109,6 +109,34 @@ public interface FieldName {
     public static final String ID = "id";
 
     public static final String DESCRIPTION = "description";
+
+  }
+
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  abstract class StudentQuiz {
+
+    public static final String ID = "id";
+
+    public static final String TRIALS = "TRIALS";
+
+    public static final String DONE = "done";
+
+    public static final String STUDENT = "student";
+
+    public static final String QUIZ = "quiz";
+
+  }
+
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  abstract class StudentQuizDetail {
+
+    public static final String ID = "id";
+
+    public static final String POINT = "point";
+
+    public static final String STUDENT_QUIZ = "studentQuiz";
+
+    public static final String QUESTION_LIST = "questionList";
 
   }
 

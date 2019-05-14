@@ -2,16 +2,25 @@ package com.future.function.service.impl.feature.scoring;
 
 import com.future.function.common.exception.BadRequestException;
 import com.future.function.common.exception.NotFoundException;
+import com.future.function.model.entity.feature.scoring.Question;
+import com.future.function.model.entity.feature.scoring.QuestionBank;
 import com.future.function.model.entity.feature.scoring.Quiz;
 import com.future.function.model.util.constant.FieldName;
 import com.future.function.repository.feature.scoring.QuizRepository;
+import com.future.function.service.api.feature.scoring.QuestionBankService;
+import com.future.function.service.api.feature.scoring.QuestionService;
 import com.future.function.service.api.feature.scoring.QuizService;
-import java.util.Optional;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Service class used to manipulate Quiz Entity
@@ -22,12 +31,17 @@ public class QuizServiceImpl implements QuizService {
 
   private QuizRepository quizRepository;
 
-//  private QuestionBankService questionBankService;
+  private QuestionBankService questionBankService;
+
+  private QuestionService questionService;
 
   @Autowired
-  public QuizServiceImpl(QuizRepository quizRepository) {
+  public QuizServiceImpl(QuizRepository quizRepository, QuestionBankService questionBankService, QuestionService questionService) {
     this.quizRepository = quizRepository;
+    this.questionBankService = questionBankService;
+    this.questionService = questionService;
   }
+
 
   /**
    * Used to find quiz from repository by passing the quiz id
@@ -54,6 +68,33 @@ public class QuizServiceImpl implements QuizService {
   @Override
   public Page<Quiz> findAllByPageableAndFilterAndSearch(Pageable pageable, String filter, String search) {
     return quizRepository.findAll(pageable);
+  }
+
+  @Override
+  public List<Question> findAllQuestionByMultipleQuestionBank(boolean random, String quizId) {
+    Quiz quiz = Optional.ofNullable(quizId)
+            .map(this::findById)
+            .orElseThrow(() -> new NotFoundException("Quiz Not Found"));
+    return Optional.of(quiz)
+            .map(Quiz::getQuestionBanks)
+            .filter(list -> !list.isEmpty())
+            .map(this::getIdFromQuestionBanks)
+            .map(questionService::findAllByMultipleQuestionBankId)
+            .map(questionList -> getListOfQuestions(random, quiz, questionList))
+            .orElseGet(ArrayList::new);
+  }
+
+  private List<Question> getListOfQuestions(boolean random, Quiz quiz, List<Question> questionList) {
+    if (random)
+      Collections.shuffle(questionList);
+    return questionList.subList(0, (quiz.getQuestionCount() - 1));
+  }
+
+  private List<String> getIdFromQuestionBanks(List<QuestionBank> list) {
+    return list
+            .stream()
+            .map(QuestionBank::getId)
+            .collect(Collectors.toList());
   }
 
   /**
