@@ -14,6 +14,11 @@
   <dependencies>
 
     <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>com.future.function</groupId>
       <artifactId>function-service-api</artifactId>
       <version>${project.parent.version}</version>

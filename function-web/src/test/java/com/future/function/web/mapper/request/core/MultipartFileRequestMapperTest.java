@@ -73,8 +73,8 @@ public class MultipartFileRequestMapperTest {
   public void testGivenMultipartFileByParsingToPairOfStringAndByteArrayReturnPairObject()
     throws IOException {
     
-    String name = "name";
-    when(multipartFile.getName()).thenReturn(name);
+    String name = "name.txt";
+    when(multipartFile.getOriginalFilename()).thenReturn(name);
     
     byte[] data = "Hello".getBytes();
     when(multipartFile.getBytes()).thenReturn(data);
@@ -86,7 +86,7 @@ public class MultipartFileRequestMapperTest {
     
     assertThat(pair).isEqualTo(expectedPair);
     
-    verify(multipartFile).getName();
+    verify(multipartFile).getOriginalFilename();
     verify(multipartFile).getBytes();
   }
   

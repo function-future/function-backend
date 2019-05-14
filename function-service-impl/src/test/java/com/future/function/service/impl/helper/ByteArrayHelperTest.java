@@ -6,6 +6,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
+import java.nio.file.Paths;
 
 import static com.googlecode.catchexception.CatchException.catchException;
 import static com.googlecode.catchexception.CatchException.caughtException;
@@ -22,12 +23,9 @@ public class ByteArrayHelperTest {
   @Test
   public void testGivenJavaIoFileByConvertingToByteArrayReturnByteArray() {
     
-    String currentPath = this.getClass()
-      .getClassLoader()
-      .getResource("")
+    String testFilePath = Paths.get(
+      "src", "test", "resources", "TestFile" + ".png")
       .toString();
-    String testFilePath = currentPath.substring(currentPath.indexOf("/"))
-      .concat("TestFile.png");
     
     byte[] convertedFile = ByteArrayHelper.getBytesFromJavaIoFile(
       new File(testFilePath));

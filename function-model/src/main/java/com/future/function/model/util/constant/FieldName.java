@@ -20,7 +20,7 @@ public interface FieldName {
     public static final String UPDATED_BY = "updatedBy";
     
     public static final String DELETED = "deleted";
-  
+    
     public static final String VERSION = "version";
     
   }
@@ -66,6 +66,10 @@ public interface FieldName {
     
     public static final String THUMBNAIL_URL = "thumbnailUrl";
     
+    public static final String NAME = "name";
+    
+    public static final String USED = "used";
+    
     public static final String MARK_FOLDER = "markFolder";
     
     public static final String AS_RESOURCE = "asResource";
@@ -74,7 +78,7 @@ public interface FieldName {
   
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
   abstract class Sequence {
-  
+    
     public static final String SEQUENCE_NUMBER = "sequenceNumber";
     
   }
