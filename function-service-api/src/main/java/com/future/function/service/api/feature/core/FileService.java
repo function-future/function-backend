@@ -6,6 +6,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Service interface class for file logic operations declaration.
+ *
+ * @deprecated
  */
 public interface FileService {
   

@@ -14,6 +14,8 @@ import org.springframework.data.mongodb.core.mapping.Field;
 
 /**
  * Entity representation for files.
+ *
+ * @deprecated
  */
 @Data
 @Builder

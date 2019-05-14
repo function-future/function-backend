@@ -8,6 +8,8 @@ import java.util.Optional;
 
 /**
  * Repository class for file database operations.
+ *
+ * @deprecated
  */
 @Repository
 public interface FileRepository extends MongoRepository<File, String> {

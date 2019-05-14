@@ -10,6 +10,7 @@ import java.io.IOException;
 
 /**
  * Helper class for converting objects to {@code byte[]}.
+ * @deprecated
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ByteArrayHelper {

@@ -26,6 +26,7 @@ import java.util.UUID;
 
 /**
  * Service implementation class for file logic operations definition.
+ * @deprecated
  */
 @Service
 public class FileServiceImpl implements FileService {
