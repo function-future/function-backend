@@ -38,6 +38,11 @@
     </dependency>
 
     <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
     </dependency>
@@ -46,6 +51,11 @@
       <groupId>eu.codearte.catch-exception</groupId>
       <artifactId>catch-exception</artifactId>
       <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>net.coobird</groupId>
+      <artifactId>thumbnailator</artifactId>
     </dependency>
 
     <dependency>

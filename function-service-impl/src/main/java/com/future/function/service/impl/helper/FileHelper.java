@@ -2,20 +2,46 @@ package com.future.function.service.impl.helper;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import net.coobird.thumbnailator.Thumbnails;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Helper class for file-related operations.
  */
+@Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class FileHelper {
   
   public static final String DOT = ".";
+  
+  public static final String PATH_SEPARATOR = File.separator;
+  
+  /**
+   * Creates file from {@code byte[]} on specific path.
+   *
+   * @param bytes Data to be 'inserted' to file.
+   * @param path  Path of the created file.
+   */
+  @SuppressWarnings("ResultOfMethodCallIgnored")
+  public static void createJavaIoFile(byte[] bytes, String path) {
+    
+    Optional.ofNullable(FileHelper.toJavaIoFile(bytes, path))
+      .ifPresent(file -> {
+        try {
+          file.createNewFile();
+        } catch (IOException e) {
+          log.error("Failed creating file: ", e);
+        }
+      });
+  }
   
   /**
    * Converts {@code byte[]} to {@link java.io.File}.
@@ -32,7 +58,32 @@ public final class FileHelper {
       FileUtils.writeByteArrayToFile(file, bytes);
       return file;
     } catch (IOException e) {
+      log.error("Failed writing byte array to file: ", e);
       return null;
+    }
+  }
+  
+  /**
+   * Creates file from {@code byte[]} on specific path with specific extenstion.
+   *
+   * @param bytes Data to be 'inserted' to file.
+   * @param path  Path of the created file.
+   */
+  @SuppressWarnings("ResultOfMethodCallIgnored")
+  public static void createThumbnail(
+    byte[] bytes, String path, String extension
+  ) {
+    
+    File thumbnailFile = FileHelper.toJavaIoFile(bytes, path);
+    try {
+      Thumbnails.of(thumbnailFile)
+        .size(150, 150)
+        .outputFormat(extension)
+        .toFile(Objects.requireNonNull(thumbnailFile));
+      
+      thumbnailFile.createNewFile();
+    } catch (IOException | NullPointerException e) {
+      log.error("Failed creating thumbnail: ", e);
     }
   }
   

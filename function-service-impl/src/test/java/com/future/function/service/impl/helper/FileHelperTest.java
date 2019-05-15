@@ -20,7 +20,7 @@ import static org.powermock.api.mockito.PowerMockito.*;
 @PrepareForTest({ FileHelper.class, File.class, FileUtils.class })
 public class FileHelperTest {
   
-  public static final String NAME = UUID.randomUUID()
+  private static final String NAME = UUID.randomUUID()
     .toString();
   
   @Before
@@ -75,7 +75,7 @@ public class FileHelperTest {
   }
   
   @Test
-  public void testGivenByteArrayAndPathButExceptionOccuredByConvertingToFileReturnNull()
+  public void testGivenByteArrayAndPathButExceptionOccurredByConvertingToFileReturnNull()
     throws Exception {
     
     mockStatic(File.class);
@@ -111,6 +111,58 @@ public class FileHelperTest {
   public void testGivenThumbnailFileNameByCheckingIsThumbnailReturnTrue() {
     
     assertThat(FileHelper.isThumbnailName(NAME + "-thumbnail")).isTrue();
+  }
+  
+  @Test
+  public void testGivenByteArrayAndPathByCreatingFileReturnSuccessfulCreation()
+    throws Exception {
+    
+    mockStatic(File.class);
+    File data = mock(File.class);
+    
+    String path = "path";
+    whenNew(File.class).withArguments(path)
+      .thenReturn(data);
+    
+    byte[] bytes = new byte[] {};
+    
+    mockStatic(FileUtils.class);
+    doNothing().when(FileUtils.class, "writeByteArrayToFile", data, bytes);
+    
+    FileHelper.createJavaIoFile(bytes, path);
+    
+    verifyNew(File.class).withArguments(path);
+    
+    verifyStatic(FileUtils.class);
+    FileUtils.writeByteArrayToFile(data, bytes);
+    
+    verifyStatic(File.class);
+    data.createNewFile();
+  }
+  
+  @Test
+  public void testGivenByteArrayAndPathButExceptionOccurredByCreatingFileReturnFailedCreation()
+    throws Exception {
+    
+    mockStatic(File.class);
+    File data = mock(File.class);
+  
+    String path = "path";
+    whenNew(File.class).withArguments(path)
+      .thenReturn(data);
+  
+    byte[] bytes = new byte[] {};
+  
+    mockStatic(FileUtils.class);
+    doThrow(new IOException()).when(
+      FileUtils.class, "writeByteArrayToFile", data, bytes);
+  
+    FileHelper.createJavaIoFile(bytes, path);
+  
+    verifyNew(File.class).withArguments(path);
+  
+    verifyStatic(FileUtils.class);
+    FileUtils.writeByteArrayToFile(data, bytes);
   }
   
 }
