@@ -91,8 +91,8 @@ public class UserServiceImpl implements UserService {
   public User createUser(User user, MultipartFile image) {
   
     if (user.getBatch() != null) {
-      user.setBatch(batchService.getBatch(user.getBatch()
-                                            .getNumber()));
+      user.setBatch(batchService.getBatchByCode(user.getBatch()
+                                            .getCode()));
     }
   
     return Optional.of(user)
@@ -170,8 +170,8 @@ public class UserServiceImpl implements UserService {
   public User updateUser(User user, MultipartFile image) {
   
     if (user.getBatch() != null) {
-      user.setBatch(batchService.getBatch(user.getBatch()
-                                            .getNumber()));
+      user.setBatch(batchService.getBatchByCode(user.getBatch()
+                                            .getCode()));
     }
   
     return Optional.of(user)

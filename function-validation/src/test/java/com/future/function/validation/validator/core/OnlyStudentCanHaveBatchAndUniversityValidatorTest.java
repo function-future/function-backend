@@ -24,7 +24,7 @@ public class OnlyStudentCanHaveBatchAndUniversityValidatorTest {
   
   private static final String STUDENT = "STUDENT";
   
-  private static final Long BATCH = 1L;
+  private static final String BATCH = "1";
   
   private static final String UNIVERSITY = "university";
   

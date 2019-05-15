@@ -47,7 +47,7 @@ public class OnlyStudentCanHaveBatchAndUniversityValidator implements
       return false;
     }
   
-    Long batchNumber = value.getBatch();
+    String batchNumber = value.getBatch();
     String university = value.getUniversity();
     
     if (role.equals("STUDENT")) {
