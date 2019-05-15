@@ -52,7 +52,6 @@ public class ResourceServiceImpl implements ResourceService {
     
     String extension = FilenameUtils.getExtension(fileName);
     
-    // TODO Create folder for each file with unique id.
     if (imageExtensions.contains(FileHelper.DOT + extension)) {
       createThumbnail(bytes, fileV2, extension, fileOrigin);
     }
@@ -105,7 +104,8 @@ public class ResourceServiceImpl implements ResourceService {
   ) {
     
     String filePath = constructPathOrUrl(
-      storagePath, fileV2.getId(), extension);
+      storagePath + fileOrigin.lowCaseValue() + FileHelper.PATH_SEPARATOR +
+      fileV2.getId() + FileHelper.PATH_SEPARATOR, fileV2.getId(), extension);
     FileHelper.createJavaIoFile(bytes, filePath);
     
     fileV2.setFilePath(filePath);
@@ -119,7 +119,8 @@ public class ResourceServiceImpl implements ResourceService {
     
     String thumbnailName = fileV2.getId() + thumbnailSuffix;
     String thumbnailPath = constructPathOrUrl(
-      storagePath, thumbnailName, extension);
+      storagePath + fileOrigin.lowCaseValue() + FileHelper.PATH_SEPARATOR +
+      fileV2.getId() + FileHelper.PATH_SEPARATOR, thumbnailName, extension);
     FileHelper.createThumbnail(bytes, thumbnailPath, extension);
     
     fileV2.setThumbnailPath(thumbnailPath);
