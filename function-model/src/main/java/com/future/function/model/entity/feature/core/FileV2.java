@@ -41,8 +41,7 @@ public class FileV2 extends BaseEntity {
   private String thumbnailPath = "";
   
   @Field(FieldName.File.THUMBNAIL_URL)
-  @Builder.Default
-  private String thumbnailUrl = "";
+  private String thumbnailUrl;
   
   @Field(FieldName.File.NAME)
   @Builder.Default

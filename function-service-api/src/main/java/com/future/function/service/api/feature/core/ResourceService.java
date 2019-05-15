@@ -7,7 +7,8 @@ import java.util.List;
 
 public interface ResourceService {
   
-  FileV2 storeFile(String fileName, byte[] bytes, FileOrigin fileOrigin);
+  FileV2 storeFile(String objectName, String fileName, byte[] bytes,
+                   FileOrigin fileOrigin);
   
   boolean markFilesUsed(List<String> fileIds, boolean used);
   

@@ -44,10 +44,11 @@ public class ResourceServiceImpl implements ResourceService {
   
   @Override
   public FileV2 storeFile(
-    String fileName, byte[] bytes, FileOrigin fileOrigin
+    String objectName, String fileName, byte[] bytes, FileOrigin fileOrigin
   ) {
     
     FileV2 fileV2 = FileV2.builder()
+      .name(objectName)
       .build();
     
     String extension = FilenameUtils.getExtension(fileName);
