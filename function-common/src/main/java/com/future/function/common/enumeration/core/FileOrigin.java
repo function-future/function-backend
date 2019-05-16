@@ -29,6 +29,19 @@ public enum FileOrigin {
     this.asResource = asResource;
   }
   
+  /**
+   * Converts a String to a specific file origin. Customized to prevent
+   * {@link IllegalStateException} from being thrown when using
+   * {@link #valueOf(String)} method. If the given parameter is not
+   * recognized as a value of FileOrigin enums, then {@link #UNKNOWN} will be
+   * returned.
+   *
+   * @param origin The name of the file origin (in form of String) to be
+   *               converted to FileOrigin enum value.
+   *
+   * @return {@link FileOrigin} - The FileOrigin enum value of the given
+   * parameter.
+   */
   public static FileOrigin toFileOrigin(String origin) {
     
     return Optional.ofNullable(origin)
@@ -38,6 +51,16 @@ public enum FileOrigin {
       .orElse(UNKNOWN);
   }
   
+  /**
+   * Compares whether the given origin is equal to any FileOrigin enum in this
+   * enum class.
+   *
+   * @param origin The name of the file origin (in form of String) to be
+   *               converted to FileOrigin enum value.
+   *
+   * @return {@code boolean} - Result of whether any file origin is equal to the
+   * given parameter.
+   */
   private static boolean isOriginEqualsAnyFileOrigin(String origin) {
     
     return Stream.of(FileOrigin.values())
