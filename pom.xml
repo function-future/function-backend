@@ -37,7 +37,9 @@
     <commons-io.version>2.6</commons-io.version>
     <guava.version>27.1-jre</guava.version>
     <jackson-annotations.version>2.8.0</jackson-annotations.version>
+    <jacoco.version>0.8.4</jacoco.version>
     <java.version>1.8</java.version>
+    <maven-javadoc-plugin.version>3.1.0</maven-javadoc-plugin.version>
     <mongobee.version>0.13</mongobee.version>
     <?SORTPOM IGNORE?>
     <sonar.coverage.exclusions>
@@ -51,6 +53,7 @@
     </sonar.coverage.exclusions>
     <?SORTPOM RESUME?>
     <powermock.version>1.7.4</powermock.version>
+    <sortpom-maven-plugin.version>2.8.0</sortpom-maven-plugin.version>
     <spring-security-test.version>5.1.4.RELEASE</spring-security-test.version>
     <swagger.version>2.9.2</swagger.version>
     <thumbnailator.version>0.4.8</thumbnailator.version>
@@ -110,6 +113,13 @@
       </dependency>
 
       <dependency>
+        <groupId>org.jacoco</groupId>
+        <artifactId>org.jacoco.agent</artifactId>
+        <version>${jacoco.version}</version>
+        <classifier>runtime</classifier>
+      </dependency>
+
+      <dependency>
         <groupId>org.powermock</groupId>
         <artifactId>powermock-api-mockito</artifactId>
         <version>${powermock.version}</version>
@@ -135,6 +145,12 @@
   </dependencyManagement>
 
   <dependencies>
+
+    <dependency>
+      <groupId>org.jacoco</groupId>
+      <artifactId>org.jacoco.agent</artifactId>
+      <classifier>runtime</classifier>
+    </dependency>
 
     <dependency>
       <groupId>org.projectlombok</groupId>
@@ -164,19 +180,19 @@
         <plugin>
           <groupId>com.github.ekryd.sortpom</groupId>
           <artifactId>sortpom-maven-plugin</artifactId>
-          <version>2.8.0</version>
+          <version>${sortpom-maven-plugin.version}</version>
         </plugin>
 
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-javadoc-plugin</artifactId>
-          <version>3.1.0</version>
+          <version>${maven-javadoc-plugin.version}</version>
         </plugin>
 
         <plugin>
           <groupId>org.jacoco</groupId>
           <artifactId>jacoco-maven-plugin</artifactId>
-          <version>0.7.8</version>
+          <version>${jacoco.version}</version>
         </plugin>
 
       </plugins>
@@ -276,6 +292,27 @@
           </excludes>
           <?SORTPOM RESUME?>
         </configuration>
+        <executions>
+          <execution>
+            <id>jacoco-instrument</id>
+            <goals>
+              <goal>instrument</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>jacoco-restore-instrumented-classes</id>
+            <goals>
+              <goal>restore-instrumented-classes</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>jacoco-report</id>
+            <goals>
+              <goal>report</goal>
+            </goals>
+            <phase>package</phase>
+          </execution>
+        </executions>
       </plugin>
 
     </plugins>
