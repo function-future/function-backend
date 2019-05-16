@@ -80,8 +80,7 @@ public class AnnouncementServiceImpl implements AnnouncementService {
     return Optional.of(announcement)
       .map(this::setFileV2s)
       .map(announcementRepository::save)
-      .map(a -> this.getAnnouncement(a.getId()))
-      .orElseGet(() -> this.getAnnouncement(announcement.getId()));
+      .orElse(announcement);
   }
   
   private Announcement setFileV2s(Announcement announcement) {
@@ -121,10 +120,9 @@ public class AnnouncementServiceImpl implements AnnouncementService {
     
     return Optional.of(announcement)
       .map(Announcement::getId)
-      .map(this::getAnnouncement)
-      .map(foundAnnouncement -> copyPropertiesAndSaveAnnouncement(announcement,
-                                                                  foundAnnouncement
-      ))
+      .map(announcementRepository::findOne)
+      .map(foundAnnouncement -> this.copyPropertiesAndSaveAnnouncement(
+        announcement, foundAnnouncement))
       .orElse(announcement);
   }
   
@@ -137,6 +135,10 @@ public class AnnouncementServiceImpl implements AnnouncementService {
   public void deleteAnnouncement(String announcementId) {
     
     Optional.ofNullable(announcementId)
+      .map(announcementRepository::findOne)
+      .map(foundAnnouncement -> resourceService.markFilesUsed(
+        this.getFileIds(foundAnnouncement), false))
+      .map(ignored -> announcementId)
       .ifPresent(announcementRepository::delete);
   }
   

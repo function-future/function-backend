@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -79,10 +80,12 @@ public class AnnouncementResponseMapper {
   
   private static List<FileWebResponse> getFiles(Announcement announcement) {
     
-    return announcement.getFileV2s()
-             .stream()
-             .map(ResourceResponseMapper::buildFileWebResponse)
-             .collect(Collectors.toList());
+    return Optional.of(announcement)
+      .map(Announcement::getFileV2s)
+      .map(List::stream)
+      .map(stream -> stream.map(ResourceResponseMapper::buildFileWebResponse)
+        .collect(Collectors.toList()))
+      .orElseGet(Collections::emptyList);
   }
   
   private static String getFileUrl(Announcement announcement) {

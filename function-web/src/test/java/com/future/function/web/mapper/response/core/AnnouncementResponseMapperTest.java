@@ -1,7 +1,6 @@
 package com.future.function.web.mapper.response.core;
 
 import com.future.function.model.entity.feature.core.Announcement;
-import com.future.function.model.entity.feature.core.File;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.base.paging.Paging;
@@ -57,7 +56,7 @@ public class AnnouncementResponseMapperTest {
       .title(TITLE)
       .summary(SUMMARY)
       .descriptionHtml(DESCRIPTION_HTML)
-      .file(new File())
+      .fileV2s(null)
       .build();
     
     announcement.setCreatedAt(1L);
@@ -69,6 +68,7 @@ public class AnnouncementResponseMapperTest {
       .summary(SUMMARY)
       .description(DESCRIPTION_HTML)
       .announcementFileUrl(null)
+      .files(Collections.emptyList())
       .updatedAt(2L)
       .build();
     

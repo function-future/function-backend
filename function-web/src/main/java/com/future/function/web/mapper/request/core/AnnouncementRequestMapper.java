@@ -9,7 +9,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -66,12 +68,14 @@ public class AnnouncementRequestMapper {
   
   private List<FileV2> toFileV2List(AnnouncementWebRequest request) {
     
-    return request.getFiles()
-      .stream()
-      .map(id -> FileV2.builder()
+    return Optional.of(request)
+      .map(AnnouncementWebRequest::getFiles)
+      .map(List::stream)
+      .map(stream -> stream.map(id -> FileV2.builder()
         .id(id)
         .build())
-      .collect(Collectors.toList());
+        .collect(Collectors.toList()))
+      .orElseGet(Collections::emptyList);
   }
   
   public Announcement toAnnouncement(AnnouncementWebRequest request) {

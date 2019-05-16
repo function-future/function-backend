@@ -24,7 +24,7 @@ public class FileMustExistValidator
     List<String> value, ConstraintValidatorContext context
   ) {
     
-    return value.stream()
+    return value == null || value.stream()
       .allMatch(s -> resourceService.getFile(s) != null);
   }
   

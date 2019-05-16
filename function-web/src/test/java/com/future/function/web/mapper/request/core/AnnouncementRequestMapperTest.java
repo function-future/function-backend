@@ -12,6 +12,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.util.Collections;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -50,6 +52,7 @@ public class AnnouncementRequestMapperTest {
       .title(TITLE)
       .summary(SUMMARY)
       .descriptionHtml(DESCRIPTION_HTML)
+      .fileV2s(Collections.emptyList())
       .build();
   
   @Mock
