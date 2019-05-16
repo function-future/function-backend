@@ -63,8 +63,8 @@ public class AnnouncementControllerTest {
     ResponseHelper.toBaseResponse(HttpStatus.OK);
   
   private static final String DATA =
-    "{\"announcementTitle\":" + TITLE + "," + "\"announcementSummary\":" +
-    SUMMARY + ",\"announcementDescriptionHtml\":" + DESCRIPTION_HTML + "}";
+    "{\"title\":" + TITLE + "," + "\"summary\":" +
+    SUMMARY + ",\"description\":" + DESCRIPTION_HTML + "}";
   
   private Announcement announcement;
   
@@ -198,7 +198,7 @@ public class AnnouncementControllerTest {
     throws Exception {
     
     given(
-      announcementService.createAnnouncement(announcement, null)).willReturn(
+      announcementService.createAnnouncement(announcement)).willReturn(
       announcement);
     given(announcementRequestMapper.toAnnouncement(DATA)).willReturn(
       announcement);
@@ -212,7 +212,7 @@ public class AnnouncementControllerTest {
         dataResponseJacksonTester.write(createdDataResponse)
           .getJson()));
     
-    verify(announcementService).createAnnouncement(announcement, null);
+    verify(announcementService).createAnnouncement(announcement);
     verify(announcementRequestMapper).toAnnouncement(DATA);
   }
   
@@ -220,7 +220,7 @@ public class AnnouncementControllerTest {
   public void testGivenAnnouncementDataByUpdatingAnnouncementReturnDataResponse()
     throws Exception {
     
-    given(announcementService.updateAnnouncement(announcement, null)).
+    given(announcementService.updateAnnouncement(announcement)).
       willReturn(announcement);
     given(announcementRequestMapper.toAnnouncement(ID, DATA)).willReturn(
       announcement);
@@ -234,7 +234,7 @@ public class AnnouncementControllerTest {
         dataResponseJacksonTester.write(retrievedDataResponse)
           .getJson()));
     
-    verify(announcementService).updateAnnouncement(announcement, null);
+    verify(announcementService).updateAnnouncement(announcement);
     verify(announcementRequestMapper).toAnnouncement(ID, DATA);
   }
   

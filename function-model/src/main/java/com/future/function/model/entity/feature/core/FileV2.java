@@ -47,6 +47,9 @@ public class FileV2 extends BaseEntity {
   @Builder.Default
   private String name = "";
   
+  @Field(FieldName.File.PARENT_ID)
+  private String parentId;
+  
   @Field(FieldName.File.USED)
   private boolean used;
   

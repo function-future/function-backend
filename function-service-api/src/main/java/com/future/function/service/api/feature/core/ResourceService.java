@@ -10,6 +10,8 @@ public interface ResourceService {
   FileV2 storeFile(String objectName, String fileName, byte[] bytes,
                    FileOrigin fileOrigin);
   
+  FileV2 getFile(String fileId);
+  
   boolean markFilesUsed(List<String> fileIds, boolean used);
   
   byte[] getFileAsByteArray(String fileName, FileOrigin fileOrigin);

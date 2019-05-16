@@ -64,12 +64,11 @@ public class AnnouncementResponseMapperTest {
     announcement.setUpdatedAt(2L);
     
     announcementWebResponse = AnnouncementWebResponse.builder()
-      .announcementId(ID)
-      .announcementTitle(TITLE)
-      .announcementSummary(SUMMARY)
-      .announcementDescriptionHtml(DESCRIPTION_HTML)
+      .id(ID)
+      .title(TITLE)
+      .summary(SUMMARY)
+      .description(DESCRIPTION_HTML)
       .announcementFileUrl(null)
-      .createdAt(1L)
       .updatedAt(2L)
       .build();
     

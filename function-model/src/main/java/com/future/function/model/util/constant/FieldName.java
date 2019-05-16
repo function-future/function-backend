@@ -68,6 +68,8 @@ public interface FieldName {
     
     public static final String NAME = "name";
     
+    public static final String PARENT_ID = "parentId";
+    
     public static final String USED = "used";
     
     public static final String MARK_FOLDER = "markFolder";

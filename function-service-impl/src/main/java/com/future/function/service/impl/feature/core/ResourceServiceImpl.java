@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -65,16 +66,25 @@ public class ResourceServiceImpl implements ResourceService {
   }
   
   @Override
+  public FileV2 getFile(String fileId) {
+    
+    return fileRepositoryV2.findOne(fileId);
+  }
+  
+  @Override
   public boolean markFilesUsed(List<String> fileIds, boolean used) {
     
-    Optional.of(fileIds)
+    return Optional.of(fileIds)
       .map(fileRepositoryV2::findAll)
       .map(Lists::newArrayList)
       .filter(list -> list.size() == fileIds.size())
       .orElseThrow(() -> new NotFoundException("File Not Found"))
-      .forEach(fileV2 -> fileV2.setUsed(used));
-    
-    return true;
+      .stream()
+      .map(fileV2 -> {
+        fileV2.setUsed(used);
+        return fileRepositoryV2.save(fileV2);
+      })
+      .allMatch(Objects::nonNull);
   }
   
   @Override

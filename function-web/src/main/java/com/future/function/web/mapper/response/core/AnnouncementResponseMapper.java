@@ -7,6 +7,7 @@ import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.feature.core.AnnouncementWebResponse;
+import com.future.function.web.model.response.feature.core.FileWebResponse;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -67,14 +68,21 @@ public class AnnouncementResponseMapper {
   ) {
     
     return AnnouncementWebResponse.builder()
-      .announcementId(announcement.getId())
-      .announcementTitle(announcement.getTitle())
-      .announcementSummary(announcement.getSummary())
-      .announcementDescriptionHtml(announcement.getDescriptionHtml())
-      .announcementFileUrl(getFileUrl(announcement))
-      .createdAt(announcement.getCreatedAt())
+      .id(announcement.getId())
+      .title(announcement.getTitle())
+      .summary(announcement.getSummary())
+      .description(announcement.getDescriptionHtml())
+      .files(getFiles(announcement))
       .updatedAt(announcement.getUpdatedAt())
       .build();
+  }
+  
+  private static List<FileWebResponse> getFiles(Announcement announcement) {
+    
+    return announcement.getFileV2s()
+             .stream()
+             .map(ResourceResponseMapper::buildFileWebResponse)
+             .collect(Collectors.toList());
   }
   
   private static String getFileUrl(Announcement announcement) {

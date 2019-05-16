@@ -32,9 +32,9 @@ public class AnnouncementRequestMapperTest {
   
   private static final AnnouncementWebRequest REQUEST =
     AnnouncementWebRequest.builder()
-      .announcementTitle(TITLE)
-      .announcementSummary(SUMMARY)
-      .announcementDescriptionHtml(DESCRIPTION_HTML)
+      .title(TITLE)
+      .summary(SUMMARY)
+      .description(DESCRIPTION_HTML)
       .build();
   
   private static final Announcement ANNOUNCEMENT_WITHOUT_ID =

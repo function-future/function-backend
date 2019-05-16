@@ -3,7 +3,6 @@ package com.future.function.service.api.feature.core;
 import com.future.function.model.entity.feature.core.Announcement;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Service interface class for announcement logic operations declaration.
@@ -36,12 +35,11 @@ public interface AnnouncementService {
    * announcement.
    *
    * @param announcement Announcement data of new announcement.
-   * @param file         File to be attached to announcement. May be null.
    *
    * @return {@code Announcement} - The announcement object of the saved data.
    */
   Announcement createAnnouncement(
-    Announcement announcement, MultipartFile file
+    Announcement announcement
   );
   
   /**
@@ -50,12 +48,11 @@ public interface AnnouncementService {
    * {@link com.future.function.common.exception.NotFoundException} exception.
    *
    * @param announcement Announcement data of new announcement.
-   * @param file         File to be attached to announcement. May be null.
    *
    * @return {@code Announcement} - The announcement object of the saved data.
    */
   Announcement updateAnnouncement(
-    Announcement announcement, MultipartFile file
+    Announcement announcement
   );
   
   /**

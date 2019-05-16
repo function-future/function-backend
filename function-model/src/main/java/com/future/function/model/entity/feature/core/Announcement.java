@@ -9,9 +9,11 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -39,7 +41,11 @@ public class Announcement extends BaseEntity {
   @Field(FieldName.Announcement.DESCRIPTION_HTML)
   private String descriptionHtml;
   
-  @Field(FieldName.Announcement.FILE)
+  @Field("f")
   private File file;
+  
+  @DBRef
+  @Field(FieldName.Announcement.FILE)
+  private List<FileV2> fileV2s;
   
 }
