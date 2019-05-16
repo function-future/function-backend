@@ -5,23 +5,22 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.data.util.Pair;
+import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.verify;
-import static org.powermock.api.mockito.PowerMockito.mock;
-import static org.powermock.api.mockito.PowerMockito.mockStatic;
-import static org.powermock.api.mockito.PowerMockito.verifyNoMoreInteractions;
-import static org.powermock.api.mockito.PowerMockito.when;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({ MultipartFileRequestMapper.class, MultipartFile.class })
+@RunWith(MockitoJUnitRunner.class)
 public class MultipartFileRequestMapperTest {
+  
+  private static final String NAME = "name";
+  
+  private static final String ORIGINAL_NAME = NAME + ".txt";
+  
+  private static final byte[] CONTENT = new byte[0];
   
   @InjectMocks
   private MultipartFileRequestMapper multipartFileRequestMapper;
@@ -31,63 +30,47 @@ public class MultipartFileRequestMapperTest {
   @Before
   public void setUp() {
     
-    mockStatic(MultipartFile.class);
-    multipartFile = mock(MultipartFile.class);
+    multipartFile = new MockMultipartFile(NAME, ORIGINAL_NAME,
+                                          MediaType.IMAGE_PNG_VALUE, CONTENT
+    );
   }
   
   @After
-  public void tearDown() {
-    
-    verifyNoMoreInteractions(multipartFile);
-  }
+  public void tearDown() {}
   
   @Test
-  public void testGivenMultipartFileByParsingToByteArrayReturnByteArray()
-    throws Exception {
-    
-    byte[] data = "Hello".getBytes();
-    when(multipartFile.getBytes()).thenReturn(data);
+  public void testGivenMultipartFileByParsingToByteArrayReturnByteArray() {
     
     byte[] bytes = multipartFileRequestMapper.toByteArray(multipartFile);
     
-    assertThat(bytes).isNotEmpty();
-    assertThat(bytes).isEqualTo(data);
-    
-    verify(multipartFile).getBytes();
+    assertThat(bytes).isEqualTo(CONTENT);
   }
   
   @Test
-  public void testGivenMultipartFileByParsingToByteArrayReturnEmptyByteArray()
-    throws Exception {
-    
-    when(multipartFile.getBytes()).thenThrow(new IOException());
+  public void testGivenMultipartFileByParsingToByteArrayReturnEmptyByteArray() {
     
     byte[] bytes = multipartFileRequestMapper.toByteArray(multipartFile);
     
     assertThat(bytes).isEmpty();
-    
-    verify(multipartFile).getBytes();
   }
   
   @Test
-  public void testGivenMultipartFileByParsingToPairOfStringAndByteArrayReturnPairObject()
-    throws IOException {
+  public void testGivenMultipartFileByParsingToPairOfStringAndByteArrayReturnPairObject() {
     
-    String name = "name.txt";
-    when(multipartFile.getOriginalFilename()).thenReturn(name);
-    
-    byte[] data = "Hello".getBytes();
-    when(multipartFile.getBytes()).thenReturn(data);
-    
-    Pair<String, byte[]> expectedPair = Pair.of(name, data);
+    Pair<String, byte[]> expectedPair = Pair.of(ORIGINAL_NAME, CONTENT);
     
     Pair<String, byte[]> pair =
       multipartFileRequestMapper.toStringAndByteArrayPair(multipartFile);
     
     assertThat(pair).isEqualTo(expectedPair);
+  }
+  
+  @Test
+  public void testGivenNullByParsingToByteArrayReturnEmptyByteArray() {
     
-    verify(multipartFile).getOriginalFilename();
-    verify(multipartFile).getBytes();
+    byte[] pair = multipartFileRequestMapper.toByteArray(null);
+    
+    assertThat(pair).isEqualTo(CONTENT);
   }
   
 }

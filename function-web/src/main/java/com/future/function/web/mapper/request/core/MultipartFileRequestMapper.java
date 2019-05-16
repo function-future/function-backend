@@ -5,8 +5,6 @@ import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-
 @Component
 public class MultipartFileRequestMapper {
   
@@ -24,7 +22,7 @@ public class MultipartFileRequestMapper {
     
     try {
       return multipartFile.getBytes();
-    } catch (IOException e) {
+    } catch (Exception e) {
       return new byte[] {};
     }
   }

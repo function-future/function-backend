@@ -6,7 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 public class FileMustExistValidator
   implements ConstraintValidator<FileMustExist, List<String>> {
@@ -24,8 +27,11 @@ public class FileMustExistValidator
     List<String> value, ConstraintValidatorContext context
   ) {
     
-    return value == null || value.stream()
-      .allMatch(s -> resourceService.getFile(s) != null);
+    return Optional.ofNullable(value)
+      .orElseGet(Collections::emptyList)
+      .stream()
+      .map(resourceService::getFile)
+      .allMatch(Objects::nonNull);
   }
   
 }
