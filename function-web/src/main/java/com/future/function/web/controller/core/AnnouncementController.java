@@ -53,7 +53,7 @@ public class AnnouncementController {
   ) {
     
     return AnnouncementResponseMapper.toAnnouncementsPagingResponse(
-      announcementService.getAnnouncements(PageHelper.toPage(page, size)));
+      announcementService.getAnnouncements(PageHelper.toPageable(page, size)));
   }
   
   /**

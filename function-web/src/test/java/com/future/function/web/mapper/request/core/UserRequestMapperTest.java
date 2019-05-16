@@ -36,7 +36,7 @@ public class UserRequestMapperTest {
   
   private static final String PASSWORD = "namefunctionapp";
   
-  private static final Long NUMBER = 1L;
+  private static final String NUMBER = "1";
   
   private static final String PHONE = "081212341234";
   
@@ -56,7 +56,7 @@ public class UserRequestMapperTest {
     .address(ADDRESS)
     .picture(new File())
     .batch(Batch.builder()
-             .number(NUMBER)
+             .code(NUMBER)
              .build())
     .university(UNIVERSITY)
     .build();
@@ -70,7 +70,7 @@ public class UserRequestMapperTest {
     .address(ADDRESS)
     .picture(new File())
     .batch(Batch.builder()
-             .number(NUMBER)
+             .code(NUMBER)
              .build())
     .university(UNIVERSITY)
     .build();

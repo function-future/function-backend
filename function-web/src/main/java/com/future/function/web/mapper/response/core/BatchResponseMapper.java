@@ -1,11 +1,14 @@
 package com.future.function.web.mapper.response.core;
 
 import com.future.function.model.entity.feature.core.Batch;
+import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.model.response.base.DataResponse;
+import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.feature.core.BatchWebResponse;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 
 import java.util.List;
@@ -31,33 +34,45 @@ public class BatchResponseMapper {
   public static DataResponse<BatchWebResponse> toBatchDataResponse(
     Batch batch
   ) {
-  
+    
     return ResponseHelper.toDataResponse(
-      HttpStatus.CREATED, new BatchWebResponse(batch.getNumber()));
+      HttpStatus.CREATED, buildBatchWebResponse(batch));
+  }
+  
+  private static BatchWebResponse buildBatchWebResponse(Batch batch) {
+    
+    return BatchWebResponse.builder()
+      .id(batch.getId())
+      .name(batch.getName())
+      .code(batch.getCode())
+      .build();
   }
   
   /**
-   * Converts batches data to {@code List<Long>} object, wrapped in
-   * {@code DataResponse}.
+   * Converts batches data to {@code BatchWebResponse} object, wrapped in
+   * {@code PagingResponse}.
    *
-   * @param batches Batches to be converted to response.
+   * @param data Batches to be converted to response.
    *
-   * @return {@code DataResponse<List<Long>>} - Batches' number found in
+   * @return {@code PagingResponse<BatchWebResponse>} - Batches' code found in
    * database, wrapped in
-   * {@link com.future.function.web.model.response.base.DataResponse}.
+   * {@link com.future.function.web.model.response.base.PagingResponse}.
    */
-  public static DataResponse<List<Long>> toBatchesDataResponse(
-    List<Batch> batches
+  public static PagingResponse<BatchWebResponse> toBatchesPagingResponse(
+    Page<Batch> data
   ) {
-  
-    return ResponseHelper.toDataResponse(
-      HttpStatus.OK, toBatchNumberList(batches));
+    
+    return ResponseHelper.toPagingResponse(
+      HttpStatus.OK, toBatchWebResponseList(data), PageHelper.toPaging(data));
   }
   
-  private static List<Long> toBatchNumberList(List<Batch> batches) {
+  private static List<BatchWebResponse> toBatchWebResponseList(
+    Page<Batch> data
+  ) {
     
-    return batches.stream()
-      .map(Batch::getNumber)
+    return data.getContent()
+      .stream()
+      .map(BatchResponseMapper::buildBatchWebResponse)
       .collect(Collectors.toList());
   }
   

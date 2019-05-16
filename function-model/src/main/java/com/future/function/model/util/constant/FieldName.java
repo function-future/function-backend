@@ -20,7 +20,7 @@ public interface FieldName {
     public static final String UPDATED_BY = "updatedBy";
     
     public static final String DELETED = "deleted";
-    
+  
     public static final String VERSION = "version";
     
   }
@@ -51,7 +51,9 @@ public interface FieldName {
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
   abstract class Batch {
     
-    public static final String NUMBER = "number";
+    public static final String NAME = "name";
+    
+    public static final String CODE = "code";
     
   }
   
@@ -75,13 +77,6 @@ public interface FieldName {
     public static final String MARK_FOLDER = "markFolder";
     
     public static final String AS_RESOURCE = "asResource";
-    
-  }
-  
-  @NoArgsConstructor(access = AccessLevel.PRIVATE)
-  abstract class Sequence {
-    
-    public static final String SEQUENCE_NUMBER = "sequenceNumber";
     
   }
   

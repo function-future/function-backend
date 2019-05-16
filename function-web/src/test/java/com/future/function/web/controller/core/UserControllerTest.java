@@ -51,7 +51,7 @@ public class UserControllerTest {
   
   private static final String NAME = "name";
   
-  private static final Long NUMBER = 1L;
+  private static final String NUMBER = "1";
   
   private static final String PHONE = "081212341234";
   
@@ -73,7 +73,7 @@ public class UserControllerTest {
     .address(ADDRESS)
     .picture(PICTURE)
     .batch(Batch.builder()
-             .number(NUMBER)
+             .code(NUMBER)
              .build())
     .university(UNIVERSITY)
     .build();
@@ -191,7 +191,7 @@ public class UserControllerTest {
       .phone(PHONE)
       .address(ADDRESS)
       .batch(Batch.builder()
-               .number(NUMBER)
+               .code(NUMBER)
                .build())
       .university(UNIVERSITY)
       .build();
@@ -223,7 +223,7 @@ public class UserControllerTest {
       .phone(PHONE)
       .address(ADDRESS)
       .batch(Batch.builder()
-               .number(NUMBER)
+               .code(NUMBER)
                .build())
       .university(UNIVERSITY)
       .build();

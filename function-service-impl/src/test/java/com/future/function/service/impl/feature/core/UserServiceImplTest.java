@@ -53,10 +53,10 @@ public class UserServiceImplTest {
   
   private static final String NON_EXISTING_USER_ID = "non-existing-user-id";
   
-  private static final Long NUMBER = 1L;
+  private static final String NUMBER = "1";
   
   private static final Batch BATCH = Batch.builder()
-    .number(NUMBER)
+    .code(NUMBER)
     .build();
   
   private static final String PHONE = "phone";
@@ -236,7 +236,7 @@ public class UserServiceImplTest {
   public void testGivenStudentDataByCreatingUserReturnStudent() {
     
     when(userRepository.findOne(STUDENT_ID)).thenReturn(null);
-    when(batchService.getBatch(NUMBER)).thenReturn(BATCH);
+    when(batchService.getBatchByCode(NUMBER)).thenReturn(BATCH);
     when(fileService.storeFile(MOCK_MULTIPARTFILE, FileOrigin.USER)).thenReturn(
       PICTURE);
     when(fileService.getFile(PICTURE_ID)).thenReturn(PICTURE);
@@ -252,7 +252,7 @@ public class UserServiceImplTest {
     assertThat(createdUserStudent.getPicture()).isEqualTo(PICTURE);
     
     verify(userRepository).findOne(STUDENT_ID);
-    verify(batchService).getBatch(NUMBER);
+    verify(batchService).getBatchByCode(NUMBER);
     verify(fileService).storeFile(MOCK_MULTIPARTFILE, FileOrigin.USER);
     verify(fileService).getFile(PICTURE_ID);
     verify(userRepository).save(userStudent);
@@ -310,7 +310,7 @@ public class UserServiceImplTest {
   @Test
   public void testGivenDeletedStudentDataByCreatingUserReturnStudent() {
     
-    when(batchService.getBatch(NUMBER)).thenReturn(BATCH);
+    when(batchService.getBatchByCode(NUMBER)).thenReturn(BATCH);
     
     userStudent.setDeleted(true);
     
@@ -326,7 +326,7 @@ public class UserServiceImplTest {
     
     assertThat(createdUserStudent).isNotNull();
     
-    verify(batchService).getBatch(NUMBER);
+    verify(batchService).getBatchByCode(NUMBER);
     verify(userRepository).findOne(STUDENT_ID);
     verify(userRepository, times(2)).save(savedUserStudent);
   }
@@ -357,7 +357,7 @@ public class UserServiceImplTest {
     
     userStudent.setPicture(PICTURE);
     
-    when(batchService.getBatch(NUMBER)).thenReturn(BATCH);
+    when(batchService.getBatchByCode(NUMBER)).thenReturn(BATCH);
     when(userRepository.findOne(STUDENT_ID)).thenReturn(userStudent);
     when(fileService.storeFile(MOCK_MULTIPARTFILE, FileOrigin.USER)).thenReturn(
       PICTURE);
@@ -374,7 +374,7 @@ public class UserServiceImplTest {
     assertThat(updatedUserStudent.getPicture()).isNotNull();
     assertThat(updatedUserStudent.getPicture()).isEqualTo(PICTURE);
     
-    verify(batchService).getBatch(NUMBER);
+    verify(batchService).getBatchByCode(NUMBER);
     verify(userRepository).findOne(STUDENT_ID);
     verify(fileService).deleteFile(PICTURE_ID);
     verify(fileService).storeFile(MOCK_MULTIPARTFILE, FileOrigin.USER);

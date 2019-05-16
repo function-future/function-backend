@@ -1,6 +1,7 @@
 package com.future.function.repository.feature.core;
 
 import com.future.function.model.entity.feature.core.Batch;
+import com.future.function.model.util.constant.FieldName;
 import com.future.function.repository.TestApplication;
 import org.junit.After;
 import org.junit.Before;
@@ -8,11 +9,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -21,21 +24,28 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(classes = TestApplication.class)
 public class BatchRepositoryTest {
   
-  private static final Long NUMBER_1 = 1L;
+  private static final String NUMBER_1 = "1";
   
-  private static final Long NUMBER_2 = 2L;
+  private static final String NUMBER_2 = "2";
+  
+  private static final Sort SORT = new Sort(
+    new Sort.Order(Sort.Direction.DESC, FieldName.BaseEntity.CREATED_AT));
+  
+  private static final Pageable PAGEABLE = new PageRequest(0, 10, SORT);
   
   @Autowired
   private BatchRepository batchRepository;
   
   @Before
   public void setUp() {
-  
-    Batch firstBatch = new Batch(NUMBER_1);
+    
+    Batch firstBatch = new Batch("id-1", "name-1", NUMBER_1);
+    firstBatch.setCreatedAt(5L);
     firstBatch.setUpdatedAt(10L);
-    Batch secondBatch = new Batch(NUMBER_2);
+    Batch secondBatch = new Batch("id-2", "name-2", NUMBER_2);
+    secondBatch.setCreatedAt(15L);
     secondBatch.setUpdatedAt(20L);
-  
+    
     batchRepository.save(Arrays.asList(firstBatch, secondBatch));
   }
   
@@ -48,14 +58,14 @@ public class BatchRepositoryTest {
   @Test
   public void testGivenMethodCallByFindingBatchesReturnBatchObject() {
     
-    List<Batch> foundBatch =
-      batchRepository.findAllByIdIsNotNullOrderByUpdatedAtDesc();
+    Page<Batch> foundBatches = batchRepository.findAllByIdIsNotNull(PAGEABLE);
     
-    assertThat(foundBatch).isNotEqualTo(Collections.emptyList());
-    assertThat(foundBatch.get(0)
-                 .getNumber()).isEqualTo(NUMBER_2);
-    assertThat(foundBatch.get(1)
-                 .getNumber()).isEqualTo(NUMBER_1);
+    assertThat(foundBatches.getContent()
+                 .get(0)
+                 .getCode()).isEqualTo(NUMBER_2);
+    assertThat(foundBatches.getContent()
+                 .get(1)
+                 .getCode()).isEqualTo(NUMBER_1);
   }
   
   @Test
@@ -63,20 +73,20 @@ public class BatchRepositoryTest {
     
     Optional<Batch> foundBatch =
       batchRepository.findFirstByIdIsNotNullOrderByUpdatedAtDesc();
-  
+    
     assertThat(foundBatch).isNotEqualTo(Optional.empty());
     assertThat(foundBatch.get()
-                 .getNumber()).isEqualTo(NUMBER_2);
+                 .getCode()).isEqualTo(NUMBER_2);
   }
   
   @Test
   public void testGivenBatchNumberByFindingBatchByNumberReturnBatchObject() {
-  
-    Optional<Batch> foundBatch = batchRepository.findByNumber(NUMBER_1);
+    
+    Optional<Batch> foundBatch = batchRepository.findByCode(NUMBER_1);
     
     assertThat(foundBatch).isNotEqualTo(Optional.empty());
     assertThat(foundBatch.get()
-                 .getNumber()).isEqualTo(NUMBER_1);
+                 .getCode()).isEqualTo(NUMBER_1);
   }
   
 }
