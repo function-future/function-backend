@@ -54,7 +54,7 @@ public class AnnouncementServiceImplTest {
     .id(ID)
     .title(TITLE)
     .summary(SUMMARY)
-    .descriptionHtml(DESCRIPTION_HTML)
+    .description(DESCRIPTION_HTML)
     .fileV2s(FILE_V2S)
     .build();
   
@@ -153,7 +153,7 @@ public class AnnouncementServiceImplTest {
       .id(ID)
       .title(TITLE)
       .summary(null)
-      .descriptionHtml(DESCRIPTION_HTML)
+      .description(DESCRIPTION_HTML)
       .fileV2s(FILE_V2S)
       .build();
     

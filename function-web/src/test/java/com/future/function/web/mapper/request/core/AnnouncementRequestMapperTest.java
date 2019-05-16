@@ -43,7 +43,7 @@ public class AnnouncementRequestMapperTest {
     Announcement.builder()
       .title(TITLE)
       .summary(SUMMARY)
-      .descriptionHtml(DESCRIPTION_HTML)
+      .description(DESCRIPTION_HTML)
       .build();
   
   private static final Announcement ANNOUNCEMENT_WITH_ID =
@@ -51,7 +51,7 @@ public class AnnouncementRequestMapperTest {
       .id(ID)
       .title(TITLE)
       .summary(SUMMARY)
-      .descriptionHtml(DESCRIPTION_HTML)
+      .description(DESCRIPTION_HTML)
       .fileV2s(Collections.emptyList())
       .build();
   
@@ -88,8 +88,8 @@ public class AnnouncementRequestMapperTest {
       ANNOUNCEMENT_WITHOUT_ID.getTitle());
     assertThat(parsedAnnouncement.getSummary()).isEqualTo(
       ANNOUNCEMENT_WITHOUT_ID.getSummary());
-    assertThat(parsedAnnouncement.getDescriptionHtml()).isEqualTo(
-      ANNOUNCEMENT_WITHOUT_ID.getDescriptionHtml());
+    assertThat(parsedAnnouncement.getDescription()).isEqualTo(
+      ANNOUNCEMENT_WITHOUT_ID.getDescription());
     
     verify(requestMapper).toWebRequestObject(
       DATA, AnnouncementWebRequest.class);

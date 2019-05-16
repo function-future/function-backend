@@ -92,7 +92,7 @@ public interface FieldName {
     
     public static final String SUMMARY = "summary";
     
-    public static final String DESCRIPTION_HTML = "descriptionHtml";
+    public static final String DESCRIPTION = "description";
     
     public static final String FILE = "file";
     

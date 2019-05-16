@@ -38,11 +38,8 @@ public class Announcement extends BaseEntity {
   @Field(FieldName.Announcement.SUMMARY)
   private String summary;
   
-  @Field(FieldName.Announcement.DESCRIPTION_HTML)
-  private String descriptionHtml;
-  
-  @Field("f")
-  private File file;
+  @Field(FieldName.Announcement.DESCRIPTION)
+  private String description;
   
   @DBRef
   @Field(FieldName.Announcement.FILE)

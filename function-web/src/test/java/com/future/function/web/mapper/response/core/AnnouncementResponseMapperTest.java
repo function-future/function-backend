@@ -55,7 +55,7 @@ public class AnnouncementResponseMapperTest {
       .id(ID)
       .title(TITLE)
       .summary(SUMMARY)
-      .descriptionHtml(DESCRIPTION_HTML)
+      .description(DESCRIPTION_HTML)
       .fileV2s(null)
       .build();
     
@@ -108,7 +108,6 @@ public class AnnouncementResponseMapperTest {
     assertThat(createdDataResponse).isNotNull();
     assertThat(createdDataResponse).isEqualTo(this.createdDataResponse);
     
-    announcement.setFile(null);
     DataResponse<AnnouncementWebResponse> retrievedDataResponse =
       AnnouncementResponseMapper.toAnnouncementDataResponse(announcement);
     

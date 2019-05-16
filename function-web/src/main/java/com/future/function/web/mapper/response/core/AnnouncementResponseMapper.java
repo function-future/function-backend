@@ -1,7 +1,6 @@
 package com.future.function.web.mapper.response.core;
 
 import com.future.function.model.entity.feature.core.Announcement;
-import com.future.function.model.entity.feature.core.File;
 import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.model.response.base.DataResponse;
@@ -72,7 +71,7 @@ public class AnnouncementResponseMapper {
       .id(announcement.getId())
       .title(announcement.getTitle())
       .summary(announcement.getSummary())
-      .description(announcement.getDescriptionHtml())
+      .description(announcement.getDescription())
       .files(getFiles(announcement))
       .updatedAt(announcement.getUpdatedAt())
       .build();
@@ -86,13 +85,6 @@ public class AnnouncementResponseMapper {
       .map(stream -> stream.map(ResourceResponseMapper::buildFileWebResponse)
         .collect(Collectors.toList()))
       .orElseGet(Collections::emptyList);
-  }
-  
-  private static String getFileUrl(Announcement announcement) {
-    
-    return Optional.ofNullable(announcement.getFile())
-      .map(File::getFileUrl)
-      .orElse(null);
   }
   
   /**

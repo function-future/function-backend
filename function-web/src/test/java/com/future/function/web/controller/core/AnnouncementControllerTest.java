@@ -111,7 +111,7 @@ public class AnnouncementControllerTest {
       .id(ID)
       .title(TITLE)
       .summary(SUMMARY)
-      .descriptionHtml(DESCRIPTION_HTML)
+      .description(DESCRIPTION_HTML)
       .fileV2s(Collections.emptyList())
       .build();
     

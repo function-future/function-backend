@@ -55,7 +55,7 @@ public class AnnouncementRequestMapper {
     Announcement announcement = Announcement.builder()
       .title(request.getTitle())
       .summary(request.getSummary())
-      .descriptionHtml(request.getDescription())
+      .description(request.getDescription())
       .fileV2s(toFileV2List(request))
       .build();
     
