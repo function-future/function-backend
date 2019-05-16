@@ -59,7 +59,7 @@ public class StickyNoteController {
   ) {
     
     return StickyNoteResponseMapper.toStickyNotePagingResponse(
-      stickyNoteService.getStickyNote(PageHelper.toPage(page, size)));
+      stickyNoteService.getStickyNote(PageHelper.toPageable(page, size)));
   }
   
   /**

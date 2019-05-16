@@ -42,7 +42,7 @@ public class UserResponseMapperTest {
   
   private static final File PICTURE = new File();
   
-  private static final Batch BATCH = new Batch(1L);
+  private static final Batch BATCH = new Batch("id-1", "name-1", "1");
   
   private static final String UNIVERSITY = "university";
   
@@ -69,7 +69,7 @@ public class UserResponseMapperTest {
       .deleted(false)
       .pictureUrl(PICTURE.getFileUrl())
       .thumbnailUrl(PICTURE.getThumbnailUrl())
-      .batch(BATCH.getNumber())
+      .batch(BATCH.getCode())
       .university(UNIVERSITY)
       .build();
   

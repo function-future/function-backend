@@ -133,7 +133,7 @@ public class UserController {
   ) {
     
     return UserResponseMapper.toUsersPagingResponse(
-      userService.getUsers(Role.toRole(role), PageHelper.toPage(page, 10)));
+      userService.getUsers(Role.toRole(role), PageHelper.toPageable(page, 10)));
   }
   
   /**

@@ -34,7 +34,7 @@ public class ErrorHelperTest {
     .name("name")
     .address("address")
     .role("JUDGE")
-    .batch(1L)
+    .batch("1")
     .university("university")
     .build();
   

@@ -50,7 +50,7 @@ public class PageHelperTest {
   @Test
   public void testGivenPageAndSizeByCreatingPageableReturnPageableObject() {
     
-    Pageable pageable = PageHelper.toPage(PAGE, SIZE);
+    Pageable pageable = PageHelper.toPageable(PAGE, SIZE);
     
     assertThat(pageable).isNotNull();
     assertThat(pageable.getPageNumber()).isEqualTo(PAGE - 1);
