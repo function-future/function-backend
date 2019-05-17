@@ -21,7 +21,7 @@ public class QuestionWebRequest {
     private String text;
 
     @NotEmpty(message = "NotEmpty")
-    @Size(message = "Size")
+    @Size(message = "Size", max = 4, min = 4)
     private List<OptionWebRequest> options;
 
 }

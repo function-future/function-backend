@@ -15,7 +15,4 @@ public class QuestionBankWebRequest {
   @NotEmpty(message = "NotEmpty")
   private String description;
 
-  //TODO uncomment and implement when question feature is created
-//  private List<QuestionWebRequest> questions;
-
 }

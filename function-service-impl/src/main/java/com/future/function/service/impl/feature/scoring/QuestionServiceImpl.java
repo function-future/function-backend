@@ -93,16 +93,16 @@ public class QuestionServiceImpl implements QuestionService {
         return Optional.of(question)
                 .map(Question::getId)
                 .flatMap(questionRepository::findByIdAndDeletedFalse)
-                .map(oldQuestion -> convertAndSaveQuestion(question, options, oldQuestion))
+                .map(foundQuestion -> convertAndSaveQuestion(question, options, foundQuestion))
                 .orElse(question);
     }
 
-    private Question convertAndSaveQuestion(Question question, List<Option> options, Question oldQuestion) {
-        BeanUtils.copyProperties(question, oldQuestion);
-        oldQuestion.setOptions(null);
-        oldQuestion = questionRepository.save(oldQuestion);
-        oldQuestion.setOptions(options);
-        return oldQuestion;
+    private Question convertAndSaveQuestion(Question question, List<Option> options, Question foundQuestion) {
+        BeanUtils.copyProperties(question, foundQuestion);
+        foundQuestion.setOptions(null);
+        foundQuestion = questionRepository.save(foundQuestion);
+        foundQuestion.setOptions(options);
+        return foundQuestion;
     }
 
     @Override
