@@ -3,7 +3,7 @@ package com.future.function.web.controller.core;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.future.function.common.enumeration.core.Role;
 import com.future.function.model.entity.feature.core.Batch;
-import com.future.function.model.entity.feature.core.File;
+import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.service.api.feature.core.UserService;
 import com.future.function.web.mapper.helper.ResponseHelper;
@@ -61,7 +61,7 @@ public class UserControllerTest {
   
   private static final String PICTURE_URL = "picture-url";
   
-  private static final File PICTURE = File.builder()
+  private static final FileV2 PICTURE = FileV2.builder()
     .fileUrl(PICTURE_URL)
     .build();
   
@@ -71,7 +71,7 @@ public class UserControllerTest {
     .name(NAME)
     .phone(PHONE)
     .address(ADDRESS)
-    .picture(PICTURE)
+    .pictureV2(new FileV2())
     .batch(Batch.builder()
              .code(NUMBER)
              .build())
@@ -122,7 +122,7 @@ public class UserControllerTest {
   
   @Before
   public void setUp() {
-  
+    
     JacksonTester.initFields(this, new ObjectMapper());
   }
   
@@ -138,7 +138,7 @@ public class UserControllerTest {
     
     given(userService.getUsers(Role.STUDENT, PAGEABLE)).willReturn(
       new PageImpl<>(STUDENTS_LIST, PAGEABLE, STUDENTS_LIST.size()));
-  
+    
     mockMvc.perform(get("/api/core/users").param("role", Role.STUDENT.name()))
       .andExpect(status().isOk())
       .andExpect(content().json(
@@ -152,7 +152,7 @@ public class UserControllerTest {
   @Test
   public void testGivenEmailFromPathVariableByDeletingUserByEmailReturnBaseResponseOK()
     throws Exception {
-  
+    
     mockMvc.perform(delete("/api/core/users/" + STUDENT_EMAIL))
       .andExpect(status().isOk())
       .andExpect(content().json(baseResponseJacksonTester.write(BASE_RESPONSE)
@@ -169,7 +169,7 @@ public class UserControllerTest {
     throws Exception {
     
     given(userService.getUser(STUDENT_EMAIL)).willReturn(STUDENT);
-  
+    
     mockMvc.perform(get("/api/core/users/" + STUDENT_EMAIL))
       .andExpect(status().isOk())
       .andExpect(content().json(
@@ -197,8 +197,8 @@ public class UserControllerTest {
       .build();
     
     given(userRequestMapper.toUser(STUDENT_JSON)).willReturn(student);
-    given(userService.createUser(student, null)).willReturn(STUDENT);
-  
+    given(userService.createUser(student)).willReturn(STUDENT);
+    
     mockMvc.perform(post("/api/core/users").contentType(
       MediaType.MULTIPART_FORM_DATA_VALUE)
                       .param("data", STUDENT_JSON)
@@ -208,7 +208,7 @@ public class UserControllerTest {
         dataResponseJacksonTester.write(CREATED_DATA_RESPONSE)
           .getJson()));
     
-    verify(userService).createUser(student, null);
+    verify(userService).createUser(student);
     verify(userRequestMapper).toUser(STUDENT_JSON);
   }
   
@@ -230,8 +230,8 @@ public class UserControllerTest {
     
     given(userRequestMapper.toUser(STUDENT_EMAIL, STUDENT_JSON)).willReturn(
       student);
-    given(userService.updateUser(student, null)).willReturn(STUDENT);
-  
+    given(userService.updateUser(student)).willReturn(STUDENT);
+    
     mockMvc.perform(put("/api/core/users/" + STUDENT_EMAIL).contentType(
       MediaType.MULTIPART_FORM_DATA_VALUE)
                       .param("data", STUDENT_JSON)
@@ -241,7 +241,7 @@ public class UserControllerTest {
         dataResponseJacksonTester.write(RETRIEVED_DATA_RESPONSE)
           .getJson()));
     
-    verify(userService).updateUser(student, null);
+    verify(userService).updateUser(student);
     verify(userRequestMapper).toUser(STUDENT_EMAIL, STUDENT_JSON);
   }
   

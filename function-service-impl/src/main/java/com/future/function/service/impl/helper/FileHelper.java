@@ -36,7 +36,7 @@ public final class FileHelper {
     Optional.ofNullable(FileHelper.toJavaIoFile(bytes, path))
       .ifPresent(file -> {
         try {
-          file.createNewFile();
+          log.info("Attempting to create file: {}", file.createNewFile());
         } catch (IOException e) {
           log.error("Failed creating file: ", e);
         }
@@ -81,7 +81,8 @@ public final class FileHelper {
         .outputFormat(extension)
         .toFile(Objects.requireNonNull(thumbnailFile));
       
-      thumbnailFile.createNewFile();
+      log.info(
+        "Attempting to create thumbnail: {}", thumbnailFile.createNewFile());
     } catch (IOException | NullPointerException e) {
       log.error("Failed creating thumbnail: ", e);
     }

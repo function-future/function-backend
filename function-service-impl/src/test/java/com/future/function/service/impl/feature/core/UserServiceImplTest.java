@@ -1,14 +1,13 @@
 package com.future.function.service.impl.feature.core;
 
-import com.future.function.common.enumeration.core.FileOrigin;
 import com.future.function.common.enumeration.core.Role;
 import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.core.Batch;
-import com.future.function.model.entity.feature.core.File;
+import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.repository.feature.core.UserRepository;
 import com.future.function.service.api.feature.core.BatchService;
-import com.future.function.service.api.feature.core.FileService;
+import com.future.function.service.api.feature.core.ResourceService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,26 +16,19 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.beans.BeanUtils;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static com.googlecode.catchexception.CatchException.catchException;
 import static com.googlecode.catchexception.CatchException.caughtException;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class UserServiceImplTest {
@@ -63,7 +55,10 @@ public class UserServiceImplTest {
   
   private static final String PICTURE_ID = "picture-id";
   
-  private static final File PICTURE = File.builder()
+  public static final List<String> FILE_IDS = Collections.singletonList(
+    PICTURE_ID);
+  
+  private static final FileV2 PICTURE = FileV2.builder()
     .id(PICTURE_ID)
     .asResource(true)
     .build();
@@ -71,9 +66,6 @@ public class UserServiceImplTest {
   private static final String UNIVERSITY = "university";
   
   private static final Pageable PAGEABLE = new PageRequest(0, 10);
-  
-  private static final MockMultipartFile MOCK_MULTIPARTFILE =
-    new MockMultipartFile("mock", "mock.png", "image/png", new byte[] {});
   
   private static final String STUDENT_ID = "student-id";
   
@@ -87,13 +79,10 @@ public class UserServiceImplTest {
   private BatchService batchService;
   
   @Mock
-  private FileService fileService;
-  
-  @Mock
   private UserRepository userRepository;
   
   @Mock
-  private ResourceLoader resourceLoader;
+  private ResourceService resourceService;
   
   @InjectMocks
   private UserServiceImpl userService;
@@ -109,7 +98,6 @@ public class UserServiceImplTest {
       .password(PASSWORD)
       .phone(PHONE)
       .address(ADDRESS)
-      .picture(PICTURE)
       .batch(BATCH)
       .university(UNIVERSITY)
       .build();
@@ -123,7 +111,6 @@ public class UserServiceImplTest {
       .password(PASSWORD)
       .phone(PHONE)
       .address(ADDRESS)
-      .picture(PICTURE)
       .build();
     userMentor.setDeleted(false);
   }
@@ -131,8 +118,7 @@ public class UserServiceImplTest {
   @After
   public void tearDown() {
     
-    verifyNoMoreInteractions(
-      batchService, fileService, userRepository, resourceLoader);
+    verifyNoMoreInteractions(batchService, userRepository, resourceService);
   }
   
   @Test
@@ -184,7 +170,7 @@ public class UserServiceImplTest {
       .password(PASSWORD)
       .phone(PHONE)
       .address(ADDRESS)
-      .picture(PICTURE)
+      .pictureV2(PICTURE)
       .batch(BATCH)
       .university(UNIVERSITY)
       .build();
@@ -214,7 +200,7 @@ public class UserServiceImplTest {
       .password(PASSWORD)
       .phone(PHONE)
       .address(ADDRESS)
-      .picture(PICTURE)
+      .pictureV2(PICTURE)
       .build();
     additionalUser.setDeleted(false);
     
@@ -235,49 +221,49 @@ public class UserServiceImplTest {
   @Test
   public void testGivenStudentDataByCreatingUserReturnStudent() {
     
+    userStudent.setPictureV2(PICTURE);
+    
     when(userRepository.findOne(STUDENT_ID)).thenReturn(null);
     when(batchService.getBatchByCode(NUMBER)).thenReturn(BATCH);
-    when(fileService.storeFile(MOCK_MULTIPARTFILE, FileOrigin.USER)).thenReturn(
-      PICTURE);
-    when(fileService.getFile(PICTURE_ID)).thenReturn(PICTURE);
+    when(resourceService.markFilesUsed(FILE_IDS, true)).thenReturn(true);
+    when(resourceService.getFile(PICTURE_ID)).thenReturn(PICTURE);
     when(userRepository.save(userStudent)).thenReturn(userStudent);
     
-    User createdUserStudent = userService.createUser(
-      userStudent, MOCK_MULTIPARTFILE);
+    User createdUserStudent = userService.createUser(userStudent);
     
     assertThat(createdUserStudent).isNotNull();
     assertThat(createdUserStudent.getBatch()).isNotNull();
     assertThat(createdUserStudent.getBatch()).isEqualTo(BATCH);
-    assertThat(createdUserStudent.getPicture()).isNotNull();
-    assertThat(createdUserStudent.getPicture()).isEqualTo(PICTURE);
+    assertThat(createdUserStudent.getPictureV2()).isNotNull();
+    assertThat(createdUserStudent.getPictureV2()).isEqualTo(PICTURE);
     
     verify(userRepository).findOne(STUDENT_ID);
     verify(batchService).getBatchByCode(NUMBER);
-    verify(fileService).storeFile(MOCK_MULTIPARTFILE, FileOrigin.USER);
-    verify(fileService).getFile(PICTURE_ID);
+    verify(resourceService).markFilesUsed(FILE_IDS, true);
+    verify(resourceService).getFile(PICTURE_ID);
     verify(userRepository).save(userStudent);
   }
   
   @Test
   public void testGivenMentorDataByCreatingUserReturnMentor() {
     
-    when(userRepository.findOne(MENTOR_ID)).thenReturn(null);
-    when(userRepository.save(userMentor)).thenReturn(userMentor);
-    when(fileService.storeFile(MOCK_MULTIPARTFILE, FileOrigin.USER)).thenReturn(
-      PICTURE);
-    when(fileService.getFile(PICTURE_ID)).thenReturn(PICTURE);
+    userMentor.setPictureV2(PICTURE);
     
-    User createdUserMentor = userService.createUser(
-      userMentor, MOCK_MULTIPARTFILE);
+    when(userRepository.findOne(MENTOR_ID)).thenReturn(null);
+    when(resourceService.markFilesUsed(FILE_IDS, true)).thenReturn(true);
+    when(resourceService.getFile(PICTURE_ID)).thenReturn(PICTURE);
+    when(userRepository.save(userMentor)).thenReturn(userMentor);
+    
+    User createdUserMentor = userService.createUser(userMentor);
     
     assertThat(createdUserMentor).isNotNull();
-    assertThat(createdUserMentor.getPicture()).isNotNull();
-    assertThat(createdUserMentor.getPicture()).isEqualTo(PICTURE);
+    assertThat(createdUserMentor.getPictureV2()).isNotNull();
+    assertThat(createdUserMentor.getPictureV2()).isEqualTo(PICTURE);
     
     verify(userRepository).findOne(MENTOR_ID);
+    verify(resourceService).markFilesUsed(FILE_IDS, true);
+    verify(resourceService).getFile(PICTURE_ID);
     verify(userRepository).save(userMentor);
-    verify(fileService).storeFile(MOCK_MULTIPARTFILE, FileOrigin.USER);
-    verify(fileService).getFile(PICTURE_ID);
   }
   
   @Test
@@ -285,26 +271,15 @@ public class UserServiceImplTest {
     
     when(userRepository.findOne(MENTOR_ID)).thenReturn(null);
     when(userRepository.save(userMentor)).thenReturn(userMentor);
-    when(
-      resourceLoader.getResource("classpath:default-profile.png")).thenReturn(
-      new ClassPathResource("default-profile.png"));
-    when(fileService.storeFile(any(MultipartFile.class),
-                               any(FileOrigin.class)
-    )).thenReturn(PICTURE);
-    when(fileService.getFile(PICTURE_ID)).thenReturn(PICTURE);
     
-    User createdUserMentor = userService.createUser(userMentor, null);
+    User createdUserMentor = userService.createUser(userMentor);
     
     assertThat(createdUserMentor).isNotNull();
-    assertThat(createdUserMentor.getPicture()).isNotNull();
-    assertThat(createdUserMentor.getPicture()).isEqualTo(PICTURE);
+    assertThat(createdUserMentor.getPictureV2()).isNull();
     
     verify(userRepository).findOne(MENTOR_ID);
     verify(userRepository).save(userMentor);
-    verify(resourceLoader).getResource("classpath:default-profile.png");
-    verify(fileService).storeFile(
-      any(MultipartFile.class), any(FileOrigin.class));
-    verify(fileService).getFile(PICTURE_ID);
+    verifyZeroInteractions(resourceService);
   }
   
   @Test
@@ -321,8 +296,7 @@ public class UserServiceImplTest {
     savedUserStudent.setDeleted(false);
     when(userRepository.save(savedUserStudent)).thenReturn(savedUserStudent);
     
-    User createdUserStudent = userService.createUser(
-      userStudent, MOCK_MULTIPARTFILE);
+    User createdUserStudent = userService.createUser(userStudent);
     
     assertThat(createdUserStudent).isNotNull();
     
@@ -343,8 +317,7 @@ public class UserServiceImplTest {
     savedUserMentor.setDeleted(false);
     when(userRepository.save(savedUserMentor)).thenReturn(savedUserMentor);
     
-    User createdUserMentor = userService.createUser(
-      userMentor, MOCK_MULTIPARTFILE);
+    User createdUserMentor = userService.createUser(userMentor);
     
     assertThat(createdUserMentor).isNotNull();
     
@@ -355,55 +328,52 @@ public class UserServiceImplTest {
   @Test
   public void testGivenStudentDataByUpdatingUserReturnStudent() {
     
-    userStudent.setPicture(PICTURE);
+    userStudent.setPictureV2(PICTURE);
     
     when(batchService.getBatchByCode(NUMBER)).thenReturn(BATCH);
     when(userRepository.findOne(STUDENT_ID)).thenReturn(userStudent);
-    when(fileService.storeFile(MOCK_MULTIPARTFILE, FileOrigin.USER)).thenReturn(
-      PICTURE);
-    when(fileService.getFile(PICTURE_ID)).thenReturn(PICTURE);
+    when(resourceService.markFilesUsed(FILE_IDS, false)).thenReturn(true);
+    when(resourceService.markFilesUsed(FILE_IDS, true)).thenReturn(true);
+    when(resourceService.getFile(PICTURE_ID)).thenReturn(PICTURE);
     when(userRepository.save(userStudent)).thenReturn(userStudent);
     
-    User updatedUserStudent = userService.updateUser(userStudent,
-                                                     MOCK_MULTIPARTFILE
-    );
+    User updatedUserStudent = userService.updateUser(userStudent);
     
     assertThat(updatedUserStudent).isNotNull();
     assertThat(updatedUserStudent.getBatch()).isNotNull();
     assertThat(updatedUserStudent.getBatch()).isEqualTo(BATCH);
-    assertThat(updatedUserStudent.getPicture()).isNotNull();
-    assertThat(updatedUserStudent.getPicture()).isEqualTo(PICTURE);
+    assertThat(updatedUserStudent.getPictureV2()).isNotNull();
+    assertThat(updatedUserStudent.getPictureV2()).isEqualTo(PICTURE);
     
     verify(batchService).getBatchByCode(NUMBER);
     verify(userRepository).findOne(STUDENT_ID);
-    verify(fileService).deleteFile(PICTURE_ID);
-    verify(fileService).storeFile(MOCK_MULTIPARTFILE, FileOrigin.USER);
-    verify(fileService).getFile(PICTURE_ID);
+    verify(resourceService).markFilesUsed(FILE_IDS, false);
+    verify(resourceService).markFilesUsed(FILE_IDS, true);
+    verify(resourceService, times(2)).getFile(PICTURE_ID);
     verify(userRepository).save(userStudent);
   }
   
   @Test
   public void testGivenMentorDataByUpdatingUserReturnMentor() {
     
-    userMentor.setPicture(PICTURE);
+    userMentor.setPictureV2(PICTURE);
     
     when(userRepository.findOne(MENTOR_ID)).thenReturn(userMentor);
-    when(fileService.storeFile(MOCK_MULTIPARTFILE, FileOrigin.USER)).thenReturn(
-      PICTURE);
-    when(fileService.getFile(PICTURE_ID)).thenReturn(PICTURE);
+    when(resourceService.markFilesUsed(FILE_IDS, false)).thenReturn(true);
+    when(resourceService.markFilesUsed(FILE_IDS, true)).thenReturn(true);
+    when(resourceService.getFile(PICTURE_ID)).thenReturn(PICTURE);
     when(userRepository.save(userMentor)).thenReturn(userMentor);
     
-    User updatedUserMentor = userService.updateUser(
-      userMentor, MOCK_MULTIPARTFILE);
+    User updatedUserMentor = userService.updateUser(userMentor);
     
     assertThat(updatedUserMentor).isNotNull();
-    assertThat(updatedUserMentor.getPicture()).isNotNull();
-    assertThat(updatedUserMentor.getPicture()).isEqualTo(PICTURE);
+    assertThat(updatedUserMentor.getPictureV2()).isNotNull();
+    assertThat(updatedUserMentor.getPictureV2()).isEqualTo(PICTURE);
     
     verify(userRepository).findOne(MENTOR_ID);
-    verify(fileService).deleteFile(PICTURE_ID);
-    verify(fileService).storeFile(MOCK_MULTIPARTFILE, FileOrigin.USER);
-    verify(fileService).getFile(PICTURE_ID);
+    verify(resourceService).markFilesUsed(FILE_IDS, false);
+    verify(resourceService).markFilesUsed(FILE_IDS, true);
+    verify(resourceService, times(2)).getFile(PICTURE_ID);
     verify(userRepository).save(userMentor);
   }
   

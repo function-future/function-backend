@@ -7,8 +7,8 @@ import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.repository.feature.core.FileRepositoryV2;
 import com.future.function.service.api.feature.core.ResourceService;
 import com.future.function.service.impl.helper.FileHelper;
+import com.google.common.collect.Lists;
 import org.apache.commons.io.FilenameUtils;
-import org.assertj.core.util.Lists;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
