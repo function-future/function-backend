@@ -21,7 +21,6 @@ import org.springframework.data.mongodb.core.mapping.Field;
 public class Option extends BaseEntity {
 
     @Builder.Default
-    @Field(FieldName.Option.ID)
     private String id = UUID.randomUUID().toString();
 
     @Field(FieldName.Option.LABEL)

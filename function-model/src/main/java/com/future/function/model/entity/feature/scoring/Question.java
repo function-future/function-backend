@@ -22,7 +22,6 @@ import org.springframework.data.mongodb.core.mapping.Field;
 public class Question extends BaseEntity {
 
     @Builder.Default
-    @Field(FieldName.Question.ID)
     private String id = UUID.randomUUID().toString();
 
     @Field(FieldName.Question.TEXT)
