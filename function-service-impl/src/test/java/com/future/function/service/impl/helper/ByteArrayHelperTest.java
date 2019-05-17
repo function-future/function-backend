@@ -3,6 +3,7 @@ package com.future.function.service.impl.helper;
 import com.future.function.common.exception.BadRequestException;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
@@ -20,6 +21,7 @@ public class ByteArrayHelperTest {
   public void tearDown() {}
   
   @Test
+  @Ignore
   public void testGivenJavaIoFileByConvertingToByteArrayReturnByteArray() {
     
     String currentPath = this.getClass()
@@ -36,6 +38,7 @@ public class ByteArrayHelperTest {
   }
   
   @Test
+  @Ignore
   public void testGivenInvalidJavaIoFileByConvertingToByteArrayReturnBadRequestException() {
     
     catchException(

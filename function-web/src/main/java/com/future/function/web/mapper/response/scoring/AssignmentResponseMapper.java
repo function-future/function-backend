@@ -5,13 +5,14 @@ import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
-import com.future.function.web.model.response.scoring.AssignmentWebResponse;
-import java.util.stream.Collectors;
+import com.future.function.web.model.response.feature.scoring.AssignmentWebResponse;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+
+import java.util.stream.Collectors;
 
 /**
  * Static class to map Assignment into a proper DataResponse / PagingResponse of AssignmentWebResponse

@@ -110,4 +110,24 @@ public interface FieldName {
 
   }
 
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  abstract class Question {
+
+    public static final String TEXT = "text";
+
+    public static final String QUESTION_BANK = "questionBank";
+
+  }
+
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  abstract class Option {
+
+    public static final String LABEL = "text";
+
+    public static final String CORRECT = "correct";
+
+    public static final String QUESTION = "question";
+
+  }
+
 }

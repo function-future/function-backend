@@ -5,7 +5,7 @@ import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.base.paging.Paging;
-import com.future.function.web.model.response.scoring.QuestionBankWebResponse;
+import com.future.function.web.model.response.feature.scoring.QuestionBankWebResponse;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
