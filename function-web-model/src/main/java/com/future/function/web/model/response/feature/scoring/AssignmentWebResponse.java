@@ -1,4 +1,4 @@
-package com.future.function.web.model.response.scoring;
+package com.future.function.web.model.response.feature.scoring;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

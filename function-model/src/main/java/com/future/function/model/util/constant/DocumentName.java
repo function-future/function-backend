@@ -23,6 +23,12 @@ public abstract class DocumentName {
 
   public static final String ASSIGNMENT = "assignments";
 
+  public static final String QUESTION_BANK = "question-banks";
+
   public static final String QUIZ = "quizzes";
+
+  public static final String QUESTION = "questions";
+
+  public static final String OPTION = "options";
 
 }
