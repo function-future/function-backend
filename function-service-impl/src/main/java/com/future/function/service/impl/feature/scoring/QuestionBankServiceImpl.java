@@ -44,13 +44,13 @@ public class QuestionBankServiceImpl implements QuestionBankService {
     return Optional.ofNullable(questionBank)
             .map(QuestionBank::getId)
             .flatMap(questionBankRepository::findByIdAndDeletedFalse)
-            .map(bankOld -> mergeOldAndNewQuestionBankThenSave(bankOld, questionBank))
+            .map(foundQuestionBank -> mergeFoundAndNewQuestionBankThenSave(foundQuestionBank, questionBank))
             .orElse(questionBank);
   }
 
-  private QuestionBank mergeOldAndNewQuestionBankThenSave(QuestionBank old, QuestionBank questionBank) {
-    BeanUtils.copyProperties(questionBank, old);
-    return questionBankRepository.save(old);
+  private QuestionBank mergeFoundAndNewQuestionBankThenSave(QuestionBank foundQuestionBank, QuestionBank questionBank) {
+    BeanUtils.copyProperties(questionBank, foundQuestionBank);
+    return questionBankRepository.save(foundQuestionBank);
   }
 
   @Override
