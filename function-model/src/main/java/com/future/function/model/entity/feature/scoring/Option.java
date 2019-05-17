@@ -2,6 +2,7 @@ package com.future.function.model.entity.feature.scoring;
 
 import com.future.function.model.entity.base.BaseEntity;
 import com.future.function.model.util.constant.DocumentName;
+import com.future.function.model.util.constant.FieldName;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,6 +11,7 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.UUID;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 @Data
 @Builder
@@ -19,12 +21,16 @@ import java.util.UUID;
 public class Option extends BaseEntity {
 
     @Builder.Default
+    @Field(FieldName.Option.ID)
     private String id = UUID.randomUUID().toString();
 
+    @Field(FieldName.Option.LABEL)
     private String label;
 
+    @Field(FieldName.Option.CORRECT)
     private boolean correct;
 
     @DBRef
+    @Field(FieldName.Option.QUESTION)
     private Question question;
 }

@@ -8,6 +8,7 @@ import com.future.function.repository.feature.scoring.QuestionRepository;
 import com.future.function.service.api.feature.scoring.OptionService;
 import com.future.function.service.api.feature.scoring.QuestionBankService;
 import com.future.function.service.api.feature.scoring.QuestionService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -58,9 +59,7 @@ public class QuestionServiceImpl implements QuestionService {
     @Override
     public Question findById(String id) {
         return Optional.ofNullable(id)
-                .map(questionRepository::findByIdAndDeletedFalse)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
+                .flatMap(questionRepository::findByIdAndDeletedFalse)
                 .orElseThrow(() -> new NotFoundException("Question not found"));
     }
 
@@ -91,18 +90,25 @@ public class QuestionServiceImpl implements QuestionService {
         question.setQuestionBank(getQuestionBank(questionBankId));
         List<Option> options = question.getOptions();
         saveOptionList(question, options, false);
-        question.setOptions(null);
-        question = questionRepository.save(question);
-        question.setOptions(options);
-        return question;
+        return Optional.of(question)
+                .map(Question::getId)
+                .flatMap(questionRepository::findByIdAndDeletedFalse)
+                .map(oldQuestion -> convertAndSaveQuestion(question, options, oldQuestion))
+                .orElse(question);
+    }
+
+    private Question convertAndSaveQuestion(Question question, List<Option> options, Question oldQuestion) {
+        BeanUtils.copyProperties(question, oldQuestion);
+        oldQuestion.setOptions(null);
+        oldQuestion = questionRepository.save(oldQuestion);
+        oldQuestion.setOptions(options);
+        return oldQuestion;
     }
 
     @Override
     public void deleteById(String id) {
         Optional.of(id)
-                .map(questionRepository::findByIdAndDeletedFalse)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
+                .flatMap(questionRepository::findByIdAndDeletedFalse)
                 .ifPresent(question -> {
                     deleteAllOptionRelatedToQuestion(question);
                     question.setDeleted(true);

@@ -51,7 +51,7 @@ public class QuestionRepositoryTest {
 
         pageable = new PageRequest(0, 10);
 
-        questionPage = new PageImpl<>(Collections.singletonList(question), pageable, 10);
+        questionPage = new PageImpl<>(Collections.singletonList(question), pageable, 1);
     }
 
     @After
