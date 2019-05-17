@@ -106,8 +106,6 @@ public interface FieldName {
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
   abstract class QuestionBank {
 
-    public static final String ID = "id";
-
     public static final String DESCRIPTION = "description";
 
   }

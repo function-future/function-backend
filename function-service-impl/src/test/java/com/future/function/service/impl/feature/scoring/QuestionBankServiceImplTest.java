@@ -57,12 +57,6 @@ public class QuestionBankServiceImplTest {
     questionBankList = Collections.singletonList(questionBank);
     questionBankPage = new PageImpl<>(questionBankList, pageable, TOTAL);
 
-    when(questionBankRepository.findAll(pageable))
-            .thenReturn(questionBankPage);
-    when(questionBankRepository.findByIdAndDeletedFalse(QUESTIONBANK_ID))
-            .thenReturn(Optional.of(questionBank));
-    when(questionBankRepository.save(questionBank))
-            .thenReturn(questionBank);
   }
 
   @After
@@ -72,6 +66,10 @@ public class QuestionBankServiceImplTest {
 
   @Test
   public void testFindByIdSuccess() {
+
+    when(questionBankRepository.findByIdAndDeletedFalse(QUESTIONBANK_ID))
+            .thenReturn(Optional.of(questionBank));
+
     QuestionBank actual = questionBankService.findById(QUESTIONBANK_ID);
 
     assertThat(actual).isEqualTo(questionBank);
@@ -94,6 +92,10 @@ public class QuestionBankServiceImplTest {
 
   @Test
   public void testFindAllWithPageableFilterAndSearch() {
+
+    when(questionBankRepository.findAll(pageable))
+            .thenReturn(questionBankPage);
+
     Page<QuestionBank> actual = questionBankService.findAllByPageableFilterAndSearch(pageable, "", "");
 
     assertThat(actual.getContent()).isEqualTo(questionBankList);
@@ -103,6 +105,10 @@ public class QuestionBankServiceImplTest {
 
   @Test
   public void testCreateQuestionBank() {
+
+    when(questionBankRepository.save(questionBank))
+            .thenReturn(questionBank);
+
     QuestionBank actual = questionBankService.createQuestionBank(questionBank);
 
     assertThat(actual).isEqualTo(questionBank);
@@ -111,15 +117,25 @@ public class QuestionBankServiceImplTest {
 
   @Test
   public void testUpdateQuestionBank() {
+
+    when(questionBankRepository.findByIdAndDeletedFalse(QUESTIONBANK_ID))
+            .thenReturn(Optional.of(questionBank));
+    when(questionBankRepository.save(questionBank))
+            .thenReturn(questionBank);
+
     QuestionBank actual = questionBankService.updateQuestionBank(questionBank);
 
     assertThat(actual).isEqualTo(questionBank);
+    verify(questionBankRepository).findByIdAndDeletedFalse(QUESTIONBANK_ID);
     verify(questionBankRepository).save(questionBank);
   }
 
   @Test
   public void testDeleteQuestionBank() {
-    questionBank.setDeleted(true);
+
+    when(questionBankRepository.findByIdAndDeletedFalse(QUESTIONBANK_ID))
+            .thenReturn(Optional.of(questionBank));
+
     questionBankService.deleteById(QUESTIONBANK_ID);
     verify(questionBankRepository).findByIdAndDeletedFalse(QUESTIONBANK_ID);
     verify(questionBankRepository).save(questionBank);
