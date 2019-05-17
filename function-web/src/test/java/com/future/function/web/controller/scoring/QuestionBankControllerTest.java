@@ -119,18 +119,6 @@ public class QuestionBankControllerTest {
 
     BASE_RESPONSE = ResponseHelper.toBaseResponse(HttpStatus.OK);
 
-    when(questionBankService.findAllByPageableFilterAndSearch(pageable, "", ""))
-            .thenReturn(questionBankPage);
-    when(questionBankService.createQuestionBank(questionBank))
-            .thenReturn(questionBank);
-    when(questionBankService.updateQuestionBank(questionBank))
-            .thenReturn(questionBank);
-    when(questionBankService.findById(QUESTION_BANK_ID))
-            .thenReturn(questionBank);
-    when(requestMapper.toQuestionBank(request))
-            .thenReturn(questionBank);
-    when(requestMapper.toQuestionBank(QUESTION_BANK_ID, request))
-            .thenReturn(questionBank);
   }
 
   @After
@@ -140,6 +128,10 @@ public class QuestionBankControllerTest {
 
   @Test
   public void testFindQuestionBankById() throws Exception {
+
+    when(questionBankService.findById(QUESTION_BANK_ID))
+            .thenReturn(questionBank);
+
     mockMvc.perform(
             get("/api/question-banks/" + QUESTION_BANK_ID)
             )
@@ -168,6 +160,10 @@ public class QuestionBankControllerTest {
 
   @Test
   public void testFindQuestionBankWithPagingParameters() throws Exception {
+
+    when(questionBankService.findAllByPageableFilterAndSearch(pageable, "", ""))
+            .thenReturn(questionBankPage);
+
     mockMvc.perform(
             get("/api/question-banks")
             .param("page", "1")
@@ -184,6 +180,10 @@ public class QuestionBankControllerTest {
 
   @Test
   public void testFindQuestionBankWithNoPagingParameters() throws Exception {
+
+    when(questionBankService.findAllByPageableFilterAndSearch(pageable, "", ""))
+            .thenReturn(questionBankPage);
+
     mockMvc.perform(
             get("/api/question-banks")
     )
@@ -198,6 +198,12 @@ public class QuestionBankControllerTest {
 
   @Test
   public void testCreateQuestionBank() throws Exception {
+
+    when(questionBankService.createQuestionBank(questionBank))
+            .thenReturn(questionBank);
+    when(requestMapper.toQuestionBank(request))
+            .thenReturn(questionBank);
+
     mockMvc.perform(
             post("/api/question-banks")
             .content(QUESTION_BANK_CREATE_REQUEST_JSON)
@@ -215,6 +221,12 @@ public class QuestionBankControllerTest {
 
   @Test
   public void testUpdateQuestionBank() throws Exception {
+
+    when(questionBankService.updateQuestionBank(questionBank))
+            .thenReturn(questionBank);
+    when(requestMapper.toQuestionBank(QUESTION_BANK_ID, request))
+            .thenReturn(questionBank);
+
     mockMvc.perform(
             put("/api/question-banks/" + QUESTION_BANK_ID)
             .content(QUESTION_BANK_UPDATE_REQUEST_JSON)

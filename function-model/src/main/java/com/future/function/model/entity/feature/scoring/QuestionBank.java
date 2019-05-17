@@ -20,7 +20,6 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @Document(collection = DocumentName.QUESTION_BANK)
 public class QuestionBank extends BaseEntity {
 
-  @Field(value = FieldName.QuestionBank.ID)
   @Builder.Default
   private String id = UUID.randomUUID().toString();
 

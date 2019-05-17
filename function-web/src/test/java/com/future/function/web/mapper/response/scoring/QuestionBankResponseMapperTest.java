@@ -58,7 +58,7 @@ public class QuestionBankResponseMapperTest {
 
     pageable = new PageRequest(0, 10);
 
-    questionBankPage = new PageImpl<>(Collections.singletonList(questionBank), pageable, 10);
+    questionBankPage = new PageImpl<>(Collections.singletonList(questionBank), pageable, 1);
 
     paging = Paging
             .builder()
@@ -99,6 +99,6 @@ public class QuestionBankResponseMapperTest {
   public void testToPagingQuestionBankResponseWithHttpStatusOk() {
     PagingResponse<QuestionBankWebResponse> actual = QuestionBankResponseMapper.toPagingQuestionBankWebResponse(questionBankPage);
     assertThat(actual.getPaging()).isEqualTo(paging);
-    assertThat(actual.getData()).isEqualTo(Collections.singletonList(questionBankWebResponsePagingResponse.getData()));
+    assertThat(actual.getData()).isEqualTo(Collections.singletonList(questionBankWebResponse));
   }
 }
