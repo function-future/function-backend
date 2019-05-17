@@ -101,8 +101,8 @@ public class ResourceServiceImpl implements ResourceService {
     
     return Optional.of(fileName)
       .filter(FileHelper::isThumbnailName)
-      .map(result -> new java.io.File(file.getThumbnailPath()))
-      .orElseGet(() -> new java.io.File(file.getFilePath()));
+      .map(result -> new File(file.getThumbnailPath()))
+      .orElseGet(() -> new File(file.getFilePath()));
   }
   
   private String getFileId(String fileName) {
