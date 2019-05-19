@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -17,14 +19,16 @@ public class QuizWebResponse {
 
   private String description;
 
-  private Long deadline;
+    private Long startDate;
+
+    private Long endDate;
 
   private Long timeLimit;
 
-  private Integer tries;
+    private Integer trials;
 
   private Integer questionCount;
 
-//  private QuestionBank questionBank;
+    private List<String> questionBanks;
 
 }

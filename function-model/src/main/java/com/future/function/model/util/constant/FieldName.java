@@ -91,11 +91,13 @@ public interface FieldName {
 
     public static final String TITLE = "title";
     public static final String DESCRIPTION = "description";
-    public static final String DEADLINE = "deadline";
+    public static final String START_DATE = "startDate";
+    public static final String END_DATE = "endDate";
     public static final String TIME_LIMIT = "timeLimit";
-    public static final String TRIES = "tries";
+    public static final String TRIALS = "trials";
     public static final String QUESTION_BANK = "questionBanks";
     public static final String QUESTION_COUNT = "questionCount";
+    public static final String BATCH = "batch";
   }
 
   @NoArgsConstructor(access = AccessLevel.PRIVATE)

@@ -21,7 +21,7 @@ import java.util.UUID;
 @Document(collection = DocumentName.STUDENT_QUIZ_DETAIL)
 public class StudentQuizDetail extends BaseEntity {
 
-    @Field(FieldName.StudentQuizDetail.ID)
+    @Builder.Default
     private String id = UUID.randomUUID().toString();
 
     @DBRef

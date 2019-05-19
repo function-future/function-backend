@@ -14,6 +14,8 @@ public interface OptionService {
 
     Option updateOption(Option option);
 
+    boolean isOptionCorrect(Option option);
+
     void deleteById(String id);
 
 }

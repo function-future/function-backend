@@ -106,6 +106,9 @@ public class QuizServiceImpl implements QuizService {
   public Quiz createQuiz(Quiz request) {
     return Optional.of(request)
             .map(quizRepository::save)
+            .map(quiz -> {
+
+            })
             .orElseThrow(() -> new BadRequestException("Bad Request"));
   }
 
