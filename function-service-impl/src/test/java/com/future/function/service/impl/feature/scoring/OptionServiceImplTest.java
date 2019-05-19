@@ -7,19 +7,21 @@ import com.future.function.repository.feature.scoring.OptionRepository;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import static com.googlecode.catchexception.CatchException.catchException;
 import static com.googlecode.catchexception.CatchException.caughtException;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
-import static org.mockito.MockitoAnnotations.initMocks;
 
+@RunWith(MockitoJUnitRunner.class)
 public class OptionServiceImplTest {
 
     private static final String OPTION_ID = "id";
@@ -38,7 +40,6 @@ public class OptionServiceImplTest {
 
     @Before
     public void setUp() throws Exception {
-        initMocks(this);
 
         question = Question.builder()
                 .id(QUESTION_ID)
@@ -51,10 +52,6 @@ public class OptionServiceImplTest {
                 .correct(true)
                 .question(question)
                 .build();
-
-        when(optionRepository.findByIdAndDeletedFalse(OPTION_ID)).thenReturn(Optional.of(option));
-        when(optionRepository.save(option)).thenReturn(option);
-        when(optionRepository.findAllByQuestionId(QUESTION_ID)).thenReturn(Collections.singletonList(option));
     }
 
     @After
@@ -64,6 +61,9 @@ public class OptionServiceImplTest {
 
     @Test
     public void getOptionListByQuestionId() {
+
+        when(optionRepository.findAllByQuestionId(QUESTION_ID)).thenReturn(Collections.singletonList(option));
+
         List<Option> actual = optionService.getOptionListByQuestionId(QUESTION_ID);
         assertThat(actual.size()).isEqualTo(1);
         assertThat(actual.get(0)).isEqualTo(option);
@@ -79,6 +79,9 @@ public class OptionServiceImplTest {
 
     @Test
     public void findById() {
+
+        when(optionRepository.findByIdAndDeletedFalse(OPTION_ID)).thenReturn(Optional.of(option));
+
         Option actual = optionService.findById(OPTION_ID);
         assertThat(actual).isEqualTo(option);
         verify(optionRepository).findByIdAndDeletedFalse(OPTION_ID);
@@ -92,6 +95,9 @@ public class OptionServiceImplTest {
 
     @Test
     public void createOption() {
+
+        when(optionRepository.save(option)).thenReturn(option);
+
         Option actual = optionService.createOption(option);
         assertThat(actual).isEqualTo(option);
         verify(optionRepository).save(option);
@@ -99,13 +105,22 @@ public class OptionServiceImplTest {
 
     @Test
     public void updateOption() {
+
+        when(optionRepository.findByIdAndDeletedFalse(OPTION_ID)).thenReturn(Optional.of(option));
+        when(optionRepository.save(option)).thenReturn(option);
+
         Option actual = optionService.updateOption(option);
         assertThat(actual).isEqualTo(option);
+
+        verify(optionRepository).findByIdAndDeletedFalse(OPTION_ID);
         verify(optionRepository).save(option);
     }
 
     @Test
     public void deleteById() {
+
+        when(optionRepository.findByIdAndDeletedFalse(OPTION_ID)).thenReturn(Optional.of(option));
+
         optionService.deleteById(OPTION_ID);
         verify(optionRepository).findByIdAndDeletedFalse(OPTION_ID);
         option.setDeleted(true);

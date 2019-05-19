@@ -14,7 +14,6 @@ import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.feature.scoring.OptionWebResponse;
 import com.future.function.web.model.response.feature.scoring.QuestionWebResponse;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,7 +38,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@Slf4j
 @RunWith(SpringRunner.class)
 @WebMvcTest(QuestionController.class)
 public class QuestionControllerTest {
@@ -147,14 +145,6 @@ public class QuestionControllerTest {
                 .toQuestionPagingResponse(questionPage);
 
         BASE_RESPONSE = ResponseHelper.toBaseResponse(HttpStatus.OK);
-
-        when(questionService.findById(QUESTION_ID)).thenReturn(question);
-        when(questionService.createQuestion(question, QUESTION_BANK_ID)).thenReturn(question);
-        when(questionService.updateQuestion(question, QUESTION_BANK_ID)).thenReturn(question);
-        when(questionService.findAllByQuestionBankId(QUESTION_BANK_ID, pageable)).thenReturn(questionPage);
-        when(questionRequestMapper.toQuestion(questionWebRequest)).thenReturn(question);
-        when(questionRequestMapper.toQuestion(questionWebRequest, QUESTION_ID)).thenReturn(question);
-
     }
 
     @After
@@ -164,6 +154,9 @@ public class QuestionControllerTest {
 
     @Test
     public void getAllQuestionForQuestionBank() throws Exception {
+
+        when(questionService.findAllByQuestionBankId(QUESTION_BANK_ID, pageable)).thenReturn(questionPage);
+
         mockMvc.perform(
                 get("/api/scoring/question-banks/" + QUESTION_BANK_ID + "/questions")
                         .param("page", "1")
@@ -180,6 +173,9 @@ public class QuestionControllerTest {
 
     @Test
     public void getQuestionDetailById() throws Exception {
+
+        when(questionService.findById(QUESTION_ID)).thenReturn(question);
+
         mockMvc.perform(
                 get("/api/scoring/question-banks/" + QUESTION_BANK_ID + "/questions/" + QUESTION_ID)
         )
@@ -193,6 +189,10 @@ public class QuestionControllerTest {
 
     @Test
     public void createQuestionForQuestionBank() throws Exception {
+
+        when(questionService.createQuestion(question, QUESTION_BANK_ID)).thenReturn(question);
+        when(questionRequestMapper.toQuestion(questionWebRequest)).thenReturn(question);
+
         mockMvc.perform(
                 post("/api/scoring/question-banks/" + QUESTION_BANK_ID + "/questions")
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -209,6 +209,10 @@ public class QuestionControllerTest {
 
     @Test
     public void updateQuestionForQuestionBank() throws Exception {
+
+        when(questionService.updateQuestion(question, QUESTION_BANK_ID)).thenReturn(question);
+        when(questionRequestMapper.toQuestion(questionWebRequest, QUESTION_ID)).thenReturn(question);
+
         questionWebRequest.getOptions().get(0).setId(OPTION_ID);
         when(questionRequestMapper.toQuestion(questionWebRequest, QUESTION_ID)).thenReturn(question);
 

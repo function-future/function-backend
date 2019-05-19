@@ -5,6 +5,7 @@ import com.future.function.model.entity.feature.scoring.QuestionBank;
 import com.future.function.repository.feature.scoring.QuestionBankRepository;
 import com.future.function.service.api.feature.scoring.QuestionBankService;
 import java.util.Optional;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,26 +30,33 @@ public class QuestionBankServiceImpl implements QuestionBankService {
   public QuestionBank findById(String id) {
     return Optional.ofNullable(id)
             .filter(val -> !val.isEmpty())
-            .map(questionBankRepository::findByIdAndDeletedFalse)
-            .filter(Optional::isPresent)
-            .map(Optional::get)
+            .flatMap(questionBankRepository::findByIdAndDeletedFalse)
             .orElseThrow(() -> new NotFoundException("Question Bank Not Found"));
   }
 
   @Override
-  public QuestionBank createQuestionBank(QuestionBank request) {
-    return questionBankRepository.save(request);
+  public QuestionBank createQuestionBank(QuestionBank questionBank) {
+    return questionBankRepository.save(questionBank);
   }
 
   @Override
-  public QuestionBank updateQuestionBank(QuestionBank request) {
-    return questionBankRepository.save(request);
+  public QuestionBank updateQuestionBank(QuestionBank questionBank) {
+    return Optional.ofNullable(questionBank)
+            .map(QuestionBank::getId)
+            .flatMap(questionBankRepository::findByIdAndDeletedFalse)
+            .map(foundQuestionBank -> mergeFoundAndNewQuestionBankThenSave(foundQuestionBank, questionBank))
+            .orElse(questionBank);
+  }
+
+  private QuestionBank mergeFoundAndNewQuestionBankThenSave(QuestionBank foundQuestionBank, QuestionBank questionBank) {
+    BeanUtils.copyProperties(questionBank, foundQuestionBank);
+    return questionBankRepository.save(foundQuestionBank);
   }
 
   @Override
   public void deleteById(String id) {
     Optional.ofNullable(id)
-            .map(this::findById)
+            .flatMap(questionBankRepository::findByIdAndDeletedFalse)
             .ifPresent(val -> {
               val.setDeleted(true);
               questionBankRepository.save(val);

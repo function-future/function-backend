@@ -9,17 +9,19 @@ import com.future.function.web.model.request.scoring.QuestionWebRequest;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 import java.util.Collections;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import static com.googlecode.catchexception.CatchException.catchException;
 import static com.googlecode.catchexception.CatchException.caughtException;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
-import static org.mockito.MockitoAnnotations.initMocks;
 
+@RunWith(MockitoJUnitRunner.class)
 public class QuestionRequestMapperTest {
 
     private static final String QUESTION_TEXT = "question-text";
@@ -43,8 +45,6 @@ public class QuestionRequestMapperTest {
 
     @Before
     public void setUp() throws Exception {
-
-        initMocks(this);
 
         optionWebRequest = OptionWebRequest
                 .builder()
@@ -70,9 +70,6 @@ public class QuestionRequestMapperTest {
                 .options(Collections.singletonList(option))
                 .build();
 
-        when(validator.validate(questionWebRequest)).thenReturn(questionWebRequest);
-        when(optionRequestMapper.toOption(optionWebRequest)).thenReturn(option);
-
     }
 
     @After
@@ -82,6 +79,10 @@ public class QuestionRequestMapperTest {
 
     @Test
     public void toQuestion() {
+
+        when(validator.validate(questionWebRequest)).thenReturn(questionWebRequest);
+        when(optionRequestMapper.toOption(optionWebRequest)).thenReturn(option);
+
         Question actual = requestMapper.toQuestion(questionWebRequest);
 
         assertThat(actual.getOptions().get(0).getLabel()).isEqualTo(option.getLabel());
@@ -100,6 +101,10 @@ public class QuestionRequestMapperTest {
 
     @Test
     public void toQuestionWithId() {
+
+        when(validator.validate(questionWebRequest)).thenReturn(questionWebRequest);
+        when(optionRequestMapper.toOption(optionWebRequest)).thenReturn(option);
+
         Question actual = requestMapper.toQuestion(questionWebRequest, QUESTION_ID);
         assertThat(actual.getText()).isEqualTo(question.getText());
         assertThat(actual.getOptions().get(0).getLabel()).isEqualTo(option.getLabel());
@@ -110,6 +115,9 @@ public class QuestionRequestMapperTest {
 
     @Test
     public void toQuestionIdNull() {
+
+        when(validator.validate(questionWebRequest)).thenReturn(questionWebRequest);
+
         catchException(() -> requestMapper.toQuestion(questionWebRequest, null));
 
         assertThat(caughtException().getClass()).isEqualTo(BadRequestException.class);

@@ -7,15 +7,17 @@ import com.future.function.web.model.request.scoring.OptionWebRequest;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import static com.googlecode.catchexception.CatchException.catchException;
 import static com.googlecode.catchexception.CatchException.caughtException;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
-import static org.mockito.MockitoAnnotations.initMocks;
 
+@RunWith(MockitoJUnitRunner.class)
 public class OptionRequestMapperTest {
 
     private static final String OPTION_LABEL = "option-label";
@@ -32,7 +34,6 @@ public class OptionRequestMapperTest {
 
     @Before
     public void setUp() throws Exception {
-        initMocks(this);
 
         optionWebRequest = OptionWebRequest
                 .builder()

@@ -35,11 +35,15 @@ public class QuestionResponseMapper {
     }
 
     public static PagingResponse<QuestionWebResponse> toQuestionPagingResponse(Page<Question> questionPage) {
-        List<QuestionWebResponse> responseList = questionPage.getContent()
+        List<QuestionWebResponse> responseList = getQuestionWebResponseList(questionPage);
+        return ResponseHelper.toPagingResponse(HttpStatus.OK, responseList, PageHelper.toPaging(questionPage));
+    }
+
+    private static List<QuestionWebResponse> getQuestionWebResponseList(Page<Question> questionPage) {
+        return questionPage.getContent()
                 .stream()
                 .map(question -> QuestionResponseMapper.buildQuestionWebResponse(question, question.getOptions()))
                 .collect(Collectors.toList());
-        return ResponseHelper.toPagingResponse(HttpStatus.OK, responseList, PageHelper.toPaging(questionPage));
     }
 
 }

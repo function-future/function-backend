@@ -106,16 +106,32 @@ public interface FieldName {
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
   abstract class QuestionBank {
 
-    public static final String ID = "id";
-
     public static final String DESCRIPTION = "description";
 
   }
 
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
-  abstract class StudentQuiz {
+  abstract class Question {
 
-    public static final String ID = "id";
+    public static final String TEXT = "text";
+
+    public static final String QUESTION_BANK = "questionBank";
+
+  }
+
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  abstract class Option {
+
+    public static final String LABEL = "text";
+
+    public static final String CORRECT = "correct";
+
+    public static final String QUESTION = "question";
+
+  }
+
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  abstract class StudentQuiz {
 
     public static final String TRIALS = "TRIALS";
 
@@ -129,8 +145,6 @@ public interface FieldName {
 
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
   abstract class StudentQuizDetail {
-
-    public static final String ID = "id";
 
     public static final String POINT = "point";
 
