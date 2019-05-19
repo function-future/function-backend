@@ -85,12 +85,10 @@ public class UserServiceImpl implements UserService {
     }
     
     return Optional.of(user)
-      .map(User::getId)
-      .map(userRepository::findOne)
-      .filter(User::isDeleted)
-      .map(foundUser -> this.markDeleted(foundUser, false))
-      .map(foundUser -> this.copyPropertiesAndSaveUser(user, foundUser))
-      .orElseGet(() -> this.createNewUser(user));
+      .map(this::setDefaultEncryptedPassword)
+      .map(this::setUserPicture)
+      .map(userRepository::save)
+      .orElse(user);
   }
   
   /**
@@ -127,7 +125,7 @@ public class UserServiceImpl implements UserService {
     
     Optional.ofNullable(userId)
       .map(userRepository::findOne)
-      .ifPresent(user -> this.markDeleted(user, true));
+      .ifPresent(this::markDeleted);
   }
   
   private User deleteUserPicture(User user) {
@@ -148,26 +146,16 @@ public class UserServiceImpl implements UserService {
       .orElse(user);
   }
   
-  private User markDeleted(User user, boolean deleted) {
+  private void markDeleted(User user) {
     
-    user.setDeleted(deleted);
-    
-    return userRepository.save(user);
+    user.setDeleted(true);
+    userRepository.save(user);
   }
   
   private User copyPropertiesAndSaveUser(User user, User foundUser) {
     
     BeanUtils.copyProperties(user, foundUser);
     return userRepository.save(foundUser);
-  }
-  
-  private User createNewUser(User user) {
-    
-    return Optional.of(user)
-      .map(this::setDefaultEncryptedPassword)
-      .map(this::setUserPicture)
-      .map(userRepository::save)
-      .orElseGet(() -> userRepository.save(user));
   }
   
   private User setUserPicture(User user) {

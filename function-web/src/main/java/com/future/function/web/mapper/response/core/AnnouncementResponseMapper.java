@@ -1,6 +1,7 @@
 package com.future.function.web.mapper.response.core;
 
 import com.future.function.model.entity.feature.core.Announcement;
+import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.model.response.base.DataResponse;
@@ -81,10 +82,17 @@ public class AnnouncementResponseMapper {
     
     return Optional.of(announcement)
       .map(Announcement::getFileV2s)
-      .map(List::stream)
-      .map(stream -> stream.map(ResourceResponseMapper::buildFileWebResponse)
-        .collect(Collectors.toList()))
+      .map(AnnouncementResponseMapper::toFileWebResponseList)
       .orElseGet(Collections::emptyList);
+  }
+  
+  private static List<FileWebResponse> toFileWebResponseList(
+    List<FileV2> list
+  ) {
+    
+    return list.stream()
+      .map(ResourceResponseMapper::buildFileWebResponse)
+      .collect(Collectors.toList());
   }
   
   /**

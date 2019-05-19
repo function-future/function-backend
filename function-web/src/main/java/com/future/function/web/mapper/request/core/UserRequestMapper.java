@@ -78,10 +78,15 @@ public class UserRequestMapper {
     return Optional.of(request)
       .map(UserWebRequest::getAvatar)
       .map(list -> list.get(0))
-      .map(fileId -> FileV2.builder()
-        .id(fileId)
-        .build())
+      .map(this::buildFileV2)
       .orElseGet(FileV2::new);
+  }
+  
+  private FileV2 buildFileV2(String fileId) {
+    
+    return FileV2.builder()
+      .id(fileId)
+      .build();
   }
   
   private String getUniversity(UserWebRequest request) {

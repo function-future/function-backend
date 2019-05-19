@@ -12,6 +12,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -74,17 +75,22 @@ public class ResourceServiceImpl implements ResourceService {
   @Override
   public boolean markFilesUsed(List<String> fileIds, boolean used) {
     
-    return Optional.of(fileIds)
-      .map(fileRepositoryV2::findAll)
-      .map(Lists::newArrayList)
-      .filter(list -> list.size() == fileIds.size())
-      .orElseThrow(() -> new NotFoundException("File Not Found"))
+    return this.getFileV2List(fileIds)
       .stream()
       .map(fileV2 -> {
         fileV2.setUsed(used);
         return fileRepositoryV2.save(fileV2);
       })
       .allMatch(Objects::nonNull);
+  }
+  
+  private ArrayList<FileV2> getFileV2List(List<String> fileIds) {
+    
+    return Optional.of(fileIds)
+      .map(fileRepositoryV2::findAll)
+      .map(Lists::newArrayList)
+      .filter(list -> list.size() == fileIds.size())
+      .orElseThrow(() -> new NotFoundException("File Not Found"));
   }
   
   @Override

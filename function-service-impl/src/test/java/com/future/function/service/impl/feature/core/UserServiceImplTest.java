@@ -223,7 +223,6 @@ public class UserServiceImplTest {
     
     userStudent.setPictureV2(PICTURE);
     
-    when(userRepository.findOne(STUDENT_ID)).thenReturn(null);
     when(batchService.getBatchByCode(NUMBER)).thenReturn(BATCH);
     when(resourceService.markFilesUsed(FILE_IDS, true)).thenReturn(true);
     when(resourceService.getFile(PICTURE_ID)).thenReturn(PICTURE);
@@ -237,7 +236,6 @@ public class UserServiceImplTest {
     assertThat(createdUserStudent.getPictureV2()).isNotNull();
     assertThat(createdUserStudent.getPictureV2()).isEqualTo(PICTURE);
     
-    verify(userRepository).findOne(STUDENT_ID);
     verify(batchService).getBatchByCode(NUMBER);
     verify(resourceService).markFilesUsed(FILE_IDS, true);
     verify(resourceService).getFile(PICTURE_ID);
@@ -249,7 +247,6 @@ public class UserServiceImplTest {
     
     userMentor.setPictureV2(PICTURE);
     
-    when(userRepository.findOne(MENTOR_ID)).thenReturn(null);
     when(resourceService.markFilesUsed(FILE_IDS, true)).thenReturn(true);
     when(resourceService.getFile(PICTURE_ID)).thenReturn(PICTURE);
     when(userRepository.save(userMentor)).thenReturn(userMentor);
@@ -260,7 +257,6 @@ public class UserServiceImplTest {
     assertThat(createdUserMentor.getPictureV2()).isNotNull();
     assertThat(createdUserMentor.getPictureV2()).isEqualTo(PICTURE);
     
-    verify(userRepository).findOne(MENTOR_ID);
     verify(resourceService).markFilesUsed(FILE_IDS, true);
     verify(resourceService).getFile(PICTURE_ID);
     verify(userRepository).save(userMentor);
@@ -269,7 +265,6 @@ public class UserServiceImplTest {
   @Test
   public void testGivenMentorDataWithoutImageByCreatingUserReturnMentor() {
     
-    when(userRepository.findOne(MENTOR_ID)).thenReturn(null);
     when(userRepository.save(userMentor)).thenReturn(userMentor);
     
     User createdUserMentor = userService.createUser(userMentor);
@@ -277,52 +272,8 @@ public class UserServiceImplTest {
     assertThat(createdUserMentor).isNotNull();
     assertThat(createdUserMentor.getPictureV2()).isNull();
     
-    verify(userRepository).findOne(MENTOR_ID);
     verify(userRepository).save(userMentor);
     verifyZeroInteractions(resourceService);
-  }
-  
-  @Test
-  public void testGivenDeletedStudentDataByCreatingUserReturnStudent() {
-    
-    when(batchService.getBatchByCode(NUMBER)).thenReturn(BATCH);
-    
-    userStudent.setDeleted(true);
-    
-    when(userRepository.findOne(STUDENT_ID)).thenReturn(userStudent);
-    
-    User savedUserStudent;
-    BeanUtils.copyProperties(userStudent, savedUserStudent = new User());
-    savedUserStudent.setDeleted(false);
-    when(userRepository.save(savedUserStudent)).thenReturn(savedUserStudent);
-    
-    User createdUserStudent = userService.createUser(userStudent);
-    
-    assertThat(createdUserStudent).isNotNull();
-    
-    verify(batchService).getBatchByCode(NUMBER);
-    verify(userRepository).findOne(STUDENT_ID);
-    verify(userRepository, times(2)).save(savedUserStudent);
-  }
-  
-  @Test
-  public void testGivenDeletedMentorDataByCreatingUserReturnMentor() {
-    
-    userMentor.setDeleted(true);
-    
-    when(userRepository.findOne(MENTOR_ID)).thenReturn(userMentor);
-    
-    User savedUserMentor;
-    BeanUtils.copyProperties(userMentor, savedUserMentor = new User());
-    savedUserMentor.setDeleted(false);
-    when(userRepository.save(savedUserMentor)).thenReturn(savedUserMentor);
-    
-    User createdUserMentor = userService.createUser(userMentor);
-    
-    assertThat(createdUserMentor).isNotNull();
-    
-    verify(userRepository).findOne(MENTOR_ID);
-    verify(userRepository, times(2)).save(savedUserMentor);
   }
   
   @Test
