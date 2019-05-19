@@ -40,7 +40,7 @@ public class UserWebRequest implements UserData {
   @NotBlank(message = "NotBlank")
   private String address;
   
-  private Long batch;
+  private String batch;
   
   private String university;
   

@@ -23,7 +23,7 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class WebRequestMapperTest {
   
-  private static final String VALID_JSON = "{\"number\":1,\"email\":\"email\"}";
+  private static final String VALID_JSON = "{\"code\":1,\"email\":\"email\"}";
   
   private static final String INVALID_JSON = "{}";
   

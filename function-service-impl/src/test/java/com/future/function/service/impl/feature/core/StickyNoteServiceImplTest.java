@@ -1,6 +1,5 @@
 package com.future.function.service.impl.feature.core;
 
-import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.core.StickyNote;
 import com.future.function.repository.feature.core.StickyNoteRepository;
 import org.junit.After;
@@ -10,11 +9,14 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
+import java.util.Collections;
 import java.util.Optional;
 
-import static com.googlecode.catchexception.CatchException.catchException;
-import static com.googlecode.catchexception.CatchException.caughtException;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -26,6 +28,8 @@ public class StickyNoteServiceImplTest {
   private static final String TITLE = "title";
   
   private static final String DESCRIPTION = "description";
+  
+  private static final Pageable PAGEABLE = new PageRequest(0, 1);
   
   private StickyNote stickyNote;
   
@@ -53,31 +57,19 @@ public class StickyNoteServiceImplTest {
   @Test
   public void testGivenMethodCallToGetStickyNoteByGettingStickyNoteReturnStickyNoteObject() {
     
-    when(
-      stickyNoteRepository.findFirstByIdIsNotNullOrderByUpdatedAtDesc()).thenReturn(
-      Optional.of(stickyNote));
-    StickyNote foundStickyNote = stickyNoteService.getStickyNote();
+    Page<StickyNote> stickyNotePage = new PageImpl<>(
+      Collections.singletonList(stickyNote), PAGEABLE, 1);
+    when(stickyNoteRepository.findAllByIdIsNotNullOrderByUpdatedAtDesc(
+      PAGEABLE)).thenReturn(stickyNotePage);
     
-    assertThat(foundStickyNote).isNotNull();
-    assertThat(foundStickyNote).isEqualTo(stickyNote);
+    Page<StickyNote> foundStickyNotePage = stickyNoteService.getStickyNote(
+      PAGEABLE);
     
-    verify(stickyNoteRepository).findFirstByIdIsNotNullOrderByUpdatedAtDesc();
-  }
-  
-  @Test
-  public void testGivenNoStickyNoteInDatabaseAndMethodCallToGetStickyNoteByGettingStickyNoteReturnNotFoundException() {
+    assertThat(foundStickyNotePage).isNotNull();
+    assertThat(foundStickyNotePage).isEqualTo(stickyNotePage);
     
-    when(
-      stickyNoteRepository.findFirstByIdIsNotNullOrderByUpdatedAtDesc()).thenReturn(
-      Optional.empty());
-    
-    catchException(() -> stickyNoteService.getStickyNote());
-    
-    assertThat(caughtException().getClass()).isEqualTo(NotFoundException.class);
-    assertThat(caughtException().getMessage()).isEqualTo(
-      "Get Sticky Note Not Found");
-    
-    verify(stickyNoteRepository).findFirstByIdIsNotNullOrderByUpdatedAtDesc();
+    verify(stickyNoteRepository).findAllByIdIsNotNullOrderByUpdatedAtDesc(
+      PAGEABLE);
   }
   
   @Test

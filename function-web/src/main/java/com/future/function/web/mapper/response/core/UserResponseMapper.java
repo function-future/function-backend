@@ -61,6 +61,7 @@ public class UserResponseMapper {
   private static UserWebResponse buildUserWebResponse(User user) {
     
     return UserWebResponse.builder()
+      .id(user.getId())
       .role(user.getRole()
               .name())
       .email(user.getEmail())
@@ -77,11 +78,11 @@ public class UserResponseMapper {
       .build();
   }
   
-  private static Long getBatch(User user) {
+  private static String getBatch(User user) {
     
     return Optional.of(user)
       .map(User::getBatch)
-      .map(Batch::getNumber)
+      .map(Batch::getCode)
       .orElse(null);
   }
   

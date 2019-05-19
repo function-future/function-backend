@@ -1,7 +1,6 @@
 package com.future.function.data.migration.change.log;
 
 import com.future.function.common.enumeration.core.Role;
-import com.future.function.model.entity.feature.Sequence;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.File;
 import com.future.function.model.util.constant.DocumentName;
@@ -18,31 +17,21 @@ import static org.springframework.data.mongodb.core.query.Query.query;
 @ChangeLog(order = "001")
 public class FunctionChangeLog {
   
-  private static final long ONE = 1;
+  private static final String ONE = "1";
   
   private Batch savedFirstBatch;
-  
-  @ChangeSet(author = "jonathan",
-             id = "sequenceMigration",
-             order = "001")
-  public void insertFirstSequence(MongoTemplate mongoTemplate) {
-    
-    Sequence sequence = new Sequence(Batch.SEQUENCE_NAME, ONE);
-    
-    mongoTemplate.save(sequence, DocumentName.SEQUENCE);
-  }
   
   @ChangeSet(author = "jonathan",
              id = "batchMigration",
              order = "002")
   public void insertFirstBatch(MongoTemplate mongoTemplate) {
     
-    Batch batch = new Batch(ONE);
+    Batch batch = new Batch("id-1", "one", ONE);
     
     mongoTemplate.save(batch, DocumentName.BATCH);
     
     savedFirstBatch = mongoTemplate.find(
-      query(where("number").is(ONE)), Batch.class)
+      query(where("code").is(ONE)), Batch.class)
       .get(0);
   }
   

@@ -28,6 +28,10 @@ public class UserResponseMapperTest {
   
   private static final String NAME = "name";
   
+  private static final String STUDENT_ID = "student-id";
+  
+  private static final String MENTOR_ID = "mentor-id";
+  
   private static final Role STUDENT_ROLE = Role.STUDENT;
   
   private static final Role MENTOR_ROLE = Role.MENTOR;
@@ -38,11 +42,12 @@ public class UserResponseMapperTest {
   
   private static final File PICTURE = new File();
   
-  private static final Batch BATCH = new Batch(1L);
+  private static final Batch BATCH = new Batch("id-1", "name-1", "1");
   
   private static final String UNIVERSITY = "university";
   
   private static final User STUDENT = User.builder()
+    .id(STUDENT_ID)
     .email(EMAIL)
     .name(NAME)
     .role(STUDENT_ROLE)
@@ -55,6 +60,7 @@ public class UserResponseMapperTest {
   
   private static final UserWebResponse STUDENT_WEB_RESPONSE =
     UserWebResponse.builder()
+      .id(STUDENT_ID)
       .role(STUDENT_ROLE.name())
       .email(EMAIL)
       .name(NAME)
@@ -63,7 +69,7 @@ public class UserResponseMapperTest {
       .deleted(false)
       .pictureUrl(PICTURE.getFileUrl())
       .thumbnailUrl(PICTURE.getThumbnailUrl())
-      .batch(BATCH.getNumber())
+      .batch(BATCH.getCode())
       .university(UNIVERSITY)
       .build();
   
@@ -75,6 +81,7 @@ public class UserResponseMapperTest {
     .build();
   
   private static final User MENTOR = User.builder()
+    .id(MENTOR_ID)
     .email(EMAIL)
     .name(NAME)
     .role(MENTOR_ROLE)
@@ -85,6 +92,7 @@ public class UserResponseMapperTest {
   
   private static final UserWebResponse MENTOR_WEB_RESPONSE =
     UserWebResponse.builder()
+      .id(MENTOR_ID)
       .role(MENTOR_ROLE.name())
       .email(EMAIL)
       .name(NAME)
@@ -113,9 +121,8 @@ public class UserResponseMapperTest {
     USERS, PAGEABLE, USERS.size());
   
   private static final Paging PAGING = Paging.builder()
-    .currentPage(0)
-    .pageSize(2)
-    .totalPages(1)
+    .page(0)
+    .size(2)
     .totalRecords(2)
     .build();
   

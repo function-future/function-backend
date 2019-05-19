@@ -14,27 +14,29 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserWebResponse {
-
+  
+  private String id;
+  
   private String role;
-
+  
   private String email;
-
+  
   private String name;
-
+  
   private String phone;
-
+  
   private String address;
-
+  
   private boolean deleted;
-
+  
   private String pictureUrl;
-
+  
   private String thumbnailUrl;
-
+  
   @JsonInclude(value = JsonInclude.Include.NON_NULL)
-  private Long batch;
-
+  private String batch;
+  
   @JsonInclude(value = JsonInclude.Include.NON_NULL)
   private String university;
-
+  
 }

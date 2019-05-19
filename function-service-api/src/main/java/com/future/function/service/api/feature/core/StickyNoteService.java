@@ -1,6 +1,8 @@
 package com.future.function.service.api.feature.core;
 
 import com.future.function.model.entity.feature.core.StickyNote;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 /**
  * Service interface class for sticky note logic operations declaration.
@@ -13,7 +15,7 @@ public interface StickyNoteService {
    *
    * @return {@code StickyNote} - The sticky note object found in database
    */
-  StickyNote getStickyNote();
+  Page<StickyNote> getStickyNote(Pageable pageable);
   
   /**
    * Saves a new sticky note to the database.
