@@ -67,7 +67,7 @@ public class UserController {
     
     return UserResponseMapper.toUserDataResponse(
       HttpStatus.CREATED,
-      userService.createUser(userRequestMapper.toUser(data), image)
+      userService.createUser(userRequestMapper.toUser(data))
     );
   }
   
@@ -162,7 +162,7 @@ public class UserController {
   ) {
     
     return UserResponseMapper.toUserDataResponse(
-      userService.updateUser(userRequestMapper.toUser(userId, data), image));
+      userService.updateUser(userRequestMapper.toUser(userId, data)));
   }
   
 }

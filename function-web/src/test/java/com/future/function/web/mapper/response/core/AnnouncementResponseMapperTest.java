@@ -1,7 +1,6 @@
 package com.future.function.web.mapper.response.core;
 
 import com.future.function.model.entity.feature.core.Announcement;
-import com.future.function.model.entity.feature.core.File;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.base.paging.Paging;
@@ -56,20 +55,20 @@ public class AnnouncementResponseMapperTest {
       .id(ID)
       .title(TITLE)
       .summary(SUMMARY)
-      .descriptionHtml(DESCRIPTION_HTML)
-      .file(new File())
+      .description(DESCRIPTION_HTML)
+      .fileV2s(null)
       .build();
     
     announcement.setCreatedAt(1L);
     announcement.setUpdatedAt(2L);
     
     announcementWebResponse = AnnouncementWebResponse.builder()
-      .announcementId(ID)
-      .announcementTitle(TITLE)
-      .announcementSummary(SUMMARY)
-      .announcementDescriptionHtml(DESCRIPTION_HTML)
+      .id(ID)
+      .title(TITLE)
+      .summary(SUMMARY)
+      .description(DESCRIPTION_HTML)
       .announcementFileUrl(null)
-      .createdAt(1L)
+      .files(Collections.emptyList())
       .updatedAt(2L)
       .build();
     
@@ -109,7 +108,6 @@ public class AnnouncementResponseMapperTest {
     assertThat(createdDataResponse).isNotNull();
     assertThat(createdDataResponse).isEqualTo(this.createdDataResponse);
     
-    announcement.setFile(null);
     DataResponse<AnnouncementWebResponse> retrievedDataResponse =
       AnnouncementResponseMapper.toAnnouncementDataResponse(announcement);
     

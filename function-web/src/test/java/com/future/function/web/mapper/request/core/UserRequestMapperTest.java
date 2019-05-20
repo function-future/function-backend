@@ -4,7 +4,7 @@ import com.future.function.common.enumeration.core.Role;
 import com.future.function.common.exception.BadRequestException;
 import com.future.function.common.validation.ObjectValidator;
 import com.future.function.model.entity.feature.core.Batch;
-import com.future.function.model.entity.feature.core.File;
+import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.web.mapper.request.WebRequestMapper;
 import com.future.function.web.model.request.core.UserWebRequest;
@@ -15,6 +15,8 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import java.util.Collections;
 
 import static com.googlecode.catchexception.CatchException.catchException;
 import static com.googlecode.catchexception.CatchException.caughtException;
@@ -46,6 +48,8 @@ public class UserRequestMapperTest {
   
   private static final String STUDENT_ID = "student-id";
   
+  private static final String FILE_ID = "file-id";
+  
   private static final User STUDENT_WITH_ID = User.builder()
     .id(STUDENT_ID)
     .role(Role.STUDENT)
@@ -54,7 +58,7 @@ public class UserRequestMapperTest {
     .password(PASSWORD)
     .phone(PHONE)
     .address(ADDRESS)
-    .picture(new File())
+    .pictureV2(FileV2.builder().id(FILE_ID).build())
     .batch(Batch.builder()
              .code(NUMBER)
              .build())
@@ -68,7 +72,7 @@ public class UserRequestMapperTest {
     .password(PASSWORD)
     .phone(PHONE)
     .address(ADDRESS)
-    .picture(new File())
+    .pictureV2(FileV2.builder().id(FILE_ID).build())
     .batch(Batch.builder()
              .code(NUMBER)
              .build())
@@ -91,6 +95,7 @@ public class UserRequestMapperTest {
       .address(ADDRESS)
       .batch(NUMBER)
       .university(UNIVERSITY)
+      .avatar(Collections.singletonList(FILE_ID))
       .build();
   
   private static final String VALID_ADMIN_ID = "valid-admin-id";
@@ -103,7 +108,7 @@ public class UserRequestMapperTest {
     .password(PASSWORD)
     .phone(PHONE)
     .address(ADDRESS)
-    .picture(new File())
+    .pictureV2(new FileV2())
     .build();
   
   private static final User VALID_ADMIN = User.builder()
@@ -113,7 +118,7 @@ public class UserRequestMapperTest {
     .password(PASSWORD)
     .phone(PHONE)
     .address(ADDRESS)
-    .picture(new File())
+    .pictureV2(new FileV2())
     .build();
   
   private static final String VALID_ADMIN_JSON =

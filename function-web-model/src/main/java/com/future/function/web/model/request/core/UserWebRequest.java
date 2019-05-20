@@ -1,6 +1,7 @@
 package com.future.function.web.model.request.core;
 
 import com.future.function.common.data.core.UserData;
+import com.future.function.validation.annotation.core.FileMustExist;
 import com.future.function.validation.annotation.core.Name;
 import com.future.function.validation.annotation.core.OnlyStudentCanHaveBatchAndUniversity;
 import com.future.function.validation.annotation.core.Phone;
@@ -12,6 +13,7 @@ import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 /**
  * Model representation for user web request.
@@ -43,5 +45,8 @@ public class UserWebRequest implements UserData {
   private String batch;
   
   private String university;
+  
+  @FileMustExist
+  private List<String> avatar;
   
 }

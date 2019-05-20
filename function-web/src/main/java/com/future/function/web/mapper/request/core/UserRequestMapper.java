@@ -3,7 +3,7 @@ package com.future.function.web.mapper.request.core;
 import com.future.function.common.enumeration.core.Role;
 import com.future.function.common.validation.ObjectValidator;
 import com.future.function.model.entity.feature.core.Batch;
-import com.future.function.model.entity.feature.core.File;
+import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.web.mapper.request.WebRequestMapper;
 import com.future.function.web.model.request.core.UserWebRequest;
@@ -61,7 +61,7 @@ public class UserRequestMapper {
       .password(getDefaultPassword(request.getName()))
       .phone(request.getPhone())
       .address(request.getAddress())
-      .picture(new File())
+      .pictureV2(this.getFileV2(request))
       .batch(toBatch(request))
       .university(getUniversity(request))
       .build();
@@ -71,6 +71,22 @@ public class UserRequestMapper {
     }
     
     return user;
+  }
+  
+  private FileV2 getFileV2(UserWebRequest request) {
+    
+    return Optional.of(request)
+      .map(UserWebRequest::getAvatar)
+      .map(list -> list.get(0))
+      .map(this::buildFileV2)
+      .orElseGet(FileV2::new);
+  }
+  
+  private FileV2 buildFileV2(String fileId) {
+    
+    return FileV2.builder()
+      .id(fileId)
+      .build();
   }
   
   private String getUniversity(UserWebRequest request) {
