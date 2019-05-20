@@ -6,6 +6,7 @@ import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.mapper.request.core.UserRequestMapper;
 import com.future.function.web.mapper.response.core.UserResponseMapper;
+import com.future.function.web.model.request.core.UserWebRequest;
 import com.future.function.web.model.response.base.BaseResponse;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
@@ -13,16 +14,7 @@ import com.future.function.web.model.response.feature.core.UserWebResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * Controller class for user APIs.
@@ -47,8 +39,7 @@ public class UserController {
   /**
    * Creates new user in database.
    *
-   * @param data  Data of new user in JSON format.
-   * @param image Profile image of the new user.
+   * @param data Data of new user in JSON format.
    *
    * @return {@code DataResponse<UserWebResponse} - The created user data,
    * wrapped in
@@ -56,13 +47,10 @@ public class UserController {
    * {@link com.future.function.web.model.response.feature.core.UserWebResponse}
    */
   @ResponseStatus(HttpStatus.CREATED)
-  @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+  @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE,
                produces = MediaType.APPLICATION_JSON_VALUE)
   public DataResponse<UserWebResponse> createUser(
-    @RequestParam
-      String data,
-    @RequestParam(required = false)
-      MultipartFile image
+    @RequestBody UserWebRequest data
   ) {
     
     return UserResponseMapper.toUserDataResponse(
@@ -140,8 +128,7 @@ public class UserController {
    * Updates existing user in database.
    *
    * @param userId Id of to-be-updated user.
-   * @param data  Data of existing user in JSON format.
-   * @param image New profile image of the existing user.
+   * @param data   Data of existing user in JSON format.
    *
    * @return {@code DataResponse<UserWebResponse} - The updated user data,
    * wrapped in
@@ -150,15 +137,12 @@ public class UserController {
    */
   @ResponseStatus(HttpStatus.OK)
   @PutMapping(value = "/{userId:.+}",
-              consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+              consumes = MediaType.APPLICATION_JSON_VALUE,
               produces = MediaType.APPLICATION_JSON_VALUE)
   public DataResponse<UserWebResponse> updateUser(
     @PathVariable
       String userId,
-    @RequestParam
-      String data,
-    @RequestParam(required = false)
-      MultipartFile image
+    @RequestBody UserWebRequest data
   ) {
     
     return UserResponseMapper.toUserDataResponse(
