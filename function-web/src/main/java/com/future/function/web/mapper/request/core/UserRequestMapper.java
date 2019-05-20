@@ -20,31 +20,24 @@ import java.util.Optional;
 @Component
 public class UserRequestMapper {
   
-  private WebRequestMapper requestMapper;
-  
-  private ObjectValidator validator;
+  private final ObjectValidator validator;
   
   @Autowired
   private UserRequestMapper(
     WebRequestMapper requestMapper, ObjectValidator validator
   ) {
     
-    this.requestMapper = requestMapper;
     this.validator = validator;
   }
   
   /**
    * Converts JSON data to {@code User} object.
    *
-   * @param data JSON data (in form of String) to be converted.
+   * @param request JSON data (in form of String) to be converted.
    *
    * @return {@code User} - Converted user object.
    */
-  public User toUser(String data) {
-    
-    UserWebRequest request = requestMapper.toWebRequestObject(data,
-                                                              UserWebRequest.class
-    );
+  public User toUser(UserWebRequest request) {
     
     return toValidatedUser(null, request);
   }
@@ -116,19 +109,17 @@ public class UserRequestMapper {
   }
   
   /**
-   * Converts JSON data to {@code User} object. This method is used for
+   * Converts JSON request to {@code User} object. This method is used for
    * update user purposes.
    *
-   * @param userId Id of user to be updated.
-   * @param data   JSON data (in form of String) to be converted.
+   * @param userId  Id of user to be updated.
+   * @param request JSON request (in form of String) to be converted.
    *
    * @return {@code User} - Converted user object.
    */
-  public User toUser(String userId, String data) {
+  public User toUser(String userId, UserWebRequest request) {
     
-    return toValidatedUser(userId, requestMapper.toWebRequestObject(data,
-                                                                    UserWebRequest.class
-    ));
+    return toValidatedUser(userId, request);
   }
   
 }
