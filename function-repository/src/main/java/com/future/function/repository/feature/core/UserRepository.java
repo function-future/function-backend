@@ -1,12 +1,14 @@
 package com.future.function.repository.feature.core;
 
 import com.future.function.common.enumeration.core.Role;
+import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -35,5 +37,15 @@ public interface UserRepository extends MongoRepository<User, String> {
    * @return {@code Page<User>} - Page of users found in database.
    */
   Page<User> findAllByRole(Role role, Pageable pageable);
+  
+  /**
+   * Finds users by role and batch data.
+   *
+   * @param role Enum of available roles.
+   * @param batch Batch object obtained from batchCode.
+   *
+   * @return {@code List<User>} - List of users (students) found in database.
+   */
+  List<User> findAllByRoleAndBatch(Role role, Batch batch);
   
 }

@@ -15,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -128,6 +129,30 @@ public class UserServiceImpl implements UserService {
       .ifPresent(this::markDeleted);
   }
   
+  /**
+   * {@inheritDoc}
+   *
+   * @param batchCode Batch code for students.
+   *
+   * @return {@code List<User>} - List of users found in database.
+   */
+  @Override
+  public List<User> getStudentsByBatchCode(
+    String batchCode
+  ) {
+    
+    return Optional.ofNullable(batchCode)
+      .map(batchService::getBatchByCode)
+      .map(batch -> userRepository.findAllByRoleAndBatch(Role.STUDENT, batch))
+      .orElseGet(Collections::emptyList);
+  }
+  
+  private void markDeleted(User user) {
+    
+    user.setDeleted(true);
+    userRepository.save(user);
+  }
+  
   private User deleteUserPicture(User user) {
     
     return Optional.of(user)
@@ -144,12 +169,6 @@ public class UserServiceImpl implements UserService {
       .map(FileV2::getId)
       .map(fileId -> this.markAndSetUserPicture(user, fileId, true))
       .orElse(user);
-  }
-  
-  private void markDeleted(User user) {
-    
-    user.setDeleted(true);
-    userRepository.save(user);
   }
   
   private User copyPropertiesAndSaveUser(User user, User foundUser) {

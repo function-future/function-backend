@@ -55,7 +55,7 @@ public class UserServiceImplTest {
   
   private static final String PICTURE_ID = "picture-id";
   
-  public static final List<String> FILE_IDS = Collections.singletonList(
+  private static final List<String> FILE_IDS = Collections.singletonList(
     PICTURE_ID);
   
   private static final FileV2 PICTURE = FileV2.builder()
@@ -367,6 +367,65 @@ public class UserServiceImplTest {
     
     verify(userRepository, times(2)).findOne(MENTOR_ID);
     verify(userRepository).save(markedDeletedUserMentor);
+  }
+  
+  @Test
+  public void testGivenBatchCodeByGettingStudentsByBatchCodeReturnListOfStudents() {
+    
+    when(batchService.getBatchByCode(NUMBER)).thenReturn(BATCH);
+    when(userRepository.findAllByRoleAndBatch(Role.STUDENT, BATCH)).thenReturn(
+      Collections.singletonList(userStudent));
+    
+    List<User> foundStudents = userService.getStudentsByBatchCode(NUMBER);
+    
+    assertThat(foundStudents).isNotNull();
+    assertThat(foundStudents).isNotEmpty();
+    assertThat(foundStudents.size()).isEqualTo(1);
+    assertThat(foundStudents.get(0)).isEqualTo(userStudent);
+    
+    verify(batchService).getBatchByCode(NUMBER);
+    verify(userRepository).findAllByRoleAndBatch(Role.STUDENT, BATCH);
+  }
+  
+  @Test
+  public void testGivenNullBatchCodeByGettingStudentsByBatchCodeReturnEmptyList() {
+    
+    List<User> foundStudents = userService.getStudentsByBatchCode(null);
+    
+    assertThat(foundStudents).isNotNull();
+    assertThat(foundStudents).isEmpty();
+    
+    verifyZeroInteractions(batchService, userRepository);
+  }
+  
+  @Test
+  public void testGivenNonExistingBatchCodeByGettingStudentsByBatchCodeNotFoundException() {
+    
+    when(batchService.getBatchByCode(NUMBER)).thenThrow(
+      new NotFoundException(""));
+    
+    catchException(() -> userService.getStudentsByBatchCode(NUMBER));
+    
+    assertThat(caughtException().getClass()).isEqualTo(NotFoundException.class);
+    
+    verify(batchService).getBatchByCode(NUMBER);
+    verifyZeroInteractions(userRepository);
+  }
+  
+  @Test
+  public void testGivenBatchCodeWithNoStudentRegisteredForThatCodeByGettingStudentsByBatchCodeEmptyList() {
+    
+    when(batchService.getBatchByCode(NUMBER)).thenReturn(BATCH);
+    when(userRepository.findAllByRoleAndBatch(Role.STUDENT, BATCH)).thenReturn(
+      Collections.emptyList());
+    
+    List<User> foundStudents = userService.getStudentsByBatchCode(NUMBER);
+    
+    assertThat(foundStudents).isNotNull();
+    assertThat(foundStudents).isEmpty();
+    
+    verify(batchService).getBatchByCode(NUMBER);
+    verify(userRepository).findAllByRoleAndBatch(Role.STUDENT, BATCH);
   }
   
 }
