@@ -24,13 +24,13 @@ import java.util.List;
 public class SharedCourseWebRequest implements CourseData {
   
   @NotNull(message = "NotNull")
-  private Long originBatch;
+  private String originBatch;
   
   @NotNull(message = "NotNull")
-  private Long targetBatch;
+  private String targetBatch;
   
   @Override
-  public List<Long> getBatchNumbers() {
+  public List<String> getBatchCodes() {
     
     return Arrays.asList(originBatch, targetBatch);
   }

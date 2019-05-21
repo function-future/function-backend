@@ -1,12 +1,12 @@
 package com.future.function.web.controller.core;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.future.function.model.entity.feature.core.Announcement;
-import com.future.function.model.entity.feature.core.File;
 import com.future.function.service.api.feature.core.AnnouncementService;
-import com.future.function.web.JacksonTestHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.mapper.request.core.AnnouncementRequestMapper;
 import com.future.function.web.mapper.response.core.AnnouncementResponseMapper;
+import com.future.function.web.model.request.core.AnnouncementWebRequest;
 import com.future.function.web.model.response.base.BaseResponse;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
@@ -17,6 +17,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -42,7 +43,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(AnnouncementController.class)
-public class AnnouncementControllerTest extends JacksonTestHelper {
+public class AnnouncementControllerTest {
   
   private static final String ID = "id";
   
@@ -62,8 +63,16 @@ public class AnnouncementControllerTest extends JacksonTestHelper {
     ResponseHelper.toBaseResponse(HttpStatus.OK);
   
   private static final String DATA =
-    "{\"announcementTitle\":" + TITLE + "," + "\"announcementSummary\":" +
-    SUMMARY + ",\"announcementDescriptionHtml\":" + DESCRIPTION_HTML + "}";
+    "{\"title\":" + TITLE + "," + "\"summary\":" + SUMMARY +
+    ",\"description\":" + DESCRIPTION_HTML + "}";
+  
+  private static final AnnouncementWebRequest ANNOUNCEMENT_WEB_REQUEST =
+    AnnouncementWebRequest.builder()
+      .title(TITLE)
+      .summary(SUMMARY)
+      .description(DESCRIPTION_HTML)
+      .files(null)
+      .build();
   
   private Announcement announcement;
   
@@ -72,6 +81,17 @@ public class AnnouncementControllerTest extends JacksonTestHelper {
   private DataResponse<AnnouncementWebResponse> retrievedDataResponse;
   
   private DataResponse<AnnouncementWebResponse> createdDataResponse;
+  
+  private JacksonTester<PagingResponse<AnnouncementWebResponse>>
+    pagingResponseJacksonTester;
+  
+  private JacksonTester<DataResponse<AnnouncementWebResponse>>
+    dataResponseJacksonTester;
+  
+  private JacksonTester<BaseResponse> baseResponseJacksonTester;
+  
+  private JacksonTester<AnnouncementWebRequest>
+    announcementWebRequestJacksonTester;
   
   @Autowired
   private MockMvc mockMvc;
@@ -84,15 +104,15 @@ public class AnnouncementControllerTest extends JacksonTestHelper {
   
   @Before
   public void setUp() {
-  
-    super.setUp();
+    
+    JacksonTester.initFields(this, new ObjectMapper());
     
     announcement = Announcement.builder()
       .id(ID)
       .title(TITLE)
       .summary(SUMMARY)
-      .descriptionHtml(DESCRIPTION_HTML)
-      .file(new File())
+      .description(DESCRIPTION_HTML)
+      .fileV2s(Collections.emptyList())
       .build();
     
     announcement.setCreatedAt(CREATED_AT);
@@ -188,45 +208,47 @@ public class AnnouncementControllerTest extends JacksonTestHelper {
   public void testGivenAnnouncementDataByCreatingAnnouncementReturnDataResponse()
     throws Exception {
     
-    given(
-      announcementService.createAnnouncement(announcement, null)).willReturn(
+    given(announcementService.createAnnouncement(announcement)).willReturn(
       announcement);
-    given(announcementRequestMapper.toAnnouncement(DATA)).willReturn(
-      announcement);
+    given(announcementRequestMapper.toAnnouncement(
+      ANNOUNCEMENT_WEB_REQUEST)).willReturn(announcement);
     
     mockMvc.perform(post("/api/core/announcements").contentType(
-      MediaType.MULTIPART_FORM_DATA)
-                      .param("data", DATA)
-                      .param("file", ""))
+      MediaType.APPLICATION_JSON_VALUE)
+                      .content(announcementWebRequestJacksonTester.write(
+                        ANNOUNCEMENT_WEB_REQUEST)
+                                 .getJson()))
       .andExpect(status().isCreated())
       .andExpect(content().json(
         dataResponseJacksonTester.write(createdDataResponse)
           .getJson()));
     
-    verify(announcementService).createAnnouncement(announcement, null);
-    verify(announcementRequestMapper).toAnnouncement(DATA);
+    verify(announcementService).createAnnouncement(announcement);
+    verify(announcementRequestMapper).toAnnouncement(ANNOUNCEMENT_WEB_REQUEST);
   }
   
   @Test
   public void testGivenAnnouncementDataByUpdatingAnnouncementReturnDataResponse()
     throws Exception {
     
-    given(announcementService.updateAnnouncement(announcement, null)).
+    given(announcementService.updateAnnouncement(announcement)).
       willReturn(announcement);
-    given(announcementRequestMapper.toAnnouncement(ID, DATA)).willReturn(
-      announcement);
+    given(announcementRequestMapper.toAnnouncement(ID,
+                                                   ANNOUNCEMENT_WEB_REQUEST
+    )).willReturn(announcement);
     
     mockMvc.perform(put("/api/core/announcements/" + ID).contentType(
-      MediaType.MULTIPART_FORM_DATA_VALUE)
-                      .param("data", DATA)
-                      .param("file", ""))
+      MediaType.APPLICATION_JSON_VALUE)
+                      .content(announcementWebRequestJacksonTester.write(
+                        ANNOUNCEMENT_WEB_REQUEST)
+                                 .getJson()))
       .andExpect(status().isOk())
       .andExpect(content().json(
         dataResponseJacksonTester.write(retrievedDataResponse)
           .getJson()));
     
-    verify(announcementService).updateAnnouncement(announcement, null);
-    verify(announcementRequestMapper).toAnnouncement(ID, DATA);
+    verify(announcementService).updateAnnouncement(announcement);
+    verify(announcementRequestMapper).toAnnouncement(ID, ANNOUNCEMENT_WEB_REQUEST);
   }
   
 }

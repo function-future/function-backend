@@ -42,7 +42,7 @@ public class CourseController {
   ) {
     
     return CourseResponseMapper.toCoursesPagingResponse(
-      courseService.getCourses(PageHelper.toPage(page, size)));
+      courseService.getCourses(PageHelper.toPageable(page, size)));
   }
   
   @ResponseStatus(HttpStatus.OK)

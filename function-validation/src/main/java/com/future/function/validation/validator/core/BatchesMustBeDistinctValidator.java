@@ -41,16 +41,16 @@ public class BatchesMustBeDistinctValidator
   public boolean isValid(CourseData data, ConstraintValidatorContext context) {
     
     return Optional.of(data)
-      .map(CourseData::getBatchNumbers)
+      .map(CourseData::getBatchCodes)
       .filter(batches -> !batches.contains(null))
       .filter(this::hasNoDuplicateBatchNumbers)
       .isPresent();
   }
   
-  private boolean hasNoDuplicateBatchNumbers(List<Long> batchNumbers) {
+  private boolean hasNoDuplicateBatchNumbers(List<String> batchCodes) {
     
-    long setSize = new LinkedHashSet<>(batchNumbers).size();
-    return setSize == batchNumbers.size();
+    long setSize = new LinkedHashSet<>(batchCodes).size();
+    return setSize == batchCodes.size();
   }
   
 }

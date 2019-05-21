@@ -22,12 +22,13 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class BatchesMustBeDistinctValidatorTest {
   
-  private static final List<Long> VALID_LIST = Arrays.asList(1L, 2L);
+  private static final List<String> VALID_LIST = Arrays.asList("1L", "2L");
   
-  private static final List<Long> INVALID_LIST = Arrays.asList(1L, 2L, 2L);
+  private static final List<String> INVALID_LIST = Arrays.asList("1L", "2L",
+                                                               "2L");
   
-  private static final List<Long> INVALID_LIST_WITH_NULL = Arrays.asList(
-    1L, null);
+  private static final List<String> INVALID_LIST_WITH_NULL = Arrays.asList(
+    "1L", null);
   
   @Mock
   private CourseData courseData;
@@ -53,33 +54,33 @@ public class BatchesMustBeDistinctValidatorTest {
   @Test
   public void testGivenValidListByCheckingNoDuplicateInListReturnTrue() {
     
-    when(courseData.getBatchNumbers()).thenReturn(VALID_LIST);
+    when(courseData.getBatchCodes()).thenReturn(VALID_LIST);
     
     assertThat(validator.isValid(courseData, null)).isTrue();
     
-    verify(courseData).getBatchNumbers();
+    verify(courseData).getBatchCodes();
     verifyZeroInteractions(annotation);
   }
   
   @Test
   public void testGivenInvalidListByCheckingNoDuplicateInListReturnFalse() {
     
-    when(courseData.getBatchNumbers()).thenReturn(INVALID_LIST);
+    when(courseData.getBatchCodes()).thenReturn(INVALID_LIST);
     
     assertThat(validator.isValid(courseData, null)).isFalse();
     
-    verify(courseData).getBatchNumbers();
+    verify(courseData).getBatchCodes();
     verifyZeroInteractions(annotation);
   }
   
   @Test
   public void testGivenInvalidListWithNullByCheckingNoDuplicateInListReturnFalse() {
     
-    when(courseData.getBatchNumbers()).thenReturn(INVALID_LIST_WITH_NULL);
+    when(courseData.getBatchCodes()).thenReturn(INVALID_LIST_WITH_NULL);
     
     assertThat(validator.isValid(courseData, null)).isFalse();
     
-    verify(courseData).getBatchNumbers();
+    verify(courseData).getBatchCodes();
     verifyZeroInteractions(annotation);
   }
   

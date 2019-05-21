@@ -29,9 +29,8 @@ public class UserWebResponse {
   
   private boolean deleted;
   
-  private String pictureUrl;
-  
-  private String thumbnailUrl;
+  @JsonInclude(value = JsonInclude.Include.NON_NULL)
+  private String avatar;
   
   @JsonInclude(value = JsonInclude.Include.NON_NULL)
   private String batch;

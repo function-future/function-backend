@@ -39,11 +39,11 @@ public class CourseRequestMapperV1 {
    *
    * @return {@code List<Long>} - Converted list object.
    */
-  public List<Long> toCopyCoursesData(SharedCourseWebRequest request) {
+  public List<String> toCopyCoursesData(SharedCourseWebRequest request) {
     
     validator.validate(request);
     
-    return request.getBatchNumbers();
+    return request.getBatchCodes();
   }
   
   /**
@@ -54,7 +54,7 @@ public class CourseRequestMapperV1 {
    *
    * @return {@code Pair} - Converted course object with its batch numbers.
    */
-  public Pair<Course, List<Long>> toCourseAndBatchNumbers(String data) {
+  public Pair<Course, List<String>> toCourseAndBatchNumbers(String data) {
     
     return toCourseAndBatchNumbers(null, data);
   }
@@ -68,17 +68,17 @@ public class CourseRequestMapperV1 {
    *
    * @return {@code Pair} - Converted course object with its batch numbers.
    */
-  public Pair<Course, List<Long>> toCourseAndBatchNumbers(
+  public Pair<Course, List<String>> toCourseAndBatchNumbers(
     String courseId, String data
   ) {
     
-    return toValidatedCourseAndBatchNumbers(courseId,
-                                            requestMapper.toWebRequestObject(
-                                              data, CourseWebRequestV1.class)
+    return toValidatedCourseAndBatchNumbers(
+      courseId,
+      requestMapper.toWebRequestObject(data, CourseWebRequestV1.class)
     );
   }
   
-  private Pair<Course, List<Long>> toValidatedCourseAndBatchNumbers(
+  private Pair<Course, List<String>> toValidatedCourseAndBatchNumbers(
     String courseId, CourseWebRequestV1 request
   ) {
     
@@ -93,7 +93,7 @@ public class CourseRequestMapperV1 {
       course.setId(courseId);
     }
     
-    return Pair.of(course, request.getBatchNumbers());
+    return Pair.of(course, request.getBatchCodes());
   }
   
 }

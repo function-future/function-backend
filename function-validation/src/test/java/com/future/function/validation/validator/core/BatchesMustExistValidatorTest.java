@@ -25,10 +25,10 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class BatchesMustExistValidatorTest {
   
-  private static final List<Long> BATCH_NUMBERS = Arrays.asList(1L, 2L);
+  private static final List<String> BATCH_CODES = Arrays.asList("1L", "2L");
   
-  private static final List<Long> BATCH_NUMBERS_WITH_NULL = Arrays.asList(
-    2L, null);
+  private static final List<String> BATCH_CODES_WITH_NULL = Arrays.asList(
+    "2L", null);
   
   @Mock
   private CourseData courseData;
@@ -57,45 +57,45 @@ public class BatchesMustExistValidatorTest {
   @Test
   public void testGivenListOfBatchNumberOfExistingBatchByCheckingExistingBatchInDatabaseReturnTrue() {
     
-    when(courseData.getBatchNumbers()).thenReturn(BATCH_NUMBERS);
-    when(batchRepository.findByNumber(BATCH_NUMBERS.get(0))).thenReturn(
-      Optional.of(new Batch(BATCH_NUMBERS.get(0))));
-    when(batchRepository.findByNumber(BATCH_NUMBERS.get(1))).thenReturn(
-      Optional.of(new Batch(BATCH_NUMBERS.get(1))));
+    when(courseData.getBatchCodes()).thenReturn(BATCH_CODES);
+    when(batchRepository.findByCode(BATCH_CODES.get(0))).thenReturn(
+      Optional.of(Batch.builder().code(BATCH_CODES.get(0)).build()));
+    when(batchRepository.findByCode(BATCH_CODES.get(1))).thenReturn(
+      Optional.of(Batch.builder().code(BATCH_CODES.get(1)).build()));
     
     assertThat(validator.isValid(courseData, null)).isTrue();
     
-    verify(courseData).getBatchNumbers();
-    verify(batchRepository).findByNumber(BATCH_NUMBERS.get(0));
-    verify(batchRepository).findByNumber(BATCH_NUMBERS.get(1));
+    verify(courseData).getBatchCodes();
+    verify(batchRepository).findByCode(BATCH_CODES.get(0));
+    verify(batchRepository).findByCode(BATCH_CODES.get(1));
     verifyZeroInteractions(annotation);
   }
   
   @Test
   public void testGivenListOfBatchNumberOfNonExistingBatchesByCheckingExistingBatchInDatabaseReturnFalse() {
     
-    when(courseData.getBatchNumbers()).thenReturn(BATCH_NUMBERS);
-    when(batchRepository.findByNumber(BATCH_NUMBERS.get(0))).thenReturn(
-      Optional.of(new Batch(BATCH_NUMBERS.get(0))));
-    when(batchRepository.findByNumber(BATCH_NUMBERS.get(1))).thenReturn(
+    when(courseData.getBatchCodes()).thenReturn(BATCH_CODES);
+    when(batchRepository.findByCode(BATCH_CODES.get(0))).thenReturn(
+      Optional.of(Batch.builder().code(BATCH_CODES.get(0)).build()));
+    when(batchRepository.findByCode(BATCH_CODES.get(1))).thenReturn(
       Optional.empty());
     
     assertThat(validator.isValid(courseData, null)).isFalse();
     
-    verify(courseData).getBatchNumbers();
-    verify(batchRepository).findByNumber(BATCH_NUMBERS.get(0));
-    verify(batchRepository).findByNumber(BATCH_NUMBERS.get(1));
+    verify(courseData).getBatchCodes();
+    verify(batchRepository).findByCode(BATCH_CODES.get(0));
+    verify(batchRepository).findByCode(BATCH_CODES.get(1));
     verifyZeroInteractions(annotation);
   }
   
   @Test
   public void testGivenListOfBatchNumberWithNullByCheckingExistingBatchInDatabaseReturnFalse() {
     
-    when(courseData.getBatchNumbers()).thenReturn(BATCH_NUMBERS_WITH_NULL);
+    when(courseData.getBatchCodes()).thenReturn(BATCH_CODES_WITH_NULL);
     
     assertThat(validator.isValid(courseData, null)).isFalse();
     
-    verify(courseData).getBatchNumbers();
+    verify(courseData).getBatchCodes();
     verifyZeroInteractions(batchRepository);
     verifyZeroInteractions(annotation);
   }

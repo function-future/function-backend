@@ -37,6 +37,6 @@ public class Course extends BaseEntity {
   private String description;
   
   @Field(FieldName.Course.FILE)
-  private File file;
+  private FileV2 file;
   
 }

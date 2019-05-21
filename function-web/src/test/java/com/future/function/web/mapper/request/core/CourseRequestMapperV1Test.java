@@ -34,9 +34,9 @@ public class CourseRequestMapperV1Test {
   
   private static final String JSON = "json";
   
-  private static final Long ONE = 1L;
+  private static final String ONE = "1L";
   
-  private static final Long TWO = 2L;
+  private static final String TWO = "2L";
   
   private static final Course COURSE = Course.builder()
     .id(ID)
@@ -48,7 +48,7 @@ public class CourseRequestMapperV1Test {
     CourseWebRequestV1.builder()
       .courseTitle(TITLE)
       .courseDescription(DESCRIPTION)
-      .batchNumbers(Collections.singletonList(ONE))
+      .batchCodes(Collections.singletonList(ONE))
       .build();
   
   private static final SharedCourseWebRequest SHARED_COURSE_WEB_REQUEST =
@@ -84,7 +84,7 @@ public class CourseRequestMapperV1Test {
   @Test
   public void testGivenJsonDataAsStringByParsingToCourseClassReturnPairObject() {
     
-    Pair<Course, List<Long>> parsedData =
+    Pair<Course, List<String>> parsedData =
       courseRequestMapperV1.toCourseAndBatchNumbers(JSON);
     
     assertThat(parsedData).isNotNull();
@@ -104,7 +104,7 @@ public class CourseRequestMapperV1Test {
   @Test
   public void testGivenIdAndJsonDataAsStringByParsingToCourseClassReturnPairObject() {
     
-    Pair<Course, List<Long>> parsedData =
+    Pair<Course, List<String>> parsedData =
       courseRequestMapperV1.toCourseAndBatchNumbers(ID, JSON);
     
     assertThat(parsedData).isNotNull();
@@ -122,9 +122,9 @@ public class CourseRequestMapperV1Test {
     when(validator.validate(SHARED_COURSE_WEB_REQUEST)).thenReturn(
       SHARED_COURSE_WEB_REQUEST);
     
-    List<Long> batchNumbers = Arrays.asList(ONE, TWO);
+    List<String> batchNumbers = Arrays.asList(ONE, TWO);
     
-    List<Long> parsedBatchNumbers = courseRequestMapperV1.toCopyCoursesData(
+    List<String> parsedBatchNumbers = courseRequestMapperV1.toCopyCoursesData(
       SHARED_COURSE_WEB_REQUEST);
     
     assertThat(parsedBatchNumbers).isNotNull();

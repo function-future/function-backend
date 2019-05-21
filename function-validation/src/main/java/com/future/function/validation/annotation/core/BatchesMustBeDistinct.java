@@ -39,6 +39,6 @@ public @interface BatchesMustBeDistinct {
    *
    * @return {@code String} - The name of the field.
    */
-  String field() default "batchNumbers";
+  String field() default "batchCodes";
   
 }

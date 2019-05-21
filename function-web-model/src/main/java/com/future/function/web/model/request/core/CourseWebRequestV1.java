@@ -30,6 +30,6 @@ public class CourseWebRequestV1 implements CourseData {
   private String courseDescription;
   
   @NotEmpty(message = "NotEmpty")
-  private List<Long> batchNumbers;
+  private List<String> batchCodes;
   
 }

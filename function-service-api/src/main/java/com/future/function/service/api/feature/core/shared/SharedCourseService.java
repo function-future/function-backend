@@ -18,33 +18,33 @@ public interface SharedCourseService {
    * {@link com.future.function.common.exception.NotFoundException} exception.
    *
    * @param courseId    Id of course to be retrieved.
-   * @param batchNumber Batch number of current user (obtained from session).
+   * @param batchCode Batch number of current user (obtained from session).
    *
    * @return {@code Course} - The course object found in database.
    */
-  Course getCourse(String courseId, long batchNumber);
+  Course getCourse(String courseId, String batchCode);
   
   /**
    * Retrieves courses from database.
    *
-   * @param pageable    Pageable object for paging data.
-   * @param batchNumber Batch number of current user (obtained from session).
+   * @param pageable  Pageable object for paging data.
+   * @param batchCode Batch number of current user (obtained from session).
    *
    * @return {@code Page<Course>} - Page of courses found in database.
    */
-  Page<Course> getCourses(Pageable pageable, long batchNumber);
+  Page<Course> getCourses(Pageable pageable, String batchCode);
   
   /**
    * Creates course object and saves any other data related to the course.
    *
-   * @param course       Course data of new course.
-   * @param file         File to be attached to course. May be null.
-   * @param batchNumbers Batch numbers of the new course.
+   * @param course     Course data of new course.
+   * @param file       File to be attached to course. May be null.
+   * @param batchCodes Batch numbers of the new course.
    *
    * @return {@code Course} - The course object of the saved data.
    */
   Course createCourse(
-    Course course, MultipartFile file, List<Long> batchNumbers
+    Course course, MultipartFile file, List<String> batchCodes
   );
   
   /**
@@ -52,32 +52,32 @@ public interface SharedCourseService {
    * course. If not found, then throw
    * {@link com.future.function.common.exception.NotFoundException} exception.
    *
-   * @param course       Course data of new course.
-   * @param file         File to be attached to course. May be null.
-   * @param batchNumbers Batch numbers of the new course.
+   * @param course     Course data of new course.
+   * @param file       File to be attached to course. May be null.
+   * @param batchCodes Batch numbers of the new course.
    *
    * @return {@code Course} - The course object of the saved data.
    */
   Course updateCourse(
-    Course course, MultipartFile file, List<Long> batchNumbers
+    Course course, MultipartFile file, List<String> batchCodes
   );
   
   /**
    * Deletes course object from database.
    *
-   * @param courseId    Id of course to be deleted.
-   * @param batchNumber Batch number of selected course.
+   * @param courseId  Id of course to be deleted.
+   * @param batchCode Batch number of selected course.
    */
-  void deleteCourse(String courseId, long batchNumber);
+  void deleteCourse(String courseId, String batchCode);
   
   /**
-   * Copies course objects of {@code originBatchNumber} by creating new
+   * Copies course objects of {@code originBatchCode} by creating new
    * {@link com.future.function.model.entity.feature.core.shared.SharedCourse}
-   * objects linking to {@code targetBatchNumber}.
+   * objects linking to {@code targetBatchCode}.
    *
-   * @param originBatchNumber Batch number of origin courses.
-   * @param targetBatchNumber Targeted batch number for courses to be copied.
+   * @param originBatchCode Batch number of origin courses.
+   * @param targetBatchCode Targeted batch number for courses to be copied.
    */
-  void copyCourses(long originBatchNumber, long targetBatchNumber);
+  void copyCourses(String originBatchCode, String targetBatchCode);
   
 }

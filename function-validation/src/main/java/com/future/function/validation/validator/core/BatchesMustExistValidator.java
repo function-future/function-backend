@@ -45,21 +45,21 @@ public class BatchesMustExistValidator
   public boolean isValid(CourseData data, ConstraintValidatorContext context) {
     
     return Optional.of(data)
-      .map(CourseData::getBatchNumbers)
+      .map(CourseData::getBatchCodes)
       .filter(batches -> !batches.contains(null))
       .filter(this::eachHasBatchInDatabase)
       .isPresent();
   }
   
-  private boolean eachHasBatchInDatabase(List<Long> batchNumbers) {
+  private boolean eachHasBatchInDatabase(List<String> batchCodes) {
   
-    return countFoundBatchInDatabase(batchNumbers) == batchNumbers.size();
+    return countFoundBatchInDatabase(batchCodes) == batchCodes.size();
   }
   
-  private long countFoundBatchInDatabase(List<Long> batchNumbers) {
+  private long countFoundBatchInDatabase(List<String> batchCodes) {
     
-    return batchNumbers.stream()
-      .filter(number -> !batchRepository.findByNumber(number)
+    return batchCodes.stream()
+      .filter(code -> !batchRepository.findByCode(code)
         .equals(Optional.empty()))
       .count();
   }

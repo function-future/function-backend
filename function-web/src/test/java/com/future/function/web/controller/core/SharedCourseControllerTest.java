@@ -59,19 +59,19 @@ public class SharedCourseControllerTest extends JacksonTestHelper {
   
   private static final String DESCRIPTION = "description";
   
-  private static final long BATCH_NUMBER_1 = 1L;
+  private static final String BATCH_CODE_1 = "1L";
   
-  private static final long BATCH_NUMBER_2 = 2L;
+  private static final String BATCH_CODE_2 = "2L";
   
   private static final SharedCourseWebRequest SHARED_COURSE_WEB_REQUEST =
-    new SharedCourseWebRequest(BATCH_NUMBER_1, BATCH_NUMBER_2);
+    new SharedCourseWebRequest(BATCH_CODE_1, BATCH_CODE_2);
   
   private static final String SHARED_COURSE_REQUEST_DATA =
     "{\"originBatch" + "\":1,\"targetBatch\":2}";
   
   private static final String COURSE_REQUEST_DATA =
     "{\"courseTitle" + "\":\"Course Title\"," + "\"courseDescription" +
-    "\":\"Course Description\"," + "\"batchNumbers\":[1]}";
+    "\":\"Course Description\"," + "\"batchCodes\":[1]}";
   
   private static final Course COURSE = Course.builder()
     .id(ID)
@@ -122,14 +122,14 @@ public class SharedCourseControllerTest extends JacksonTestHelper {
     
     mockMvc.perform(delete("/api/core/courses/" + ID).param("batch",
                                                             String.valueOf(
-                                                              BATCH_NUMBER_1)
+                                                              BATCH_CODE_1)
     ))
       .andExpect(status().isOk())
       .andExpect(content().json(
         baseResponseJacksonTester.write(OK_BASE_RESPONSE)
           .getJson()));
     
-    verify(sharedCourseService).deleteCourse(ID, BATCH_NUMBER_1);
+    verify(sharedCourseService).deleteCourse(ID, BATCH_CODE_1);
     verifyZeroInteractions(courseRequestMapperV1);
   }
   
@@ -137,7 +137,7 @@ public class SharedCourseControllerTest extends JacksonTestHelper {
   public void testGivenRequestBodyByCopyingCoursesReturnBaseResponseObject()
     throws Exception {
     
-    List<Long> batchNumbers = Arrays.asList(BATCH_NUMBER_1, BATCH_NUMBER_2);
+    List<String> batchNumbers = Arrays.asList(BATCH_CODE_1, BATCH_CODE_2);
     when(courseRequestMapperV1.toCopyCoursesData(
       SHARED_COURSE_WEB_REQUEST)).thenReturn(batchNumbers);
     
@@ -158,44 +158,44 @@ public class SharedCourseControllerTest extends JacksonTestHelper {
   public void testGivenCourseIdAndBatchNumberByGettingCourseReturnDataResponseObject()
     throws Exception {
     
-    when(sharedCourseService.getCourse(ID, BATCH_NUMBER_1)).thenReturn(COURSE);
+    when(sharedCourseService.getCourse(ID, BATCH_CODE_1)).thenReturn(COURSE);
     
     mockMvc.perform(get("/api/core/courses/" + ID).param("batch",
                                                          String.valueOf(
-                                                           BATCH_NUMBER_1)
+                                                           BATCH_CODE_1)
     ))
       .andExpect(status().isOk())
       .andExpect(content().json(
         dataResponseJacksonTester.write(RETRIEVED_COURSE_WEB_RESPONSE)
           .getJson()));
     
-    verify(sharedCourseService).getCourse(ID, BATCH_NUMBER_1);
+    verify(sharedCourseService).getCourse(ID, BATCH_CODE_1);
   }
   
   @Test
   public void testGivenPageAndSizeAndBatchNumberByGettingCoursesReturnPagingResponseObject()
     throws Exception {
     
-    when(sharedCourseService.getCourses(PAGEABLE, BATCH_NUMBER_1)).thenReturn(
+    when(sharedCourseService.getCourses(PAGEABLE, BATCH_CODE_1)).thenReturn(
       COURSE_PAGE);
     
     mockMvc.perform(get("/api/core/courses").param("page", "1")
                       .param("size", "5")
-                      .param("batch", String.valueOf(BATCH_NUMBER_1)))
+                      .param("batch", String.valueOf(BATCH_CODE_1)))
       .andExpect(status().isOk())
       .andExpect(content().json(
         pagingResponseJacksonTester.write(PAGING_RESPONSE)
           .getJson()));
     
-    verify(sharedCourseService).getCourses(PAGEABLE, BATCH_NUMBER_1);
+    verify(sharedCourseService).getCourses(PAGEABLE, BATCH_CODE_1);
   }
   
   @Test
   public void testGivenCourseDataAndFileByCreatingCourseReturnDataResponseObject()
     throws Exception {
     
-    List<Long> batchNumbers = Collections.singletonList(BATCH_NUMBER_1);
-    Pair<Course, List<Long>> pair = Pair.of(COURSE, batchNumbers);
+    List<String> batchNumbers = Collections.singletonList(BATCH_CODE_1);
+    Pair<Course, List<String>> pair = Pair.of(COURSE, batchNumbers);
     
     when(courseRequestMapperV1.toCourseAndBatchNumbers(
       COURSE_REQUEST_DATA)).thenReturn(pair);
@@ -220,8 +220,8 @@ public class SharedCourseControllerTest extends JacksonTestHelper {
   public void testGivenCourseIdAndDataAndFileByUpdatingCourseReturnDataResponseObject()
     throws Exception {
     
-    List<Long> batchNumbers = Arrays.asList(BATCH_NUMBER_1, BATCH_NUMBER_2);
-    Pair<Course, List<Long>> pair = Pair.of(COURSE, batchNumbers);
+    List<String> batchNumbers = Arrays.asList(BATCH_CODE_1, BATCH_CODE_2);
+    Pair<Course, List<String>> pair = Pair.of(COURSE, batchNumbers);
     
     when(courseRequestMapperV1.toCourseAndBatchNumbers(ID,
                                                        COURSE_REQUEST_DATA

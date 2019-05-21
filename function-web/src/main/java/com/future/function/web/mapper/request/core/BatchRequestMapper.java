@@ -1,7 +1,7 @@
 package com.future.function.web.mapper.request.core;
 
-import com.future.function.common.validation.ObjectValidator;
 import com.future.function.model.entity.feature.core.Batch;
+import com.future.function.validation.RequestValidator;
 import com.future.function.web.model.request.core.BatchWebRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -9,10 +9,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class BatchRequestMapper {
   
-  private final ObjectValidator validator;
+  private final RequestValidator validator;
   
   @Autowired
-  public BatchRequestMapper(ObjectValidator validator) {
+  public BatchRequestMapper(RequestValidator validator) {
     
     this.validator = validator;
   }

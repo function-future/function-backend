@@ -31,4 +31,20 @@ public class FileOriginTest {
     assertThat(userLowCaseValue).isEqualTo("user");
   }
   
+  @Test
+  public void testGivenProperFileOriginStringByConvertingStringToFileOriginReturnFileOrigin() {
+    
+    FileOrigin fileOrigin = FileOrigin.toFileOrigin("USER");
+    assertThat(fileOrigin).isNotNull();
+    assertThat(fileOrigin).isEqualTo(FileOrigin.USER);
+  }
+  
+  @Test
+  public void testGivenImproperFileOriginStringByConvertingStringToFileOriginReturnProperFileOriginUnknown() {
+  
+    FileOrigin fileOrigin = FileOrigin.toFileOrigin("ANY ORIGIN");
+    assertThat(fileOrigin).isNotNull();
+    assertThat(fileOrigin).isEqualTo(FileOrigin.UNKNOWN);
+  }
+  
 }

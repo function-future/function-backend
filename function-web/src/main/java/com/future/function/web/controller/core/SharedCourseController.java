@@ -66,11 +66,11 @@ public class SharedCourseController {
     @RequestParam(defaultValue = "5")
       int size,
     @RequestParam
-      long batch
+      String batch
   ) {
     
     return CourseResponseMapper.toCoursesPagingResponse(
-      sharedCourseService.getCourses(PageHelper.toPage(page, size), batch));
+      sharedCourseService.getCourses(PageHelper.toPageable(page, size), batch));
   }
   
   /**
@@ -89,7 +89,8 @@ public class SharedCourseController {
       SharedCourseWebRequest request
   ) {
     
-    List<Long> batchNumbers = courseRequestMapperV1.toCopyCoursesData(request);
+    List<String> batchNumbers = courseRequestMapperV1.toCopyCoursesData(
+      request);
     sharedCourseService.copyCourses(batchNumbers.get(0), batchNumbers.get(1));
     return ResponseHelper.toBaseResponse(HttpStatus.CREATED);
   }
@@ -114,9 +115,9 @@ public class SharedCourseController {
     @RequestParam(required = false)
       MultipartFile file
   ) {
-  
-    Pair<Course, List<Long>> pair = courseRequestMapperV1.toCourseAndBatchNumbers(
-      data);
+    
+    Pair<Course, List<String>> pair =
+      courseRequestMapperV1.toCourseAndBatchNumbers(data);
     return CourseResponseMapper.toCourseDataResponse(
       HttpStatus.CREATED, sharedCourseService.createCourse(
         pair.getFirst(), file, pair.getSecond()));
@@ -146,9 +147,9 @@ public class SharedCourseController {
     @RequestParam(required = false)
       MultipartFile file
   ) {
-  
-    Pair<Course, List<Long>> pair = courseRequestMapperV1.toCourseAndBatchNumbers(
-      courseId, data);
+    
+    Pair<Course, List<String>> pair =
+      courseRequestMapperV1.toCourseAndBatchNumbers(courseId, data);
     return CourseResponseMapper.toCourseDataResponse(
       sharedCourseService.updateCourse(pair.getFirst(), file,
                                        pair.getSecond()
@@ -174,7 +175,7 @@ public class SharedCourseController {
     @PathVariable
       String courseId,
     @RequestParam
-      long batch
+      String batch
   ) {
     
     return CourseResponseMapper.toCourseDataResponse(
@@ -196,7 +197,7 @@ public class SharedCourseController {
     @PathVariable
       String courseId,
     @RequestParam
-      long batch
+      String batch
   ) {
     
     sharedCourseService.deleteCourse(courseId, batch);

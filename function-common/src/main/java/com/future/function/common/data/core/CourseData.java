@@ -17,6 +17,6 @@ public interface CourseData {
    * @return {@code Long} - Origin batch number in the request. Could be of null
    * value, which would be considered invalid.
    */
-  List<Long> getBatchNumbers();
+  List<String> getBatchCodes();
   
 }

@@ -26,6 +26,13 @@
     </dependency>
 
     <dependency>
+      <groupId>com.future.function</groupId>
+      <artifactId>function-service-api</artifactId>
+      <version>0.0.0</version>
+      <scope>compile</scope>
+    </dependency>
+
+    <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
     </dependency>

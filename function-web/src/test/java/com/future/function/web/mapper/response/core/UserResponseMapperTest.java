@@ -2,7 +2,7 @@ package com.future.function.web.mapper.response.core;
 
 import com.future.function.common.enumeration.core.Role;
 import com.future.function.model.entity.feature.core.Batch;
-import com.future.function.model.entity.feature.core.File;
+import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
@@ -40,7 +40,7 @@ public class UserResponseMapperTest {
   
   private static final String ADDRESS = "address";
   
-  private static final File PICTURE = new File();
+  private static final FileV2 PICTURE = new FileV2();
   
   private static final Batch BATCH = new Batch("id-1", "name-1", "1");
   
@@ -53,7 +53,7 @@ public class UserResponseMapperTest {
     .role(STUDENT_ROLE)
     .phone(PHONE)
     .address(ADDRESS)
-    .picture(PICTURE)
+    .pictureV2(new FileV2())
     .batch(BATCH)
     .university(UNIVERSITY)
     .build();
@@ -67,8 +67,7 @@ public class UserResponseMapperTest {
       .phone(PHONE)
       .address(ADDRESS)
       .deleted(false)
-      .pictureUrl(PICTURE.getFileUrl())
-      .thumbnailUrl(PICTURE.getThumbnailUrl())
+      .avatar(PICTURE.getFileUrl())
       .batch(BATCH.getCode())
       .university(UNIVERSITY)
       .build();
@@ -87,7 +86,7 @@ public class UserResponseMapperTest {
     .role(MENTOR_ROLE)
     .phone(PHONE)
     .address(ADDRESS)
-    .picture(PICTURE)
+    .pictureV2(new FileV2())
     .build();
   
   private static final UserWebResponse MENTOR_WEB_RESPONSE =
@@ -99,8 +98,7 @@ public class UserResponseMapperTest {
       .phone(PHONE)
       .address(ADDRESS)
       .deleted(false)
-      .pictureUrl(PICTURE.getFileUrl())
-      .thumbnailUrl(PICTURE.getThumbnailUrl())
+      .avatar(PICTURE.getFileUrl())
       .build();
   
   private static final DataResponse<UserWebResponse>

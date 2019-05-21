@@ -2,7 +2,7 @@ package com.future.function.service.impl.feature.core.shared;
 
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.Course;
-import com.future.function.model.entity.feature.core.File;
+import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.shared.SharedCourse;
 import com.future.function.repository.feature.core.shared.SharedCourseRepository;
 import com.future.function.service.api.feature.core.BatchService;
@@ -44,12 +44,12 @@ public class SharedCourseServiceImplTest {
     .id(COURSE_ID)
     .title(TITLE)
     .description(DESCRIPTION)
-    .file(new File())
+    .file(new FileV2())
     .build();
   
-  private static final Long ONE = 1L;
+  private static final String ONE = "1L";
   
-  private static final Batch BATCH_1 = new Batch(ONE);
+  private static final Batch BATCH_1 = Batch.builder().code(ONE).build();
   
   private static final String SHARED_COURSE_ID = "shared-course-id";
   
@@ -72,9 +72,9 @@ public class SharedCourseServiceImplTest {
   private static final Page<Course> COURSE_PAGE = new PageImpl<>(
     COURSES, PAGEABLE, COURSES.size());
   
-  private static final Long TWO = 2L;
+  private static final String TWO = "2L";
   
-  private static final Batch BATCH_2 = new Batch(TWO);
+  private static final Batch BATCH_2 = Batch.builder().code(TWO).build();
   
   @Mock
   private CourseService courseService;
@@ -101,7 +101,7 @@ public class SharedCourseServiceImplTest {
   @Test
   public void testGivenCourseIdAndBatchNumberByGettingCourseReturnCourseObject() {
     
-    when(batchService.getBatch(ONE)).thenReturn(BATCH_1);
+    when(batchService.getBatchByCode(ONE)).thenReturn(BATCH_1);
     when(sharedCourseRepository.findByCourseIdAndBatch(COURSE_ID,
                                                        BATCH_1
     )).thenReturn(Optional.of(SHARED_COURSE));
@@ -110,7 +110,7 @@ public class SharedCourseServiceImplTest {
     
     assertThat(retrievedCourse).isEqualTo(COURSE);
     
-    verify(batchService).getBatch(ONE);
+    verify(batchService).getBatchByCode(ONE);
     verify(sharedCourseRepository).findByCourseIdAndBatch(COURSE_ID, BATCH_1);
     verifyZeroInteractions(courseService);
   }
@@ -118,7 +118,7 @@ public class SharedCourseServiceImplTest {
   @Test
   public void testGivenPageableAndBatchNumberByGettingCoursesReturnPageOfCourses() {
     
-    when(batchService.getBatch(ONE)).thenReturn(BATCH_1);
+    when(batchService.getBatchByCode(ONE)).thenReturn(BATCH_1);
     when(sharedCourseRepository.findAllByBatch(BATCH_1, PAGEABLE)).thenReturn(
       SHARED_COURSE_PAGE);
     
@@ -128,7 +128,7 @@ public class SharedCourseServiceImplTest {
     
     assertThat(retrievedCourses).isEqualTo(COURSE_PAGE);
     
-    verify(batchService).getBatch(ONE);
+    verify(batchService).getBatchByCode(ONE);
     verify(sharedCourseRepository).findAllByBatch(BATCH_1, PAGEABLE);
     verifyZeroInteractions(courseService);
   }
@@ -136,7 +136,7 @@ public class SharedCourseServiceImplTest {
   @Test
   public void testGivenCourseIdAndNoCourseUsageByDeletingCourseReturnSuccessfulDeletion() {
     
-    when(batchService.getBatch(ONE)).thenReturn(BATCH_1);
+    when(batchService.getBatchByCode(ONE)).thenReturn(BATCH_1);
     when(sharedCourseRepository.findByCourseIdAndBatch(COURSE_ID,
                                                        BATCH_1
     )).thenReturn(Optional.of(SHARED_COURSE));
@@ -146,7 +146,7 @@ public class SharedCourseServiceImplTest {
     
     sharedCourseService.deleteCourse(COURSE_ID, ONE);
     
-    verify(batchService).getBatch(ONE);
+    verify(batchService).getBatchByCode(ONE);
     verify(sharedCourseRepository).findByCourseIdAndBatch(COURSE_ID, BATCH_1);
     verify(sharedCourseRepository).findAllByCourseId(COURSE_ID);
     verify(sharedCourseRepository).delete(SHARED_COURSE);
@@ -156,7 +156,7 @@ public class SharedCourseServiceImplTest {
   @Test
   public void testGivenCourseIdAndCourseUsageExistsByDeletingCourseReturnSuccessfulDeletion() {
     
-    when(batchService.getBatch(ONE)).thenReturn(BATCH_1);
+    when(batchService.getBatchByCode(ONE)).thenReturn(BATCH_1);
     when(sharedCourseRepository.findByCourseIdAndBatch(COURSE_ID,
                                                        BATCH_1
     )).thenReturn(Optional.of(SHARED_COURSE));
@@ -167,7 +167,7 @@ public class SharedCourseServiceImplTest {
     
     sharedCourseService.deleteCourse(COURSE_ID, ONE);
     
-    verify(batchService).getBatch(ONE);
+    verify(batchService).getBatchByCode(ONE);
     verify(sharedCourseRepository).findByCourseIdAndBatch(COURSE_ID, BATCH_1);
     verify(sharedCourseRepository).findAllByCourseId(COURSE_ID);
     verify(sharedCourseRepository).delete(SHARED_COURSE);
@@ -177,13 +177,13 @@ public class SharedCourseServiceImplTest {
   @Test
   public void testGivenTwoDistinctBatchNumbersByCopyingCoursesReturnSuccessfulCopying() {
     
-    when(batchService.getBatch(ONE)).thenReturn(BATCH_1);
+    when(batchService.getBatchByCode(ONE)).thenReturn(BATCH_1);
     
     Stream<SharedCourse> originSharedCourseStream = Stream.of(SHARED_COURSE);
     when(sharedCourseRepository.findAllByBatch(BATCH_1)).thenReturn(
       originSharedCourseStream);
     
-    when(batchService.getBatch(TWO)).thenReturn(BATCH_2);
+    when(batchService.getBatchByCode(TWO)).thenReturn(BATCH_2);
     
     SharedCourse savedSharedCourse = SharedCourse.builder()
       .course(COURSE)
@@ -194,9 +194,9 @@ public class SharedCourseServiceImplTest {
     
     sharedCourseService.copyCourses(ONE, TWO);
     
-    verify(batchService).getBatch(ONE);
+    verify(batchService).getBatchByCode(ONE);
     verify(sharedCourseRepository).findAllByBatch(BATCH_1);
-    verify(batchService).getBatch(TWO);
+    verify(batchService).getBatchByCode(TWO);
     verify(sharedCourseRepository).save(savedSharedCourses);
   }
   
@@ -204,17 +204,17 @@ public class SharedCourseServiceImplTest {
   public void testGivenCourseAndMultipartFileAndBatchNumbersByCreatingCourseReturnCreatedCourseObject() {
     
     when(courseService.createCourse(COURSE, null)).thenReturn(COURSE);
-    when(batchService.getBatch(ONE)).thenReturn(BATCH_1);
+    when(batchService.getBatchByCode(ONE)).thenReturn(BATCH_1);
     
-    List<Long> batchNumbers = Collections.singletonList(ONE);
+    List<String> batchCodes = Collections.singletonList(ONE);
     
     Course createdCourse = sharedCourseService.createCourse(
-      COURSE, null, batchNumbers);
+      COURSE, null, batchCodes);
     
     assertThat(createdCourse).isEqualTo(COURSE);
     
     verify(courseService).createCourse(COURSE, null);
-    verify(batchService).getBatch(ONE);
+    verify(batchService).getBatchByCode(ONE);
     
     SharedCourse savedSharedCourse = SharedCourse.builder()
       .course(COURSE)
@@ -229,8 +229,8 @@ public class SharedCourseServiceImplTest {
   public void testGivenCourseAndMultipartFileAndBatchNumbersByUpdatingCourseReturnUpdatedCourseObject() {
     
     when(courseService.updateCourse(COURSE, null)).thenReturn(COURSE);
-    when(batchService.getBatch(ONE)).thenReturn(BATCH_1);
-    when(batchService.getBatch(TWO)).thenReturn(BATCH_2);
+    when(batchService.getBatchByCode(ONE)).thenReturn(BATCH_1);
+    when(batchService.getBatchByCode(TWO)).thenReturn(BATCH_2);
     
     Stream<SharedCourse> sharedCourseStream = Stream.of(SHARED_COURSE);
     when(sharedCourseRepository.findAllByCourseId(COURSE_ID)).thenReturn(
@@ -240,16 +240,16 @@ public class SharedCourseServiceImplTest {
                                                        BATCH_1
     )).thenReturn(Optional.of(SHARED_COURSE));
     
-    List<Long> batchNumbers = Collections.singletonList(TWO);
+    List<String> batchCodes = Collections.singletonList(TWO);
     Course updatedCourse = sharedCourseService.updateCourse(COURSE, null,
-                                                            batchNumbers
+                                                            batchCodes
     );
     
     assertThat(updatedCourse).isEqualTo(COURSE);
     
     verify(courseService).updateCourse(COURSE, null);
-    verify(batchService).getBatch(ONE);
-    verify(batchService).getBatch(TWO);
+    verify(batchService).getBatchByCode(ONE);
+    verify(batchService).getBatchByCode(TWO);
     verify(sharedCourseRepository).findAllByCourseId(COURSE_ID);
     verify(sharedCourseRepository).findByCourseIdAndBatch(COURSE_ID, BATCH_1);
     verify(sharedCourseRepository).delete(SHARED_COURSE);
@@ -267,20 +267,20 @@ public class SharedCourseServiceImplTest {
   public void testGivenCourseAndMultipartFileAndExistingBatchNumbersByUpdatingCourseReturnUpdatedCourseObject() {
     
     when(courseService.updateCourse(COURSE, null)).thenReturn(COURSE);
-    when(batchService.getBatch(TWO)).thenReturn(BATCH_2);
+    when(batchService.getBatchByCode(TWO)).thenReturn(BATCH_2);
     
     Stream<SharedCourse> sharedCourseStream = Stream.of(SHARED_COURSE);
     when(sharedCourseRepository.findAllByCourseId(COURSE_ID)).thenReturn(
       sharedCourseStream);
     
-    List<Long> batchNumbers = Arrays.asList(ONE, TWO);
+    List<String> batchCodes = Arrays.asList(ONE, TWO);
     Course updatedCourse = sharedCourseService.updateCourse(
-      COURSE, null, batchNumbers);
+      COURSE, null, batchCodes);
     
     assertThat(updatedCourse).isEqualTo(COURSE);
     
     verify(courseService).updateCourse(COURSE, null);
-    verify(batchService).getBatch(TWO);
+    verify(batchService).getBatchByCode(TWO);
     verify(sharedCourseRepository).findAllByCourseId(COURSE_ID);
     
     SharedCourse savedSharedCourse = SharedCourse.builder()

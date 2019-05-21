@@ -1,5 +1,6 @@
 package com.future.function.web.model.request.core;
 
+import com.future.function.validation.annotation.core.FileMustExist;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -8,6 +9,7 @@ import org.hibernate.validator.constraints.NotBlank;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.List;
 
 /**
  * Model representation for announcement web request.
@@ -19,13 +21,16 @@ import javax.validation.constraints.Size;
 public class AnnouncementWebRequest {
   
   @NotBlank(message = "NotBlank")
-  private String announcementTitle;
+  private String title;
   
   @Size(max = 70,
         message = "Size")
-  private String announcementSummary;
+  private String summary;
   
   @NotNull(message = "NotNull")
-  private String announcementDescriptionHtml;
+  private String description;
+  
+  @FileMustExist
+  private List<String> files;
   
 }

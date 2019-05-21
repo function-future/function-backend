@@ -2,7 +2,7 @@ package com.future.function.service.impl.feature.core;
 
 import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.core.Course;
-import com.future.function.model.entity.feature.core.File;
+import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.repository.feature.core.CourseRepository;
 import org.junit.After;
 import org.junit.Before;
@@ -38,7 +38,7 @@ public class CourseServiceImplTest {
     .id(ID)
     .title(TITLE)
     .description(DESCRIPTION)
-    .file(new File())
+    .file(new FileV2())
     .build();
   
   @Mock

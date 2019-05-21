@@ -1,7 +1,7 @@
 package com.future.function.web.mapper.response.core;
 
 import com.future.function.model.entity.feature.core.Course;
-import com.future.function.model.entity.feature.core.File;
+import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.model.response.base.DataResponse;
@@ -75,14 +75,14 @@ public class CourseResponseMapper {
   private static String getFileUrl(Course course) {
     
     return Optional.ofNullable(course.getFile())
-      .map(File::getFileUrl)
+      .map(FileV2::getFileUrl)
       .orElse(null);
   }
   
   private static String getThumbnailUrl(Course course) {
     
     return Optional.ofNullable(course.getFile())
-      .map(File::getFileUrl)
+      .map(FileV2::getFileUrl)
       .orElse(null);
   }
   
