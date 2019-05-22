@@ -68,6 +68,12 @@ public interface FieldName {
     
     public static final String THUMBNAIL_URL = "thumbnailUrl";
     
+    public static final String NAME = "name";
+    
+    public static final String PARENT_ID = "parentId";
+    
+    public static final String USED = "used";
+    
     public static final String MARK_FOLDER = "markFolder";
     
     public static final String AS_RESOURCE = "asResource";
@@ -81,7 +87,7 @@ public interface FieldName {
     
     public static final String SUMMARY = "summary";
     
-    public static final String DESCRIPTION_HTML = "descriptionHtml";
+    public static final String DESCRIPTION = "description";
     
     public static final String FILE = "file";
     

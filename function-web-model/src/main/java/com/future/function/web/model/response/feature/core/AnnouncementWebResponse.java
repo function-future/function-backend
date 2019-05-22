@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 /**
  * Model representation for announcement web response.
  */
@@ -15,19 +17,19 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class AnnouncementWebResponse {
 
-  private String announcementId;
+  private String id;
 
-  private String announcementTitle;
+  private String title;
   
   @JsonInclude(value = JsonInclude.Include.NON_NULL)
-  private String announcementSummary;
+  private String summary;
   
-  private String announcementDescriptionHtml;
+  private String description;
+  
+  private List<FileWebResponse> files;
   
   @JsonInclude(value = JsonInclude.Include.NON_NULL)
   private String announcementFileUrl;
-  
-  private Long createdAt;
   
   private Long updatedAt;
   

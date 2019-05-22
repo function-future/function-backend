@@ -6,36 +6,29 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * Model representation for user web response.
- */
+import java.util.Map;
+
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserWebResponse {
+public class FileWebResponse {
   
   private String id;
   
-  private String role;
+  @JsonInclude(value = JsonInclude.Include.NON_EMPTY)
+  private String type;
   
-  private String email;
-  
+  @JsonInclude(value = JsonInclude.Include.NON_EMPTY)
   private String name;
   
-  private String phone;
-  
-  private String address;
-  
-  private boolean deleted;
+  @JsonInclude(value = JsonInclude.Include.NON_EMPTY)
+  private Object file;
   
   @JsonInclude(value = JsonInclude.Include.NON_NULL)
-  private String avatar;
+  private Map<Long, String> versions;
   
   @JsonInclude(value = JsonInclude.Include.NON_NULL)
-  private String batch;
-  
-  @JsonInclude(value = JsonInclude.Include.NON_NULL)
-  private String university;
+  private String parentId;
   
 }
