@@ -22,13 +22,7 @@ public class StudentQuizResponseMapper {
         return StudentQuizWebResponse
                 .builder()
                 .quiz(QuizResponseMapper.toQuizWebDataResponse(studentQuiz.getQuiz()).getData())
-                .status(studentQuiz.isDone() ? "DONE" : "ONGOING")
                 .build();
-    }
-
-    public static DataResponse<StudentQuizWebResponse> toStudentQuizWebResponse(HttpStatus httpStatus,
-                                                                                StudentQuiz studentQuiz) {
-        return ResponseHelper.toDataResponse(httpStatus, buildStudentQuizWebResponse(studentQuiz));
     }
 
     public static PagingResponse<StudentQuizWebResponse> toPagingStudentQuizWebResponse(Page<StudentQuiz> studentQuizPage) {

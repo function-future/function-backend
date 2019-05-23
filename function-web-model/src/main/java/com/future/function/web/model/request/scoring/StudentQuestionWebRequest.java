@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 
 @Data
 @Builder
@@ -15,11 +14,10 @@ import javax.validation.constraints.Size;
 @AllArgsConstructor
 public class StudentQuestionWebRequest {
 
-    @NotEmpty(message = "NotEmpty")
-    private String text;
-
     @NotNull(message = "NotNull")
-    @Size(max = 1, min = 1, message = "Size")
-    private OptionWebRequest option;
+    private Integer number;
+
+    @NotEmpty(message = "NotEmpty")
+    private String optionId;
 
 }

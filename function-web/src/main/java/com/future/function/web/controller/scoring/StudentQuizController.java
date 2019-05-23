@@ -1,18 +1,14 @@
 package com.future.function.web.controller.scoring;
 
-import com.future.function.common.enumeration.core.Role;
-import com.future.function.service.api.feature.core.UserService;
-import com.future.function.service.api.feature.scoring.QuizService;
 import com.future.function.service.api.feature.scoring.StudentQuizService;
 import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
-import com.future.function.web.mapper.request.scoring.StudentQuizRequestMapper;
 import com.future.function.web.mapper.response.scoring.StudentQuizResponseMapper;
-import com.future.function.web.model.request.scoring.StudentQuizWebRequest;
 import com.future.function.web.model.response.base.BaseResponse;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.feature.scoring.StudentQuizWebResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -23,20 +19,9 @@ public class StudentQuizController {
 
     private StudentQuizService studentQuizService;
 
-    private StudentQuizRequestMapper requestMapper;
-
-    private UserService userService;
-
-    private QuizService quizService;
-
-    public StudentQuizController(StudentQuizService studentQuizService,
-                                 StudentQuizRequestMapper requestMapper,
-                                 UserService userService,
-                                 QuizService quizService) {
+    @Autowired
+    public StudentQuizController(StudentQuizService studentQuizService) {
         this.studentQuizService = studentQuizService;
-        this.requestMapper = requestMapper;
-        this.userService = userService;
-        this.quizService = quizService;
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -49,7 +34,7 @@ public class StudentQuizController {
         return StudentQuizResponseMapper
                 .toPagingStudentQuizWebResponse(
                         studentQuizService
-                                .findAllByStudentId(studentId, PageHelper.toPage(page, size))
+                                .findAllByStudentId(studentId, PageHelper.toPageable(page, size))
                 );
 
     }
@@ -61,22 +46,6 @@ public class StudentQuizController {
                 .toStudentQuizWebResponse(
                         studentQuizService
                                 .findById(studentQuizId)
-                );
-    }
-
-    @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public DataResponse<StudentQuizWebResponse> createStudentQuiz(@RequestBody StudentQuizWebRequest request) {
-        return StudentQuizResponseMapper
-                .toStudentQuizWebResponse(
-                        HttpStatus.CREATED,
-                        userService.getUsers(Role.STUDENT, PageHelper.toPage(1, 10))
-                                .getContent()
-                                .stream()
-                                .forEach(student -> studentQuizService
-                                        .createStudentQuiz(
-                                                student.getId(),
-                                                quizService.findById(request.getQuizId())))
                 );
     }
 

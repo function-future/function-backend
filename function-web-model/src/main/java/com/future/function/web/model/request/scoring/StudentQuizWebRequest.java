@@ -17,7 +17,7 @@ public class StudentQuizWebRequest {
     @NotNull(message = "NotNull")
     private int batchCode;
 
-    @NotEmpty(message = "Not Empty")
+    @NotEmpty(message = "NotEmpty")
     private String quizId;
 
 }

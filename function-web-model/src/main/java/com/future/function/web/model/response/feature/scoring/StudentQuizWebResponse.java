@@ -13,7 +13,5 @@ public class StudentQuizWebResponse {
 
     private QuizWebResponse quiz;
 
-    private String status;
-
 
 }

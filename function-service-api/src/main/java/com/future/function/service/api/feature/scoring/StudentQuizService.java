@@ -13,10 +13,11 @@ public interface StudentQuizService {
 
     StudentQuiz createStudentQuiz(String userId, Quiz quiz);
 
-    StudentQuiz createStudentQuizByBatchCode(Integer batchCode, Quiz quiz);
+    Quiz createStudentQuizByBatchCode(String batchCode, Quiz quiz);
 
-    StudentQuiz copyQuizFromBatch(Integer originBatch, Integer targetBatch, String studentQuizId);
+    Quiz copyQuizFromBatch(String targetBatch, Quiz quiz);
 
     void deleteById(String id);
 
+    void deleteByBatchCodeAndQuiz(String batchCode, String quizId);
 }
