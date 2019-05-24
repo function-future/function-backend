@@ -4,6 +4,7 @@ import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.core.Course;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.repository.feature.core.CourseRepository;
+import com.future.function.service.api.feature.core.ResourceService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,9 +22,7 @@ import java.util.Collections;
 import static com.googlecode.catchexception.CatchException.catchException;
 import static com.googlecode.catchexception.CatchException.caughtException;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CourseServiceImplTest {
@@ -34,124 +33,109 @@ public class CourseServiceImplTest {
   
   private static final String DESCRIPTION = "description";
   
-  private static final Course COURSE = Course.builder()
-    .id(ID)
-    .title(TITLE)
-    .description(DESCRIPTION)
-    .file(new FileV2())
+  private static final String FILE_ID = "file-id";
+  
+  private static final FileV2 FILE_V2 = FileV2.builder()
+    .id(FILE_ID)
     .build();
+  
+  private Course course;
   
   @Mock
   private CourseRepository courseRepository;
+  
+  @Mock
+  private ResourceService resourceService;
   
   @InjectMocks
   private CourseServiceImpl courseService;
   
   @Before
-  public void setUp() {}
+  public void setUp() {
+    course = Course.builder()
+      .id(ID)
+      .title(TITLE)
+      .description(DESCRIPTION)
+      .file(FILE_V2)
+      .build();
+  }
   
   @After
   public void tearDown() {
     
-    verifyNoMoreInteractions(courseRepository);
-  }
-  
-  @Test
-  public void testGivenCourseAndMultipartFileByCreatingCourseReturnCreatedCourse() {
-    
-    when(courseRepository.save(COURSE)).thenReturn(COURSE);
-    when(courseRepository.findOne(ID)).thenReturn(COURSE);
-    
-    Course createdCourse = courseService.createCourse(COURSE, null);
-    
-    assertThat(createdCourse).isEqualTo(COURSE);
-    
-    verify(courseRepository).save(COURSE);
-    verify(courseRepository).findOne(ID);
+    verifyNoMoreInteractions(courseRepository, resourceService);
   }
   
   @Test
   public void testGivenCourseByCreatingCourseReturnCreatedCourse() {
     
-    when(courseRepository.save(COURSE)).thenReturn(COURSE);
-    when(courseRepository.findOne(ID)).thenReturn(COURSE);
+    when(courseRepository.save(course)).thenReturn(course);
+    when(resourceService.getFile(FILE_ID)).thenReturn(FILE_V2);
+    when(courseRepository.findOne(ID)).thenReturn(course);
     
-    Course createdCourse = courseService.createCourse(COURSE);
+    Course createdCourse = courseService.createCourse(course);
     
-    assertThat(createdCourse).isEqualTo(COURSE);
+    assertThat(createdCourse).isEqualTo(course);
     
-    verify(courseRepository).save(COURSE);
+    verify(courseRepository).save(course);
+    verify(resourceService).markFilesUsed(
+      Collections.singletonList(FILE_ID), true);
+    verify(resourceService).getFile(FILE_ID);
     verify(courseRepository).findOne(ID);
+    verifyZeroInteractions(resourceService);
   }
   
   @Test
-  public void testGivenInvalidCourseAndMultipartFileByCreatingCourseReturnUnsupportedOperationException() {
+  public void testGivenInvalidCourseByCreatingCourseReturnUnsupportedOperationException() {
     
-    when(courseRepository.save(COURSE)).thenReturn(null);
+    when(resourceService.getFile(FILE_ID)).thenReturn(FILE_V2);
+    when(courseRepository.save(course)).thenReturn(null);
     
-    catchException(() -> courseService.createCourse(COURSE, null));
+    catchException(() -> courseService.createCourse(course));
     
     assertThat(caughtException().getClass()).isEqualTo(
       UnsupportedOperationException.class);
     assertThat(caughtException().getMessage()).isEqualTo(
       "Create Course Failed");
     
-    verify(courseRepository).save(COURSE);
-  }
-  
-  @Test
-  public void testGivenCourseAndMultipartFileByUpdatingCourseReturnUpdatedCourse() {
-    
-    when(courseRepository.findOne(ID)).thenReturn(COURSE);
-    when(courseRepository.save(COURSE)).thenReturn(COURSE);
-    
-    Course updatedCourse = courseService.updateCourse(COURSE, null);
-    
-    assertThat(updatedCourse).isEqualTo(COURSE);
-    
-    verify(courseRepository).findOne(ID);
-    verify(courseRepository).save(COURSE);
+    verify(courseRepository).save(course);
+    verify(resourceService).markFilesUsed(
+      Collections.singletonList(FILE_ID), true);
+    verify(resourceService).getFile(FILE_ID);
+    verifyZeroInteractions(resourceService);
   }
   
   @Test
   public void testGivenCourseByUpdatingCourseReturnUpdatedCourse() {
     
-    when(courseRepository.findOne(ID)).thenReturn(COURSE);
-    when(courseRepository.save(COURSE)).thenReturn(COURSE);
+    when(courseRepository.findOne(ID)).thenReturn(course);
+    when(resourceService.getFile(FILE_ID)).thenReturn(FILE_V2);
+    when(courseRepository.save(course)).thenReturn(course);
     
-    Course updatedCourse = courseService.updateCourse(COURSE);
+    Course updatedCourse = courseService.updateCourse(course);
     
-    assertThat(updatedCourse).isEqualTo(COURSE);
-    
-    verify(courseRepository).findOne(ID);
-    verify(courseRepository).save(COURSE);
-  }
-  
-  @Test
-  public void testGivenInvalidCourseAndMultipartFileByUpdatingCourseReturnUnsupportedOperationException() {
-    
-    when(courseRepository.findOne(ID)).thenReturn(null);
-    
-    catchException(() -> courseService.updateCourse(COURSE, null));
-    
-    assertThat(caughtException().getClass()).isEqualTo(
-      UnsupportedOperationException.class);
-    assertThat(caughtException().getMessage()).isEqualTo(
-      "Update Course Failed");
+    assertThat(updatedCourse).isEqualTo(course);
     
     verify(courseRepository).findOne(ID);
+    verify(resourceService).markFilesUsed(
+      Collections.singletonList(FILE_ID), false);
+    verify(resourceService).markFilesUsed(
+      Collections.singletonList(FILE_ID), true);
+    verify(resourceService, times(2)).getFile(FILE_ID);
+    verify(courseRepository).save(course);
   }
   
   @Test
   public void testGivenCourseIdByGettingCourseReturnCourseObject() {
     
-    when(courseRepository.findOne(ID)).thenReturn(COURSE);
+    when(courseRepository.findOne(ID)).thenReturn(course);
     
     Course retrievedCourse = courseService.getCourse(ID);
     
-    assertThat(retrievedCourse).isEqualTo(COURSE);
+    assertThat(retrievedCourse).isEqualTo(course);
     
     verify(courseRepository).findOne(ID);
+    verifyZeroInteractions(resourceService);
   }
   
   @Test
@@ -166,6 +150,7 @@ public class CourseServiceImplTest {
       "Get Course Not Found");
     
     verify(courseRepository).findOne(ID);
+    verifyZeroInteractions(resourceService);
   }
   
   @Test
@@ -173,7 +158,7 @@ public class CourseServiceImplTest {
     
     Pageable pageable = new PageRequest(0, 5);
     Page<Course> coursePage = new PageImpl<>(
-      Collections.singletonList(COURSE), pageable, 1);
+      Collections.singletonList(course), pageable, 1);
     when(courseRepository.findAll(pageable)).thenReturn(coursePage);
     
     Page<Course> retrievedCourses = courseService.getCourses(pageable);
@@ -181,14 +166,21 @@ public class CourseServiceImplTest {
     assertThat(retrievedCourses).isEqualTo(coursePage);
     
     verify(courseRepository).findAll(pageable);
+    verifyZeroInteractions(resourceService);
   }
   
   @Test
   public void testGivenCourseIdByDeletingCourseReturnSuccessfulDeletion() {
     
+    when(courseRepository.findOne(ID)).thenReturn(course);
+    
     courseService.deleteCourse(ID);
     
-    verify(courseRepository).delete(ID);
+    verify(courseRepository).findOne(ID);
+    verify(resourceService).markFilesUsed(
+      Collections.singletonList(FILE_ID), false);
+    verify(resourceService).getFile(FILE_ID);
+    verify(courseRepository).delete(course);
   }
   
 }

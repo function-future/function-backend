@@ -1,10 +1,13 @@
 package com.future.function.web.mapper.request.core;
 
 import com.future.function.model.entity.feature.core.Course;
+import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.validation.RequestValidator;
 import com.future.function.web.model.request.core.CourseWebRequestV2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Optional;
 
 /**
  * Mapper class for incoming request for course feature.
@@ -37,6 +40,23 @@ public class CourseRequestMapperV2 {
     return Course.builder()
       .title(request.getTitle())
       .description(request.getDescription())
+      .file(this.getFileV2(request))
+      .build();
+  }
+  
+  private FileV2 getFileV2(CourseWebRequestV2 request) {
+  
+    return Optional.of(request)
+      .map(CourseWebRequestV2::getMaterial)
+      .map(list -> list.get(0))
+      .map(this::buildFileV2)
+      .orElseGet(FileV2::new);
+  }
+  
+  private FileV2 buildFileV2(String fileId) {
+    
+    return FileV2.builder()
+      .id(fileId)
       .build();
   }
   
@@ -56,6 +76,7 @@ public class CourseRequestMapperV2 {
     Course course = Course.builder()
       .title(request.getTitle())
       .description(request.getDescription())
+      .file(this.getFileV2(request))
       .build();
     
     if (courseId != null) {

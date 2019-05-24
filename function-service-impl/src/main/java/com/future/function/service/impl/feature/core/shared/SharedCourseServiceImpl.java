@@ -111,7 +111,7 @@ public class SharedCourseServiceImpl implements SharedCourseService {
   ) {
     
     return Optional.of(course)
-      .map(c -> courseService.createCourse(c, file))
+//      .map(c -> courseService.createCourse(c, file))
       .map(c -> createSharedCourses(c, batchCodes))
       .map(this::saveSharedCoursesAndGetCourse)
       .orElseThrow(() -> new UnsupportedOperationException(
@@ -152,7 +152,7 @@ public class SharedCourseServiceImpl implements SharedCourseService {
   ) {
     
     return Optional.of(course)
-      .map(c -> courseService.updateCourse(c, file))
+//      .map(c -> courseService.updateCourse(c, file))
       .map(c -> Pair.of(c, this.getBatchesDataAsPair(c.getId(), batchCodes)))
       .map(this::updateSharedCoursesAndGetCourse)
       .orElseThrow(() -> new UnsupportedOperationException(

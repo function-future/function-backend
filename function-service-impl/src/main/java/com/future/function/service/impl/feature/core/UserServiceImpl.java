@@ -111,8 +111,8 @@ public class UserServiceImpl implements UserService {
       .map(User::getId)
       .map(userRepository::findOne)
       .map(this::deleteUserPicture)
-      .map(foundUser -> this.copyPropertiesAndSaveUser(user, foundUser))
       .map(foundUser -> this.setUserPicture(user, foundUser))
+      .map(foundUser -> this.copyPropertiesAndSaveUser(user, foundUser))
       .orElse(user);
   }
   
@@ -150,6 +150,7 @@ public class UserServiceImpl implements UserService {
   private void markDeleted(User user) {
     
     user.setDeleted(true);
+    deleteUserPicture(user);
     userRepository.save(user);
   }
   
