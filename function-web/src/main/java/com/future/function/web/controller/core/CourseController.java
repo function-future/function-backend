@@ -4,12 +4,12 @@ import com.future.function.service.api.feature.core.CourseService;
 import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.mapper.request.core.CourseRequestMapperV2;
-import com.future.function.web.mapper.response.core.CourseResponseMapper;
+import com.future.function.web.mapper.response.core.CourseResponseMapperV2;
 import com.future.function.web.model.request.core.CourseWebRequestV2;
 import com.future.function.web.model.response.base.BaseResponse;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
-import com.future.function.web.model.response.feature.core.CourseWebResponse;
+import com.future.function.web.model.response.feature.core.CourseWebResponseV2;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,36 +34,36 @@ public class CourseController {
   
   @ResponseStatus(HttpStatus.OK)
   @GetMapping
-  public PagingResponse<CourseWebResponse> getCourses(
+  public PagingResponse<CourseWebResponseV2> getCourses(
     @RequestParam(defaultValue = "1")
       int page,
     @RequestParam(defaultValue = "5")
       int size
   ) {
     
-    return CourseResponseMapper.toCoursesPagingResponse(
+    return CourseResponseMapperV2.toCoursesPagingResponse(
       courseService.getCourses(PageHelper.toPageable(page, size)));
   }
   
   @ResponseStatus(HttpStatus.OK)
   @GetMapping(value = "/{courseId}")
-  public DataResponse<CourseWebResponse> getCourse(
+  public DataResponse<CourseWebResponseV2> getCourse(
     @PathVariable
       String courseId
   ) {
     
-    return CourseResponseMapper.toCourseDataResponse(
+    return CourseResponseMapperV2.toCourseDataResponse(
       courseService.getCourse(courseId));
   }
   
   @ResponseStatus(HttpStatus.CREATED)
   @PostMapping
-  public DataResponse<CourseWebResponse> createCourse(
+  public DataResponse<CourseWebResponseV2> createCourse(
     @RequestBody
       CourseWebRequestV2 request
   ) {
     
-    return CourseResponseMapper.toCourseDataResponse(
+    return CourseResponseMapperV2.toCourseDataResponse(
       HttpStatus.CREATED,
       courseService.createCourse(courseRequestMapperV2.toCourse(request))
     );
@@ -71,14 +71,14 @@ public class CourseController {
   
   @ResponseStatus(HttpStatus.OK)
   @PutMapping("/{courseId}")
-  public DataResponse<CourseWebResponse> updateCourse(
+  public DataResponse<CourseWebResponseV2> updateCourse(
     @PathVariable
       String courseId,
     @RequestBody
       CourseWebRequestV2 request
   ) {
     
-    return CourseResponseMapper.toCourseDataResponse(courseService.updateCourse(
+    return CourseResponseMapperV2.toCourseDataResponse(courseService.updateCourse(
       courseRequestMapperV2.toCourse(courseId, request)));
   }
   

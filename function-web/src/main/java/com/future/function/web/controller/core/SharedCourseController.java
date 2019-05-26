@@ -5,12 +5,13 @@ import com.future.function.service.api.feature.core.shared.SharedCourseService;
 import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.mapper.request.core.CourseRequestMapperV1;
-import com.future.function.web.mapper.response.core.CourseResponseMapper;
+import com.future.function.web.mapper.response.core.CourseResponseMapperV2;
 import com.future.function.web.model.request.core.shared.SharedCourseWebRequest;
 import com.future.function.web.model.response.base.BaseResponse;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.feature.core.CourseWebResponse;
+import com.future.function.web.model.response.feature.core.CourseWebResponseV2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
@@ -24,7 +25,7 @@ import java.util.List;
  * Controller class for course APIs.
  */
 @RestController
-@RequestMapping(value = "/api/core/batches/{batchId}/courses")
+@RequestMapping(value = "/api/core/batches/{batchId}/coursess")
 public class SharedCourseController {
   
   // TODO When security is enabled, add parameter `Principal` to each method
@@ -60,7 +61,7 @@ public class SharedCourseController {
    */
   @ResponseStatus(HttpStatus.OK)
   @GetMapping
-  public PagingResponse<CourseWebResponse> getCourses(
+  public PagingResponse<CourseWebResponseV2> getCourses(
     @RequestParam(defaultValue = "1")
       int page,
     @RequestParam(defaultValue = "5")
@@ -69,7 +70,7 @@ public class SharedCourseController {
       String batch
   ) {
     
-    return CourseResponseMapper.toCoursesPagingResponse(
+    return CourseResponseMapperV2.toCoursesPagingResponse(
       sharedCourseService.getCourses(PageHelper.toPageable(page, size), batch));
   }
   
@@ -109,7 +110,7 @@ public class SharedCourseController {
   @ResponseStatus(HttpStatus.CREATED)
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
                produces = MediaType.APPLICATION_JSON_VALUE)
-  public DataResponse<CourseWebResponse> createCourse(
+  public DataResponse<CourseWebResponseV2> createCourse(
     @RequestParam
       String data,
     @RequestParam(required = false)
@@ -118,7 +119,7 @@ public class SharedCourseController {
     
     Pair<Course, List<String>> pair =
       courseRequestMapperV1.toCourseAndBatchNumbers(data);
-    return CourseResponseMapper.toCourseDataResponse(
+    return CourseResponseMapperV2.toCourseDataResponse(
       HttpStatus.CREATED, sharedCourseService.createCourse(
         pair.getFirst(), file, pair.getSecond()));
   }
@@ -139,7 +140,7 @@ public class SharedCourseController {
   @PutMapping(value = "/{courseId}",
               consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
               produces = MediaType.APPLICATION_JSON_VALUE)
-  public DataResponse<CourseWebResponse> updateCourse(
+  public DataResponse<CourseWebResponseV2> updateCourse(
     @PathVariable
       String courseId,
     @RequestParam
@@ -150,7 +151,7 @@ public class SharedCourseController {
     
     Pair<Course, List<String>> pair =
       courseRequestMapperV1.toCourseAndBatchNumbers(courseId, data);
-    return CourseResponseMapper.toCourseDataResponse(
+    return CourseResponseMapperV2.toCourseDataResponse(
       sharedCourseService.updateCourse(pair.getFirst(), file,
                                        pair.getSecond()
       ));
@@ -171,14 +172,14 @@ public class SharedCourseController {
   @ResponseStatus(HttpStatus.OK)
   @GetMapping(value = "/{courseId}",
               produces = MediaType.APPLICATION_JSON_VALUE)
-  public DataResponse<CourseWebResponse> getCourse(
+  public DataResponse<CourseWebResponseV2> getCourse(
     @PathVariable
       String courseId,
     @RequestParam
       String batch
   ) {
     
-    return CourseResponseMapper.toCourseDataResponse(
+    return CourseResponseMapperV2.toCourseDataResponse(
       sharedCourseService.getCourse(courseId, batch));
   }
   

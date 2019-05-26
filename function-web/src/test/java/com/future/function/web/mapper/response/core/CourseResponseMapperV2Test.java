@@ -5,6 +5,7 @@ import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.base.paging.Paging;
 import com.future.function.web.model.response.feature.core.CourseWebResponse;
+import com.future.function.web.model.response.feature.core.CourseWebResponseV2;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,7 +19,7 @@ import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class CourseResponseMapperTest {
+public class CourseResponseMapperV2Test {
   
   private static final String COURSE_ID = "course-id";
   
@@ -80,14 +81,14 @@ public class CourseResponseMapperTest {
   @Test
   public void testGivenCourseDataByMappingToDataResponseReturnDataResponseObject() {
     
-    DataResponse<CourseWebResponse> createdDataResponse =
-      CourseResponseMapper.toCourseDataResponse(HttpStatus.CREATED, COURSE);
+    DataResponse<CourseWebResponseV2> createdDataResponse =
+      CourseResponseMapperV2.toCourseDataResponse(HttpStatus.CREATED, COURSE);
     
     assertThat(createdDataResponse).isNotNull();
     assertThat(createdDataResponse).isEqualTo(CREATED_DATA_RESPONSE);
     
-    DataResponse<CourseWebResponse> retrievedDataResponse =
-      CourseResponseMapper.toCourseDataResponse(COURSE);
+    DataResponse<CourseWebResponseV2> retrievedDataResponse =
+      CourseResponseMapperV2.toCourseDataResponse(COURSE);
     
     assertThat(retrievedDataResponse).isNotNull();
     assertThat(retrievedDataResponse).isEqualTo(RETRIEVED_DATA_RESPONSE);
@@ -97,8 +98,8 @@ public class CourseResponseMapperTest {
   @Test
   public void testGivenCoursesDataByMappingToPagingResponseReturnPagingResponseObject() {
     
-    PagingResponse<CourseWebResponse> pagingResponse =
-      CourseResponseMapper.toCoursesPagingResponse(PAGE);
+    PagingResponse<CourseWebResponseV2> pagingResponse =
+      CourseResponseMapperV2.toCoursesPagingResponse(PAGE);
     
     assertThat(pagingResponse).isNotNull();
     assertThat(pagingResponse).isEqualTo(PAGING_RESPONSE);

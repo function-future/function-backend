@@ -5,10 +5,12 @@ import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.Course;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.shared.SharedCourse;
+import com.future.function.model.util.constant.FieldName;
 import com.future.function.repository.feature.core.shared.SharedCourseRepository;
 import com.future.function.service.api.feature.core.BatchService;
 import com.future.function.service.api.feature.core.CourseService;
 import com.future.function.service.api.feature.core.ResourceService;
+import com.future.function.service.api.feature.core.shared.SharedCourseServiceV2;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -16,6 +18,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.Collections;
 import java.util.List;
@@ -23,7 +26,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-public class SharedCourseServiceImplV2 {
+public class SharedCourseServiceImplV2 implements SharedCourseServiceV2 {
   
   private final SharedCourseRepository sharedCourseRepository;
   
@@ -45,6 +48,7 @@ public class SharedCourseServiceImplV2 {
     this.courseService = courseService;
   }
   
+  @Override
   public Course getCourseByIdAndBatchCode(String courseId, String batchCode) {
     
     return this.getBatch(batchCode)
@@ -60,6 +64,7 @@ public class SharedCourseServiceImplV2 {
       .map(batchService::getBatchByCode);
   }
   
+  @Override
   public Page<Course> getCoursesByBatchCode(
     String batchCode, Pageable pageable
   ) {
@@ -87,6 +92,7 @@ public class SharedCourseServiceImplV2 {
       .collect(Collectors.toList());
   }
   
+  @Override
   public void deleteCourseByIdAndBatchCode(String courseId, String batchCode) {
     
     this.getBatch(batchCode)
@@ -104,7 +110,35 @@ public class SharedCourseServiceImplV2 {
       });
   }
   
+  @Override
   public List<Course> createCourseForBatch(
+    List<String> courseIds, String originBatchCode, String targetBatchCode
+  ) {
+    
+    return Optional.ofNullable(originBatchCode)
+      .filter(code -> !StringUtils.isEmpty(code))
+      .map(code -> this.createCourseForBatchFromAnotherBatch(courseIds, originBatchCode,
+                                              targetBatchCode))
+      .orElseGet(() -> this.createCourseForBatchFromMasterData(courseIds, targetBatchCode));
+  }
+  
+  private List<Course> createCourseForBatchFromAnotherBatch(
+    List<String> courseIds, String originBatchCode, String targetBatchCode
+  ) {
+    
+    Batch originBatch = batchService.getBatchByCode(originBatchCode);
+  
+    return sharedCourseRepository.findAllByBatch(originBatch)
+      .map(SharedCourse::getCourse)
+      .filter(course -> courseIds.contains(course.getId()))
+      .map(course -> this.buildSharedCourse(course, batchService.getBatchByCode(
+        targetBatchCode)))
+      .map(sharedCourseRepository::save)
+      .map(SharedCourse::getCourse)
+      .collect(Collectors.toList());
+  }
+  
+  private List<Course> createCourseForBatchFromMasterData(
     List<String> courseIds, String batchCode
   ) {
     
@@ -126,6 +160,7 @@ public class SharedCourseServiceImplV2 {
       .build();
   }
   
+  @Override
   public Course updateCourseForBatch(
     String courseId, String batchCode, Course course
   ) {
@@ -150,7 +185,11 @@ public class SharedCourseServiceImplV2 {
     course.setFile(resourceService.getFile(course.getFile()
                                              .getId()));
     
-    BeanUtils.copyProperties(course, sharedCourse.getCourse());
+    BeanUtils.copyProperties(course, sharedCourse.getCourse(), "id",
+                             FieldName.BaseEntity.VERSION,
+                             FieldName.BaseEntity.CREATED_AT,
+                             FieldName.BaseEntity.CREATED_BY
+    );
     
     return sharedCourseRepository.save(sharedCourse);
   }

@@ -169,7 +169,8 @@ public class UserServiceImpl implements UserService {
       .map(User::getPictureV2)
       .map(FileV2::getId)
       .map(fileId -> this.markAndSetUserPicture(user, fileId, true))
-      .orElse(user);
+      .map(ignored -> foundUser)
+      .orElse(foundUser);
   }
   
   private User copyPropertiesAndSaveUser(User user, User foundUser) {

@@ -5,12 +5,12 @@ import com.future.function.service.api.feature.core.shared.SharedCourseService;
 import com.future.function.web.JacksonTestHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.mapper.request.core.CourseRequestMapperV1;
-import com.future.function.web.mapper.response.core.CourseResponseMapper;
+import com.future.function.web.mapper.response.core.CourseResponseMapperV2;
 import com.future.function.web.model.request.core.shared.SharedCourseWebRequest;
 import com.future.function.web.model.response.base.BaseResponse;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
-import com.future.function.web.model.response.feature.core.CourseWebResponse;
+import com.future.function.web.model.response.feature.core.CourseWebResponseV2;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -84,15 +84,15 @@ public class SharedCourseControllerTest extends JacksonTestHelper {
   private static final Page<Course> COURSE_PAGE = new PageImpl<>(
     Collections.singletonList(COURSE), PAGEABLE, 1);
   
-  private static final PagingResponse<CourseWebResponse> PAGING_RESPONSE =
-    CourseResponseMapper.toCoursesPagingResponse(COURSE_PAGE);
+  private static final PagingResponse<CourseWebResponseV2> PAGING_RESPONSE =
+    CourseResponseMapperV2.toCoursesPagingResponse(COURSE_PAGE);
   
-  private static final DataResponse<CourseWebResponse>
-    RETRIEVED_COURSE_WEB_RESPONSE = CourseResponseMapper.toCourseDataResponse(
+  private static final DataResponse<CourseWebResponseV2>
+    RETRIEVED_COURSE_WEB_RESPONSE = CourseResponseMapperV2.toCourseDataResponse(
     COURSE);
   
-  private static final DataResponse<CourseWebResponse>
-    CREATED_COURSE_WEB_RESPONSE = CourseResponseMapper.toCourseDataResponse(
+  private static final DataResponse<CourseWebResponseV2>
+    CREATED_COURSE_WEB_RESPONSE = CourseResponseMapperV2.toCourseDataResponse(
     HttpStatus.CREATED, COURSE);
   
   @Autowired

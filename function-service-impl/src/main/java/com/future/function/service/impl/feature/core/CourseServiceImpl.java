@@ -94,7 +94,8 @@ public class CourseServiceImpl implements CourseService {
       .map(Course::getFile)
       .map(FileV2::getId)
       .map(fileId -> this.markAndSetCourseFile(course, fileId, true))
-      .orElse(course);
+      .map(ignored -> foundCourse)
+      .orElse(foundCourse);
   }
   
   private Course deleteCourseFile(Course course) {
