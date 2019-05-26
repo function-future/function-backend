@@ -100,22 +100,22 @@ public final class CourseResponseMapper {
   }
   
   /**
-   * Converts a course data to {@code CourseWebResponse}, wrapped in {@code
+   * Converts courses data to {@code List<CourseWebResponse>}, wrapped in {@code
    * DataResponse}.
    *
    * @param courses Course data to be converted to response.
    *
-   * @return {@code DataResponse<CourseWebResponse>} - The converted course
-   * data, wrapped in
+   * @return {@code DataResponse<List<CourseWebResponse>>} - The converted
+   * course data, wrapped in
    * {@link com.future.function.web.model.response.base.DataResponse} and
-   * {@link CourseWebResponse}
+   * {@link List} and {@link CourseWebResponse}.
    */
   public static DataResponse<List<CourseWebResponse>> toCoursesDataResponse(
     List<Course> courses
   ) {
     
     return ResponseHelper.toDataResponse(
-      HttpStatus.OK, toCourseWebResponseV2List(courses));
+      HttpStatus.CREATED, toCourseWebResponseV2List(courses));
   }
   
   private static List<CourseWebResponse> toCourseWebResponseV2List(

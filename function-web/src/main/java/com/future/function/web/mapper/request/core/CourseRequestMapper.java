@@ -35,19 +35,14 @@ public class CourseRequestMapper {
    */
   public Course toCourse(CourseWebRequest request) {
     
-    validator.validate(request);
-    
-    return Course.builder()
-      .title(request.getTitle())
-      .description(request.getDescription())
-      .file(this.getFileV2(request))
-      .build();
+    return toCourse(null, request);
   }
   
   private FileV2 getFileV2(CourseWebRequest request) {
     
     return Optional.of(request)
       .map(CourseWebRequest::getMaterial)
+      .filter(materialList -> !materialList.isEmpty())
       .map(list -> list.get(0))
       .map(this::buildFileV2)
       .orElseGet(FileV2::new);

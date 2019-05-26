@@ -15,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 
 import java.util.Collections;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -44,6 +45,12 @@ public class CourseResponseMapperTest {
     DataResponse.<CourseWebResponse>builder().code(201)
       .status("CREATED")
       .data(COURSE_WEB_RESPONSE)
+      .build();
+  
+  private static final DataResponse<List<CourseWebResponse>> CREATED_DATA_RESPONSE_LIST =
+    DataResponse.<List<CourseWebResponse>>builder().code(201)
+      .status("CREATED")
+      .data(Collections.singletonList(COURSE_WEB_RESPONSE))
       .build();
   
   private static final DataResponse<CourseWebResponse> RETRIEVED_DATA_RESPONSE =
@@ -101,6 +108,16 @@ public class CourseResponseMapperTest {
     
     assertThat(pagingResponse).isNotNull();
     assertThat(pagingResponse).isEqualTo(PAGING_RESPONSE);
+  }
+  
+  @Test
+  public void testGivenListOfCoursesByMappingToDataResponseReturnDataResponseObject() {
+    
+    DataResponse<List<CourseWebResponse>> dataResponse =
+      CourseResponseMapper.toCoursesDataResponse(Collections.singletonList(COURSE));
+  
+    assertThat(dataResponse).isNotNull();
+    assertThat(dataResponse).isEqualTo(CREATED_DATA_RESPONSE_LIST);
   }
   
 }

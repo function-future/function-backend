@@ -189,7 +189,8 @@ public class SharedCourseServiceImpl implements SharedCourseService {
     course.setFile(resourceService.getFile(course.getFile()
                                              .getId()));
     
-    BeanUtils.copyProperties(course, sharedCourse.getCourse(), FieldName.ID,
+    BeanUtils.copyProperties(course, sharedCourse.getCourse(),
+                             FieldName.BaseEntity.ID,
                              FieldName.BaseEntity.VERSION,
                              FieldName.BaseEntity.CREATED_AT,
                              FieldName.BaseEntity.CREATED_BY

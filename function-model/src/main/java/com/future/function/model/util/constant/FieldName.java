@@ -8,10 +8,10 @@ import lombok.NoArgsConstructor;
  */
 public interface FieldName {
   
-  String ID = "id";
-  
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
   abstract class BaseEntity {
+    
+    public static final String ID = "id";
     
     public static final String CREATED_AT = "createdAt";
     

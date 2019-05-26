@@ -3,7 +3,7 @@ package com.future.function.web.controller.core;
 import com.future.function.service.api.feature.core.SharedCourseService;
 import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
-import com.future.function.web.mapper.request.core.CourseRequestMapper;
+import com.future.function.web.mapper.request.core.SharedCourseRequestMapper;
 import com.future.function.web.mapper.response.core.CourseResponseMapper;
 import com.future.function.web.model.request.core.CourseWebRequest;
 import com.future.function.web.model.request.core.SharedCourseWebRequest;
@@ -12,6 +12,7 @@ import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.feature.core.CourseWebResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,16 +27,16 @@ public class SharedCourseController {
   
   private final SharedCourseService sharedCourseService;
   
-  private final CourseRequestMapper courseRequestMapper;
+  private final SharedCourseRequestMapper sharedCourseRequestMapper;
   
   @Autowired
   public SharedCourseController(
     SharedCourseService sharedCourseService,
-    CourseRequestMapper courseRequestMapper
+    SharedCourseRequestMapper sharedCourseRequestMapper
   ) {
     
     this.sharedCourseService = sharedCourseService;
-    this.courseRequestMapper = courseRequestMapper;
+    this.sharedCourseRequestMapper = sharedCourseRequestMapper;
   }
   
   @ResponseStatus(HttpStatus.OK)
@@ -92,10 +93,13 @@ public class SharedCourseController {
       SharedCourseWebRequest request
   ) {
     
+    Pair<List<String>, String> courseIdsAndOriginBatchPair =
+      sharedCourseRequestMapper.toCourseIdsAndOriginBatchCodePair(request);
+    
     return CourseResponseMapper.toCoursesDataResponse(
-      sharedCourseService.createCourseForBatch(request.getCourses(),
-                                               request.getOriginBatch(),
-                                               batchCode
+      sharedCourseService.createCourseForBatch(
+        courseIdsAndOriginBatchPair.getFirst(),
+        courseIdsAndOriginBatchPair.getSecond(), batchCode
       ));
   }
   
@@ -112,8 +116,8 @@ public class SharedCourseController {
     
     return CourseResponseMapper.toCourseDataResponse(
       sharedCourseService.updateCourseForBatch(courseId, batchCode,
-                                               courseRequestMapper.toCourse(
-                                                 request)
+                                               sharedCourseRequestMapper.toCourse(
+                                                 courseId, request)
       ));
   }
   

@@ -1,6 +1,6 @@
 package com.future.function.validation.annotation.core;
 
-import com.future.function.validation.validator.core.BatchesMustExistValidator;
+import com.future.function.validation.validator.core.BatchMustExistValidator;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
@@ -15,10 +15,10 @@ import java.lang.annotation.Target;
  * CourseData} has batch representation in database.
  */
 @Documented
-@Constraint(validatedBy = BatchesMustExistValidator.class)
-@Target({ ElementType.TYPE })
+@Constraint(validatedBy = BatchMustExistValidator.class)
+@Target({ ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)
-public @interface BatchesMustExist {
+public @interface BatchMustExist {
   
   /**
    * Default message returned when any of the specified batch numbers in
@@ -26,7 +26,7 @@ public @interface BatchesMustExist {
    *
    * @return {@code String} - The name of this annotation.
    */
-  String message() default "BatchesMustExist";
+  String message() default "BatchMustExist";
   
   Class<?>[] groups() default {};
   
