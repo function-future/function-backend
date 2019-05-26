@@ -1,4 +1,4 @@
-package com.future.function.web.model.request.core.shared;
+package com.future.function.web.model.request.core;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,10 +11,10 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SharedCourseWebRequestV2 {
-
+public class SharedCourseWebRequest {
+  
   private String originBatch;
   
   private List<String> courses;
-
+  
 }

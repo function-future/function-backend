@@ -1,8 +1,6 @@
-package com.future.function.model.entity.feature.core.shared;
+package com.future.function.model.entity.feature.core;
 
 import com.future.function.model.entity.base.BaseEntity;
-import com.future.function.model.entity.feature.core.Batch;
-import com.future.function.model.entity.feature.core.Course;
 import com.future.function.model.util.constant.DocumentName;
 import com.future.function.model.util.constant.FieldName;
 import lombok.AllArgsConstructor;

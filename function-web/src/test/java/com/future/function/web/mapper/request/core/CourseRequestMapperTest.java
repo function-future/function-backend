@@ -2,7 +2,7 @@ package com.future.function.web.mapper.request.core;
 
 import com.future.function.model.entity.feature.core.Course;
 import com.future.function.validation.RequestValidator;
-import com.future.function.web.model.request.core.CourseWebRequestV2;
+import com.future.function.web.model.request.core.CourseWebRequest;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,7 +17,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class CourseRequestMapperV2Test {
+public class CourseRequestMapperTest {
   
   private static final String ID = "id";
   
@@ -31,8 +31,8 @@ public class CourseRequestMapperV2Test {
     .description(DESCRIPTION)
     .build();
   
-  private static final CourseWebRequestV2 COURSE_WEB_REQUEST =
-    CourseWebRequestV2.builder()
+  private static final CourseWebRequest COURSE_WEB_REQUEST =
+    CourseWebRequest.builder()
       .title(TITLE)
       .description(DESCRIPTION)
       .build();
@@ -41,7 +41,7 @@ public class CourseRequestMapperV2Test {
   private RequestValidator validator;
   
   @InjectMocks
-  private CourseRequestMapperV2 courseRequestMapperV2;
+  private CourseRequestMapper courseRequestMapper;
   
   @Before
   public void setUp() {
@@ -58,7 +58,7 @@ public class CourseRequestMapperV2Test {
   @Test
   public void testGivenCourseWebRequestByParsingToCourseClassReturnCourseObject() {
     
-    Course parsedCourse = courseRequestMapperV2.toCourse(COURSE_WEB_REQUEST);
+    Course parsedCourse = courseRequestMapper.toCourse(COURSE_WEB_REQUEST);
     
     assertThat(parsedCourse).isNotNull();
     assertThat(parsedCourse.getId()).isNotBlank();
@@ -71,9 +71,7 @@ public class CourseRequestMapperV2Test {
   @Test
   public void testGivenCourseIdAndCourseWebRequestByParsingToCourseClassReturnCourseObject() {
     
-    Course parsedCourse = courseRequestMapperV2.toCourse(ID,
-                                                         COURSE_WEB_REQUEST
-    );
+    Course parsedCourse = courseRequestMapper.toCourse(ID, COURSE_WEB_REQUEST);
     
     assertThat(parsedCourse).isNotNull();
     assertThat(parsedCourse).isEqualTo(COURSE);

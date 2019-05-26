@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
  */
 public interface FieldName {
   
+  String ID = "id";
+  
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
   abstract class BaseEntity {
     
@@ -20,7 +22,7 @@ public interface FieldName {
     public static final String UPDATED_BY = "updatedBy";
     
     public static final String DELETED = "deleted";
-  
+    
     public static final String VERSION = "version";
     
   }
@@ -97,9 +99,9 @@ public interface FieldName {
   abstract class Course {
     
     public static final String TITLE = "title";
-  
+    
     public static final String DESCRIPTION = "description";
-  
+    
     public static final String FILE = "file";
     
   }
@@ -108,7 +110,7 @@ public interface FieldName {
   abstract class SharedCourse {
     
     public static final String BATCH = "batch";
-  
+    
     public static final String COURSE = "course";
     
   }

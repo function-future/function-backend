@@ -5,7 +5,6 @@ import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.base.paging.Paging;
 import com.future.function.web.model.response.feature.core.CourseWebResponse;
-import com.future.function.web.model.response.feature.core.CourseWebResponseV2;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,27 +18,26 @@ import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class CourseResponseMapperV2Test {
+public class CourseResponseMapperTest {
   
-  private static final String COURSE_ID = "course-id";
+  private static final String ID = "course-id";
   
-  private static final String COURSE_TITLE = "course-title";
+  private static final String TITLE = "course-title";
   
-  private static final String COURSE_DESCRIPTION = "course-description";
+  private static final String DESCRIPTION = "course-description";
   
   private static final Course COURSE = Course.builder()
-    .id(COURSE_ID)
-    .title(COURSE_TITLE)
-    .description(COURSE_DESCRIPTION)
+    .id(ID)
+    .title(TITLE)
+    .description(DESCRIPTION)
     .build();
   
   private static final CourseWebResponse COURSE_WEB_RESPONSE =
     CourseWebResponse.builder()
-      .courseId(COURSE_ID)
-      .courseTitle(COURSE_TITLE)
-      .courseDescription(COURSE_DESCRIPTION)
-      .courseFileUrl(null)
-      .courseThumbnailUrl(null)
+      .id(ID)
+      .title(TITLE)
+      .description(DESCRIPTION)
+      .material(null)
       .build();
   
   private static final DataResponse<CourseWebResponse> CREATED_DATA_RESPONSE =
@@ -81,14 +79,14 @@ public class CourseResponseMapperV2Test {
   @Test
   public void testGivenCourseDataByMappingToDataResponseReturnDataResponseObject() {
     
-    DataResponse<CourseWebResponseV2> createdDataResponse =
-      CourseResponseMapperV2.toCourseDataResponse(HttpStatus.CREATED, COURSE);
+    DataResponse<CourseWebResponse> createdDataResponse =
+      CourseResponseMapper.toCourseDataResponse(HttpStatus.CREATED, COURSE);
     
     assertThat(createdDataResponse).isNotNull();
     assertThat(createdDataResponse).isEqualTo(CREATED_DATA_RESPONSE);
     
-    DataResponse<CourseWebResponseV2> retrievedDataResponse =
-      CourseResponseMapperV2.toCourseDataResponse(COURSE);
+    DataResponse<CourseWebResponse> retrievedDataResponse =
+      CourseResponseMapper.toCourseDataResponse(COURSE);
     
     assertThat(retrievedDataResponse).isNotNull();
     assertThat(retrievedDataResponse).isEqualTo(RETRIEVED_DATA_RESPONSE);
@@ -98,8 +96,8 @@ public class CourseResponseMapperV2Test {
   @Test
   public void testGivenCoursesDataByMappingToPagingResponseReturnPagingResponseObject() {
     
-    PagingResponse<CourseWebResponseV2> pagingResponse =
-      CourseResponseMapperV2.toCoursesPagingResponse(PAGE);
+    PagingResponse<CourseWebResponse> pagingResponse =
+      CourseResponseMapper.toCoursesPagingResponse(PAGE);
     
     assertThat(pagingResponse).isNotNull();
     assertThat(pagingResponse).isEqualTo(PAGING_RESPONSE);

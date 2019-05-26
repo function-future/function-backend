@@ -17,7 +17,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CourseWebRequestV2 {
+public class CourseWebRequest {
   
   @NotBlank(message = "NotBlank")
   private String title;

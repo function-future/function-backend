@@ -4,14 +4,13 @@ import com.future.function.model.entity.feature.core.Course;
 import com.future.function.service.api.feature.core.CourseService;
 import com.future.function.web.JacksonTestHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
-import com.future.function.web.mapper.request.core.CourseRequestMapperV2;
-import com.future.function.web.mapper.response.core.CourseResponseMapperV2;
-import com.future.function.web.model.request.core.CourseWebRequestV2;
+import com.future.function.web.mapper.request.core.CourseRequestMapper;
+import com.future.function.web.mapper.response.core.CourseResponseMapper;
+import com.future.function.web.model.request.core.CourseWebRequest;
 import com.future.function.web.model.response.base.BaseResponse;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.feature.core.CourseWebResponse;
-import com.future.function.web.model.response.feature.core.CourseWebResponseV2;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -61,8 +60,8 @@ public class CourseControllerTest extends JacksonTestHelper {
     .description(DESCRIPTION)
     .build();
   
-  private static final CourseWebRequestV2 COURSE_WEB_REQUEST =
-    CourseWebRequestV2.builder()
+  private static final CourseWebRequest COURSE_WEB_REQUEST =
+    CourseWebRequest.builder()
       .title(TITLE)
       .description(DESCRIPTION)
       .build();
@@ -72,18 +71,18 @@ public class CourseControllerTest extends JacksonTestHelper {
   private static final Page<Course> COURSE_PAGE = new PageImpl<>(
     Collections.singletonList(COURSE), PAGEABLE, 1);
   
-  private static final PagingResponse<CourseWebResponseV2> PAGING_RESPONSE =
-    CourseResponseMapperV2.toCoursesPagingResponse(COURSE_PAGE);
+  private static final PagingResponse<CourseWebResponse> PAGING_RESPONSE =
+    CourseResponseMapper.toCoursesPagingResponse(COURSE_PAGE);
   
-  private static final DataResponse<CourseWebResponseV2>
-    RETRIEVED_COURSE_WEB_RESPONSE = CourseResponseMapperV2.toCourseDataResponse(
+  private static final DataResponse<CourseWebResponse>
+    RETRIEVED_COURSE_WEB_RESPONSE = CourseResponseMapper.toCourseDataResponse(
     COURSE);
   
-  private static final DataResponse<CourseWebResponseV2>
-    CREATED_COURSE_WEB_RESPONSE = CourseResponseMapperV2.toCourseDataResponse(
+  private static final DataResponse<CourseWebResponse>
+    CREATED_COURSE_WEB_RESPONSE = CourseResponseMapper.toCourseDataResponse(
     HttpStatus.CREATED, COURSE);
   
-  private JacksonTester<CourseWebRequestV2> courseWebRequestV2JacksonTester;
+  private JacksonTester<CourseWebRequest> courseWebRequestV2JacksonTester;
   
   @Autowired
   private MockMvc mockMvc;
@@ -92,7 +91,7 @@ public class CourseControllerTest extends JacksonTestHelper {
   private CourseService courseService;
   
   @MockBean
-  private CourseRequestMapperV2 courseRequestMapperV2;
+  private CourseRequestMapper courseRequestMapper;
   
   @Before
   public void setUp() {
@@ -103,14 +102,14 @@ public class CourseControllerTest extends JacksonTestHelper {
   @After
   public void tearDown() {
     
-    verifyNoMoreInteractions(courseService, courseRequestMapperV2);
+    verifyNoMoreInteractions(courseService, courseRequestMapper);
   }
   
   @Test
   public void testGivenApiCallByCreatingCourseReturnDataResponseObject()
     throws Exception {
     
-    when(courseRequestMapperV2.toCourse(COURSE_WEB_REQUEST)).thenReturn(COURSE);
+    when(courseRequestMapper.toCourse(COURSE_WEB_REQUEST)).thenReturn(COURSE);
     when(courseService.createCourse(COURSE)).thenReturn(COURSE);
     
     mockMvc.perform(post("/api/core/courses").contentType(
@@ -123,7 +122,7 @@ public class CourseControllerTest extends JacksonTestHelper {
         dataResponseJacksonTester.write(CREATED_COURSE_WEB_RESPONSE)
           .getJson()));
     
-    verify(courseRequestMapperV2).toCourse(COURSE_WEB_REQUEST);
+    verify(courseRequestMapper).toCourse(COURSE_WEB_REQUEST);
     verify(courseService).createCourse(COURSE);
   }
   
@@ -131,7 +130,7 @@ public class CourseControllerTest extends JacksonTestHelper {
   public void testGivenApiCallAndCourseIdByUpdatingCourseReturnDataResponseObject()
     throws Exception {
     
-    when(courseRequestMapperV2.toCourse(ID, COURSE_WEB_REQUEST)).thenReturn(
+    when(courseRequestMapper.toCourse(ID, COURSE_WEB_REQUEST)).thenReturn(
       COURSE);
     when(courseService.updateCourse(COURSE)).thenReturn(COURSE);
     
@@ -145,7 +144,7 @@ public class CourseControllerTest extends JacksonTestHelper {
         dataResponseJacksonTester.write(RETRIEVED_COURSE_WEB_RESPONSE)
           .getJson()));
     
-    verify(courseRequestMapperV2).toCourse(ID, COURSE_WEB_REQUEST);
+    verify(courseRequestMapper).toCourse(ID, COURSE_WEB_REQUEST);
     verify(courseService).updateCourse(COURSE);
   }
   
@@ -160,7 +159,7 @@ public class CourseControllerTest extends JacksonTestHelper {
           .getJson()));
     
     verify(courseService).deleteCourse(ID);
-    verifyZeroInteractions(courseRequestMapperV2);
+    verifyZeroInteractions(courseRequestMapper);
   }
   
   @Test
@@ -177,7 +176,7 @@ public class CourseControllerTest extends JacksonTestHelper {
           .getJson()));
     
     verify(courseService).getCourses(PAGEABLE);
-    verifyZeroInteractions(courseRequestMapperV2);
+    verifyZeroInteractions(courseRequestMapper);
   }
   
   @Test
@@ -193,7 +192,7 @@ public class CourseControllerTest extends JacksonTestHelper {
           .getJson()));
     
     verify(courseService).getCourse(ID);
-    verifyZeroInteractions(courseRequestMapperV2);
+    verifyZeroInteractions(courseRequestMapper);
   }
   
 }

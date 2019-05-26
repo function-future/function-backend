@@ -1,4 +1,4 @@
-package com.future.function.service.api.feature.core.shared;
+package com.future.function.service.api.feature.core;
 
 import com.future.function.model.entity.feature.core.Course;
 import org.springframework.data.domain.Page;
@@ -6,7 +6,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
-public interface SharedCourseServiceV2 {
+public interface SharedCourseService {
   
   Course getCourseByIdAndBatchCode(String courseId, String batchCode);
   
