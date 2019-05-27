@@ -1,7 +1,7 @@
 package com.future.function.web.controller.scoring;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.future.function.model.entity.feature.core.File;
+import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.scoring.Assignment;
 import com.future.function.service.api.feature.scoring.AssignmentService;
 import com.future.function.web.mapper.helper.ResponseHelper;
@@ -62,7 +62,7 @@ public class AssignmentControllerTest {
                   "    \"description\": \"" + ASSIGNMENT_DESCRIPTION + "\",\n" + "    \"question\": \"" +
                   ASSIGNMENT_QUESTION + "\",\n" + "    \"deadline\": " + ASSIGNMENT_DEADLINE + ",\n" +
                   "    \"batch\": " + ASSIGNMENT_BATCH + "}";
-  private File file;
+  private FileV2 file;
   private Pageable pageable;
   private Assignment assignment;
   private Assignment assignmentWithFile;
@@ -113,7 +113,7 @@ public class AssignmentControllerTest {
 
     assignmentPage = new PageImpl<>(assignmentList, pageable, 10);
 
-    file = File
+    file = FileV2
             .builder()
             .filePath(ASSIGNMENT_FILE_PATH)
             .build();

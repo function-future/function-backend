@@ -11,7 +11,7 @@ public interface StudentQuizService {
 
     StudentQuiz findById(String id);
 
-    StudentQuiz createStudentQuiz(String userId, Quiz quiz);
+    StudentQuiz createStudentQuizAndSave(String userId, Quiz quiz);
 
     Quiz createStudentQuizByBatchCode(String batchCode, Quiz quiz);
 

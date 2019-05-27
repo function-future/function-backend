@@ -5,11 +5,9 @@ import com.future.function.common.validation.ObjectValidator;
 import com.future.function.model.entity.feature.scoring.Option;
 import com.future.function.model.entity.feature.scoring.Question;
 import com.future.function.web.model.request.scoring.QuestionWebRequest;
-import com.future.function.web.model.request.scoring.StudentQuestionWebRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -56,20 +54,6 @@ public class QuestionRequestMapper {
                 .stream()
                 .map(requestMapper::toOption)
                 .collect(Collectors.toList());
-    }
-
-    public Question toStudentQuizQuestion(StudentQuestionWebRequest request) {
-        return toValidatedStudentQuizQuestion(request);
-    }
-
-    private Question toValidatedStudentQuizQuestion(StudentQuestionWebRequest request) {
-        request = validator.validate(request);
-
-        return Question
-                .builder()
-                .text(request.getText())
-                .options(Collections.singletonList(requestMapper.toOption(request.getOption())))
-                .build();
     }
 
 }

@@ -4,10 +4,12 @@ import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.model.entity.feature.scoring.Quiz;
 import com.future.function.model.entity.feature.scoring.StudentQuiz;
+import com.future.function.model.entity.feature.scoring.StudentQuizDetail;
 import com.future.function.repository.feature.scoring.StudentQuizRepository;
 import com.future.function.service.api.feature.core.BatchService;
 import com.future.function.service.api.feature.core.UserService;
 import com.future.function.service.api.feature.scoring.QuizService;
+import com.future.function.service.api.feature.scoring.StudentQuizDetailService;
 import com.future.function.service.api.feature.scoring.StudentQuizService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +37,9 @@ public class StudentQuizServiceImpl implements StudentQuizService {
     @Autowired
     private BatchService batchService;
 
+    @Autowired
+    private StudentQuizDetailService studentQuizDetailService;
+
     @Override
     public Page<StudentQuiz> findAllByStudentId(String studentId, Pageable pageable) {
         return studentQuizRepository.findAllByStudentId(studentId, pageable);
@@ -48,10 +53,11 @@ public class StudentQuizServiceImpl implements StudentQuizService {
     }
 
     @Override
-    public StudentQuiz createStudentQuiz(String userId, Quiz quiz) {
+    public StudentQuiz createStudentQuizAndSave(String userId, Quiz quiz) {
         return Optional.ofNullable(quiz)
                 .filter(Objects::nonNull)
                 .map(quizObj -> toStudentQuizWithUserAndQuiz(userId, quizObj))
+                .map(studentQuizRepository::save)
                 .orElseThrow(() -> new UnsupportedOperationException("Create quiz failed"));
     }
 
@@ -60,12 +66,23 @@ public class StudentQuizServiceImpl implements StudentQuizService {
         return Optional.ofNullable(batchCode)
                 .map(userService::getStudentsByBatchCode)
                 .map(userList -> createStudentQuizFromUserList(quiz, userList))
+                .map(studentQuiz -> studentQuiz.get(0))
+                .map(this::createStudentQuizDetailAndSave)
                 .map(returnValue -> quiz)
                 .map(returnValue -> {
                     returnValue.setBatch(batchService.getBatchByCode(batchCode));
                     return returnValue;
                 })
                 .orElseThrow(() -> new UnsupportedOperationException("Batch code is null"));
+    }
+
+    private StudentQuizDetail createStudentQuizDetailAndSave(StudentQuiz studentQuiz) {
+        StudentQuizDetail detail = StudentQuizDetail
+                .builder()
+                .studentQuiz(studentQuiz)
+                .point(0)
+                .build();
+        return studentQuizDetailService.createStudentQuizDetail(studentQuiz, null);
     }
 
     @Override
@@ -96,13 +113,14 @@ public class StudentQuizServiceImpl implements StudentQuizService {
                         .ifPresent(studentQuiz -> {
                             studentQuiz.setDeleted(true);
                             studentQuizRepository.save(studentQuiz);
+                            studentQuizDetailService.deleteByStudentQuiz(studentQuiz);
                         }));
     }
 
     private List<StudentQuiz> createStudentQuizFromUserList(Quiz quiz, List<User> userList) {
         return userList.stream()
                 .map(User::getId)
-                .map(userId -> createStudentQuiz(userId, quiz))
+                .map(userId -> createStudentQuizAndSave(userId, quiz))
                 .collect(Collectors.toList());
     }
 

@@ -72,10 +72,9 @@ public class AssignmentResponseMapperTest {
 
     paging = Paging
             .builder()
-            .currentPage(assignmentPage.getNumber())
-            .pageSize(assignmentPage.getSize())
+            .page(assignmentPage.getNumber())
+            .size(assignmentPage.getSize())
             .totalRecords(assignmentPage.getTotalElements())
-            .totalPages(assignmentPage.getTotalPages())
             .build();
 
     assignmentWebResponsePagingResponse = PagingResponse

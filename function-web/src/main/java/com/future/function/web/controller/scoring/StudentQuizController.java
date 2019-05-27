@@ -2,9 +2,7 @@ package com.future.function.web.controller.scoring;
 
 import com.future.function.service.api.feature.scoring.StudentQuizService;
 import com.future.function.web.mapper.helper.PageHelper;
-import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.mapper.response.scoring.StudentQuizResponseMapper;
-import com.future.function.web.model.response.base.BaseResponse;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.feature.scoring.StudentQuizWebResponse;
@@ -47,13 +45,6 @@ public class StudentQuizController {
                         studentQuizService
                                 .findById(studentQuizId)
                 );
-    }
-
-
-    @ResponseStatus(HttpStatus.OK)
-    @DeleteMapping(path = "/{studentQuizId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public BaseResponse deleteStudentQuizById(@PathVariable String studentQuizId) {
-        return ResponseHelper.toBaseResponse(HttpStatus.OK);
     }
 
 }

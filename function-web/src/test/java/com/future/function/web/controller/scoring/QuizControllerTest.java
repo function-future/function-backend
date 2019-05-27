@@ -44,24 +44,24 @@ public class QuizControllerTest {
 
   private static final String QUIZ_TITLE = "assignment-title";
   private static final String QUIZ_DESCRIPTION = "assignment-description";
-  private static final long QUIZ_DEADLINE = 150000;
+  private static final long QUIZ_DATE = 150000;
   private static final long QUIZ_TIME_LIMIT = 150000;
-  private static final int QUIZ_TRIES = 3;
+  private static final int QUIZ_TRIALS = 3;
   private static final int QUIZ_QUESTION_COUNT = 3;
   private static final String QUIZ_BATCH = "[2, 3]";
   private static final String QUIZ_CREATE_REQUEST_JSON =
           "{\n" + "\"title\": \"" + QUIZ_TITLE + "\",\n" + "    \"description\": \"" +
                   QUIZ_DESCRIPTION + "\",\n" + "    \"questionCount\": \"" + QUIZ_QUESTION_COUNT + "\",\n" +
-                  "    \"deadline\": " + QUIZ_DEADLINE + ",\n" + "    \"batch\": " + QUIZ_BATCH +
-                  ",\n" + "    \"timeLimit\": " + QUIZ_TIME_LIMIT + ",\n" + "    \"tries\": " + QUIZ_TRIES +
+                  "    \"deadline\": " + QUIZ_DATE + ",\n" + "    \"batch\": " + QUIZ_BATCH +
+                  ",\n" + "    \"timeLimit\": " + QUIZ_TIME_LIMIT + ",\n" + "    \"tries\": " + QUIZ_TRIALS +
                   "}";
   private static String QUIZ_ID = UUID.randomUUID().toString();
   private static final String QUIZ_UPDATE_REQUEST_JSON =
           "{\n" + "\"id\": \"" + QUIZ_ID + "\",\n" + "  \"title\": \"" + QUIZ_TITLE + "\",\n" +
                   "    \"description\": \"" + QUIZ_DESCRIPTION + "\",\n" + "    " +
                   "\"questionCount\": \"" + QUIZ_QUESTION_COUNT + "\",\n" + "    \"deadline\": "
-                  + QUIZ_DEADLINE + ",\n" + "    \"batch\": " + QUIZ_BATCH + ",\n" + "    " +
-                  "\"timeLimit\": " + QUIZ_TIME_LIMIT + ",\n" + "    \"tries\": " + QUIZ_TRIES +
+                  + QUIZ_DATE + ",\n" + "    \"batch\": " + QUIZ_BATCH + ",\n" + "    " +
+                  "\"timeLimit\": " + QUIZ_TIME_LIMIT + ",\n" + "    \"tries\": " + QUIZ_TRIALS +
                   "}";
   private Pageable pageable;
   private Quiz quiz;
@@ -100,10 +100,11 @@ public class QuizControllerTest {
             .id(QUIZ_ID)
             .title(QUIZ_TITLE)
             .description(QUIZ_DESCRIPTION)
-            .deadline(QUIZ_DEADLINE)
+            .startDate(QUIZ_DATE)
+            .endDate(QUIZ_DATE)
             .timeLimit(QUIZ_TIME_LIMIT)
             .questionCount(QUIZ_QUESTION_COUNT)
-            .tries(QUIZ_TRIES)
+            .trials(QUIZ_TRIALS)
             .build();
 
     quizWebRequest = new QuizWebRequest();

@@ -79,7 +79,7 @@ public class StudentQuizRepositoryTest {
         Optional<StudentQuiz> actual = repository.findByIdAndDeletedFalse(STUDENT_QUIZ_ID);
 
         assertThat(actual.isPresent()).isTrue();
-        assertThat(actual.get()).isEqualTo(studentQuiz);
+        assertThat(actual.get().getTrials()).isEqualTo(studentQuiz.getTrials());
     }
 
     @Test
@@ -88,6 +88,13 @@ public class StudentQuizRepositoryTest {
 
         assertThat(actual.getContent()).isNotEmpty();
         assertThat(actual.getTotalElements()).isEqualTo(1);
-        assertThat(actual.getContent().get(0)).isEqualTo(studentQuiz);
+        assertThat(actual.getContent().get(0).getQuiz()).isEqualTo(studentQuiz.getQuiz());
+    }
+
+    @Test
+    public void testFindByStudentIdAndQuizId() {
+        Optional<StudentQuiz> actual = repository.findByStudentIdAndQuizId(USER_ID, QUIZ_ID);
+
+        assertThat(actual.get().getTrials()).isEqualTo(studentQuiz.getTrials());
     }
 }

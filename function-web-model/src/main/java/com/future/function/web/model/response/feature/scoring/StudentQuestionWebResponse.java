@@ -1,4 +1,4 @@
-package com.future.function.web.model.request.scoring;
+package com.future.function.web.model.response.feature.scoring;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,8 +11,10 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class StudentQuizDetailWebRequest {
+public class StudentQuestionWebResponse {
 
-    private List<StudentQuestionWebRequest> questions;
+    private String questionText;
+
+    private List<OptionWebResponse> options;
 
 }

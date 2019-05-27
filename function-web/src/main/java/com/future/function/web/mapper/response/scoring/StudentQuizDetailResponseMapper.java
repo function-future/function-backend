@@ -1,9 +1,11 @@
 package com.future.function.web.mapper.response.scoring;
 
+import com.future.function.model.entity.feature.scoring.StudentQuestion;
 import com.future.function.model.entity.feature.scoring.StudentQuizDetail;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.model.response.base.DataResponse;
-import com.future.function.web.model.response.feature.scoring.QuestionWebResponse;
+import com.future.function.web.model.response.base.PagingResponse;
+import com.future.function.web.model.response.feature.scoring.StudentQuestionWebResponse;
 import com.future.function.web.model.response.feature.scoring.StudentQuizDetailWebResponse;
 import org.springframework.http.HttpStatus;
 
@@ -20,17 +22,25 @@ public class StudentQuizDetailResponseMapper {
     private static StudentQuizDetailWebResponse buildStudentQuizDetailWebResponse(StudentQuizDetail studentQuizDetail) {
         return StudentQuizDetailWebResponse
                 .builder()
-                .questions(buildListOfQuestionWebResponse(studentQuizDetail))
                 .point(studentQuizDetail.getPoint())
                 .build();
     }
 
-    private static List<QuestionWebResponse> buildListOfQuestionWebResponse(StudentQuizDetail studentQuizDetail) {
-        return studentQuizDetail.getQuestions()
+    public static PagingResponse<StudentQuestionWebResponse> toStudentQuestionWebResponses(List<StudentQuestion> studentQuestions) {
+        List<StudentQuestionWebResponse> responseList = studentQuestions
                 .stream()
-                .map(QuestionResponseMapper::toQuestionWebResponse)
-                .map(DataResponse::getData)
+                .map(StudentQuizDetailResponseMapper::toStudentQuestionWebResponse)
                 .collect(Collectors.toList());
+
+        return ResponseHelper.toPagingResponse(HttpStatus.OK, responseList, null);
+    }
+
+    private static StudentQuestionWebResponse toStudentQuestionWebResponse(StudentQuestion studentQuestion) {
+        return StudentQuestionWebResponse
+                .builder()
+                .questionText(studentQuestion.getQuestion().getText())
+                .options(OptionResponseMapper.toListOfOptionWebResponse(studentQuestion.getQuestion().getOptions()))
+                .build();
     }
 
     public static DataResponse<StudentQuizDetailWebResponse> toStudentQuizDetailWebResponse(HttpStatus httpStatus,

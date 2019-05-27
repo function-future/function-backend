@@ -52,7 +52,7 @@ public class QuizController {
             .toQuizWebPagingResponse(
                     quizService
                       .findAllByPageableAndFilterAndSearch(
-                              PageHelper.toPage(page, size),
+                              PageHelper.toPageable(page, size),
                               filter,
                               search
                       )

@@ -101,10 +101,7 @@ public class QuizServiceImpl implements QuizService {
   public Quiz createQuiz(Quiz request) {
     return Optional.of(request)
             .map(quizRepository::save)
-            .map(quiz -> {
-              studentQuizService.createStudentQuizByBatchCode(quiz.getBatch().getCode(), quiz);
-              return quiz;
-            })
+            .map(quiz -> studentQuizService.createStudentQuizByBatchCode(quiz.getBatch().getCode(), quiz))
             .orElseThrow(() -> new BadRequestException("Bad Request"));
   }
 
@@ -143,6 +140,8 @@ public class QuizServiceImpl implements QuizService {
     Optional.ofNullable(id)
             .map(this::findById)
             .ifPresent(val -> {
+                String batchCode = val.getBatch().getCode();
+                studentQuizService.deleteByBatchCodeAndQuiz(batchCode, val.getId());
               val.setDeleted(true);
               quizRepository.save(val);
             });
@@ -171,7 +170,7 @@ public class QuizServiceImpl implements QuizService {
   private void checkAndEditBatchCodeByRequest(Quiz quiz, String requestedBatchCode) {
     if (!quiz.getBatch().getCode().equals(requestedBatchCode)) {
       studentQuizService.deleteByBatchCodeAndQuiz(quiz.getBatch().getCode(), quiz.getId());
-      studentQuizService.createStudentQuiz(quiz.getBatch().getCode(), quiz);
+        studentQuizService.createStudentQuizAndSave(quiz.getBatch().getCode(), quiz);
     }
   }
 }

@@ -11,7 +11,6 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -27,9 +26,6 @@ public class StudentQuizDetail extends BaseEntity {
     @DBRef
     @Field(FieldName.StudentQuizDetail.STUDENT_QUIZ)
     private StudentQuiz studentQuiz;
-
-    @Field(FieldName.StudentQuizDetail.QUESTION_LIST)
-    private List<Question> questions;
 
     @Field(FieldName.StudentQuizDetail.POINT)
     private int point;

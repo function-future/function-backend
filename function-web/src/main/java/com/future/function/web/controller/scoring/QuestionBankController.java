@@ -41,7 +41,7 @@ public class QuestionBankController {
             .toPagingQuestionBankWebResponse(
                     questionBankService
                       .findAllByPageableFilterAndSearch(
-                              PageHelper.toPage(page, size),
+                              PageHelper.toPageable(page, size),
                               filter,
                               search
                       )

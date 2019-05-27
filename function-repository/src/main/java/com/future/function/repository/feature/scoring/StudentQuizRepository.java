@@ -17,6 +17,4 @@ public interface StudentQuizRepository extends MongoRepository<StudentQuiz, Stri
 
     Page<StudentQuiz> findAllByStudentId(String studentId, Pageable pageable);
 
-    Optional<StudentQuiz> findByQuizId(String quizId);
-
 }

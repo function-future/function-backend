@@ -54,7 +54,7 @@ public class AssignmentController {
                     assignmentService
                             .findAllByPageableAndFilterAndSearch(
                                     PageHelper
-                                            .toPage(page, size),
+                                            .toPageable(page, size),
                                     filter,
                                     search
                             )

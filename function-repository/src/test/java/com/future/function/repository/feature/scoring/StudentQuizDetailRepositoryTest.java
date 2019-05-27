@@ -60,4 +60,12 @@ public class StudentQuizDetailRepositoryTest {
         assertThat(actual.isPresent()).isTrue();
         assertThat(actual.get()).isNotNull();
     }
+
+    @Test
+    public void findFirstByStudentId() {
+        Optional<StudentQuizDetail> actual = repository.findFirstByStudentQuizId(STUDENT_QUIZ_ID);
+
+        assertThat(actual.isPresent()).isTrue();
+        assertThat(actual.get()).isNotNull();
+    }
 }

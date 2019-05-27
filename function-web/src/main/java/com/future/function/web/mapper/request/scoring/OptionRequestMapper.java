@@ -25,6 +25,13 @@ public class OptionRequestMapper {
                 .orElseThrow(() -> new BadRequestException("Bad Request"));
     }
 
+    public Option toOptionFromOptionId(String optionId) {
+        return Optional.ofNullable(optionId)
+                .filter(id -> !id.equals(""))
+                .map(id -> Option.builder().id(id).build())
+                .orElseThrow(() -> new BadRequestException("Bad Request"));
+    }
+
     private Option toValidatedOption(OptionWebRequest request) {
         request = validator.validate(request);
         return Option.builder()

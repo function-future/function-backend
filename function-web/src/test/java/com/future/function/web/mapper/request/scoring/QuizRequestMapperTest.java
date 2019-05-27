@@ -3,9 +3,7 @@ package com.future.function.web.mapper.request.scoring;
 import com.future.function.common.exception.BadRequestException;
 import com.future.function.common.validation.ObjectValidator;
 import com.future.function.model.entity.feature.scoring.Quiz;
-import com.future.function.web.mapper.request.WebRequestMapper;
 import com.future.function.web.model.request.scoring.QuizWebRequest;
-import java.util.UUID;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,13 +13,12 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.beans.BeanUtils;
 
+import java.util.UUID;
+
 import static com.googlecode.catchexception.CatchException.catchException;
 import static com.googlecode.catchexception.CatchException.caughtException;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class QuizRequestMapperTest {
@@ -29,9 +26,9 @@ public class QuizRequestMapperTest {
   private String QUIZ_ID = UUID.randomUUID().toString();
   private String QUIZ_TITLE = "quiz-title";
   private String QUIZ_DESCRIPTION = "quiz-description";
-  private long DEADLINE = 0;
+  private long DATE = 0;
   private long TIME_LIMIT = 0;
-  private int TRIES = 0;
+  private int TRIALS = 0;
   private int QUESTION_COUNT = 0;
 
   private Quiz quiz;
@@ -50,9 +47,10 @@ public class QuizRequestMapperTest {
             .id(QUIZ_ID)
             .title(QUIZ_TITLE)
             .description(QUIZ_DESCRIPTION)
-            .deadline(DEADLINE)
+            .startDate(DATE)
+            .endDate(DATE)
             .timeLimit(TIME_LIMIT)
-            .tries(TRIES)
+            .trials(TRIALS)
             .questionCount(QUESTION_COUNT)
             .build();
 
