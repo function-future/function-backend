@@ -69,4 +69,13 @@ public interface UserService {
    */
   List<User> getStudentsByBatchCode(String batchCode);
   
+  /**
+   * Retrieves user from database with specified email.
+   *
+   * @param email Email of user to be retrieved.
+   *
+   * @return {@code User} - User found in database.
+   */
+  User getUserByEmail(String email);
+  
 }
