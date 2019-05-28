@@ -19,7 +19,7 @@ public interface DiscussionService {
    * @return {@code Page<Discussion>} - Page of discussions found in database.
    */
   Page<Discussion> getDiscussions(
-    String courseId, String batchCode, Pageable pageable
+    String email, String courseId, String batchCode, Pageable pageable
   );
   
   /**

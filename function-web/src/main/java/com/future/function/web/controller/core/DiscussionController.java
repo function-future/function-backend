@@ -43,6 +43,8 @@ public class DiscussionController {
       String batchCode,
     @PathVariable
       String courseId,
+    @RequestParam
+      String email,
     @RequestParam(defaultValue = "1")
       int page,
     @RequestParam(defaultValue = "4")
@@ -50,7 +52,7 @@ public class DiscussionController {
   ) {
     
     return DiscussionResponseMapper.toDiscussionPagingResponse(
-      discussionService.getDiscussions(courseId, batchCode,
+      discussionService.getDiscussions(email, courseId, batchCode,
                                        PageHelper.toPageable(page, size)
       ));
   }

@@ -1,6 +1,7 @@
 package com.future.function.service.impl.feature.core;
 
 import com.future.function.common.enumeration.core.Role;
+import com.future.function.common.exception.UnauthorizedException;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.Discussion;
 import com.future.function.model.entity.feature.core.User;
@@ -51,11 +52,12 @@ public class DiscussionServiceImpl implements DiscussionService {
    */
   @Override
   public Page<Discussion> getDiscussions(
-    String courseId, String batchCode, Pageable pageable
+    String email, String courseId, String batchCode, Pageable pageable
   ) {
     
-    return Optional.of(
-      sharedCourseService.getCourseByIdAndBatchCode(courseId, batchCode))
+    return Optional.of(email)
+      .filter(e -> this.isUserValidForAddingDiscussion(e, batchCode))
+      .filter(ignored -> this.isSharedCourseExist(courseId, batchCode))
       .map(
         ignored -> discussionRepository.findAllByCourseIdAndBatchCodeOrderByCreatedAtDesc(
           courseId, batchCode, pageable))
@@ -70,17 +72,16 @@ public class DiscussionServiceImpl implements DiscussionService {
    * @return {@code Discussion} - The discussion object of the saved data.
    */
   @Override
-  public Discussion createDiscussion(
-    Discussion discussion
-  ) {
+  public Discussion createDiscussion(Discussion discussion) {
     
-    String email = this.getUserEmail(discussion.getUser());
+    String email = discussion.getUser()
+      .getEmail();
     String courseId = discussion.getCourseId();
     String batchCode = discussion.getBatchCode();
     
     return Optional.of(discussion)
-      .filter(ignored -> this.isSharedCourseExist(courseId, batchCode))
       .filter(ignored -> this.isUserValidForAddingDiscussion(email, batchCode))
+      .filter(ignored -> this.isSharedCourseExist(courseId, batchCode))
       .map(this::setDiscussionUser)
       .map(discussionRepository::save)
       .orElseThrow(
@@ -89,29 +90,30 @@ public class DiscussionServiceImpl implements DiscussionService {
   
   private Discussion setDiscussionUser(Discussion discussion) {
     
-    User user = userService.getUserByEmail(
-      this.getUserEmail(discussion.getUser()));
+    User user = userService.getUserByEmail(discussion.getUser()
+                                             .getEmail());
     
     discussion.setUser(user);
     
     return discussion;
   }
   
-  private String getUserEmail(User discussionUser) {
-    
-    return discussionUser.getEmail();
-  }
-  
   private boolean isUserValidForAddingDiscussion(
     String email, String batchCode
   ) {
     
-    return Optional.of(userService.getUserByEmail(email))
-      .filter(user -> user.getRole() == Role.STUDENT)
+    User userByEmail = userService.getUserByEmail(email);
+    
+    if (userByEmail.getRole() != Role.STUDENT) {
+      return true;
+    }
+    
+    return Optional.of(userByEmail)
       .map(User::getBatch)
       .map(Batch::getCode)
-      .map(code -> code.equals(batchCode))
-      .orElse(true);
+      .filter(code -> code.equals(batchCode))
+      .map(code -> true)
+      .orElseThrow(() -> new UnauthorizedException("Invalid Batch"));
   }
   
   private boolean isSharedCourseExist(String courseId, String batchCode) {
