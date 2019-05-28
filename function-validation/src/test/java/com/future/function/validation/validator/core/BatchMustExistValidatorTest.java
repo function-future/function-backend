@@ -70,4 +70,20 @@ public class BatchMustExistValidatorTest {
     verifyZeroInteractions(annotation);
   }
   
+  @Test
+  public void testGivenNullBatchCodeIndicatingCreateSharedCourseFromMasterDataByCheckingExistingBatchInDatabaseReturnTrue() {
+    
+    assertThat(validator.isValid(null, null)).isTrue();
+    
+    verifyZeroInteractions(batchRepository, annotation);
+  }
+  
+  @Test
+  public void testGivenEmptyBatchCodeIndicatingCreateSharedCourseFromMasterDataByCheckingExistingBatchInDatabaseReturnTrue() {
+    
+    assertThat(validator.isValid("", null)).isTrue();
+    
+    verifyZeroInteractions(batchRepository, annotation);
+  }
+  
 }

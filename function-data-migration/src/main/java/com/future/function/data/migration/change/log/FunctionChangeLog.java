@@ -8,6 +8,7 @@ import com.github.mongobee.changeset.ChangeLog;
 import com.github.mongobee.changeset.ChangeSet;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBRef;
+import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
 import static org.springframework.data.mongodb.core.query.Criteria.where;
@@ -25,7 +26,7 @@ public class FunctionChangeLog {
              order = "002")
   public void insertFirstBatch(MongoTemplate mongoTemplate) {
     
-    Batch batch = new Batch("id-1", "one", ONE);
+    Batch batch = new Batch(new ObjectId().toString(), "one", ONE);
     
     mongoTemplate.save(batch, DocumentName.BATCH);
     
