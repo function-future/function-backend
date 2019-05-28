@@ -128,4 +128,17 @@ public interface FieldName {
     
   }
   
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  abstract class ActivityBlog {
+    
+    public static final String TITLE = "title";
+    
+    public static final String DESCRIPTION = "description";
+    
+    public static final String USER = "user";
+    
+    public static final String FILES = "files";
+    
+  }
+  
 }
