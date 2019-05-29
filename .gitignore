@@ -76,3 +76,6 @@ secrets.yml
 
 ### VS Code ###
 .vscode/
+
+### Testing Results ###
+*.exec

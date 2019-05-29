@@ -2,10 +2,11 @@ package com.future.function.repository.feature.core.shared;
 
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.Course;
-import com.future.function.model.entity.feature.core.shared.SharedCourse;
+import com.future.function.model.entity.feature.core.SharedCourse;
 import com.future.function.repository.TestApplication;
 import com.future.function.repository.feature.core.BatchRepository;
 import com.future.function.repository.feature.core.CourseRepository;
+import com.future.function.repository.feature.core.SharedCourseRepository;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -91,6 +92,13 @@ public class SharedCourseRepositoryTest {
       .build();
   }
   
+  public Batch buildBatch(String code) {
+    
+    return Batch.builder()
+      .code(code)
+      .build();
+  }
+  
   @Test
   public void testGivenBatchByFindingByBatchReturnPageOfSharedCourses() {
     
@@ -119,33 +127,26 @@ public class SharedCourseRepositoryTest {
   
   @Test
   public void testGivenBatchByFindingByBatchReturnStreamOfSharedCourses() {
-  
+    
     String courseId = "course-id-3";
     courseRepository.save(buildCourse(courseId));
-  
+    
     String code = "3L";
     batchRepository.save(buildBatch(code));
-  
+    
     SharedCourse sharedCourse = buildSharedCourse(courseId, code);
     sharedCourseRepository.save(sharedCourse);
-  
+    
     Batch foundBatch = getBatch(code);
-  
+    
     Stream<SharedCourse> foundSharedCourseStream =
       sharedCourseRepository.findAllByBatch(foundBatch);
-  
+    
     Stream<SharedCourse> sharedCourseStream = Stream.of(sharedCourse);
-  
+    
     assertThat(foundSharedCourseStream).isNotEqualTo(Stream.empty());
     assertThat(foundSharedCourseStream.collect(Collectors.toList())).isEqualTo(
       sharedCourseStream.collect(Collectors.toList()));
-  }
-  
-  public Batch buildBatch(String code) {
-    
-    return Batch.builder()
-      .code(code)
-      .build();
   }
   
   @Test

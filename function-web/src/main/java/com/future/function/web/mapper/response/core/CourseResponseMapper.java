@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
  * Mapper class for course web response.
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class CourseResponseMapper {
+public final class CourseResponseMapper {
   
   /**
    * Converts a course data to {@code CourseWebResponse}, wrapped in {@code
@@ -31,7 +31,7 @@ public class CourseResponseMapper {
    * @return {@code DataResponse<CourseWebResponse>} - The converted course
    * data, wrapped in
    * {@link com.future.function.web.model.response.base.DataResponse} and
-   * {@link com.future.function.web.model.response.feature.core.CourseWebResponse}
+   * {@link CourseWebResponse}
    */
   public static DataResponse<CourseWebResponse> toCourseDataResponse(
     Course course
@@ -50,25 +50,26 @@ public class CourseResponseMapper {
    * @return {@code DataResponse<CourseWebResponse>} - The converted course
    * data, wrapped in
    * {@link com.future.function.web.model.response.base.DataResponse} and
-   * {@link com.future.function.web.model.response.feature.core.CourseWebResponse}
+   * {@link CourseWebResponse}
    */
   public static DataResponse<CourseWebResponse> toCourseDataResponse(
     HttpStatus httpStatus, Course course
   ) {
     
     return ResponseHelper.toDataResponse(httpStatus,
-                                         buildCourseWebResponse(course)
+                                         buildNormalCourseWebResponseV2(course)
     );
   }
   
-  private static CourseWebResponse buildCourseWebResponse(Course course) {
+  private static CourseWebResponse buildNormalCourseWebResponseV2(
+    Course course
+  ) {
     
     return CourseWebResponse.builder()
-      .courseId(course.getId())
-      .courseTitle(course.getTitle())
-      .courseDescription(course.getDescription())
-      .courseFileUrl(getFileUrl(course))
-      .courseThumbnailUrl(getThumbnailUrl(course))
+      .id(course.getId())
+      .title(course.getTitle())
+      .description(course.getDescription())
+      .material(CourseResponseMapper.getFileUrl(course))
       .build();
   }
   
@@ -79,11 +80,51 @@ public class CourseResponseMapper {
       .orElse(null);
   }
   
+  private static CourseWebResponse buildThumbnailCourseWebResponseV2(
+    Course course
+  ) {
+    
+    return CourseWebResponse.builder()
+      .id(course.getId())
+      .title(course.getTitle())
+      .description(course.getDescription())
+      .material(CourseResponseMapper.getThumbnailUrl(course))
+      .build();
+  }
+  
   private static String getThumbnailUrl(Course course) {
     
     return Optional.ofNullable(course.getFile())
-      .map(FileV2::getFileUrl)
+      .map(FileV2::getThumbnailUrl)
       .orElse(null);
+  }
+  
+  /**
+   * Converts courses data to {@code List<CourseWebResponse>}, wrapped in {@code
+   * DataResponse}.
+   *
+   * @param courses Course data to be converted to response.
+   *
+   * @return {@code DataResponse<List<CourseWebResponse>>} - The converted
+   * course data, wrapped in
+   * {@link com.future.function.web.model.response.base.DataResponse} and
+   * {@link List} and {@link CourseWebResponse}.
+   */
+  public static DataResponse<List<CourseWebResponse>> toCoursesDataResponse(
+    List<Course> courses
+  ) {
+    
+    return ResponseHelper.toDataResponse(
+      HttpStatus.CREATED, toCourseWebResponseV2List(courses));
+  }
+  
+  private static List<CourseWebResponse> toCourseWebResponseV2List(
+    List<Course> data
+  ) {
+    
+    return data.stream()
+      .map(CourseResponseMapper::buildThumbnailCourseWebResponseV2)
+      .collect(Collectors.toList());
   }
   
   /**
@@ -95,23 +136,23 @@ public class CourseResponseMapper {
    * @return {@code PagingResponse<CourseWebResponse} - The converted course
    * data, wrapped in
    * {@link com.future.function.web.model.response.base.PagingResponse} and
-   * {@link com.future.function.web.model.response.feature.core.CourseWebResponse}
+   * {@link CourseWebResponse}
    */
   public static PagingResponse<CourseWebResponse> toCoursesPagingResponse(
     Page<Course> data
   ) {
     
-    return ResponseHelper.toPagingResponse(HttpStatus.OK, toCourseWebResponseList(data), PageHelper.toPaging(data));
+    return ResponseHelper.toPagingResponse(HttpStatus.OK,
+                                           toCourseWebResponseV2List(data),
+                                           PageHelper.toPaging(data)
+    );
   }
   
-  private static List<CourseWebResponse> toCourseWebResponseList(
+  private static List<CourseWebResponse> toCourseWebResponseV2List(
     Page<Course> data
   ) {
     
-    return data.getContent()
-      .stream()
-      .map(CourseResponseMapper::buildCourseWebResponse)
-      .collect(Collectors.toList());
+    return toCourseWebResponseV2List(data.getContent());
   }
   
 }

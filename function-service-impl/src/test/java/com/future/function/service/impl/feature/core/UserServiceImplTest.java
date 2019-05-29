@@ -132,6 +132,7 @@ public class UserServiceImplTest {
     assertThat(foundUserStudent).isEqualTo(userStudent);
     
     verify(userRepository).findOne(STUDENT_ID);
+    verifyZeroInteractions(batchService, resourceService);
   }
   
   @Test
@@ -145,6 +146,7 @@ public class UserServiceImplTest {
     assertThat(foundUserMentor).isEqualTo(userMentor);
     
     verify(userRepository).findOne(MENTOR_ID);
+    verifyZeroInteractions(batchService, resourceService);
   }
   
   @Test
@@ -158,6 +160,7 @@ public class UserServiceImplTest {
     assertThat(caughtException().getMessage()).isEqualTo("Get User Not Found");
     
     verify(userRepository).findOne(NON_EXISTING_USER_ID);
+    verifyZeroInteractions(batchService, resourceService);
   }
   
   @Test
@@ -188,6 +191,7 @@ public class UserServiceImplTest {
     assertThat(foundUserStudentsPage.getContent()).isEqualTo(studentsList);
     
     verify(userRepository).findAllByRole(Role.STUDENT, PAGEABLE);
+    verifyZeroInteractions(batchService, resourceService);
   }
   
   @Test
@@ -216,6 +220,7 @@ public class UserServiceImplTest {
     assertThat(foundUserMentorsPage.getContent()).isEqualTo(mentorsList);
     
     verify(userRepository).findAllByRole(Role.MENTOR, PAGEABLE);
+    verifyZeroInteractions(batchService, resourceService);
   }
   
   @Test
@@ -260,6 +265,7 @@ public class UserServiceImplTest {
     verify(resourceService).markFilesUsed(FILE_IDS, true);
     verify(resourceService).getFile(PICTURE_ID);
     verify(userRepository).save(userMentor);
+    verifyZeroInteractions(batchService);
   }
   
   @Test
@@ -273,7 +279,7 @@ public class UserServiceImplTest {
     assertThat(createdUserMentor.getPictureV2()).isNull();
     
     verify(userRepository).save(userMentor);
-    verifyZeroInteractions(resourceService);
+    verifyZeroInteractions(batchService, resourceService);
   }
   
   @Test
@@ -326,10 +332,13 @@ public class UserServiceImplTest {
     verify(resourceService).markFilesUsed(FILE_IDS, true);
     verify(resourceService, times(2)).getFile(PICTURE_ID);
     verify(userRepository).save(userMentor);
+    verifyZeroInteractions(batchService);
   }
   
   @Test
   public void testGivenStudentEmailByDeletingUsersReturnSuccessfulDeletion() {
+    
+    userStudent.setPictureV2(PICTURE);
     
     when(userRepository.findOne(STUDENT_ID)).thenReturn(userStudent);
     
@@ -346,11 +355,16 @@ public class UserServiceImplTest {
     assertThat(markedDeletedUserStudent.isDeleted()).isTrue();
     
     verify(userRepository, times(2)).findOne(STUDENT_ID);
+    verify(resourceService).markFilesUsed(FILE_IDS, false);
+    verify(resourceService).getFile(PICTURE_ID);
     verify(userRepository).save(markedDeletedUserStudent);
+    verifyZeroInteractions(batchService);
   }
   
   @Test
   public void testGivenMentorEmailByDeletingUsersReturnSuccessfulDeletion() {
+    
+    userMentor.setPictureV2(PICTURE);
     
     when(userRepository.findOne(MENTOR_ID)).thenReturn(userMentor);
     
@@ -366,7 +380,10 @@ public class UserServiceImplTest {
     assertThat(markedDeletedUserMentor.isDeleted()).isTrue();
     
     verify(userRepository, times(2)).findOne(MENTOR_ID);
+    verify(resourceService).markFilesUsed(FILE_IDS, false);
+    verify(resourceService).getFile(PICTURE_ID);
     verify(userRepository).save(markedDeletedUserMentor);
+    verifyZeroInteractions(batchService);
   }
   
   @Test
@@ -385,6 +402,7 @@ public class UserServiceImplTest {
     
     verify(batchService).getBatchByCode(NUMBER);
     verify(userRepository).findAllByRoleAndBatch(Role.STUDENT, BATCH);
+    verifyZeroInteractions(resourceService);
   }
   
   @Test
@@ -395,7 +413,7 @@ public class UserServiceImplTest {
     assertThat(foundStudents).isNotNull();
     assertThat(foundStudents).isEmpty();
     
-    verifyZeroInteractions(batchService, userRepository);
+    verifyZeroInteractions(batchService, userRepository, resourceService);
   }
   
   @Test
@@ -409,7 +427,7 @@ public class UserServiceImplTest {
     assertThat(caughtException().getClass()).isEqualTo(NotFoundException.class);
     
     verify(batchService).getBatchByCode(NUMBER);
-    verifyZeroInteractions(userRepository);
+    verifyZeroInteractions(userRepository, resourceService);
   }
   
   @Test
@@ -426,6 +444,7 @@ public class UserServiceImplTest {
     
     verify(batchService).getBatchByCode(NUMBER);
     verify(userRepository).findAllByRoleAndBatch(Role.STUDENT, BATCH);
+    verifyZeroInteractions(resourceService);
   }
   
 }

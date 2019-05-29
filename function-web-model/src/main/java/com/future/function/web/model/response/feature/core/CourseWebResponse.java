@@ -14,14 +14,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CourseWebResponse {
   
-  private String courseId;
+  private String id;
   
-  private String courseTitle;
+  private String title;
   
-  private String courseDescription;
+  private String description;
   
-  private String courseThumbnailUrl;
-  
-  private String courseFileUrl;
+  private String material;
   
 }

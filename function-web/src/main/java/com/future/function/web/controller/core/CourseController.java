@@ -3,9 +3,9 @@ package com.future.function.web.controller.core;
 import com.future.function.service.api.feature.core.CourseService;
 import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
-import com.future.function.web.mapper.request.core.CourseRequestMapperV2;
+import com.future.function.web.mapper.request.core.CourseRequestMapper;
 import com.future.function.web.mapper.response.core.CourseResponseMapper;
-import com.future.function.web.model.request.core.CourseWebRequestV2;
+import com.future.function.web.model.request.core.CourseWebRequest;
 import com.future.function.web.model.response.base.BaseResponse;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
@@ -22,14 +22,14 @@ public class CourseController {
   
   private final CourseService courseService;
   
-  private final CourseRequestMapperV2 courseRequestMapperV2;
+  private final CourseRequestMapper courseRequestMapper;
   
   public CourseController(
-    CourseService courseService, CourseRequestMapperV2 courseRequestMapperV2
+    CourseService courseService, CourseRequestMapper courseRequestMapper
   ) {
     
     this.courseService = courseService;
-    this.courseRequestMapperV2 = courseRequestMapperV2;
+    this.courseRequestMapper = courseRequestMapper;
   }
   
   @ResponseStatus(HttpStatus.OK)
@@ -60,12 +60,12 @@ public class CourseController {
   @PostMapping
   public DataResponse<CourseWebResponse> createCourse(
     @RequestBody
-      CourseWebRequestV2 request
+      CourseWebRequest request
   ) {
     
     return CourseResponseMapper.toCourseDataResponse(
       HttpStatus.CREATED,
-      courseService.createCourse(courseRequestMapperV2.toCourse(request))
+      courseService.createCourse(courseRequestMapper.toCourse(request))
     );
   }
   
@@ -75,11 +75,11 @@ public class CourseController {
     @PathVariable
       String courseId,
     @RequestBody
-      CourseWebRequestV2 request
+      CourseWebRequest request
   ) {
     
     return CourseResponseMapper.toCourseDataResponse(courseService.updateCourse(
-      courseRequestMapperV2.toCourse(courseId, request)));
+      courseRequestMapper.toCourse(courseId, request)));
   }
   
   @ResponseStatus(HttpStatus.OK)
