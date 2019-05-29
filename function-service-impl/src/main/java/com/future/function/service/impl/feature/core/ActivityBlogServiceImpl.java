@@ -77,70 +77,47 @@ public class ActivityBlogServiceImpl implements ActivityBlogService {
   ) {
     
     return Optional.ofNullable(
-      activityBlogRepository.findAll(this.toExample(search), pageable))
-      .map(page -> this.filterIfNotEmptyUserId(page, userId, pageable))
+      activityBlogRepository.findAll(this.toExample(userId, search), pageable))
       .orElseGet(() -> PageHelper.empty(pageable));
   }
   
-  private Page<ActivityBlog> filterIfNotEmptyUserId(
-    Page<ActivityBlog> page, String userId, Pageable pageable
-  ) {
+  private Example<ActivityBlog> toExample(String userId, String search) {
     
-    return Optional.ofNullable(userId)
-      .filter(id -> !StringUtils.isEmpty(id))
-      .map(id -> this.getFilteredActivityBlogsForUser(id, page))
-      .map(activityBlogs -> PageHelper.toPage(activityBlogs, pageable))
-      .orElse(page);
-  }
-  
-  private List<ActivityBlog> getFilteredActivityBlogsForUser(
-    String userId, Page<ActivityBlog> page
-  ) {
-    
-    return page.getContent()
-      .stream()
-      .filter(activityBlog -> this.isIdEqual(activityBlog.getUser(), userId))
-      .collect(Collectors.toList());
-  }
-  
-  private boolean isIdEqual(User user, String userId) {
-    
-    return user.getId()
-      .equals(userId);
-  }
-  
-  private Example<ActivityBlog> toExample(String search) {
-    
-    return Example.of(this.buildActivityBlogForExample(search),
-                      this.buildExampleMatcher()
+    return Example.of(
+      this.buildActivityBlogForExample(userId, search),
+      this.buildExampleMatcher()
     );
   }
   
   private ExampleMatcher buildExampleMatcher() {
     
-    return ExampleMatcher.matchingAny()
+    return ExampleMatcher.matching()
       .withIgnoreCase()
       .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING)
       .withIgnoreNullValues();
   }
   
   private ActivityBlog buildActivityBlogForExample(
-    String search
+    String userId, String search
   ) {
     
     ActivityBlog activityBlog = new ActivityBlog();
     
-    this.setActivityBlogExampleProperties(activityBlog, search);
+    if (!StringUtils.isEmpty(userId)) {
+      activityBlog.setUser(this.buildUserForExample(userId));
+    }
+    
+    activityBlog.setTitle(search);
+    activityBlog.setDescription(search);
     
     return activityBlog;
   }
   
-  private void setActivityBlogExampleProperties(
-    ActivityBlog activityBlog, String text
-  ) {
+  private User buildUserForExample(String userId) {
     
-    activityBlog.setTitle(text);
-    activityBlog.setDescription(text);
+    return User.builder()
+      .id(userId)
+      .build();
   }
   
   /**
