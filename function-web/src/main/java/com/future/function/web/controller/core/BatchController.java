@@ -59,7 +59,7 @@ public class BatchController {
   /**
    * Saves a new batch to database.
    *
-   * @return {@code DataResponse<BatchWebResponse} - The created batch data,
+   * @return {@code DataResponse<BatchWebResponse>} - The created batch data,
    * wrapped in
    * {@link com.future.function.web.model.response.base.DataResponse} and
    * {@link com.future.function.web.model.response.feature.core.BatchWebResponse}

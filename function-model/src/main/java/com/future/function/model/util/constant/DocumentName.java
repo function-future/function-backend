@@ -15,8 +15,12 @@ public abstract class DocumentName {
   
   public static final String USER = "users";
   
+  public static final String COURSE = "courses";
+  
+  public static final String SHARED_COURSE = "shared-courses";
+  
   public static final String ANNOUNCEMENT = "announcements";
-
+  
   public static final String STICKY_NOTE = "sticky-notes";
   
 }
