@@ -23,4 +23,6 @@ public abstract class DocumentName {
   
   public static final String STICKY_NOTE = "sticky-notes";
   
+  public static final String DISCUSSION = "discussions";
+  
 }

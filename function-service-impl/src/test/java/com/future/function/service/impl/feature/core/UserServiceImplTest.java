@@ -24,6 +24,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static com.googlecode.catchexception.CatchException.catchException;
 import static com.googlecode.catchexception.CatchException.caughtException;
@@ -444,6 +445,34 @@ public class UserServiceImplTest {
     
     verify(batchService).getBatchByCode(NUMBER);
     verify(userRepository).findAllByRoleAndBatch(Role.STUDENT, BATCH);
+    verifyZeroInteractions(resourceService);
+  }
+  
+  @Test
+  public void testGivenEmailByGettingUserByEmailReturnUser() {
+  
+    when(userRepository.findByEmail(EMAIL_MENTOR)).thenReturn(Optional.of(userMentor));
+    
+    User retrievedUser = userService.getUserByEmail(EMAIL_MENTOR);
+    
+    assertThat(retrievedUser).isNotNull();
+    assertThat(retrievedUser).isEqualTo(userMentor);
+    
+    verify(userRepository).findByEmail(EMAIL_MENTOR);
+    verifyZeroInteractions(resourceService);
+  }
+  
+  @Test
+  public void testGivenNonExistingEmailByGettingUserByEmailReturnNotFoundException() {
+  
+    when(userRepository.findByEmail(EMAIL_MENTOR)).thenReturn(Optional.empty());
+  
+    catchException(() -> userService.getUserByEmail(EMAIL_MENTOR));
+  
+    assertThat(caughtException().getClass()).isEqualTo(NotFoundException.class);
+    assertThat(caughtException().getMessage()).isEqualTo("Get User Not Found");
+  
+    verify(userRepository).findByEmail(EMAIL_MENTOR);
     verifyZeroInteractions(resourceService);
   }
   

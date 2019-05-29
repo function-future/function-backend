@@ -147,6 +147,13 @@ public class UserServiceImpl implements UserService {
       .orElseGet(Collections::emptyList);
   }
   
+  @Override
+  public User getUserByEmail(String email) {
+    
+    return userRepository.findByEmail(email)
+      .orElseThrow(() -> new NotFoundException("Get User Not Found"));
+  }
+  
   private void markDeleted(User user) {
     
     user.setDeleted(true);
