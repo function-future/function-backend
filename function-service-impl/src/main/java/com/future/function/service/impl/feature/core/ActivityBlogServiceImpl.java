@@ -3,18 +3,20 @@ package com.future.function.service.impl.feature.core;
 import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.core.ActivityBlog;
 import com.future.function.model.entity.feature.core.FileV2;
+import com.future.function.model.entity.feature.core.User;
 import com.future.function.repository.feature.core.ActivityBlogRepository;
 import com.future.function.service.api.feature.core.ActivityBlogService;
 import com.future.function.service.api.feature.core.ResourceService;
+import com.future.function.service.api.feature.core.UserService;
+import com.future.function.service.impl.helper.CopyHelper;
+import com.future.function.service.impl.helper.PageHelper;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -31,13 +33,16 @@ public class ActivityBlogServiceImpl implements ActivityBlogService {
   
   private final ResourceService resourceService;
   
+  private final UserService userService;
+  
   public ActivityBlogServiceImpl(
     ActivityBlogRepository activityBlogRepository,
-    ResourceService resourceService
+    ResourceService resourceService, UserService userService
   ) {
     
     this.activityBlogRepository = activityBlogRepository;
     this.resourceService = resourceService;
+    this.userService = userService;
   }
   
   /**
@@ -48,9 +53,7 @@ public class ActivityBlogServiceImpl implements ActivityBlogService {
    * @return {@code ActivityBlog} - The activity blog object found in database.
    */
   @Override
-  public ActivityBlog getActivityBlog(
-    String activityBlogId
-  ) {
+  public ActivityBlog getActivityBlog(String activityBlogId) {
     
     return Optional.ofNullable(activityBlogId)
       .map(activityBlogRepository::findOne)
@@ -74,15 +77,42 @@ public class ActivityBlogServiceImpl implements ActivityBlogService {
   ) {
     
     return Optional.ofNullable(
-      activityBlogRepository.findAll(this.toExample(userId, search), pageable))
-      .orElseGet(() -> new PageImpl<>(Collections.emptyList(), pageable, 0));
+      activityBlogRepository.findAll(this.toExample(search), pageable))
+      .map(page -> this.filterIfNotEmptyUserId(page, userId, pageable))
+      .orElseGet(() -> PageHelper.empty(pageable));
   }
   
-  private Example<ActivityBlog> toExample(String userId, String search) {
+  private Page<ActivityBlog> filterIfNotEmptyUserId(
+    Page<ActivityBlog> page, String userId, Pageable pageable
+  ) {
     
-    return Example.of(
-      this.buildActivityBlogForExample(userId, search),
-      this.buildExampleMatcher()
+    return Optional.ofNullable(userId)
+      .filter(id -> !StringUtils.isEmpty(id))
+      .map(id -> this.getFilteredActivityBlogsForUser(id, page))
+      .map(activityBlogs -> PageHelper.toPage(activityBlogs, pageable))
+      .orElse(page);
+  }
+  
+  private List<ActivityBlog> getFilteredActivityBlogsForUser(
+    String userId, Page<ActivityBlog> page
+  ) {
+    
+    return page.getContent()
+      .stream()
+      .filter(activityBlog -> this.isIdEqual(activityBlog.getUser(), userId))
+      .collect(Collectors.toList());
+  }
+  
+  private boolean isIdEqual(User user, String userId) {
+    
+    return user.getId()
+      .equals(userId);
+  }
+  
+  private Example<ActivityBlog> toExample(String search) {
+    
+    return Example.of(this.buildActivityBlogForExample(search),
+                      this.buildExampleMatcher()
     );
   }
   
@@ -95,38 +125,22 @@ public class ActivityBlogServiceImpl implements ActivityBlogService {
   }
   
   private ActivityBlog buildActivityBlogForExample(
-    String userId, String search
+    String search
   ) {
     
     ActivityBlog activityBlog = new ActivityBlog();
     
-    Optional.ofNullable(userId)
-      .filter(id -> !StringUtils.isEmpty(id))
-      .ifPresent(activityBlog::setId);
-    
-    Optional.ofNullable(search)
-      .filter(text -> !StringUtils.isEmpty(text))
-      .ifPresent(text -> {
-        activityBlog.setTitle(text);
-        activityBlog.setDescription(text);
-      });
+    this.setActivityBlogExampleProperties(activityBlog, search);
     
     return activityBlog;
   }
   
-  /**
-   * {@inheritDoc}
-   *
-   * @param activityBlog Activity blog data of new activity blog.
-   *
-   * @return {@code ActivityBlog} - The activity blog object of the saved data.
-   */
-  @Override
-  public ActivityBlog createActivityBlog(
-    ActivityBlog activityBlog
+  private void setActivityBlogExampleProperties(
+    ActivityBlog activityBlog, String text
   ) {
     
-    return null;
+    activityBlog.setTitle(text);
+    activityBlog.setDescription(text);
   }
   
   /**
@@ -137,11 +151,89 @@ public class ActivityBlogServiceImpl implements ActivityBlogService {
    * @return {@code ActivityBlog} - The activity blog object of the saved data.
    */
   @Override
-  public ActivityBlog updateActivityBlog(
-    ActivityBlog activityBlog
+  public ActivityBlog createActivityBlog(ActivityBlog activityBlog) {
+    
+    return Optional.of(activityBlog)
+      .map(this::setUser)
+      .map(this::setFileV2s)
+      .map(activityBlogRepository::save)
+      .orElseThrow(
+        () -> new UnsupportedOperationException("Create Activity Blog Failed"));
+  }
+  
+  private ActivityBlog setUser(ActivityBlog activityBlog) {
+    
+    Optional.of(activityBlog)
+      .map(ActivityBlog::getUser)
+      .map(User::getEmail)
+      .map(userService::getUserByEmail)
+      .ifPresent(activityBlog::setUser);
+    
+    return activityBlog;
+  }
+  
+  private ActivityBlog setFileV2s(ActivityBlog activityBlog) {
+    
+    List<String> fileIds = this.getFileIds(activityBlog);
+    
+    activityBlog.setFiles(this.getFileV2s(fileIds));
+    
+    resourceService.markFilesUsed(fileIds, true);
+    
+    return activityBlog;
+  }
+  
+  private List<String> getFileIds(ActivityBlog activityBlog) {
+    
+    return activityBlog.getFiles()
+      .stream()
+      .map(FileV2::getId)
+      .collect(Collectors.toList());
+  }
+  
+  private List<FileV2> getFileV2s(List<String> fileIds) {
+    
+    return fileIds.stream()
+      .map(resourceService::getFile)
+      .collect(Collectors.toList());
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @param activityBlog Activity blog data of new activity blog.
+   *
+   * @return {@code ActivityBlog} - The activity blog object of the saved data.
+   */
+  @Override
+  public ActivityBlog updateActivityBlog(ActivityBlog activityBlog) {
+    
+    return Optional.of(activityBlog)
+      .map(ActivityBlog::getId)
+      .map(activityBlogRepository::findOne)
+      .map(this::deleteActivityBlogFiles)
+      .map(this::setFileV2s)
+      .map(foundActivityBlog -> this.copyPropertiesAndSaveActivityBlog(
+        activityBlog, foundActivityBlog))
+      .orElse(activityBlog);
+  }
+  
+  private ActivityBlog deleteActivityBlogFiles(ActivityBlog activityBlog) {
+    
+    List<String> existingFileIds = this.getFileIds(activityBlog);
+    resourceService.markFilesUsed(existingFileIds, false);
+    
+    return activityBlog;
+  }
+  
+  private ActivityBlog copyPropertiesAndSaveActivityBlog(
+    ActivityBlog activityBlog, ActivityBlog foundActivityBlog
   ) {
     
-    return null;
+    CopyHelper.copyProperties(activityBlog, foundActivityBlog);
+    
+    return activityBlogRepository.save(foundActivityBlog);
+    
   }
   
   /**
@@ -159,14 +251,6 @@ public class ActivityBlogServiceImpl implements ActivityBlogService {
         resourceService.markFilesUsed(this.getFileIds(activityBlog), false);
         activityBlogRepository.delete(activityBlog);
       });
-  }
-  
-  private List<String> getFileIds(ActivityBlog activityBlog) {
-    
-    return activityBlog.getFiles()
-      .stream()
-      .map(FileV2::getId)
-      .collect(Collectors.toList());
   }
   
 }

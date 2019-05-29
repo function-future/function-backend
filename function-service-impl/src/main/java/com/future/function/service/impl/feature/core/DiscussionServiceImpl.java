@@ -9,6 +9,7 @@ import com.future.function.repository.feature.core.DiscussionRepository;
 import com.future.function.service.api.feature.core.DiscussionService;
 import com.future.function.service.api.feature.core.SharedCourseService;
 import com.future.function.service.api.feature.core.UserService;
+import com.future.function.service.impl.helper.PageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -61,7 +62,7 @@ public class DiscussionServiceImpl implements DiscussionService {
       .map(
         ignored -> discussionRepository.findAllByCourseIdAndBatchCodeOrderByCreatedAtDesc(
           courseId, batchCode, pageable))
-      .orElseGet(() -> new PageImpl<>(Collections.emptyList(), pageable, 0));
+      .orElseGet(() -> PageHelper.empty(pageable));
   }
   
   /**

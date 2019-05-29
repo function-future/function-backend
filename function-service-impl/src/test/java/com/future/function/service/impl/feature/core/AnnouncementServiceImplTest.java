@@ -5,6 +5,7 @@ import com.future.function.model.entity.feature.core.Announcement;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.repository.feature.core.AnnouncementRepository;
 import com.future.function.service.api.feature.core.ResourceService;
+import com.future.function.service.impl.helper.PageHelper;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -13,7 +14,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
@@ -60,8 +60,8 @@ public class AnnouncementServiceImplTest {
   
   private static final Pageable PAGEABLE = new PageRequest(0, 4);
   
-  private static final Page<Announcement> ANNOUNCEMENT_PAGE = new PageImpl<>(
-    Collections.singletonList(ANNOUNCEMENT), PAGEABLE, 1);
+  private static final Page<Announcement> ANNOUNCEMENT_PAGE = PageHelper.toPage(
+    Collections.singletonList(ANNOUNCEMENT), PAGEABLE);
   
   @Mock
   private AnnouncementRepository announcementRepository;

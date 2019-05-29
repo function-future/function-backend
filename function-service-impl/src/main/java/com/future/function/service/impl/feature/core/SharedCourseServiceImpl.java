@@ -11,6 +11,7 @@ import com.future.function.service.api.feature.core.BatchService;
 import com.future.function.service.api.feature.core.CourseService;
 import com.future.function.service.api.feature.core.ResourceService;
 import com.future.function.service.api.feature.core.SharedCourseService;
+import com.future.function.service.impl.helper.PageHelper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -72,7 +73,7 @@ public class SharedCourseServiceImpl implements SharedCourseService {
     return this.getBatch(batchCode)
       .map(batch -> sharedCourseRepository.findAllByBatch(batch, pageable))
       .map(sharedCourses -> this.toCoursePage(sharedCourses, pageable))
-      .orElseGet(() -> new PageImpl<>(Collections.emptyList(), pageable, 0));
+      .orElseGet(() -> PageHelper.empty(pageable));
   }
   
   private Page<Course> toCoursePage(
@@ -81,7 +82,7 @@ public class SharedCourseServiceImpl implements SharedCourseService {
     
     List<Course> courses = toCourseList(sharedCourses);
     
-    return new PageImpl<>(courses, pageable, sharedCourses.getTotalElements());
+    return PageHelper.toPage(courses, pageable);
   }
   
   private List<Course> toCourseList(Page<SharedCourse> sharedCourses) {

@@ -1,5 +1,6 @@
 package com.future.function.web.model.response.feature.core;
 
+import com.future.function.web.model.response.feature.core.embedded.AuthorWebResponse;
 import com.future.function.web.model.response.feature.core.embedded.EmbeddedFileWebResponse;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,5 +25,7 @@ public class ActivityBlogWebResponse {
   private String description;
   
   private List<EmbeddedFileWebResponse> files;
+  
+  private AuthorWebResponse author;
   
 }
