@@ -2,7 +2,7 @@ package com.future.function.validation.validator.core;
 
 import com.future.function.common.properties.core.FileProperties;
 import com.future.function.model.entity.feature.core.FileV2;
-import com.future.function.service.api.feature.core.ResourceService;
+import com.future.function.repository.feature.core.FileRepositoryV2;
 import com.future.function.validation.annotation.core.FileMustBeImage;
 import org.junit.After;
 import org.junit.Before;
@@ -54,7 +54,7 @@ public class FileMustBeImageValidatorTest {
   private FileProperties fileProperties;
   
   @Mock
-  private ResourceService resourceService;
+  private FileRepositoryV2 fileRepositoryV2;
   
   @InjectMocks
   private FileMustBeImageValidator validator;
@@ -70,30 +70,30 @@ public class FileMustBeImageValidatorTest {
   @After
   public void tearDown() {
     
-    verifyNoMoreInteractions(annotation, fileProperties, resourceService);
+    verifyNoMoreInteractions(annotation, fileProperties, fileRepositoryV2);
   }
   
   @Test
   public void testGivenListOfFileIdsOfImageFilesByValidatingFileIdsOfImageReturnTrue() {
     
-    when(resourceService.getFile(FILE_ID)).thenReturn(IMAGE_FILE);
+    when(fileRepositoryV2.findOne(FILE_ID)).thenReturn(IMAGE_FILE);
     
     assertThat(validator.isValid(FILE_IDS, null)).isTrue();
     
     verify(fileProperties).getImageExtensions();
-    verify(resourceService).getFile(FILE_ID);
+    verify(fileRepositoryV2).findOne(FILE_ID);
     verifyZeroInteractions(annotation);
   }
   
   @Test
   public void testGivenListOfFileIdsOfNonImageFilesByValidatingFileIdsOfImageReturnFalse() {
     
-    when(resourceService.getFile(FILE_ID)).thenReturn(TEXT_FILE);
+    when(fileRepositoryV2.findOne(FILE_ID)).thenReturn(TEXT_FILE);
     
     assertThat(validator.isValid(FILE_IDS, null)).isFalse();
     
     verify(fileProperties).getImageExtensions();
-    verify(resourceService).getFile(FILE_ID);
+    verify(fileRepositoryV2).findOne(FILE_ID);
     verifyZeroInteractions(annotation);
   }
   
