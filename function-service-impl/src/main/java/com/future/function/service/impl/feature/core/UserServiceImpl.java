@@ -111,8 +111,8 @@ public class UserServiceImpl implements UserService {
       .map(User::getId)
       .map(userRepository::findOne)
       .map(this::deleteUserPicture)
-      .map(foundUser -> this.copyPropertiesAndSaveUser(user, foundUser))
       .map(foundUser -> this.setUserPicture(user, foundUser))
+      .map(foundUser -> this.copyPropertiesAndSaveUser(user, foundUser))
       .orElse(user);
   }
   
@@ -147,9 +147,17 @@ public class UserServiceImpl implements UserService {
       .orElseGet(Collections::emptyList);
   }
   
+  @Override
+  public User getUserByEmail(String email) {
+    
+    return userRepository.findByEmail(email)
+      .orElseThrow(() -> new NotFoundException("Get User Not Found"));
+  }
+  
   private void markDeleted(User user) {
     
     user.setDeleted(true);
+    deleteUserPicture(user);
     userRepository.save(user);
   }
   
@@ -168,7 +176,8 @@ public class UserServiceImpl implements UserService {
       .map(User::getPictureV2)
       .map(FileV2::getId)
       .map(fileId -> this.markAndSetUserPicture(user, fileId, true))
-      .orElse(user);
+      .map(ignored -> foundUser)
+      .orElse(foundUser);
   }
   
   private User copyPropertiesAndSaveUser(User user, User foundUser) {

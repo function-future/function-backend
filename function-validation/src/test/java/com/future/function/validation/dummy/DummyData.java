@@ -1,4 +1,4 @@
-package com.future.function.common.dummy;
+package com.future.function.validation.dummy;
 
 import javax.validation.constraints.Min;
 import lombok.AllArgsConstructor;

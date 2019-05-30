@@ -15,6 +15,10 @@ public abstract class DocumentName {
   
   public static final String USER = "users";
 
+  public static final String COURSE = "courses";
+
+  public static final String SHARED_COURSE = "shared-courses";
+
   public static final String ANNOUNCEMENT = "announcements";
 
   public static final String STICKY_NOTE = "sticky-notes";
@@ -25,12 +29,14 @@ public abstract class DocumentName {
 
   public static final String QUIZ = "quizzes";
 
-    public static final String STUDENT_QUIZ = "student-quizzes";
+  public static final String STUDENT_QUIZ = "student-quizzes";
 
-    public static final String STUDENT_QUIZ_DETAIL = "student-quizzes-detail";
+  public static final String STUDENT_QUIZ_DETAIL = "student-quizzes-detail";
 
   public static final String QUESTION = "questions";
 
   public static final String OPTION = "options";
+
+  public static final String DISCUSSION = "discussions";
 
 }
