@@ -92,5 +92,16 @@ public interface FieldName {
     public static final String FILE = "file";
     
   }
+
+  @NoArgsConstructor(access = AccessLevel.PACKAGE)
+  abstract class Chatroom {
+
+    public static final String MEMBERS = "members";
+
+    public static final String CHATROOM_TITLE = "chatroomTitle";
+
+    public static final String TYPE = "type";
+
+  }
   
 }
