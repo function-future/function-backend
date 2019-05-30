@@ -93,7 +93,7 @@ public interface FieldName {
     
   }
 
-  @NoArgsConstructor(access = AccessLevel.PACKAGE)
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
   abstract class Chatroom {
 
     public static final String MEMBERS = "members";
@@ -101,6 +101,28 @@ public interface FieldName {
     public static final String CHATROOM_TITLE = "chatroomTitle";
 
     public static final String TYPE = "type";
+
+  }
+
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  abstract class Message {
+
+    public static final String TEXT = "text";
+
+    public static final String SENDER = "sender";
+
+    public static final String CHATROOM = "chatroom";
+
+  }
+
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  abstract class MessageStatus {
+
+    public static final String MEMBER = "member";
+
+    public static final String MESSAGE = "message";
+
+    public static final String IS_SEEN = "isSeen";
 
   }
   

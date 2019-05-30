@@ -23,6 +23,6 @@ public abstract class DocumentName {
 
   public static final String MESSAGE = "messages";
 
-  public static final String CHATROOM_STATUS = "chatroom-status";
+  public static final String MESSAGE_STATUS = "message-status";
 
 }

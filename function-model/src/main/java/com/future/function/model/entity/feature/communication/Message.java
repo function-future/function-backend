@@ -1,6 +1,5 @@
 package com.future.function.model.entity.feature.communication;
 
-import com.future.function.common.enumeration.communication.ChatroomType;
 import com.future.function.model.entity.base.BaseEntity;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.model.util.constant.DocumentName;
@@ -11,11 +10,9 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-import java.util.List;
-
 /**
  * Author: PriagungSatyagama
- * Created At: 21:48 30/05/2019
+ * Created At: 22:11 30/05/2019
  */
 
 @Data
@@ -23,20 +20,21 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@Document(collection = DocumentName.CHATROOM)
-public class Chatroom extends BaseEntity {
+@Document(collection = DocumentName.MESSAGE)
+public class Message extends BaseEntity {
 
   @Id
   private String id;
 
-  @Field(FieldName.Chatroom.CHATROOM_TITLE)
-  private String title;
+  @Field(FieldName.Message.SENDER)
+  @DBRef
+  private User sender;
 
-  @Field(FieldName.Chatroom.TYPE)
-  private ChatroomType type;
+  @Field(FieldName.Message.TEXT)
+  private String text;
 
-  @Field(FieldName.Chatroom.MEMBERS)
-  @DBRef(lazy = true)
-  private List<User> members;
+  @Field(FieldName.Message.CHATROOM)
+  @DBRef
+  private Chatroom chatroom;
 
 }
