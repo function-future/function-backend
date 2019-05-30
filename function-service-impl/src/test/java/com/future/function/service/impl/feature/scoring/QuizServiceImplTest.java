@@ -4,11 +4,6 @@ import com.future.function.common.exception.BadRequestException;
 import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.scoring.Quiz;
 import com.future.function.repository.feature.scoring.QuizRepository;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,14 +16,16 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
 import static com.googlecode.catchexception.CatchException.catchException;
 import static com.googlecode.catchexception.CatchException.caughtException;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class QuizServiceImplTest {
@@ -36,9 +33,9 @@ public class QuizServiceImplTest {
   private String QUIZ_ID = UUID.randomUUID().toString();
   private String QUIZ_TITLE = "quiz-title";
   private String QUIZ_DESCRIPTION = "quiz-description";
-  private long DEADLINE = 0;
+  private long DATE = 0;
   private long TIME_LIMIT = 0;
-  private int TRIES = 0;
+  private int TRIALS = 0;
   private int QUESTION_COUNT = 0;
 
   private int PAGE = 0;
@@ -64,9 +61,10 @@ public class QuizServiceImplTest {
             .id(QUIZ_ID)
             .title(QUIZ_TITLE)
             .description(QUIZ_DESCRIPTION)
-            .deadline(DEADLINE)
+            .startDate(DATE)
+            .endDate(DATE)
             .timeLimit(TIME_LIMIT)
-            .tries(TRIES)
+            .trials(TRIALS)
             .questionCount(QUESTION_COUNT)
             .build();
 

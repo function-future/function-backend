@@ -43,9 +43,4 @@ public class StudentQuizDetailResponseMapper {
                 .build();
     }
 
-    public static DataResponse<StudentQuizDetailWebResponse> toStudentQuizDetailWebResponse(HttpStatus httpStatus,
-                                                                                            StudentQuizDetail studentQuizDetail) {
-        return ResponseHelper.toDataResponse(httpStatus, buildStudentQuizDetailWebResponse(studentQuizDetail));
-    }
-
 }

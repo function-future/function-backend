@@ -1,18 +1,17 @@
 package com.future.function.service.impl.feature.scoring;
 
-import com.future.function.common.enumeration.core.FileOrigin;
 import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.scoring.Assignment;
 import com.future.function.repository.feature.scoring.AssignmentRepository;
-import com.future.function.service.api.feature.core.FileService;
 import com.future.function.service.api.feature.scoring.AssignmentService;
-import java.util.Optional;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.Optional;
 
 /**
  * Service class used to manipulate Assignment Entity
@@ -23,12 +22,9 @@ public class AssignmentServiceImpl implements AssignmentService {
 
   private AssignmentRepository assignmentRepository;
 
-  private FileService fileService;
-
   @Autowired
-  public AssignmentServiceImpl(AssignmentRepository assignmentRepository, FileService fileService) {
+  public AssignmentServiceImpl(AssignmentRepository assignmentRepository) {
     this.assignmentRepository = assignmentRepository;
-    this.fileService = fileService;
   }
 
   /**
