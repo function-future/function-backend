@@ -1,27 +1,18 @@
 package com.future.function.web.controller.core;
 
-import com.future.function.model.entity.feature.core.ActivityBlog;
-import com.future.function.model.entity.feature.core.FileV2;
-import com.future.function.model.entity.feature.core.User;
 import com.future.function.service.api.feature.core.ActivityBlogService;
-import com.future.function.validation.RequestValidator;
 import com.future.function.web.mapper.helper.PageHelper;
+import com.future.function.web.mapper.helper.ResponseHelper;
+import com.future.function.web.mapper.request.core.ActivityBlogRequestMapper;
 import com.future.function.web.mapper.response.core.ActivityBlogResponseMapper;
 import com.future.function.web.model.request.core.ActivityBlogWebRequest;
+import com.future.function.web.model.response.base.BaseResponse;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.feature.core.ActivityBlogWebResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.util.stream.Collectors;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * Controller class for activity blog APIs.
@@ -32,12 +23,16 @@ public class ActivityBlogController {
   
   private final ActivityBlogService activityBlogService;
   
-  @Autowired
-  private RequestValidator validator;
+  private final ActivityBlogRequestMapper activityBlogRequestMapper;
   
-  public ActivityBlogController(ActivityBlogService activityBlogService) {
+  @Autowired
+  public ActivityBlogController(
+    ActivityBlogService activityBlogService,
+    ActivityBlogRequestMapper activityBlogRequestMapper
+  ) {
     
     this.activityBlogService = activityBlogService;
+    this.activityBlogRequestMapper = activityBlogRequestMapper;
   }
   
   @ResponseStatus(HttpStatus.OK)
@@ -59,6 +54,25 @@ public class ActivityBlogController {
       ));
   }
   
+  @ResponseStatus(HttpStatus.OK)
+  @GetMapping("/{activityBlogId}")
+  public DataResponse<ActivityBlogWebResponse> getActivityBlog(
+    @RequestParam(defaultValue = "")
+      String userId,
+    @RequestParam(defaultValue = "1")
+      int page,
+    @RequestParam(defaultValue = "5")
+      int size,
+    @RequestParam(defaultValue = "")
+      String search,
+    @PathVariable
+      String activityBlogId
+  ) {
+    
+    return ActivityBlogResponseMapper.toActivityBlogDataResponse(
+      activityBlogService.getActivityBlog(activityBlogId));
+  }
+  
   @ResponseStatus(HttpStatus.CREATED)
   @PostMapping
   public DataResponse<ActivityBlogWebResponse> createActivityBlog(
@@ -68,24 +82,38 @@ public class ActivityBlogController {
       String email
   ) {
     
-    validator.validate(request);
-    
-    ActivityBlog activityBlog = ActivityBlog.builder()
-      .title(request.getTitle())
-      .description(request.getDescription())
-      .files(request.getFiles()
-               .stream()
-               .map(id -> FileV2.builder()
-                 .id(id)
-                 .build())
-               .collect(Collectors.toList()))
-      .user(User.builder()
-              .email(email)
-              .build())
-      .build();
+    return ActivityBlogResponseMapper.toActivityBlogDataResponse(
+      HttpStatus.CREATED, activityBlogService.createActivityBlog(
+        activityBlogRequestMapper.toActivityBlog(email, request)));
+  }
+  
+  @ResponseStatus(HttpStatus.OK)
+  @PutMapping("/{activityBlogId}")
+  public DataResponse<ActivityBlogWebResponse> updateActivityBlog(
+    @RequestBody
+      ActivityBlogWebRequest request,
+    @RequestParam
+      String email,
+    @PathVariable
+      String activityBlogId
+  ) {
     
     return ActivityBlogResponseMapper.toActivityBlogDataResponse(
-      HttpStatus.CREATED, activityBlogService.createActivityBlog(activityBlog));
+      activityBlogService.updateActivityBlog(
+        activityBlogRequestMapper.toActivityBlog(email, activityBlogId,
+                                                 request
+        )));
+  }
+  
+  @ResponseStatus(HttpStatus.OK)
+  @DeleteMapping("/{activityBlogId}")
+  public BaseResponse deleteActivityBlog(
+    @PathVariable
+      String activityBlogId
+  ) {
+    
+    activityBlogService.deleteActivityBlog(activityBlogId);
+    return ResponseHelper.toBaseResponse(HttpStatus.OK);
   }
   
 }
