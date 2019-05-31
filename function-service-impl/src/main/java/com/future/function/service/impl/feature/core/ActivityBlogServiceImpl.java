@@ -77,47 +77,8 @@ public class ActivityBlogServiceImpl implements ActivityBlogService {
   ) {
     
     return Optional.ofNullable(
-      activityBlogRepository.findAll(this.toExample(userId, search), pageable))
+      activityBlogRepository.findAll(userId, search, pageable))
       .orElseGet(() -> PageHelper.empty(pageable));
-  }
-  
-  private Example<ActivityBlog> toExample(String userId, String search) {
-    
-    return Example.of(
-      this.buildActivityBlogForExample(userId, search),
-      this.buildExampleMatcher()
-    );
-  }
-  
-  private ExampleMatcher buildExampleMatcher() {
-    
-    return ExampleMatcher.matching()
-      .withIgnoreCase()
-      .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING)
-      .withIgnoreNullValues();
-  }
-  
-  private ActivityBlog buildActivityBlogForExample(
-    String userId, String search
-  ) {
-    
-    ActivityBlog activityBlog = new ActivityBlog();
-    
-    if (!StringUtils.isEmpty(userId)) {
-      activityBlog.setUser(this.buildUserForExample(userId));
-    }
-    
-    activityBlog.setTitle(search);
-    activityBlog.setDescription(search);
-    
-    return activityBlog;
-  }
-  
-  private User buildUserForExample(String userId) {
-    
-    return User.builder()
-      .id(userId)
-      .build();
   }
   
   /**
