@@ -3,10 +3,11 @@ package com.future.function.web.mapper.response.core;
 import com.future.function.model.entity.feature.core.ActivityBlog;
 import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
+import com.future.function.web.mapper.response.core.embedded.AuthorWebResponseMapper;
+import com.future.function.web.mapper.response.core.embedded.EmbeddedFileWebResponseMapper;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.feature.core.ActivityBlogWebResponse;
-import com.future.function.web.model.response.feature.core.embedded.AuthorWebResponse;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -42,30 +43,6 @@ public final class ActivityBlogResponseMapper {
       .collect(Collectors.toList());
   }
   
-  private static ActivityBlogWebResponse buildActivityBlogWebResponse(
-    ActivityBlog activityBlog
-  ) {
-    
-    return ActivityBlogWebResponse.builder()
-      .id(activityBlog.getId())
-      .title(activityBlog.getTitle())
-      .description(activityBlog.getDescription())
-      .files(EmbeddedFileWebResponseMapper.toEmbeddedFileWebResponses(
-        activityBlog.getFiles()))
-      .author(ActivityBlogResponseMapper.buildAuthor(activityBlog))
-      .build();
-  }
-  
-  private static AuthorWebResponse buildAuthor(ActivityBlog activityBlog) {
-    
-    return AuthorWebResponse.builder()
-      .id(activityBlog.getUser()
-            .getId())
-      .name(activityBlog.getUser()
-              .getName())
-      .build();
-  }
-  
   public static DataResponse<ActivityBlogWebResponse> toActivityBlogDataResponse(
     ActivityBlog activityBlog
   ) {
@@ -82,6 +59,21 @@ public final class ActivityBlogResponseMapper {
                                          ActivityBlogResponseMapper.buildActivityBlogWebResponse(
                                            activityBlog)
     );
+  }
+  
+  private static ActivityBlogWebResponse buildActivityBlogWebResponse(
+    ActivityBlog activityBlog
+  ) {
+    
+    return ActivityBlogWebResponse.builder()
+      .id(activityBlog.getId())
+      .title(activityBlog.getTitle())
+      .description(activityBlog.getDescription())
+      .files(EmbeddedFileWebResponseMapper.toEmbeddedFileWebResponses(
+        activityBlog.getFiles()))
+      .author(
+        AuthorWebResponseMapper.buildAuthorWebResponse(activityBlog.getUser()))
+      .build();
   }
   
 }

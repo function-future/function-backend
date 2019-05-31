@@ -1,4 +1,4 @@
-package com.future.function.web.mapper.response.core;
+package com.future.function.web.mapper.response.core.embedded;
 
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.web.model.response.feature.core.embedded.EmbeddedFileWebResponse;

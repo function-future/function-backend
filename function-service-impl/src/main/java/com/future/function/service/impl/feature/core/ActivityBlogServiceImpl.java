@@ -10,12 +10,9 @@ import com.future.function.service.api.feature.core.ResourceService;
 import com.future.function.service.api.feature.core.UserService;
 import com.future.function.service.impl.helper.CopyHelper;
 import com.future.function.service.impl.helper.PageHelper;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Objects;
@@ -99,43 +96,6 @@ public class ActivityBlogServiceImpl implements ActivityBlogService {
         () -> new UnsupportedOperationException("Create Activity Blog Failed"));
   }
   
-  private ActivityBlog setUser(ActivityBlog activityBlog) {
-    
-    Optional.of(activityBlog)
-      .map(ActivityBlog::getUser)
-      .map(User::getEmail)
-      .map(userService::getUserByEmail)
-      .ifPresent(activityBlog::setUser);
-    
-    return activityBlog;
-  }
-  
-  private ActivityBlog setFileV2s(ActivityBlog activityBlog) {
-    
-    List<String> fileIds = this.getFileIds(activityBlog);
-    
-    activityBlog.setFiles(this.getFileV2s(fileIds));
-    
-    resourceService.markFilesUsed(fileIds, true);
-    
-    return activityBlog;
-  }
-  
-  private List<String> getFileIds(ActivityBlog activityBlog) {
-    
-    return activityBlog.getFiles()
-      .stream()
-      .map(FileV2::getId)
-      .collect(Collectors.toList());
-  }
-  
-  private List<FileV2> getFileV2s(List<String> fileIds) {
-    
-    return fileIds.stream()
-      .map(resourceService::getFile)
-      .collect(Collectors.toList());
-  }
-  
   /**
    * {@inheritDoc}
    *
@@ -154,14 +114,6 @@ public class ActivityBlogServiceImpl implements ActivityBlogService {
       .map(foundActivityBlog -> this.copyPropertiesAndSaveActivityBlog(
         activityBlog, foundActivityBlog))
       .orElse(activityBlog);
-  }
-  
-  private ActivityBlog deleteActivityBlogFiles(ActivityBlog activityBlog) {
-    
-    List<String> existingFileIds = this.getFileIds(activityBlog);
-    resourceService.markFilesUsed(existingFileIds, false);
-    
-    return activityBlog;
   }
   
   private ActivityBlog copyPropertiesAndSaveActivityBlog(
@@ -189,6 +141,51 @@ public class ActivityBlogServiceImpl implements ActivityBlogService {
         resourceService.markFilesUsed(this.getFileIds(activityBlog), false);
         activityBlogRepository.delete(activityBlog);
       });
+  }
+  
+  private List<String> getFileIds(ActivityBlog activityBlog) {
+    
+    return activityBlog.getFiles()
+      .stream()
+      .map(FileV2::getId)
+      .collect(Collectors.toList());
+  }
+  
+  private ActivityBlog setUser(ActivityBlog activityBlog) {
+    
+    Optional.of(activityBlog)
+      .map(ActivityBlog::getUser)
+      .map(User::getEmail)
+      .map(userService::getUserByEmail)
+      .ifPresent(activityBlog::setUser);
+    
+    return activityBlog;
+  }
+  
+  private ActivityBlog setFileV2s(ActivityBlog activityBlog) {
+    
+    List<String> fileIds = this.getFileIds(activityBlog);
+    
+    activityBlog.setFiles(this.getFileV2s(fileIds));
+    
+    resourceService.markFilesUsed(fileIds, true);
+    
+    return activityBlog;
+  }
+  
+  private List<FileV2> getFileV2s(List<String> fileIds) {
+    
+    return fileIds.stream()
+      .map(resourceService::getFile)
+      .collect(Collectors.toList());
+  }
+  
+  private ActivityBlog deleteActivityBlogFiles(ActivityBlog activityBlog) {
+    
+    List<String> existingFileIds = this.getFileIds(activityBlog);
+    resourceService.markFilesUsed(existingFileIds, false);
+    
+    return activityBlog;
   }
   
 }

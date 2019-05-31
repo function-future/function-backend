@@ -44,12 +44,18 @@ public class ActivityBlogRequestMapper {
     
     validator.validate(request);
     
-    return ActivityBlog.builder()
+    ActivityBlog activityBlog = ActivityBlog.builder()
       .title(request.getTitle())
       .description(request.getDescription())
       .files(this.getFileV2s(request))
       .user(this.buildUser(email))
       .build();
+    
+    if (activityBlogId != null) {
+      activityBlog.setId(activityBlogId);
+    }
+    
+    return activityBlog;
   }
   
   private List<FileV2> getFileV2s(ActivityBlogWebRequest request) {
