@@ -9,4 +9,4 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface ActivityBlogRepository
-  extends MongoRepository<ActivityBlog, String> {}
+  extends MongoRepository<ActivityBlog, String>, ActivityBlogRepositoryCustom {}
