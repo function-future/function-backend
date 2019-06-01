@@ -16,24 +16,24 @@ import org.springframework.stereotype.Repository;
 public interface ChatroomRepository extends MongoRepository<Chatroom, String> {
 
   /**
-   * Find all paged chatroom by chatroom type and member
+   * Find all paged chatting by chatting type and member
    *
-   * @param type enum of chatroom type (private, public, group)
+   * @param type enum of chatting type (private, public, group)
    * @param member user object who has chatrooms
    * @param pageable pageable object for paging
    *
-   * @return {@code Page<Chatroom>} - Paged chatroom list from database
+   * @return {@code Page<Chatroom>} - Paged chatting list from database
    */
   Page<Chatroom> findAllByTypeAndMembers(ChatroomType type, User member, Pageable pageable);
 
   /**
-   * Find all paged chatroom by title keyword and member
+   * Find all paged chatting by title keyword and member
    *
    * @param titleKeyword title keyword for searching chatrooms
    * @param member user object who has chatrooms
    * @param pageable pageable object for paging
    *
-   * @return {@code Page<Chatroom} - Paged chatroom list from database
+   * @return {@code Page<Chatroom} - Paged chatting list from database
    */
   Page<Chatroom> findAllByTitleContainingAndMembers(String titleKeyword, User member, Pageable pageable);
 

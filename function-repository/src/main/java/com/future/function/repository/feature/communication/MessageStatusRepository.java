@@ -18,9 +18,9 @@ import java.util.List;
 public interface MessageStatusRepository extends MongoRepository<MessageStatus, String> {
 
   /**
-   * find all message status by chatroom, member, and unseen
+   * find all message status by chatting, member, and unseen
    *
-   * @param chatroom chatroom where to find message's message status
+   * @param chatroom chatting where to find message's message status
    * @param member member who has message status
    *
    * @return {@code List<MessageStatus} - all message status filtered with the query
@@ -29,9 +29,9 @@ public interface MessageStatusRepository extends MongoRepository<MessageStatus, 
           Chatroom chatroom, User member);
 
   /**
-   * find all message status by chatroom, member, timestamp, and unseen
+   * find all message status by chatting, member, timestamp, and unseen
    *
-   * @param chatroom chatroom where to find message's message status
+   * @param chatroom chatting where to find message's message status
    * @param member member who has message status
    * @param timestamp timestamp as a pivot to find message status less than equal this
    * @return {@code List<MessageStatus>} - all message status filtered with the query

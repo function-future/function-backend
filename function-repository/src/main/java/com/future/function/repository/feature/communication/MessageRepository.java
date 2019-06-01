@@ -15,9 +15,9 @@ import org.springframework.stereotype.Repository;
 public interface MessageRepository extends MongoRepository<Message, String> {
 
   /**
-   * Find all paged message in a specific chatroom
+   * Find all paged message in a specific chatting
    *
-   * @param chatroom chatroom where messages are attached
+   * @param chatroom chatting where messages are attached
    * @param pageable pageable object for paging
    * @return {@code Page<Message>} -  paged messages from database
    */
