@@ -36,10 +36,11 @@ public class ActivityBlog extends BaseEntity {
   private String description;
   
   @Field(FieldName.ActivityBlog.USER)
-  @DBRef(lazy = false)
+  @DBRef(lazy = true)
   private User user;
   
   @Field(FieldName.ActivityBlog.FILES)
+  @DBRef(lazy = true)
   private List<FileV2> files;
   
 }

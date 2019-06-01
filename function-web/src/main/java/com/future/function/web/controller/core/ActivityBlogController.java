@@ -109,10 +109,11 @@ public class ActivityBlogController {
   @DeleteMapping("/{activityBlogId}")
   public BaseResponse deleteActivityBlog(
     @PathVariable
-      String activityBlogId
+      String activityBlogId,
+    @RequestParam String email
   ) {
     
-    activityBlogService.deleteActivityBlog(activityBlogId);
+    activityBlogService.deleteActivityBlog(email, activityBlogId);
     return ResponseHelper.toBaseResponse(HttpStatus.OK);
   }
   

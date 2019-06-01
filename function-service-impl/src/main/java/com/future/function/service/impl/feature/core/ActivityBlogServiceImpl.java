@@ -15,7 +15,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -110,14 +109,15 @@ public class ActivityBlogServiceImpl implements ActivityBlogService {
       .map(ActivityBlog::getId)
       .map(activityBlogRepository::findOne)
       .map(this::deleteActivityBlogFiles)
-      .map(this::setFileV2s)
+      .map(
+        foundActivityBlog -> this.setFileV2s(foundActivityBlog, activityBlog))
       .map(foundActivityBlog -> this.copyPropertiesAndSaveActivityBlog(
-        activityBlog, foundActivityBlog))
+        foundActivityBlog, activityBlog))
       .orElse(activityBlog);
   }
   
   private ActivityBlog copyPropertiesAndSaveActivityBlog(
-    ActivityBlog activityBlog, ActivityBlog foundActivityBlog
+    ActivityBlog foundActivityBlog, ActivityBlog activityBlog
   ) {
     
     CopyHelper.copyProperties(activityBlog, foundActivityBlog);
@@ -132,15 +132,29 @@ public class ActivityBlogServiceImpl implements ActivityBlogService {
    * @param activityBlogId Id of activity blog to be deleted.
    */
   @Override
-  public void deleteActivityBlog(String activityBlogId) {
+  public void deleteActivityBlog(String email, String activityBlogId) {
     
     Optional.ofNullable(activityBlogId)
       .map(activityBlogRepository::findOne)
-      .filter(Objects::nonNull)
+      // .filter(
+      //   activityBlog -> email.equalsIgnoreCase(activityBlog.getCreatedBy()))
       .ifPresent(activityBlog -> {
         resourceService.markFilesUsed(this.getFileIds(activityBlog), false);
         activityBlogRepository.delete(activityBlog);
       });
+  }
+  
+  private ActivityBlog setFileV2s(
+    ActivityBlog foundActivityBlog, ActivityBlog activityBlog
+  ) {
+    
+    List<String> fileIds = this.getFileIds(activityBlog);
+    
+    activityBlog.setFiles(this.getFileV2s(fileIds));
+    
+    resourceService.markFilesUsed(fileIds, true);
+    
+    return foundActivityBlog;
   }
   
   private List<String> getFileIds(ActivityBlog activityBlog) {
@@ -148,6 +162,13 @@ public class ActivityBlogServiceImpl implements ActivityBlogService {
     return activityBlog.getFiles()
       .stream()
       .map(FileV2::getId)
+      .collect(Collectors.toList());
+  }
+  
+  private List<FileV2> getFileV2s(List<String> fileIds) {
+    
+    return fileIds.stream()
+      .map(resourceService::getFile)
       .collect(Collectors.toList());
   }
   
@@ -171,13 +192,6 @@ public class ActivityBlogServiceImpl implements ActivityBlogService {
     resourceService.markFilesUsed(fileIds, true);
     
     return activityBlog;
-  }
-  
-  private List<FileV2> getFileV2s(List<String> fileIds) {
-    
-    return fileIds.stream()
-      .map(resourceService::getFile)
-      .collect(Collectors.toList());
   }
   
   private ActivityBlog deleteActivityBlogFiles(ActivityBlog activityBlog) {
