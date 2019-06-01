@@ -124,6 +124,8 @@ public interface FieldName {
 
     public static final String IS_SEEN = "isSeen";
 
+    public static final String CHATROOM = "chatroom";
+
   }
   
 }

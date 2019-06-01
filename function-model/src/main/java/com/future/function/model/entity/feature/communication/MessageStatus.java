@@ -27,7 +27,7 @@ public class MessageStatus extends BaseEntity {
   private String id;
 
   @Field(FieldName.MessageStatus.IS_SEEN)
-  private boolean isSeen;
+  private boolean seen;
 
   @Field(FieldName.MessageStatus.MEMBER)
   @DBRef
@@ -36,5 +36,9 @@ public class MessageStatus extends BaseEntity {
   @Field(FieldName.MessageStatus.MESSAGE)
   @DBRef
   private Message message;
+
+  @Field(FieldName.MessageStatus.CHATROOM)
+  @DBRef
+  private Chatroom chatroom;
 
 }
