@@ -2,6 +2,7 @@ package com.future.function.web.model.request.core;
 
 import com.future.function.common.data.core.UserData;
 import com.future.function.validation.annotation.core.FileMustBeImage;
+import com.future.function.validation.annotation.core.EmailMustBeUnique;
 import com.future.function.validation.annotation.core.FileMustExist;
 import com.future.function.validation.annotation.core.Name;
 import com.future.function.validation.annotation.core.OnlyStudentCanHaveBatchAndUniversity;
@@ -30,6 +31,7 @@ public class UserWebRequest implements UserData {
   @NotNull(message = "NotNull")
   private String role;
   
+  @EmailMustBeUnique
   @Email(message = "Email")
   @NotBlank(message = "NotBlank")
   private String email;
