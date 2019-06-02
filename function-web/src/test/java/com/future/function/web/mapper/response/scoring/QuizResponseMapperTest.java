@@ -54,6 +54,7 @@ public class QuizResponseMapperTest {
             .timeLimit(QUIZ_TIME_LIMIT)
             .questionCount(QUIZ_QUESTION_COUNT)
             .trials(QUIZ_TRIALS)
+            .questionBanks(new ArrayList<>())
             .build();
 
     quizList = new ArrayList<>();

@@ -1,7 +1,7 @@
 package com.future.function.web.mapper.request.scoring;
 
-import com.future.function.common.validation.ObjectValidator;
 import com.future.function.model.entity.feature.scoring.StudentQuestion;
+import com.future.function.validation.RequestValidator;
 import com.future.function.web.model.request.scoring.StudentQuestionWebRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 public class StudentQuestionRequestMapper {
 
     @Autowired
-    private ObjectValidator validator;
+    private RequestValidator validator;
 
     @Autowired
     private OptionRequestMapper optionRequestMapper;

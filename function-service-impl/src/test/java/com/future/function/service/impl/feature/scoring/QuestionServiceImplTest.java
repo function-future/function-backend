@@ -20,6 +20,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import static com.googlecode.catchexception.CatchException.catchException;
@@ -112,6 +113,24 @@ public class QuestionServiceImplTest {
         catchException(() -> questionService.findAllByQuestionBankId(null, pageable));
 
         assertThat(caughtException().getClass()).isEqualTo(NotFoundException.class);
+    }
+
+    @Test
+    public void findAllQuestionByMultipleQuestionBankIdTest() {
+        when(questionBankService.findById(QUESTION_BANK_ID)).thenReturn(questionBank);
+        when(questionRepository.findAllByQuestionBankId(QUESTION_BANK_ID)).thenReturn(Collections.singletonList(question));
+        when(optionService.getOptionListByQuestionId(QUESTION_ID)).thenReturn(Collections.singletonList(option));
+        List<Question> actual = questionService.findAllByMultipleQuestionBankId(Collections.singletonList(QUESTION_BANK_ID));
+        assertThat(actual.size()).isEqualTo(1);
+        assertThat(actual.get(0).getText()).isEqualTo(QUESTION_TEXT);
+        verify(questionRepository).findAllByQuestionBankId(QUESTION_BANK_ID);
+        verify(optionService).getOptionListByQuestionId(QUESTION_ID);
+    }
+
+    @Test
+    public void findAllQuestionByMultipleQuestionBankIdEmptyQuestionBankTest() {
+        List<Question> actual = questionService.findAllByMultipleQuestionBankId(Collections.emptyList());
+        assertThat(actual.size()).isEqualTo(0);
     }
 
     @Test

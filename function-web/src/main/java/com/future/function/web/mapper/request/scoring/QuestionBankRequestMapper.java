@@ -1,24 +1,25 @@
 package com.future.function.web.mapper.request.scoring;
 
 import com.future.function.common.exception.BadRequestException;
-import com.future.function.common.validation.ObjectValidator;
 import com.future.function.model.entity.feature.scoring.QuestionBank;
+import com.future.function.validation.RequestValidator;
 import com.future.function.web.mapper.request.WebRequestMapper;
 import com.future.function.web.model.request.scoring.QuestionBankWebRequest;
-import java.util.Optional;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+
 @Component
 public class QuestionBankRequestMapper {
 
-  private ObjectValidator validator;
+    private RequestValidator validator;
 
   private WebRequestMapper requestMapper;
 
   @Autowired
-  public QuestionBankRequestMapper(ObjectValidator validator, WebRequestMapper requestMapper) {
+  public QuestionBankRequestMapper(RequestValidator validator, WebRequestMapper requestMapper) {
     this.validator = validator;
     this.requestMapper = requestMapper;
   }

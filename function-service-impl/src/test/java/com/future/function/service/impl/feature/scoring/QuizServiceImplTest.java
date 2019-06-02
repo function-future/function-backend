@@ -2,8 +2,13 @@ package com.future.function.service.impl.feature.scoring;
 
 import com.future.function.common.exception.BadRequestException;
 import com.future.function.common.exception.NotFoundException;
+import com.future.function.model.entity.feature.core.Batch;
+import com.future.function.model.entity.feature.scoring.Question;
+import com.future.function.model.entity.feature.scoring.QuestionBank;
 import com.future.function.model.entity.feature.scoring.Quiz;
 import com.future.function.repository.feature.scoring.QuizRepository;
+import com.future.function.service.api.feature.scoring.QuestionService;
+import com.future.function.service.api.feature.scoring.StudentQuizService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -11,15 +16,13 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import static com.googlecode.catchexception.CatchException.catchException;
 import static com.googlecode.catchexception.CatchException.caughtException;
@@ -30,13 +33,21 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class QuizServiceImplTest {
 
-  private String QUIZ_ID = UUID.randomUUID().toString();
-  private String QUIZ_TITLE = "quiz-title";
-  private String QUIZ_DESCRIPTION = "quiz-description";
-  private long DATE = 0;
-  private long TIME_LIMIT = 0;
-  private int TRIALS = 0;
-  private int QUESTION_COUNT = 0;
+    private static final String QUIZ_ID = UUID.randomUUID().toString();
+    private static final String QUIZ_TITLE = "quiz-title";
+    private static final String QUIZ_DESCRIPTION = "quiz-description";
+    private static final long DATE = 15000000;
+    private static final long TIME_LIMIT = 1500000;
+    private static final int TRIALS = 10;
+    private static final int QUESTION_COUNT = 10;
+
+    private static final String BATCH_CODE = "batch-code";
+
+    private static final String QUESTION_BANK_ID = "question-bank-id";
+    private static final String QUESTION_BANK_DESCRIPTION = "question-bank-description";
+
+    private static final String QUESTION_ID = "question-id";
+    private static final String QUESTION_TEXT = "question-text";
 
   private int PAGE = 0;
   private int TOTAL = 10;
@@ -44,6 +55,9 @@ public class QuizServiceImplTest {
   private static final String NOT_FOUND_MSG = "Quiz Not Found";
 
   private Quiz quiz;
+    private Batch batch;
+    private QuestionBank questionBank;
+    private Question question;
   private Pageable pageable;
   private List<Quiz> quizList;
   private Page<Quiz> quizPage;
@@ -54,8 +68,31 @@ public class QuizServiceImplTest {
   @Mock
   private QuizRepository quizRepository;
 
+    @Mock
+    private StudentQuizService studentQuizService;
+
+    @Mock
+    private QuestionService questionService;
+
   @Before
   public void setUp() throws Exception {
+      batch = Batch
+              .builder()
+              .code(BATCH_CODE)
+              .build();
+
+      questionBank = QuestionBank
+              .builder()
+              .id(QUESTION_BANK_ID)
+              .description(QUESTION_BANK_DESCRIPTION)
+              .build();
+
+      question = Question
+              .builder()
+              .questionBank(questionBank)
+              .text(QUESTION_TEXT)
+              .build();
+
     quiz = Quiz
             .builder()
             .id(QUIZ_ID)
@@ -66,6 +103,8 @@ public class QuizServiceImplTest {
             .timeLimit(TIME_LIMIT)
             .trials(TRIALS)
             .questionCount(QUESTION_COUNT)
+            .questionBanks(Collections.singletonList(questionBank))
+            .batch(batch)
             .build();
 
     quizList = Collections.singletonList(quiz);
@@ -77,6 +116,10 @@ public class QuizServiceImplTest {
     when(quizRepository.findAll(pageable)).thenReturn(quizPage);
     when(quizRepository.findByIdAndDeletedFalse(QUIZ_ID)).thenReturn(Optional.of(quiz));
     when(quizRepository.save(quiz)).thenReturn(quiz);
+      when(studentQuizService.createStudentQuizByBatchCode(BATCH_CODE, quiz))
+              .thenReturn(quiz);
+      when(questionService.findAllByMultipleQuestionBankId(Collections.singletonList(QUESTION_BANK_ID)))
+              .thenReturn(Collections.singletonList(question));
   }
 
   @After
@@ -130,6 +173,47 @@ public class QuizServiceImplTest {
     verify(quizRepository).findAll(eq(pageable));
   }
 
+    @Test
+    public void findAllQuestionsFromMultipleQuestionBanks() {
+        List<Question> actual = quizService.findAllQuestionByMultipleQuestionBank(true, QUIZ_ID);
+        assertThat(actual.size()).isEqualTo(1);
+        assertThat(actual.get(0).getText()).isEqualTo(QUESTION_TEXT);
+        verify(quizRepository).findByIdAndDeletedFalse(QUIZ_ID);
+        verify(questionService).findAllByMultipleQuestionBankId(Collections.singletonList(QUESTION_BANK_ID));
+    }
+
+    @Test
+    public void findAllQuestionsFromMultipleQuestionBanksNotRandom() {
+        List<Question> actual = quizService.findAllQuestionByMultipleQuestionBank(false, QUIZ_ID);
+        assertThat(actual.size()).isEqualTo(1);
+        assertThat(actual.get(0).getText()).isEqualTo(QUESTION_TEXT);
+        verify(quizRepository).findByIdAndDeletedFalse(QUIZ_ID);
+        verify(questionService).findAllByMultipleQuestionBankId(Collections.singletonList(QUESTION_BANK_ID));
+    }
+
+    @Test
+    public void findAllQuestionsFromMultipleQuestionBanksQuestionCountZero() {
+        Quiz quizDB = new Quiz();
+        BeanUtils.copyProperties(quiz, quizDB);
+        quizDB.setQuestionCount(0);
+        List<Question> actual = quizService.findAllQuestionByMultipleQuestionBank(true, QUIZ_ID);
+        assertThat(actual.size()).isEqualTo(1);
+        assertThat(actual.get(0).getText()).isEqualTo(QUESTION_TEXT);
+        verify(quizRepository).findByIdAndDeletedFalse(QUIZ_ID);
+        verify(questionService).findAllByMultipleQuestionBankId(Collections.singletonList(QUESTION_BANK_ID));
+    }
+
+    @Test
+    public void findAllQuestionsFromMultipleQuestionBanksEmptyQuestionBankList() {
+        Quiz quizDB = new Quiz();
+        BeanUtils.copyProperties(quiz, quizDB);
+        quizDB.setQuestionBanks(new ArrayList<>());
+        when(quizRepository.findByIdAndDeletedFalse(QUIZ_ID)).thenReturn(Optional.of(quizDB));
+        List<Question> actual = quizService.findAllQuestionByMultipleQuestionBank(true, QUIZ_ID);
+        assertThat(actual.size()).isEqualTo(0);
+        verify(quizRepository).findByIdAndDeletedFalse(QUIZ_ID);
+    }
+
   @Test
   public void testCreateQuizSuccess() {
     Quiz actual = quizService.createQuiz(quiz);
@@ -157,6 +241,20 @@ public class QuizServiceImplTest {
     verify(quizRepository).save(eq(quiz));
   }
 
+    @Test
+    public void testUpdateQuizSuccessChangeBatch() {
+        Batch anotherBatch = Batch.builder().code("abc").build();
+        Quiz request = Quiz.builder().id(QUIZ_ID).batch(anotherBatch).build();
+        quiz.setId(QUIZ_ID);
+        Quiz actual = quizService.updateQuiz(request);
+        assertThat(actual).isEqualTo(quiz);
+
+        verify(quizRepository).findByIdAndDeletedFalse(QUIZ_ID);
+        verify(quizRepository).save(quiz);
+        verify(studentQuizService).deleteByBatchCodeAndQuiz(batch.getCode(), QUIZ_ID);
+        verify(studentQuizService).createStudentQuizByBatchCode("abc", quiz);
+    }
+
   @Test
   public void testUpdateQuizFindByIdNotFound() {
     quiz.setId("randomId");
@@ -175,5 +273,6 @@ public class QuizServiceImplTest {
     quiz.setDeleted(true);
     verify(quizRepository).findByIdAndDeletedFalse(QUIZ_ID);
     verify(quizRepository).save(quiz);
+      verify(studentQuizService).deleteByBatchCodeAndQuiz(BATCH_CODE, QUIZ_ID);
   }
 }

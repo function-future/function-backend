@@ -55,6 +55,7 @@ public class QuestionServiceImpl implements QuestionService {
                             .forEach(questionList::addAll);
                     return questionList;
                 })
+                .map(this::findListFromQuestionList)
                 .orElse(questionList);
     }
 
@@ -62,6 +63,12 @@ public class QuestionServiceImpl implements QuestionService {
         page.getContent()
                 .forEach(this::searchOptionsForQuestion);
         return page;
+    }
+
+    private List<Question> findListFromQuestionList(List<Question> list) {
+        list
+                .forEach(this::searchOptionsForQuestion);
+        return list;
     }
 
     private void searchOptionsForQuestion(Question question) {
@@ -97,7 +104,10 @@ public class QuestionServiceImpl implements QuestionService {
     private void saveOptionList(Question question, List<Option> options, boolean isCreate) {
         options
                 .stream()
-                .peek(option -> option.setQuestion(question))
+                .map(option -> {
+                    option.setQuestion(question);
+                    return option;
+                })
                 .forEach(isCreate ? optionService::createOption : optionService::updateOption);
     }
 

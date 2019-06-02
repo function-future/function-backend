@@ -5,7 +5,8 @@ import com.future.function.model.entity.feature.scoring.StudentQuestion;
 import com.future.function.model.entity.feature.scoring.StudentQuiz;
 import com.future.function.model.entity.feature.scoring.StudentQuizDetail;
 import com.future.function.repository.feature.scoring.StudentQuizDetailRepository;
-import com.future.function.service.api.feature.scoring.*;
+import com.future.function.service.api.feature.scoring.StudentQuestionService;
+import com.future.function.service.api.feature.scoring.StudentQuizDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,32 +20,18 @@ public class StudentQuizDetailServiceImpl implements StudentQuizDetailService {
 
     private StudentQuizDetailRepository studentQuizDetailRepository;
 
-    private StudentQuizService studentQuizService;
-
-    private QuestionService questionService;
-
-    private OptionService optionService;
-
     private StudentQuestionService studentQuestionService;
 
     @Autowired
     public StudentQuizDetailServiceImpl(StudentQuizDetailRepository studentQuizDetailRepository,
-                                        StudentQuizService studentQuizService,
-                                        QuestionService questionService,
-                                        OptionService optionService,
                                         StudentQuestionService studentQuestionService) {
         this.studentQuizDetailRepository = studentQuizDetailRepository;
-        this.studentQuizService = studentQuizService;
-        this.questionService = questionService;
-        this.optionService = optionService;
         this.studentQuestionService = studentQuestionService;
     }
 
     @Override
     public StudentQuizDetail findLatestByStudentQuizId(String studentQuizId) {
         return Optional.ofNullable(studentQuizId)
-                .map(studentQuizService::findById)
-                .map(StudentQuiz::getId)
                 .flatMap(studentQuizDetailRepository::findFirstByStudentQuizId)
                 .orElseThrow(() -> new NotFoundException("Quiz not found"));
     }
@@ -65,7 +52,10 @@ public class StudentQuizDetailServiceImpl implements StudentQuizDetailService {
                 .orElseThrow(() -> new NotFoundException("Student quiz detail not found"));
 
         answers = answers.stream()
-                .peek(answer -> answer.setStudentQuizDetail(detail))
+                .map(answer -> {
+                    answer.setStudentQuizDetail(detail);
+                    return answer;
+                })
                 .collect(Collectors.toList());
 
         Integer point = studentQuestionService.postAnswerForAllStudentQuestion(answers);
@@ -82,7 +72,7 @@ public class StudentQuizDetailServiceImpl implements StudentQuizDetailService {
                     validateQuestionsAndCreateStudentQuestions(detail, questions);
                     return detail;
                 })
-                .orElseThrow(() -> new UnsupportedOperationException("Answer quiz failed"));
+                .orElseThrow(() -> new UnsupportedOperationException("create quiz failed"));
     }
 
     @Override

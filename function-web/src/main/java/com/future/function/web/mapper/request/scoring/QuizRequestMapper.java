@@ -1,15 +1,15 @@
 package com.future.function.web.mapper.request.scoring;
 
 import com.future.function.common.exception.BadRequestException;
-import com.future.function.common.validation.ObjectValidator;
 import com.future.function.model.entity.feature.scoring.Quiz;
-import com.future.function.web.mapper.request.WebRequestMapper;
+import com.future.function.validation.RequestValidator;
 import com.future.function.web.model.request.scoring.QuizWebRequest;
-import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Optional;
 
 /**
  * Bean class used to map web request for Quiz entity
@@ -18,10 +18,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class QuizRequestMapper {
 
-  private ObjectValidator validator;
+    private RequestValidator validator;
 
   @Autowired
-  public QuizRequestMapper(ObjectValidator validator) {
+  public QuizRequestMapper(RequestValidator validator) {
     this.validator = validator;
   }
 

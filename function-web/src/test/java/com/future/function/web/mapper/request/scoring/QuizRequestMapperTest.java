@@ -1,8 +1,8 @@
 package com.future.function.web.mapper.request.scoring;
 
 import com.future.function.common.exception.BadRequestException;
-import com.future.function.common.validation.ObjectValidator;
 import com.future.function.model.entity.feature.scoring.Quiz;
+import com.future.function.validation.RequestValidator;
 import com.future.function.web.model.request.scoring.QuizWebRequest;
 import org.junit.After;
 import org.junit.Before;
@@ -38,7 +38,7 @@ public class QuizRequestMapperTest {
   private QuizRequestMapper requestMapper;
 
   @Mock
-  private ObjectValidator validator;
+  private RequestValidator validator;
 
   @Before
   public void setUp() throws Exception {

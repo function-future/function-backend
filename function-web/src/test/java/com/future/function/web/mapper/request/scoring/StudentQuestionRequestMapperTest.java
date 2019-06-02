@@ -1,8 +1,8 @@
 package com.future.function.web.mapper.request.scoring;
 
-import com.future.function.common.validation.ObjectValidator;
 import com.future.function.model.entity.feature.scoring.Option;
 import com.future.function.model.entity.feature.scoring.StudentQuestion;
+import com.future.function.validation.RequestValidator;
 import com.future.function.web.model.request.scoring.StudentQuestionWebRequest;
 import org.junit.After;
 import org.junit.Before;
@@ -29,7 +29,7 @@ public class StudentQuestionRequestMapperTest {
     private StudentQuestionWebRequest studentQuestionWebRequest;
 
     @Mock
-    private ObjectValidator objectValidator;
+    private RequestValidator objectValidator;
 
     @Mock
     private OptionRequestMapper optionRequestMapper;

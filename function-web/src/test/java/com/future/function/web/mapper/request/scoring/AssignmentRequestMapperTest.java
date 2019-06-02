@@ -1,12 +1,9 @@
 package com.future.function.web.mapper.request.scoring;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.future.function.common.exception.BadRequestException;
-import com.future.function.common.validation.ObjectValidator;
 import com.future.function.model.entity.feature.scoring.Assignment;
+import com.future.function.validation.RequestValidator;
 import com.future.function.web.mapper.request.WebRequestMapper;
 import com.future.function.web.model.request.scoring.AssignmentWebRequest;
-import java.io.IOException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,13 +12,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import static com.googlecode.catchexception.CatchException.catchException;
-import static com.googlecode.catchexception.CatchException.caughtException;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class AssignmentRequestMapperTest {
@@ -49,7 +41,7 @@ public class AssignmentRequestMapperTest {
   private AssignmentRequestMapper assignmentRequestMapper;
 
   @Mock
-  private ObjectValidator validator;
+  private RequestValidator validator;
 
   @Before
   public void setUp() {

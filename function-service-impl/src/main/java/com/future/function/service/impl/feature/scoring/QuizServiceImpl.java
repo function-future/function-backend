@@ -8,7 +8,6 @@ import com.future.function.model.entity.feature.scoring.QuestionBank;
 import com.future.function.model.entity.feature.scoring.Quiz;
 import com.future.function.model.util.constant.FieldName;
 import com.future.function.repository.feature.scoring.QuizRepository;
-import com.future.function.service.api.feature.scoring.QuestionBankService;
 import com.future.function.service.api.feature.scoring.QuestionService;
 import com.future.function.service.api.feature.scoring.QuizService;
 import com.future.function.service.api.feature.scoring.StudentQuizService;
@@ -33,19 +32,15 @@ public class QuizServiceImpl implements QuizService {
 
   private QuizRepository quizRepository;
 
-  private QuestionBankService questionBankService;
-
   private QuestionService questionService;
 
   private StudentQuizService studentQuizService;
 
   @Autowired
   public QuizServiceImpl(QuizRepository quizRepository,
-                         QuestionBankService questionBankService,
                          QuestionService questionService,
                          StudentQuizService studentQuizService) {
     this.quizRepository = quizRepository;
-    this.questionBankService = questionBankService;
     this.questionService = questionService;
     this.studentQuizService = studentQuizService;
   }
@@ -117,6 +112,7 @@ public class QuizServiceImpl implements QuizService {
             .map(this::findById)
             .map(quiz -> {
               String requestedBatchCode = getRequestedBatchCode(request, quiz);
+              checkAndEditBatchCodeByRequest(quiz, requestedBatchCode);
               BeanUtils.copyProperties(
                       request,
                       quiz,
@@ -124,7 +120,6 @@ public class QuizServiceImpl implements QuizService {
                       FieldName.BaseEntity.CREATED_BY,
                       FieldName.BaseEntity.VERSION
               );
-              checkAndEditBatchCodeByRequest(quiz, requestedBatchCode);
               return quiz;
             })
             .map(quizRepository::save)
@@ -150,7 +145,10 @@ public class QuizServiceImpl implements QuizService {
   private List<Question> getListOfQuestions(boolean random, Quiz quiz, List<Question> questionList) {
     if (random)
       Collections.shuffle(questionList);
-    return questionList.subList(0, (quiz.getQuestionCount() - 1));
+    int toIndex = (quiz.getQuestionCount() - 1);
+    if (questionList.size() < toIndex)
+      toIndex = questionList.size();
+    return questionList.subList(0, toIndex);
   }
 
   private List<String> getIdFromQuestionBanks(List<QuestionBank> list) {
@@ -165,12 +163,14 @@ public class QuizServiceImpl implements QuizService {
             .map(Quiz::getBatch)
             .map(Batch::getCode)
             .orElseGet(() -> quiz.getBatch().getCode());
+
+
   }
 
   private void checkAndEditBatchCodeByRequest(Quiz quiz, String requestedBatchCode) {
     if (!quiz.getBatch().getCode().equals(requestedBatchCode)) {
       studentQuizService.deleteByBatchCodeAndQuiz(quiz.getBatch().getCode(), quiz.getId());
-        studentQuizService.createStudentQuizAndSave(quiz.getBatch().getCode(), quiz);
+      studentQuizService.createStudentQuizByBatchCode(requestedBatchCode, quiz);
     }
   }
 }

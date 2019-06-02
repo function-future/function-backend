@@ -39,7 +39,7 @@ public class StudentQuizController {
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping(path = "/{studentQuizId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public DataResponse<StudentQuizWebResponse> getStudentQuizById(@PathVariable String studentQuizId) {
+    public DataResponse<StudentQuizWebResponse> getStudentQuizById(@PathVariable(value = "studentQuizId") String studentQuizId) {
         return StudentQuizResponseMapper
                 .toStudentQuizWebResponse(
                         studentQuizService

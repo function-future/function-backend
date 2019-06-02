@@ -48,7 +48,7 @@ public class StudentQuestionServiceImpl implements StudentQuestionService {
     }
 
     private String getAnswerIdFromAnswerList(List<StudentQuestion> answers, StudentQuestion question) {
-        return answers.get(question.getNumber()).getOption().getId();
+        return answers.get(question.getNumber() - 1).getOption().getId();
     }
 
     private String validateAnswersForSameAndReturnStudentQuizDetailId(List<StudentQuestion> answers) {
@@ -62,7 +62,7 @@ public class StudentQuestionServiceImpl implements StudentQuestionService {
     }
 
     private int getTotalPoint(List<StudentQuestion> questions, Long correctQuestions) {
-        return Integer.valueOf(String.valueOf(correctQuestions)) / questions.size();
+        return (Integer.valueOf(String.valueOf(correctQuestions)) / questions.size()) * 100;
     }
 
     @Override

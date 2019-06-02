@@ -63,16 +63,13 @@ public class StudentQuizServiceImpl implements StudentQuizService {
 
     @Override
     public Quiz createStudentQuizByBatchCode(String batchCode, Quiz quiz) {
+        quiz.setBatch(batchService.getBatchByCode(batchCode));
         return Optional.ofNullable(batchCode)
                 .map(userService::getStudentsByBatchCode)
                 .map(userList -> createStudentQuizFromUserList(quiz, userList))
                 .map(studentQuiz -> studentQuiz.get(0))
                 .map(this::createStudentQuizDetailAndSave)
                 .map(returnValue -> quiz)
-                .map(returnValue -> {
-                    returnValue.setBatch(batchService.getBatchByCode(batchCode));
-                    return returnValue;
-                })
                 .orElseThrow(() -> new UnsupportedOperationException("Batch code is null"));
     }
 
@@ -88,9 +85,16 @@ public class StudentQuizServiceImpl implements StudentQuizService {
     @Override
     public Quiz copyQuizFromBatch(String targetBatch, Quiz quiz) {
         return Optional.ofNullable(quiz)
-                .map(value -> createStudentQuizzesAndReturnNewQuiz(targetBatch, value))
+                .map(this::createNewQuiz)
                 .map(quizService::createQuiz)
+                .map(newQuiz -> this.createStudentQuizByBatchCode(targetBatch, newQuiz))
                 .orElseThrow(() -> new UnsupportedOperationException("Copy Quiz Failed"));
+    }
+
+    private Quiz createNewQuiz(Quiz quiz) {
+        Quiz newQuiz = new Quiz();
+        BeanUtils.copyProperties(quiz, newQuiz, "id");
+        return newQuiz;
     }
 
     @Override
@@ -122,13 +126,6 @@ public class StudentQuizServiceImpl implements StudentQuizService {
                 .map(User::getId)
                 .map(userId -> createStudentQuizAndSave(userId, quiz))
                 .collect(Collectors.toList());
-    }
-
-    private Quiz createStudentQuizzesAndReturnNewQuiz(String targetBatch, Quiz quiz) {
-        quiz = this.createStudentQuizByBatchCode(targetBatch, quiz);
-        Quiz newQuiz = new Quiz();
-        BeanUtils.copyProperties(quiz, newQuiz, "id");
-        return newQuiz;
     }
 
     private StudentQuiz toStudentQuizWithUserAndQuiz(String userId, Quiz quiz) {

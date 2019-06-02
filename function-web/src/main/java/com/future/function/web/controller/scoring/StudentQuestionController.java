@@ -28,7 +28,7 @@ public class StudentQuestionController {
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public PagingResponse<StudentQuestionWebResponse> findStudentQuizDetailByStudentQuizId(@PathVariable(value = "studentQuizId")
+    public PagingResponse<StudentQuestionWebResponse> findStudentQuestionsByStudentQuizId(@PathVariable(value = "studentQuizId")
                                                                                                    String studentQuizId) {
         return StudentQuizDetailResponseMapper
                 .toStudentQuestionWebResponses(

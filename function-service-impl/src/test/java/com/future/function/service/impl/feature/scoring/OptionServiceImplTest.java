@@ -10,11 +10,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.beans.BeanUtils;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import org.mockito.runners.MockitoJUnitRunner;
 
 import static com.googlecode.catchexception.CatchException.catchException;
 import static com.googlecode.catchexception.CatchException.caughtException;
@@ -130,5 +131,24 @@ public class OptionServiceImplTest {
     @Test
     public void deleteByIdNull() {
         optionService.deleteById(null);
+    }
+
+    @Test
+    public void isOptionCorrectTest() {
+        when(optionRepository.findByIdAndDeletedFalse(OPTION_ID)).thenReturn(Optional.of(option));
+        boolean actual = optionService.isOptionCorrect(option);
+        assertThat(actual).isTrue();
+        verify(optionRepository).findByIdAndDeletedFalse(OPTION_ID);
+    }
+
+    @Test
+    public void isOptionCorrectTestOptionFromDBFalse() {
+        Option optionDB = new Option();
+        BeanUtils.copyProperties(option, optionDB);
+        optionDB.setCorrect(false);
+        when(optionRepository.findByIdAndDeletedFalse(OPTION_ID)).thenReturn(Optional.of(optionDB));
+        boolean actual = optionService.isOptionCorrect(option);
+        assertThat(actual).isFalse();
+        verify(optionRepository).findByIdAndDeletedFalse(OPTION_ID);
     }
 }
