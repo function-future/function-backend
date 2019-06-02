@@ -7,25 +7,19 @@ import lombok.NoArgsConstructor;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class EmbeddedFileWebResponseMapper {
   
-  public static EmbeddedFileWebResponse toEmbeddedFileWebResponse(
-    FileV2 file
-  ) {
-    
-    return EmbeddedFileWebResponseMapper.toEmbeddedFileWebResponses(
-      Collections.singletonList(file))
-      .get(0);
-  }
-  
   public static List<EmbeddedFileWebResponse> toEmbeddedFileWebResponses(
     List<FileV2> files
   ) {
     
-    return files.stream()
+    return Optional.ofNullable(files)
+      .orElseGet(Collections::emptyList)
+      .stream()
       .map(EmbeddedFileWebResponseMapper::buildEmbeddedFileWebResponse)
       .collect(Collectors.toList());
   }

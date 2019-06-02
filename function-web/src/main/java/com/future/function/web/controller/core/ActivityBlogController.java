@@ -57,14 +57,6 @@ public class ActivityBlogController {
   @ResponseStatus(HttpStatus.OK)
   @GetMapping("/{activityBlogId}")
   public DataResponse<ActivityBlogWebResponse> getActivityBlog(
-    @RequestParam(defaultValue = "")
-      String userId,
-    @RequestParam(defaultValue = "1")
-      int page,
-    @RequestParam(defaultValue = "5")
-      int size,
-    @RequestParam(defaultValue = "")
-      String search,
     @PathVariable
       String activityBlogId
   ) {
@@ -110,7 +102,8 @@ public class ActivityBlogController {
   public BaseResponse deleteActivityBlog(
     @PathVariable
       String activityBlogId,
-    @RequestParam String email
+    @RequestParam
+      String email
   ) {
     
     activityBlogService.deleteActivityBlog(email, activityBlogId);

@@ -108,12 +108,22 @@ public class ActivityBlogServiceImpl implements ActivityBlogService {
     return Optional.of(activityBlog)
       .map(ActivityBlog::getId)
       .map(activityBlogRepository::findOne)
+      .filter(foundActivityBlog -> this.isUserValidForEditing(
+        foundActivityBlog.getUser(), activityBlog.getUser()))
       .map(this::deleteActivityBlogFiles)
       .map(
         foundActivityBlog -> this.setFileV2s(foundActivityBlog, activityBlog))
       .map(foundActivityBlog -> this.copyPropertiesAndSaveActivityBlog(
         foundActivityBlog, activityBlog))
       .orElse(activityBlog);
+  }
+  
+  private boolean isUserValidForEditing(
+    User foundActivityBlogUser, User requestActivityBlogUser
+  ) {
+    
+    return foundActivityBlogUser.getEmail()
+      .equalsIgnoreCase(requestActivityBlogUser.getEmail());
   }
   
   private ActivityBlog copyPropertiesAndSaveActivityBlog(
@@ -139,9 +149,17 @@ public class ActivityBlogServiceImpl implements ActivityBlogService {
       // .filter(
       //   activityBlog -> email.equalsIgnoreCase(activityBlog.getCreatedBy()))
       .ifPresent(activityBlog -> {
-        resourceService.markFilesUsed(this.getFileIds(activityBlog), false);
+        this.deleteActivityBlogFiles(activityBlog);
         activityBlogRepository.delete(activityBlog);
       });
+  }
+  
+  private ActivityBlog deleteActivityBlogFiles(ActivityBlog activityBlog) {
+    
+    List<String> existingFileIds = this.getFileIds(activityBlog);
+    resourceService.markFilesUsed(existingFileIds, false);
+    
+    return activityBlog;
   }
   
   private ActivityBlog setFileV2s(
@@ -190,14 +208,6 @@ public class ActivityBlogServiceImpl implements ActivityBlogService {
     activityBlog.setFiles(this.getFileV2s(fileIds));
     
     resourceService.markFilesUsed(fileIds, true);
-    
-    return activityBlog;
-  }
-  
-  private ActivityBlog deleteActivityBlogFiles(ActivityBlog activityBlog) {
-    
-    List<String> existingFileIds = this.getFileIds(activityBlog);
-    resourceService.markFilesUsed(existingFileIds, false);
     
     return activityBlog;
   }
