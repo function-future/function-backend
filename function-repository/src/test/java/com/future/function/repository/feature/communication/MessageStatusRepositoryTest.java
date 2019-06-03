@@ -101,10 +101,9 @@ public class MessageStatusRepositoryTest {
               ROOM_1, MEMBER_1
             );
 
-
     assertThat(messageStatuses.size()).isEqualTo(2);
-    assertThat(messageStatuses.get(0).isSeen()).isEqualTo(false);
-    assertThat(messageStatuses.get(1).isSeen()).isEqualTo(false);
+    assertThat(messageStatuses.get(0).isSeen()).isFalse();
+    assertThat(messageStatuses.get(1).isSeen()).isFalse();
 
   }
 
@@ -124,9 +123,9 @@ public class MessageStatusRepositoryTest {
     assertThat(messageStatuses1.size()).isEqualTo(1);
     assertThat(messageStatuses2.size()).isEqualTo(2);
 
-    assertThat(messageStatuses1.get(0).isSeen()).isEqualTo(false);
-    assertThat(messageStatuses2.get(0).isSeen()).isEqualTo(false);
-    assertThat(messageStatuses2.get(1).isSeen()).isEqualTo(false);
+    assertThat(messageStatuses1.get(0).isSeen()).isFalse();
+    assertThat(messageStatuses2.get(0).isSeen()).isFalse();
+    assertThat(messageStatuses2.get(1).isSeen()).isFalse();
 
   }
 

@@ -27,14 +27,14 @@ public class Message extends BaseEntity {
   private String id;
 
   @Field(FieldName.Message.SENDER)
-  @DBRef
+  @DBRef(lazy = true)
   private User sender;
 
   @Field(FieldName.Message.TEXT)
   private String text;
 
   @Field(FieldName.Message.CHATROOM)
-  @DBRef
+  @DBRef(lazy = true)
   private Chatroom chatroom;
 
 }

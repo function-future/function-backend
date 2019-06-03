@@ -37,10 +37,7 @@ public class ChatroomRepositoryTest {
 
   private static final String KEYWORD = "tle";
 
-  private static final Sort SORT = new Sort(
-          new Sort.Order(Sort.Direction.DESC, FieldName.BaseEntity.CREATED_AT));
-
-  private static final Pageable PAGEABLE = new PageRequest(0, 10, SORT);
+  private static final Pageable PAGEABLE = new PageRequest(0, 10);
 
   private static final User member1 = User.builder()
           .name("member1")
@@ -62,7 +59,6 @@ public class ChatroomRepositoryTest {
             .title(TITLE_1)
             .type(ChatroomType.GROUP)
             .build();
-
     chatroom1.setCreatedAt(5L);
 
     Chatroom chatroom2 = Chatroom.builder()
@@ -70,7 +66,6 @@ public class ChatroomRepositoryTest {
             .title(TITLE_2)
             .type(ChatroomType.GROUP)
             .build();
-
     chatroom2.setCreatedAt(10L);
 
     Chatroom chatroom3 = Chatroom.builder()
@@ -78,7 +73,6 @@ public class ChatroomRepositoryTest {
             .title(TITLE_3)
             .type(ChatroomType.PRIVATE)
             .build();
-
     chatroom3.setCreatedAt(15L);
 
     chatroomRepository.save(chatroom1);
@@ -92,18 +86,9 @@ public class ChatroomRepositoryTest {
   }
 
   @Test
-  public void testGivenMethodCallByFindingChatroomsReturnPagedChatrooms() {
-    Page<Chatroom> chatrooms = chatroomRepository.findAll(PAGEABLE);
-
-    assertThat(chatrooms.getTotalElements()).isEqualTo(3);
-    assertThat(chatrooms.getContent().get(0).getTitle()).isEqualTo(TITLE_3);
-    assertThat(chatrooms.getContent().get(1).getTitle()).isEqualTo(TITLE_2);
-    assertThat(chatrooms.getContent().get(2).getTitle()).isEqualTo(TITLE_1);
-  }
-
-  @Test
   public void testGivenTypeAndMemberByFindingAllChatroomReturnPagedChatrooms() {
-    Page<Chatroom> chatrooms = chatroomRepository.findAllByTypeAndMembers(ChatroomType.GROUP, member1, PAGEABLE);
+    Page<Chatroom> chatrooms = chatroomRepository
+            .findAllByTypeAndMembersOrderByCreatedAtDesc(ChatroomType.GROUP, member1, PAGEABLE);
 
     assertThat(chatrooms.getTotalElements()).isEqualTo(2);
     assertThat(chatrooms.getContent().get(0).getTitle()).isEqualTo(TITLE_2);
@@ -112,7 +97,7 @@ public class ChatroomRepositoryTest {
 
   @Test
   public void testGivenTypeAndMemberAndKeywordByFindingAllChatroomReturnPagedChatrooms() {
-    Page<Chatroom> chatrooms = chatroomRepository.findAllByTitleContainingAndMembers(KEYWORD, member1, PAGEABLE);
+    Page<Chatroom> chatrooms = chatroomRepository.findAllByTitleContainingIgnoreCaseAndMembersOrderByCreatedAtDesc(KEYWORD, member1, PAGEABLE);
 
     assertThat(chatrooms.getTotalElements()).isEqualTo(2);
     assertThat(chatrooms.getContent().get(0).getTitle()).isEqualTo(TITLE_3);

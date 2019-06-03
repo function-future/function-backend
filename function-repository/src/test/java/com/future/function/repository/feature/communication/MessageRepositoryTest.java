@@ -33,10 +33,7 @@ public class MessageRepositoryTest {
 
   private static final String TEXT_3 = "text message 3";
 
-  private static final Sort SORT = new Sort(
-          new Sort.Order(Sort.Direction.DESC, FieldName.BaseEntity.CREATED_AT));
-
-  private static final Pageable PAGEABLE = new PageRequest(0, 10, SORT);
+  private static final Pageable PAGEABLE = new PageRequest(0, 10);
 
   private static final Chatroom chatroom1 = Chatroom.builder()
           .id("id1")
@@ -85,7 +82,7 @@ public class MessageRepositoryTest {
 
   @Test
   public void testGivenChatroomByFindingAllMessageReturnPagedMessages() {
-    Page<Message> messages = messageRepository.findAllByChatroom(chatroom1, PAGEABLE);
+    Page<Message> messages = messageRepository.findAllByChatroomOrderByCreatedAtDesc(chatroom1, PAGEABLE);
 
     assertThat(messages.getTotalElements()).isEqualTo(2);
     assertThat(messages.getContent().get(0).getText()).isEqualTo(TEXT_2);

@@ -21,6 +21,6 @@ public interface MessageRepository extends MongoRepository<Message, String> {
    * @param pageable pageable object for paging
    * @return {@code Page<Message>} -  paged messages from database
    */
-  Page<Message> findAllByChatroom(Chatroom chatroom, Pageable pageable);
+  Page<Message> findAllByChatroomOrderByCreatedAtDesc(Chatroom chatroom, Pageable pageable);
 
 }
