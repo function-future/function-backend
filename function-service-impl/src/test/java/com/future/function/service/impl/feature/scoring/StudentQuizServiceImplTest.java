@@ -174,7 +174,7 @@ public class StudentQuizServiceImplTest {
 
     @Test
     public void copyQuizFromBatch() {
-        Quiz actual = studentQuizService.copyQuizFromBatch(TARGET_BATCH, quiz);
+        Quiz actual = studentQuizService.copyQuizWithTargetBatch(TARGET_BATCH, quiz);
         assertThat(actual.getTrials()).isEqualTo(QUIZ_TRIALS);
         assertThat(actual.getId()).isNotEqualTo(QUIZ_ID);
         verify(studentQuizRepository).save(any(StudentQuiz.class));

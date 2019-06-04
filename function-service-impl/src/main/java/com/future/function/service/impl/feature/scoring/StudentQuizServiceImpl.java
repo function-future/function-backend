@@ -8,7 +8,6 @@ import com.future.function.model.entity.feature.scoring.StudentQuizDetail;
 import com.future.function.repository.feature.scoring.StudentQuizRepository;
 import com.future.function.service.api.feature.core.BatchService;
 import com.future.function.service.api.feature.core.UserService;
-import com.future.function.service.api.feature.scoring.QuizService;
 import com.future.function.service.api.feature.scoring.StudentQuizDetailService;
 import com.future.function.service.api.feature.scoring.StudentQuizService;
 import org.springframework.beans.BeanUtils;
@@ -30,9 +29,6 @@ public class StudentQuizServiceImpl implements StudentQuizService {
 
     @Autowired
     private UserService userService;
-
-    @Autowired
-    private QuizService quizService;
 
     @Autowired
     private BatchService batchService;
@@ -83,10 +79,9 @@ public class StudentQuizServiceImpl implements StudentQuizService {
     }
 
     @Override
-    public Quiz copyQuizFromBatch(String targetBatch, Quiz quiz) {
+    public Quiz copyQuizWithTargetBatch(String targetBatch, Quiz quiz) {
         return Optional.ofNullable(quiz)
                 .map(this::createNewQuiz)
-                .map(quizService::createQuiz)
                 .map(newQuiz -> this.createStudentQuizByBatchCode(targetBatch, newQuiz))
                 .orElseThrow(() -> new UnsupportedOperationException("Copy Quiz Failed"));
     }

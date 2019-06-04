@@ -18,6 +18,8 @@ public interface QuizService {
 
   List<Question> findAllQuestionByMultipleQuestionBank(boolean random, String quizId);
 
+  Quiz copyQuizWithTargetBatch(String targetBatch, Quiz quiz);
+
   Quiz createQuiz(Quiz request);
 
   Quiz updateQuiz(Quiz request);

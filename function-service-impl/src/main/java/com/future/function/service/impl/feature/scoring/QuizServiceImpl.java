@@ -87,6 +87,12 @@ public class QuizServiceImpl implements QuizService {
             .orElseGet(ArrayList::new);
   }
 
+  @Override
+  public Quiz copyQuizWithTargetBatch(String targetBatch, Quiz quiz) {
+    quiz = this.findById(quiz.getId());
+    return studentQuizService.copyQuizWithTargetBatch(targetBatch, quiz);
+  }
+
   /**
    * Used to create new quiz in repository by passing the requested quiz entity object
    * @param request (Quiz)

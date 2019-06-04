@@ -15,7 +15,7 @@ public interface StudentQuizService {
 
     Quiz createStudentQuizByBatchCode(String batchCode, Quiz quiz);
 
-    Quiz copyQuizFromBatch(String targetBatch, Quiz quiz);
+    Quiz copyQuizWithTargetBatch(String targetBatch, Quiz quiz);
 
     void deleteById(String id);
 

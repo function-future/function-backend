@@ -42,6 +42,7 @@ public class StudentQuizDetailResponseMapper {
         return StudentQuestionWebResponse
                 .builder()
                 .questionText(studentQuestion.getQuestion().getText())
+                .number(studentQuestion.getNumber())
                 .options(OptionResponseMapper.toListOfOptionWebResponse(studentQuestion.getQuestion().getOptions()))
                 .build();
     }

@@ -1,14 +1,19 @@
 package com.future.function.web.controller.scoring;
 
+import com.future.function.model.entity.feature.scoring.Question;
 import com.future.function.service.api.feature.scoring.StudentQuizDetailService;
+import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.request.scoring.StudentQuestionRequestMapper;
+import com.future.function.web.mapper.response.scoring.QuestionResponseMapper;
 import com.future.function.web.mapper.response.scoring.StudentQuizDetailResponseMapper;
 import com.future.function.web.model.request.scoring.StudentQuestionWebRequest;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
+import com.future.function.web.model.response.feature.scoring.QuestionWebResponse;
 import com.future.function.web.model.response.feature.scoring.StudentQuestionWebResponse;
 import com.future.function.web.model.response.feature.scoring.StudentQuizDetailWebResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +30,19 @@ public class StudentQuestionController {
 
     @Autowired
     private StudentQuestionRequestMapper studentQuestionRequestMapper;
+
+    @ResponseStatus(HttpStatus.OK)
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    public PagingResponse<QuestionWebResponse> findQuestionsByStudentQuizId(@PathVariable(value = "studentQuizId")
+                                                                                    String studentQuizId) {
+        List<Question> questionList = studentQuizDetailService.findAllUnansweredQuestionsFromStudentQuizId(studentQuizId);
+        return QuestionResponseMapper
+                .toQuestionPagingResponse(
+                        new PageImpl<>(questionList,
+                                PageHelper.toPageable(0, questionList.size()),
+                                questionList.size())
+                );
+    }
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)

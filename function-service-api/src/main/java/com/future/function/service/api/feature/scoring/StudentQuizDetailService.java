@@ -1,5 +1,6 @@
 package com.future.function.service.api.feature.scoring;
 
+import com.future.function.model.entity.feature.scoring.Question;
 import com.future.function.model.entity.feature.scoring.StudentQuestion;
 import com.future.function.model.entity.feature.scoring.StudentQuiz;
 import com.future.function.model.entity.feature.scoring.StudentQuizDetail;
@@ -11,6 +12,8 @@ public interface StudentQuizDetailService {
     StudentQuizDetail findLatestByStudentQuizId(String studentQuizId);
 
     List<StudentQuestion> findAllQuestionsByStudentQuizId(String studentQuizId);
+
+    List<Question> findAllUnansweredQuestionsFromStudentQuizId(String studentQuizId);
 
     StudentQuizDetail answerStudentQuiz(String studentQuizId, List<StudentQuestion> answers);
 
