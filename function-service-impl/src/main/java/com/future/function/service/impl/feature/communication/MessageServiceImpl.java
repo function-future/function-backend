@@ -20,11 +20,11 @@ import java.util.Optional;
 @Service
 public class MessageServiceImpl implements MessageService {
 
-  private MessageRepository messageRepository;
+  private final MessageRepository messageRepository;
 
-  private ChatroomService chatroomService;
+  private final ChatroomService chatroomService;
 
-  private UserService userService;
+  private final UserService userService;
 
   @Autowired
   public MessageServiceImpl(MessageRepository messageRepository, ChatroomService chatroomService, UserService userService) {
@@ -45,7 +45,7 @@ public class MessageServiceImpl implements MessageService {
   public Message getLastMessage(String chatroomId) {
     return Optional.of(chatroomId)
             .map(chatroomService::getChatroom)
-            .map(chatroom -> messageRepository.findFirstByChatroomOrderByCreatedAtDesc(chatroom))
+            .map(messageRepository::findFirstByChatroomOrderByCreatedAtDesc)
             .orElseThrow(() -> new NotFoundException("No message was found"));
   }
 
@@ -54,6 +54,7 @@ public class MessageServiceImpl implements MessageService {
     return Optional.of(message)
             .map(this::setSender)
             .map(this::setChatroom)
+            .map(messageRepository::save)
             .get();
   }
 
