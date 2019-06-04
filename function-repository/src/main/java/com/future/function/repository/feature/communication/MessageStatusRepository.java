@@ -4,6 +4,7 @@ import com.future.function.model.entity.feature.communication.Chatroom;
 import com.future.function.model.entity.feature.communication.Message;
 import com.future.function.model.entity.feature.communication.MessageStatus;
 import com.future.function.model.entity.feature.core.User;
+import org.springframework.data.domain.Page;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -38,6 +39,5 @@ public interface MessageStatusRepository extends MongoRepository<MessageStatus, 
    */
   List<MessageStatus> findAllByChatroomAndMemberAndCreatedAtLessThanEqualAndSeenIsFalseOrderByCreatedAtDesc(
           Chatroom chatroom, User member, Long timestamp);
-
 
 }

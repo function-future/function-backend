@@ -1,5 +1,6 @@
 package com.future.function.web.model.request.communication;
 
+import com.future.function.validation.annotation.communication.ChatroomName;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,6 +18,7 @@ import java.util.List;
 @AllArgsConstructor
 public class ChatroomRequest {
 
+  @ChatroomName
   private String name;
 
   private List<String> members;
