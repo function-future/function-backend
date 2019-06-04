@@ -9,9 +9,9 @@ import org.springframework.data.domain.Page;
  */
 public interface MessageService {
 
-  Page<Message> getMessages(String chatroomId, String userId);
+  Page<Message> getMessages(String chatroomId);
 
-  Message getLastMessage(String chatroomId, String userId);
+  Message getLastMessage(String chatroomId);
 
   Message createMessage(Message message);
 
