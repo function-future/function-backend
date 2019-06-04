@@ -89,4 +89,12 @@ public class MessageRepositoryTest {
     assertThat(messages.getContent().get(1).getText()).isEqualTo(TEXT_1);
   }
 
+  @Test
+  public void testGivenChatroomByFindingLatestMessageReturnMessage() {
+    Message message = messageRepository.findFirstByChatroomOrderByCreatedAtDesc(chatroom1);
+
+    assertThat(message).isNotNull();
+    assertThat(message.getText()).isEqualTo(TEXT_2);
+  }
+
 }

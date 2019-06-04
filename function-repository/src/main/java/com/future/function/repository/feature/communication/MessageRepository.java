@@ -23,4 +23,6 @@ public interface MessageRepository extends MongoRepository<Message, String> {
    */
   Page<Message> findAllByChatroomOrderByCreatedAtDesc(Chatroom chatroom, Pageable pageable);
 
+  Message findFirstByChatroomOrderByCreatedAtDesc(Chatroom chatroom);
+
 }
