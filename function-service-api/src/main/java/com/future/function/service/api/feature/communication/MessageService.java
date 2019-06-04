@@ -2,6 +2,7 @@ package com.future.function.service.api.feature.communication;
 
 import com.future.function.model.entity.feature.communication.Message;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 /**
  * Author: PriagungSatyagama
@@ -9,7 +10,7 @@ import org.springframework.data.domain.Page;
  */
 public interface MessageService {
 
-  Page<Message> getMessages(String chatroomId);
+  Page<Message> getMessages(String chatroomId, Pageable pageable);
 
   Message getLastMessage(String chatroomId);
 
