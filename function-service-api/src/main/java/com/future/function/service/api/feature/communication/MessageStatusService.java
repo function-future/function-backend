@@ -18,6 +18,8 @@ public interface MessageStatusService {
 
   MessageStatus createMessageStatus(MessageStatus messageStatus);
 
+  void updateSeenStatus(String chatroomId, String messageId, String userId);
+
   MessageStatus updateMessageStatus(MessageStatus messageStatus);
 
 }
