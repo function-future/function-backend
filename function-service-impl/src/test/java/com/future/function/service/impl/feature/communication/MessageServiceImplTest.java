@@ -107,6 +107,30 @@ public class MessageServiceImplTest {
   }
 
   @Test
+  public void testGivenMessageIdByGettingMessageByMessageIdReturnMessage() {
+    when(messageRepository.findOne(MESSAGE_ID_1)).thenReturn(message1);
+
+    Message message = messageService.getMessage(MESSAGE_ID_1);
+
+    assertThat(message).isNotNull();
+    assertThat(message.getId()).isEqualTo(MESSAGE_ID_1);
+
+    verify(messageRepository).findOne(MESSAGE_ID_1);
+  }
+
+  @Test
+  public void testGivenMessageIdByGettingMessageByMessageIdReturnNotFoundException() {
+    when(messageRepository.findOne(MESSAGE_ID_1)).thenReturn(null);
+
+    catchException(() -> messageService.getMessage(MESSAGE_ID_1));
+
+    assertThat(caughtException().getClass()).isEqualTo(NotFoundException.class);
+    assertThat(caughtException().getMessage()).isEqualTo("Message not found");
+
+    verify(messageRepository).findOne(MESSAGE_ID_1);
+  }
+
+  @Test
   public void testGivenChatroomByGettingLastMessageByChatroomReturnMessage() {
     when(chatroomService.getChatroom(CHATROOM_ID)).thenReturn(CHATROOM);
     when(messageRepository.findFirstByChatroomOrderByCreatedAtDesc(CHATROOM)).thenReturn(message2);
