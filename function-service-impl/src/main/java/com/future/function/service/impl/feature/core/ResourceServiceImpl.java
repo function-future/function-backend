@@ -10,6 +10,7 @@ import com.future.function.service.impl.helper.FileHelper;
 import com.google.common.collect.Lists;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -45,17 +46,25 @@ public class ResourceServiceImpl implements ResourceService {
   }
   
   @Override
-  public FileV2 storeFile(
+  public FileV2 storeAndSaveFile(
     String objectName, String fileName, byte[] bytes, FileOrigin fileOrigin
   ) {
     
-    FileV2 fileV2 = FileV2.builder()
-      .name(objectName)
-      .build();
+    return fileRepositoryV2.save(
+      this.storeFile(null, null, objectName, fileName, bytes, fileOrigin));
+  }
+  
+  @Override
+  public FileV2 storeFile(
+    String fileId, String parentId, String objectName, String fileName,
+    byte[] bytes, FileOrigin fileOrigin
+  ) {
+    
+    FileV2 fileV2 = this.buildFileV2(fileId, parentId, objectName);
     
     String extension = FilenameUtils.getExtension(fileName);
     
-    if (imageExtensions.contains(FileHelper.DOT + extension)) {
+    if (imageExtensions.contains(FileHelper.DOT + extension.toLowerCase())) {
       createThumbnail(bytes, fileV2, extension, fileOrigin);
     }
     
@@ -63,7 +72,28 @@ public class ResourceServiceImpl implements ResourceService {
     
     fileV2.setAsResource(fileOrigin.isAsResource());
     
-    return fileRepositoryV2.save(fileV2);
+    return fileV2;
+  }
+  
+  private FileV2 buildFileV2(
+    String fileId, String parentId, String objectName
+  ) {
+    
+    FileV2 fileV2 = Optional.ofNullable(fileId)
+      .map(id -> fileRepositoryV2.findOne(fileId))
+      .orElseGet(() -> FileV2.builder()
+        .name(objectName)
+        .build());
+    
+    if (!StringUtils.isEmpty(fileId)) {
+      fileV2.setId(fileId);
+    }
+    
+    if (!StringUtils.isEmpty(parentId)) {
+      fileV2.setParentId(parentId);
+    }
+    
+    return fileV2;
   }
   
   @Override
@@ -94,13 +124,31 @@ public class ResourceServiceImpl implements ResourceService {
   }
   
   @Override
-  public byte[] getFileAsByteArray(String fileName, FileOrigin fileOrigin) {
+  public byte[] getFileAsByteArray(
+    String fileName, FileOrigin fileOrigin, Long version
+  ) {
     
     return fileRepositoryV2.findByIdAndAsResource(
       this.getFileId(fileName), fileOrigin.isAsResource())
-      .map(file -> this.getFileOrThumbnail(file, fileName))
+      .map(file -> this.getFileOrThumbnail(file, fileName, version))
       .map(FileHelper::toByteArray)
       .orElseThrow(() -> new NotFoundException("Get File Not Found"));
+  }
+  
+  private File getFileOrThumbnail(FileV2 file, String fileName, Long version) {
+    
+    return Optional.ofNullable(version)
+      .map(v -> this.getFileByVersion(file, v))
+      .orElseGet(() -> this.getFileOrThumbnail(file, fileName));
+  }
+  
+  private File getFileByVersion(FileV2 file, Long version) {
+    
+    return Optional.ofNullable(version)
+      .map(result -> new File(file.getVersions()
+                                .get(version)
+                                .getPath()))
+      .orElseGet(() -> new File(file.getFilePath()));
   }
   
   private File getFileOrThumbnail(FileV2 file, String fileName) {
@@ -122,7 +170,9 @@ public class ResourceServiceImpl implements ResourceService {
     
     String filePath = constructPathOrUrl(
       storagePath + fileOrigin.lowCaseValue() + FileHelper.PATH_SEPARATOR +
-      fileV2.getId() + FileHelper.PATH_SEPARATOR, fileV2.getId(), extension);
+      fileV2.getId() + this.getFileVersion(fileV2) + FileHelper.PATH_SEPARATOR,
+      fileV2.getId(), extension
+    );
     FileHelper.createJavaIoFile(bytes, filePath);
     
     fileV2.setFilePath(filePath);
@@ -137,12 +187,22 @@ public class ResourceServiceImpl implements ResourceService {
     String thumbnailName = fileV2.getId() + thumbnailSuffix;
     String thumbnailPath = constructPathOrUrl(
       storagePath + fileOrigin.lowCaseValue() + FileHelper.PATH_SEPARATOR +
-      fileV2.getId() + FileHelper.PATH_SEPARATOR, thumbnailName, extension);
+      fileV2.getId() + this.getFileVersion(fileV2) + FileHelper.PATH_SEPARATOR,
+      thumbnailName, extension
+    );
     FileHelper.createThumbnail(bytes, thumbnailPath, extension);
     
     fileV2.setThumbnailPath(thumbnailPath);
     fileV2.setThumbnailUrl(constructPathOrUrl(urlPrefix + fileOrigin.name()
       .toLowerCase() + URL_SEPARATOR, thumbnailName, extension));
+  }
+  
+  private String getFileVersion(FileV2 fileV2) {
+    
+    return Optional.ofNullable(fileV2)
+      .map(FileV2::getVersion)
+      .map(version -> "-" + (version + 1))
+      .orElse("-0");
   }
   
   private String constructPathOrUrl(
