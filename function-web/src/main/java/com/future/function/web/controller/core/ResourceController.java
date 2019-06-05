@@ -52,8 +52,8 @@ public class ResourceController {
       multipartFileRequestMapper.toStringAndByteArrayPair(file);
     
     return ResourceResponseMapper.toResourceDataResponse(
-      resourceService.storeFile(name, pair.getFirst(), pair.getSecond(),
-                                FileOrigin.toFileOrigin(origin)
+      resourceService.storeAndSaveFile(name, pair.getFirst(), pair.getSecond(),
+                                       FileOrigin.toFileOrigin(origin)
       ));
   }
   
@@ -63,11 +63,13 @@ public class ResourceController {
     @PathVariable
       String origin,
     @PathVariable
-      String fileName
+      String fileName,
+    @RequestParam(required = false)
+      Long version
   ) {
     
     return resourceService.getFileAsByteArray(
-      fileName, FileOrigin.toFileOrigin(origin));
+      fileName, FileOrigin.toFileOrigin(origin), version);
   }
   
 }

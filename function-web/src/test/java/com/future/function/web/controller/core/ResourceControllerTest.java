@@ -90,8 +90,8 @@ public class ResourceControllerTest {
     
     when(multipartFileRequestMapper.toStringAndByteArrayPair(
       any(MultipartFile.class))).thenReturn(pair);
-    when(resourceService.storeFile(NAME, NAME, BYTES,
-                                   FileOrigin.ANNOUNCEMENT
+    when(resourceService.storeAndSaveFile(NAME, NAME, BYTES,
+                                          FileOrigin.ANNOUNCEMENT
     )).thenReturn(FILE_V2_NULL_THUMBNAIL);
     
     mockMvc.perform(post("/api/resources").contentType(
@@ -107,7 +107,7 @@ public class ResourceControllerTest {
     
     verify(multipartFileRequestMapper).toStringAndByteArrayPair(
       any(MultipartFile.class));
-    verify(resourceService).storeFile(
+    verify(resourceService).storeAndSaveFile(
       NAME, NAME, BYTES, FileOrigin.ANNOUNCEMENT);
   }
   
@@ -115,15 +115,17 @@ public class ResourceControllerTest {
   public void testGivenApiCallAndFileNameByGettingFileAsByteArrayReturnByteArray()
     throws Exception {
     
-    when(resourceService.getFileAsByteArray(NAME,
-                                            FileOrigin.ANNOUNCEMENT
+    when(resourceService.getFileAsByteArray(NAME, FileOrigin.ANNOUNCEMENT,
+                                            null
     )).thenReturn(BYTES);
     
     mockMvc.perform(get("/api/resources/" + ORIGIN + "/" + ORIGINAL_NAME))
       .andExpect(status().isOk())
       .andExpect(content().bytes(BYTES));
     
-    verify(resourceService).getFileAsByteArray(NAME, FileOrigin.ANNOUNCEMENT);
+    verify(resourceService).getFileAsByteArray(NAME, FileOrigin.ANNOUNCEMENT,
+                                               null
+    );
     verifyZeroInteractions(multipartFileRequestMapper);
   }
   
