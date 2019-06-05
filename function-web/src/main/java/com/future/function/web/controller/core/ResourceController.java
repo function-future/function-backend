@@ -35,7 +35,6 @@ public class ResourceController {
     this.multipartFileRequestMapper = multipartFileRequestMapper;
   }
   
-  // TODO Put name in request body
   @ResponseStatus(HttpStatus.CREATED)
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
                produces = MediaType.APPLICATION_JSON_VALUE)
@@ -43,16 +42,14 @@ public class ResourceController {
     @RequestParam(required = false)
       MultipartFile file,
     @RequestParam
-      String origin,
-    @RequestParam(required = false)
-      String name
+      String origin
   ) {
     
     Pair<String, byte[]> pair =
       multipartFileRequestMapper.toStringAndByteArrayPair(file);
     
     return ResourceResponseMapper.toResourceDataResponse(
-      resourceService.storeAndSaveFile(name, pair.getFirst(), pair.getSecond(),
+      resourceService.storeAndSaveFile(null, pair.getFirst(), pair.getSecond(),
                                        FileOrigin.toFileOrigin(origin)
       ));
   }

@@ -3,8 +3,10 @@ package com.future.function.web.controller.core;
 import com.future.function.service.api.feature.core.FileService;
 import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
+import com.future.function.web.mapper.request.core.FileRequestMapper;
 import com.future.function.web.mapper.request.core.MultipartFileRequestMapper;
 import com.future.function.web.mapper.response.core.FileResponseMapper;
+import com.future.function.web.model.request.core.FileWebRequest;
 import com.future.function.web.model.response.base.BaseResponse;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
@@ -32,14 +34,18 @@ public class FileController {
   
   private final MultipartFileRequestMapper multipartFileRequestMapper;
   
+  private final FileRequestMapper fileRequestMapper;
+  
   @Autowired
   public FileController(
     FileService fileService,
-    MultipartFileRequestMapper multipartFileRequestMapper
+    MultipartFileRequestMapper multipartFileRequestMapper,
+    FileRequestMapper fileRequestMapper
   ) {
     
     this.fileService = fileService;
     this.multipartFileRequestMapper = multipartFileRequestMapper;
+    this.fileRequestMapper = fileRequestMapper;
   }
   
   @ResponseStatus(HttpStatus.OK)
@@ -84,19 +90,18 @@ public class FileController {
     @RequestParam(required = false)
       MultipartFile file,
     @RequestParam
-      String name
+      String data
   ) {
     
     Pair<String, byte[]> pair =
       multipartFileRequestMapper.toStringAndByteArrayPair(file);
     
-    return FileResponseMapper.toFileDataResponse(HttpStatus.CREATED,
-                                                 fileService.createFileOrFolder(
-                                                   parentId, name,
-                                                   pair.getFirst(),
-                                                   pair.getSecond()
-                                                 )
-    );
+    FileWebRequest request = fileRequestMapper.toFileWebRequest(
+      data, pair.getSecond());
+    
+    return FileResponseMapper.toFileDataResponse(
+      HttpStatus.CREATED, fileService.createFileOrFolder(
+        parentId, request.getName(), pair.getFirst(), pair.getSecond()));
   }
   
   @ResponseStatus(HttpStatus.OK)

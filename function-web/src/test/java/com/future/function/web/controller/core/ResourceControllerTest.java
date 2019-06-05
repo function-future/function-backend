@@ -90,15 +90,14 @@ public class ResourceControllerTest {
     
     when(multipartFileRequestMapper.toStringAndByteArrayPair(
       any(MultipartFile.class))).thenReturn(pair);
-    when(resourceService.storeAndSaveFile(NAME, NAME, BYTES,
+    when(resourceService.storeAndSaveFile(null, NAME, BYTES,
                                           FileOrigin.ANNOUNCEMENT
     )).thenReturn(FILE_V2_NULL_THUMBNAIL);
     
     mockMvc.perform(post("/api/resources").contentType(
       MediaType.MULTIPART_FORM_DATA)
                       .param("file", "")
-                      .param("origin", ORIGIN)
-                      .param("name", NAME))
+                      .param("origin", ORIGIN))
       .andExpect(status().isCreated())
       .andExpect(content().json(
         dataResponseJacksonTester.write(CREATED_DATA_RESPONSE_NULL_THUMBNAIL)
@@ -108,7 +107,7 @@ public class ResourceControllerTest {
     verify(multipartFileRequestMapper).toStringAndByteArrayPair(
       any(MultipartFile.class));
     verify(resourceService).storeAndSaveFile(
-      NAME, NAME, BYTES, FileOrigin.ANNOUNCEMENT);
+      null, NAME, BYTES, FileOrigin.ANNOUNCEMENT);
   }
   
   @Test

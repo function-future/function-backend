@@ -26,4 +26,10 @@ public enum FileType {
     
     return this.markFolder;
   }
+  
+  public static boolean isAnyMatch(String type) {
+    
+    return Stream.of(FileType.values())
+      .anyMatch(fileType -> type.equals(fileType.name()));
+  }
 }
