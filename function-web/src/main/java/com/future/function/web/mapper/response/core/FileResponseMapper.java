@@ -2,7 +2,7 @@ package com.future.function.web.mapper.response.core;
 
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.embedded.Version;
-import com.future.function.web.mapper.enumeration.FileType;
+import com.future.function.common.enumeration.core.FileType;
 import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.model.response.base.DataResponse;
