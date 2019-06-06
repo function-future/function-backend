@@ -80,6 +80,8 @@ public interface FieldName {
     
     public static final String AS_RESOURCE = "asResource";
     
+    public static final String VERSIONS = "versions";
+    
   }
   
   @NoArgsConstructor(access = AccessLevel.PRIVATE)

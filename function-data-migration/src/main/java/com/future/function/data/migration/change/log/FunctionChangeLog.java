@@ -111,4 +111,23 @@ public class FunctionChangeLog {
     mongoTemplate.insert(judge, DocumentName.USER);
   }
   
+  @ChangeSet(author = "jonathan",
+             id = "rootFolderMigration",
+             order = "007")
+  public void insertRootFolder(MongoTemplate mongoTemplate) {
+    
+    BasicDBObject rootFolder = new BasicDBObject();
+    rootFolder.append("_" + FieldName.BaseEntity.ID, "root");
+    rootFolder.append(FieldName.File.AS_RESOURCE, false);
+    rootFolder.append(FieldName.File.MARK_FOLDER, true);
+    rootFolder.append(FieldName.File.USED, true);
+    rootFolder.append(
+      FieldName.BaseEntity.CREATED_AT, System.currentTimeMillis());
+    rootFolder.append(
+      FieldName.BaseEntity.UPDATED_AT, System.currentTimeMillis());
+    rootFolder.append(FieldName.BaseEntity.VERSION, 0);
+    
+    mongoTemplate.insert(rootFolder, DocumentName.FILE);
+  }
+  
 }
