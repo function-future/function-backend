@@ -12,7 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -69,14 +69,37 @@ public class FileRepositoryV2Test {
   @Test
   public void testGivenParentIdAndPageableByFindingFilesOrFoldersReturnPageOfFileOrFolder() {
     
-    Page<FileV2> foundFileV2s = fileRepositoryV2.findAllByParentId(PARENT_ID,
-                                                                   new PageRequest(
-                                                                     0, 5)
-    );
+    FileV2 file1 = FileV2.builder()
+      .id(FILE_ID + "FILE")
+      .filePath(FILE_PATH)
+      .fileUrl(FILE_URL)
+      .asResource(false)
+      .markFolder(false)
+      .parentId(PARENT_ID)
+      .build();
+    
+    FileV2 folder = FileV2.builder()
+      .id(FILE_ID + "FOLDER")
+      .filePath(FILE_PATH)
+      .fileUrl(FILE_URL)
+      .asResource(false)
+      .markFolder(true)
+      .parentId(PARENT_ID)
+      .build();
+    
+    fileRepositoryV2.save(file1);
+    fileRepositoryV2.save(folder);
+    
+    Page<FileV2> foundFileV2s =
+      fileRepositoryV2.findAllByParentIdAndAsResourceFalseOrderByMarkFolderDesc(
+        PARENT_ID, new PageRequest(0, 10));
     
     assertThat(foundFileV2s).isNotNull();
     assertThat(foundFileV2s.getContent()).isEqualTo(
-      Collections.singletonList(file));
+      Arrays.asList(folder, file1));
+    
+    fileRepositoryV2.delete(FILE_ID + "FILE");
+    fileRepositoryV2.delete(FILE_ID + "FOLDER");
   }
   
   @Test

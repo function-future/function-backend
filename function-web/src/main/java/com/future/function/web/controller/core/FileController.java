@@ -116,7 +116,7 @@ public class FileController {
     @RequestParam(required = false)
       MultipartFile file,
     @RequestParam
-      String name,
+      String data,
     @RequestParam
       String email
   ) {
@@ -124,9 +124,13 @@ public class FileController {
     Pair<String, byte[]> pair =
       multipartFileRequestMapper.toStringAndByteArrayPair(file);
     
+    FileWebRequest request = fileRequestMapper.toFileWebRequest(
+      data, pair.getSecond());
+    
     return FileResponseMapper.toFileDataResponse(
-      fileService.updateFileOrFolder(email, fileOrFolderId, parentId, name,
-                                     pair.getFirst(), pair.getSecond()
+      fileService.updateFileOrFolder(email, fileOrFolderId, parentId,
+                                     request.getName(), pair.getFirst(),
+                                     pair.getSecond()
       ));
   }
   

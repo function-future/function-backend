@@ -6,7 +6,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -37,7 +36,9 @@ public interface FileRepositoryV2 extends MongoRepository<FileV2, String> {
    * @return {@code Page<FileV2>} - FileV2 objects found in database, if any
    * exists.
    */
-  Page<FileV2> findAllByParentId(String parentId, Pageable pageable);
+  Page<FileV2> findAllByParentIdAndAsResourceFalseOrderByMarkFolderDesc(
+    String parentId, Pageable pageable
+  );
   
   /**
    * Finds all file/folder given parentId.

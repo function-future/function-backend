@@ -28,4 +28,12 @@ public class FileTypeTest {
     assertThat(FileType.FOLDER.isMarkFolder()).isTrue();
   }
   
+  @Test
+  public void testGivenMethodCallToCheckIfStringMatchesAnyFileTypeByCheckingAnyMatchingFileTypeReturnBoolean() {
+    
+    assertThat(FileType.isAnyMatch("FILE")).isTrue();
+    assertThat(FileType.isAnyMatch("FOLDER")).isTrue();
+    assertThat(FileType.isAnyMatch("ASD")).isFalse();
+  }
+  
 }

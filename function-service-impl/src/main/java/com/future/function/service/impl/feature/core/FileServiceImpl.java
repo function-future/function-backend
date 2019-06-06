@@ -74,7 +74,9 @@ public class FileServiceImpl implements FileService {
   public Page<FileV2> getFilesAndFolders(String parentId, Pageable pageable) {
     
     return Optional.ofNullable(parentId)
-      .map(id -> fileRepositoryV2.findAllByParentId(id, pageable))
+      .map(
+        id -> fileRepositoryV2.findAllByParentIdAndAsResourceFalseOrderByMarkFolderDesc(
+          id, pageable))
       .orElseGet(() -> PageHelper.empty(pageable));
   }
   
