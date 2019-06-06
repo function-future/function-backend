@@ -25,4 +25,6 @@ public abstract class DocumentName {
   
   public static final String DISCUSSION = "discussions";
   
+  public static final String ACTIVITY_BLOG = "activity-blogs";
+  
 }

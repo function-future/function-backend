@@ -8,6 +8,7 @@ import com.future.function.model.entity.feature.core.User;
 import com.future.function.repository.feature.core.UserRepository;
 import com.future.function.service.api.feature.core.BatchService;
 import com.future.function.service.api.feature.core.ResourceService;
+import com.future.function.service.impl.helper.PageHelper;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,7 +18,6 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
@@ -183,7 +183,7 @@ public class UserServiceImplTest {
     List<User> studentsList = Arrays.asList(userStudent, additionalUser);
     
     when(userRepository.findAllByRole(Role.STUDENT, PAGEABLE)).thenReturn(
-      new PageImpl<>(studentsList, PAGEABLE, studentsList.size()));
+      PageHelper.toPage(studentsList, PAGEABLE));
     
     Page<User> foundUserStudentsPage = userService.getUsers(
       Role.STUDENT, PAGEABLE);
@@ -212,7 +212,7 @@ public class UserServiceImplTest {
     List<User> mentorsList = Arrays.asList(userMentor, additionalUser);
     
     when(userRepository.findAllByRole(Role.MENTOR, PAGEABLE)).thenReturn(
-      new PageImpl<>(mentorsList, PAGEABLE, mentorsList.size()));
+      PageHelper.toPage(mentorsList, PAGEABLE));
     
     Page<User> foundUserMentorsPage = userService.getUsers(
       Role.MENTOR, PAGEABLE);
@@ -450,8 +450,9 @@ public class UserServiceImplTest {
   
   @Test
   public void testGivenEmailByGettingUserByEmailReturnUser() {
-  
-    when(userRepository.findByEmail(EMAIL_MENTOR)).thenReturn(Optional.of(userMentor));
+    
+    when(userRepository.findByEmail(EMAIL_MENTOR)).thenReturn(
+      Optional.of(userMentor));
     
     User retrievedUser = userService.getUserByEmail(EMAIL_MENTOR);
     
@@ -464,14 +465,14 @@ public class UserServiceImplTest {
   
   @Test
   public void testGivenNonExistingEmailByGettingUserByEmailReturnNotFoundException() {
-  
+    
     when(userRepository.findByEmail(EMAIL_MENTOR)).thenReturn(Optional.empty());
-  
+    
     catchException(() -> userService.getUserByEmail(EMAIL_MENTOR));
-  
+    
     assertThat(caughtException().getClass()).isEqualTo(NotFoundException.class);
     assertThat(caughtException().getMessage()).isEqualTo("Get User Not Found");
-  
+    
     verify(userRepository).findByEmail(EMAIL_MENTOR);
     verifyZeroInteractions(resourceService);
   }
