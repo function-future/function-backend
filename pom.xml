@@ -27,6 +27,7 @@
     <module>function-repository</module>
     <module>function-service-api</module>
     <module>function-service-impl</module>
+    <module>function-session</module>
     <module>function-validation</module>
     <module>function-web</module>
     <module>function-web-model</module>

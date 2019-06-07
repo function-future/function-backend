@@ -3,6 +3,7 @@ package com.future.function.web.controller.core;
 import com.future.function.model.entity.feature.core.StickyNote;
 import com.future.function.service.api.feature.core.StickyNoteService;
 import com.future.function.web.JacksonTestHelper;
+import com.future.function.web.TestSecurityConfiguration;
 import com.future.function.web.mapper.request.core.StickyNoteRequestMapper;
 import com.future.function.web.mapper.response.core.StickyNoteResponseMapper;
 import com.future.function.web.model.request.core.StickyNoteWebRequest;
@@ -17,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -37,7 +39,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
-@WebMvcTest(StickyNoteController.class)
+@Import(TestSecurityConfiguration.class)
+@WebMvcTest(value = StickyNoteController.class)
 public class StickyNoteControllerTest extends JacksonTestHelper {
   
   private static final String TITLE = "title";

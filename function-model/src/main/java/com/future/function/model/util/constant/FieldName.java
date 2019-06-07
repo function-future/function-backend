@@ -36,7 +36,7 @@ public interface FieldName {
     
     public static final String ROLE = "role";
     
-    public static final String PASSWORD = "password";
+    public static final String PASS = "password";
     
     public static final String PHONE = "phone";
     

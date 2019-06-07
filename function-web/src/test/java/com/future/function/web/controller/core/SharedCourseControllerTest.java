@@ -4,6 +4,7 @@ import com.future.function.model.entity.feature.core.Course;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.service.api.feature.core.SharedCourseService;
 import com.future.function.web.JacksonTestHelper;
+import com.future.function.web.TestSecurityConfiguration;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.mapper.request.core.SharedCourseRequestMapper;
 import com.future.function.web.mapper.response.core.CourseResponseMapper;
@@ -21,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -46,7 +48,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
-@WebMvcTest(SharedCourseController.class)
+@Import(TestSecurityConfiguration.class)
+@WebMvcTest(value = SharedCourseController.class)
 public class SharedCourseControllerTest extends JacksonTestHelper {
   
   private static final String ORIGIN_BATCH_CODE = "origin-batch-code";

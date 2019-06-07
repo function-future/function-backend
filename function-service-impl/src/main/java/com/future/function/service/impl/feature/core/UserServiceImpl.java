@@ -2,6 +2,7 @@ package com.future.function.service.impl.feature.core;
 
 import com.future.function.common.enumeration.core.Role;
 import com.future.function.common.exception.NotFoundException;
+import com.future.function.common.exception.UnauthorizedException;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.repository.feature.core.UserRepository;
@@ -12,6 +13,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -30,15 +32,18 @@ public class UserServiceImpl implements UserService {
   
   private final ResourceService resourceService;
   
+  private final BCryptPasswordEncoder encoder;
+  
   @Autowired
   public UserServiceImpl(
     BatchService batchService, UserRepository userRepository,
-    ResourceService resourceService
+    ResourceService resourceService, BCryptPasswordEncoder encoder
   ) {
     
     this.batchService = batchService;
     this.userRepository = userRepository;
     this.resourceService = resourceService;
+    this.encoder = encoder;
   }
   
   /**
@@ -54,6 +59,23 @@ public class UserServiceImpl implements UserService {
     return Optional.ofNullable(userId)
       .map(userRepository::findOne)
       .orElseThrow(() -> new NotFoundException("Get User Not Found"));
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @param email    Email of user to be retrieved.
+   * @param password Password of user.
+   *
+   * @return {@code User} - The user object found in database.
+   */
+  @Override
+  public User getUserByEmailAndPassword(String email, String password) {
+  
+    return Optional.ofNullable(email)
+      .flatMap(userRepository::findByEmail)
+      .filter(user -> encoder.matches(password, user.getPassword()))
+      .orElseThrow(() -> new UnauthorizedException("Invalid Email/Password"));
   }
   
   /**
@@ -204,7 +226,7 @@ public class UserServiceImpl implements UserService {
   
   private User setDefaultEncryptedPassword(User user) {
     
-    // TODO encrypt password when auth is developed
+    user.setPassword(encoder.encode(user.getPassword()));
     return user;
   }
   

@@ -3,6 +3,7 @@ package com.future.function.web.controller.core;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.future.function.model.entity.feature.core.Announcement;
 import com.future.function.service.api.feature.core.AnnouncementService;
+import com.future.function.web.TestSecurityConfiguration;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.mapper.request.core.AnnouncementRequestMapper;
 import com.future.function.web.mapper.response.core.AnnouncementResponseMapper;
@@ -19,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -42,7 +44,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
-@WebMvcTest(AnnouncementController.class)
+@Import(TestSecurityConfiguration.class)
+@WebMvcTest(value = AnnouncementController.class)
 public class AnnouncementControllerTest {
   
   private static final String ID = "id";

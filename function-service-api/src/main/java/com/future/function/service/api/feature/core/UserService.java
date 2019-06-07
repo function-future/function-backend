@@ -24,6 +24,19 @@ public interface UserService {
   User getUser(String userId);
   
   /**
+   * Retrieves a user from database given the users's userId. If not found,
+   * then throw
+   * {@link com.future.function.common.exception.UnauthorizedException}
+   * exception.
+   *
+   * @param email    Email of user to be retrieved.
+   * @param password Password of user.
+   *
+   * @return {@code User} - The user object found in database.
+   */
+  User getUserByEmailAndPassword(String email, String password);
+  
+  /**
    * Retrieves users from database given role.
    *
    * @param role     Role enum of to-be-retrieved users.

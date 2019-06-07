@@ -1,0 +1,110 @@
+package com.future.function.session.resolver;
+
+import com.future.function.common.enumeration.core.Role;
+import com.future.function.common.exception.UnauthorizedException;
+import com.future.function.common.properties.core.SessionProperties;
+import com.future.function.session.annotation.WithAnyRole;
+import com.future.function.session.model.Session;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.MethodParameter;
+import org.springframework.data.redis.core.HashOperations;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Component;
+import org.springframework.web.bind.support.WebDataBinderFactory;
+import org.springframework.web.context.request.NativeWebRequest;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
+import org.springframework.web.method.support.ModelAndViewContainer;
+
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Stream;
+
+@Component
+public class SessionResolver implements HandlerMethodArgumentResolver {
+  
+  private final HashOperations<String, String, Session> hashOperations;
+  
+  private final SessionProperties sessionProperties;
+  
+  @Autowired
+  public SessionResolver(
+    RedisTemplate<String, Session> redisTemplate,
+    SessionProperties sessionProperties
+  ) {
+    
+    this.hashOperations = redisTemplate.opsForHash();
+    this.sessionProperties = sessionProperties;
+  }
+  
+  @Override
+  public boolean supportsParameter(MethodParameter parameter) {
+    
+    return Objects.nonNull(
+      parameter.getParameterAnnotation(WithAnyRole.class)) &&
+           Session.class.equals(parameter.getParameterType());
+  }
+  
+  @Override
+  public Object resolveArgument(
+    MethodParameter parameter, ModelAndViewContainer mavContainer,
+    NativeWebRequest webRequest, WebDataBinderFactory binderFactory
+  ) throws Exception {
+    
+    return Optional.ofNullable(webRequest)
+      .map(this::getCookies)
+      .map(this::getSession)
+      .filter(session -> this.isUserOfValidRole(session, parameter))
+      .orElseThrow(() -> new UnauthorizedException("Invalid Role"));
+  }
+  
+  private boolean isUserOfValidRole(
+    Session session, MethodParameter parameter
+  ) {
+    
+    WithAnyRole parameterAnnotation = parameter.getParameterAnnotation(
+      WithAnyRole.class);
+    
+    Role[] roles = parameterAnnotation.roles();
+    
+    if (roles.length == 0) {
+      return true;
+    }
+    
+    return Stream.of(roles)
+      .anyMatch(role -> role.equals(session.getRole()));
+  }
+  
+  private Session getSession(Cookie[] cookies) {
+    
+    return this.getCustomCookieValue(cookies)
+      .map(id -> hashOperations.get(id, sessionProperties.getKey()))
+      .orElseThrow(
+        () -> new UnauthorizedException("Invalid Session From Resolver"));
+  }
+  
+  private Optional<String> getCustomCookieValue(Cookie[] cookies) {
+    
+    return Stream.of(cookies)
+      .filter(this::isCookieNameMatch)
+      .map(Cookie::getValue)
+      .findFirst();
+  }
+  
+  private boolean isCookieNameMatch(Cookie cookie) {
+    
+    return sessionProperties.getCookieName()
+      .equals(cookie.getName());
+  }
+  
+  private Cookie[] getCookies(NativeWebRequest webRequest) {
+    
+    return Optional.ofNullable(webRequest)
+      .map(NativeWebRequest::getNativeRequest)
+      .map(HttpServletRequest.class::cast)
+      .map(HttpServletRequest::getCookies)
+      .orElseGet(() -> new Cookie[0]);
+  }
+  
+}

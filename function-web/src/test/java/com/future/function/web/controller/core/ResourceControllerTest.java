@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.future.function.common.enumeration.core.FileOrigin;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.service.api.feature.core.ResourceService;
+import com.future.function.web.TestSecurityConfiguration;
 import com.future.function.web.mapper.request.core.MultipartFileRequestMapper;
 import com.future.function.web.mapper.response.core.ResourceResponseMapper;
 import com.future.function.web.model.response.base.DataResponse;
@@ -16,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.util.Pair;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -33,7 +35,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
-@WebMvcTest(ResourceController.class)
+@Import(TestSecurityConfiguration.class)
+@WebMvcTest(value = ResourceController.class)
 public class ResourceControllerTest {
   
   private static final byte[] BYTES = new byte[0];

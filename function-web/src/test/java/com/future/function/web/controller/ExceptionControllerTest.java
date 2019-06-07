@@ -1,6 +1,7 @@
 package com.future.function.web.controller;
 
 import com.future.function.web.JacksonTestHelper;
+import com.future.function.web.TestSecurityConfiguration;
 import com.future.function.web.dummy.controller.BadController;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.model.response.base.BaseResponse;
@@ -10,6 +11,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -19,6 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
+@Import(TestSecurityConfiguration.class)
 @WebMvcTest(value = { ExceptionController.class, BadController.class })
 public class ExceptionControllerTest extends JacksonTestHelper {
   

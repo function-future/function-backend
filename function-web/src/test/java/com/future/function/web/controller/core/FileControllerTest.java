@@ -3,6 +3,7 @@ package com.future.function.web.controller.core;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.service.api.feature.core.FileService;
 import com.future.function.web.JacksonTestHelper;
+import com.future.function.web.TestSecurityConfiguration;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.mapper.request.core.FileRequestMapper;
 import com.future.function.web.mapper.request.core.MultipartFileRequestMapper;
@@ -19,6 +20,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -44,7 +46,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
-@WebMvcTest(FileController.class)
+@Import(TestSecurityConfiguration.class)
+@WebMvcTest(value = FileController.class)
 public class FileControllerTest extends JacksonTestHelper {
   
   public static final PageRequest PAGEABLE = new PageRequest(0, 10);
