@@ -15,25 +15,25 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@Document(collection = DocumentName.QUESTION_RESPONSE_SUMMARY)
-public class QuestionResponseSummary extends BaseEntity {
+@Document(collection = DocumentName.QUESTIONS_RESPONSE_SUMMARY)
+public class QuestionsResponseSummary extends BaseEntity {
 
     @Id
     private String id;
 
-    @Field(FieldName.QuestionResponseSummary.QUESTION)
+    @Field(FieldName.QuestionsResponseSummary.QUESTION)
     @DBRef(lazy = true)
     private Question question;
 
-    @Field(FieldName.QuestionResponseSummary.QUESTIONNAIRE)
+    @Field(FieldName.QuestionsResponseSummary.QUESTIONNAIRE)
     @DBRef(lazy = true)
     private Questionnaire questionnaire;
 
-    @Field(FieldName.QuestionResponseSummary.APPRAISEE)
+    @Field(FieldName.QuestionsResponseSummary.APPRAISEE)
     @DBRef(lazy = true)
     private User appraise;
 
-    @Field(FieldName.QuestionResponseSummary.SCORE_SUMMARY)
+    @Field(FieldName.QuestionsResponseSummary.SCORE_SUMMARY)
     @DBRef
     private Answer scoreSummary;
 

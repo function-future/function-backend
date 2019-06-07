@@ -139,7 +139,7 @@ public interface FieldName {
   }
 
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
-  abstract class QuestionResponseSummary {
+  abstract class QuestionsResponseSummary {
 
     public static final String QUESTION = "question";
 
@@ -149,4 +149,45 @@ public interface FieldName {
 
     public static final String SCORE_SUMMARY = "scoreSummary";
   }
+
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  abstract class QuestionnaireResponse {
+
+    public static final String QUESTIONNAIRE = "questionnaire";
+
+    public static final String APPRAISER = "appraiser";
+
+    public static final String APPRAISEE = "appraisee";
+
+    public static final String SCORE_SUMMARY = "scoreSummary";
+
+    public static final String DETAILS = "details";
+  }
+
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  abstract class QuestionnairesResponseSummary {
+
+    public static final String QUESTIONNAIRE = "questionnaire";
+
+    public static final String APPRAISEE = "appraisee";
+
+    public static final String SCORE_SUMMARY = "scoreSummary";
+  }
+
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  abstract class QuestionnairePartiipant {
+
+    public static final String QUESTIONNAIRE = "questionnaire";
+
+    public static final String MEMBERS = "members";
+
+    public static final String TYPE = "type";
+  }
+
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  abstract class UserQuestionnairesSummary{
+
+  }
+
+
 }

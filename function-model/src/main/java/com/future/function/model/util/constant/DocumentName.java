@@ -27,6 +27,13 @@ public abstract class DocumentName {
 
   public static final String ANSWER = "answers";
 
-  public static final String QUESTION_RESPONSE_SUMMARY = "question-response-summary";
+  public static final String QUESTIONS_RESPONSE_SUMMARY = "questions-response-summary";
 
+  public static final String QUESTIONNAIRE_RESPONSE = "questionnaire-responses";
+
+  public static final String QUETIONNAIRES_RESPONSE_SUMMARY = "questionnaires-response-summary";
+
+  public static final String QUESTIONNAIRE_PARTICIPANT = "questionnaire-participants";
+
+  public static final String USER_QUESTIONNAIRE_SUMMARY = "user-questionnaire-summary";
 }
