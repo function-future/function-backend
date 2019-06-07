@@ -92,5 +92,25 @@ public interface FieldName {
     public static final String FILE = "file";
     
   }
+
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  abstract class Questionnaire {
+
+    public static final String TITLE = "title";
+
+    public static final String DESCRIPTION = "description";
+
+    public static final String START_DATE = "startDate";
+
+  }
+
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  abstract class Question {
+
+    public static final String QUESIONNAIRE = "questionnaire";
+
+    public static final String DESCRIPTION = "description";
+
+  }
   
 }
