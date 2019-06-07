@@ -14,15 +14,15 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @Document(collection = DocumentName.ANSWER)
 public class Answer {
 
-    @Id
-    private String id;
+  @Id
+  private String id;
 
-    @Field(FieldName.Answer.MIN)
-    private Float minimum;
+  @Field(FieldName.Answer.MIN)
+  private Float minimum;
 
-    @Field(FieldName.Answer.MAX)
-    private Float maximum;
+  @Field(FieldName.Answer.MAX)
+  private Float maximum;
 
-    @Field(FieldName.Answer.AVG)
-    private Float average;
+  @Field(FieldName.Answer.AVG)
+  private Float average;
 }

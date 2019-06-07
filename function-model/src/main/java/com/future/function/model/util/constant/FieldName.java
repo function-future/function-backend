@@ -179,13 +179,19 @@ public interface FieldName {
 
     public static final String QUESTIONNAIRE = "questionnaire";
 
-    public static final String MEMBERS = "members";
+    public static final String MEMBER = "member";
 
     public static final String TYPE = "type";
   }
 
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
   abstract class UserQuestionnairesSummary{
+
+    public static final String APPRAISEE = "appraisee";
+
+    public static final String BATCH = "batch";
+
+    public static final String SCORE_SUMMARY = "scoreSummary";
 
   }
 

@@ -1,6 +1,7 @@
 package com.future.function.model.entity.feature.communication.questionnaire;
 
 import com.future.function.model.entity.base.BaseEntity;
+import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.model.util.constant.DocumentName;
 import com.future.function.model.util.constant.FieldName;
@@ -15,28 +16,20 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@Document(collection = DocumentName.QUESTION_RESPONSE)
-public class QuestionResponse extends BaseEntity {
+@Document(collection = DocumentName.USER_QUESTIONNAIRE_SUMMARY)
+public class UserQuestionnaireSummary extends BaseEntity {
 
   @Id
   private String id;
 
-  @Field(FieldName.QuestionResponse.QUESTION)
-  @DBRef
-  private Question question;
-
-  @Field(FieldName.QuestionResponse.APRAISER)
-  @DBRef(lazy = true)
-  private User appraiser;
-
-  @Field(FieldName.QuestionResponse.APRAISEE)
+  @Field(FieldName.UserQuestionnairesSummary.APPRAISEE)
   @DBRef(lazy = true)
   private User appraisee;
 
-  @Field(FieldName.QuestionResponse.SCORE)
-  private Float score;
+  @Field(FieldName.UserQuestionnairesSummary.BATCH)
+  @DBRef(lazy = true)
+  private Batch batch;
 
-  @Field(FieldName.QuestionResponse.COMMENT)
-  private String comment;
-
+  @Field(FieldName.UserQuestionnairesSummary.SCORE_SUMMARY)
+  private Answer scoreSummary;
 }

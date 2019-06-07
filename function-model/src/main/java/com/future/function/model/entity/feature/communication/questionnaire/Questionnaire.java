@@ -16,16 +16,16 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @Document(collection = DocumentName.QUESTIONNAIRE)
 public class Questionnaire extends BaseEntity {
 
-    @Id
-    private String id;
+  @Id
+  private String id;
 
-    @Field(FieldName.Questionnaire.TITLE)
-    private String title;
+  @Field(FieldName.Questionnaire.TITLE)
+  private String title;
 
-    @Field(FieldName.Questionnaire.DESCRIPTION)
-    private String description;
+  @Field(FieldName.Questionnaire.DESCRIPTION)
+  private String description;
 
-    @Field(FieldName.Questionnaire.START_DATE)
-    private Long startDate;
+  @Field(FieldName.Questionnaire.START_DATE)
+  private Long startDate;
 
 }

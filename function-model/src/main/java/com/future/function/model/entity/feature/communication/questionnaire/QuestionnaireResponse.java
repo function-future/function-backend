@@ -20,27 +20,27 @@ import java.util.List;
 @Document(collection = DocumentName.QUESTIONNAIRE_RESPONSE)
 public class QuestionnaireResponse extends BaseEntity {
 
-   @Id
-   private String id;
+  @Id
+  private String id;
 
-   @Field(FieldName.QuestionnaireResponse.QUESTIONNAIRE)
-   @DBRef(lazy = true)
-   private Questionnaire questionnaire;
+  @Field(FieldName.QuestionnaireResponse.QUESTIONNAIRE)
+  @DBRef(lazy = true)
+  private Questionnaire questionnaire;
 
-   @Field(FieldName.QuestionnaireResponse.APPRAISER)
-   @DBRef(lazy = true)
-   private User appraiser;
+  @Field(FieldName.QuestionnaireResponse.APPRAISER)
+  @DBRef(lazy = true)
+  private User appraiser;
 
-   @Field(FieldName.QuestionnaireResponse.APPRAISEE)
-   @DBRef(lazy = true)
-   private User appraisee;
+  @Field(FieldName.QuestionnaireResponse.APPRAISEE)
+  @DBRef(lazy = true)
+  private User appraisee;
 
-   @Field(FieldName.QuestionnaireResponse.SCORE_SUMMARY)
-   @DBRef
-   private Answer score_summary;
+  @Field(FieldName.QuestionnaireResponse.SCORE_SUMMARY)
+  @DBRef
+  private Answer score_summary;
 
-   @Field(FieldName.QuestionnaireResponse.DETAILS)
-   @DBRef(lazy = true)
-   private List<QuestionResponse> details;
+  @Field(FieldName.QuestionnaireResponse.DETAILS)
+  @DBRef(lazy = true)
+  private List<QuestionResponse> details;
 
 }
