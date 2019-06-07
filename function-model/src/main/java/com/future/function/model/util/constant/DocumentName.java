@@ -19,6 +19,7 @@ public abstract class DocumentName {
 
   public static final String STICKY_NOTE = "sticky-notes";
 
+
   public static final String QUESTIONNAIRE = "questionnaires";
 
   public static final String QUESTION = "questions";
@@ -36,4 +37,12 @@ public abstract class DocumentName {
   public static final String QUESTIONNAIRE_PARTICIPANT = "questionnaire-participants";
 
   public static final String USER_QUESTIONNAIRE_SUMMARY = "user-questionnaire-summary";
+
+  public static final String CHATROOM = "chatrooms";
+
+  public static final String MESSAGE = "messages";
+
+  public static final String MESSAGE_STATUS = "message-status";
+
+
 }
