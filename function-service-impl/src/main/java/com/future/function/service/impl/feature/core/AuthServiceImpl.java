@@ -9,6 +9,9 @@ import com.future.function.session.model.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.Cookie;
@@ -54,9 +57,26 @@ public class AuthServiceImpl implements AuthService {
     hashOperations.put(session.getId(), sessionProperties.getKey(), session);
     redisTemplate.expire(
       session.getId(), sessionProperties.getExpireTime(), TimeUnit.SECONDS);
+    
     this.setCookie(response, session.getId(), sessionProperties.getMaxAge());
     
+    this.setAuthenticationOnSecurityContextHolder(this.toAuthentication(user));
+    
     return user;
+  }
+  
+  private void setAuthenticationOnSecurityContextHolder(
+    Authentication authentication
+  ) {
+    
+    SecurityContextHolder.getContext()
+      .setAuthentication(authentication);
+  }
+  
+  private UsernamePasswordAuthenticationToken toAuthentication(User user) {
+    
+    return new UsernamePasswordAuthenticationToken(
+      user.getEmail(), user.getPassword());
   }
   
   private void setCookie(
@@ -75,16 +95,18 @@ public class AuthServiceImpl implements AuthService {
     
     Optional.ofNullable(sessionId)
       .map(id -> hashOperations.get(id, sessionProperties.getKey()))
-      .ifPresent(session -> this.deleteAndUnsetCookie(session, response));
+      .ifPresent(session -> this.unsetRelatedDataToSession(session, response));
   }
   
-  private void deleteAndUnsetCookie(
+  private void unsetRelatedDataToSession(
     Session session, HttpServletResponse response
   ) {
     
     hashOperations.delete(session.getId(), sessionProperties.getKey());
     
     this.setCookie(response, null, 0);
+    
+    this.setAuthenticationOnSecurityContextHolder(null);
   }
   
   @Override
