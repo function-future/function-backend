@@ -71,7 +71,7 @@ public class UserServiceImpl implements UserService {
    */
   @Override
   public User getUserByEmailAndPassword(String email, String password) {
-  
+    
     return Optional.ofNullable(email)
       .flatMap(userRepository::findByEmail)
       .filter(user -> encoder.matches(password, user.getPassword()))
@@ -176,6 +176,39 @@ public class UserServiceImpl implements UserService {
       .orElseThrow(() -> new NotFoundException("Get User Not Found"));
   }
   
+  @Override
+  public void changeUserPassword(String email, String newPassword) {
+    
+    userRepository.findByEmail(email)
+      .ifPresent(user -> {
+        user.setPassword(encoder.encode(newPassword));
+        userRepository.save(user);
+      });
+  }
+  
+  private User setUserPicture(User user, User foundUser) {
+    
+    return Optional.of(foundUser)
+      .map(User::getPictureV2)
+      .map(FileV2::getId)
+      .map(fileId -> this.markAndSetUserPicture(user, fileId, true))
+      .map(ignored -> foundUser)
+      .orElse(foundUser);
+  }
+  
+  private User markAndSetUserPicture(User user, String fileId, boolean used) {
+    
+    resourceService.markFilesUsed(Collections.singletonList(fileId), used);
+    user.setPictureV2(resourceService.getFile(fileId));
+    return user;
+  }
+  
+  private User copyPropertiesAndSaveUser(User user, User foundUser) {
+    
+    BeanUtils.copyProperties(user, foundUser);
+    return userRepository.save(foundUser);
+  }
+  
   private void markDeleted(User user) {
     
     user.setDeleted(true);
@@ -192,22 +225,6 @@ public class UserServiceImpl implements UserService {
       .orElse(user);
   }
   
-  private User setUserPicture(User user, User foundUser) {
-    
-    return Optional.of(foundUser)
-      .map(User::getPictureV2)
-      .map(FileV2::getId)
-      .map(fileId -> this.markAndSetUserPicture(user, fileId, true))
-      .map(ignored -> foundUser)
-      .orElse(foundUser);
-  }
-  
-  private User copyPropertiesAndSaveUser(User user, User foundUser) {
-    
-    BeanUtils.copyProperties(user, foundUser);
-    return userRepository.save(foundUser);
-  }
-  
   private User setUserPicture(User user) {
     
     return Optional.of(user)
@@ -215,13 +232,6 @@ public class UserServiceImpl implements UserService {
       .map(FileV2::getId)
       .map(fileId -> this.markAndSetUserPicture(user, fileId, true))
       .orElse(user);
-  }
-  
-  private User markAndSetUserPicture(User user, String fileId, boolean used) {
-    
-    resourceService.markFilesUsed(Collections.singletonList(fileId), used);
-    user.setPictureV2(resourceService.getFile(fileId));
-    return user;
   }
   
   private User setDefaultEncryptedPassword(User user) {

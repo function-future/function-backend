@@ -57,6 +57,7 @@ public class FunctionChangeLog {
     student.append(FieldName.User.UNIVERSITY, "University");
     student.append(FieldName.BaseEntity.CREATED_AT, System.currentTimeMillis());
     student.append(FieldName.BaseEntity.UPDATED_AT, System.currentTimeMillis());
+    student.append(FieldName.BaseEntity.VERSION, 0);
     
     mongoTemplate.insert(student, DocumentName.USER);
   }
@@ -70,11 +71,13 @@ public class FunctionChangeLog {
     admin.append(FieldName.User.EMAIL, "admin@admin.com");
     admin.append(FieldName.User.NAME, "Admin Istrator");
     admin.append(FieldName.User.ROLE, Role.ADMIN);
-    admin.append(FieldName.User.PASS, ENCODER.encode("administratorfunctionapp"));
+    admin.append(
+      FieldName.User.PASS, ENCODER.encode("administratorfunctionapp"));
     admin.append(FieldName.User.PHONE, "+6281212341234");
     admin.append(FieldName.User.ADDRESS, "Admin Address");
     admin.append(FieldName.BaseEntity.CREATED_AT, System.currentTimeMillis());
     admin.append(FieldName.BaseEntity.UPDATED_AT, System.currentTimeMillis());
+    admin.append(FieldName.BaseEntity.VERSION, 0);
     
     mongoTemplate.insert(admin, DocumentName.USER);
   }
@@ -93,6 +96,7 @@ public class FunctionChangeLog {
     mentor.append(FieldName.User.ADDRESS, "Mentor Address");
     mentor.append(FieldName.BaseEntity.CREATED_AT, System.currentTimeMillis());
     mentor.append(FieldName.BaseEntity.UPDATED_AT, System.currentTimeMillis());
+    mentor.append(FieldName.BaseEntity.VERSION, 0);
     
     mongoTemplate.insert(mentor, DocumentName.USER);
   }
@@ -111,6 +115,7 @@ public class FunctionChangeLog {
     judge.append(FieldName.User.ADDRESS, "Judge Address");
     judge.append(FieldName.BaseEntity.CREATED_AT, System.currentTimeMillis());
     judge.append(FieldName.BaseEntity.UPDATED_AT, System.currentTimeMillis());
+    judge.append(FieldName.BaseEntity.VERSION, 0);
     
     mongoTemplate.insert(judge, DocumentName.USER);
   }
