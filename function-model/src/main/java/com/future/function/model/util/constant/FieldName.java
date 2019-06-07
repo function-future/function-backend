@@ -112,5 +112,29 @@ public interface FieldName {
     public static final String DESCRIPTION = "description";
 
   }
-  
+
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  abstract class QuestionResponse {
+
+    public static final String QUESTION = "question";
+
+    public static final String APRAISER = "apraiser";
+
+    public static final String APRAISEE = "apraisee";
+
+    public static final String SCORE = "score";
+
+    public static final String COMMENT = "comment";
+
+  }
+
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  abstract class Answer {
+
+    public static final String MIN = "minimum";
+
+    public static final String MAX = "maximum";
+
+    public static final String AVG = "average";
+  }
 }
