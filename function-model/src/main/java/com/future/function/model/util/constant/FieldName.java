@@ -137,4 +137,16 @@ public interface FieldName {
 
     public static final String AVG = "average";
   }
+
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  abstract class QuestionResponseSummary {
+
+    public static final String QUESTION = "question";
+
+    public static final String QUESTIONNAIRE = "questionnaire";
+
+    public static final String APPRAISEE = "appraisee";
+
+    public static final String SCORE_SUMMARY = "scoreSummary";
+  }
 }

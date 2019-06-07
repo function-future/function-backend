@@ -26,4 +26,7 @@ public abstract class DocumentName {
   public static final String QUESTION_RESPONSE = "question-responses";
 
   public static final String ANSWER = "answers";
+
+  public static final String QUESTION_RESPONSE_SUMMARY = "question-response-summary";
+
 }
