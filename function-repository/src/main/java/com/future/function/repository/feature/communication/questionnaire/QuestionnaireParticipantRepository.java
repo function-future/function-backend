@@ -24,7 +24,7 @@ public interface QuestionnaireParticipantRepository extends MongoRepository<Ques
    * @return {@code page<QuestionnaireParticipant>} - all questionnaire participant filtered by the query
    */
 
-  Page<QuestionnaireParticipant> findByMemberAndParticipantType(User member, ParticipantType participantType, Pageable pageable);
+  Page<QuestionnaireParticipant> findAllByMemberAndParticipantType(User member, ParticipantType participantType, Pageable pageable);
 
   /**
    * Find all questionnaire participant by questionnaire
@@ -33,5 +33,5 @@ public interface QuestionnaireParticipantRepository extends MongoRepository<Ques
    *
    * @return {@code List<QuestionnaireParticipant>} - all questionnaire participant filtered by the query
    */
-  List<QuestionnaireParticipant> findByQuestionnaire(Questionnaire questionnaire);
+  List<QuestionnaireParticipant> findAllByQuestionnaire(Questionnaire questionnaire);
 }

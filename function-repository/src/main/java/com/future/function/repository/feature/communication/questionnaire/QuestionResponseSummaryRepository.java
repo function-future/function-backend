@@ -17,5 +17,5 @@ public interface QuestionResponseSummaryRepository extends MongoRepository<Quest
    *
    * @return {@code List<QuestionsResponseSummary>} - Questions Response Summary list from database
    */
-  List<QuestionResponseSummary> findByQuestionnaire(Questionnaire questionnaire);
+  List<QuestionResponseSummary> findAllByQuestionnaire(Questionnaire questionnaire);
 }

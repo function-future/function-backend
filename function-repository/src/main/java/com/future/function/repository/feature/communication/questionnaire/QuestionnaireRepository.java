@@ -39,6 +39,6 @@ public interface QuestionnaireRepository extends MongoRepository<Questionnaire, 
    * @return {@code Page<Questionnaire>} - paged questionnaire list from database
    */
 
-  Page<Questionnaire> findByTitleIgnoreCaseContaining(String titleName, Pageable pageable);
+  Page<Questionnaire> findAllByTitleIgnoreCaseContaining(String titleName, Pageable pageable);
 
 }

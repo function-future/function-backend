@@ -17,5 +17,5 @@ public interface QuestionnaireResponseRepository extends MongoRepository<Questio
    *
    * @return {@code List<QuestionnaireResponse>} - questionnaire response list from database
    */
-  List<QuestionnaireResponse> findByQuestionnaire(Questionnaire questionnaire);
+  List<QuestionnaireResponse> findAllByQuestionnaire(Questionnaire questionnaire);
 }

@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface QuestionRespository
+public interface QuestionRepository
         extends MongoRepository<Question, String> {
 
   /**
@@ -16,5 +16,5 @@ public interface QuestionRespository
    * @param questionnaire
    * @return {@code List<Question>} - question list from data base
    */
-  List<Question> findByQuestionnaire(Questionnaire questionnaire);
+  List<Question> findAllByQuestionnaire(Questionnaire questionnaire);
 }

@@ -16,5 +16,5 @@ public interface QuestionnaireResponseSummaryRepository extends MongoRepository<
    * @param pageable pageable object for paging
    * @return {@code Page<QuestionnaireResponseSummary>} - paged Questionnaire Response Summary -
    */
-  Page<QuestionnaireResponseSummary> findByAppraisee(User appraisee, Pageable pageable);
+  Page<QuestionnaireResponseSummary> findAllByAppraisee(User appraisee, Pageable pageable);
 }
