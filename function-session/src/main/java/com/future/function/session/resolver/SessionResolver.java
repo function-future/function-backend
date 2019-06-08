@@ -7,8 +7,8 @@ import com.future.function.session.annotation.WithAnyRole;
 import com.future.function.session.model.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
-import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
@@ -24,7 +24,7 @@ import java.util.stream.Stream;
 @Component
 public class SessionResolver implements HandlerMethodArgumentResolver {
   
-  private final HashOperations<String, String, Session> hashOperations;
+  private final ValueOperations<String, Session> valueOperations;
   
   private final SessionProperties sessionProperties;
   
@@ -34,7 +34,7 @@ public class SessionResolver implements HandlerMethodArgumentResolver {
     SessionProperties sessionProperties
   ) {
     
-    this.hashOperations = redisTemplate.opsForHash();
+    this.valueOperations = redisTemplate.opsForValue();
     this.sessionProperties = sessionProperties;
   }
   
@@ -79,7 +79,7 @@ public class SessionResolver implements HandlerMethodArgumentResolver {
   private Session getSession(Cookie[] cookies) {
     
     return this.getCustomCookieValue(cookies)
-      .map(id -> hashOperations.get(id, sessionProperties.getKey()))
+      .map(valueOperations::get)
       .orElseThrow(
         () -> new UnauthorizedException("Invalid Session From Resolver"));
   }

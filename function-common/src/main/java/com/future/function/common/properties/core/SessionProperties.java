@@ -15,8 +15,6 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties("session")
 public class SessionProperties {
   
-  private String key;
-  
   private int maxAge;
   
   private int expireTime;

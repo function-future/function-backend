@@ -7,8 +7,8 @@ import com.future.function.service.api.feature.core.AuthService;
 import com.future.function.service.api.feature.core.UserService;
 import com.future.function.session.model.Session;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -26,7 +26,7 @@ public class AuthServiceImpl implements AuthService {
   
   private final RedisTemplate<String, Session> redisTemplate;
   
-  private final HashOperations<String, String, Session> hashOperations;
+  private final ValueOperations<String, Session> valueOperations;
   
   private final SessionProperties sessionProperties;
   
@@ -38,7 +38,7 @@ public class AuthServiceImpl implements AuthService {
     
     this.userService = userService;
     this.redisTemplate = redisTemplate;
-    this.hashOperations = redisTemplate.opsForHash();
+    this.valueOperations = redisTemplate.opsForValue();
     this.sessionProperties = sessionProperties;
   }
   
@@ -54,7 +54,7 @@ public class AuthServiceImpl implements AuthService {
       .role(user.getRole())
       .build();
     
-    hashOperations.put(session.getId(), sessionProperties.getKey(), session);
+    valueOperations.set(session.getId(), session);
     redisTemplate.expire(
       session.getId(), sessionProperties.getExpireTime(), TimeUnit.SECONDS);
     
@@ -94,7 +94,7 @@ public class AuthServiceImpl implements AuthService {
   public void logout(String sessionId, HttpServletResponse response) {
     
     Optional.ofNullable(sessionId)
-      .map(id -> hashOperations.get(id, sessionProperties.getKey()))
+      .map(valueOperations::get)
       .ifPresent(session -> this.unsetRelatedDataToSession(session, response));
   }
   
@@ -102,7 +102,8 @@ public class AuthServiceImpl implements AuthService {
     Session session, HttpServletResponse response
   ) {
     
-    hashOperations.delete(session.getId(), sessionProperties.getKey());
+    valueOperations.getOperations()
+      .delete(session.getId());
     
     this.setCookie(response, null, 0);
     
@@ -113,7 +114,7 @@ public class AuthServiceImpl implements AuthService {
   public User getLoginStatus(String sessionId) {
     
     return Optional.ofNullable(sessionId)
-      .map(id -> hashOperations.get(id, sessionProperties.getKey()))
+      .map(valueOperations::get)
       .map(Session::getEmail)
       .map(userService::getUserByEmail)
       .orElseThrow(
