@@ -23,6 +23,8 @@ public class FunctionChangeLog {
   
   private static final String ONE = "1";
   
+  private static final String ADMIN_EMAIL = "admin@admin.com";
+  
   private Batch savedFirstBatch;
   
   @ChangeSet(author = "jonathan",
@@ -31,7 +33,7 @@ public class FunctionChangeLog {
   public void insertAdmin(MongoTemplate mongoTemplate) {
     
     BasicDBObject admin = new BasicDBObject();
-    admin.append(FieldName.User.EMAIL, "admin@admin.com");
+    admin.append(FieldName.User.EMAIL, ADMIN_EMAIL);
     admin.append(FieldName.User.NAME, "Admin Istrator");
     admin.append(FieldName.User.ROLE, Role.ADMIN);
     admin.append(
@@ -39,9 +41,9 @@ public class FunctionChangeLog {
     admin.append(FieldName.User.PHONE, "+6281212341234");
     admin.append(FieldName.User.ADDRESS, "Admin Address");
     admin.append(FieldName.BaseEntity.CREATED_AT, System.currentTimeMillis());
-    admin.append(FieldName.BaseEntity.CREATED_BY, "admin@admin.com");
+    admin.append(FieldName.BaseEntity.CREATED_BY, ADMIN_EMAIL);
     admin.append(FieldName.BaseEntity.UPDATED_AT, System.currentTimeMillis());
-    admin.append(FieldName.BaseEntity.UPDATED_BY, "admin@admin.com");
+    admin.append(FieldName.BaseEntity.UPDATED_BY, ADMIN_EMAIL);
     admin.append(FieldName.BaseEntity.VERSION, 0);
     
     mongoTemplate.insert(admin, DocumentName.USER);
@@ -54,9 +56,9 @@ public class FunctionChangeLog {
     
     Batch batch = new Batch(new ObjectId().toString(), "one", ONE);
     batch.setCreatedAt(System.currentTimeMillis());
-    batch.setCreatedBy("admin@admin.com");
+    batch.setCreatedBy(ADMIN_EMAIL);
     batch.setUpdatedAt(System.currentTimeMillis());
-    batch.setUpdatedBy("admin@admin.com");
+    batch.setUpdatedBy(ADMIN_EMAIL);
     
     mongoTemplate.save(batch, DocumentName.BATCH);
     
@@ -82,9 +84,9 @@ public class FunctionChangeLog {
     student.append(FieldName.User.BATCH, batchRef);
     student.append(FieldName.User.UNIVERSITY, "University");
     student.append(FieldName.BaseEntity.CREATED_AT, System.currentTimeMillis());
-    student.append(FieldName.BaseEntity.CREATED_BY, "admin@admin.com");
+    student.append(FieldName.BaseEntity.CREATED_BY, ADMIN_EMAIL);
     student.append(FieldName.BaseEntity.UPDATED_AT, System.currentTimeMillis());
-    student.append(FieldName.BaseEntity.UPDATED_BY, "admin@admin.com");
+    student.append(FieldName.BaseEntity.UPDATED_BY, ADMIN_EMAIL);
     student.append(FieldName.BaseEntity.VERSION, 0);
     
     mongoTemplate.insert(student, DocumentName.USER);
@@ -103,9 +105,9 @@ public class FunctionChangeLog {
     mentor.append(FieldName.User.PHONE, "+628121234123");
     mentor.append(FieldName.User.ADDRESS, "Mentor Address");
     mentor.append(FieldName.BaseEntity.CREATED_AT, System.currentTimeMillis());
-    mentor.append(FieldName.BaseEntity.CREATED_BY, "admin@admin.com");
+    mentor.append(FieldName.BaseEntity.CREATED_BY, ADMIN_EMAIL);
     mentor.append(FieldName.BaseEntity.UPDATED_AT, System.currentTimeMillis());
-    mentor.append(FieldName.BaseEntity.UPDATED_BY, "admin@admin.com");
+    mentor.append(FieldName.BaseEntity.UPDATED_BY, ADMIN_EMAIL);
     mentor.append(FieldName.BaseEntity.VERSION, 0);
     
     mongoTemplate.insert(mentor, DocumentName.USER);
@@ -124,9 +126,9 @@ public class FunctionChangeLog {
     judge.append(FieldName.User.PHONE, "+62812123412345");
     judge.append(FieldName.User.ADDRESS, "Judge Address");
     judge.append(FieldName.BaseEntity.CREATED_AT, System.currentTimeMillis());
-    judge.append(FieldName.BaseEntity.CREATED_BY, "admin@admin.com");
+    judge.append(FieldName.BaseEntity.CREATED_BY, ADMIN_EMAIL);
     judge.append(FieldName.BaseEntity.UPDATED_AT, System.currentTimeMillis());
-    judge.append(FieldName.BaseEntity.UPDATED_BY, "admin@admin.com");
+    judge.append(FieldName.BaseEntity.UPDATED_BY, ADMIN_EMAIL);
     judge.append(FieldName.BaseEntity.VERSION, 0);
     
     mongoTemplate.insert(judge, DocumentName.USER);
@@ -144,10 +146,10 @@ public class FunctionChangeLog {
     rootFolder.append(FieldName.File.USED, true);
     rootFolder.append(
       FieldName.BaseEntity.CREATED_AT, System.currentTimeMillis());
-    rootFolder.append(FieldName.BaseEntity.CREATED_BY, "admin@admin.com");
+    rootFolder.append(FieldName.BaseEntity.CREATED_BY, ADMIN_EMAIL);
     rootFolder.append(
       FieldName.BaseEntity.UPDATED_AT, System.currentTimeMillis());
-    rootFolder.append(FieldName.BaseEntity.UPDATED_BY, "admin@admin.com");
+    rootFolder.append(FieldName.BaseEntity.UPDATED_BY, ADMIN_EMAIL);
     rootFolder.append(FieldName.BaseEntity.VERSION, 0);
     
     mongoTemplate.insert(rootFolder, DocumentName.FILE);
