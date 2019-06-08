@@ -4,6 +4,7 @@ import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.model.entity.feature.scoring.Quiz;
+import com.future.function.model.entity.feature.scoring.StudentQuestion;
 import com.future.function.model.entity.feature.scoring.StudentQuiz;
 import com.future.function.model.entity.feature.scoring.StudentQuizDetail;
 import com.future.function.repository.feature.scoring.StudentQuizRepository;
@@ -49,6 +50,28 @@ public class StudentQuizServiceImpl implements StudentQuizService {
     }
 
     @Override
+    public List<StudentQuestion> findAllQuestionsByStudentQuizId(String studentQuizId) {
+        return studentQuizDetailService.findAllQuestionsByStudentQuizId(studentQuizId);
+    }
+
+    @Override
+    public List<StudentQuestion> findAllUnansweredQuestionByStudentQuizId(String studentQuizId) {
+        StudentQuiz studentQuiz = findAndUpdateTrials(studentQuizId);
+        return studentQuizDetailService.findAllUnansweredQuestionsByStudentQuizId(studentQuiz.getId());
+    }
+
+    private StudentQuiz findAndUpdateTrials(String studentQuizId) {
+        StudentQuiz studentQuiz = this.findById(studentQuizId);
+        studentQuiz.setTrials(studentQuiz.getTrials() - 1);
+        return studentQuizRepository.save(studentQuiz);
+    }
+
+    @Override
+    public StudentQuizDetail answerQuestionsByStudentQuizId(String studentQuizId, List<StudentQuestion> answers) {
+        return studentQuizDetailService.answerStudentQuiz(studentQuizId, answers);
+    }
+
+    @Override
     public StudentQuiz createStudentQuizAndSave(String userId, Quiz quiz) {
         return Optional.ofNullable(quiz)
                 .filter(Objects::nonNull)
@@ -87,7 +110,7 @@ public class StudentQuizServiceImpl implements StudentQuizService {
 
     private Quiz createNewQuiz(Quiz quiz) {
         Quiz newQuiz = new Quiz();
-        BeanUtils.copyProperties(quiz, newQuiz, "id");
+        BeanUtils.copyProperties(quiz, newQuiz, "_id", "id");
         return newQuiz;
     }
 

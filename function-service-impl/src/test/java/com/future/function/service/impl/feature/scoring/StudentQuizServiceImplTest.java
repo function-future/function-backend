@@ -2,9 +2,7 @@ package com.future.function.service.impl.feature.scoring;
 
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.User;
-import com.future.function.model.entity.feature.scoring.Quiz;
-import com.future.function.model.entity.feature.scoring.StudentQuiz;
-import com.future.function.model.entity.feature.scoring.StudentQuizDetail;
+import com.future.function.model.entity.feature.scoring.*;
 import com.future.function.repository.feature.scoring.StudentQuizRepository;
 import com.future.function.service.api.feature.core.BatchService;
 import com.future.function.service.api.feature.core.UserService;
@@ -22,6 +20,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import static com.googlecode.catchexception.CatchException.catchException;
@@ -43,10 +42,22 @@ public class StudentQuizServiceImplTest {
     private static final String BATCH_CODE = "batch-code";
     private static final String TARGET_BATCH = "target-batch";
 
+    private static final String STUDENT_QUIZ_DETAIL_ID = "student-detail-quiz-id";
+    private static final String STUDENT_QUESTION_ID = "student-question-id";
+
+    private static final String QUESTION_ID = "question-id";
+    private static final String OPTION_ID = "option-id";
+    private static final String OPTION_LABEL = "option-label";
+    private static final String QUESTION_TEXT = "question-text";
+
     private Batch batch;
     private User student;
     private Quiz quiz;
     private StudentQuiz studentQuiz;
+    private StudentQuizDetail studentQuizDetail;
+    private StudentQuestion studentQuestion;
+    private Question question;
+    private Option option;
     private Pageable pageable;
     private Page<StudentQuiz> studentQuizPage;
 
@@ -68,6 +79,20 @@ public class StudentQuizServiceImplTest {
 
     @Before
     public void setUp() throws Exception {
+
+        question = Question
+                .builder()
+                .id(QUESTION_ID)
+                .text(QUESTION_TEXT)
+                .build();
+
+        option = Option
+                .builder()
+                .id(OPTION_ID)
+                .label(OPTION_LABEL)
+                .correct(true)
+                .question(question)
+                .build();
 
         student = User
                 .builder()
@@ -95,6 +120,21 @@ public class StudentQuizServiceImplTest {
                 .trials(QUIZ_TRIALS)
                 .build();
 
+        studentQuizDetail = StudentQuizDetail
+                .builder()
+                .id(STUDENT_QUIZ_DETAIL_ID)
+                .studentQuiz(studentQuiz)
+                .build();
+
+        studentQuestion = StudentQuestion
+                .builder()
+                .id(STUDENT_QUESTION_ID)
+                .number(1)
+                .studentQuizDetail(studentQuizDetail)
+                .question(question)
+                .option(option)
+                .build();
+
         pageable = new PageRequest(0, 10);
 
         studentQuizPage = new PageImpl<>(Collections.singletonList(studentQuiz), pageable, 1);
@@ -120,6 +160,12 @@ public class StudentQuizServiceImplTest {
                 .thenReturn(batch);
         when(studentQuizDetailService.createStudentQuizDetail(studentQuiz, null))
                 .thenReturn(new StudentQuizDetail());
+        when(studentQuizDetailService.findAllUnansweredQuestionsByStudentQuizId(STUDENT_QUIZ_ID))
+                .thenReturn(Collections.singletonList(studentQuestion));
+        when(studentQuizDetailService.findAllQuestionsByStudentQuizId(STUDENT_QUIZ_ID))
+                .thenReturn(Collections.singletonList(studentQuestion));
+        when(studentQuizDetailService.answerStudentQuiz(STUDENT_QUIZ_ID, Collections.singletonList(studentQuestion)))
+                .thenReturn(studentQuizDetail);
 
     }
 
@@ -144,6 +190,31 @@ public class StudentQuizServiceImplTest {
         assertThat(studentQuiz.getId()).isEqualTo(STUDENT_QUIZ_ID);
         assertThat(studentQuiz.getTrials()).isEqualTo(QUIZ_TRIALS);
         verify(studentQuizRepository).findByIdAndDeletedFalse(STUDENT_QUIZ_ID);
+    }
+
+    @Test
+    public void findAllQuestionsByStudentQuizId() {
+        List<StudentQuestion> actual = studentQuizService.findAllQuestionsByStudentQuizId(STUDENT_QUIZ_ID);
+        assertThat(actual.size()).isEqualTo(1);
+        verify(studentQuizDetailService).findAllQuestionsByStudentQuizId(STUDENT_QUIZ_ID);
+    }
+
+    @Test
+    public void findAllUnansweredQuestionsByStudentQuizId() {
+        List<StudentQuestion> actual = studentQuizService.findAllUnansweredQuestionByStudentQuizId(STUDENT_QUIZ_ID);
+        assertThat(actual.size()).isEqualTo(1);
+        verify(studentQuizDetailService).findAllUnansweredQuestionsByStudentQuizId(STUDENT_QUIZ_ID);
+        verify(studentQuizRepository).findByIdAndDeletedFalse(STUDENT_QUIZ_ID);
+        studentQuiz.setTrials(QUIZ_TRIALS - 1);
+        verify(studentQuizRepository).save(studentQuiz);
+    }
+
+    @Test
+    public void answerQuestionsByStudentQuizId() {
+        StudentQuizDetail actual = studentQuizService.answerQuestionsByStudentQuizId(STUDENT_QUIZ_ID,
+                Collections.singletonList(studentQuestion));
+        assertThat(actual.getStudentQuiz().getId()).isEqualTo(STUDENT_QUIZ_ID);
+        verify(studentQuizDetailService).answerStudentQuiz(STUDENT_QUIZ_ID, Collections.singletonList(studentQuestion));
     }
 
     @Test

@@ -31,7 +31,9 @@ public abstract class DocumentName {
 
   public static final String STUDENT_QUIZ = "student-quizzes";
 
-  public static final String STUDENT_QUIZ_DETAIL = "student-quizzes-detail";
+    public static final String STUDENT_QUIZ_DETAIL = "student-quizzes-details";
+
+    public static final String STUDENT_QUESTION = "student-questions";
 
   public static final String QUESTION = "questions";
 

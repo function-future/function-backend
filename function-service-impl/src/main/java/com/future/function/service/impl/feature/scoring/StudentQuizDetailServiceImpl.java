@@ -7,6 +7,7 @@ import com.future.function.model.entity.feature.scoring.StudentQuizDetail;
 import com.future.function.repository.feature.scoring.StudentQuizDetailRepository;
 import com.future.function.service.api.feature.scoring.StudentQuestionService;
 import com.future.function.service.api.feature.scoring.StudentQuizDetailService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -55,10 +56,16 @@ public class StudentQuizDetailServiceImpl implements StudentQuizDetailService {
                         quiz.getQuestionCount()))
                 .map(questionList -> studentQuestionService
                         .createStudentQuestionsFromQuestionList(questionList,
-                                this.findLatestByStudentQuizId(studentQuizId)))
+                                this.createNewStudentQuizDetail(studentQuizId)))
                 .orElseThrow(() -> new UnsupportedOperationException("Student Quiz not found"));
     }
 
+    private StudentQuizDetail createNewStudentQuizDetail(String studentQuizId) {
+        StudentQuizDetail detail = new StudentQuizDetail();
+        StudentQuizDetail source = this.findLatestByStudentQuizId(studentQuizId);
+        BeanUtils.copyProperties(source, detail, "_id");
+        return studentQuizDetailRepository.save(detail);
+    }
     @Override
     public StudentQuizDetail answerStudentQuiz(String studentQuizId, List<StudentQuestion> answers) {
         StudentQuizDetail detail = Optional.ofNullable(studentQuizId)

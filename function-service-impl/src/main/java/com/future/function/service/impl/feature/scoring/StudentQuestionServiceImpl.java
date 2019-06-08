@@ -94,8 +94,16 @@ public class StudentQuestionServiceImpl implements StudentQuestionService {
         List<StudentQuestion> questions = this.findAllByStudentQuizDetailId(studentQuizDetailId);
         Long correctQuestions = questions.stream()
                 .filter(question -> checkRequestedOptionCorrect(answers, question))
+                .map(question -> setCorrectOption(answers, questions, question))
+                .map(studentQuestionRepository::save)
                 .count();
         return getTotalPoint(questions, correctQuestions);
+    }
+
+    private StudentQuestion setCorrectOption(List<StudentQuestion> answers, List<StudentQuestion> questions, StudentQuestion question) {
+        question.setCorrect(true);
+        question.setOption(answers.get(questions.size() - 1).getOption());
+        return question;
     }
 
     private boolean checkRequestedOptionCorrect(List<StudentQuestion> answers, StudentQuestion question) {

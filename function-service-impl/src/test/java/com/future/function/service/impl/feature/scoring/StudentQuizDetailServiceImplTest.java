@@ -149,6 +149,7 @@ public class StudentQuizDetailServiceImplTest {
         assertThat(actual.get(0).getNumber()).isEqualTo(1);
         assertThat(actual.get(0).getQuestion().getText()).isEqualTo(QUESTION_TEXT);
         verify(studentQuizDetailRepository, times(2)).findFirstByStudentQuizId(STUDENT_QUIZ_ID);
+        verify(studentQuizDetailRepository).save(any(StudentQuizDetail.class));
         verify(studentQuestionService).findAllQuestionsFromMultipleQuestionBank(true,
                 Collections.singletonList(questionBank), studentQuiz.getQuiz().getQuestionCount());
         verify(studentQuestionService)

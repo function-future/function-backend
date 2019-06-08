@@ -74,7 +74,7 @@ public class QuizServiceImpl implements QuizService {
   @Override
   public Quiz copyQuizWithTargetBatch(String targetBatch, Quiz quiz) {
       Batch batch = batchService.getBatchByCode(targetBatch);
-    quiz = this.findById(quiz.getId());
+      quiz = this.findById(quiz.getId());
       quiz = studentQuizService.copyQuizWithTargetBatch(batch, quiz);
       return quizRepository.save(quiz);
   }

@@ -1,6 +1,6 @@
 package com.future.function.web.controller.scoring;
 
-import com.future.function.service.api.feature.scoring.StudentQuizDetailService;
+import com.future.function.service.api.feature.scoring.StudentQuizService;
 import com.future.function.web.mapper.request.scoring.StudentQuestionRequestMapper;
 import com.future.function.web.mapper.response.scoring.StudentQuizDetailResponseMapper;
 import com.future.function.web.model.request.scoring.StudentQuestionWebRequest;
@@ -21,7 +21,7 @@ import java.util.List;
 public class StudentQuestionController {
 
     @Autowired
-    private StudentQuizDetailService studentQuizDetailService;
+    private StudentQuizService studentQuizService;
 
     @Autowired
     private StudentQuestionRequestMapper studentQuestionRequestMapper;
@@ -32,7 +32,7 @@ public class StudentQuestionController {
                                                                                                    String studentQuizId) {
         return StudentQuizDetailResponseMapper
                 .toStudentQuestionWebResponses(
-                        studentQuizDetailService
+                        studentQuizService
                                 .findAllQuestionsByStudentQuizId(studentQuizId));
     }
 
@@ -42,8 +42,8 @@ public class StudentQuestionController {
             @PathVariable(value = "studentQuizId") String studentQuizId) {
         return StudentQuizDetailResponseMapper
                 .toStudentQuestionWebResponses(
-                        studentQuizDetailService
-                                .findAllUnansweredQuestionsByStudentQuizId(studentQuizId));
+                        studentQuizService
+                                .findAllUnansweredQuestionByStudentQuizId(studentQuizId));
     }
 
     @ResponseStatus(HttpStatus.CREATED)
@@ -52,8 +52,8 @@ public class StudentQuestionController {
                                                                               @RequestBody List<StudentQuestionWebRequest> answerRequests) {
         return StudentQuizDetailResponseMapper
                 .toStudentQuizDetailWebResponse(
-                        studentQuizDetailService
-                                .answerStudentQuiz(
+                        studentQuizService
+                                .answerQuestionsByStudentQuizId(
                                         studentQuizId,
                                         studentQuestionRequestMapper
                                                 .toStudentQuestionList(answerRequests)));

@@ -189,8 +189,20 @@ public interface FieldName {
 
     public static final String STUDENT_QUIZ = "studentQuiz";
 
-    public static final String QUESTION_LIST = "questionList";
-
   }
 
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    abstract class StudentQuestion {
+
+        public static final String STUDENT_QUIZ_DETAIL = "studentQuizDetail";
+
+        public static final String QUESTION = "question";
+
+        public static final String OPTION = "option";
+
+        public static final String CORRECT = "correct";
+
+        public static final String NUMBER = "number";
+
+    }
 }

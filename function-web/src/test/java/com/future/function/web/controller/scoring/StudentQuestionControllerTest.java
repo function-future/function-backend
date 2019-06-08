@@ -2,7 +2,7 @@ package com.future.function.web.controller.scoring;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.future.function.model.entity.feature.scoring.*;
-import com.future.function.service.api.feature.scoring.StudentQuizDetailService;
+import com.future.function.service.api.feature.scoring.StudentQuizService;
 import com.future.function.web.mapper.request.scoring.StudentQuestionRequestMapper;
 import com.future.function.web.mapper.response.scoring.StudentQuizDetailResponseMapper;
 import com.future.function.web.model.request.scoring.StudentQuestionWebRequest;
@@ -59,7 +59,7 @@ public class StudentQuestionControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
-    private StudentQuizDetailService studentQuizDetailService;
+    private StudentQuizService studentQuizService;
 
     @MockBean
     private StudentQuestionRequestMapper requestMapper;
@@ -115,11 +115,11 @@ public class StudentQuestionControllerTest {
         pagingResponse = StudentQuizDetailResponseMapper
                 .toStudentQuestionWebResponses(Collections.singletonList(studentQuestion));
 
-        when(studentQuizDetailService.answerStudentQuiz(STUDENT_QUIZ_ID, Collections.singletonList(studentQuestion)))
+        when(studentQuizService.answerQuestionsByStudentQuizId(STUDENT_QUIZ_ID, Collections.singletonList(studentQuestion)))
                 .thenReturn(studentQuizDetail);
-        when(studentQuizDetailService.findAllQuestionsByStudentQuizId(STUDENT_QUIZ_ID))
+        when(studentQuizService.findAllQuestionsByStudentQuizId(STUDENT_QUIZ_ID))
                 .thenReturn(Collections.singletonList(studentQuestion));
-        when(studentQuizDetailService.findAllUnansweredQuestionsByStudentQuizId(STUDENT_QUIZ_ID))
+        when(studentQuizService.findAllUnansweredQuestionByStudentQuizId(STUDENT_QUIZ_ID))
                 .thenReturn(Collections.singletonList(studentQuestion));
         when(requestMapper.toStudentQuestionList(Collections.singletonList(studentQuestionWebRequest)))
                 .thenReturn(Collections.singletonList(studentQuestion));
@@ -129,7 +129,7 @@ public class StudentQuestionControllerTest {
 
     @After
     public void tearDown() throws Exception {
-        verifyNoMoreInteractions(studentQuizDetailService, requestMapper);
+        verifyNoMoreInteractions(studentQuizService, requestMapper);
     }
 
     @Test
@@ -141,7 +141,7 @@ public class StudentQuestionControllerTest {
                         pagingResponseJacksonTester.write(
                                 pagingResponse).getJson()
                 ));
-        verify(studentQuizDetailService).findAllQuestionsByStudentQuizId(STUDENT_QUIZ_ID);
+        verify(studentQuizService).findAllQuestionsByStudentQuizId(STUDENT_QUIZ_ID);
     }
 
     @Test
@@ -153,7 +153,7 @@ public class StudentQuestionControllerTest {
                         pagingResponseJacksonTester.write(
                                 pagingResponse).getJson()
                 ));
-        verify(studentQuizDetailService).findAllUnansweredQuestionsByStudentQuizId(STUDENT_QUIZ_ID);
+        verify(studentQuizService).findAllUnansweredQuestionByStudentQuizId(STUDENT_QUIZ_ID);
     }
 
     @Test
@@ -169,7 +169,7 @@ public class StudentQuestionControllerTest {
                         dataResponseJacksonTester.write(
                                 studentQuizDetailWebResponseDataResponse).getJson()
                 ));
-        verify(studentQuizDetailService).answerStudentQuiz(STUDENT_QUIZ_ID, Collections.singletonList(studentQuestion));
+        verify(studentQuizService).answerQuestionsByStudentQuizId(STUDENT_QUIZ_ID, Collections.singletonList(studentQuestion));
         verify(requestMapper).toStudentQuestionList(Collections.singletonList(studentQuestionWebRequest));
     }
 }

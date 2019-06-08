@@ -77,7 +77,6 @@ public class StudentQuestionServiceImplTest {
                 .builder()
                 .id(OPTION_ID)
                 .label(OPTION_LABEL)
-                .question(question)
                 .correct(true)
                 .build();
 
@@ -92,7 +91,7 @@ public class StudentQuestionServiceImplTest {
                 .studentQuizDetail(studentQuizDetail)
                 .build();
 
-        sort = new Sort(Sort.Direction.ASC, "number");
+        sort = new Sort(Sort.DEFAULT_DIRECTION, "number");
 
         when(studentQuestionRepository.findAllByStudentQuizDetailId(STUDENT_QUIZ_DETAIL_ID, sort))
                 .thenReturn(Collections.singletonList(studentQuestion));
@@ -162,6 +161,7 @@ public class StudentQuestionServiceImplTest {
                 .postAnswerForAllStudentQuestion(Collections.singletonList(studentQuestion));
         assertThat(actual).isEqualTo(100);
         verify(studentQuestionRepository).findAllByStudentQuizDetailId(STUDENT_QUIZ_DETAIL_ID, sort);
+        verify(studentQuestionRepository).save(studentQuestion);
     }
 
     @Test(expected = UnsupportedOperationException.class)
