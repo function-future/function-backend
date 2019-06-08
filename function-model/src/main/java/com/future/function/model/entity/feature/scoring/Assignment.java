@@ -5,6 +5,7 @@ import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.util.constant.DocumentName;
 import lombok.*;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.UUID;
@@ -30,8 +31,7 @@ public class Assignment extends BaseEntity {
 
   private long deadline;
 
-  private String question;
-
-    private FileV2 file;
+  @DBRef
+  private FileV2 file;
 
 }
