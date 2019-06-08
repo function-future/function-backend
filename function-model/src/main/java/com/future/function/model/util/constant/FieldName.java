@@ -139,7 +139,7 @@ public interface FieldName {
   }
 
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
-  abstract class QuestionsResponseSummary {
+  abstract class QuestionResponseSummary {
 
     public static final String QUESTION = "question";
 
@@ -165,7 +165,7 @@ public interface FieldName {
   }
 
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
-  abstract class QuestionnairesResponseSummary {
+  abstract class QuestionnaireResponseSummary {
 
     public static final String QUESTIONNAIRE = "questionnaire";
 

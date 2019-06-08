@@ -28,11 +28,11 @@ public abstract class DocumentName {
 
   public static final String ANSWER = "answers";
 
-  public static final String QUESTIONS_RESPONSE_SUMMARY = "questions-response-summary";
+  public static final String QUESTION_RESPONSE_SUMMARY = "question-response-summaries";
 
   public static final String QUESTIONNAIRE_RESPONSE = "questionnaire-responses";
 
-  public static final String QUESTIONNAIRES_RESPONSE_SUMMARY = "questionnaires-response-summary";
+  public static final String QUESTIONNAIRE_RESPONSE_SUMMARY = "questionnaire-response-summaries";
 
   public static final String QUESTIONNAIRE_PARTICIPANT = "questionnaire-participants";
 
