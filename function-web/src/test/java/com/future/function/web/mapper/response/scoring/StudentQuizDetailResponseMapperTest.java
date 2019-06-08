@@ -64,6 +64,7 @@ public class StudentQuizDetailResponseMapperTest {
                 .question(question)
                 .option(option)
                 .studentQuizDetail(studentQuizDetail)
+                .number(1)
                 .build();
 
     }
@@ -84,7 +85,7 @@ public class StudentQuizDetailResponseMapperTest {
     public void toStudentQuestionWebResponses() {
         PagingResponse<StudentQuestionWebResponse> responses = StudentQuizDetailResponseMapper
                 .toStudentQuestionWebResponses(Collections.singletonList(studentQuestion));
-        assertThat(responses.getData().get(0).getQuestionText()).isEqualTo(QUESTION_TEXT);
+        assertThat(responses.getData().get(0).getText()).isEqualTo(QUESTION_TEXT);
         assertThat(responses.getData().get(0).getOptions().get(0).getLabel()).isEqualTo(OPTION_LABEL);
         assertThat(responses.getData().get(0).getOptions().get(0).getCorrect()).isEqualTo(null);
     }

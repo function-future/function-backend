@@ -35,8 +35,8 @@ public class QuizWebRequest {
   @Min(value = 1, message = "MinimalOnePositiveNumber")
   private Integer trials;
 
-  @Min(value = 1, message = "MinimalOnePositiveNumber")
-  private Integer batchCode;
+    @NotBlank(message = "NotBlank")
+    private String batchCode;
 
   @Min(value = 1, message = "MinimalOnePositiveNumber")
   private Integer questionCount;

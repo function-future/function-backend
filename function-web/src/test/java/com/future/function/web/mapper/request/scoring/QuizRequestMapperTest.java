@@ -1,8 +1,10 @@
 package com.future.function.web.mapper.request.scoring;
 
 import com.future.function.common.exception.BadRequestException;
+import com.future.function.model.entity.feature.scoring.QuestionBank;
 import com.future.function.model.entity.feature.scoring.Quiz;
 import com.future.function.validation.RequestValidator;
+import com.future.function.web.model.request.scoring.CopyQuizWebRequest;
 import com.future.function.web.model.request.scoring.QuizWebRequest;
 import org.junit.After;
 import org.junit.Before;
@@ -13,6 +15,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.beans.BeanUtils;
 
+import java.util.Collections;
 import java.util.UUID;
 
 import static com.googlecode.catchexception.CatchException.catchException;
@@ -30,8 +33,10 @@ public class QuizRequestMapperTest {
   private long TIME_LIMIT = 0;
   private int TRIALS = 0;
   private int QUESTION_COUNT = 0;
+    private String QUESTION_BANK_ID = "question-bank-id";
 
   private Quiz quiz;
+    private QuestionBank questionBank;
   private QuizWebRequest request;
 
   @InjectMocks
@@ -42,6 +47,12 @@ public class QuizRequestMapperTest {
 
   @Before
   public void setUp() throws Exception {
+
+      questionBank = QuestionBank
+              .builder()
+              .id(QUESTION_BANK_ID)
+              .build();
+
     quiz = Quiz
             .builder()
             .id(QUIZ_ID)
@@ -52,10 +63,12 @@ public class QuizRequestMapperTest {
             .timeLimit(TIME_LIMIT)
             .trials(TRIALS)
             .questionCount(QUESTION_COUNT)
+            .questionBanks(Collections.singletonList(questionBank))
             .build();
 
     request = new QuizWebRequest();
     BeanUtils.copyProperties(quiz, request);
+      request.setQuestionBanks(Collections.singletonList(QUESTION_BANK_ID));
 
     when(validator.validate(request)).thenReturn(request);
   }
@@ -69,25 +82,36 @@ public class QuizRequestMapperTest {
   public void testToQuizWithQuizWebRequest() {
     quiz.setId(null);
     Quiz actual = requestMapper.toQuiz(request);
-    assertThat(actual).isEqualTo(quiz);
-
+      assertThat(actual.getTitle()).isEqualTo(quiz.getTitle());
     verify(validator).validate(request);
   }
 
   @Test
   public void testToQuizWithNullQuizWebRequest() {
     catchException(() -> requestMapper.toQuiz(null));
-
     assertThat(caughtException().getClass()).isEqualTo(BadRequestException.class);
   }
 
   @Test
   public void testToQuizWithIdAndQuizWebRequest() {
     Quiz actual = requestMapper.toQuiz(QUIZ_ID, request);
-    assertThat(actual).isEqualTo(quiz);
-
-    verify(validator).validate(request);
+      assertThat(actual.getTitle()).isEqualTo(quiz.getTitle());
+      verify(validator).validate(request);
   }
+
+    @Test
+    public void testValidateCopyQuizWebRequest() {
+        CopyQuizWebRequest request = CopyQuizWebRequest
+                .builder()
+                .quizId(QUIZ_ID)
+                .batchCode("3")
+                .build();
+        when(validator.validate(request)).thenReturn(request);
+        CopyQuizWebRequest actual = requestMapper.validateCopyQuizWebRequest(request);
+        assertThat(actual.getQuizId()).isEqualTo(QUIZ_ID);
+        assertThat(actual.getBatchCode()).isEqualTo("3");
+        verify(validator).validate(request);
+    }
 
   @Test
   public void testToQuizWithIdNullAndQuizWebRequest() {

@@ -17,14 +17,13 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class QuestionServiceImpl implements QuestionService {
 
     private QuestionRepository questionRepository;
-
     private OptionService optionService;
-
     private QuestionBankService questionBankService;
 
     @Autowired
@@ -105,6 +104,7 @@ public class QuestionServiceImpl implements QuestionService {
         options
                 .stream()
                 .map(option -> {
+                    option.setId(UUID.randomUUID().toString());
                     option.setQuestion(question);
                     return option;
                 })

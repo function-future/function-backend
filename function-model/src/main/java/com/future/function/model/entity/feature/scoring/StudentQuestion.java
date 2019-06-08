@@ -10,6 +10,8 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+import java.util.UUID;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -18,7 +20,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 public class StudentQuestion extends BaseEntity {
 
     @Builder.Default
-    private String id;
+    private String id = UUID.randomUUID().toString();
 
     @Field
     private StudentQuizDetail studentQuizDetail;
@@ -34,5 +36,6 @@ public class StudentQuestion extends BaseEntity {
     @Field
     private Option option;
 
+    @Field
     private boolean correct;
 }

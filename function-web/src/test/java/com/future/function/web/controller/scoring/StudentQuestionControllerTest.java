@@ -119,6 +119,8 @@ public class StudentQuestionControllerTest {
                 .thenReturn(studentQuizDetail);
         when(studentQuizDetailService.findAllQuestionsByStudentQuizId(STUDENT_QUIZ_ID))
                 .thenReturn(Collections.singletonList(studentQuestion));
+        when(studentQuizDetailService.findAllUnansweredQuestionsByStudentQuizId(STUDENT_QUIZ_ID))
+                .thenReturn(Collections.singletonList(studentQuestion));
         when(requestMapper.toStudentQuestionList(Collections.singletonList(studentQuestionWebRequest)))
                 .thenReturn(Collections.singletonList(studentQuestion));
 
@@ -140,6 +142,18 @@ public class StudentQuestionControllerTest {
                                 pagingResponse).getJson()
                 ));
         verify(studentQuizDetailService).findAllQuestionsByStudentQuizId(STUDENT_QUIZ_ID);
+    }
+
+    @Test
+    public void findUnansweredQuestionsByStudentQuizIdTest() throws Exception {
+        mockMvc.perform(
+                get("/api/scoring/students/studentId/quizzes/" + STUDENT_QUIZ_ID + "/questions/start"))
+                .andExpect(status().isOk())
+                .andExpect(content().json(
+                        pagingResponseJacksonTester.write(
+                                pagingResponse).getJson()
+                ));
+        verify(studentQuizDetailService).findAllUnansweredQuestionsByStudentQuizId(STUDENT_QUIZ_ID);
     }
 
     @Test

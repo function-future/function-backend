@@ -1,12 +1,10 @@
 package com.future.function.service.impl.feature.scoring;
 
 import com.future.function.common.exception.NotFoundException;
-import com.future.function.model.entity.feature.scoring.Question;
 import com.future.function.model.entity.feature.scoring.StudentQuestion;
 import com.future.function.model.entity.feature.scoring.StudentQuiz;
 import com.future.function.model.entity.feature.scoring.StudentQuizDetail;
 import com.future.function.repository.feature.scoring.StudentQuizDetailRepository;
-import com.future.function.service.api.feature.scoring.QuizService;
 import com.future.function.service.api.feature.scoring.StudentQuestionService;
 import com.future.function.service.api.feature.scoring.StudentQuizDetailService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,14 +18,15 @@ import java.util.stream.Collectors;
 @Service
 public class StudentQuizDetailServiceImpl implements StudentQuizDetailService {
 
-    @Autowired
     private StudentQuizDetailRepository studentQuizDetailRepository;
-
-    @Autowired
     private StudentQuestionService studentQuestionService;
 
     @Autowired
-    private QuizService quizService;
+    public StudentQuizDetailServiceImpl(StudentQuizDetailRepository studentQuizDetailRepository,
+                                        StudentQuestionService studentQuestionService) {
+        this.studentQuizDetailRepository = studentQuizDetailRepository;
+        this.studentQuestionService = studentQuestionService;
+    }
 
     @Override
     public StudentQuizDetail findLatestByStudentQuizId(String studentQuizId) {
@@ -46,9 +45,18 @@ public class StudentQuizDetailServiceImpl implements StudentQuizDetailService {
     }
 
     @Override
-    public List<Question> findAllUnansweredQuestionsFromStudentQuizId(String studentQuizId) {
-        String quizId = this.findLatestByStudentQuizId(studentQuizId).getStudentQuiz().getQuiz().getId();
-        return quizService.findAllQuestionByMultipleQuestionBank(true, quizId);
+    public List<StudentQuestion> findAllUnansweredQuestionsByStudentQuizId(String studentQuizId) {
+        return Optional.ofNullable(studentQuizId)
+                .map(this::findLatestByStudentQuizId)
+                .map(StudentQuizDetail::getStudentQuiz)
+                .map(StudentQuiz::getQuiz)
+                .map(quiz -> studentQuestionService.findAllQuestionsFromMultipleQuestionBank(true,
+                        quiz.getQuestionBanks(),
+                        quiz.getQuestionCount()))
+                .map(questionList -> studentQuestionService
+                        .createStudentQuestionsFromQuestionList(questionList,
+                                this.findLatestByStudentQuizId(studentQuizId)))
+                .orElseThrow(() -> new UnsupportedOperationException("Student Quiz not found"));
     }
 
     @Override

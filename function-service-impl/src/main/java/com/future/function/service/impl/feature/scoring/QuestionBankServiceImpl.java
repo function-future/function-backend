@@ -4,12 +4,13 @@ import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.scoring.QuestionBank;
 import com.future.function.repository.feature.scoring.QuestionBankRepository;
 import com.future.function.service.api.feature.scoring.QuestionBankService;
-import java.util.Optional;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 public class QuestionBankServiceImpl implements QuestionBankService {
@@ -23,7 +24,7 @@ public class QuestionBankServiceImpl implements QuestionBankService {
 
   @Override
   public Page<QuestionBank> findAllByPageableFilterAndSearch(Pageable pageable, String filter, String search) {
-    return questionBankRepository.findAll(pageable);
+    return questionBankRepository.findAllByDeletedFalse(pageable);
   }
 
   @Override

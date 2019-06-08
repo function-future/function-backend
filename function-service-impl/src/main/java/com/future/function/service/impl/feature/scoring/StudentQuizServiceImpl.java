@@ -1,12 +1,12 @@
 package com.future.function.service.impl.feature.scoring;
 
 import com.future.function.common.exception.NotFoundException;
+import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.model.entity.feature.scoring.Quiz;
 import com.future.function.model.entity.feature.scoring.StudentQuiz;
 import com.future.function.model.entity.feature.scoring.StudentQuizDetail;
 import com.future.function.repository.feature.scoring.StudentQuizRepository;
-import com.future.function.service.api.feature.core.BatchService;
 import com.future.function.service.api.feature.core.UserService;
 import com.future.function.service.api.feature.scoring.StudentQuizDetailService;
 import com.future.function.service.api.feature.scoring.StudentQuizService;
@@ -24,17 +24,17 @@ import java.util.stream.Collectors;
 @Service
 public class StudentQuizServiceImpl implements StudentQuizService {
 
-    @Autowired
     private StudentQuizRepository studentQuizRepository;
-
-    @Autowired
     private UserService userService;
-
-    @Autowired
-    private BatchService batchService;
-
-    @Autowired
     private StudentQuizDetailService studentQuizDetailService;
+
+    @Autowired
+    public StudentQuizServiceImpl(StudentQuizRepository studentQuizRepository, UserService userService,
+                                  StudentQuizDetailService studentQuizDetailService) {
+        this.studentQuizRepository = studentQuizRepository;
+        this.userService = userService;
+        this.studentQuizDetailService = studentQuizDetailService;
+    }
 
     @Override
     public Page<StudentQuiz> findAllByStudentId(String studentId, Pageable pageable) {
@@ -59,9 +59,9 @@ public class StudentQuizServiceImpl implements StudentQuizService {
 
     @Override
     public Quiz createStudentQuizByBatchCode(String batchCode, Quiz quiz) {
-        quiz.setBatch(batchService.getBatchByCode(batchCode));
         return Optional.ofNullable(batchCode)
                 .map(userService::getStudentsByBatchCode)
+                .filter(userList -> !userList.isEmpty())
                 .map(userList -> createStudentQuizFromUserList(quiz, userList))
                 .map(studentQuiz -> studentQuiz.get(0))
                 .map(this::createStudentQuizDetailAndSave)
@@ -70,19 +70,18 @@ public class StudentQuizServiceImpl implements StudentQuizService {
     }
 
     private StudentQuizDetail createStudentQuizDetailAndSave(StudentQuiz studentQuiz) {
-        StudentQuizDetail detail = StudentQuizDetail
-                .builder()
-                .studentQuiz(studentQuiz)
-                .point(0)
-                .build();
         return studentQuizDetailService.createStudentQuizDetail(studentQuiz, null);
     }
 
     @Override
-    public Quiz copyQuizWithTargetBatch(String targetBatch, Quiz quiz) {
+    public Quiz copyQuizWithTargetBatch(Batch targetBatch, Quiz quiz) {
         return Optional.ofNullable(quiz)
                 .map(this::createNewQuiz)
-                .map(newQuiz -> this.createStudentQuizByBatchCode(targetBatch, newQuiz))
+                .map(newQuiz -> {
+                    newQuiz.setBatch(targetBatch);
+                    return newQuiz;
+                })
+                .map(newQuiz -> this.createStudentQuizByBatchCode(targetBatch.getCode(), newQuiz))
                 .orElseThrow(() -> new UnsupportedOperationException("Copy Quiz Failed"));
     }
 

@@ -24,6 +24,7 @@ public class StudentQuizResponseMapper {
     private static StudentQuizWebResponse buildStudentQuizWebResponse(StudentQuiz studentQuiz) {
         return StudentQuizWebResponse
                 .builder()
+                .id(studentQuiz.getId())
                 .quiz(QuizResponseMapper.toQuizWebDataResponse(studentQuiz.getQuiz()).getData())
                 .build();
     }

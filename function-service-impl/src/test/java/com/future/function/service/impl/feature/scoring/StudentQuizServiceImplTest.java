@@ -8,7 +8,6 @@ import com.future.function.model.entity.feature.scoring.StudentQuizDetail;
 import com.future.function.repository.feature.scoring.StudentQuizRepository;
 import com.future.function.service.api.feature.core.BatchService;
 import com.future.function.service.api.feature.core.UserService;
-import com.future.function.service.api.feature.scoring.QuizService;
 import com.future.function.service.api.feature.scoring.StudentQuizDetailService;
 import org.junit.After;
 import org.junit.Before;
@@ -25,6 +24,8 @@ import org.springframework.data.domain.Pageable;
 import java.util.Collections;
 import java.util.Optional;
 
+import static com.googlecode.catchexception.CatchException.catchException;
+import static com.googlecode.catchexception.CatchException.caughtException;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
@@ -57,9 +58,6 @@ public class StudentQuizServiceImplTest {
 
     @Mock
     private UserService userService;
-
-    @Mock
-    private QuizService quizService;
 
     @Mock
     private BatchService batchService;
@@ -111,8 +109,6 @@ public class StudentQuizServiceImplTest {
                 .thenReturn(studentQuiz);
         when(studentQuizRepository.save(any(StudentQuiz.class)))
                 .thenReturn(studentQuiz);
-        when(quizService.createQuiz(any(Quiz.class)))
-                .thenReturn(Quiz.builder().id("any").trials(QUIZ_TRIALS).build());
         when(userService.getStudentsByBatchCode(BATCH_CODE))
                 .thenReturn(Collections.singletonList(student));
         when(userService.getStudentsByBatchCode(TARGET_BATCH))
@@ -129,8 +125,8 @@ public class StudentQuizServiceImplTest {
 
     @After
     public void tearDown() throws Exception {
-        verifyNoMoreInteractions(studentQuizRepository, batchService, quizService,
-                studentQuizDetailService, userService);
+        verifyNoMoreInteractions(studentQuizRepository, batchService, studentQuizDetailService,
+                userService);
     }
 
     @Test
@@ -168,18 +164,24 @@ public class StudentQuizServiceImplTest {
         verify(userService).getStudentsByBatchCode(BATCH_CODE);
         verify(userService).getUser(USER_ID);
         verify(studentQuizDetailService).createStudentQuizDetail(studentQuiz, null);
-        verify(batchService).getBatchByCode(BATCH_CODE);
         verify(studentQuizRepository).save(any(StudentQuiz.class));
     }
 
     @Test
+    public void createStudentQuizByBatchCodeStudentQuizFailToSave() {
+        when(userService.getStudentsByBatchCode(BATCH_CODE)).thenReturn(Collections.emptyList());
+        catchException(() -> studentQuizService.createStudentQuizByBatchCode(BATCH_CODE, quiz));
+        assertThat(caughtException().getClass()).isEqualTo(UnsupportedOperationException.class);
+        verify(userService).getStudentsByBatchCode(BATCH_CODE);
+    }
+
+    @Test
     public void copyQuizFromBatch() {
-        Quiz actual = studentQuizService.copyQuizWithTargetBatch(TARGET_BATCH, quiz);
+        Batch targetBatch = Batch.builder().code(TARGET_BATCH).build();
+        Quiz actual = studentQuizService.copyQuizWithTargetBatch(targetBatch, quiz);
         assertThat(actual.getTrials()).isEqualTo(QUIZ_TRIALS);
         assertThat(actual.getId()).isNotEqualTo(QUIZ_ID);
         verify(studentQuizRepository).save(any(StudentQuiz.class));
-        verify(batchService).getBatchByCode(TARGET_BATCH);
-        verify(quizService).createQuiz(any(Quiz.class));
         verify(userService).getStudentsByBatchCode(TARGET_BATCH);
         verify(userService).getUser(USER_ID);
         verify(studentQuizDetailService).createStudentQuizDetail(studentQuiz, null);

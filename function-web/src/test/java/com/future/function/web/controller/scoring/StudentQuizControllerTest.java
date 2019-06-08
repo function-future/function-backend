@@ -1,6 +1,7 @@
 package com.future.function.web.controller.scoring;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.model.entity.feature.scoring.Quiz;
 import com.future.function.model.entity.feature.scoring.StudentQuiz;
@@ -39,12 +40,14 @@ public class StudentQuizControllerTest {
     private static final String QUIZ_ID = "quiz-id";
     private static final String QUIZ_TITLE = "quiz-title";
     private static final int QUIZ_TRIALS = 3;
+    private static final String BATCH_CODE = "1";
     private static final String STUDENT_ID = "student-id";
     private static final String STUDENT_NAME = "student-name";
     private static final String STUDENT_QUIZ_ID = "student-quiz-id";
 
     private StudentQuiz studentQuiz;
     private Quiz quiz;
+    private Batch batch;
     private User user;
     private StudentQuizWebResponse webResponse;
     private QuizWebResponse quizWebResponse;
@@ -70,14 +73,21 @@ public class StudentQuizControllerTest {
 
         JacksonTester.initFields(this, ObjectMapper::new);
 
+        batch = Batch
+                .builder()
+                .code(BATCH_CODE)
+                .build();
+
         user = User.builder()
                 .id(STUDENT_ID)
                 .name(STUDENT_NAME)
+                .batch(batch)
                 .build();
 
         quiz = Quiz.builder()
                 .id(QUIZ_ID)
                 .trials(QUIZ_TRIALS)
+                .batch(batch)
                 .build();
 
         studentQuiz = StudentQuiz
@@ -94,10 +104,12 @@ public class StudentQuizControllerTest {
                 .id(QUIZ_ID)
                 .title(QUIZ_TITLE)
                 .trials(QUIZ_TRIALS)
+                .batchCode(BATCH_CODE)
                 .build();
 
         webResponse = StudentQuizWebResponse
                 .builder()
+                .id(STUDENT_QUIZ_ID)
                 .quiz(quizWebResponse)
                 .build();
 

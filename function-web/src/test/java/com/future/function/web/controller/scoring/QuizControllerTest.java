@@ -1,12 +1,14 @@
 package com.future.function.web.controller.scoring;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.scoring.QuestionBank;
 import com.future.function.model.entity.feature.scoring.Quiz;
 import com.future.function.service.api.feature.scoring.QuizService;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.mapper.request.scoring.QuizRequestMapper;
 import com.future.function.web.mapper.response.scoring.QuizResponseMapper;
+import com.future.function.web.model.request.scoring.CopyQuizWebRequest;
 import com.future.function.web.model.request.scoring.QuizWebRequest;
 import com.future.function.web.model.response.base.BaseResponse;
 import com.future.function.web.model.response.base.DataResponse;
@@ -52,11 +54,13 @@ public class QuizControllerTest {
     private static final int QUIZ_TRIALS = 3;
     private static final String QUIZ_QUESTION_BANK_ID = "question-bank-id";
     private static final int QUIZ_QUESTION_COUNT = 3;
-    private static final int QUIZ_BATCH_CODE = 3;
+    private static final String QUIZ_BATCH_CODE = "3";
 
     private Pageable pageable;
     private Quiz quiz;
+    private Batch batch;
     private QuizWebRequest quizWebRequest;
+    private CopyQuizWebRequest copyQuizWebRequest;
     private List<Quiz> quizList;
     private Page<Quiz> quizPage;
     private QuestionBank questionBank;
@@ -77,6 +81,8 @@ public class QuizControllerTest {
 
     private JacksonTester<QuizWebRequest> webRequestJacksonTester;
 
+    private JacksonTester<CopyQuizWebRequest> copyQuizWebRequestJacksonTester;
+
     @Autowired
     private MockMvc mockMvc;
 
@@ -95,6 +101,11 @@ public class QuizControllerTest {
                 .id(QUIZ_QUESTION_BANK_ID)
                 .build();
 
+        batch = Batch
+                .builder()
+                .code(QUIZ_BATCH_CODE)
+                .build();
+
         QUESTION_BANK_IDS = new ArrayList<>();
         QUESTION_BANK_IDS.add(QUIZ_QUESTION_BANK_ID);
 
@@ -109,6 +120,7 @@ public class QuizControllerTest {
                 .questionCount(QUIZ_QUESTION_COUNT)
                 .trials(QUIZ_TRIALS)
                 .questionBanks(Collections.singletonList(questionBank))
+                .batch(batch)
                 .build();
 
         quizWebRequest = QuizWebRequest
@@ -122,6 +134,12 @@ public class QuizControllerTest {
                 .trials(QUIZ_TRIALS)
                 .batchCode(QUIZ_BATCH_CODE)
                 .questionBanks(QUESTION_BANK_IDS)
+                .build();
+
+        copyQuizWebRequest = CopyQuizWebRequest
+                .builder()
+                .quizId(QUIZ_ID)
+                .batchCode(QUIZ_BATCH_CODE)
                 .build();
 
         quizList = new ArrayList<>();
@@ -147,9 +165,10 @@ public class QuizControllerTest {
         when(quizService.updateQuiz(quiz)).thenReturn(quiz);
         when(quizService.findAllByPageableAndFilterAndSearch(pageable, "", ""))
                 .thenReturn(quizPage);
-
+        when(quizService.copyQuizWithTargetBatch(QUIZ_BATCH_CODE, quiz)).thenReturn(quiz);
         when(requestMapper.toQuiz(quizWebRequest)).thenReturn(quiz);
         when(requestMapper.toQuiz(QUIZ_ID, quizWebRequest)).thenReturn(quiz);
+        when(requestMapper.validateCopyQuizWebRequest(copyQuizWebRequest)).thenReturn(copyQuizWebRequest);
     }
 
     @After
@@ -226,6 +245,23 @@ public class QuizControllerTest {
 
         verify(quizService).createQuiz(quiz);
         verify(requestMapper).toQuiz(quizWebRequest);
+    }
+
+    @Test
+    public void testCopyQuizWithTargetBatch() throws Exception {
+        mockMvc.perform(
+                post("/api/scoring/quizzes/copy")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(copyQuizWebRequestJacksonTester.write(
+                                copyQuizWebRequest).getJson()))
+                .andExpect(status().isCreated())
+                .andExpect(content().json(
+                        dataResponseJacksonTester.write(CREATED_DATA_RESPONSE)
+                                .getJson()
+                ));
+        verify(quizService).findById(QUIZ_ID);
+        verify(quizService).copyQuizWithTargetBatch(QUIZ_BATCH_CODE, quiz);
+        verify(requestMapper).validateCopyQuizWebRequest(copyQuizWebRequest);
     }
 
     @Test

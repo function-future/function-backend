@@ -7,6 +7,8 @@ import com.future.function.model.entity.feature.scoring.Question;
 import com.future.function.model.entity.feature.scoring.QuestionBank;
 import com.future.function.model.entity.feature.scoring.Quiz;
 import com.future.function.repository.feature.scoring.QuizRepository;
+import com.future.function.service.api.feature.core.BatchService;
+import com.future.function.service.api.feature.scoring.QuestionBankService;
 import com.future.function.service.api.feature.scoring.QuestionService;
 import com.future.function.service.api.feature.scoring.StudentQuizService;
 import org.junit.After;
@@ -16,13 +18,15 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 import static com.googlecode.catchexception.CatchException.catchException;
 import static com.googlecode.catchexception.CatchException.caughtException;
@@ -74,6 +78,12 @@ public class QuizServiceImplTest {
     @Mock
     private QuestionService questionService;
 
+    @Mock
+    private BatchService batchService;
+
+    @Mock
+    private QuestionBankService questionBankService;
+
   @Before
   public void setUp() throws Exception {
       batch = Batch
@@ -113,13 +123,15 @@ public class QuizServiceImplTest {
 
     quizPage = new PageImpl<>(quizList, pageable, TOTAL);
 
-    when(quizRepository.findAll(pageable)).thenReturn(quizPage);
+      when(quizRepository.findAllByDeletedFalse(pageable)).thenReturn(quizPage);
     when(quizRepository.findByIdAndDeletedFalse(QUIZ_ID)).thenReturn(Optional.of(quiz));
     when(quizRepository.save(quiz)).thenReturn(quiz);
       when(studentQuizService.createStudentQuizByBatchCode(BATCH_CODE, quiz))
               .thenReturn(quiz);
       when(questionService.findAllByMultipleQuestionBankId(Collections.singletonList(QUESTION_BANK_ID)))
               .thenReturn(Collections.singletonList(question));
+      when(questionBankService.findById(QUESTION_BANK_ID)).thenReturn(questionBank);
+      when(batchService.getBatchByCode(BATCH_CODE)).thenReturn(batch);
   }
 
   @After
@@ -159,7 +171,7 @@ public class QuizServiceImplTest {
     assertThat(actual.getTotalElements()).isEqualTo(TOTAL);
     assertThat(actual).isEqualTo(quizPage);
 
-    verify(quizRepository).findAll(eq(pageable));
+      verify(quizRepository).findAllByDeletedFalse(pageable);
   }
 
   @Test
@@ -170,49 +182,8 @@ public class QuizServiceImplTest {
     assertThat(actual.getTotalElements()).isEqualTo(TOTAL);
     assertThat(actual).isEqualTo(quizPage);
 
-    verify(quizRepository).findAll(eq(pageable));
+      verify(quizRepository).findAllByDeletedFalse(pageable);
   }
-
-    @Test
-    public void findAllQuestionsFromMultipleQuestionBanks() {
-        List<Question> actual = quizService.findAllQuestionByMultipleQuestionBank(true, QUIZ_ID);
-        assertThat(actual.size()).isEqualTo(1);
-        assertThat(actual.get(0).getText()).isEqualTo(QUESTION_TEXT);
-        verify(quizRepository).findByIdAndDeletedFalse(QUIZ_ID);
-        verify(questionService).findAllByMultipleQuestionBankId(Collections.singletonList(QUESTION_BANK_ID));
-    }
-
-    @Test
-    public void findAllQuestionsFromMultipleQuestionBanksNotRandom() {
-        List<Question> actual = quizService.findAllQuestionByMultipleQuestionBank(false, QUIZ_ID);
-        assertThat(actual.size()).isEqualTo(1);
-        assertThat(actual.get(0).getText()).isEqualTo(QUESTION_TEXT);
-        verify(quizRepository).findByIdAndDeletedFalse(QUIZ_ID);
-        verify(questionService).findAllByMultipleQuestionBankId(Collections.singletonList(QUESTION_BANK_ID));
-    }
-
-    @Test
-    public void findAllQuestionsFromMultipleQuestionBanksQuestionCountZero() {
-        Quiz quizDB = new Quiz();
-        BeanUtils.copyProperties(quiz, quizDB);
-        quizDB.setQuestionCount(0);
-        List<Question> actual = quizService.findAllQuestionByMultipleQuestionBank(true, QUIZ_ID);
-        assertThat(actual.size()).isEqualTo(1);
-        assertThat(actual.get(0).getText()).isEqualTo(QUESTION_TEXT);
-        verify(quizRepository).findByIdAndDeletedFalse(QUIZ_ID);
-        verify(questionService).findAllByMultipleQuestionBankId(Collections.singletonList(QUESTION_BANK_ID));
-    }
-
-    @Test
-    public void findAllQuestionsFromMultipleQuestionBanksEmptyQuestionBankList() {
-        Quiz quizDB = new Quiz();
-        BeanUtils.copyProperties(quiz, quizDB);
-        quizDB.setQuestionBanks(new ArrayList<>());
-        when(quizRepository.findByIdAndDeletedFalse(QUIZ_ID)).thenReturn(Optional.of(quizDB));
-        List<Question> actual = quizService.findAllQuestionByMultipleQuestionBank(true, QUIZ_ID);
-        assertThat(actual.size()).isEqualTo(0);
-        verify(quizRepository).findByIdAndDeletedFalse(QUIZ_ID);
-    }
 
   @Test
   public void testCreateQuizSuccess() {
@@ -226,8 +197,9 @@ public class QuizServiceImplTest {
   public void testCreateQuizFail() {
     when(quizRepository.save(quiz)).thenThrow(BadRequestException.class);
     catchException(() -> quizService.createQuiz(quiz));
-
     verify(quizRepository).save(quiz);
+      verify(questionBankService).findById(QUESTION_BANK_ID);
+      verify(batchService).getBatchByCode(BATCH_CODE);
     assertThat(caughtException().getClass()).isEqualTo(BadRequestException.class);
   }
 
@@ -275,4 +247,18 @@ public class QuizServiceImplTest {
     verify(quizRepository).save(quiz);
       verify(studentQuizService).deleteByBatchCodeAndQuiz(BATCH_CODE, QUIZ_ID);
   }
+
+    @Test
+    public void copyQuizWithTargetBatch() {
+        String targetBatch = "ABC";
+        Batch targetBatchObj = Batch.builder().code(targetBatch).build();
+        when(batchService.getBatchByCode(targetBatch)).thenReturn(targetBatchObj);
+        when(studentQuizService.copyQuizWithTargetBatch(targetBatchObj, quiz)).thenReturn(quiz);
+        Quiz actual = quizService.copyQuizWithTargetBatch(targetBatch, quiz);
+        assertThat(actual.getTitle()).isEqualTo(QUIZ_TITLE);
+        verify(quizRepository).findByIdAndDeletedFalse(QUIZ_ID);
+        verify(studentQuizService).copyQuizWithTargetBatch(targetBatchObj, quiz);
+        quiz.getBatch().setCode(targetBatch);
+        verify(quizRepository).save(quiz);
+    }
 }

@@ -31,4 +31,6 @@ public class QuizWebResponse {
 
     private List<String> questionBanks;
 
+    private String batchCode;
+
 }

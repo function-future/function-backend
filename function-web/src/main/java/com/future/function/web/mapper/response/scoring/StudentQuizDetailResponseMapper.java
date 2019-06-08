@@ -5,6 +5,7 @@ import com.future.function.model.entity.feature.scoring.StudentQuizDetail;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
+import com.future.function.web.model.response.feature.scoring.OptionWebResponse;
 import com.future.function.web.model.response.feature.scoring.StudentQuestionWebResponse;
 import com.future.function.web.model.response.feature.scoring.StudentQuizDetailWebResponse;
 import lombok.AccessLevel;
@@ -34,16 +35,29 @@ public class StudentQuizDetailResponseMapper {
                 .stream()
                 .map(StudentQuizDetailResponseMapper::toStudentQuestionWebResponse)
                 .collect(Collectors.toList());
-
         return ResponseHelper.toPagingResponse(HttpStatus.OK, responseList, null);
+    }
+
+    private static List<OptionWebResponse> removeCorrectField(List<OptionWebResponse> options) {
+        return options
+                .stream()
+                .map(option -> {
+                    option.setCorrect(null);
+                    return option;
+                })
+                .collect(Collectors.toList());
     }
 
     private static StudentQuestionWebResponse toStudentQuestionWebResponse(StudentQuestion studentQuestion) {
         return StudentQuestionWebResponse
                 .builder()
-                .questionText(studentQuestion.getQuestion().getText())
+                .text(studentQuestion.getQuestion().getText())
                 .number(studentQuestion.getNumber())
-                .options(OptionResponseMapper.toListOfOptionWebResponse(studentQuestion.getQuestion().getOptions()))
+                .options(StudentQuizDetailResponseMapper
+                        .removeCorrectField(OptionResponseMapper
+                                .toListOfOptionWebResponse(studentQuestion
+                                        .getQuestion()
+                                        .getOptions())))
                 .build();
     }
 

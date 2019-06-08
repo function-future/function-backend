@@ -92,14 +92,14 @@ public class QuestionBankServiceImplTest {
   @Test
   public void testFindAllWithPageableFilterAndSearch() {
 
-    when(questionBankRepository.findAll(pageable))
+      when(questionBankRepository.findAllByDeletedFalse(pageable))
             .thenReturn(questionBankPage);
 
     Page<QuestionBank> actual = questionBankService.findAllByPageableFilterAndSearch(pageable, "", "");
 
     assertThat(actual.getContent()).isEqualTo(questionBankList);
     assertThat(actual.getTotalElements()).isEqualTo(questionBankPage.getTotalElements());
-    verify(questionBankRepository).findAll(pageable);
+      verify(questionBankRepository).findAllByDeletedFalse(pageable);
   }
 
   @Test

@@ -1,10 +1,9 @@
 package com.future.function.service.impl.feature.scoring;
 
-import com.future.function.model.entity.feature.scoring.Option;
-import com.future.function.model.entity.feature.scoring.Question;
-import com.future.function.model.entity.feature.scoring.StudentQuestion;
-import com.future.function.model.entity.feature.scoring.StudentQuizDetail;
+import com.future.function.common.exception.NotFoundException;
+import com.future.function.model.entity.feature.scoring.*;
 import com.future.function.repository.feature.scoring.StudentQuestionRepository;
+import com.future.function.service.api.feature.scoring.QuestionService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,6 +17,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import static com.googlecode.catchexception.CatchException.catchException;
+import static com.googlecode.catchexception.CatchException.caughtException;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
@@ -26,11 +27,18 @@ public class StudentQuestionServiceImplTest {
 
     private static final String STUDENT_QUIZ_DETAIL_ID = "student-quiz-detail-id";
     private static final String STUDENT_QUESTION_ID = "student-question-id";
+
     private static final String QUESTION_ID = "question-id";
     private static final String QUESTION_TEXT = "question-text";
+
     private static final String OPTION_ID = "option-id";
     private static final String OPTION_LABEL = "option-label";
 
+    private static final String QUESTION_BANK_ID = "question-bank-id";
+    private static final int QUESTION_COUNT = 10;
+
+    private QuestionBank questionBank;
+    private StudentQuizDetail studentQuizDetail;
     private StudentQuestion studentQuestion;
     private Question question;
     private Option option;
@@ -42,11 +50,26 @@ public class StudentQuestionServiceImplTest {
     @Mock
     private StudentQuestionRepository studentQuestionRepository;
 
+    @Mock
+    private QuestionService questionService;
+
     @Before
     public void setUp() throws Exception {
+
+        studentQuizDetail = StudentQuizDetail
+                .builder()
+                .id(STUDENT_QUIZ_DETAIL_ID)
+                .build();
+
+        questionBank = QuestionBank
+                .builder()
+                .id(QUESTION_BANK_ID)
+                .build();
+
         question = Question
                 .builder()
                 .id(QUESTION_ID)
+                .questionBank(questionBank)
                 .text(QUESTION_TEXT)
                 .build();
 
@@ -55,7 +78,10 @@ public class StudentQuestionServiceImplTest {
                 .id(OPTION_ID)
                 .label(OPTION_LABEL)
                 .question(question)
+                .correct(true)
                 .build();
+
+        question.setOptions(Collections.singletonList(option));
 
         studentQuestion = StudentQuestion
                 .builder()
@@ -63,7 +89,7 @@ public class StudentQuestionServiceImplTest {
                 .number(1)
                 .question(question)
                 .option(option)
-                .studentQuizDetail(StudentQuizDetail.builder().id(STUDENT_QUIZ_DETAIL_ID).build())
+                .studentQuizDetail(studentQuizDetail)
                 .build();
 
         sort = new Sort(Sort.Direction.ASC, "number");
@@ -71,6 +97,8 @@ public class StudentQuestionServiceImplTest {
         when(studentQuestionRepository.findAllByStudentQuizDetailId(STUDENT_QUIZ_DETAIL_ID, sort))
                 .thenReturn(Collections.singletonList(studentQuestion));
         when(studentQuestionRepository.save(studentQuestion)).thenReturn(studentQuestion);
+        when(questionService.findAllByMultipleQuestionBankId(Collections.singletonList(QUESTION_BANK_ID)))
+                .thenReturn(Collections.singletonList(question));
     }
 
     @After
@@ -85,6 +113,47 @@ public class StudentQuestionServiceImplTest {
         assertThat(actual.get(0).getQuestion().getText()).isEqualTo(QUESTION_TEXT);
         assertThat(actual.get(0).getOption().getLabel()).isEqualTo(OPTION_LABEL);
         verify(studentQuestionRepository).findAllByStudentQuizDetailId(STUDENT_QUIZ_DETAIL_ID, sort);
+    }
+
+    @Test
+    public void findAllQuestionsFromMultipleQuestionBanks() {
+        List<Question> actual = studentQuestionService.findAllQuestionsFromMultipleQuestionBank(true,
+                Collections.singletonList(questionBank), QUESTION_COUNT);
+        assertThat(actual.size()).isEqualTo(1);
+        assertThat(actual.get(0).getText()).isEqualTo(QUESTION_TEXT);
+        verify(questionService).findAllByMultipleQuestionBankId(Collections.singletonList(QUESTION_BANK_ID));
+    }
+
+    @Test
+    public void findAllQuestionsFromMultipleQuestionBanksNotRandom() {
+        List<Question> actual = studentQuestionService.findAllQuestionsFromMultipleQuestionBank(false,
+                Collections.singletonList(questionBank), 0);
+        assertThat(actual.size()).isEqualTo(0);
+        verify(questionService).findAllByMultipleQuestionBankId(Collections.singletonList(QUESTION_BANK_ID));
+    }
+
+    @Test
+    public void findAllQuestionsFromMultipleQuestionBanksEmptyQuestionBankList() {
+        List<Question> actual = studentQuestionService.findAllQuestionsFromMultipleQuestionBank(true,
+                Collections.emptyList(), QUESTION_COUNT);
+        assertThat(actual.size()).isEqualTo(0);
+    }
+
+    @Test
+    public void createStudentQuestionsFromQuestionList() {
+        List<StudentQuestion> actual = studentQuestionService
+                .createStudentQuestionsFromQuestionList(Collections.singletonList(question), studentQuizDetail);
+        assertThat(actual.size()).isEqualTo(1);
+        assertThat(actual.get(0).getNumber()).isEqualTo(1);
+        assertThat(actual.get(0).getQuestion().getText()).isEqualTo(QUESTION_TEXT);
+    }
+
+    @Test
+    public void createStudentQuestionsFromQuestionListNoCorrectOption() {
+        question.getOptions().get(0).setCorrect(false);
+        catchException(() -> studentQuestionService
+                .createStudentQuestionsFromQuestionList(Collections.singletonList(question), studentQuizDetail));
+        assertThat(caughtException().getClass()).isEqualTo(NotFoundException.class);
     }
 
     @Test

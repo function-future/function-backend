@@ -1,5 +1,6 @@
 package com.future.function.web.mapper.response.scoring;
 
+import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.scoring.Quiz;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
@@ -29,11 +30,13 @@ public class QuizResponseMapperTest {
   private static final long QUIZ_TIME_LIMIT = 15000;
   private static final int QUIZ_QUESTION_COUNT = 2;
   private static final int QUIZ_TRIALS = 3;
+    private static final String BATCH_CODE = "3";
 
   private static final int PAGE = 0;
   private static final int SIZE = 10;
 
   private Quiz quiz;
+    private Batch batch;
   private Paging paging;
   private Pageable pageable;
   private List<Quiz> quizList;
@@ -45,6 +48,12 @@ public class QuizResponseMapperTest {
 
   @Before
   public void setUp() throws Exception {
+
+      batch = Batch
+              .builder()
+              .code(BATCH_CODE)
+              .build();
+
     quiz = Quiz
             .builder()
             .title(QUIZ_TITLE)
@@ -55,6 +64,7 @@ public class QuizResponseMapperTest {
             .questionCount(QUIZ_QUESTION_COUNT)
             .trials(QUIZ_TRIALS)
             .questionBanks(new ArrayList<>())
+            .batch(batch)
             .build();
 
     quizList = new ArrayList<>();
@@ -62,6 +72,7 @@ public class QuizResponseMapperTest {
 
     quizWebResponse = new QuizWebResponse();
     BeanUtils.copyProperties(quiz, quizWebResponse);
+      quizWebResponse.setBatchCode(BATCH_CODE);
 
     quizWebDataResponse = DataResponse
             .<QuizWebResponse> builder()

@@ -1,5 +1,6 @@
 package com.future.function.service.api.feature.scoring;
 
+import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.scoring.Quiz;
 import com.future.function.model.entity.feature.scoring.StudentQuiz;
 import org.springframework.data.domain.Page;
@@ -15,7 +16,7 @@ public interface StudentQuizService {
 
     Quiz createStudentQuizByBatchCode(String batchCode, Quiz quiz);
 
-    Quiz copyQuizWithTargetBatch(String targetBatch, Quiz quiz);
+    Quiz copyQuizWithTargetBatch(Batch targetBatch, Quiz quiz);
 
     void deleteById(String id);
 

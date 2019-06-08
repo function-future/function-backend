@@ -6,16 +6,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.NotBlank;
 
-import javax.validation.constraints.NotNull;
-
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class CopyQuizWebRequest {
 
-    @NotNull(message = "NotNull")
-    private int batchCode;
+    @NotBlank(message = "NotBlank")
+    private String batchCode;
 
     @NotBlank(message = "NotBlank")
     private String quizId;

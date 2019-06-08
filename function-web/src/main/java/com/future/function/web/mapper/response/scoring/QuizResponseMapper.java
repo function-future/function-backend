@@ -55,6 +55,7 @@ public class QuizResponseMapper {
               QuizWebResponse response = new QuizWebResponse();
               BeanUtils.copyProperties(val, response);
               response.setQuestionBanks(getQuestionBankIds(quiz));
+              response.setBatchCode(quiz.getBatch().getCode());
               return response;
             })
             .orElseThrow(() -> new BadRequestException("Bad Request"));

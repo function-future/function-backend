@@ -30,6 +30,12 @@ public class StudentQuizDetailServiceImplTest {
     private static final String OPTION_LABEL = "option-label";
     private static final String QUESTION_TEXT = "question-text";
 
+    private static final String QUIZ_ID = "quiz-id";
+    private static final String QUESTION_BANK_ID = "question-bank-id";
+    private static final int QUESTION_COUNT = 1;
+
+    private Quiz quiz;
+    private QuestionBank questionBank;
     private StudentQuiz studentQuiz;
     private StudentQuizDetail studentQuizDetail;
     private StudentQuestion studentQuestion;
@@ -48,21 +54,16 @@ public class StudentQuizDetailServiceImplTest {
     @Before
     public void setUp() throws Exception {
 
-        studentQuiz = StudentQuiz
+        questionBank = QuestionBank
                 .builder()
-                .id(STUDENT_QUIZ_ID)
-                .build();
-
-        studentQuizDetail = StudentQuizDetail
-                .builder()
-                .id(STUDENT_QUIZ_DETAIL_ID)
-                .studentQuiz(studentQuiz)
+                .id(QUESTION_BANK_ID)
                 .build();
 
         question = Question
                 .builder()
                 .id(QUESTION_ID)
                 .text(QUESTION_TEXT)
+                .questionBank(questionBank)
                 .build();
 
         option = Option
@@ -73,9 +74,29 @@ public class StudentQuizDetailServiceImplTest {
                 .question(question)
                 .build();
 
+        quiz = Quiz
+                .builder()
+                .id(QUIZ_ID)
+                .questionCount(QUESTION_COUNT)
+                .questionBanks(Collections.singletonList(questionBank))
+                .build();
+
+        studentQuiz = StudentQuiz
+                .builder()
+                .id(STUDENT_QUIZ_ID)
+                .quiz(quiz)
+                .build();
+
+        studentQuizDetail = StudentQuizDetail
+                .builder()
+                .id(STUDENT_QUIZ_DETAIL_ID)
+                .studentQuiz(studentQuiz)
+                .build();
+
         studentQuestion = StudentQuestion
                 .builder()
                 .id(STUDENT_QUESTION_ID)
+                .number(1)
                 .studentQuizDetail(studentQuizDetail)
                 .question(question)
                 .option(option)
@@ -89,6 +110,11 @@ public class StudentQuizDetailServiceImplTest {
         when(studentQuizDetailRepository.save(any(StudentQuizDetail.class))).thenReturn(studentQuizDetail);
         when(studentQuestionService.createStudentQuestionsByStudentQuizDetail(studentQuizDetail,
                 Collections.singletonList(studentQuestion))).thenReturn(Collections.singletonList(studentQuestion));
+        when(studentQuestionService
+                .findAllQuestionsFromMultipleQuestionBank(true, Collections.singletonList(questionBank), QUESTION_COUNT))
+                .thenReturn(Collections.singletonList(question));
+        when(studentQuestionService.createStudentQuestionsFromQuestionList(Collections.singletonList(question), studentQuizDetail))
+                .thenReturn(Collections.singletonList(studentQuestion));
         when(studentQuestionService.postAnswerForAllStudentQuestion(Collections.singletonList(studentQuestion)))
                 .thenReturn(100);
         when(studentQuestionService.findAllByStudentQuizDetailId(STUDENT_QUIZ_DETAIL_ID))
@@ -115,6 +141,18 @@ public class StudentQuizDetailServiceImplTest {
         assertThat(actual.get(0).getId()).isEqualTo(STUDENT_QUESTION_ID);
         verify(studentQuizDetailRepository).findFirstByStudentQuizId(STUDENT_QUIZ_ID);
         verify(studentQuestionService).findAllByStudentQuizDetailId(STUDENT_QUIZ_DETAIL_ID);
+    }
+
+    @Test
+    public void findAllUnansweredQuestionsByStudentQuizId() {
+        List<StudentQuestion> actual = studentQuizDetailService.findAllUnansweredQuestionsByStudentQuizId(STUDENT_QUIZ_ID);
+        assertThat(actual.get(0).getNumber()).isEqualTo(1);
+        assertThat(actual.get(0).getQuestion().getText()).isEqualTo(QUESTION_TEXT);
+        verify(studentQuizDetailRepository, times(2)).findFirstByStudentQuizId(STUDENT_QUIZ_ID);
+        verify(studentQuestionService).findAllQuestionsFromMultipleQuestionBank(true,
+                Collections.singletonList(questionBank), studentQuiz.getQuiz().getQuestionCount());
+        verify(studentQuestionService)
+                .createStudentQuestionsFromQuestionList(Collections.singletonList(question), studentQuizDetail);
     }
 
     @Test

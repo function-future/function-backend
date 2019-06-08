@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class StudentQuizWebResponse {
 
+    private String id;
     private QuizWebResponse quiz;
 
 
