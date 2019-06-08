@@ -102,8 +102,7 @@ public class AuthServiceImpl implements AuthService {
     Session session, HttpServletResponse response
   ) {
     
-    valueOperations.getOperations()
-      .delete(session.getId());
+    redisTemplate.delete(session.getId());
     
     this.setCookie(response, null, 0);
     

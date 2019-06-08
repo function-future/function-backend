@@ -2,6 +2,7 @@ package com.future.function.service.impl.feature.core;
 
 import com.future.function.common.enumeration.core.Role;
 import com.future.function.common.exception.NotFoundException;
+import com.future.function.common.exception.UnauthorizedException;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.User;
@@ -426,7 +427,8 @@ public class UserServiceImplTest {
     assertThat(foundStudents).isNotNull();
     assertThat(foundStudents).isEmpty();
     
-    verifyZeroInteractions(batchService, userRepository, resourceService, encoder);
+    verifyZeroInteractions(
+      batchService, userRepository, resourceService, encoder);
   }
   
   @Test
@@ -487,6 +489,65 @@ public class UserServiceImplTest {
     
     verify(userRepository).findByEmail(EMAIL_MENTOR);
     verifyZeroInteractions(resourceService, encoder);
+  }
+  
+  @Test
+  public void testGivenEmailAndPasswordByGettingUserByEmailAndPasswordReturnUser() {
+    
+    when(userRepository.findByEmail(EMAIL_STUDENT)).thenReturn(
+      Optional.of(userStudent));
+    
+    String rawPassword = "pass";
+    when(encoder.matches(rawPassword, PASSWORD)).thenReturn(true);
+    
+    User retrievedUser = userService.getUserByEmailAndPassword(
+      EMAIL_STUDENT, rawPassword);
+    
+    assertThat(retrievedUser).isNotNull();
+    assertThat(retrievedUser).isEqualTo(userStudent);
+    
+    verify(userRepository).findByEmail(EMAIL_STUDENT);
+    verify(encoder).matches(rawPassword, PASSWORD);
+    verifyZeroInteractions(resourceService);
+  }
+  
+  @Test
+  public void testGivenEmailAndPasswordByGettingUserByEmailAndPasswordReturnUnauthorizedException() {
+    
+    when(userRepository.findByEmail(EMAIL_STUDENT)).thenReturn(
+      Optional.of(userStudent));
+    
+    String rawPassword = "pass";
+    when(encoder.matches(rawPassword, PASSWORD)).thenReturn(false);
+    
+    catchException(
+      () -> userService.getUserByEmailAndPassword(EMAIL_STUDENT, rawPassword));
+    
+    assertThat(caughtException().getClass()).isEqualTo(
+      UnauthorizedException.class);
+    assertThat(caughtException().getMessage()).isEqualTo(
+      "Invalid Email/Password");
+    
+    verify(userRepository).findByEmail(EMAIL_STUDENT);
+    verify(encoder).matches(rawPassword, PASSWORD);
+    verifyZeroInteractions(resourceService);
+  }
+  
+  @Test
+  public void testGivenEmailAndPasswordByChangingUserPasswordReturnSuccessfulChange() {
+    
+    when(userRepository.findByEmail(EMAIL_STUDENT)).thenReturn(
+      Optional.of(userStudent));
+    
+    String rawPassword = "pass";
+    when(encoder.encode(rawPassword)).thenReturn(PASSWORD);
+    
+    userService.changeUserPassword(EMAIL_STUDENT, rawPassword);
+    
+    verify(userRepository).findByEmail(EMAIL_STUDENT);
+    verify(encoder).encode(rawPassword);
+    verify(userRepository).save(userStudent);
+    verifyZeroInteractions(resourceService);
   }
   
 }

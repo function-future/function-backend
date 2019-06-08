@@ -20,7 +20,7 @@ public class TestApplication {
   @Bean
   public SessionProperties sessionProperties() {
     
-    return new SessionProperties();
+    return new SessionProperties(108000, 108000, "Function-Session");
   }
   
   @Bean

@@ -9,7 +9,6 @@ import com.future.function.web.model.response.base.PagingResponse;
 import org.junit.After;
 import org.junit.Before;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
@@ -21,30 +20,30 @@ import java.util.Arrays;
 
 public abstract class TestHelper {
   
-  private static final String STUDENT_SESSION_ID = "session-id-student";
+  protected static final String STUDENT_EMAIL = "student@student.com";
   
-  private static final String STUDENT_EMAIL = "student@student.com";
+  protected static final String MENTOR_EMAIL = "mentor@mentor.com";
+  
+  protected static final String JUDGE_EMAIL = "judge@judge.com";
+  
+  protected static final String ADMIN_EMAIL = "admin@admin.com";
+  
+  protected static final String STUDENT_SESSION_ID = "session-id-student";
+  
+  protected static final String MENTOR_SESSION_ID = "session-id-mentor";
+  
+  protected static final String JUDGE_SESSION_ID = "session-id-judge";
+  
+  protected static final String ADMIN_SESSION_ID = "session-id-admin";
   
   private static final Session STUDENT_SESSION = new Session(
     STUDENT_SESSION_ID, STUDENT_EMAIL, Role.STUDENT);
   
-  private static final String MENTOR_SESSION_ID = "session-id-mentor";
-  
-  private static final String MENTOR_EMAIL = "mentor@mentor.com";
-  
   private static final Session MENTOR_SESSION = new Session(
     MENTOR_SESSION_ID, MENTOR_EMAIL, Role.MENTOR);
   
-  private static final String JUDGE_SESSION_ID = "session-id-judge";
-  
-  private static final String JUDGE_EMAIL = "judge@judge.com";
-  
   private static final Session JUDGE_SESSION = new Session(
     JUDGE_SESSION_ID, JUDGE_EMAIL, Role.JUDGE);
-  
-  private static final String ADMIN_SESSION_ID = "session-id-admin";
-  
-  private static final String ADMIN_EMAIL = "admin@admin.com";
   
   private static final Session ADMIN_SESSION = new Session(
     ADMIN_SESSION_ID, ADMIN_EMAIL, Role.ADMIN);
@@ -67,15 +66,12 @@ public abstract class TestHelper {
   @Autowired
   private RedisTemplate<String, Session> redisTemplate;
   
-  @Value("${spring.redis.port}")
-  private int redisPort;
-  
   @Before
   protected void setUp() throws Exception {
     
     JacksonTester.initFields(this, new ObjectMapper());
     
-    redisServer = new RedisServer(redisPort);
+    redisServer = new RedisServer(6379);
     redisServer.start();
     
     valueOperations = redisTemplate.opsForValue();

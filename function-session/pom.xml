@@ -18,6 +18,12 @@
     </dependency>
 
     <dependency>
+      <groupId>eu.codearte.catch-exception</groupId>
+      <artifactId>catch-exception</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-data-redis</artifactId>
     </dependency>
