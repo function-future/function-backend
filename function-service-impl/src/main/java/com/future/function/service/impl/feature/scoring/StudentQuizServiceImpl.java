@@ -7,6 +7,7 @@ import com.future.function.model.entity.feature.scoring.Quiz;
 import com.future.function.model.entity.feature.scoring.StudentQuestion;
 import com.future.function.model.entity.feature.scoring.StudentQuiz;
 import com.future.function.model.entity.feature.scoring.StudentQuizDetail;
+import com.future.function.model.util.constant.FieldName;
 import com.future.function.repository.feature.scoring.StudentQuizRepository;
 import com.future.function.service.api.feature.core.UserService;
 import com.future.function.service.api.feature.scoring.StudentQuizDetailService;
@@ -110,7 +111,15 @@ public class StudentQuizServiceImpl implements StudentQuizService {
 
     private Quiz createNewQuiz(Quiz quiz) {
         Quiz newQuiz = new Quiz();
-        BeanUtils.copyProperties(quiz, newQuiz, "_id", "id");
+        BeanUtils.copyProperties(
+                quiz,
+                newQuiz,
+                "_id",
+                "id",
+                FieldName.BaseEntity.CREATED_AT,
+                FieldName.BaseEntity.CREATED_BY,
+                FieldName.BaseEntity.VERSION
+        );
         return newQuiz;
     }
 
