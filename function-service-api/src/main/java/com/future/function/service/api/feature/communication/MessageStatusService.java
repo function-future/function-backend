@@ -1,6 +1,6 @@
 package com.future.function.service.api.feature.communication;
 
-import com.future.function.model.entity.feature.communication.MessageStatus;
+import com.future.function.model.entity.feature.communication.chatting.MessageStatus;
 
 import java.util.List;
 

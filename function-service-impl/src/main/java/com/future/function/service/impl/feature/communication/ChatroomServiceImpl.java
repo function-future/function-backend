@@ -2,18 +2,16 @@ package com.future.function.service.impl.feature.communication;
 
 import com.future.function.common.enumeration.communication.ChatroomType;
 import com.future.function.common.exception.NotFoundException;
-import com.future.function.model.entity.feature.communication.Chatroom;
+import com.future.function.model.entity.feature.communication.chatting.Chatroom;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.repository.feature.communication.ChatroomRepository;
 import com.future.function.service.api.feature.communication.ChatroomService;
 import com.future.function.service.api.feature.core.UserService;
-import com.future.function.service.impl.feature.core.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import javax.swing.text.html.Option;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;

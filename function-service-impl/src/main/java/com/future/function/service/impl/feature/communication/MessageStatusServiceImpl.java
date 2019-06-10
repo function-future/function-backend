@@ -1,15 +1,14 @@
 package com.future.function.service.impl.feature.communication;
 
-import com.future.function.model.entity.feature.communication.Chatroom;
-import com.future.function.model.entity.feature.communication.Message;
-import com.future.function.model.entity.feature.communication.MessageStatus;
+import com.future.function.model.entity.feature.communication.chatting.Chatroom;
+import com.future.function.model.entity.feature.communication.chatting.Message;
+import com.future.function.model.entity.feature.communication.chatting.MessageStatus;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.repository.feature.communication.MessageStatusRepository;
 import com.future.function.service.api.feature.communication.ChatroomService;
 import com.future.function.service.api.feature.communication.MessageService;
 import com.future.function.service.api.feature.communication.MessageStatusService;
 import com.future.function.service.api.feature.core.UserService;
-import org.checkerframework.checker.nullness.Opt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
