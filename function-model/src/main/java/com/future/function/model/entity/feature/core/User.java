@@ -42,7 +42,7 @@ public class User extends BaseEntity {
   
   @Field(FieldName.User.PICTURE)
   @DBRef(lazy = true)
-  private File picture;
+  private FileV2 pictureV2;
   
   @Field(FieldName.User.PHONE)
   private String phone;

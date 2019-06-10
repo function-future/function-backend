@@ -1,11 +1,10 @@
 package com.future.function.web.mapper.request.core;
 
 import com.future.function.common.enumeration.core.Role;
-import com.future.function.common.validation.ObjectValidator;
 import com.future.function.model.entity.feature.core.Batch;
-import com.future.function.model.entity.feature.core.File;
+import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.User;
-import com.future.function.web.mapper.request.WebRequestMapper;
+import com.future.function.validation.RequestValidator;
 import com.future.function.web.model.request.core.UserWebRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,49 +19,63 @@ import java.util.Optional;
 @Component
 public class UserRequestMapper {
   
-  private WebRequestMapper requestMapper;
-  
-  private ObjectValidator validator;
+  private final RequestValidator validator;
   
   @Autowired
-  private UserRequestMapper(
-    WebRequestMapper requestMapper, ObjectValidator validator
-  ) {
-  
-    this.requestMapper = requestMapper;
+  private UserRequestMapper(RequestValidator validator) {
+    
     this.validator = validator;
   }
   
   /**
    * Converts JSON data to {@code User} object.
    *
-   * @param data JSON data (in form of String) to be converted.
+   * @param request JSON data (in form of String) to be converted.
    *
    * @return {@code User} - Converted user object.
    */
-  public User toUser(String data) {
-  
-    UserWebRequest request = requestMapper.toWebRequestObject(data,
-                                                              UserWebRequest.class
-    );
+  public User toUser(UserWebRequest request) {
     
-    return toValidatedUser(request.getEmail(), request);
+    return toValidatedUser(null, request);
   }
   
-  private User toValidatedUser(String email, UserWebRequest request) {
-  
+  private User toValidatedUser(String userId, UserWebRequest request) {
+    
     validator.validate(request);
-  
-    return User.builder()
+    
+    User user = User.builder()
       .role(Role.toRole(request.getRole()))
-      .email(email)
+      .email(request.getEmail()
+               .toLowerCase())
       .name(request.getName())
       .password(getDefaultPassword(request.getName()))
       .phone(request.getPhone())
       .address(request.getAddress())
-      .picture(new File())
+      .pictureV2(this.getFileV2(request))
       .batch(toBatch(request))
       .university(getUniversity(request))
+      .build();
+    
+    if (userId != null) {
+      user.setId(userId);
+    }
+    
+    return user;
+  }
+  
+  private FileV2 getFileV2(UserWebRequest request) {
+    
+    return Optional.of(request)
+      .map(UserWebRequest::getAvatar)
+      .map(list -> list.get(0))
+      .map(this::buildFileV2)
+      .orElseGet(FileV2::new);
+  }
+  
+  private FileV2 buildFileV2(String fileId) {
+    
+    return FileV2.builder()
+      .id(fileId)
       .build();
   }
   
@@ -78,7 +91,7 @@ public class UserRequestMapper {
     return Optional.of(request)
       .map(UserWebRequest::getBatch)
       .map(batchNumber -> Batch.builder()
-        .number(batchNumber)
+        .code(batchNumber)
         .build())
       .orElse(null);
   }
@@ -93,19 +106,17 @@ public class UserRequestMapper {
   }
   
   /**
-   * Converts JSON data to {@code User} object. This method is used for
+   * Converts JSON request to {@code User} object. This method is used for
    * update user purposes.
    *
-   * @param email Email of user to be updated.
-   * @param data  JSON data (in form of String) to be converted.
+   * @param userId  Id of user to be updated.
+   * @param request JSON request (in form of String) to be converted.
    *
    * @return {@code User} - Converted user object.
    */
-  public User toUser(String email, String data) {
-  
-    return toValidatedUser(email, requestMapper.toWebRequestObject(data,
-                                                                   UserWebRequest.class
-    ));
+  public User toUser(String userId, UserWebRequest request) {
+    
+    return toValidatedUser(userId, request);
   }
   
 }

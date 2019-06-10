@@ -12,6 +12,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class OptionWebResponse {
 
+    private String optionId;
+
     private String label;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)

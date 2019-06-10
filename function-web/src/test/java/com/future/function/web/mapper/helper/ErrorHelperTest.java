@@ -1,7 +1,7 @@
 package com.future.function.web.mapper.helper;
 
 import com.future.function.web.dummy.data.DummyData;
-import com.future.function.web.model.request.core.UserWebRequest;
+import com.future.function.web.dummy.data.DummyDataUser;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -28,13 +28,12 @@ public class ErrorHelperTest {
     .number(7)
     .email(" ")
     .build();
-  
-  private static final UserWebRequest USER = UserWebRequest.builder()
-    .email("email@email.com")
-    .name("name")
-    .address("address")
+
+  private static final DummyDataUser DUMMY_DATA_USER = DummyDataUser.builder()
+    .number(17)
+    .email("example@example.com")
     .role("JUDGE")
-    .batch(1L)
+    .batch("1")
     .university("university")
     .build();
   
@@ -78,16 +77,16 @@ public class ErrorHelperTest {
     assertThat(errors.get("email")).contains("NotBlank", "Email");
     
   }
-
-  private void throwConstraintViolationException(Object object) {
   
+  private void throwConstraintViolationException(Object object) {
+    
     throw new ConstraintViolationException(validator.validate(object));
   }
   
   @Test
   public void testGivenSetOfConstraintViolationsWithNotBlankPropertyPathByMappingErrorsReturnMapOfErrorsWithGettingFieldValue() {
   
-    catchException(() -> throwConstraintViolationException(USER));
+    catchException(() -> throwConstraintViolationException(DUMMY_DATA_USER));
   
     Set<ConstraintViolation<?>> violations = caughtException(
       ConstraintViolationException.class).getConstraintViolations();

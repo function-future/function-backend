@@ -5,6 +5,7 @@ import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.mapper.request.scoring.QuizRequestMapper;
 import com.future.function.web.mapper.response.scoring.QuizResponseMapper;
+import com.future.function.web.model.request.scoring.CopyQuizWebRequest;
 import com.future.function.web.model.request.scoring.QuizWebRequest;
 import com.future.function.web.model.response.base.BaseResponse;
 import com.future.function.web.model.response.base.DataResponse;
@@ -52,7 +53,7 @@ public class QuizController {
             .toQuizWebPagingResponse(
                     quizService
                       .findAllByPageableAndFilterAndSearch(
-                              PageHelper.toPage(page, size),
+                              PageHelper.toPageable(page, size),
                               filter,
                               search
                       )
@@ -74,6 +75,18 @@ public class QuizController {
             );
   }
 
+  @ResponseStatus(HttpStatus.CREATED)
+  @PostMapping(value = "/copy", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+  public DataResponse<QuizWebResponse> copyQuiz(@RequestBody CopyQuizWebRequest request) {
+    request = quizRequestMapper.validateCopyQuizWebRequest(request);
+    return QuizResponseMapper
+            .toQuizWebDataResponse(
+                    HttpStatus.CREATED,
+                    quizService.copyQuizWithTargetBatch(
+                            request.getBatchCode(),
+                            quizService.findById(request.getQuizId())
+                    ));
+  }
   /**
    * Used to create new quiz by passing the QuizWebRequest object as JSON
    * @param quizWebRequest (JSON)

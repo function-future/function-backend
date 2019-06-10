@@ -15,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -73,6 +74,13 @@ public class QuestionRepositoryTest {
         Page<Question> actual = repository.findAllByQuestionBankId(QUESTION_BANK_ID, pageable);
         assertThat(actual.getTotalElements()).isEqualTo(1);
         question.setQuestionBank(null);
-        assertThat(actual.getContent()).isEqualTo(Collections.singletonList(question));
+        assertThat(actual.getContent().get(0).getText()).isEqualTo(question.getText());
+    }
+
+    @Test
+    public void findAllByQuestionBankIdListTest() {
+        List<Question> actual = repository.findAllByQuestionBankId(QUESTION_BANK_ID);
+        assertThat(actual.size()).isEqualTo(1);
+        assertThat(actual.get(0).getText()).isEqualTo(question.getText());
     }
 }

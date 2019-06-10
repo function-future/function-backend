@@ -1,6 +1,7 @@
 package com.future.function.web.mapper.response.core;
 
 import com.future.function.model.entity.feature.core.Batch;
+import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
@@ -53,7 +54,7 @@ public class UserResponseMapper {
   public static DataResponse<UserWebResponse> toUserDataResponse(
     HttpStatus httpStatus, User user
   ) {
-  
+    
     return ResponseHelper.toDataResponse(
       httpStatus, buildUserWebResponse(user));
   }
@@ -61,6 +62,7 @@ public class UserResponseMapper {
   private static UserWebResponse buildUserWebResponse(User user) {
     
     return UserWebResponse.builder()
+      .id(user.getId())
       .role(user.getRole()
               .name())
       .email(user.getEmail())
@@ -68,20 +70,24 @@ public class UserResponseMapper {
       .phone(user.getPhone())
       .address(user.getAddress())
       .deleted(user.isDeleted())
-      .pictureUrl(user.getPicture()
-                    .getFileUrl())
-      .thumbnailUrl(user.getPicture()
-                      .getThumbnailUrl())
-      .batch(getBatch(user))
+      .avatar(UserResponseMapper.getFileUrl(user.getPictureV2()))
+      .batch(UserResponseMapper.getBatch(user))
       .university(user.getUniversity())
       .build();
   }
   
-  private static Long getBatch(User user) {
+  private static String getFileUrl(FileV2 fileV2) {
+    
+    return Optional.ofNullable(fileV2)
+      .map(FileV2::getFileUrl)
+      .orElse(null);
+  }
+  
+  private static String getBatch(User user) {
     
     return Optional.of(user)
       .map(User::getBatch)
-      .map(Batch::getNumber)
+      .map(Batch::getCode)
       .orElse(null);
   }
   
@@ -99,7 +105,7 @@ public class UserResponseMapper {
   public static PagingResponse<UserWebResponse> toUsersPagingResponse(
     Page<User> data
   ) {
-  
+    
     return ResponseHelper.toPagingResponse(
       HttpStatus.OK, toUserWebResponseList(data), PageHelper.toPaging(data));
   }

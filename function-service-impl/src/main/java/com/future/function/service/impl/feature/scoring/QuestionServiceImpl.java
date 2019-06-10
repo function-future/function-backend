@@ -14,16 +14,16 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class QuestionServiceImpl implements QuestionService {
 
     private QuestionRepository questionRepository;
-
     private OptionService optionService;
-
     private QuestionBankService questionBankService;
 
     @Autowired
@@ -42,10 +42,32 @@ public class QuestionServiceImpl implements QuestionService {
                 .orElseThrow(() -> new NotFoundException("Question Bank is not found"));
     }
 
+    @Override
+    public List<Question> findAllByMultipleQuestionBankId(List<String> questionBankIds) {
+        List<Question> questionList = new ArrayList<>();
+        return Optional.ofNullable(questionBankIds)
+                .filter(list -> !list.isEmpty())
+                .map(list -> {
+                    list
+                            .stream()
+                            .map(questionRepository::findAllByQuestionBankId)
+                            .forEach(questionList::addAll);
+                    return questionList;
+                })
+                .map(this::findListFromQuestionList)
+                .orElse(questionList);
+    }
+
     private Page<Question> findListFromQuestionPage(Page<Question> page) {
         page.getContent()
                 .forEach(this::searchOptionsForQuestion);
         return page;
+    }
+
+    private List<Question> findListFromQuestionList(List<Question> list) {
+        list
+                .forEach(this::searchOptionsForQuestion);
+        return list;
     }
 
     private void searchOptionsForQuestion(Question question) {
@@ -81,7 +103,11 @@ public class QuestionServiceImpl implements QuestionService {
     private void saveOptionList(Question question, List<Option> options, boolean isCreate) {
         options
                 .stream()
-                .peek(option -> option.setQuestion(question))
+                .map(option -> {
+                    option.setId(UUID.randomUUID().toString());
+                    option.setQuestion(question);
+                    return option;
+                })
                 .forEach(isCreate ? optionService::createOption : optionService::updateOption);
     }
 

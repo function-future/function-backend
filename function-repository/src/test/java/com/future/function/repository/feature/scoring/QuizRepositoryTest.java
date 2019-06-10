@@ -1,11 +1,6 @@
 package com.future.function.repository.feature.scoring;
 
 import com.future.function.model.entity.feature.scoring.Quiz;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -13,10 +8,14 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -27,9 +26,9 @@ public class QuizRepositoryTest {
   private String QUIZ_ID = UUID.randomUUID().toString();
   private String QUIZ_TITLE = "quiz-title";
   private String QUIZ_DESCRIPTION = "quiz-description";
-  private long DEADLINE = 0;
+  private long DATE = 0;
   private long TIME_LIMIT = 0;
-  private int TRIES = 0;
+  private int TRIALS = 0;
   private int QUESTION_COUNT = 0;
 
   private int PAGE = 0;
@@ -49,9 +48,10 @@ public class QuizRepositoryTest {
             .id(QUIZ_ID)
             .title(QUIZ_TITLE)
             .description(QUIZ_DESCRIPTION)
-            .deadline(DEADLINE)
+            .startDate(DATE)
+            .endDate(DATE)
             .timeLimit(TIME_LIMIT)
-            .tries(TRIES)
+            .trials(TRIALS)
             .questionCount(QUESTION_COUNT)
             .build();
 

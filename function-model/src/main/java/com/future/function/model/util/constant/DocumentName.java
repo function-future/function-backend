@@ -9,13 +9,15 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public abstract class DocumentName {
   
-  public static final String SEQUENCE = "sequences";
-  
   public static final String BATCH = "batches";
   
   public static final String FILE = "files";
   
   public static final String USER = "users";
+
+  public static final String COURSE = "courses";
+
+  public static final String SHARED_COURSE = "shared-courses";
 
   public static final String ANNOUNCEMENT = "announcements";
 
@@ -27,8 +29,16 @@ public abstract class DocumentName {
 
   public static final String QUIZ = "quizzes";
 
+  public static final String STUDENT_QUIZ = "student-quizzes";
+
+    public static final String STUDENT_QUIZ_DETAIL = "student-quizzes-details";
+
+    public static final String STUDENT_QUESTION = "student-questions";
+
   public static final String QUESTION = "questions";
 
   public static final String OPTION = "options";
+
+  public static final String DISCUSSION = "discussions";
 
 }

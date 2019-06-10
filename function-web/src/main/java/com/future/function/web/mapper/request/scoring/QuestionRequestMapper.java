@@ -1,9 +1,9 @@
 package com.future.function.web.mapper.request.scoring;
 
 import com.future.function.common.exception.BadRequestException;
-import com.future.function.common.validation.ObjectValidator;
 import com.future.function.model.entity.feature.scoring.Option;
 import com.future.function.model.entity.feature.scoring.Question;
+import com.future.function.validation.RequestValidator;
 import com.future.function.web.model.request.scoring.QuestionWebRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -15,12 +15,12 @@ import java.util.stream.Collectors;
 @Component
 public class QuestionRequestMapper {
 
-    private ObjectValidator validator;
+    private RequestValidator validator;
 
     private OptionRequestMapper requestMapper;
 
     @Autowired
-    public QuestionRequestMapper(ObjectValidator validator, OptionRequestMapper requestMapper) {
+    public QuestionRequestMapper(RequestValidator validator, OptionRequestMapper requestMapper) {
         this.validator = validator;
         this.requestMapper = requestMapper;
     }

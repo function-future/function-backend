@@ -1,12 +1,11 @@
 package com.future.function.web.mapper.response.scoring;
 
+import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.scoring.Quiz;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.base.paging.Paging;
 import com.future.function.web.model.response.feature.scoring.QuizWebResponse;
-import java.util.ArrayList;
-import java.util.List;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,6 +16,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class QuizResponseMapperTest {
@@ -24,15 +26,17 @@ public class QuizResponseMapperTest {
   private static String QUIZ_ID;
   private static final String QUIZ_TITLE = "quiz-title";
   private static final String QUIZ_DESCRIPTION = "quiz-description";
-  private static final long DEADLINE = 150000;
+  private static final long DATE = 150000;
   private static final long QUIZ_TIME_LIMIT = 15000;
   private static final int QUIZ_QUESTION_COUNT = 2;
-  private static final int QUIZ_TRIES = 3;
+  private static final int QUIZ_TRIALS = 3;
+    private static final String BATCH_CODE = "3";
 
   private static final int PAGE = 0;
   private static final int SIZE = 10;
 
   private Quiz quiz;
+    private Batch batch;
   private Paging paging;
   private Pageable pageable;
   private List<Quiz> quizList;
@@ -44,14 +48,23 @@ public class QuizResponseMapperTest {
 
   @Before
   public void setUp() throws Exception {
+
+      batch = Batch
+              .builder()
+              .code(BATCH_CODE)
+              .build();
+
     quiz = Quiz
             .builder()
             .title(QUIZ_TITLE)
             .description(QUIZ_DESCRIPTION)
-            .deadline(DEADLINE)
+            .startDate(DATE)
+            .endDate(DATE)
             .timeLimit(QUIZ_TIME_LIMIT)
             .questionCount(QUIZ_QUESTION_COUNT)
-            .tries(QUIZ_TRIES)
+            .trials(QUIZ_TRIALS)
+            .questionBanks(new ArrayList<>())
+            .batch(batch)
             .build();
 
     quizList = new ArrayList<>();
@@ -59,6 +72,7 @@ public class QuizResponseMapperTest {
 
     quizWebResponse = new QuizWebResponse();
     BeanUtils.copyProperties(quiz, quizWebResponse);
+      quizWebResponse.setBatchCode(BATCH_CODE);
 
     quizWebDataResponse = DataResponse
             .<QuizWebResponse> builder()
@@ -70,10 +84,9 @@ public class QuizResponseMapperTest {
 
     paging = Paging
             .builder()
-            .totalPages(1)
             .totalRecords(SIZE)
-            .pageSize(SIZE)
-            .currentPage(PAGE)
+            .size(SIZE)
+            .page(PAGE)
             .build();
 
     quizWebPagingResponse = PagingResponse

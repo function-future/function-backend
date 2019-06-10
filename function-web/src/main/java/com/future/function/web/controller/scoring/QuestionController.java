@@ -40,7 +40,7 @@ public class QuestionController {
         return QuestionResponseMapper
                 .toQuestionPagingResponse(
                         questionService
-                                .findAllByQuestionBankId(questionBankId, PageHelper.toPage(page, size))
+                                .findAllByQuestionBankId(questionBankId, PageHelper.toPageable(page, size))
                 );
     }
 

@@ -3,9 +3,6 @@ package com.future.function.service.impl.feature.scoring;
 import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.scoring.QuestionBank;
 import com.future.function.repository.feature.scoring.QuestionBankRepository;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,12 +15,14 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
 import static com.googlecode.catchexception.CatchException.catchException;
 import static com.googlecode.catchexception.CatchException.caughtException;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class QuestionBankServiceImplTest {
@@ -93,14 +92,14 @@ public class QuestionBankServiceImplTest {
   @Test
   public void testFindAllWithPageableFilterAndSearch() {
 
-    when(questionBankRepository.findAll(pageable))
+      when(questionBankRepository.findAllByDeletedFalse(pageable))
             .thenReturn(questionBankPage);
 
     Page<QuestionBank> actual = questionBankService.findAllByPageableFilterAndSearch(pageable, "", "");
 
     assertThat(actual.getContent()).isEqualTo(questionBankList);
     assertThat(actual.getTotalElements()).isEqualTo(questionBankPage.getTotalElements());
-    verify(questionBankRepository).findAll(pageable);
+      verify(questionBankRepository).findAllByDeletedFalse(pageable);
   }
 
   @Test
@@ -139,12 +138,5 @@ public class QuestionBankServiceImplTest {
     questionBankService.deleteById(QUESTIONBANK_ID);
     verify(questionBankRepository).findByIdAndDeletedFalse(QUESTIONBANK_ID);
     verify(questionBankRepository).save(questionBank);
-  }
-
-  @Test
-  public void testDeleteQuestionBankEmptyString() {
-    catchException(() -> questionBankService.deleteById(""));
-
-    assertThat(caughtException().getClass()).isEqualTo(NotFoundException.class);
   }
 }

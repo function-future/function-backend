@@ -1,17 +1,15 @@
 package com.future.function.web.mapper.request.scoring;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.future.function.common.exception.BadRequestException;
-import com.future.function.common.validation.ObjectValidator;
 import com.future.function.model.entity.feature.scoring.Assignment;
+import com.future.function.validation.RequestValidator;
 import com.future.function.web.mapper.request.WebRequestMapper;
 import com.future.function.web.model.request.scoring.AssignmentWebRequest;
-import java.io.IOException;
-import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Optional;
 
 /**
  * Bean class used to map AssignmentWebRequest from json string
@@ -22,10 +20,10 @@ public class AssignmentRequestMapper {
 
   private WebRequestMapper requestMapper;
 
-  private ObjectValidator validator;
+    private RequestValidator validator;
 
   @Autowired
-  public AssignmentRequestMapper(WebRequestMapper requestMapper, ObjectValidator validator) {
+  public AssignmentRequestMapper(WebRequestMapper requestMapper, RequestValidator validator) {
     this.requestMapper = requestMapper;
     this.validator = validator;
   }

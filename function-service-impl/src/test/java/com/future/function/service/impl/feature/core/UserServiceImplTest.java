@@ -1,14 +1,13 @@
 package com.future.function.service.impl.feature.core;
 
-import com.future.function.common.enumeration.core.FileOrigin;
 import com.future.function.common.enumeration.core.Role;
 import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.core.Batch;
-import com.future.function.model.entity.feature.core.File;
+import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.repository.feature.core.UserRepository;
 import com.future.function.service.api.feature.core.BatchService;
-import com.future.function.service.api.feature.core.FileService;
+import com.future.function.service.api.feature.core.ResourceService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,27 +16,20 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.beans.BeanUtils;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import static com.googlecode.catchexception.CatchException.catchException;
 import static com.googlecode.catchexception.CatchException.caughtException;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class UserServiceImplTest {
@@ -52,19 +44,22 @@ public class UserServiceImplTest {
   
   private static final String PASSWORD = "password";
   
-  private static final String NON_EXISTING_USER_EMAIL = "email@email.com";
+  private static final String NON_EXISTING_USER_ID = "non-existing-user-id";
   
-  private static final Long NUMBER = 1L;
+  private static final String NUMBER = "1";
   
   private static final Batch BATCH = Batch.builder()
-    .number(NUMBER)
+    .code(NUMBER)
     .build();
   
   private static final String PHONE = "phone";
   
   private static final String PICTURE_ID = "picture-id";
   
-  private static final File PICTURE = File.builder()
+  private static final List<String> FILE_IDS = Collections.singletonList(
+    PICTURE_ID);
+  
+  private static final FileV2 PICTURE = FileV2.builder()
     .id(PICTURE_ID)
     .asResource(true)
     .build();
@@ -73,8 +68,9 @@ public class UserServiceImplTest {
   
   private static final Pageable PAGEABLE = new PageRequest(0, 10);
   
-  private static final MockMultipartFile MOCK_MULTIPARTFILE =
-    new MockMultipartFile("mock", "mock.png", "image/png", new byte[] {});
+  private static final String STUDENT_ID = "student-id";
+  
+  private static final String MENTOR_ID = "mentor-id";
   
   private User userStudent;
   
@@ -84,13 +80,10 @@ public class UserServiceImplTest {
   private BatchService batchService;
   
   @Mock
-  private FileService fileService;
-  
-  @Mock
   private UserRepository userRepository;
   
   @Mock
-  private ResourceLoader resourceLoader;
+  private ResourceService resourceService;
   
   @InjectMocks
   private UserServiceImpl userService;
@@ -99,26 +92,26 @@ public class UserServiceImplTest {
   public void setUp() {
     
     userStudent = User.builder()
+      .id(STUDENT_ID)
       .role(Role.STUDENT)
       .email(EMAIL_STUDENT)
       .name(NAME)
       .password(PASSWORD)
       .phone(PHONE)
       .address(ADDRESS)
-      .picture(PICTURE)
       .batch(BATCH)
       .university(UNIVERSITY)
       .build();
     userStudent.setDeleted(false);
     
     userMentor = User.builder()
+      .id(MENTOR_ID)
       .role(Role.MENTOR)
       .email(EMAIL_MENTOR)
       .name(NAME)
       .password(PASSWORD)
       .phone(PHONE)
       .address(ADDRESS)
-      .picture(PICTURE)
       .build();
     userMentor.setDeleted(false);
   }
@@ -126,50 +119,49 @@ public class UserServiceImplTest {
   @After
   public void tearDown() {
     
-    verifyNoMoreInteractions(
-      batchService, fileService, userRepository, resourceLoader);
+    verifyNoMoreInteractions(batchService, userRepository, resourceService);
   }
   
   @Test
   public void testGivenStudentEmailByGettingUserByEmailReturnStudent() {
     
-    when(userRepository.findByEmail(EMAIL_STUDENT)).thenReturn(
-      Optional.of(userStudent));
+    when(userRepository.findOne(STUDENT_ID)).thenReturn(userStudent);
     
-    User foundUserStudent = userService.getUser(EMAIL_STUDENT);
+    User foundUserStudent = userService.getUser(STUDENT_ID);
     
     assertThat(foundUserStudent).isNotNull();
     assertThat(foundUserStudent).isEqualTo(userStudent);
     
-    verify(userRepository).findByEmail(EMAIL_STUDENT);
+    verify(userRepository).findOne(STUDENT_ID);
+    verifyZeroInteractions(batchService, resourceService);
   }
   
   @Test
   public void testGivenMentorEmailByGettingUserByEmailReturnMentor() {
     
-    when(userRepository.findByEmail(EMAIL_MENTOR)).thenReturn(
-      Optional.of(userMentor));
+    when(userRepository.findOne(MENTOR_ID)).thenReturn(userMentor);
     
-    User foundUserMentor = userService.getUser(EMAIL_MENTOR);
+    User foundUserMentor = userService.getUser(MENTOR_ID);
     
     assertThat(foundUserMentor).isNotNull();
     assertThat(foundUserMentor).isEqualTo(userMentor);
     
-    verify(userRepository).findByEmail(EMAIL_MENTOR);
+    verify(userRepository).findOne(MENTOR_ID);
+    verifyZeroInteractions(batchService, resourceService);
   }
   
   @Test
   public void testGivenEmailOfNonExistingUserByGettingUserByEmailReturnNotFoundException() {
     
-    when(userRepository.findByEmail(NON_EXISTING_USER_EMAIL)).thenReturn(
-      Optional.empty());
+    when(userRepository.findOne(NON_EXISTING_USER_ID)).thenReturn(null);
     
-    catchException(() -> userService.getUser(NON_EXISTING_USER_EMAIL));
+    catchException(() -> userService.getUser(NON_EXISTING_USER_ID));
     
     assertThat(caughtException().getClass()).isEqualTo(NotFoundException.class);
     assertThat(caughtException().getMessage()).isEqualTo("Get User Not Found");
     
-    verify(userRepository).findByEmail(NON_EXISTING_USER_EMAIL);
+    verify(userRepository).findOne(NON_EXISTING_USER_ID);
+    verifyZeroInteractions(batchService, resourceService);
   }
   
   @Test
@@ -182,7 +174,7 @@ public class UserServiceImplTest {
       .password(PASSWORD)
       .phone(PHONE)
       .address(ADDRESS)
-      .picture(PICTURE)
+      .pictureV2(PICTURE)
       .batch(BATCH)
       .university(UNIVERSITY)
       .build();
@@ -200,6 +192,7 @@ public class UserServiceImplTest {
     assertThat(foundUserStudentsPage.getContent()).isEqualTo(studentsList);
     
     verify(userRepository).findAllByRole(Role.STUDENT, PAGEABLE);
+    verifyZeroInteractions(batchService, resourceService);
   }
   
   @Test
@@ -212,7 +205,7 @@ public class UserServiceImplTest {
       .password(PASSWORD)
       .phone(PHONE)
       .address(ADDRESS)
-      .picture(PICTURE)
+      .pictureV2(PICTURE)
       .build();
     additionalUser.setDeleted(false);
     
@@ -228,193 +221,127 @@ public class UserServiceImplTest {
     assertThat(foundUserMentorsPage.getContent()).isEqualTo(mentorsList);
     
     verify(userRepository).findAllByRole(Role.MENTOR, PAGEABLE);
+    verifyZeroInteractions(batchService, resourceService);
   }
   
   @Test
   public void testGivenStudentDataByCreatingUserReturnStudent() {
     
-    when(userRepository.findByEmail(EMAIL_STUDENT)).thenReturn(
-      Optional.empty());
-    when(batchService.getBatch(NUMBER)).thenReturn(BATCH);
-    when(fileService.storeFile(MOCK_MULTIPARTFILE, FileOrigin.USER)).thenReturn(
-      PICTURE);
-    when(fileService.getFile(PICTURE_ID)).thenReturn(PICTURE);
+    userStudent.setPictureV2(PICTURE);
+    
+    when(batchService.getBatchByCode(NUMBER)).thenReturn(BATCH);
+    when(resourceService.markFilesUsed(FILE_IDS, true)).thenReturn(true);
+    when(resourceService.getFile(PICTURE_ID)).thenReturn(PICTURE);
     when(userRepository.save(userStudent)).thenReturn(userStudent);
     
-    User createdUserStudent = userService.createUser(
-      userStudent, MOCK_MULTIPARTFILE);
+    User createdUserStudent = userService.createUser(userStudent);
     
     assertThat(createdUserStudent).isNotNull();
     assertThat(createdUserStudent.getBatch()).isNotNull();
     assertThat(createdUserStudent.getBatch()).isEqualTo(BATCH);
-    assertThat(createdUserStudent.getPicture()).isNotNull();
-    assertThat(createdUserStudent.getPicture()).isEqualTo(PICTURE);
+    assertThat(createdUserStudent.getPictureV2()).isNotNull();
+    assertThat(createdUserStudent.getPictureV2()).isEqualTo(PICTURE);
     
-    verify(userRepository).findByEmail(EMAIL_STUDENT);
-    verify(batchService).getBatch(NUMBER);
-    verify(fileService).storeFile(MOCK_MULTIPARTFILE, FileOrigin.USER);
-    verify(fileService).getFile(PICTURE_ID);
+    verify(batchService).getBatchByCode(NUMBER);
+    verify(resourceService).markFilesUsed(FILE_IDS, true);
+    verify(resourceService).getFile(PICTURE_ID);
     verify(userRepository).save(userStudent);
   }
   
   @Test
   public void testGivenMentorDataByCreatingUserReturnMentor() {
     
-    when(userRepository.findByEmail(EMAIL_MENTOR)).thenReturn(Optional.empty());
-    when(userRepository.save(userMentor)).thenReturn(userMentor);
-    when(fileService.storeFile(MOCK_MULTIPARTFILE, FileOrigin.USER)).thenReturn(
-      PICTURE);
-    when(fileService.getFile(PICTURE_ID)).thenReturn(PICTURE);
+    userMentor.setPictureV2(PICTURE);
     
-    User createdUserMentor = userService.createUser(
-      userMentor, MOCK_MULTIPARTFILE);
+    when(resourceService.markFilesUsed(FILE_IDS, true)).thenReturn(true);
+    when(resourceService.getFile(PICTURE_ID)).thenReturn(PICTURE);
+    when(userRepository.save(userMentor)).thenReturn(userMentor);
+    
+    User createdUserMentor = userService.createUser(userMentor);
     
     assertThat(createdUserMentor).isNotNull();
-    assertThat(createdUserMentor.getPicture()).isNotNull();
-    assertThat(createdUserMentor.getPicture()).isEqualTo(PICTURE);
+    assertThat(createdUserMentor.getPictureV2()).isNotNull();
+    assertThat(createdUserMentor.getPictureV2()).isEqualTo(PICTURE);
     
-    verify(userRepository).findByEmail(EMAIL_MENTOR);
+    verify(resourceService).markFilesUsed(FILE_IDS, true);
+    verify(resourceService).getFile(PICTURE_ID);
     verify(userRepository).save(userMentor);
-    verify(fileService).storeFile(MOCK_MULTIPARTFILE, FileOrigin.USER);
-    verify(fileService).getFile(PICTURE_ID);
+    verifyZeroInteractions(batchService);
   }
   
   @Test
   public void testGivenMentorDataWithoutImageByCreatingUserReturnMentor() {
     
-    when(userRepository.findByEmail(EMAIL_MENTOR)).thenReturn(Optional.empty());
     when(userRepository.save(userMentor)).thenReturn(userMentor);
-    when(
-      resourceLoader.getResource("classpath:default-profile.png")).thenReturn(
-      new ClassPathResource("default-profile.png"));
-    when(fileService.storeFile(any(MultipartFile.class),
-                               any(FileOrigin.class)
-    )).thenReturn(PICTURE);
-    when(fileService.getFile(PICTURE_ID)).thenReturn(PICTURE);
     
-    User createdUserMentor = userService.createUser(userMentor, null);
+    User createdUserMentor = userService.createUser(userMentor);
     
     assertThat(createdUserMentor).isNotNull();
-    assertThat(createdUserMentor.getPicture()).isNotNull();
-    assertThat(createdUserMentor.getPicture()).isEqualTo(PICTURE);
+    assertThat(createdUserMentor.getPictureV2()).isNull();
     
-    verify(userRepository).findByEmail(EMAIL_MENTOR);
     verify(userRepository).save(userMentor);
-    verify(resourceLoader).getResource("classpath:default-profile.png");
-    verify(fileService).storeFile(
-      any(MultipartFile.class), any(FileOrigin.class));
-    verify(fileService).getFile(PICTURE_ID);
-  }
-  
-  @Test
-  public void testGivenDeletedStudentDataByCreatingUserReturnStudent() {
-    
-    when(batchService.getBatch(NUMBER)).thenReturn(BATCH);
-    
-    userStudent.setDeleted(true);
-    
-    when(userRepository.findByEmail(EMAIL_STUDENT)).thenReturn(
-      Optional.of(userStudent));
-    
-    User savedUserStudent;
-    BeanUtils.copyProperties(userStudent, savedUserStudent = new User());
-    savedUserStudent.setDeleted(false);
-    when(userRepository.save(savedUserStudent)).thenReturn(savedUserStudent);
-    
-    User createdUserStudent = userService.createUser(
-      userStudent, MOCK_MULTIPARTFILE);
-    
-    assertThat(createdUserStudent).isNotNull();
-    
-    verify(batchService).getBatch(NUMBER);
-    verify(userRepository).findByEmail(EMAIL_STUDENT);
-    verify(userRepository, times(2)).save(savedUserStudent);
-  }
-  
-  @Test
-  public void testGivenDeletedMentorDataByCreatingUserReturnMentor() {
-    
-    userMentor.setDeleted(true);
-    
-    when(userRepository.findByEmail(EMAIL_MENTOR)).thenReturn(
-      Optional.of(userMentor));
-    
-    User savedUserMentor;
-    BeanUtils.copyProperties(userMentor, savedUserMentor = new User());
-    savedUserMentor.setDeleted(false);
-    when(userRepository.save(savedUserMentor)).thenReturn(savedUserMentor);
-    
-    User createdUserMentor = userService.createUser(
-      userMentor, MOCK_MULTIPARTFILE);
-    
-    assertThat(createdUserMentor).isNotNull();
-    
-    verify(userRepository).findByEmail(EMAIL_MENTOR);
-    verify(userRepository, times(2)).save(savedUserMentor);
+    verifyZeroInteractions(batchService, resourceService);
   }
   
   @Test
   public void testGivenStudentDataByUpdatingUserReturnStudent() {
     
-    userStudent.setPicture(PICTURE);
+    userStudent.setPictureV2(PICTURE);
     
-    when(batchService.getBatch(NUMBER)).thenReturn(BATCH);
-    when(userRepository.findByEmail(EMAIL_STUDENT)).thenReturn(
-      Optional.of(userStudent));
-    when(fileService.storeFile(MOCK_MULTIPARTFILE, FileOrigin.USER)).thenReturn(
-      PICTURE);
-    when(fileService.getFile(PICTURE_ID)).thenReturn(PICTURE);
+    when(batchService.getBatchByCode(NUMBER)).thenReturn(BATCH);
+    when(userRepository.findOne(STUDENT_ID)).thenReturn(userStudent);
+    when(resourceService.markFilesUsed(FILE_IDS, false)).thenReturn(true);
+    when(resourceService.markFilesUsed(FILE_IDS, true)).thenReturn(true);
+    when(resourceService.getFile(PICTURE_ID)).thenReturn(PICTURE);
     when(userRepository.save(userStudent)).thenReturn(userStudent);
     
-    User updatedUserStudent = userService.updateUser(userStudent,
-                                                     MOCK_MULTIPARTFILE
-    );
+    User updatedUserStudent = userService.updateUser(userStudent);
     
     assertThat(updatedUserStudent).isNotNull();
     assertThat(updatedUserStudent.getBatch()).isNotNull();
     assertThat(updatedUserStudent.getBatch()).isEqualTo(BATCH);
-    assertThat(updatedUserStudent.getPicture()).isNotNull();
-    assertThat(updatedUserStudent.getPicture()).isEqualTo(PICTURE);
+    assertThat(updatedUserStudent.getPictureV2()).isNotNull();
+    assertThat(updatedUserStudent.getPictureV2()).isEqualTo(PICTURE);
     
-    verify(batchService).getBatch(NUMBER);
-    verify(userRepository).findByEmail(EMAIL_STUDENT);
-    verify(fileService).deleteFile(PICTURE_ID);
-    verify(fileService).storeFile(MOCK_MULTIPARTFILE, FileOrigin.USER);
-    verify(fileService).getFile(PICTURE_ID);
+    verify(batchService).getBatchByCode(NUMBER);
+    verify(userRepository).findOne(STUDENT_ID);
+    verify(resourceService).markFilesUsed(FILE_IDS, false);
+    verify(resourceService).markFilesUsed(FILE_IDS, true);
+    verify(resourceService, times(2)).getFile(PICTURE_ID);
     verify(userRepository).save(userStudent);
   }
   
   @Test
   public void testGivenMentorDataByUpdatingUserReturnMentor() {
     
-    userMentor.setPicture(PICTURE);
+    userMentor.setPictureV2(PICTURE);
     
-    when(userRepository.findByEmail(EMAIL_MENTOR)).thenReturn(
-      Optional.of(userMentor));
-    when(fileService.storeFile(MOCK_MULTIPARTFILE, FileOrigin.USER)).thenReturn(
-      PICTURE);
-    when(fileService.getFile(PICTURE_ID)).thenReturn(PICTURE);
+    when(userRepository.findOne(MENTOR_ID)).thenReturn(userMentor);
+    when(resourceService.markFilesUsed(FILE_IDS, false)).thenReturn(true);
+    when(resourceService.markFilesUsed(FILE_IDS, true)).thenReturn(true);
+    when(resourceService.getFile(PICTURE_ID)).thenReturn(PICTURE);
     when(userRepository.save(userMentor)).thenReturn(userMentor);
     
-    User updatedUserMentor = userService.updateUser(
-      userMentor, MOCK_MULTIPARTFILE);
+    User updatedUserMentor = userService.updateUser(userMentor);
     
     assertThat(updatedUserMentor).isNotNull();
-    assertThat(updatedUserMentor.getPicture()).isNotNull();
-    assertThat(updatedUserMentor.getPicture()).isEqualTo(PICTURE);
+    assertThat(updatedUserMentor.getPictureV2()).isNotNull();
+    assertThat(updatedUserMentor.getPictureV2()).isEqualTo(PICTURE);
     
-    verify(userRepository).findByEmail(EMAIL_MENTOR);
-    verify(fileService).deleteFile(PICTURE_ID);
-    verify(fileService).storeFile(MOCK_MULTIPARTFILE, FileOrigin.USER);
-    verify(fileService).getFile(PICTURE_ID);
+    verify(userRepository).findOne(MENTOR_ID);
+    verify(resourceService).markFilesUsed(FILE_IDS, false);
+    verify(resourceService).markFilesUsed(FILE_IDS, true);
+    verify(resourceService, times(2)).getFile(PICTURE_ID);
     verify(userRepository).save(userMentor);
+    verifyZeroInteractions(batchService);
   }
   
   @Test
   public void testGivenStudentEmailByDeletingUsersReturnSuccessfulDeletion() {
     
-    when(userRepository.findByEmail(EMAIL_STUDENT)).thenReturn(
-      Optional.of(userStudent));
+    userStudent.setPictureV2(PICTURE);
+    
+    when(userRepository.findOne(STUDENT_ID)).thenReturn(userStudent);
     
     User deletedUserStudent = new User();
     BeanUtils.copyProperties(userStudent, deletedUserStudent);
@@ -422,49 +349,131 @@ public class UserServiceImplTest {
     when(userRepository.save(deletedUserStudent)).thenReturn(
       deletedUserStudent);
     
-    userService.deleteUser(EMAIL_STUDENT);
-    User markedDeletedUserStudent = userService.getUser(EMAIL_STUDENT);
+    userService.deleteUser(STUDENT_ID);
+    User markedDeletedUserStudent = userService.getUser(STUDENT_ID);
     
     assertThat(markedDeletedUserStudent).isNotNull();
     assertThat(markedDeletedUserStudent.isDeleted()).isTrue();
     
-    verify(userRepository, times(2)).findByEmail(EMAIL_STUDENT);
+    verify(userRepository, times(2)).findOne(STUDENT_ID);
+    verify(resourceService).markFilesUsed(FILE_IDS, false);
+    verify(resourceService).getFile(PICTURE_ID);
     verify(userRepository).save(markedDeletedUserStudent);
+    verifyZeroInteractions(batchService);
   }
   
   @Test
   public void testGivenMentorEmailByDeletingUsersReturnSuccessfulDeletion() {
     
-    when(userRepository.findByEmail(EMAIL_MENTOR)).thenReturn(
-      Optional.of(userMentor));
+    userMentor.setPictureV2(PICTURE);
+    
+    when(userRepository.findOne(MENTOR_ID)).thenReturn(userMentor);
     
     User deletedUserMentor = new User();
     BeanUtils.copyProperties(userMentor, deletedUserMentor);
     deletedUserMentor.setDeleted(true);
     when(userRepository.save(deletedUserMentor)).thenReturn(deletedUserMentor);
     
-    userService.deleteUser(EMAIL_MENTOR);
-    User markedDeletedUserMentor = userService.getUser(EMAIL_MENTOR);
+    userService.deleteUser(MENTOR_ID);
+    User markedDeletedUserMentor = userService.getUser(MENTOR_ID);
     
     assertThat(markedDeletedUserMentor).isNotNull();
     assertThat(markedDeletedUserMentor.isDeleted()).isTrue();
     
-    verify(userRepository, times(2)).findByEmail(EMAIL_MENTOR);
+    verify(userRepository, times(2)).findOne(MENTOR_ID);
+    verify(resourceService).markFilesUsed(FILE_IDS, false);
+    verify(resourceService).getFile(PICTURE_ID);
     verify(userRepository).save(markedDeletedUserMentor);
+    verifyZeroInteractions(batchService);
   }
   
   @Test
-  public void testGivenEmailOfNonExistingUserByDeletingUserReturnNotFoundException() {
+  public void testGivenBatchCodeByGettingStudentsByBatchCodeReturnListOfStudents() {
     
-    when(userRepository.findByEmail(NON_EXISTING_USER_EMAIL)).thenReturn(
-      Optional.empty());
+    when(batchService.getBatchByCode(NUMBER)).thenReturn(BATCH);
+    when(userRepository.findAllByRoleAndBatch(Role.STUDENT, BATCH)).thenReturn(
+      Collections.singletonList(userStudent));
     
-    catchException(() -> userService.deleteUser(NON_EXISTING_USER_EMAIL));
+    List<User> foundStudents = userService.getStudentsByBatchCode(NUMBER);
+    
+    assertThat(foundStudents).isNotNull();
+    assertThat(foundStudents).isNotEmpty();
+    assertThat(foundStudents.size()).isEqualTo(1);
+    assertThat(foundStudents.get(0)).isEqualTo(userStudent);
+    
+    verify(batchService).getBatchByCode(NUMBER);
+    verify(userRepository).findAllByRoleAndBatch(Role.STUDENT, BATCH);
+    verifyZeroInteractions(resourceService);
+  }
+  
+  @Test
+  public void testGivenNullBatchCodeByGettingStudentsByBatchCodeReturnEmptyList() {
+    
+    List<User> foundStudents = userService.getStudentsByBatchCode(null);
+    
+    assertThat(foundStudents).isNotNull();
+    assertThat(foundStudents).isEmpty();
+    
+    verifyZeroInteractions(batchService, userRepository, resourceService);
+  }
+  
+  @Test
+  public void testGivenNonExistingBatchCodeByGettingStudentsByBatchCodeNotFoundException() {
+    
+    when(batchService.getBatchByCode(NUMBER)).thenThrow(
+      new NotFoundException(""));
+    
+    catchException(() -> userService.getStudentsByBatchCode(NUMBER));
     
     assertThat(caughtException().getClass()).isEqualTo(NotFoundException.class);
-    assertThat(caughtException().getMessage()).isEqualTo("Get User Not Found");
     
-    verify(userRepository).findByEmail(NON_EXISTING_USER_EMAIL);
+    verify(batchService).getBatchByCode(NUMBER);
+    verifyZeroInteractions(userRepository, resourceService);
+  }
+  
+  @Test
+  public void testGivenBatchCodeWithNoStudentRegisteredForThatCodeByGettingStudentsByBatchCodeEmptyList() {
+    
+    when(batchService.getBatchByCode(NUMBER)).thenReturn(BATCH);
+    when(userRepository.findAllByRoleAndBatch(Role.STUDENT, BATCH)).thenReturn(
+      Collections.emptyList());
+    
+    List<User> foundStudents = userService.getStudentsByBatchCode(NUMBER);
+    
+    assertThat(foundStudents).isNotNull();
+    assertThat(foundStudents).isEmpty();
+    
+    verify(batchService).getBatchByCode(NUMBER);
+    verify(userRepository).findAllByRoleAndBatch(Role.STUDENT, BATCH);
+    verifyZeroInteractions(resourceService);
+  }
+  
+  @Test
+  public void testGivenEmailByGettingUserByEmailReturnUser() {
+  
+    when(userRepository.findByEmail(EMAIL_MENTOR)).thenReturn(Optional.of(userMentor));
+    
+    User retrievedUser = userService.getUserByEmail(EMAIL_MENTOR);
+    
+    assertThat(retrievedUser).isNotNull();
+    assertThat(retrievedUser).isEqualTo(userMentor);
+    
+    verify(userRepository).findByEmail(EMAIL_MENTOR);
+    verifyZeroInteractions(resourceService);
+  }
+  
+  @Test
+  public void testGivenNonExistingEmailByGettingUserByEmailReturnNotFoundException() {
+  
+    when(userRepository.findByEmail(EMAIL_MENTOR)).thenReturn(Optional.empty());
+  
+    catchException(() -> userService.getUserByEmail(EMAIL_MENTOR));
+  
+    assertThat(caughtException().getClass()).isEqualTo(NotFoundException.class);
+    assertThat(caughtException().getMessage()).isEqualTo("Get User Not Found");
+  
+    verify(userRepository).findByEmail(EMAIL_MENTOR);
+    verifyZeroInteractions(resourceService);
   }
   
 }

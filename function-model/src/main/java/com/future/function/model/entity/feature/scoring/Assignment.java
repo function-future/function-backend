@@ -1,16 +1,13 @@
 package com.future.function.model.entity.feature.scoring;
 
 import com.future.function.model.entity.base.BaseEntity;
-import com.future.function.model.entity.feature.core.File;
+import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.util.constant.DocumentName;
-import java.util.UUID;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.util.UUID;
 
 /**
  * Entity representation for assignments.
@@ -35,6 +32,6 @@ public class Assignment extends BaseEntity {
 
   private String question;
 
-  private File file;
+    private FileV2 file;
 
 }

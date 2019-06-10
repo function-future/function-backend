@@ -13,6 +13,8 @@ public interface QuizService {
 
   Page<Quiz> findAllByPageableAndFilterAndSearch(Pageable pageable, String filter, String search);
 
+  Quiz copyQuizWithTargetBatch(String targetBatch, Quiz quiz);
+
   Quiz createQuiz(Quiz request);
 
   Quiz updateQuiz(Quiz request);

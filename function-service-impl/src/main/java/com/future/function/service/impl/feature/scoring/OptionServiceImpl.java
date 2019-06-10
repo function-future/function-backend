@@ -53,6 +53,15 @@ public class OptionServiceImpl implements OptionService {
     }
 
     @Override
+    public boolean isOptionCorrect(Option option) {
+        return Optional.of(option)
+                .map(Option::getId)
+                .map(this::findById)
+                .map(optionDB -> option.isCorrect() == optionDB.isCorrect())
+                .orElse(false);
+    }
+
+    @Override
     public void deleteById(String id) {
         Optional.ofNullable(id)
                 .flatMap(optionRepository::findByIdAndDeletedFalse)

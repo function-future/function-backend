@@ -1,8 +1,8 @@
 package com.future.function.web.mapper.request.scoring;
 
 import com.future.function.common.exception.BadRequestException;
-import com.future.function.common.validation.ObjectValidator;
 import com.future.function.model.entity.feature.scoring.Option;
+import com.future.function.validation.RequestValidator;
 import com.future.function.web.model.request.scoring.OptionWebRequest;
 import org.junit.After;
 import org.junit.Before;
@@ -30,7 +30,7 @@ public class OptionRequestMapperTest {
     private OptionRequestMapper requestMapper;
 
     @Mock
-    private ObjectValidator validator;
+    private RequestValidator validator;
 
     @Before
     public void setUp() throws Exception {
@@ -93,6 +93,24 @@ public class OptionRequestMapperTest {
     public void testToOptionNull() {
         catchException(() -> requestMapper.toOption(null));
 
+        assertThat(caughtException().getClass()).isEqualTo(BadRequestException.class);
+    }
+
+    @Test
+    public void testToOptionWithOptionId() {
+        Option actual = requestMapper.toOptionFromOptionId("id");
+        assertThat(actual.getId()).isEqualTo("id");
+    }
+
+    @Test
+    public void testToOptionWithOptionIdBlank() {
+        catchException(() -> requestMapper.toOptionFromOptionId(""));
+        assertThat(caughtException().getClass()).isEqualTo(BadRequestException.class);
+    }
+
+    @Test
+    public void testToOptionWithOptionIdNull() {
+        catchException(() -> requestMapper.toOptionFromOptionId(null));
         assertThat(caughtException().getClass()).isEqualTo(BadRequestException.class);
     }
 }

@@ -1,15 +1,20 @@
 package com.future.function.web.mapper.request.scoring;
 
 import com.future.function.common.exception.BadRequestException;
-import com.future.function.common.validation.ObjectValidator;
+import com.future.function.model.entity.feature.core.Batch;
+import com.future.function.model.entity.feature.scoring.QuestionBank;
 import com.future.function.model.entity.feature.scoring.Quiz;
-import com.future.function.web.mapper.request.WebRequestMapper;
+import com.future.function.validation.RequestValidator;
+import com.future.function.web.model.request.scoring.CopyQuizWebRequest;
 import com.future.function.web.model.request.scoring.QuizWebRequest;
-import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Bean class used to map web request for Quiz entity
@@ -18,10 +23,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class QuizRequestMapper {
 
-  private ObjectValidator validator;
+    private RequestValidator validator;
 
   @Autowired
-  public QuizRequestMapper(ObjectValidator validator) {
+  public QuizRequestMapper(RequestValidator validator) {
     this.validator = validator;
   }
 
@@ -41,6 +46,10 @@ public class QuizRequestMapper {
             .orElseThrow(() -> new BadRequestException("Bad Request"));
     return toValidatedQuiz(request, quiz);
   }
+
+    public CopyQuizWebRequest validateCopyQuizWebRequest(CopyQuizWebRequest request) {
+        return validator.validate(request);
+    }
 
   /**
    * Used to map web request to quiz entity object
@@ -62,8 +71,18 @@ public class QuizRequestMapper {
             .map(validator::validate)
             .map(val -> {
               BeanUtils.copyProperties(val, quiz);
+                Batch batch = Batch.builder().code(val.getBatchCode()).build();
+                quiz.setBatch(batch);
+                quiz.setQuestionBanks(buildQuestionBanks(val.getQuestionBanks()));
               return quiz;
             })
             .orElseThrow(() -> new BadRequestException("Bad Request"));
   }
+
+    private List<QuestionBank> buildQuestionBanks(List<String> questionBankIds) {
+        return questionBankIds
+                .stream()
+                .map(id -> QuestionBank.builder().id(id).build())
+                .collect(Collectors.toList());
+    }
 }

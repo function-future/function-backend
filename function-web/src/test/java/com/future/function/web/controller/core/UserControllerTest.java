@@ -3,12 +3,13 @@ package com.future.function.web.controller.core;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.future.function.common.enumeration.core.Role;
 import com.future.function.model.entity.feature.core.Batch;
-import com.future.function.model.entity.feature.core.File;
+import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.service.api.feature.core.UserService;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.mapper.request.core.UserRequestMapper;
 import com.future.function.web.mapper.response.core.UserResponseMapper;
+import com.future.function.web.model.request.core.UserWebRequest;
 import com.future.function.web.model.response.base.BaseResponse;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
@@ -51,7 +52,7 @@ public class UserControllerTest {
   
   private static final String NAME = "name";
   
-  private static final Long NUMBER = 1L;
+  private static final String NUMBER = "1";
   
   private static final String PHONE = "081212341234";
   
@@ -61,7 +62,7 @@ public class UserControllerTest {
   
   private static final String PICTURE_URL = "picture-url";
   
-  private static final File PICTURE = File.builder()
+  private static final FileV2 PICTURE = FileV2.builder()
     .fileUrl(PICTURE_URL)
     .build();
   
@@ -71,19 +72,23 @@ public class UserControllerTest {
     .name(NAME)
     .phone(PHONE)
     .address(ADDRESS)
-    .picture(PICTURE)
+    .pictureV2(new FileV2())
     .batch(Batch.builder()
-             .number(NUMBER)
+             .code(NUMBER)
              .build())
     .university(UNIVERSITY)
     .build();
   
-  private static final String STUDENT_JSON =
-    "{\n" + "    \"role\": \"STUDENT\",\n" + "    \"email\": \"" +
-    STUDENT_EMAIL + "\",\n" + "    \"name\": \"" + NAME + "\",\n" +
-    "    \"phone\": \"" + PHONE + "\",\n" + "    \"address\": \"" + ADDRESS +
-    "\",\n" + "    \"batch\": " + NUMBER + ",\n" + "    \"university\": \"" +
-    UNIVERSITY + "\"\n" + "}";
+  private static final UserWebRequest STUDENT_WEB_REQUEST = UserWebRequest.builder()
+    .role("STUDENT")
+    .email(STUDENT_EMAIL)
+    .name(NAME)
+    .phone(PHONE)
+    .address(ADDRESS)
+    .batch(NUMBER)
+    .university(UNIVERSITY).build();
+  
+  private JacksonTester<UserWebRequest> userWebRequestJacksonTester;
   
   private static final Pageable PAGEABLE = new PageRequest(0, 10);
   
@@ -122,7 +127,7 @@ public class UserControllerTest {
   
   @Before
   public void setUp() {
-  
+    
     JacksonTester.initFields(this, new ObjectMapper());
   }
   
@@ -138,7 +143,7 @@ public class UserControllerTest {
     
     given(userService.getUsers(Role.STUDENT, PAGEABLE)).willReturn(
       new PageImpl<>(STUDENTS_LIST, PAGEABLE, STUDENTS_LIST.size()));
-  
+    
     mockMvc.perform(get("/api/core/users").param("role", Role.STUDENT.name()))
       .andExpect(status().isOk())
       .andExpect(content().json(
@@ -152,7 +157,7 @@ public class UserControllerTest {
   @Test
   public void testGivenEmailFromPathVariableByDeletingUserByEmailReturnBaseResponseOK()
     throws Exception {
-  
+    
     mockMvc.perform(delete("/api/core/users/" + STUDENT_EMAIL))
       .andExpect(status().isOk())
       .andExpect(content().json(baseResponseJacksonTester.write(BASE_RESPONSE)
@@ -169,7 +174,7 @@ public class UserControllerTest {
     throws Exception {
     
     given(userService.getUser(STUDENT_EMAIL)).willReturn(STUDENT);
-  
+    
     mockMvc.perform(get("/api/core/users/" + STUDENT_EMAIL))
       .andExpect(status().isOk())
       .andExpect(content().json(
@@ -191,25 +196,24 @@ public class UserControllerTest {
       .phone(PHONE)
       .address(ADDRESS)
       .batch(Batch.builder()
-               .number(NUMBER)
+               .code(NUMBER)
                .build())
       .university(UNIVERSITY)
       .build();
     
-    given(userRequestMapper.toUser(STUDENT_JSON)).willReturn(student);
-    given(userService.createUser(student, null)).willReturn(STUDENT);
-  
+    given(userRequestMapper.toUser(STUDENT_WEB_REQUEST)).willReturn(student);
+    given(userService.createUser(student)).willReturn(STUDENT);
+    
     mockMvc.perform(post("/api/core/users").contentType(
-      MediaType.MULTIPART_FORM_DATA_VALUE)
-                      .param("data", STUDENT_JSON)
-                      .param("image", ""))
+      MediaType.APPLICATION_JSON_VALUE)
+                      .content(userWebRequestJacksonTester.write(STUDENT_WEB_REQUEST).getJson()))
       .andExpect(status().isCreated())
       .andExpect(content().json(
         dataResponseJacksonTester.write(CREATED_DATA_RESPONSE)
           .getJson()));
     
-    verify(userService).createUser(student, null);
-    verify(userRequestMapper).toUser(STUDENT_JSON);
+    verify(userService).createUser(student);
+    verify(userRequestMapper).toUser(STUDENT_WEB_REQUEST);
   }
   
   @Test
@@ -223,26 +227,25 @@ public class UserControllerTest {
       .phone(PHONE)
       .address(ADDRESS)
       .batch(Batch.builder()
-               .number(NUMBER)
+               .code(NUMBER)
                .build())
       .university(UNIVERSITY)
       .build();
     
-    given(userRequestMapper.toUser(STUDENT_EMAIL, STUDENT_JSON)).willReturn(
+    given(userRequestMapper.toUser(STUDENT_EMAIL, STUDENT_WEB_REQUEST)).willReturn(
       student);
-    given(userService.updateUser(student, null)).willReturn(STUDENT);
-  
+    given(userService.updateUser(student)).willReturn(STUDENT);
+    
     mockMvc.perform(put("/api/core/users/" + STUDENT_EMAIL).contentType(
-      MediaType.MULTIPART_FORM_DATA_VALUE)
-                      .param("data", STUDENT_JSON)
-                      .param("image", ""))
+      MediaType.APPLICATION_JSON_VALUE)
+                      .content(userWebRequestJacksonTester.write(STUDENT_WEB_REQUEST).getJson()))
       .andExpect(status().isOk())
       .andExpect(content().json(
         dataResponseJacksonTester.write(RETRIEVED_DATA_RESPONSE)
           .getJson()));
     
-    verify(userService).updateUser(student, null);
-    verify(userRequestMapper).toUser(STUDENT_EMAIL, STUDENT_JSON);
+    verify(userService).updateUser(student);
+    verify(userRequestMapper).toUser(STUDENT_EMAIL, STUDENT_WEB_REQUEST);
   }
   
 }

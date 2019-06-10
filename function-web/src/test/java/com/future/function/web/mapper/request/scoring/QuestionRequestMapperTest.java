@@ -1,9 +1,9 @@
 package com.future.function.web.mapper.request.scoring;
 
 import com.future.function.common.exception.BadRequestException;
-import com.future.function.common.validation.ObjectValidator;
 import com.future.function.model.entity.feature.scoring.Option;
 import com.future.function.model.entity.feature.scoring.Question;
+import com.future.function.validation.RequestValidator;
 import com.future.function.web.model.request.scoring.OptionWebRequest;
 import com.future.function.web.model.request.scoring.QuestionWebRequest;
 import org.junit.After;
@@ -12,9 +12,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.Collections;
-import org.mockito.runners.MockitoJUnitRunner;
 
 import static com.googlecode.catchexception.CatchException.catchException;
 import static com.googlecode.catchexception.CatchException.caughtException;
@@ -41,7 +41,7 @@ public class QuestionRequestMapperTest {
     private OptionRequestMapper optionRequestMapper;
 
     @Mock
-    private ObjectValidator validator;
+    private RequestValidator validator;
 
     @Before
     public void setUp() throws Exception {

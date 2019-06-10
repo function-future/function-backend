@@ -2,16 +2,24 @@ package com.future.function.service.impl.feature.scoring;
 
 import com.future.function.common.exception.BadRequestException;
 import com.future.function.common.exception.NotFoundException;
+import com.future.function.model.entity.feature.core.Batch;
+import com.future.function.model.entity.feature.scoring.QuestionBank;
 import com.future.function.model.entity.feature.scoring.Quiz;
 import com.future.function.model.util.constant.FieldName;
 import com.future.function.repository.feature.scoring.QuizRepository;
+import com.future.function.service.api.feature.core.BatchService;
+import com.future.function.service.api.feature.scoring.QuestionBankService;
 import com.future.function.service.api.feature.scoring.QuizService;
-import java.util.Optional;
+import com.future.function.service.api.feature.scoring.StudentQuizService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Service class used to manipulate Quiz Entity
@@ -21,12 +29,19 @@ import org.springframework.stereotype.Service;
 public class QuizServiceImpl implements QuizService {
 
   private QuizRepository quizRepository;
-
-//  private QuestionBankService questionBankService;
+  private StudentQuizService studentQuizService;
+    private QuestionBankService questionBankService;
+    private BatchService batchService;
 
   @Autowired
-  public QuizServiceImpl(QuizRepository quizRepository) {
+  public QuizServiceImpl(QuizRepository quizRepository,
+                         StudentQuizService studentQuizService,
+                         QuestionBankService questionBankService,
+                         BatchService batchService) {
     this.quizRepository = quizRepository;
+    this.studentQuizService = studentQuizService;
+      this.questionBankService = questionBankService;
+      this.batchService = batchService;
   }
 
   /**
@@ -53,7 +68,15 @@ public class QuizServiceImpl implements QuizService {
    */
   @Override
   public Page<Quiz> findAllByPageableAndFilterAndSearch(Pageable pageable, String filter, String search) {
-    return quizRepository.findAll(pageable);
+      return quizRepository.findAllByDeletedFalse(pageable);
+  }
+
+  @Override
+  public Quiz copyQuizWithTargetBatch(String targetBatch, Quiz quiz) {
+      Batch batch = batchService.getBatchByCode(targetBatch);
+      quiz = this.findById(quiz.getId());
+      quiz = studentQuizService.copyQuizWithTargetBatch(batch, quiz);
+      return quizRepository.save(quiz);
   }
 
   /**
@@ -64,9 +87,23 @@ public class QuizServiceImpl implements QuizService {
   @Override
   public Quiz createQuiz(Quiz request) {
     return Optional.of(request)
+            .map(quiz -> {
+                quiz.setBatch(batchService.getBatchByCode(quiz.getBatch().getCode()));
+                quiz.setQuestionBanks(getQuestionBanksFromService(quiz.getQuestionBanks()));
+                return quiz;
+            })
             .map(quizRepository::save)
+            .map(quiz -> studentQuizService.createStudentQuizByBatchCode(quiz.getBatch().getCode(), quiz))
             .orElseThrow(() -> new BadRequestException("Bad Request"));
   }
+
+    private List<QuestionBank> getQuestionBanksFromService(List<QuestionBank> questionBanks) {
+        return questionBanks
+                .stream()
+                .map(QuestionBank::getId)
+                .map(questionBankService::findById)
+                .collect(Collectors.toList());
+    }
 
   /**
    * Used to update existing quiz from repository by passing the requested quiz entity object with its id
@@ -75,18 +112,20 @@ public class QuizServiceImpl implements QuizService {
    */
   @Override
   public Quiz updateQuiz(Quiz request) {
-    return Optional.of(request)
+    return Optional.ofNullable(request)
             .map(Quiz::getId)
             .map(this::findById)
-            .map(val -> {
+            .map(quiz -> {
+              String requestedBatchCode = getRequestedBatchCode(request, quiz);
+              checkAndEditBatchCodeByRequest(quiz, requestedBatchCode);
               BeanUtils.copyProperties(
                       request,
-                      val,
+                      quiz,
                       FieldName.BaseEntity.CREATED_AT,
                       FieldName.BaseEntity.CREATED_BY,
                       FieldName.BaseEntity.VERSION
               );
-              return val;
+              return quiz;
             })
             .map(quizRepository::save)
             .orElseThrow(() -> new BadRequestException("Bad Request"));
@@ -101,8 +140,27 @@ public class QuizServiceImpl implements QuizService {
     Optional.ofNullable(id)
             .map(this::findById)
             .ifPresent(val -> {
+                String batchCode = val.getBatch().getCode();
+                studentQuizService.deleteByBatchCodeAndQuiz(batchCode, val.getId());
               val.setDeleted(true);
               quizRepository.save(val);
             });
+  }
+
+
+    private String getRequestedBatchCode(Quiz request, Quiz quiz) {
+    return Optional.ofNullable(request)
+            .map(Quiz::getBatch)
+            .map(Batch::getCode)
+            .orElseGet(() -> quiz.getBatch().getCode());
+
+
+  }
+
+  private void checkAndEditBatchCodeByRequest(Quiz quiz, String requestedBatchCode) {
+    if (!quiz.getBatch().getCode().equals(requestedBatchCode)) {
+      studentQuizService.deleteByBatchCodeAndQuiz(quiz.getBatch().getCode(), quiz.getId());
+      studentQuizService.createStudentQuizByBatchCode(requestedBatchCode, quiz);
+    }
   }
 }

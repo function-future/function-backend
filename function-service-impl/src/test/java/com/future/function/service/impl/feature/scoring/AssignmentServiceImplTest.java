@@ -1,15 +1,9 @@
 package com.future.function.service.impl.feature.scoring;
 
-import com.future.function.common.enumeration.core.FileOrigin;
 import com.future.function.common.exception.NotFoundException;
-import com.future.function.model.entity.feature.core.File;
+import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.scoring.Assignment;
 import com.future.function.repository.feature.scoring.AssignmentRepository;
-import com.future.function.service.api.feature.core.FileService;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,13 +17,15 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.mock.web.MockMultipartFile;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+
 import static com.googlecode.catchexception.CatchException.catchException;
 import static com.googlecode.catchexception.CatchException.caughtException;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class AssignmentServiceImplTest {
@@ -48,7 +44,7 @@ public class AssignmentServiceImplTest {
   private static final String STRING_EMPTY = "";
 
   private Assignment assignment;
-  private File file;
+    private FileV2 file;
   private MockMultipartFile multipartFile;
   private Pageable pageable;
   private Page<Assignment> assignmentPage;
@@ -59,9 +55,6 @@ public class AssignmentServiceImplTest {
 
   @Mock
   private AssignmentRepository assignmentRepository;
-
-  @Mock
-  private FileService fileService;
 
   @Before
   public void setUp() throws Exception {
@@ -82,16 +75,11 @@ public class AssignmentServiceImplTest {
 
     assignmentPage = new PageImpl<>(assignmentList, pageable, 10);
 
-    file = File
+      file = FileV2
             .builder()
             .filePath(FILE_PATH)
             .id(FILE_ID)
             .build();
-
-    when(fileService.storeFile(multipartFile, FileOrigin.ASSIGNMENT))
-            .thenReturn(file);
-    when(fileService.getFile(FILE_ID))
-            .thenReturn(file);
     when(assignmentRepository.findByIdAndDeletedFalse(assignment.getId()))
             .thenReturn(Optional.of(assignment));
     when(assignmentRepository.findAll(pageable))
@@ -103,7 +91,6 @@ public class AssignmentServiceImplTest {
   @After
   public void tearDown() throws Exception {
     verifyNoMoreInteractions(assignmentRepository);
-    verifyNoMoreInteractions(fileService);
   }
 
   @Test
