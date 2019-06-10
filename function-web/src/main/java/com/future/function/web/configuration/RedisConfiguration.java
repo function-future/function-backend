@@ -1,6 +1,8 @@
 package com.future.function.web.configuration;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.future.function.session.model.Session;
+import com.future.function.session.serializer.JsonSerializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
@@ -18,13 +20,14 @@ public class RedisConfiguration {
   
   @Bean
   public RedisTemplate<String, Session> redisTemplate(
-    JedisConnectionFactory jedisConnectionFactory
+    JedisConnectionFactory jedisConnectionFactory, ObjectMapper objectMapper
   ) {
     
     RedisTemplate<String, Session> redisTemplate = new RedisTemplate<>();
     
     redisTemplate.setConnectionFactory(jedisConnectionFactory);
     redisTemplate.setKeySerializer(new StringRedisSerializer());
+    redisTemplate.setValueSerializer(new JsonSerializer(objectMapper));
     
     return redisTemplate;
   }
