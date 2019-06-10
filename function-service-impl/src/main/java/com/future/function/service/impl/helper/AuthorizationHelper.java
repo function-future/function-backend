@@ -25,26 +25,31 @@ public final class AuthorizationHelper {
     String currentUserEmail, T obj
   ) {
     
+    return AuthorizationHelper.isUserCreatorOfObject(currentUserEmail, obj)
+      .orElseThrow(() -> new UnauthorizedException("Invalid User Email"));
+  }
+  
+  private static <T extends BaseEntity> Optional<Boolean> isUserCreatorOfObject(
+    String currentUserEmail, T obj
+  ) {
+    
     return Optional.ofNullable(currentUserEmail)
       .filter(e -> e.equals(obj.getCreatedBy()))
-      .map(ignored -> true)
-      .orElseThrow(() -> new UnauthorizedException("Invalid User Email"));
+      .map(ignored -> true);
   }
   
   public static <T extends BaseEntity> boolean isAuthorizedForEdit(
     String currentUserEmail, Role currentUserRole, T obj, Role... allowedRoles
   ) {
     
-    return Optional.ofNullable(currentUserEmail)
-      .filter(email -> email.equals(obj.getCreatedBy()))
-      .map(ignored -> true)
+    return AuthorizationHelper.isUserCreatorOfObject(currentUserEmail, obj)
       .orElseGet(() -> AuthorizationHelper.isRoleValidForEdit(currentUserRole,
                                                               Arrays.asList(
                                                                 allowedRoles)
       ));
   }
   
-  private static <T extends BaseEntity> boolean isRoleValidForEdit(
+  private static boolean isRoleValidForEdit(
     Role currentUserRole, List<Role> allowedRoles
   ) {
     
