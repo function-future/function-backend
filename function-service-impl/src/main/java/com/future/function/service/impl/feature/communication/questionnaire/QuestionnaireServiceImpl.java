@@ -1,5 +1,6 @@
 package com.future.function.service.impl.feature.communication.questionnaire;
 
+import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.communication.questionnaire.Questionnaire;
 import com.future.function.repository.feature.communication.questionnaire.QuestionnaireRepository;
 import com.future.function.service.api.feature.communication.questionnaire.QuestionnaireService;
@@ -41,12 +42,16 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
 
   @Override
   public Questionnaire getQuestionnaire(String questionnaireId) {
-    return null;
+    return Optional.ofNullable(questionnaireId)
+            .map(this.questionnaireRepository::findOne)
+            .orElseThrow(() -> new NotFoundException("Get Questionnaire by id Not Found"));
   }
 
   @Override
-  public Questionnaire createQuestionnaire(Questionnaire qustionnaire) {
-    return null;
+  public Questionnaire createQuestionnaire(Questionnaire questionnaire) {
+    return Optional.of(questionnaire)
+            .map(questionnaireRepository::save)
+            .orElse(questionnaire);
   }
 
   @Override
