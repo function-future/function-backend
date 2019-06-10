@@ -7,7 +7,9 @@ import com.future.function.web.model.response.base.BaseResponse;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -48,6 +50,8 @@ public abstract class TestHelper {
   private static final Session ADMIN_SESSION = new Session(
     ADMIN_SESSION_ID, ADMIN_EMAIL, Role.ADMIN);
   
+  private static RedisServer redisServer;
+  
   protected Cookie[] cookies;
   
   protected JacksonTester<BaseResponse> baseResponseJacksonTester;
@@ -59,20 +63,28 @@ public abstract class TestHelper {
   @Autowired
   protected MockMvc mockMvc;
   
-  private RedisServer redisServer;
-  
   private ValueOperations<String, Session> valueOperations;
   
   @Autowired
   private RedisTemplate<String, Session> redisTemplate;
   
+  @BeforeClass
+  public static void setUpClass() throws Exception {
+    
+    redisServer = new RedisServer(6379);
+    redisServer.start();
+  }
+  
+  @AfterClass
+  public static void tearDownClass() throws Exception {
+    
+    redisServer.stop();
+  }
+  
   @Before
   protected void setUp() throws Exception {
     
     JacksonTester.initFields(this, new ObjectMapper());
-    
-    redisServer = new RedisServer(6379);
-    redisServer.start();
     
     valueOperations = redisTemplate.opsForValue();
   }
@@ -112,7 +124,6 @@ public abstract class TestHelper {
       Arrays.asList(STUDENT_SESSION_ID, MENTOR_SESSION_ID, JUDGE_SESSION_ID,
                     ADMIN_SESSION_ID
       ));
-    redisServer.stop();
   }
   
 }
