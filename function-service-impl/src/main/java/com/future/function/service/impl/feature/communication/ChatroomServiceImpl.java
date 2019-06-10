@@ -7,6 +7,7 @@ import com.future.function.model.entity.feature.core.User;
 import com.future.function.repository.feature.communication.ChatroomRepository;
 import com.future.function.service.api.feature.communication.ChatroomService;
 import com.future.function.service.api.feature.core.UserService;
+import com.future.function.service.impl.helper.PageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -47,7 +48,7 @@ public class ChatroomServiceImpl implements ChatroomService {
             .map(userService::getUser)
             .map(user -> chatroomRepository.findAllByTitleContainingIgnoreCaseAndMembersOrderByCreatedAtDesc(
                     keyword, user, pageable))
-            .get();
+            .orElse(PageHelper.empty(pageable));
   }
 
   @Override
@@ -62,35 +63,35 @@ public class ChatroomServiceImpl implements ChatroomService {
     return Optional.of(chatroom)
             .map(this::setMembers)
             .map(chatroomRepository::save)
-            .get();
+            .orElseThrow(UnsupportedOperationException::new);
   }
 
   @Override
   public Chatroom updateChatroom(Chatroom chatroom) {
-    Chatroom existing = Optional.of(chatroomRepository.findOne(chatroom.getId()))
-            .orElseThrow(() -> new NotFoundException("Chatroom not found"));
-    return Optional.of(existing)
+    return Optional.of(chatroom)
+            .map(Chatroom::getId)
+            .map(chatroomRepository::findOne)
             .map(room -> this.updateMember(room, chatroom))
             .map(room -> this.updateTitle(room, chatroom))
             .map(room -> this.updateType(room, chatroom))
             .map(chatroomRepository::save)
-            .get();
+            .orElse(chatroom);
   }
 
-  private Chatroom updateMember(Chatroom existing, Chatroom newChatroom) {
-    existing.setMembers(newChatroom.getMembers());
-    this.setMembers(existing);
-    return existing;
+  private Chatroom updateMember(Chatroom existingChatroom, Chatroom newChatroom) {
+    existingChatroom.setMembers(newChatroom.getMembers());
+    this.setMembers(existingChatroom);
+    return existingChatroom;
   }
 
-  private Chatroom updateTitle(Chatroom existing, Chatroom newChatroom) {
-    existing.setTitle(newChatroom.getTitle());
-    return existing;
+  private Chatroom updateTitle(Chatroom existingChatroom, Chatroom newChatroom) {
+    existingChatroom.setTitle(newChatroom.getTitle());
+    return existingChatroom;
   }
 
-  private Chatroom updateType(Chatroom existing, Chatroom newChatroom) {
-    existing.setType(newChatroom.getType());
-    return existing;
+  private Chatroom updateType(Chatroom existingChatroom, Chatroom newChatroom) {
+    existingChatroom.setType(newChatroom.getType());
+    return existingChatroom;
   }
 
   private Chatroom setMembers(Chatroom chatroom) {

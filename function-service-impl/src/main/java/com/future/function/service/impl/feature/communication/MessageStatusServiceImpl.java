@@ -69,7 +69,7 @@ public class MessageStatusServiceImpl implements MessageStatusService {
             .map(this::setMember)
             .map(this::setMessage)
             .map(messageStatusRepository::save)
-            .get();
+            .orElseThrow(UnsupportedOperationException::new);
   }
 
   @Override
@@ -77,7 +77,7 @@ public class MessageStatusServiceImpl implements MessageStatusService {
     Long timestamp = Optional.of(messageId)
             .map(messageService::getMessage)
             .map(Message::getCreatedAt)
-            .get();
+            .orElse(0L);
     this.getUnseenMessageStatusBeforeTimestamp(chatroomId, userId, timestamp).forEach(messageStatus -> {
       messageStatus.setSeen(true);
       this.updateMessageStatus(messageStatus);
@@ -91,7 +91,7 @@ public class MessageStatusServiceImpl implements MessageStatusService {
             .map(this::setMessage)
             .map(this::setChatroom)
             .map(messageStatusRepository::save)
-            .get();
+            .orElse(messageStatus);
   }
 
   private MessageStatus setMember(MessageStatus messageStatus) {

@@ -12,12 +12,12 @@ import javax.validation.ConstraintValidatorContext;
 public class ChatroomNameValidator implements ConstraintValidator<ChatroomName, String> {
 
   @Override
-  public void initialize(ChatroomName chatroomName) {
-
+  public void initialize(ChatroomName constraintAnnotation) {
+    // No initialization needed.
   }
 
   @Override
-  public boolean isValid(String s, ConstraintValidatorContext constraintValidatorContext) {
-    return s == null || s.matches("^([A-Za-z0-9]+(( )[A-Za-z0-9]+)*)+$");
+  public boolean isValid(String name, ConstraintValidatorContext constraintValidatorContext) {
+    return name == null || name.matches("^([A-Za-z0-9]+(( )[A-Za-z0-9]+)*)+$");
   }
 }

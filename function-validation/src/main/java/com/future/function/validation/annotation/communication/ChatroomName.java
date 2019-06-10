@@ -12,7 +12,7 @@ import java.lang.annotation.*;
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.TYPE, ElementType.TYPE_USE })
+@Target({ ElementType.TYPE, ElementType.FIELD })
 @Constraint(validatedBy = ChatroomNameValidator.class)
 public @interface ChatroomName {
 
@@ -22,18 +22,10 @@ public @interface ChatroomName {
    *
    * @return {@code String} - The name of this annotation.
    */
-  String message() default "OnlyStudentCanHaveBatchAndUniversity";
+  String message() default "ChatroomName";
 
   Class<?>[] groups() default {};
 
   Class<? extends Payload>[] payload() default {};
-
-  /**
-   * Declares which field of an object that causes this annotation's
-   * validator to mark the object as invalid.
-   *
-   * @return {@code String} - The name of the field.
-   */
-  String field() default "role";
 
 }

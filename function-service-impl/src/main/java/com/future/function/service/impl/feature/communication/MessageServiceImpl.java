@@ -6,6 +6,7 @@ import com.future.function.repository.feature.communication.MessageRepository;
 import com.future.function.service.api.feature.communication.ChatroomService;
 import com.future.function.service.api.feature.communication.MessageService;
 import com.future.function.service.api.feature.core.UserService;
+import com.future.function.service.impl.helper.PageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -45,7 +46,7 @@ public class MessageServiceImpl implements MessageService {
     return Optional.of(chatroomId)
             .map(chatroomService::getChatroom)
             .map(chatroom -> messageRepository.findAllByChatroomOrderByCreatedAtDesc(chatroom, pageable))
-            .get();
+            .orElse(PageHelper.empty(pageable));
   }
 
   @Override
@@ -62,7 +63,7 @@ public class MessageServiceImpl implements MessageService {
             .map(this::setSender)
             .map(this::setChatroom)
             .map(messageRepository::save)
-            .get();
+            .orElseThrow(UnsupportedOperationException::new);
   }
 
   private Message setSender(Message message) {
