@@ -1,6 +1,6 @@
 package com.future.function.web.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.future.function.web.JacksonTestHelper;
 import com.future.function.web.dummy.controller.BadController;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.model.response.base.BaseResponse;
@@ -10,7 +10,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -21,7 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(value = { ExceptionController.class, BadController.class })
-public class ExceptionControllerTest {
+public class ExceptionControllerTest extends JacksonTestHelper {
   
   private static final BaseResponse BAD_REQUEST_RESPONSE =
     ResponseHelper.toBaseResponse(HttpStatus.BAD_REQUEST);
@@ -35,7 +34,8 @@ public class ExceptionControllerTest {
   private static final BaseResponse NOT_FOUND_RESPONSE =
     ResponseHelper.toBaseResponse(HttpStatus.NOT_FOUND);
   
-  private JacksonTester<BaseResponse> baseResponseJacksonTester;
+  private static final BaseResponse INTERNAL_SERVER_ERROR_RESPONSE =
+    ResponseHelper.toBaseResponse(HttpStatus.INTERNAL_SERVER_ERROR);
   
   @Autowired
   private MockMvc mockMvc;
@@ -43,7 +43,7 @@ public class ExceptionControllerTest {
   @Before
   public void setUp() {
   
-    JacksonTester.initFields(this, new ObjectMapper());
+    super.setUp();
   }
   
   @After
@@ -110,6 +110,22 @@ public class ExceptionControllerTest {
       .andExpect(status().is4xxClientError())
       .andExpect(content().json(
         baseResponseJacksonTester.write(NOT_FOUND_RESPONSE)
+          .getJson()));
+  }
+  
+  @Test
+  public void givenUnsupportedOperationExceptionRaisedByExceptionHandlingReturnErrorResponse()
+    throws Exception {
+    
+    mockMvc.perform(get("/unsupported-operation"))
+      .andExpect(status().isInternalServerError())
+      .andExpect(content().json(
+        baseResponseJacksonTester.write(INTERNAL_SERVER_ERROR_RESPONSE)
+          .getJson()));
+    mockMvc.perform(get("/unsupported-operation-throwable"))
+      .andExpect(status().isInternalServerError())
+      .andExpect(content().json(
+        baseResponseJacksonTester.write(INTERNAL_SERVER_ERROR_RESPONSE)
           .getJson()));
   }
   

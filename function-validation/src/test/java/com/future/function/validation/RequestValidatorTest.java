@@ -1,7 +1,7 @@
-package com.future.function.common.validation;
+package com.future.function.validation;
 
-import com.future.function.common.dummy.DummyData;
 import com.future.function.common.exception.BadRequestException;
+import com.future.function.validation.dummy.DummyData;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -25,14 +25,14 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ObjectValidatorTest {
+public class RequestValidatorTest {
   
   private static ValidatorFactory validatorFactory;
   
   private static Validator realValidator;
   
   @InjectMocks
-  private ObjectValidator objectValidator;
+  private RequestValidator requestValidator;
   
   @Mock
   private Validator validator;
@@ -71,8 +71,8 @@ public class ObjectValidatorTest {
     
     when(validator.validate(dummyData)).thenReturn(
       realValidator.validate(dummyData));
-    
-    DummyData validatedDummyData = objectValidator.validate(dummyData);
+  
+    DummyData validatedDummyData = requestValidator.validate(dummyData);
     
     assertThat(validatedDummyData).isNotNull();
     assertThat(validatedDummyData.getNumber()).isEqualTo(11);
@@ -92,8 +92,8 @@ public class ObjectValidatorTest {
     when(validator.validate(dummyData)).thenReturn(
       realValidator.validate(dummyData));
   
-    catchException(() -> objectValidator.validate(dummyData));
-  
+    catchException(() -> requestValidator.validate(dummyData));
+    
     assertThat(caughtException().getClass()).isEqualTo(
       BadRequestException.class);
     assertThat(caughtException().getMessage()).isNotBlank();

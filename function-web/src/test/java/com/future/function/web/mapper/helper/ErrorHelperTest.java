@@ -77,9 +77,9 @@ public class ErrorHelperTest {
     assertThat(errors.get("email")).contains("NotBlank", "Email");
     
   }
-
-  private void throwConstraintViolationException(Object object) {
   
+  private void throwConstraintViolationException(Object object) {
+    
     throw new ConstraintViolationException(validator.validate(object));
   }
   
