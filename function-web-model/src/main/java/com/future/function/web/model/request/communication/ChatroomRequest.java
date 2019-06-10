@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.NotEmpty;
 
 import java.util.List;
 
@@ -18,9 +19,10 @@ import java.util.List;
 @AllArgsConstructor
 public class ChatroomRequest {
 
-  @ChatroomName
+  @ChatroomName(message = "InvalidName")
   private String name;
 
+  @NotEmpty(message = "NotEmpty")
   private List<String> members;
 
 }
