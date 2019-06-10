@@ -17,7 +17,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertTrue;
 
 
 @RunWith(SpringRunner.class)
@@ -27,6 +26,7 @@ public class QuestionnaireRepositoryTest {
   private static final Pageable PAGEABLE = new PageRequest(0,10);
 
   private static final String ID_1 = "id_1";
+
   private static final String ID_2 = "id_2";
 
   private static final String TITLE_1 = "abc";
