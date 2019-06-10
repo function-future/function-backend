@@ -68,6 +68,7 @@ public class UserQuestionnaireSummaryRepositoryTest {
   @After
   public void TearDown() {
     userQuestionnaireSummaryRepository.deleteAll();
+    userRepository.deleteAll();
   }
 
   @Test

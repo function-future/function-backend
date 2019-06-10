@@ -1,5 +1,6 @@
 package com.future.function.model.entity.feature.communication.questionnaire;
 
+import com.future.function.common.enumeration.communication.ParticipantType;
 import com.future.function.model.entity.base.BaseEntity;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.model.util.constant.DocumentName;
