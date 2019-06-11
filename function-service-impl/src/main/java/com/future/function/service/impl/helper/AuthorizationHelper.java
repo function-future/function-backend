@@ -13,13 +13,11 @@ import java.util.Optional;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class AuthorizationHelper {
   
-  public static final Role[] NON_STUDENT_ONLY = new Role[] {
-    Role.ADMIN, Role.JUDGE, Role.MENTOR
-  };
+  public static final List<Role> NON_STUDENT_ONLY = Arrays.asList(
+    Role.ADMIN, Role.JUDGE, Role.MENTOR);
   
-  public static final Role[] AUTHENTICATED_ONLY = new Role[] {
-    Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT
-  };
+  public static final List<Role> AUTHENTICATED_ONLY = Arrays.asList(
+    Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT);
   
   public static <T extends BaseEntity> boolean isAuthorizedForEdit(
     String currentUserEmail, T obj
@@ -42,10 +40,20 @@ public final class AuthorizationHelper {
     String currentUserEmail, Role currentUserRole, T obj, Role... allowedRoles
   ) {
     
+    return AuthorizationHelper.isAuthorizedForEdit(currentUserEmail,
+                                                   currentUserRole, obj,
+                                                   Arrays.asList(allowedRoles)
+    );
+  }
+  
+  public static <T extends BaseEntity> boolean isAuthorizedForEdit(
+    String currentUserEmail, Role currentUserRole, T obj,
+    List<Role> allowedRoles
+  ) {
+    
     return AuthorizationHelper.isUserCreatorOfObject(currentUserEmail, obj)
       .orElseGet(() -> AuthorizationHelper.isRoleValidForEdit(currentUserRole,
-                                                              Arrays.asList(
-                                                                allowedRoles)
+                                                              allowedRoles
       ));
   }
   

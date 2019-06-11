@@ -55,6 +55,15 @@ public class AuthorizationHelperTest {
   }
   
   @Test
+  public void testGivenEmailAndRoleAndEntityAndSomeAllowedRolesAndRoleMatchingAnyAllowedRolesReturnTrue() {
+    
+    assertThat(
+      AuthorizationHelper.isAuthorizedForEdit("", Role.STUDENT, BASE_ENTITY,
+                                              Role.STUDENT, Role.MENTOR
+      )).isTrue();
+  }
+  
+  @Test
   public void testGivenEmailAndRoleAndEntityAndAllowedRolesAndNotMatchingAnyAllowedRolesReturnUnauthorizedException() {
     
     catchException(
