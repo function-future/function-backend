@@ -1,0 +1,76 @@
+package com.future.function.web.mapper.response.core;
+
+import com.future.function.model.entity.feature.core.Discussion;
+import com.future.function.model.entity.feature.core.User;
+import com.future.function.web.mapper.helper.PageHelper;
+import com.future.function.web.mapper.helper.ResponseHelper;
+import com.future.function.web.model.response.base.DataResponse;
+import com.future.function.web.model.response.base.PagingResponse;
+import com.future.function.web.model.response.feature.core.DiscussionWebResponse;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+/**
+ * Mapper class for announcement web response.
+ */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public class DiscussionResponseMapper {
+  
+  public static DataResponse<DiscussionWebResponse> toDiscussionDataResponse(
+    Discussion discussion
+  ) {
+    
+    return ResponseHelper.toDataResponse(
+      HttpStatus.CREATED, buildDiscussionWebResponse(discussion));
+  }
+  
+  private static DiscussionWebResponse buildDiscussionWebResponse(
+    Discussion discussion
+  ) {
+    
+    return DiscussionWebResponse.builder()
+      .id(discussion.getId())
+      .comment(discussion.getDescription())
+      .author(buildDiscussionWebResponseAuthorObject(discussion))
+      .createdAt(discussion.getCreatedAt())
+      .build();
+  }
+  
+  private static DiscussionWebResponse.Author buildDiscussionWebResponseAuthorObject(
+    Discussion discussion
+  ) {
+    
+    User user = discussion.getUser();
+    
+    return DiscussionWebResponse.Author.builder()
+      .id(user.getId())
+      .name(user.getName())
+      .build();
+  }
+  
+  public static PagingResponse<DiscussionWebResponse> toDiscussionPagingResponse(
+    Page<Discussion> data
+  ) {
+    
+    return ResponseHelper.toPagingResponse(HttpStatus.OK,
+                                           DiscussionResponseMapper.toDiscussionWebResponseList(
+                                             data.getContent()),
+                                           PageHelper.toPaging(data)
+    );
+  }
+  
+  private static List<DiscussionWebResponse> toDiscussionWebResponseList(
+    List<Discussion> data
+  ) {
+    
+    return data.stream()
+      .map(DiscussionResponseMapper::buildDiscussionWebResponse)
+      .collect(Collectors.toList());
+  }
+  
+}
