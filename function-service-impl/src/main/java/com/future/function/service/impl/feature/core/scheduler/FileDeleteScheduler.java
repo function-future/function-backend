@@ -18,7 +18,7 @@ public class FileDeleteScheduler {
     this.fileRepository = fileRepository;
   }
   
-  @Scheduled(fixedDelay = 60 * 60 * 24)
+  @Scheduled(fixedDelay = 1000 * 60 * 60 * 24)
   public void deleteFileOnSchedule() {
     
     fileRepository.findAllByUsedFalse()
@@ -37,7 +37,7 @@ public class FileDeleteScheduler {
     
     String filePath = fileV2.getFilePath();
     
-    return filePath.substring(0, filePath.lastIndexOf("/"));
+    return filePath.substring(0, filePath.lastIndexOf(File.separator));
   }
   
 }
