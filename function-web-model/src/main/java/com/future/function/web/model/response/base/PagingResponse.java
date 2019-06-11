@@ -1,10 +1,11 @@
 package com.future.function.web.model.response.base;
 
 import com.future.function.web.model.response.base.paging.Paging;
-import java.util.List;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import java.util.List;
 
 /**
  * Model representation for data response with paging.
@@ -17,9 +18,8 @@ public class PagingResponse<T> extends BaseResponse {
 
   private Paging paging;
 
-  public PagingResponse() {
-  }
-
+  public PagingResponse() {}
+  
   @Builder
   private PagingResponse(int code, String status, List<T> data, Paging paging) {
 
