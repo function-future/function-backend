@@ -7,17 +7,24 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class AuthorizationHelper {
   
-  public static final List<Role> NON_STUDENT_ONLY = Arrays.asList(
+  private static final List<Role> NON_STUDENT_ROLES = Arrays.asList(
     Role.ADMIN, Role.JUDGE, Role.MENTOR);
   
-  public static final List<Role> AUTHENTICATED_ONLY = Arrays.asList(
+  public static final List<Role> NON_STUDENT_ONLY =
+    Collections.unmodifiableList(NON_STUDENT_ROLES);
+  
+  private static final List<Role> AUTHENTICATED_ROLES = Arrays.asList(
     Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT);
+  
+  public static final List<Role> AUTHENTICATED_ONLY =
+    Collections.unmodifiableList(AUTHENTICATED_ROLES);
   
   public static <T extends BaseEntity> boolean isAuthorizedForEdit(
     String currentUserEmail, T obj

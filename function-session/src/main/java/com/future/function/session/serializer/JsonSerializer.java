@@ -15,7 +15,7 @@ public class JsonSerializer implements RedisSerializer<Session> {
   }
   
   @Override
-  public byte[] serialize(Session session) throws SerializationException {
+  public byte[] serialize(Session session) {
     
     try {
       return objectMapper.writeValueAsBytes(session);
@@ -25,7 +25,7 @@ public class JsonSerializer implements RedisSerializer<Session> {
   }
   
   @Override
-  public Session deserialize(byte[] bytes) throws SerializationException {
+  public Session deserialize(byte[] bytes) {
     
     if (bytes == null) {
       return null;
