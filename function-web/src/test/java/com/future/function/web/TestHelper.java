@@ -7,18 +7,12 @@ import com.future.function.web.model.response.base.BaseResponse;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.json.JacksonTester;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.test.web.servlet.MockMvc;
-import redis.embedded.RedisServer;
 
 import javax.servlet.http.Cookie;
-import java.util.Arrays;
 
 public abstract class TestHelper {
   
@@ -38,19 +32,17 @@ public abstract class TestHelper {
   
   protected static final String ADMIN_SESSION_ID = "session-id-admin";
   
-  private static final Session STUDENT_SESSION = new Session(
+  protected static final Session STUDENT_SESSION = new Session(
     STUDENT_SESSION_ID, STUDENT_EMAIL, Role.STUDENT);
   
-  private static final Session MENTOR_SESSION = new Session(
+  protected static final Session MENTOR_SESSION = new Session(
     MENTOR_SESSION_ID, MENTOR_EMAIL, Role.MENTOR);
   
-  private static final Session JUDGE_SESSION = new Session(
+  protected static final Session JUDGE_SESSION = new Session(
     JUDGE_SESSION_ID, JUDGE_EMAIL, Role.JUDGE);
   
-  private static final Session ADMIN_SESSION = new Session(
+  protected static final Session ADMIN_SESSION = new Session(
     ADMIN_SESSION_ID, ADMIN_EMAIL, Role.ADMIN);
-  
-  private static RedisServer redisServer;
   
   protected Cookie[] cookies;
   
@@ -63,30 +55,10 @@ public abstract class TestHelper {
   @Autowired
   protected MockMvc mockMvc;
   
-  private ValueOperations<String, Session> valueOperations;
-  
-  @Autowired
-  private RedisTemplate<String, Session> redisTemplate;
-  
-  @BeforeClass
-  public static void setUpClass() throws Exception {
-    
-    redisServer = new RedisServer(6379);
-    redisServer.start();
-  }
-  
-  @AfterClass
-  public static void tearDownClass() throws Exception {
-    
-    redisServer.stop();
-  }
-  
   @Before
   protected void setUp() throws Exception {
     
     JacksonTester.initFields(this, new ObjectMapper());
-    
-    valueOperations = redisTemplate.opsForValue();
   }
   
   protected void setCookie(Role role) {
@@ -96,19 +68,15 @@ public abstract class TestHelper {
     switch (role) {
       case STUDENT:
         cookie.setValue(STUDENT_SESSION_ID);
-        valueOperations.set(STUDENT_SESSION_ID, STUDENT_SESSION);
         break;
       case MENTOR:
         cookie.setValue(MENTOR_SESSION_ID);
-        valueOperations.set(MENTOR_SESSION_ID, MENTOR_SESSION);
         break;
       case JUDGE:
         cookie.setValue(JUDGE_SESSION_ID);
-        valueOperations.set(JUDGE_SESSION_ID, JUDGE_SESSION);
         break;
       case ADMIN:
         cookie.setValue(ADMIN_SESSION_ID);
-        valueOperations.set(ADMIN_SESSION_ID, ADMIN_SESSION);
         break;
       default:
         return;
@@ -118,12 +86,6 @@ public abstract class TestHelper {
   }
   
   @After
-  protected void tearDown() {
-    
-    redisTemplate.delete(
-      Arrays.asList(STUDENT_SESSION_ID, MENTOR_SESSION_ID, JUDGE_SESSION_ID,
-                    ADMIN_SESSION_ID
-      ));
-  }
+  protected void tearDown() {}
   
 }
