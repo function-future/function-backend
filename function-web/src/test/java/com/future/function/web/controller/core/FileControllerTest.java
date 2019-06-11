@@ -1,8 +1,9 @@
 package com.future.function.web.controller.core;
 
+import com.future.function.common.enumeration.core.Role;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.service.api.feature.core.FileService;
-import com.future.function.web.JacksonTestHelper;
+import com.future.function.web.TestHelper;
 import com.future.function.web.TestSecurityConfiguration;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.mapper.request.core.FileRequestMapper;
@@ -17,7 +18,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
@@ -28,7 +28,6 @@ import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Collections;
@@ -48,7 +47,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @Import(TestSecurityConfiguration.class)
 @WebMvcTest(value = FileController.class)
-public class FileControllerTest extends JacksonTestHelper {
+public class FileControllerTest extends TestHelper {
   
   public static final PageRequest PAGEABLE = new PageRequest(0, 10);
   
@@ -76,8 +75,6 @@ public class FileControllerTest extends JacksonTestHelper {
   private static final BaseResponse OK_BASE_RESPONSE =
     ResponseHelper.toBaseResponse(HttpStatus.OK);
   
-  private static final String EMAIL = "email";
-  
   private static final String JSON = "{\"name\":\"NAME\",\"type\":\"FILE\"}";
   
   @MockBean
@@ -89,13 +86,12 @@ public class FileControllerTest extends JacksonTestHelper {
   @MockBean
   private FileRequestMapper fileRequestMapper;
   
-  @Autowired
-  private MockMvc mockMvc;
-  
+  @Override
   @Before
   public void setUp() {
     
     super.setUp();
+    super.setCookie(Role.ADMIN);
   }
   
   @After
@@ -111,7 +107,7 @@ public class FileControllerTest extends JacksonTestHelper {
     
     when(fileService.getFilesAndFolders(PARENT_ID, PAGEABLE)).thenReturn(PAGE);
     
-    mockMvc.perform(get("/api/core/files/" + PARENT_ID))
+    mockMvc.perform(get("/api/core/files/" + PARENT_ID).cookie(cookies))
       .andExpect(status().isOk())
       .andExpect(content().json(
         pagingResponseJacksonTester.write(PAGING_RESPONSE)
@@ -127,7 +123,8 @@ public class FileControllerTest extends JacksonTestHelper {
     
     when(fileService.getFileOrFolder(ID, PARENT_ID)).thenReturn(FILE);
     
-    mockMvc.perform(get("/api/core/files/" + PARENT_ID + "/" + ID))
+    mockMvc.perform(
+      get("/api/core/files/" + PARENT_ID + "/" + ID).cookie(cookies))
       .andExpect(status().isOk())
       .andExpect(content().json(
         dataResponseJacksonTester.write(RETRIEVED_DATA_RESPONSE)
@@ -156,8 +153,8 @@ public class FileControllerTest extends JacksonTestHelper {
                                         ID.getBytes()
     )).thenReturn(FILE);
     
-    mockMvc.perform(post("/api/core/files/" + PARENT_ID).contentType(
-      MediaType.MULTIPART_FORM_DATA)
+    mockMvc.perform(post("/api/core/files/" + PARENT_ID).cookie(cookies)
+                      .contentType(MediaType.MULTIPART_FORM_DATA)
                       .param("data", JSON)
                       .param("file", ""))
       .andExpect(status().isCreated())
@@ -187,15 +184,16 @@ public class FileControllerTest extends JacksonTestHelper {
     when(fileRequestMapper.toFileWebRequest(JSON, ID.getBytes())).thenReturn(
       request);
     
-    when(fileService.updateFileOrFolder(EMAIL, ID, PARENT_ID, "NAME", "NAME",
-                                        ID.getBytes()
-    )).thenReturn(FILE);
+    when(
+      fileService.updateFileOrFolder(ADMIN_EMAIL, ID, PARENT_ID, "NAME", "NAME",
+                                     ID.getBytes()
+      )).thenReturn(FILE);
     
-    mockMvc.perform(put("/api/core/files/" + PARENT_ID + "/" + ID).contentType(
-      MediaType.MULTIPART_FORM_DATA)
+    mockMvc.perform(put("/api/core/files/" + PARENT_ID + "/" + ID).cookie(
+      cookies)
+                      .contentType(MediaType.MULTIPART_FORM_DATA)
                       .param("data", JSON)
-                      .param("file", "")
-                      .param("email", EMAIL))
+                      .param("file", ""))
       .andExpect(status().isOk())
       .andExpect(content().json(
         dataResponseJacksonTester.write(RETRIEVED_DATA_RESPONSE)
@@ -205,7 +203,7 @@ public class FileControllerTest extends JacksonTestHelper {
       any(MultipartFile.class));
     verify(fileRequestMapper).toFileWebRequest(JSON, ID.getBytes());
     verify(fileService).updateFileOrFolder(
-      EMAIL, ID, PARENT_ID, "NAME", "NAME", ID.getBytes());
+      ADMIN_EMAIL, ID, PARENT_ID, "NAME", "NAME", ID.getBytes());
   }
   
   @Test
@@ -213,13 +211,13 @@ public class FileControllerTest extends JacksonTestHelper {
     throws Exception {
     
     mockMvc.perform(
-      delete("/api/core/files/" + PARENT_ID + "/" + ID).param("email", EMAIL))
+      delete("/api/core/files/" + PARENT_ID + "/" + ID).cookie(cookies))
       .andExpect(status().isOk())
       .andExpect(content().json(
         baseResponseJacksonTester.write(OK_BASE_RESPONSE)
           .getJson()));
     
-    verify(fileService).deleteFileOrFolder(EMAIL, PARENT_ID, ID);
+    verify(fileService).deleteFileOrFolder(ADMIN_EMAIL, PARENT_ID, ID);
     verifyZeroInteractions(multipartFileRequestMapper, fileRequestMapper);
   }
   

@@ -15,10 +15,10 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties("session")
 public class SessionProperties {
   
-  private int maxAge;
+  private int maxAge = 1800;
   
-  private int expireTime;
+  private int expireTime = 1800;
   
-  private String cookieName;
+  private String cookieName = "Function-Session";
   
 }

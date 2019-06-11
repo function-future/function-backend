@@ -2,6 +2,8 @@ package com.future.function.web.controller.core;
 
 import com.future.function.common.enumeration.core.Role;
 import com.future.function.service.api.feature.core.UserService;
+import com.future.function.session.annotation.WithAnyRole;
+import com.future.function.session.model.Session;
 import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.mapper.request.core.UserRequestMapper;
@@ -50,7 +52,10 @@ public class UserController {
   @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE,
                produces = MediaType.APPLICATION_JSON_VALUE)
   public DataResponse<UserWebResponse> createUser(
-    @RequestBody UserWebRequest data
+    @WithAnyRole(roles = Role.ADMIN)
+      Session session,
+    @RequestBody
+      UserWebRequest data
   ) {
     
     return UserResponseMapper.toUserDataResponse(
@@ -70,6 +75,8 @@ public class UserController {
   @DeleteMapping(value = "/{userId:.+}",
                  produces = MediaType.APPLICATION_JSON_VALUE)
   public BaseResponse deleteUser(
+    @WithAnyRole(roles = Role.ADMIN)
+      Session session,
     @PathVariable
       String userId
   ) {
@@ -92,6 +99,8 @@ public class UserController {
   @GetMapping(value = "/{userId:.+}",
               produces = MediaType.APPLICATION_JSON_VALUE)
   public DataResponse<UserWebResponse> getUser(
+    @WithAnyRole(roles = Role.ADMIN)
+      Session session,
     @PathVariable
       String userId
   ) {
@@ -113,6 +122,8 @@ public class UserController {
   @ResponseStatus(HttpStatus.OK)
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   public PagingResponse<UserWebResponse> getUsers(
+    @WithAnyRole(roles = Role.ADMIN)
+      Session session,
     @RequestParam(required = false)
       String role,
     @RequestParam(required = false,
@@ -140,9 +151,12 @@ public class UserController {
               consumes = MediaType.APPLICATION_JSON_VALUE,
               produces = MediaType.APPLICATION_JSON_VALUE)
   public DataResponse<UserWebResponse> updateUser(
+    @WithAnyRole(roles = Role.ADMIN)
+      Session session,
     @PathVariable
       String userId,
-    @RequestBody UserWebRequest data
+    @RequestBody
+      UserWebRequest data
   ) {
     
     return UserResponseMapper.toUserDataResponse(

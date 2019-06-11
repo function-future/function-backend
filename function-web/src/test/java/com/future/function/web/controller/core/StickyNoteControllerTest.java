@@ -1,8 +1,9 @@
 package com.future.function.web.controller.core;
 
+import com.future.function.common.enumeration.core.Role;
 import com.future.function.model.entity.feature.core.StickyNote;
 import com.future.function.service.api.feature.core.StickyNoteService;
-import com.future.function.web.JacksonTestHelper;
+import com.future.function.web.TestHelper;
 import com.future.function.web.TestSecurityConfiguration;
 import com.future.function.web.mapper.request.core.StickyNoteRequestMapper;
 import com.future.function.web.mapper.response.core.StickyNoteResponseMapper;
@@ -14,7 +15,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -26,7 +26,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Collections;
 
@@ -41,15 +40,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @Import(TestSecurityConfiguration.class)
 @WebMvcTest(value = StickyNoteController.class)
-public class StickyNoteControllerTest extends JacksonTestHelper {
+public class StickyNoteControllerTest extends TestHelper {
   
   private static final String TITLE = "title";
   
   private static final String DESCRIPTION = "description";
-  
-  private static final String VALID_JSON =
-    "{\"title\":\"" + TITLE + "\"," + "\"description\":\"" + DESCRIPTION +
-    "\"}";
   
   private static final StickyNote STICKY_NOTE = StickyNote.builder()
     .title(TITLE)
@@ -77,18 +72,16 @@ public class StickyNoteControllerTest extends JacksonTestHelper {
   
   private JacksonTester<StickyNoteWebRequest> stickyNoteWebRequestJacksonTester;
   
-  @Autowired
-  private MockMvc mockMvc;
-  
   @MockBean
   private StickyNoteService stickyNoteService;
   
   @MockBean
   private StickyNoteRequestMapper stickyNoteRequestMapper;
   
+  @Override
   @Before
   public void setUp() {
-  
+    
     super.setUp();
   }
   
@@ -102,7 +95,8 @@ public class StickyNoteControllerTest extends JacksonTestHelper {
   public void testGivenCallToStickyNoteApiByGettingStickyNoteReturnDataResponseOfStickyNote()
     throws Exception {
     
-    given(stickyNoteService.getStickyNote(PAGEABLE)).willReturn(STICKY_NOTE_PAGE);
+    given(stickyNoteService.getStickyNote(PAGEABLE)).willReturn(
+      STICKY_NOTE_PAGE);
     
     mockMvc.perform(get("/api/core/sticky-notes"))
       .andExpect(status().isOk())
@@ -116,15 +110,17 @@ public class StickyNoteControllerTest extends JacksonTestHelper {
   @Test
   public void testGivenCallToStickyNoteApiByCreatingStickyNoteReturnDataResponseOfStickyNote()
     throws Exception {
-  
+    
+    super.setCookie(Role.ADMIN);
+    
     given(
       stickyNoteRequestMapper.toStickyNote(STICKY_NOTE_WEB_REQUEST)).willReturn(
       STICKY_NOTE);
     given(stickyNoteService.createStickyNote(STICKY_NOTE)).willReturn(
       STICKY_NOTE);
-  
-    mockMvc.perform(post("/api/core/sticky-notes").contentType(
-      MediaType.APPLICATION_JSON_VALUE)
+    
+    mockMvc.perform(post("/api/core/sticky-notes").cookie(cookies)
+                      .contentType(MediaType.APPLICATION_JSON_VALUE)
                       .content(stickyNoteWebRequestJacksonTester.write(
                         STICKY_NOTE_WEB_REQUEST)
                                  .getJson()))
@@ -132,7 +128,7 @@ public class StickyNoteControllerTest extends JacksonTestHelper {
       .andExpect(content().json(
         dataResponseJacksonTester.write(CREATED_DATA_RESPONSE)
           .getJson()));
-  
+    
     verify(stickyNoteRequestMapper).toStickyNote(STICKY_NOTE_WEB_REQUEST);
     verify(stickyNoteService).createStickyNote(STICKY_NOTE);
   }

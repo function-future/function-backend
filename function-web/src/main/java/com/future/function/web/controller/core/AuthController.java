@@ -48,7 +48,7 @@ public class AuthController {
   @ResponseStatus(HttpStatus.OK)
   @GetMapping
   public DataResponse<AuthWebResponse> getLoginStatus(
-    @WithAnyRole(roles = { Role.STUDENT, Role.MENTOR, Role.ADMIN, Role.JUDGE })
+    @WithAnyRole
       Session session
   ) {
     
@@ -59,7 +59,7 @@ public class AuthController {
   @ResponseStatus(HttpStatus.OK)
   @DeleteMapping
   public BaseResponse logout(
-    @WithAnyRole(roles = { Role.STUDENT, Role.MENTOR, Role.ADMIN, Role.JUDGE })
+    @WithAnyRole(roles = { Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT })
       Session session, HttpServletResponse response
   ) {
     

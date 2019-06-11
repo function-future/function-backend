@@ -1,6 +1,9 @@
 package com.future.function.web.controller.core;
 
+import com.future.function.common.enumeration.core.Role;
 import com.future.function.service.api.feature.core.ActivityBlogService;
+import com.future.function.session.annotation.WithAnyRole;
+import com.future.function.session.model.Session;
 import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.mapper.request.core.ActivityBlogRequestMapper;
@@ -68,45 +71,45 @@ public class ActivityBlogController {
   @ResponseStatus(HttpStatus.CREATED)
   @PostMapping
   public DataResponse<ActivityBlogWebResponse> createActivityBlog(
+    @WithAnyRole(roles = { Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT })
+      Session session,
     @RequestBody
-      ActivityBlogWebRequest request,
-    @RequestParam
-      String email
+      ActivityBlogWebRequest request
   ) {
     
     return ActivityBlogResponseMapper.toActivityBlogDataResponse(
       HttpStatus.CREATED, activityBlogService.createActivityBlog(
-        activityBlogRequestMapper.toActivityBlog(email, request)));
+        activityBlogRequestMapper.toActivityBlog(session.getEmail(), request)));
   }
   
   @ResponseStatus(HttpStatus.OK)
   @PutMapping("/{activityBlogId}")
   public DataResponse<ActivityBlogWebResponse> updateActivityBlog(
+    @WithAnyRole(roles = { Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT })
+      Session session,
     @RequestBody
       ActivityBlogWebRequest request,
-    @RequestParam
-      String email,
     @PathVariable
       String activityBlogId
   ) {
     
     return ActivityBlogResponseMapper.toActivityBlogDataResponse(
       activityBlogService.updateActivityBlog(
-        activityBlogRequestMapper.toActivityBlog(email, activityBlogId,
-                                                 request
+        activityBlogRequestMapper.toActivityBlog(session.getEmail(),
+                                                 activityBlogId, request
         )));
   }
   
   @ResponseStatus(HttpStatus.OK)
   @DeleteMapping("/{activityBlogId}")
   public BaseResponse deleteActivityBlog(
+    @WithAnyRole(roles = { Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT })
+      Session session,
     @PathVariable
-      String activityBlogId,
-    @RequestParam
-      String email
+      String activityBlogId
   ) {
     
-    activityBlogService.deleteActivityBlog(email, activityBlogId);
+    activityBlogService.deleteActivityBlog(session.getEmail(), activityBlogId);
     return ResponseHelper.toBaseResponse(HttpStatus.OK);
   }
   

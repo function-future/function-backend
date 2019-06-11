@@ -70,16 +70,15 @@ public class AuthControllerTest extends TestHelper {
   @MockBean
   private AuthService authService;
   
+  @Override
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
     
     super.setUp();
   }
   
   @After
   public void tearDown() {
-    
-    super.tearDown();
     
     verifyNoMoreInteractions(authService);
   }

@@ -1,11 +1,11 @@
 package com.future.function.web.controller.core;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.future.function.common.enumeration.core.Role;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.service.api.feature.core.UserService;
+import com.future.function.web.TestHelper;
 import com.future.function.web.TestSecurityConfiguration;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.mapper.request.core.UserRequestMapper;
@@ -19,7 +19,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -30,7 +29,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Arrays;
 import java.util.List;
@@ -49,7 +47,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @Import(TestSecurityConfiguration.class)
 @WebMvcTest(value = UserController.class)
-public class UserControllerTest {
+public class UserControllerTest extends TestHelper {
   
   private static final String ADDRESS = "address";
   
@@ -62,12 +60,6 @@ public class UserControllerTest {
   private static final String STUDENT_EMAIL = "student@test.com";
   
   private static final String UNIVERSITY = "university";
-  
-  private static final String PICTURE_URL = "picture-url";
-  
-  private static final FileV2 PICTURE = FileV2.builder()
-    .fileUrl(PICTURE_URL)
-    .build();
   
   private static final User STUDENT = User.builder()
     .role(Role.STUDENT)
@@ -82,16 +74,16 @@ public class UserControllerTest {
     .university(UNIVERSITY)
     .build();
   
-  private static final UserWebRequest STUDENT_WEB_REQUEST = UserWebRequest.builder()
-    .role("STUDENT")
-    .email(STUDENT_EMAIL)
-    .name(NAME)
-    .phone(PHONE)
-    .address(ADDRESS)
-    .batch(NUMBER)
-    .university(UNIVERSITY).build();
-  
-  private JacksonTester<UserWebRequest> userWebRequestJacksonTester;
+  private static final UserWebRequest STUDENT_WEB_REQUEST =
+    UserWebRequest.builder()
+      .role("STUDENT")
+      .email(STUDENT_EMAIL)
+      .name(NAME)
+      .phone(PHONE)
+      .address(ADDRESS)
+      .batch(NUMBER)
+      .university(UNIVERSITY)
+      .build();
   
   private static final Pageable PAGEABLE = new PageRequest(0, 10);
   
@@ -111,16 +103,7 @@ public class UserControllerTest {
   private static final BaseResponse BASE_RESPONSE =
     ResponseHelper.toBaseResponse(HttpStatus.OK);
   
-  private JacksonTester<DataResponse<UserWebResponse>>
-    dataResponseJacksonTester;
-  
-  private JacksonTester<PagingResponse<UserWebResponse>>
-    pagingResponseJacksonTester;
-  
-  private JacksonTester<BaseResponse> baseResponseJacksonTester;
-  
-  @Autowired
-  private MockMvc mockMvc;
+  private JacksonTester<UserWebRequest> userWebRequestJacksonTester;
   
   @MockBean
   private UserService userService;
@@ -128,10 +111,11 @@ public class UserControllerTest {
   @MockBean
   private UserRequestMapper userRequestMapper;
   
+  @Override
   @Before
   public void setUp() {
     
-    JacksonTester.initFields(this, new ObjectMapper());
+    super.setUp();
   }
   
   @After
@@ -144,10 +128,13 @@ public class UserControllerTest {
   public void testGivenCallToUsersApiByGettingUsersFromUserServiceReturnPagingResponseOfUsers()
     throws Exception {
     
+    super.setCookie(Role.ADMIN);
+    
     given(userService.getUsers(Role.STUDENT, PAGEABLE)).willReturn(
       new PageImpl<>(STUDENTS_LIST, PAGEABLE, STUDENTS_LIST.size()));
     
-    mockMvc.perform(get("/api/core/users").param("role", Role.STUDENT.name()))
+    mockMvc.perform(get("/api/core/users").cookie(cookies)
+                      .param("role", Role.STUDENT.name()))
       .andExpect(status().isOk())
       .andExpect(content().json(
         pagingResponseJacksonTester.write(PAGING_RESPONSE)
@@ -161,7 +148,9 @@ public class UserControllerTest {
   public void testGivenEmailFromPathVariableByDeletingUserByEmailReturnBaseResponseOK()
     throws Exception {
     
-    mockMvc.perform(delete("/api/core/users/" + STUDENT_EMAIL))
+    super.setCookie(Role.ADMIN);
+    
+    mockMvc.perform(delete("/api/core/users/" + STUDENT_EMAIL).cookie(cookies))
       .andExpect(status().isOk())
       .andExpect(content().json(baseResponseJacksonTester.write(BASE_RESPONSE)
                                   .getJson()))
@@ -176,9 +165,11 @@ public class UserControllerTest {
   public void testGivenEmailFromPathVariableByGettingUserByEmailReturnDataResponseUser()
     throws Exception {
     
+    super.setCookie(Role.ADMIN);
+    
     given(userService.getUser(STUDENT_EMAIL)).willReturn(STUDENT);
     
-    mockMvc.perform(get("/api/core/users/" + STUDENT_EMAIL))
+    mockMvc.perform(get("/api/core/users/" + STUDENT_EMAIL).cookie(cookies))
       .andExpect(status().isOk())
       .andExpect(content().json(
         dataResponseJacksonTester.write(RETRIEVED_DATA_RESPONSE)
@@ -191,6 +182,8 @@ public class UserControllerTest {
   @Test
   public void testGivenUserDataAsStringAndImageByCreatingUserReturnDataResponseUser()
     throws Exception {
+    
+    super.setCookie(Role.ADMIN);
     
     User student = User.builder()
       .role(Role.STUDENT)
@@ -207,9 +200,11 @@ public class UserControllerTest {
     given(userRequestMapper.toUser(STUDENT_WEB_REQUEST)).willReturn(student);
     given(userService.createUser(student)).willReturn(STUDENT);
     
-    mockMvc.perform(post("/api/core/users").contentType(
-      MediaType.APPLICATION_JSON_VALUE)
-                      .content(userWebRequestJacksonTester.write(STUDENT_WEB_REQUEST).getJson()))
+    mockMvc.perform(post("/api/core/users").cookie(cookies)
+                      .contentType(MediaType.APPLICATION_JSON_VALUE)
+                      .content(
+                        userWebRequestJacksonTester.write(STUDENT_WEB_REQUEST)
+                          .getJson()))
       .andExpect(status().isCreated())
       .andExpect(content().json(
         dataResponseJacksonTester.write(CREATED_DATA_RESPONSE)
@@ -223,6 +218,8 @@ public class UserControllerTest {
   public void testGivenEmailFromPathVariableAndUserDataAsStringaAndImageByUpdatingUserReturnDataResponseUser()
     throws Exception {
     
+    super.setCookie(Role.ADMIN);
+    
     User student = User.builder()
       .role(Role.STUDENT)
       .email(STUDENT_EMAIL)
@@ -235,13 +232,16 @@ public class UserControllerTest {
       .university(UNIVERSITY)
       .build();
     
-    given(userRequestMapper.toUser(STUDENT_EMAIL, STUDENT_WEB_REQUEST)).willReturn(
+    given(
+      userRequestMapper.toUser(STUDENT_EMAIL, STUDENT_WEB_REQUEST)).willReturn(
       student);
     given(userService.updateUser(student)).willReturn(STUDENT);
     
-    mockMvc.perform(put("/api/core/users/" + STUDENT_EMAIL).contentType(
-      MediaType.APPLICATION_JSON_VALUE)
-                      .content(userWebRequestJacksonTester.write(STUDENT_WEB_REQUEST).getJson()))
+    mockMvc.perform(put("/api/core/users/" + STUDENT_EMAIL).cookie(cookies)
+                      .contentType(MediaType.APPLICATION_JSON_VALUE)
+                      .content(
+                        userWebRequestJacksonTester.write(STUDENT_WEB_REQUEST)
+                          .getJson()))
       .andExpect(status().isOk())
       .andExpect(content().json(
         dataResponseJacksonTester.write(RETRIEVED_DATA_RESPONSE)

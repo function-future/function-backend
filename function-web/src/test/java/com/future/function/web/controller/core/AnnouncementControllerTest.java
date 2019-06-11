@@ -1,8 +1,9 @@
 package com.future.function.web.controller.core;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.future.function.common.enumeration.core.Role;
 import com.future.function.model.entity.feature.core.Announcement;
 import com.future.function.service.api.feature.core.AnnouncementService;
+import com.future.function.web.TestHelper;
 import com.future.function.web.TestSecurityConfiguration;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.mapper.request.core.AnnouncementRequestMapper;
@@ -16,7 +17,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -28,7 +28,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Collections;
 import java.util.List;
@@ -46,7 +45,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @Import(TestSecurityConfiguration.class)
 @WebMvcTest(value = AnnouncementController.class)
-public class AnnouncementControllerTest {
+public class AnnouncementControllerTest extends TestHelper {
   
   private static final String ID = "id";
   
@@ -85,19 +84,8 @@ public class AnnouncementControllerTest {
   
   private DataResponse<AnnouncementWebResponse> createdDataResponse;
   
-  private JacksonTester<PagingResponse<AnnouncementWebResponse>>
-    pagingResponseJacksonTester;
-  
-  private JacksonTester<DataResponse<AnnouncementWebResponse>>
-    dataResponseJacksonTester;
-  
-  private JacksonTester<BaseResponse> baseResponseJacksonTester;
-  
   private JacksonTester<AnnouncementWebRequest>
     announcementWebRequestJacksonTester;
-  
-  @Autowired
-  private MockMvc mockMvc;
   
   @MockBean
   private AnnouncementService announcementService;
@@ -105,10 +93,9 @@ public class AnnouncementControllerTest {
   @MockBean
   private AnnouncementRequestMapper announcementRequestMapper;
   
+  @Override
   @Before
   public void setUp() {
-    
-    JacksonTester.initFields(this, new ObjectMapper());
     
     announcement = Announcement.builder()
       .id(ID)
@@ -132,6 +119,8 @@ public class AnnouncementControllerTest {
     
     createdDataResponse = AnnouncementResponseMapper.toAnnouncementDataResponse(
       HttpStatus.CREATED, announcement);
+    
+    super.setUp();
   }
   
   @After
@@ -198,7 +187,9 @@ public class AnnouncementControllerTest {
   public void testGivenAnnouncementIdByDeletingAnnouncementFromAnnouncementServiceReturnBaseResponse()
     throws Exception {
     
-    mockMvc.perform(delete("/api/core/announcements/" + ID))
+    super.setCookie(Role.ADMIN);
+    
+    mockMvc.perform(delete("/api/core/announcements/" + ID).cookie(cookies))
       .andExpect(status().isOk())
       .andExpect(content().json(
         baseResponseJacksonTester.write(DELETED_BASE_RESPONSE)
@@ -211,13 +202,15 @@ public class AnnouncementControllerTest {
   public void testGivenAnnouncementDataByCreatingAnnouncementReturnDataResponse()
     throws Exception {
     
+    super.setCookie(Role.ADMIN);
+    
     given(announcementService.createAnnouncement(announcement)).willReturn(
       announcement);
     given(announcementRequestMapper.toAnnouncement(
       ANNOUNCEMENT_WEB_REQUEST)).willReturn(announcement);
     
-    mockMvc.perform(post("/api/core/announcements").contentType(
-      MediaType.APPLICATION_JSON_VALUE)
+    mockMvc.perform(post("/api/core/announcements").cookie(cookies)
+                      .contentType(MediaType.APPLICATION_JSON_VALUE)
                       .content(announcementWebRequestJacksonTester.write(
                         ANNOUNCEMENT_WEB_REQUEST)
                                  .getJson()))
@@ -234,14 +227,16 @@ public class AnnouncementControllerTest {
   public void testGivenAnnouncementDataByUpdatingAnnouncementReturnDataResponse()
     throws Exception {
     
+    super.setCookie(Role.ADMIN);
+    
     given(announcementService.updateAnnouncement(announcement)).
       willReturn(announcement);
     given(announcementRequestMapper.toAnnouncement(ID,
                                                    ANNOUNCEMENT_WEB_REQUEST
     )).willReturn(announcement);
     
-    mockMvc.perform(put("/api/core/announcements/" + ID).contentType(
-      MediaType.APPLICATION_JSON_VALUE)
+    mockMvc.perform(put("/api/core/announcements/" + ID).cookie(cookies)
+                      .contentType(MediaType.APPLICATION_JSON_VALUE)
                       .content(announcementWebRequestJacksonTester.write(
                         ANNOUNCEMENT_WEB_REQUEST)
                                  .getJson()))
@@ -251,7 +246,8 @@ public class AnnouncementControllerTest {
           .getJson()));
     
     verify(announcementService).updateAnnouncement(announcement);
-    verify(announcementRequestMapper).toAnnouncement(ID, ANNOUNCEMENT_WEB_REQUEST);
+    verify(announcementRequestMapper).toAnnouncement(
+      ID, ANNOUNCEMENT_WEB_REQUEST);
   }
   
 }

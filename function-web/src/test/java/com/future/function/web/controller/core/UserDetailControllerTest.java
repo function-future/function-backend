@@ -72,15 +72,13 @@ public class UserDetailControllerTest extends TestHelper {
   
   @Override
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
     
     super.setUp();
   }
   
   @After
   public void tearDown() {
-    
-    super.tearDown();
     
     verifyNoMoreInteractions(userService);
   }
@@ -89,9 +87,9 @@ public class UserDetailControllerTest extends TestHelper {
   public void testGivenApiCallAndValidRoleByGettingProfileReturnDataResponse()
     throws Exception {
     
-    when(userService.getUserByEmail(MENTOR_EMAIL)).thenReturn(USER);
-    
     super.setCookie(Role.MENTOR);
+    
+    when(userService.getUserByEmail(MENTOR_EMAIL)).thenReturn(USER);
     
     mockMvc.perform(get("/api/core/user/profile").cookie(cookies))
       .andExpect(status().isOk())

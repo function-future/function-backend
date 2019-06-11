@@ -1,6 +1,9 @@
 package com.future.function.web.controller.core;
 
+import com.future.function.common.enumeration.core.Role;
 import com.future.function.service.api.feature.core.FileService;
+import com.future.function.session.annotation.WithAnyRole;
+import com.future.function.session.model.Session;
 import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.mapper.request.core.FileRequestMapper;
@@ -51,6 +54,8 @@ public class FileController {
   @ResponseStatus(HttpStatus.OK)
   @GetMapping(value = "/{parentId}")
   public PagingResponse<FileWebResponse> getFilesAndFolders(
+    @WithAnyRole(roles = { Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT })
+      Session session,
     @PathVariable
       String parentId,
     @RequestParam(defaultValue = "1")
@@ -69,6 +74,8 @@ public class FileController {
   @ResponseStatus(HttpStatus.OK)
   @GetMapping(value = "/{parentId}/{fileOrFolderId}")
   public DataResponse<FileWebResponse> getFileOrFolder(
+    @WithAnyRole(roles = { Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT })
+      Session session,
     @PathVariable
       String parentId,
     @PathVariable
@@ -85,6 +92,8 @@ public class FileController {
                consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
                produces = MediaType.APPLICATION_JSON_VALUE)
   public DataResponse<FileWebResponse> createFileOrFolder(
+    @WithAnyRole(roles = Role.ADMIN)
+      Session session,
     @PathVariable
       String parentId,
     @RequestParam(required = false)
@@ -109,6 +118,8 @@ public class FileController {
               consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
               produces = MediaType.APPLICATION_JSON_VALUE)
   public DataResponse<FileWebResponse> updateFileOrFolder(
+    @WithAnyRole(roles = Role.ADMIN)
+      Session session,
     @PathVariable
       String parentId,
     @PathVariable
@@ -116,9 +127,7 @@ public class FileController {
     @RequestParam(required = false)
       MultipartFile file,
     @RequestParam
-      String data,
-    @RequestParam
-      String email
+      String data
   ) {
     
     Pair<String, byte[]> pair =
@@ -128,24 +137,25 @@ public class FileController {
       data, pair.getSecond());
     
     return FileResponseMapper.toFileDataResponse(
-      fileService.updateFileOrFolder(email, fileOrFolderId, parentId,
-                                     request.getName(), pair.getFirst(),
-                                     pair.getSecond()
+      fileService.updateFileOrFolder(session.getEmail(), fileOrFolderId,
+                                     parentId, request.getName(),
+                                     pair.getFirst(), pair.getSecond()
       ));
   }
   
   @ResponseStatus(HttpStatus.OK)
   @DeleteMapping("/{parentId}/{fileOrFolderId}")
   public BaseResponse deleteFileOrFolder(
+    @WithAnyRole(roles = { Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT })
+      Session session,
     @PathVariable
       String parentId,
     @PathVariable
-      String fileOrFolderId,
-    @RequestParam
-      String email
+      String fileOrFolderId
   ) {
     
-    fileService.deleteFileOrFolder(email, parentId, fileOrFolderId);
+    fileService.deleteFileOrFolder(
+      session.getEmail(), parentId, fileOrFolderId);
     return ResponseHelper.toBaseResponse(HttpStatus.OK);
   }
   

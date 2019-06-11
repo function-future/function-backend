@@ -6,7 +6,6 @@ import com.future.function.session.model.Session;
 import com.future.function.web.model.response.base.BaseResponse;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
-import org.junit.After;
 import org.junit.Before;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.json.JacksonTester;
@@ -56,7 +55,7 @@ public abstract class TestHelper {
   protected MockMvc mockMvc;
   
   @Before
-  protected void setUp() throws Exception {
+  protected void setUp() {
     
     JacksonTester.initFields(this, new ObjectMapper());
   }
@@ -84,8 +83,5 @@ public abstract class TestHelper {
     
     this.cookies = new Cookie[] { cookie };
   }
-  
-  @After
-  protected void tearDown() {}
   
 }
