@@ -15,8 +15,12 @@ public abstract class DocumentName {
   
   public static final String USER = "users";
   
+  public static final String COURSE = "courses";
+  
+  public static final String SHARED_COURSE = "shared-courses";
+  
   public static final String ANNOUNCEMENT = "announcements";
-
+  
   public static final String STICKY_NOTE = "sticky-notes";
 
   public static final String CHATROOM = "chatrooms";
@@ -25,4 +29,8 @@ public abstract class DocumentName {
 
   public static final String MESSAGE_STATUS = "message-status";
 
+  public static final String DISCUSSION = "discussions";
+  
+  public static final String ACTIVITY_BLOG = "activity-blogs";
+  
 }

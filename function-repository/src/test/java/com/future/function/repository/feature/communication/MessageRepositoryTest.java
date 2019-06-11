@@ -1,9 +1,8 @@
 package com.future.function.repository.feature.communication;
 
 import com.future.function.common.enumeration.communication.ChatroomType;
-import com.future.function.model.entity.feature.communication.Chatroom;
-import com.future.function.model.entity.feature.communication.Message;
-import com.future.function.model.util.constant.FieldName;
+import com.future.function.model.entity.feature.communication.chatting.Chatroom;
+import com.future.function.model.entity.feature.communication.chatting.Message;
 import com.future.function.repository.TestApplication;
 import org.junit.After;
 import org.junit.Before;
@@ -14,7 +13,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -87,6 +85,14 @@ public class MessageRepositoryTest {
     assertThat(messages.getTotalElements()).isEqualTo(2);
     assertThat(messages.getContent().get(0).getText()).isEqualTo(TEXT_2);
     assertThat(messages.getContent().get(1).getText()).isEqualTo(TEXT_1);
+  }
+
+  @Test
+  public void testGivenChatroomByFindingLatestMessageReturnMessage() {
+    Message message = messageRepository.findFirstByChatroomOrderByCreatedAtDesc(chatroom1);
+
+    assertThat(message).isNotNull();
+    assertThat(message.getText()).isEqualTo(TEXT_2);
   }
 
 }

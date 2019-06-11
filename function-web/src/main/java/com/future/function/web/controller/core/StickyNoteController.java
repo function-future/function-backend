@@ -4,6 +4,7 @@ import com.future.function.service.api.feature.core.StickyNoteService;
 import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.request.core.StickyNoteRequestMapper;
 import com.future.function.web.mapper.response.core.StickyNoteResponseMapper;
+import com.future.function.web.model.request.core.StickyNoteWebRequest;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.feature.core.StickyNoteWebResponse;
@@ -38,6 +39,14 @@ public class StickyNoteController {
     this.stickyNoteRequestMapper = stickyNoteRequestMapper;
   }
   
+  /**
+   * Retrieves last inserted sticky note in database.
+   *
+   * @return {@code DataResponse<StickyNoteWebResponse>} - The retrieved
+   * sticky note data, wrapped in
+   * {@link com.future.function.web.model.response.base.DataResponse} and
+   * {@link com.future.function.web.model.response.feature.core.StickyNoteWebResponse}
+   */
   @ResponseStatus(HttpStatus.OK)
   @GetMapping
   public PagingResponse<StickyNoteWebResponse> getStickyNote(
@@ -53,16 +62,26 @@ public class StickyNoteController {
       stickyNoteService.getStickyNote(PageHelper.toPageable(page, size)));
   }
   
+  /**
+   * Creates new sticky note in database.
+   *
+   * @param request Data of new sticky note in JSON format.
+   *
+   * @return {@code DataResponse<StickyNoteWebResponse>} - The created
+   * sticky note data, wrapped in
+   * {@link com.future.function.web.model.response.base.DataResponse} and
+   * {@link com.future.function.web.model.response.feature.core.StickyNoteWebResponse}
+   */
   @ResponseStatus(HttpStatus.CREATED)
   @PostMapping
   public DataResponse<StickyNoteWebResponse> createStickyNote(
     @RequestBody
-      String data
+      StickyNoteWebRequest request
   ) {
     
     return StickyNoteResponseMapper.toStickyNoteDataResponse(
       HttpStatus.CREATED, stickyNoteService.createStickyNote(
-        stickyNoteRequestMapper.toStickyNote(data)));
+        stickyNoteRequestMapper.toStickyNote(request)));
   }
   
 }

@@ -15,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -110,8 +111,8 @@ public class UserServiceImpl implements UserService {
       .map(User::getId)
       .map(userRepository::findOne)
       .map(this::deleteUserPicture)
-      .map(foundUser -> this.copyPropertiesAndSaveUser(user, foundUser))
       .map(foundUser -> this.setUserPicture(user, foundUser))
+      .map(foundUser -> this.copyPropertiesAndSaveUser(user, foundUser))
       .orElse(user);
   }
   
@@ -126,6 +127,38 @@ public class UserServiceImpl implements UserService {
     Optional.ofNullable(userId)
       .map(userRepository::findOne)
       .ifPresent(this::markDeleted);
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
+   * @param batchCode Batch code for students.
+   *
+   * @return {@code List<User>} - List of users found in database.
+   */
+  @Override
+  public List<User> getStudentsByBatchCode(
+    String batchCode
+  ) {
+    
+    return Optional.ofNullable(batchCode)
+      .map(batchService::getBatchByCode)
+      .map(batch -> userRepository.findAllByRoleAndBatch(Role.STUDENT, batch))
+      .orElseGet(Collections::emptyList);
+  }
+  
+  @Override
+  public User getUserByEmail(String email) {
+    
+    return userRepository.findByEmail(email)
+      .orElseThrow(() -> new NotFoundException("Get User Not Found"));
+  }
+  
+  private void markDeleted(User user) {
+    
+    user.setDeleted(true);
+    deleteUserPicture(user);
+    userRepository.save(user);
   }
   
   private User deleteUserPicture(User user) {
@@ -143,13 +176,8 @@ public class UserServiceImpl implements UserService {
       .map(User::getPictureV2)
       .map(FileV2::getId)
       .map(fileId -> this.markAndSetUserPicture(user, fileId, true))
-      .orElse(user);
-  }
-  
-  private void markDeleted(User user) {
-    
-    user.setDeleted(true);
-    userRepository.save(user);
+      .map(ignored -> foundUser)
+      .orElse(foundUser);
   }
   
   private User copyPropertiesAndSaveUser(User user, User foundUser) {

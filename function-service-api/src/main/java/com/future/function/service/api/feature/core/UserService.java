@@ -5,6 +5,8 @@ import com.future.function.model.entity.feature.core.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 /**
  * Service interface class for user logic operations declaration.
  */
@@ -34,7 +36,7 @@ public interface UserService {
   /**
    * Creates user object and saves any other data related to the user.
    *
-   * @param user  User data of new user.
+   * @param user User data of new user.
    *
    * @return {@code User} - The user object of the saved data.
    */
@@ -44,7 +46,7 @@ public interface UserService {
    * Updates user object and saves any other data related to the user. If not
    * found, then return the request object.
    *
-   * @param user  User data of existing user.
+   * @param user User data of existing user.
    *
    * @return {@code User} - The user object of the saved data.
    */
@@ -57,5 +59,23 @@ public interface UserService {
    * @param userId Id of user to be deleted.
    */
   void deleteUser(String userId);
+  
+  /**
+   * Retrieves users from database given role.
+   *
+   * @param batchCode Batch code for students.
+   *
+   * @return {@code List<User>} - List of users found in database.
+   */
+  List<User> getStudentsByBatchCode(String batchCode);
+  
+  /**
+   * Retrieves user from database with specified email.
+   *
+   * @param email Email of user to be retrieved.
+   *
+   * @return {@code User} - User found in database.
+   */
+  User getUserByEmail(String email);
   
 }

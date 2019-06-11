@@ -17,21 +17,28 @@
       <groupId>com.future.function</groupId>
       <artifactId>function-common</artifactId>
       <version>${project.parent.version}</version>
-      <scope>compile</scope>
     </dependency>
 
     <dependency>
       <groupId>com.future.function</groupId>
       <artifactId>function-repository</artifactId>
       <version>${project.parent.version}</version>
-      <scope>compile</scope>
     </dependency>
 
     <dependency>
-      <groupId>com.future.function</groupId>
-      <artifactId>function-service-api</artifactId>
-      <version>0.0.0</version>
-      <scope>compile</scope>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>eu.codearte.catch-exception</groupId>
+      <artifactId>catch-exception</artifactId>
+      <scope>test</scope>
     </dependency>
 
     <dependency>

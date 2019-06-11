@@ -1,8 +1,8 @@
 package com.future.function.web.mapper.request.core;
 
-import com.future.function.common.validation.ObjectValidator;
 import com.future.function.model.entity.feature.core.Announcement;
 import com.future.function.model.entity.feature.core.FileV2;
+import com.future.function.validation.RequestValidator;
 import com.future.function.web.mapper.request.WebRequestMapper;
 import com.future.function.web.model.request.core.AnnouncementWebRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -18,13 +18,13 @@ import java.util.stream.Collectors;
 @Component
 public class AnnouncementRequestMapper {
   
-  private final ObjectValidator validator;
+  private final RequestValidator validator;
   
   private final WebRequestMapper requestMapper;
   
   @Autowired
   public AnnouncementRequestMapper(
-    ObjectValidator validator, WebRequestMapper requestMapper
+    RequestValidator validator, WebRequestMapper requestMapper
   ) {
     
     this.validator = validator;

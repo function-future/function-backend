@@ -1,10 +1,13 @@
 package com.future.function.repository.feature.core;
 
 import com.future.function.model.entity.feature.core.FileV2;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * Repository class for file database operations.
@@ -23,5 +26,39 @@ public interface FileRepositoryV2 extends MongoRepository<FileV2, String> {
    * exists; otherwise returns {@link Optional#empty()}.
    */
   Optional<FileV2> findByIdAndAsResource(String id, boolean asResource);
+  
+  /**
+   * Finds all file/folder given parentId.
+   *
+   * @param parentId Id of parent of file(s)/folder(s).
+   * @param pageable Pageable object for paging data.
+   *
+   * @return {@code Page<FileV2>} - FileV2 objects found in database, if any
+   * exists.
+   */
+  Page<FileV2> findAllByParentIdAndAsResourceFalseOrderByMarkFolderDesc(
+    String parentId, Pageable pageable
+  );
+  
+  /**
+   * Finds all file/folder given parentId.
+   *
+   * @param parentId Id of parent of file(s)/folder(s).
+   *
+   * @return {@code Stream<FileV2>} - FileV2 objects found in database, if any
+   * exists.
+   */
+  Stream<FileV2> findAllByParentId(String parentId);
+  
+  /**
+   * Finds a file/folder by its id and parentId.
+   *
+   * @param id       Id of file/folder to-be-retrieved.
+   * @param parentId Id of parent of file/folder.
+   *
+   * @return {@code Optional<FileV2>} - File found in database, if any
+   * exists; otherwise returns {@link Optional#empty()}.
+   */
+  Optional<FileV2> findByIdAndParentId(String id, String parentId);
   
 }

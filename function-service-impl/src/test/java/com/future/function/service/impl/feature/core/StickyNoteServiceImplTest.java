@@ -2,6 +2,7 @@ package com.future.function.service.impl.feature.core;
 
 import com.future.function.model.entity.feature.core.StickyNote;
 import com.future.function.repository.feature.core.StickyNoteRepository;
+import com.future.function.service.impl.helper.PageHelper;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -10,7 +11,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
@@ -57,8 +57,8 @@ public class StickyNoteServiceImplTest {
   @Test
   public void testGivenMethodCallToGetStickyNoteByGettingStickyNoteReturnStickyNoteObject() {
     
-    Page<StickyNote> stickyNotePage = new PageImpl<>(
-      Collections.singletonList(stickyNote), PAGEABLE, 1);
+    Page<StickyNote> stickyNotePage = PageHelper.toPage(
+      Collections.singletonList(stickyNote), PAGEABLE);
     when(stickyNoteRepository.findAllByIdIsNotNullOrderByUpdatedAtDesc(
       PAGEABLE)).thenReturn(stickyNotePage);
     
