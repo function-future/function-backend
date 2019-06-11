@@ -31,9 +31,9 @@ public abstract class DocumentName {
 
   public static final String STUDENT_QUIZ = "student-quizzes";
 
-    public static final String STUDENT_QUIZ_DETAIL = "student-quizzes-details";
+  public static final String STUDENT_QUIZ_DETAIL = "student-quizzes-details";
 
-    public static final String STUDENT_QUESTION = "student-questions";
+  public static final String STUDENT_QUESTION = "student-questions";
 
   public static final String QUESTION = "questions";
 
@@ -41,4 +41,14 @@ public abstract class DocumentName {
 
   public static final String DISCUSSION = "discussions";
 
+  public static final String CHATROOM = "chatrooms";
+
+  public static final String MESSAGE = "messages";
+
+  public static final String MESSAGE_STATUS = "message-status";
+
+  public static final String DISCUSSION = "discussions";
+  
+  public static final String ACTIVITY_BLOG = "activity-blogs";
+  
 }

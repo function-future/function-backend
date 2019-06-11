@@ -90,15 +90,14 @@ public class ResourceControllerTest {
     
     when(multipartFileRequestMapper.toStringAndByteArrayPair(
       any(MultipartFile.class))).thenReturn(pair);
-    when(resourceService.storeFile(NAME, NAME, BYTES,
-                                   FileOrigin.ANNOUNCEMENT
+    when(resourceService.storeAndSaveFile(null, NAME, BYTES,
+                                          FileOrigin.ANNOUNCEMENT
     )).thenReturn(FILE_V2_NULL_THUMBNAIL);
     
     mockMvc.perform(post("/api/resources").contentType(
       MediaType.MULTIPART_FORM_DATA)
                       .param("file", "")
-                      .param("origin", ORIGIN)
-                      .param("name", NAME))
+                      .param("origin", ORIGIN))
       .andExpect(status().isCreated())
       .andExpect(content().json(
         dataResponseJacksonTester.write(CREATED_DATA_RESPONSE_NULL_THUMBNAIL)
@@ -107,23 +106,25 @@ public class ResourceControllerTest {
     
     verify(multipartFileRequestMapper).toStringAndByteArrayPair(
       any(MultipartFile.class));
-    verify(resourceService).storeFile(
-      NAME, NAME, BYTES, FileOrigin.ANNOUNCEMENT);
+    verify(resourceService).storeAndSaveFile(
+      null, NAME, BYTES, FileOrigin.ANNOUNCEMENT);
   }
   
   @Test
   public void testGivenApiCallAndFileNameByGettingFileAsByteArrayReturnByteArray()
     throws Exception {
     
-    when(resourceService.getFileAsByteArray(NAME,
-                                            FileOrigin.ANNOUNCEMENT
+    when(resourceService.getFileAsByteArray(NAME, FileOrigin.ANNOUNCEMENT,
+                                            null
     )).thenReturn(BYTES);
     
     mockMvc.perform(get("/api/resources/" + ORIGIN + "/" + ORIGINAL_NAME))
       .andExpect(status().isOk())
       .andExpect(content().bytes(BYTES));
     
-    verify(resourceService).getFileAsByteArray(NAME, FileOrigin.ANNOUNCEMENT);
+    verify(resourceService).getFileAsByteArray(NAME, FileOrigin.ANNOUNCEMENT,
+                                               null
+    );
     verifyZeroInteractions(multipartFileRequestMapper);
   }
   

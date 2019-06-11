@@ -9,6 +9,7 @@ import com.future.function.repository.feature.core.SharedCourseRepository;
 import com.future.function.service.api.feature.core.BatchService;
 import com.future.function.service.api.feature.core.CourseService;
 import com.future.function.service.api.feature.core.ResourceService;
+import com.future.function.service.impl.helper.PageHelper;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,7 +18,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
@@ -81,8 +81,8 @@ public class SharedCourseServiceImplTest {
   private static final List<SharedCourse> SHARED_COURSE_LIST =
     Collections.singletonList(SHARED_COURSE);
   
-  private static final Page<SharedCourse> SHARED_COURSE_PAGE = new PageImpl<>(
-    SHARED_COURSE_LIST, PAGEABLE, SHARED_COURSE_LIST.size());
+  private static final Page<SharedCourse> SHARED_COURSE_PAGE =
+    PageHelper.toPage(SHARED_COURSE_LIST, PAGEABLE);
   
   @Mock
   private SharedCourseRepository sharedCourseRepository;
@@ -159,8 +159,8 @@ public class SharedCourseServiceImplTest {
     when(sharedCourseRepository.findAllByBatch(BATCH, PAGEABLE)).thenReturn(
       SHARED_COURSE_PAGE);
     
-    Page<Course> expectedCoursePage = new PageImpl<>(
-      Collections.singletonList(COURSE), PAGEABLE, 1);
+    Page<Course> expectedCoursePage = PageHelper.toPage(
+      Collections.singletonList(COURSE), PAGEABLE);
     
     Page<Course> coursePage = sharedCourseService.getCoursesByBatchCode(
       BATCH_CODE, PAGEABLE);
@@ -177,13 +177,11 @@ public class SharedCourseServiceImplTest {
   public void testGivenBatchCodeWithNoSharedCoursesByGettingCoursesForBatchReturnEmptyPageOfCourse() {
     
     when(batchService.getBatchByCode(BATCH_CODE)).thenReturn(BATCH);
-    PageImpl<SharedCourse> sharedCoursePage = new PageImpl<>(
-      Collections.emptyList(), PAGEABLE, 0);
+    Page<SharedCourse> sharedCoursePage = PageHelper.empty(PAGEABLE);
     when(sharedCourseRepository.findAllByBatch(BATCH, PAGEABLE)).thenReturn(
       sharedCoursePage);
     
-    Page<Course> expectedCoursePage = new PageImpl<>(
-      Collections.emptyList(), PAGEABLE, 0);
+    Page<Course> expectedCoursePage = PageHelper.empty(PAGEABLE);
     
     Page<Course> coursePage = sharedCourseService.getCoursesByBatchCode(
       BATCH_CODE, PAGEABLE);
@@ -286,10 +284,10 @@ public class SharedCourseServiceImplTest {
       Stream.of(SHARED_COURSE));
     when(batchService.getBatchByCode(BATCH_CODE)).thenReturn(BATCH);
     when(sharedCourseRepository.save(SHARED_COURSE)).thenReturn(SHARED_COURSE);
-  
+    
     List<Course> createdCourseList = sharedCourseService.createCourseForBatch(
       COURSE_IDS, originBatchCode, BATCH_CODE);
-  
+    
     assertThat(createdCourseList).isNotEmpty();
     assertThat(createdCourseList).isEqualTo(COURSE_LIST);
     
