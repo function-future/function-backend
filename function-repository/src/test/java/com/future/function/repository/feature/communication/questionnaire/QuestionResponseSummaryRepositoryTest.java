@@ -17,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -101,13 +102,20 @@ public class QuestionResponseSummaryRepositoryTest {
   @Test
   public void
     testGivenQuestionnaireAndAppraiseeByFindingAllQuestionResponseSummaryReturnedListQuestionResponseSummary() {
-    List<QuestionResponseSummary> questionResponseSummaries =
-            questionResponseSummaryRepository
-                    .findAllByQuestionnaireAndAppraisee(questionnaire, appraisee);
+      List<QuestionResponseSummary> questionResponseSummaries =
+              questionResponseSummaryRepository
+                      .findAllByQuestionnaireAndAppraisee(questionnaire, appraisee);
 
-    assertThat(questionResponseSummaries.size()).isEqualTo(2);
-    assertThat(questionResponseSummaries.get(0).getId()).isEqualTo(ID_1);
-    assertThat(questionResponseSummaries.get(1).getId()).isEqualTo(ID_2);
+      assertThat(questionResponseSummaries.size()).isEqualTo(2);
+      assertThat(questionResponseSummaries.get(0).getId()).isEqualTo(ID_1);
+      assertThat(questionResponseSummaries.get(1).getId()).isEqualTo(ID_2);
   }
 
+  @Test
+  public void testGivenAppraiseeAndQuestionByFindingQuestionResponseSummaryReturnedQuestionResponseSummary() {
+    Optional<QuestionResponseSummary> questionResponseSummary =
+            questionResponseSummaryRepository.findAllByAppraiseeAndQuestion(appraisee,question1);
+
+    assertThat(questionResponseSummary.get().getId()).isEqualTo(ID_1);
+  }
 }
