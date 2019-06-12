@@ -7,6 +7,8 @@ import com.future.function.model.entity.feature.communication.chatting.Message;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.User;
+import com.future.function.service.api.feature.communication.MessageService;
+import com.future.function.service.api.feature.communication.MessageStatusService;
 import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
@@ -17,6 +19,9 @@ import com.future.function.web.model.response.feature.communication.chatting.Mes
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpStatus;
 
@@ -24,12 +29,13 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.*;
 
 /**
  * Author: priagung.satyagama
  * Created At: 10:25 AM 6/11/2019
  */
+@RunWith(MockitoJUnitRunner.class)
 public class ChatroomResponseMapperTest {
 
     private static final String MESSAGE_ID_1 = "messageId1";
@@ -97,6 +103,17 @@ public class ChatroomResponseMapperTest {
             .type(ChatroomType.GROUP)
             .build();
 
+    @Mock
+    private MessageService messageService;
+
+    @Mock
+    private MessageStatusService messageStatusService;
+
+    @After
+    public void tearDown() {
+        verifyNoMoreInteractions(messageService, messageStatusService);
+    }
+
     @Test
     public void testGivenChatroomByCallingToChatroomDetailDataReturnDataResponse() {
         DataResponse<ChatroomDetailResponse> data = ChatroomResponseMapper.toChatroomDetailDataResponse(CHATROOM);
@@ -111,16 +128,24 @@ public class ChatroomResponseMapperTest {
 
     @Test
     public void testGivenPagedChatroomAndMessageAndBooleanByCallingToPagingChatroomResponseReturnPaging() {
+
+        when(messageService.getLastMessage(CHATROOM_ID)).thenReturn(MESSAGE_1);
+        when(messageStatusService.getSeenStatus(CHATROOM_ID, MEMBER_ID_1)).thenReturn(IS_SEEN);
+
         PagingResponse<ChatroomResponse> data = ChatroomResponseMapper.toPagingChatroomResponse(
                 new PageImpl<>(Collections.singletonList(CHATROOM), PageHelper.toPageable(1, 1), 1),
-                MESSAGE_1,
-                IS_SEEN
+                messageService,
+                messageStatusService,
+                MEMBER_ID_1
         );
 
         assertThat(data).isNotNull();
         assertThat(data.getPaging().getPage()).isEqualTo(0);
         assertThat(data.getPaging().getSize()).isEqualTo(1);
         assertThat(data.getData().get(0).getId()).isEqualTo(CHATROOM_ID);
+
+        verify(messageService).getLastMessage(CHATROOM_ID);
+        verify(messageStatusService).getSeenStatus(CHATROOM_ID, MEMBER_ID_1);
     }
 
     @Test

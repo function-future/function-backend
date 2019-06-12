@@ -3,6 +3,9 @@ package com.future.function.web.mapper.response.communication;
 import com.future.function.model.entity.feature.communication.chatting.Chatroom;
 import com.future.function.model.entity.feature.communication.chatting.Message;
 import com.future.function.model.entity.feature.core.User;
+import com.future.function.service.api.feature.communication.ChatroomService;
+import com.future.function.service.api.feature.communication.MessageService;
+import com.future.function.service.api.feature.communication.MessageStatusService;
 import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.mapper.response.core.BatchResponseMapper;
@@ -11,6 +14,7 @@ import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.feature.communication.chatting.*;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 
@@ -72,22 +76,28 @@ public class ChatroomResponseMapper {
 
     private static List<ChatroomResponse> toChatroomResponseList(
             Page<Chatroom> data,
-            Message lastMessage,
-            boolean isSeen
+            MessageService messageService,
+            MessageStatusService messageStatusService,
+            String userId
     ) {
         return data.getContent()
                 .stream()
-                .map(content -> toChatroomResponse(content, lastMessage, isSeen))
+                .map(content -> toChatroomResponse(
+                        content,
+                        messageService.getLastMessage(content.getId()),
+                        messageStatusService.getSeenStatus(content.getId(), userId))
+                )
                 .collect(Collectors.toList());
     }
 
     public static PagingResponse<ChatroomResponse> toPagingChatroomResponse(
             Page<Chatroom> data,
-            Message lastMessage,
-            boolean isSeen
+            MessageService messageService,
+            MessageStatusService messageStatusService,
+            String userId
     ) {
         return ResponseHelper.toPagingResponse(
-                HttpStatus.OK, toChatroomResponseList(data, lastMessage, isSeen), PageHelper.toPaging(data));
+                HttpStatus.OK, toChatroomResponseList(data, messageService, messageStatusService, userId), PageHelper.toPaging(data));
     }
 
     private static LastMessageResponse toLastMessageResponse(Message message, boolean isSeen) {
