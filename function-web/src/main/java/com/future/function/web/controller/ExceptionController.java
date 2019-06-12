@@ -102,10 +102,29 @@ public class ExceptionController {
    * @return {@link com.future.function.web.model.response.base.BaseResponse}
    * - Response showing 'unsupported operation' message.
    */
-  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
   @ExceptionHandler(UnsupportedOperationException.class)
   public BaseResponse unsupportedOperationException(
     UnsupportedOperationException e
+  ) {
+    
+    log.error(e.getMessage(), e.getCause());
+    
+    return ResponseHelper.toBaseResponse(HttpStatus.BAD_REQUEST);
+  }
+  
+  /**
+   * Handles any {@link Throwable} exception thrown from controller/service.
+   *
+   * @param e Exception that is thrown.
+   *
+   * @return {@link com.future.function.web.model.response.base.BaseResponse}
+   * - Response showing 'exception' message.
+   */
+  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+  @ExceptionHandler(Throwable.class)
+  public BaseResponse genericException(
+    Throwable e
   ) {
     
     log.error(e.getMessage(), e.getCause());

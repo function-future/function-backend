@@ -74,4 +74,10 @@ public class BadController {
     throw new UnsupportedOperationException(MESSAGE, new Throwable());
   }
   
+  @GetMapping(value = "/throwable")
+  public String throwable() throws Throwable {
+    
+    throw new Throwable();
+  }
+  
 }
