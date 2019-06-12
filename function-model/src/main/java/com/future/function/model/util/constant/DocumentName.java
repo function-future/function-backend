@@ -27,4 +27,8 @@ public abstract class DocumentName {
   
   public static final String ACTIVITY_BLOG = "activity-blogs";
   
+  public static final String ACCESS = "accesses";
+  
+  public static final String MENU = "menus";
+  
 }

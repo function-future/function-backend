@@ -11,23 +11,25 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-import java.util.HashMap;
 import java.util.Map;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(collection = DocumentName.MENU)
-public class Menu {
+@Document(collection = DocumentName.ACCESS)
+public class Access {
   
   @Id
   private String id;
   
-  @Field(FieldName.Menu.ROLE)
+  @Field(FieldName.Access.URL_REGEX)
+  private String urlRegex;
+  
+  @Field(FieldName.Access.ROLE)
   private Role role;
   
-  @Field(FieldName.Menu.SECTIONS)
-  private Map<String, Object> sections = new HashMap<>();
+  @Field(FieldName.Access.COMPONENTS)
+  private Map<String, Object> components;
   
 }
