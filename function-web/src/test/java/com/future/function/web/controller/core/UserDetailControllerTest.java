@@ -3,6 +3,7 @@ package com.future.function.web.controller.core;
 import com.future.function.common.enumeration.core.Role;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.User;
+import com.future.function.service.api.feature.core.AccessService;
 import com.future.function.service.api.feature.core.MenuService;
 import com.future.function.service.api.feature.core.UserService;
 import com.future.function.web.TestHelper;
@@ -79,6 +80,9 @@ public class UserDetailControllerTest extends TestHelper {
   @MockBean
   private MenuService menuService;
   
+  @MockBean
+  private AccessService accessService;
+  
   @Override
   @Before
   public void setUp() {
@@ -89,7 +93,7 @@ public class UserDetailControllerTest extends TestHelper {
   @After
   public void tearDown() {
     
-    verifyNoMoreInteractions(userService, menuService);
+    verifyNoMoreInteractions(userService, menuService, accessService);
   }
   
   @Test
@@ -170,6 +174,59 @@ public class UserDetailControllerTest extends TestHelper {
                                   .getJson()));
     
     verify(menuService).getSectionsByRole(null);
+  }
+  
+  @Test
+  public void testGivenApiCallAndUrlAndLoggedInUserByGettingAccessListReturnMap()
+    throws Exception {
+    
+    super.setCookie(Role.JUDGE);
+    
+    String url = "url";
+    Map<String, Object> accessList = Collections.singletonMap("key", true);
+    when(accessService.getComponentsByUrlAndRole(url, Role.JUDGE)).thenReturn(
+      accessList);
+    
+    mockMvc.perform(get("/api/core/user/access-list").cookie(cookies)
+                      .param("url", url))
+      .andExpect(status().isOk())
+      .andExpect(content().json(mapJacksonTester.write(accessList)
+                                  .getJson()));
+    
+    verify(accessService).getComponentsByUrlAndRole(url, Role.JUDGE);
+  }
+  
+  @Test
+  public void testGivenApiCallAndUrlAndNotLoggedInUserByGettingAccessListReturnDefaultMap()
+    throws Exception {
+    
+    String url = "url";
+    Map<String, Object> defaultAccessList = Collections.emptyMap();
+    when(accessService.getComponentsByUrlAndRole(url, null)).thenReturn(
+      defaultAccessList);
+    
+    mockMvc.perform(get("/api/core/user/access-list").param("url", url))
+      .andExpect(status().isOk())
+      .andExpect(content().json(mapJacksonTester.write(defaultAccessList)
+                                  .getJson()));
+    
+    verify(accessService).getComponentsByUrlAndRole(url, null);
+  }
+  
+  @Test
+  public void testGivenApiCallAndNotLoggedInUserByGettingAccessListReturnDefaultMap()
+    throws Exception {
+    
+    Map<String, Object> defaultAccessList = Collections.emptyMap();
+    when(accessService.getComponentsByUrlAndRole("", null)).thenReturn(
+      defaultAccessList);
+    
+    mockMvc.perform(get("/api/core/user/access-list"))
+      .andExpect(status().isOk())
+      .andExpect(content().json(mapJacksonTester.write(defaultAccessList)
+                                  .getJson()));
+    
+    verify(accessService).getComponentsByUrlAndRole("", null);
   }
   
 }

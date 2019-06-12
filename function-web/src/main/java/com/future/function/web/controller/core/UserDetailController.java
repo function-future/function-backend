@@ -1,6 +1,7 @@
 package com.future.function.web.controller.core;
 
 import com.future.function.common.enumeration.core.Role;
+import com.future.function.service.api.feature.core.AccessService;
 import com.future.function.service.api.feature.core.MenuService;
 import com.future.function.service.api.feature.core.UserService;
 import com.future.function.session.annotation.WithAnyRole;
@@ -17,11 +18,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/core/user")
@@ -31,13 +32,17 @@ public class UserDetailController {
   
   private final MenuService menuService;
   
+  private final AccessService accessService;
+  
   @Autowired
   public UserDetailController(
-    UserService userService, MenuService menuService
+    UserService userService, MenuService menuService,
+    AccessService accessService
   ) {
     
     this.userService = userService;
     this.menuService = menuService;
+    this.accessService = accessService;
   }
   
   @ResponseStatus(HttpStatus.OK)
@@ -76,14 +81,19 @@ public class UserDetailController {
       Session session
   ) {
     
-    return menuService.getSectionsByRole(this.getRoleFromSession(session));
+    return menuService.getSectionsByRole(session.getRole());
   }
   
-  private Role getRoleFromSession(Session session) {
+  @ResponseStatus(HttpStatus.OK)
+  @GetMapping("/access-list")
+  public Map<String, Object> getAccessList(
+    @RequestParam(defaultValue = "")
+      String url,
+    @WithAnyRole(noUnauthorized = true)
+      Session session
+  ) {
     
-    return Optional.ofNullable(session)
-      .map(Session::getRole)
-      .orElse(null);
+    return accessService.getComponentsByUrlAndRole(url, session.getRole());
   }
   
 }
