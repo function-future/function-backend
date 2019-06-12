@@ -5,13 +5,14 @@ import java.util.stream.Stream;
 
 public enum ParticipantType {
   APPRAISER,
-  APPRAISEE;
+  APPRAISEE,
+  UNKNOWN;
 
   public static ParticipantType fromString(String type) {
     return Optional.of(type)
             .filter(ParticipantType::isNameEqualAnyType)
             .map(ParticipantType::valueOf)
-            .get();
+            .orElse(ParticipantType.UNKNOWN);
   }
 
   private static boolean isNameEqualAnyType(String name) {

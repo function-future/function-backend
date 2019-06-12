@@ -23,14 +23,11 @@ public abstract class DocumentName {
 
   public static final String STICKY_NOTE = "sticky-notes";
 
-
   public static final String QUESTIONNAIRE = "questionnaires";
 
   public static final String QUESTION = "questions";
 
   public static final String QUESTION_RESPONSE = "question-responses";
-
-  public static final String ANSWER = "answers";
 
   public static final String QUESTION_RESPONSE_SUMMARY = "question-response-summaries";
 
@@ -64,7 +61,6 @@ public abstract class DocumentName {
   public static final String MESSAGE = "messages";
 
   public static final String MESSAGE_STATUS = "message-status";
-
 
   public static final String DISCUSSION = "discussions";
   

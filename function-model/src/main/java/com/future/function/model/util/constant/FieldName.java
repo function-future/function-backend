@@ -133,16 +133,6 @@ public interface FieldName {
   }
 
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
-  abstract class Answer {
-
-    public static final String MIN = "minimum";
-
-    public static final String MAX = "maximum";
-
-    public static final String AVG = "average";
-  }
-
-  @NoArgsConstructor(access = AccessLevel.PRIVATE)
   abstract class QuestionResponseSummary {
 
     public static final String QUESTION = "question";

@@ -7,22 +7,16 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(collection = DocumentName.ANSWER)
 public class Answer {
 
-  @Id
   private String id;
 
-  @Field(FieldName.Answer.MIN)
-  private Float minimum;
+  private float minimum;
 
-  @Field(FieldName.Answer.MAX)
-  private Float maximum;
+  private float maximum;
 
-  @Field(FieldName.Answer.AVG)
-  private Float average;
+  private float average;
 }

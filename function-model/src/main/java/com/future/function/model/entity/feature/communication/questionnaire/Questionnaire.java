@@ -26,6 +26,6 @@ public class Questionnaire extends BaseEntity {
   private String description;
 
   @Field(FieldName.Questionnaire.START_DATE)
-  private Long startDate;
+  private long startDate;
 
 }
