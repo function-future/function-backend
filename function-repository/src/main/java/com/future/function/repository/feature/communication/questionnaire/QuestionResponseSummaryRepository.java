@@ -33,5 +33,4 @@ public interface QuestionResponseSummaryRepository extends MongoRepository<Quest
    */
   Optional<QuestionResponseSummary> findAllByAppraiseeAndQuestion(User appraisee, Question question);
 
-
 }
