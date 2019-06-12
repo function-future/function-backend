@@ -2,6 +2,7 @@ package com.future.function.service.impl.feature.communication.questionnaire;
 
 import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.communication.questionnaire.Questionnaire;
+import com.future.function.model.entity.feature.communication.questionnaire.QuestionnaireResponse;
 import com.future.function.repository.feature.communication.questionnaire.QuestionnaireRepository;
 import com.future.function.service.api.feature.communication.questionnaire.QuestionnaireService;
 import com.future.function.service.api.feature.core.UserService;
@@ -56,11 +57,21 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
 
   @Override
   public Questionnaire updateQuestionnaire(Questionnaire questionnaire) {
-    return null;
+    return Optional.of(questionnaire)
+            .map(Questionnaire::getId)
+            .map(questionnaireRepository::findOne)
+            .orElse(questionnaire);
   }
 
   @Override
   public void deleteQuestionnaire(String QuestionnaireId) {
+    Optional.ofNullable(QuestionnaireId)
+      .map(questionnaireRepository::findOne)
+      .ifPresent(this::deleteQuesionnaireHelper);
+  }
 
+  private void deleteQuesionnaireHelper(Questionnaire questionnaire) {
+    questionnaire.setDeleted(true);
+    questionnaireRepository.save(questionnaire);
   }
 }
