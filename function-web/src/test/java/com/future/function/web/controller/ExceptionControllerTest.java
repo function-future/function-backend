@@ -110,6 +110,11 @@ public class ExceptionControllerTest extends TestHelper {
       .andExpect(content().json(
         baseResponseJacksonTester.write(NOT_FOUND_RESPONSE)
           .getJson()));
+    mockMvc.perform(get("/no-handler"))
+      .andExpect(status().is4xxClientError())
+      .andExpect(content().json(
+        baseResponseJacksonTester.write(NOT_FOUND_RESPONSE)
+          .getJson()));
   }
   
   @Test
