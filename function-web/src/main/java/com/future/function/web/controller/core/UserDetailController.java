@@ -21,6 +21,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/core/user")
+@WithAnyRole(roles = {
+  Role.STUDENT, Role.MENTOR, Role.JUDGE, Role.ADMIN
+})
 public class UserDetailController {
   
   private final UserService userService;
@@ -34,10 +37,7 @@ public class UserDetailController {
   @ResponseStatus(HttpStatus.OK)
   @GetMapping("/profile")
   public DataResponse<UserWebResponse> getProfile(
-    @WithAnyRole(roles = {
-      Role.STUDENT, Role.MENTOR, Role.JUDGE, Role.ADMIN
-    })
-      Session session
+    Session session
   ) {
     
     return UserResponseMapper.toUserDataResponse(
@@ -47,10 +47,7 @@ public class UserDetailController {
   @ResponseStatus(HttpStatus.OK)
   @PostMapping("/password")
   public BaseResponse changePassword(
-    @WithAnyRole(roles = {
-      Role.STUDENT, Role.MENTOR, Role.JUDGE, Role.ADMIN
-    })
-      Session session,
+    Session session,
     @RequestBody
       ChangePasswordWebRequest request
   ) {

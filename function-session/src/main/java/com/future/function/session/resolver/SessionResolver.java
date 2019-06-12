@@ -41,9 +41,24 @@ public class SessionResolver implements HandlerMethodArgumentResolver {
   @Override
   public boolean supportsParameter(MethodParameter parameter) {
     
-    return Objects.nonNull(
-      parameter.getParameterAnnotation(WithAnyRole.class)) &&
-           Session.class.equals(parameter.getParameterType());
+    return this.isClassAnnotated(parameter) || this.isMethodAnnotated(
+      parameter) || this.isParameterAnnotated(parameter);
+  }
+  
+  private boolean isMethodAnnotated(MethodParameter parameter) {
+    
+    return Objects.nonNull(parameter.getMethodAnnotation(WithAnyRole.class));
+  }
+  
+  private boolean isClassAnnotated(MethodParameter parameter) {
+    
+    return Objects.nonNull(parameter.getContainingClass()
+                             .getAnnotation(WithAnyRole.class));
+  }
+  
+  private boolean isParameterAnnotated(MethodParameter parameter) {
+    
+    return Objects.nonNull(parameter.getParameterAnnotation(WithAnyRole.class));
   }
   
   @Override
@@ -63,8 +78,18 @@ public class SessionResolver implements HandlerMethodArgumentResolver {
     Session session, MethodParameter parameter
   ) {
     
-    WithAnyRole parameterAnnotation = parameter.getParameterAnnotation(
-      WithAnyRole.class);
+    WithAnyRole parameterAnnotation;
+    
+    if (isClassAnnotated(parameter)) {
+      parameterAnnotation = parameter.getContainingClass()
+        .getAnnotation(WithAnyRole.class);
+    } else if (isMethodAnnotated(parameter)) {
+      parameterAnnotation = parameter.getMethodAnnotation(WithAnyRole.class);
+    } else if (isParameterAnnotated(parameter)) {
+      parameterAnnotation = parameter.getParameterAnnotation(WithAnyRole.class);
+    } else {
+      return false;
+    }
     
     Role[] roles = parameterAnnotation.roles();
     

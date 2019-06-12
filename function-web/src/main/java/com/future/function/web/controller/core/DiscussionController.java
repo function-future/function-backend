@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping(value = "/api/core/batches/{batchCode}/courses/{courseId" +
                         "}/discussions")
+@WithAnyRole(roles = { Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT })
 public class DiscussionController {
   
   private final DiscussionService discussionService;
@@ -42,8 +43,7 @@ public class DiscussionController {
   @ResponseStatus(HttpStatus.OK)
   @GetMapping
   public PagingResponse<DiscussionWebResponse> getDiscussions(
-    @WithAnyRole(roles = { Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT })
-      Session session,
+    Session session,
     @PathVariable
       String batchCode,
     @PathVariable
@@ -63,8 +63,7 @@ public class DiscussionController {
   @ResponseStatus(HttpStatus.CREATED)
   @PostMapping
   public DataResponse<DiscussionWebResponse> createDiscussion(
-    @WithAnyRole(roles = { Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT })
-      Session session,
+    Session session,
     @PathVariable
       String batchCode,
     @PathVariable

@@ -3,7 +3,6 @@ package com.future.function.web.controller.core;
 import com.future.function.common.enumeration.core.Role;
 import com.future.function.service.api.feature.core.AnnouncementService;
 import com.future.function.session.annotation.WithAnyRole;
-import com.future.function.session.model.Session;
 import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.mapper.request.core.AnnouncementRequestMapper;
@@ -92,9 +91,8 @@ public class AnnouncementController {
    */
   @ResponseStatus(HttpStatus.CREATED)
   @PostMapping
+  @WithAnyRole(roles = Role.ADMIN)
   public DataResponse<AnnouncementWebResponse> createAnnouncement(
-    @WithAnyRole(roles = { Role.ADMIN })
-      Session session,
     @RequestBody
       AnnouncementWebRequest request
   ) {
@@ -116,9 +114,8 @@ public class AnnouncementController {
    */
   @ResponseStatus(HttpStatus.OK)
   @PutMapping(value = "/{announcementId}")
+  @WithAnyRole(roles = Role.ADMIN)
   public DataResponse<AnnouncementWebResponse> updateAnnouncement(
-    @WithAnyRole(roles = { Role.ADMIN })
-      Session session,
     @PathVariable
       String announcementId,
     @RequestBody
@@ -140,9 +137,8 @@ public class AnnouncementController {
    */
   @ResponseStatus(HttpStatus.OK)
   @DeleteMapping(value = "/{announcementId}")
+  @WithAnyRole(roles = Role.ADMIN)
   public BaseResponse deleteAnnouncement(
-    @WithAnyRole(roles = { Role.ADMIN })
-      Session session,
     @PathVariable
       String announcementId
   ) {

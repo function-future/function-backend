@@ -31,6 +31,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/core/files")
+@WithAnyRole(roles = { Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT })
 public class FileController {
   
   private final FileService fileService;
@@ -54,8 +55,6 @@ public class FileController {
   @ResponseStatus(HttpStatus.OK)
   @GetMapping(value = "/{parentId}")
   public PagingResponse<FileWebResponse> getFilesAndFolders(
-    @WithAnyRole(roles = { Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT })
-      Session session,
     @PathVariable
       String parentId,
     @RequestParam(defaultValue = "1")
@@ -74,8 +73,6 @@ public class FileController {
   @ResponseStatus(HttpStatus.OK)
   @GetMapping(value = "/{parentId}/{fileOrFolderId}")
   public DataResponse<FileWebResponse> getFileOrFolder(
-    @WithAnyRole(roles = { Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT })
-      Session session,
     @PathVariable
       String parentId,
     @PathVariable
@@ -92,8 +89,6 @@ public class FileController {
                consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
                produces = MediaType.APPLICATION_JSON_VALUE)
   public DataResponse<FileWebResponse> createFileOrFolder(
-    @WithAnyRole(roles = Role.ADMIN)
-      Session session,
     @PathVariable
       String parentId,
     @RequestParam(required = false)
@@ -118,8 +113,7 @@ public class FileController {
               consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
               produces = MediaType.APPLICATION_JSON_VALUE)
   public DataResponse<FileWebResponse> updateFileOrFolder(
-    @WithAnyRole(roles = { Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT })
-      Session session,
+    Session session,
     @PathVariable
       String parentId,
     @PathVariable
@@ -146,8 +140,7 @@ public class FileController {
   @ResponseStatus(HttpStatus.OK)
   @DeleteMapping("/{parentId}/{fileOrFolderId}")
   public BaseResponse deleteFileOrFolder(
-    @WithAnyRole(roles = { Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT })
-      Session session,
+    Session session,
     @PathVariable
       String parentId,
     @PathVariable

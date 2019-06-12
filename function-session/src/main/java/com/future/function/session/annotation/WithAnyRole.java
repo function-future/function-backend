@@ -8,7 +8,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.PARAMETER)
+@Target(value = { ElementType.TYPE, ElementType.METHOD, ElementType.PARAMETER })
 public @interface WithAnyRole {
   
   Role[] roles() default {};

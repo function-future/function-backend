@@ -54,10 +54,11 @@ public class SessionResolverTest {
   
   private MethodParameter sessionParameterWithRole;
   
-  private MethodParameter nonInjectedParameter;
+  private MethodParameter classLevelAnnotatedMethod;
+  
+  private MethodParameter methodLevelAnnotatedMethod;
   
   private MethodParameter nonAnnotatedParameter;
-  private MethodParameter incorrectlyAnnotatedParameter;
   
   private SessionResolver sessionResolver;
   
@@ -75,11 +76,11 @@ public class SessionResolverTest {
   @AfterClass
   public static void tearDownClass() {
     
-    int numberOfTestMethodInClass = 4;
+    int numberOfTestMethodInClass = 7;
     
     verify(redisTemplate, times(numberOfTestMethodInClass)).opsForValue();
     
-    verify(valueOperations, times(3)).get(COOKIE_VALUE);
+    verify(valueOperations, times(6)).get(COOKIE_VALUE);
     
     verifyNoMoreInteractions(redisTemplate, valueOperations);
   }
@@ -89,6 +90,18 @@ public class SessionResolverTest {
     
     sessionResolver = new SessionResolver(redisTemplate, sessionProperties);
     webRequest = new ServletWebRequest(servletRequest);
+    
+    Method methodWithClassLevelAnnotation = ReflectionUtils.findMethod(
+      ClassLevelAnnotatedClass.class, "methodOfClassLevelAnnotatedClass",
+      (Class<?>[]) null
+    );
+    classLevelAnnotatedMethod = new SynthesizingMethodParameter(
+      methodWithClassLevelAnnotation, 0);
+    
+    Method methodWithMethodLevelAnnotation = ReflectionUtils.findMethod(
+      this.getClass(), "methodOfMethodLevelAnnotated", (Class<?>[]) null);
+    methodLevelAnnotatedMethod = new SynthesizingMethodParameter(
+      methodWithMethodLevelAnnotation, 0);
     
     Method methodWithoutRole = ReflectionUtils.findMethod(
       this.getClass(), "sessionInjectedMethodWithoutRole", (Class<?>[]) null);
@@ -100,20 +113,10 @@ public class SessionResolverTest {
     sessionParameterWithRole = new SynthesizingMethodParameter(
       methodWithRole, 0);
     
-    Method nonInjectedMethod = ReflectionUtils.findMethod(
-      this.getClass(), "nonInjectedMethod", (Class<?>[]) null);
-    nonInjectedParameter = new SynthesizingMethodParameter(
-      nonInjectedMethod, 0);
-    
     Method nonAnnotatedMethod = ReflectionUtils.findMethod(
       this.getClass(), "nonAnnotatedMethod", (Class<?>[]) null);
     nonAnnotatedParameter = new SynthesizingMethodParameter(
       nonAnnotatedMethod, 0);
-    
-    Method incorrectlyAnnotatedMethod = ReflectionUtils.findMethod(
-      this.getClass(), "incorrectlyAnnotatedMethod", (Class<?>[]) null);
-    incorrectlyAnnotatedParameter = new SynthesizingMethodParameter(
-      incorrectlyAnnotatedMethod, 0);
     
     when(sessionProperties.getCookieName()).thenReturn(COOKIE_NAME);
     
@@ -132,15 +135,43 @@ public class SessionResolverTest {
   public void testGivenParameterByCheckingIfParameterIsSupportedReturnBoolean() {
     
     assertThat(
+      sessionResolver.supportsParameter(classLevelAnnotatedMethod)).isTrue();
+    assertThat(
+      sessionResolver.supportsParameter(methodLevelAnnotatedMethod)).isTrue();
+    assertThat(
       sessionResolver.supportsParameter(sessionParameterWithoutRole)).isTrue();
     assertThat(
       sessionResolver.supportsParameter(sessionParameterWithRole)).isTrue();
     assertThat(
-      sessionResolver.supportsParameter(nonInjectedParameter)).isFalse();
-    assertThat(
       sessionResolver.supportsParameter(nonAnnotatedParameter)).isFalse();
-    assertThat(
-      sessionResolver.supportsParameter(incorrectlyAnnotatedParameter)).isFalse();
+  }
+  
+  @Test
+  public void testGivenAnnotatedClassByInjectingValueToParameterReturnInjectedParameter()
+    throws Exception {
+    
+    when(valueOperations.get(COOKIE_VALUE)).thenReturn(SESSION);
+    
+    assertThat(sessionResolver.resolveArgument(classLevelAnnotatedMethod, null,
+                                               webRequest, null
+    )).isNotNull();
+    
+    verify(servletRequest).getCookies();
+    verify(sessionProperties).getCookieName();
+  }
+  
+  @Test
+  public void testGivenAnnotatedMethodByInjectingValueToParameterReturnInjectedParameter()
+    throws Exception {
+    
+    when(valueOperations.get(COOKIE_VALUE)).thenReturn(SESSION);
+    
+    assertThat(sessionResolver.resolveArgument(methodLevelAnnotatedMethod, null,
+                                               webRequest, null
+    )).isNotNull();
+    
+    verify(servletRequest).getCookies();
+    verify(sessionProperties).getCookieName();
   }
   
   @Test
@@ -191,6 +222,24 @@ public class SessionResolverTest {
     verify(sessionProperties).getCookieName();
   }
   
+  @Test
+  public void testGivenNonAnnotatedMethodByInjectingValueToParameterReturnUnauthorizedException() {
+    
+    when(valueOperations.get(COOKIE_VALUE)).thenReturn(SESSION);
+    
+    catchException(
+      () -> sessionResolver.resolveArgument(nonAnnotatedParameter, null,
+                                            webRequest, null
+      ));
+    
+    assertThat(caughtException().getClass()).isEqualTo(
+      UnauthorizedException.class);
+    assertThat(caughtException().getMessage()).isEqualTo("Invalid Role");
+    
+    verify(servletRequest).getCookies();
+    verify(sessionProperties).getCookieName();
+  }
+  
   @SuppressWarnings("unused")
   private void sessionInjectedMethodWithRole(
     @WithAnyRole(roles = Role.MENTOR)
@@ -204,17 +253,20 @@ public class SessionResolverTest {
   ) {}
   
   @SuppressWarnings("unused")
-  private void nonInjectedMethod(String string) {}
-  
-  @SuppressWarnings("unused")
   private void nonAnnotatedMethod(
-    Session session
+    String string
   ) {}
   
+  @WithAnyRole
   @SuppressWarnings("unused")
-  private void incorrectlyAnnotatedMethod(
-    @WithAnyRole
-      String string
-  ) {}
+  private void methodOfMethodLevelAnnotated() {}
+  
+  @WithAnyRole
+  class ClassLevelAnnotatedClass {
+    
+    @SuppressWarnings("unused")
+    public void methodOfClassLevelAnnotatedClass() {}
+    
+  }
   
 }
