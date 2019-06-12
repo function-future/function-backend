@@ -22,11 +22,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(classes = TestApplication.class)
 public class QuestionReponseRepositoryTest {
 
-  public static final String ID_1 ="id_1";
+  private static final String ID_1 ="id_1";
 
-  public static final String ID_2 ="id_2";
+  private static final String ID_2 ="id_2";
 
-  public static final String QUESTION_ID = "question_id";
+  private static final String QUESTION_ID = "question_id";
 
   private static final String ID_USER_1 = "id_user1";
 
