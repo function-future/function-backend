@@ -184,10 +184,9 @@ public class FileControllerTest extends TestHelper {
     when(fileRequestMapper.toFileWebRequest(JSON, ID.getBytes())).thenReturn(
       request);
     
-    when(
-      fileService.updateFileOrFolder(ADMIN_EMAIL, ID, PARENT_ID, "NAME", "NAME",
-                                     ID.getBytes()
-      )).thenReturn(FILE);
+    when(fileService.updateFileOrFolder(ADMIN_SESSION, ID, PARENT_ID, "NAME",
+                                        "NAME", ID.getBytes()
+    )).thenReturn(FILE);
     
     mockMvc.perform(put("/api/core/files/" + PARENT_ID + "/" + ID).cookie(
       cookies)
@@ -203,7 +202,7 @@ public class FileControllerTest extends TestHelper {
       any(MultipartFile.class));
     verify(fileRequestMapper).toFileWebRequest(JSON, ID.getBytes());
     verify(fileService).updateFileOrFolder(
-      ADMIN_EMAIL, ID, PARENT_ID, "NAME", "NAME", ID.getBytes());
+      ADMIN_SESSION, ID, PARENT_ID, "NAME", "NAME", ID.getBytes());
   }
   
   @Test
@@ -217,7 +216,7 @@ public class FileControllerTest extends TestHelper {
         baseResponseJacksonTester.write(OK_BASE_RESPONSE)
           .getJson()));
     
-    verify(fileService).deleteFileOrFolder(ADMIN_EMAIL, PARENT_ID, ID);
+    verify(fileService).deleteFileOrFolder(ADMIN_SESSION, PARENT_ID, ID);
     verifyZeroInteractions(multipartFileRequestMapper, fileRequestMapper);
   }
   

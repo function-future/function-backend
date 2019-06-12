@@ -1,6 +1,7 @@
 package com.future.function.service.impl.feature.core;
 
 import com.future.function.common.exception.NotFoundException;
+import com.future.function.common.exception.UnauthorizedException;
 import com.future.function.model.entity.feature.core.ActivityBlog;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.User;
@@ -54,7 +55,7 @@ public class ActivityBlogServiceImplTest {
     .email(EMAIL)
     .build();
   
-  private static final ActivityBlog ACTIVITY_BLOG = ActivityBlog.builder()
+  private ActivityBlog activityBlog = ActivityBlog.builder()
     .id(ID)
     .files(FILES)
     .user(USER)
@@ -73,7 +74,10 @@ public class ActivityBlogServiceImplTest {
   private ActivityBlogServiceImpl activityBlogService;
   
   @Before
-  public void setUp() {}
+  public void setUp() {
+    
+    activityBlog.setCreatedBy(EMAIL);
+  }
   
   @After
   public void tearDown() {
@@ -85,13 +89,13 @@ public class ActivityBlogServiceImplTest {
   @Test
   public void testGivenActivityBlogIdByFindingActivityBlogReturnActivityBlog() {
     
-    when(activityBlogRepository.findOne(ID)).thenReturn(ACTIVITY_BLOG);
+    when(activityBlogRepository.findOne(ID)).thenReturn(activityBlog);
     
     ActivityBlog retrievedActivityBlog = activityBlogService.getActivityBlog(
       ID);
     
     assertThat(retrievedActivityBlog).isNotNull();
-    assertThat(retrievedActivityBlog).isEqualTo(ACTIVITY_BLOG);
+    assertThat(retrievedActivityBlog).isEqualTo(activityBlog);
     
     verify(activityBlogRepository).findOne(ID);
     verifyZeroInteractions(resourceService, userService);
@@ -116,7 +120,7 @@ public class ActivityBlogServiceImplTest {
   public void testGivenPageableByFindingActivityBlogsReturnPageOfActivityBlog() {
     
     Page<ActivityBlog> activityBlogPage = PageHelper.toPage(
-      Collections.singletonList(ACTIVITY_BLOG), PAGEABLE);
+      Collections.singletonList(activityBlog), PAGEABLE);
     when(activityBlogRepository.findAll("", "", PAGEABLE)).thenReturn(
       activityBlogPage);
     
@@ -150,7 +154,7 @@ public class ActivityBlogServiceImplTest {
   @Test
   public void testGivenEmailAndActivityBlogIdByDeletingActivityBlogReturnSuccessfulDeletion() {
     
-    when(activityBlogRepository.findOne(ID)).thenReturn(ACTIVITY_BLOG);
+    when(activityBlogRepository.findOne(ID)).thenReturn(activityBlog);
     when(resourceService.markFilesUsed(Collections.singletonList(FILE_ID),
                                        false
     )).thenReturn(true);
@@ -161,7 +165,7 @@ public class ActivityBlogServiceImplTest {
     verify(resourceService).markFilesUsed(Collections.singletonList(FILE_ID),
                                           false
     );
-    verify(activityBlogRepository).delete(ACTIVITY_BLOG);
+    verify(activityBlogRepository).delete(activityBlog);
     verifyZeroInteractions(userService);
   }
   
@@ -177,23 +181,39 @@ public class ActivityBlogServiceImplTest {
   }
   
   @Test
+  public void testGivenEmailAndInvalidUserByDeletingActivityBlogsReturnUnauthorizedException() {
+    
+    when(activityBlogRepository.findOne(ID)).thenReturn(activityBlog);
+    
+    catchException(
+      () -> activityBlogService.deleteActivityBlog(EMAIL + "2", ID));
+    
+    assertThat(caughtException().getClass()).isEqualTo(
+      UnauthorizedException.class);
+    assertThat(caughtException().getMessage()).isEqualTo("Invalid User Email");
+    
+    verify(activityBlogRepository).findOne(ID);
+    verifyZeroInteractions(resourceService, userService);
+  }
+  
+  @Test
   public void testGivenActivityBlogDataByCreatingActivityBlogReturnCreatedActivityBlog() {
     
     when(userService.getUserByEmail(EMAIL)).thenReturn(USER);
     when(resourceService.getFile(FILE_ID)).thenReturn(FILE_V2);
     when(resourceService.markFilesUsed(FILE_IDS, true)).thenReturn(true);
-    when(activityBlogRepository.save(ACTIVITY_BLOG)).thenReturn(ACTIVITY_BLOG);
+    when(activityBlogRepository.save(activityBlog)).thenReturn(activityBlog);
     
     ActivityBlog createdActivityBlog = activityBlogService.createActivityBlog(
-      ACTIVITY_BLOG);
+      activityBlog);
     
     assertThat(createdActivityBlog).isNotNull();
-    assertThat(createdActivityBlog).isEqualTo(ACTIVITY_BLOG);
+    assertThat(createdActivityBlog).isEqualTo(activityBlog);
     
     verify(userService).getUserByEmail(EMAIL);
     verify(resourceService).getFile(FILE_ID);
     verify(resourceService).markFilesUsed(FILE_IDS, true);
-    verify(activityBlogRepository).save(ACTIVITY_BLOG);
+    verify(activityBlogRepository).save(activityBlog);
   }
   
   @Test
@@ -202,9 +222,9 @@ public class ActivityBlogServiceImplTest {
     when(userService.getUserByEmail(EMAIL)).thenReturn(USER);
     when(resourceService.getFile(FILE_ID)).thenReturn(FILE_V2);
     when(resourceService.markFilesUsed(FILE_IDS, true)).thenReturn(true);
-    when(activityBlogRepository.save(ACTIVITY_BLOG)).thenReturn(null);
+    when(activityBlogRepository.save(activityBlog)).thenReturn(null);
     
-    catchException(() -> activityBlogService.createActivityBlog(ACTIVITY_BLOG));
+    catchException(() -> activityBlogService.createActivityBlog(activityBlog));
     
     assertThat(caughtException().getClass()).isEqualTo(
       UnsupportedOperationException.class);
@@ -214,29 +234,29 @@ public class ActivityBlogServiceImplTest {
     verify(userService).getUserByEmail(EMAIL);
     verify(resourceService).getFile(FILE_ID);
     verify(resourceService).markFilesUsed(FILE_IDS, true);
-    verify(activityBlogRepository).save(ACTIVITY_BLOG);
+    verify(activityBlogRepository).save(activityBlog);
   }
   
   @Test
   public void testGivenActivityBlogDataByUpdatingActivityBlogReturnUpdatedActivityBlog() {
     
-    when(activityBlogRepository.findOne(ID)).thenReturn(ACTIVITY_BLOG);
+    when(activityBlogRepository.findOne(ID)).thenReturn(activityBlog);
     when(resourceService.markFilesUsed(FILE_IDS, false)).thenReturn(true);
     when(resourceService.getFile(FILE_ID)).thenReturn(FILE_V2);
     when(resourceService.markFilesUsed(FILE_IDS, true)).thenReturn(true);
-    when(activityBlogRepository.save(ACTIVITY_BLOG)).thenReturn(ACTIVITY_BLOG);
+    when(activityBlogRepository.save(activityBlog)).thenReturn(activityBlog);
     
     ActivityBlog updatedActivityBlog = activityBlogService.updateActivityBlog(
-      ACTIVITY_BLOG);
+      activityBlog);
     
     assertThat(updatedActivityBlog).isNotNull();
-    assertThat(updatedActivityBlog).isEqualTo(ACTIVITY_BLOG);
+    assertThat(updatedActivityBlog).isEqualTo(activityBlog);
     
     verify(activityBlogRepository).findOne(ID);
     verify(resourceService).markFilesUsed(FILE_IDS, false);
     verify(resourceService).getFile(FILE_ID);
     verify(resourceService).markFilesUsed(FILE_IDS, true);
-    verify(activityBlogRepository).save(ACTIVITY_BLOG);
+    verify(activityBlogRepository).save(activityBlog);
     verifyZeroInteractions(userService);
   }
   
@@ -246,33 +266,33 @@ public class ActivityBlogServiceImplTest {
     when(activityBlogRepository.findOne(ID)).thenReturn(null);
     
     ActivityBlog updatedActivityBlog = activityBlogService.updateActivityBlog(
-      ACTIVITY_BLOG);
+      activityBlog);
     
     assertThat(updatedActivityBlog).isNotNull();
-    assertThat(updatedActivityBlog).isEqualTo(ACTIVITY_BLOG);
+    assertThat(updatedActivityBlog).isEqualTo(activityBlog);
     
     verify(activityBlogRepository).findOne(ID);
     verifyZeroInteractions(resourceService, userService);
   }
   
   @Test
-  public void testGivenActivityBlogDataAndInvalidUserByUpdatingActivityBlogReturnRequestActivityBlogObject() {
+  public void testGivenActivityBlogDataAndInvalidUserByUpdatingActivityBlogReturnUnauthorizedException() {
     
-    when(activityBlogRepository.findOne(ID)).thenReturn(ACTIVITY_BLOG);
+    when(activityBlogRepository.findOne(ID)).thenReturn(activityBlog);
     
     ActivityBlog activityBlog = new ActivityBlog();
-    BeanUtils.copyProperties(ACTIVITY_BLOG, activityBlog);
+    BeanUtils.copyProperties(this.activityBlog, activityBlog);
     
     User user = User.builder()
       .email(EMAIL + "2")
       .build();
     activityBlog.setUser(user);
     
-    ActivityBlog updatedActivityBlog = activityBlogService.updateActivityBlog(
-      activityBlog);
+    catchException(() -> activityBlogService.updateActivityBlog(activityBlog));
     
-    assertThat(updatedActivityBlog).isNotNull();
-    assertThat(updatedActivityBlog).isEqualTo(activityBlog);
+    assertThat(caughtException().getClass()).isEqualTo(
+      UnauthorizedException.class);
+    assertThat(caughtException().getMessage()).isEqualTo("Invalid User Email");
     
     verify(activityBlogRepository).findOne(ID);
     verifyZeroInteractions(resourceService, userService);

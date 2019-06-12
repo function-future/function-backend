@@ -1,11 +1,13 @@
 package com.future.function.service.impl.feature.core;
 
 import com.future.function.common.enumeration.core.FileOrigin;
+import com.future.function.common.enumeration.core.Role;
 import com.future.function.common.exception.NotFoundException;
 import com.future.function.common.properties.core.FileProperties;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.repository.feature.core.FileRepositoryV2;
 import com.future.function.service.api.feature.core.ResourceService;
+import com.future.function.session.model.Session;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,22 +40,25 @@ public class FileServiceImplTest {
   
   private static final String PARENT_ID = "parent-id";
   
-  private static final FileV2 FILE = FileV2.builder()
+  private static final String EMAIL = "email";
+  
+  private static final Pageable PAGEABLE = new PageRequest(0, 5);
+  
+  private static final String ROOT = "root";
+  
+  private static final String NAME = "name";
+  
+  private static final Session SESSION = new Session("session-id", EMAIL,
+                                                     Role.ADMIN
+  );
+  
+  private FileV2 file = FileV2.builder()
     .id(ID)
     .parentId(PARENT_ID)
     .markFolder(false)
     .build();
   
-  private static final Pageable PAGEABLE = new PageRequest(0, 5);
-  
-  private static final Page<FileV2> PAGE = new PageImpl<>(
-    Collections.singletonList(FILE), PAGEABLE, 1);
-  
-  private static final String ROOT = "root";
-  
-  private static final String EMAIL = "email";
-  
-  private static final String NAME = "name";
+  private Page<FileV2> page;
   
   @Mock
   private FileRepositoryV2 fileRepository;
@@ -68,7 +73,10 @@ public class FileServiceImplTest {
   private FileServiceImpl fileService;
   
   @Before
-  public void setUp() {}
+  public void setUp() {
+    
+    file.setCreatedBy(EMAIL);
+  }
   
   @After
   public void tearDown() {
@@ -80,12 +88,12 @@ public class FileServiceImplTest {
   public void testGivenFileOrFolderIdAndParentIdByGettingFileOrFolderReturnFileOrFolder() {
     
     when(fileRepository.findByIdAndParentId(ID, PARENT_ID)).thenReturn(
-      Optional.of(FILE));
+      Optional.of(file));
     
     FileV2 file = fileService.getFileOrFolder(ID, PARENT_ID);
     
     assertThat(file).isNotNull();
-    assertThat(file).isEqualTo(FILE);
+    assertThat(file).isEqualTo(this.file);
     
     verify(fileRepository).findByIdAndParentId(ID, PARENT_ID);
     verifyZeroInteractions(resourceService, fileProperties);
@@ -110,14 +118,16 @@ public class FileServiceImplTest {
   @Test
   public void testGivenParentIdAndPageableByGettingFilesOrFoldersReturnPageOfFile() {
     
+    page = new PageImpl<>(Collections.singletonList(file), PAGEABLE, 1);
+    
     when(
       fileRepository.findAllByParentIdAndAsResourceFalseOrderByMarkFolderDesc(
-        PARENT_ID, PAGEABLE)).thenReturn(PAGE);
+        PARENT_ID, PAGEABLE)).thenReturn(page);
     
     Page<FileV2> page = fileService.getFilesAndFolders(PARENT_ID, PAGEABLE);
     
     assertThat(page).isNotNull();
-    assertThat(page).isEqualTo(PAGE);
+    assertThat(page).isEqualTo(this.page);
     
     verify(
       fileRepository).findAllByParentIdAndAsResourceFalseOrderByMarkFolderDesc(
@@ -129,13 +139,13 @@ public class FileServiceImplTest {
     
     when(fileProperties.getRootId()).thenReturn(ROOT);
     when(fileRepository.findByIdAndParentId(ID, PARENT_ID)).thenReturn(
-      Optional.of(FILE));
+      Optional.of(file));
     when(fileRepository.findAllByParentId(ID)).thenReturn(Stream.empty());
     when(resourceService.markFilesUsed(Collections.singletonList(ID),
                                        false
     )).thenReturn(true);
     
-    fileService.deleteFileOrFolder(EMAIL, PARENT_ID, ID);
+    fileService.deleteFileOrFolder(SESSION, PARENT_ID, ID);
     
     verify(fileProperties).getRootId();
     verify(fileRepository).findByIdAndParentId(ID, PARENT_ID);
@@ -148,7 +158,7 @@ public class FileServiceImplTest {
     
     when(fileProperties.getRootId()).thenReturn(ROOT);
     
-    fileService.deleteFileOrFolder(EMAIL, PARENT_ID, ROOT);
+    fileService.deleteFileOrFolder(SESSION, PARENT_ID, ROOT);
     
     verify(fileProperties).getRootId();
     verifyZeroInteractions(fileRepository, resourceService);
@@ -219,24 +229,24 @@ public class FileServiceImplTest {
   public void testGivenMethodCallAndNonEmptyByteArrayByUpdatingFileOrFolderReturnUpdatedFile() {
     
     when(fileRepository.findByIdAndParentId(ID, PARENT_ID)).thenReturn(
-      Optional.of(FILE));
+      Optional.of(file));
     when(resourceService.storeFile(ID, PARENT_ID, NAME, NAME, NAME.getBytes(),
                                    FileOrigin.FILE
-    )).thenReturn(FILE);
-    when(fileRepository.findOne(ID)).thenReturn(FILE);
-    when(fileRepository.save(FILE)).thenReturn(FILE);
+    )).thenReturn(file);
+    when(fileRepository.findOne(ID)).thenReturn(file);
+    when(fileRepository.save(file)).thenReturn(file);
     
     FileV2 updatedFile = fileService.updateFileOrFolder(
-      EMAIL, ID, PARENT_ID, NAME, NAME, NAME.getBytes());
+      SESSION, ID, PARENT_ID, NAME, NAME, NAME.getBytes());
     
     assertThat(updatedFile).isNotNull();
-    assertThat(updatedFile).isEqualTo(FILE);
+    assertThat(updatedFile).isEqualTo(file);
     
     verify(fileRepository).findByIdAndParentId(ID, PARENT_ID);
     verify(resourceService).storeFile(
       ID, PARENT_ID, NAME, NAME, NAME.getBytes(), FileOrigin.FILE);
     verify(fileRepository).findOne(ID);
-    verify(fileRepository).save(FILE);
+    verify(fileRepository).save(file);
     verifyZeroInteractions(fileProperties);
   }
   
@@ -256,7 +266,7 @@ public class FileServiceImplTest {
     when(fileRepository.save(folder)).thenReturn(folder);
     
     FileV2 updatedFolder = fileService.updateFileOrFolder(
-      EMAIL, folder.getId(), PARENT_ID, NAME, NAME, new byte[] {});
+      SESSION, folder.getId(), PARENT_ID, NAME, NAME, new byte[] {});
     
     assertThat(updatedFolder).isNotNull();
     assertThat(updatedFolder).isEqualTo(folder);

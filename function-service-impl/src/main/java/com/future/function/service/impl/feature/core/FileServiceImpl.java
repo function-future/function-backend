@@ -7,8 +7,10 @@ import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.repository.feature.core.FileRepositoryV2;
 import com.future.function.service.api.feature.core.FileService;
 import com.future.function.service.api.feature.core.ResourceService;
+import com.future.function.service.impl.helper.AuthorizationHelper;
 import com.future.function.service.impl.helper.CopyHelper;
 import com.future.function.service.impl.helper.PageHelper;
+import com.future.function.session.model.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -130,7 +132,7 @@ public class FileServiceImpl implements FileService {
   /**
    * {@inheritDoc}
    *
-   * @param email          Email of current user.
+   * @param session        Current user's session.
    * @param fileOrFolderId Id of file/folder to-be-updated.
    * @param parentId       Id of parent of file/folder.
    * @param objectName     Name of file, to be stored as object's name.
@@ -141,7 +143,7 @@ public class FileServiceImpl implements FileService {
    */
   @Override
   public FileV2 updateFileOrFolder(
-    String email, String fileOrFolderId, String parentId, String objectName,
+    Session session, String fileOrFolderId, String parentId, String objectName,
     String fileName, byte[] bytes
   ) {
     
@@ -149,27 +151,35 @@ public class FileServiceImpl implements FileService {
     
     return Optional.of(fileV2)
       .filter(file -> !file.isMarkFolder())
-      .map(file -> this.updateFile(file, email, fileOrFolderId, parentId,
+      .map(file -> this.updateFile(file, session, fileOrFolderId, parentId,
                                    objectName, fileName, bytes
       ))
-      .orElseGet(() -> this.updateFolder(email, fileV2));
+      .orElseGet(() -> this.updateFolder(session, fileV2));
   }
   
-  private FileV2 updateFolder(String email, FileV2 fileV2) {
+  private FileV2 updateFolder(Session session, FileV2 fileV2) {
     
     return Optional.of(fileV2)
-      //      .filter(file -> email.equals(file.getCreatedBy()))
+      .filter(
+        file -> AuthorizationHelper.isAuthorizedForEdit(session.getEmail(),
+                                                        session.getRole(), file,
+                                                        AuthorizationHelper.AUTHENTICATED_ONLY
+        ))
       .map(fileRepositoryV2::save)
       .orElse(fileV2);
   }
   
   private FileV2 updateFile(
-    FileV2 fileV2, String email, String fileOrFolderId, String parentId,
+    FileV2 fileV2, Session session, String fileOrFolderId, String parentId,
     String objectName, String fileName, byte[] bytes
   ) {
     
     return Optional.of(fileV2)
-      //      .filter(file -> email.equals(file.getCreatedBy()))
+      .filter(
+        file -> AuthorizationHelper.isAuthorizedForEdit(session.getEmail(),
+                                                        session.getRole(), file,
+                                                        AuthorizationHelper.AUTHENTICATED_ONLY
+        ))
       .map(ignored -> resourceService.storeFile(fileOrFolderId, parentId,
                                                 objectName, fileName, bytes,
                                                 FileOrigin.FILE
@@ -185,18 +195,23 @@ public class FileServiceImpl implements FileService {
   /**
    * {@inheritDoc}
    *
-   * @param email        Email of current user.
+   * @param session      Current user's session.
+   * @param parentId     Id of parent of file/folder.
    * @param fileFolderId Id of file/folder to be deleted.
    */
   @Override
   public void deleteFileOrFolder(
-    String email, String parentId, String fileFolderId
+    Session session, String parentId, String fileFolderId
   ) {
     
     Optional.ofNullable(fileFolderId)
       .filter(id -> !id.equalsIgnoreCase(fileProperties.getRootId()))
       .flatMap(id -> fileRepositoryV2.findByIdAndParentId(id, parentId))
-      //      .filter(file -> email.equalsIgnoreCase(file.getCreatedBy()))
+      .filter(
+        file -> AuthorizationHelper.isAuthorizedForEdit(session.getEmail(),
+                                                        session.getRole(), file,
+                                                        AuthorizationHelper.AUTHENTICATED_ONLY
+        ))
       .ifPresent(
         file -> resourceService.markFilesUsed(this.getListOfIdToBeMarked(file),
                                               false

@@ -84,11 +84,9 @@ public class StickyNoteController {
       StickyNoteWebRequest request
   ) {
     
-    return StickyNoteResponseMapper.toStickyNoteDataResponse(HttpStatus.CREATED,
-                                                             stickyNoteService.createStickyNote(
-                                                               stickyNoteRequestMapper.toStickyNote(
-                                                                 request))
-    );
+    return StickyNoteResponseMapper.toStickyNoteDataResponse(
+      HttpStatus.CREATED, stickyNoteService.createStickyNote(
+        stickyNoteRequestMapper.toStickyNote(request)));
   }
   
 }

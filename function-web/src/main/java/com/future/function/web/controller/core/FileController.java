@@ -118,7 +118,7 @@ public class FileController {
               consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
               produces = MediaType.APPLICATION_JSON_VALUE)
   public DataResponse<FileWebResponse> updateFileOrFolder(
-    @WithAnyRole(roles = Role.ADMIN)
+    @WithAnyRole(roles = { Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT })
       Session session,
     @PathVariable
       String parentId,
@@ -137,9 +137,9 @@ public class FileController {
       data, pair.getSecond());
     
     return FileResponseMapper.toFileDataResponse(
-      fileService.updateFileOrFolder(session.getEmail(), fileOrFolderId,
-                                     parentId, request.getName(),
-                                     pair.getFirst(), pair.getSecond()
+      fileService.updateFileOrFolder(session, fileOrFolderId, parentId,
+                                     request.getName(), pair.getFirst(),
+                                     pair.getSecond()
       ));
   }
   
@@ -154,8 +154,7 @@ public class FileController {
       String fileOrFolderId
   ) {
     
-    fileService.deleteFileOrFolder(
-      session.getEmail(), parentId, fileOrFolderId);
+    fileService.deleteFileOrFolder(session, parentId, fileOrFolderId);
     return ResponseHelper.toBaseResponse(HttpStatus.OK);
   }
   
