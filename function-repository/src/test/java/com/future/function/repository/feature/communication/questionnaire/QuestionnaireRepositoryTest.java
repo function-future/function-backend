@@ -78,7 +78,6 @@ public class QuestionnaireRepositoryTest {
 
     assertThat(questionnaire1.get().getId()).isEqualTo(ID_1);
     assertThat(questionnaire2.get().getId()).isEqualTo(ID_2);
-
   }
 
   @Test

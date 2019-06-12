@@ -1,5 +1,6 @@
 package com.future.function.repository.feature.communication.questionnaire;
 
+import com.future.function.model.entity.feature.communication.questionnaire.Answer;
 import com.future.function.model.entity.feature.communication.questionnaire.Question;
 import com.future.function.model.entity.feature.communication.questionnaire.QuestionResponseSummary;
 import com.future.function.model.entity.feature.communication.questionnaire.Questionnaire;
@@ -24,8 +25,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = TestApplication.class)
 public class QuestionResponseSummaryRepositoryTest {
-
-  private static final Pageable PAGEABLE = new PageRequest(0,10);
 
   private static final String ID_1 = "id_1";
 
@@ -55,6 +54,12 @@ public class QuestionResponseSummaryRepositoryTest {
           .id(QUESTIONNAIRE_ID)
           .build();
 
+  private static final String ANSWER_ID = "answer_Id";
+
+  private Answer answer = Answer.builder()
+          .id(ANSWER_ID)
+          .build();
+
   @Autowired
   private QuestionResponseSummaryRepository questionResponseSummaryRepository;
 
@@ -74,6 +79,7 @@ public class QuestionResponseSummaryRepositoryTest {
             .appraisee(appraisee)
             .question(question1)
             .questionnaire(questionnaire)
+            .scoreSummary(answer)
             .build();
 
     QuestionResponseSummary qRS2 = QuestionResponseSummary.builder()
@@ -117,5 +123,6 @@ public class QuestionResponseSummaryRepositoryTest {
             questionResponseSummaryRepository.findAllByAppraiseeAndQuestion(appraisee,question1);
 
     assertThat(questionResponseSummary.get().getId()).isEqualTo(ID_1);
+    assertThat(questionResponseSummary.get().getScoreSummary().getId()).isEqualTo(ANSWER_ID);
   }
 }

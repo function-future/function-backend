@@ -37,7 +37,7 @@ public class QuestionnaireResponse extends BaseEntity {
 
   @Field(FieldName.QuestionnaireResponse.SCORE_SUMMARY)
   @DBRef
-  private Answer score_summary;
+  private Answer scoreSummary;
 
   @Field(FieldName.QuestionnaireResponse.DETAILS)
   @DBRef(lazy = true)
