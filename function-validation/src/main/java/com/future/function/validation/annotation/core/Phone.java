@@ -19,7 +19,7 @@ import java.lang.annotation.Target;
 @Target({ ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Phone {
-  
+
   /**
    * Default message returned when a String field does not fulfill the
    * required values.
@@ -27,9 +27,9 @@ public @interface Phone {
    * @return {@code String} - The name of this annotation.
    */
   String message() default "Phone";
-  
+
   Class<?>[] groups() default {};
-  
+
   Class<? extends Payload>[] payload() default {};
-  
+
 }

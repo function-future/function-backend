@@ -1,6 +1,6 @@
 package com.future.function.validation.validator.core;
 
-import com.future.function.service.api.feature.core.ResourceService;
+import com.future.function.repository.feature.core.FileRepositoryV2;
 import com.future.function.validation.annotation.core.FileMustExist;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -15,7 +15,7 @@ public class FileMustExistValidator
   implements ConstraintValidator<FileMustExist, List<String>> {
   
   @Autowired
-  private ResourceService resourceService;
+  private FileRepositoryV2 fileRepositoryV2;
   
   @Override
   public void initialize(FileMustExist constraintAnnotation) {
@@ -30,7 +30,7 @@ public class FileMustExistValidator
     return Optional.ofNullable(value)
       .orElseGet(Collections::emptyList)
       .stream()
-      .map(resourceService::getFile)
+      .map(fileRepositoryV2::findOne)
       .allMatch(Objects::nonNull);
   }
   

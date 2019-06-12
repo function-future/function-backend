@@ -21,9 +21,7 @@ public class FileMongoEventListenerTest {
   private FileRepositoryV2 fileRepository;
   
   @Before
-  public void setUp() {
-  
-  }
+  public void setUp() {}
   
   @After
   public void tearDown() {
