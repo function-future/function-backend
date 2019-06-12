@@ -76,11 +76,11 @@ public class SessionResolverTest {
   @AfterClass
   public static void tearDownClass() {
     
-    int numberOfTestMethodInClass = 7;
+    int numberOfTestMethodInClass = 8;
     
     verify(redisTemplate, times(numberOfTestMethodInClass)).opsForValue();
     
-    verify(valueOperations, times(6)).get(COOKIE_VALUE);
+    verify(valueOperations, times(7)).get(COOKIE_VALUE);
     
     verifyNoMoreInteractions(redisTemplate, valueOperations);
   }
@@ -223,6 +223,21 @@ public class SessionResolverTest {
   }
   
   @Test
+  public void testGivenParameterWithoutRoleAndNoUnauthorizedByInjectingValueToParameterReturnInjectedParameter()
+    throws Exception {
+    
+    when(valueOperations.get(COOKIE_VALUE)).thenReturn(null);
+    
+    assertThat(
+      sessionResolver.resolveArgument(sessionParameterWithoutRole, null,
+                                      webRequest, null
+      )).isNotNull();
+    
+    verify(servletRequest).getCookies();
+    verify(sessionProperties).getCookieName();
+  }
+  
+  @Test
   public void testGivenNonAnnotatedMethodByInjectingValueToParameterReturnUnauthorizedException() {
     
     when(valueOperations.get(COOKIE_VALUE)).thenReturn(SESSION);
@@ -248,7 +263,7 @@ public class SessionResolverTest {
   
   @SuppressWarnings("unused")
   private void sessionInjectedMethodWithoutRole(
-    @WithAnyRole
+    @WithAnyRole(noUnauthorized = true)
       Session session
   ) {}
   

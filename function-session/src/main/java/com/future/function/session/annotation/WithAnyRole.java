@@ -13,4 +13,6 @@ public @interface WithAnyRole {
   
   Role[] roles() default {};
   
+  boolean noUnauthorized() default false;
+  
 }

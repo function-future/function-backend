@@ -67,28 +67,25 @@ public class SessionResolver implements HandlerMethodArgumentResolver {
     NativeWebRequest webRequest, WebDataBinderFactory binderFactory
   ) throws Exception {
     
+    WithAnyRole parameterAnnotation = this.getParameterAnnotation(parameter);
+    
     return Optional.ofNullable(webRequest)
       .map(this::getCookies)
-      .map(this::getSession)
-      .filter(session -> this.isUserOfValidRole(session, parameter))
+      .map(cookies -> this.getSession(cookies, parameterAnnotation))
+      .filter(session -> this.isUserOfValidRole(session, parameterAnnotation))
       .orElseThrow(() -> new UnauthorizedException("Invalid Role"));
   }
   
   private boolean isUserOfValidRole(
-    Session session, MethodParameter parameter
+    Session session, WithAnyRole parameterAnnotation
   ) {
     
-    WithAnyRole parameterAnnotation;
-    
-    if (isClassAnnotated(parameter)) {
-      parameterAnnotation = parameter.getContainingClass()
-        .getAnnotation(WithAnyRole.class);
-    } else if (isMethodAnnotated(parameter)) {
-      parameterAnnotation = parameter.getMethodAnnotation(WithAnyRole.class);
-    } else if (isParameterAnnotated(parameter)) {
-      parameterAnnotation = parameter.getParameterAnnotation(WithAnyRole.class);
-    } else {
+    if (Objects.isNull(parameterAnnotation)) {
       return false;
+    }
+    
+    if (parameterAnnotation.noUnauthorized()) {
+      return true;
     }
     
     Role[] roles = parameterAnnotation.roles();
@@ -101,10 +98,22 @@ public class SessionResolver implements HandlerMethodArgumentResolver {
       .anyMatch(role -> role.equals(session.getRole()));
   }
   
-  private Session getSession(Cookie[] cookies) {
+  private Session getSession(
+    Cookie[] cookies, WithAnyRole parameterAnnotation
+  ) {
     
     return this.getCustomCookieValue(cookies)
       .map(valueOperations::get)
+      .orElseGet(() -> this.returnEmptySessionOrException(parameterAnnotation));
+  }
+  
+  private Session returnEmptySessionOrException(
+    WithAnyRole parameterAnnotation
+  ) {
+    
+    return Optional.ofNullable(parameterAnnotation)
+      .filter(WithAnyRole::noUnauthorized)
+      .map(ignored -> new Session())
       .orElseThrow(
         () -> new UnauthorizedException("Invalid Session From Resolver"));
   }
@@ -121,6 +130,20 @@ public class SessionResolver implements HandlerMethodArgumentResolver {
     
     return sessionProperties.getCookieName()
       .equals(cookie.getName());
+  }
+  
+  private WithAnyRole getParameterAnnotation(MethodParameter parameter) {
+    
+    if (this.isClassAnnotated(parameter)) {
+      return parameter.getContainingClass()
+        .getAnnotation(WithAnyRole.class);
+    } else if (this.isMethodAnnotated(parameter)) {
+      return parameter.getMethodAnnotation(WithAnyRole.class);
+    } else if (this.isParameterAnnotated(parameter)) {
+      return parameter.getParameterAnnotation(WithAnyRole.class);
+    } else {
+      return null;
+    }
   }
   
   private Cookie[] getCookies(NativeWebRequest webRequest) {
