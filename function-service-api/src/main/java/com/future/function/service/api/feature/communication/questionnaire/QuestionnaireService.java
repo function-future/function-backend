@@ -18,7 +18,7 @@ public interface QuestionnaireService {
 
   Questionnaire getQuestionnaire(String questionnaireId);
 
-  Questionnaire createQuestionnaire(Questionnaire qustionnaire);
+  Questionnaire createQuestionnaire(Questionnaire questionnaire);
 
   Questionnaire updateQuestionnaire(Questionnaire questionnaire);
 
