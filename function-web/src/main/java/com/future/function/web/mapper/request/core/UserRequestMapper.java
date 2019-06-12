@@ -1,11 +1,10 @@
 package com.future.function.web.mapper.request.core;
 
 import com.future.function.common.enumeration.core.Role;
-import com.future.function.common.validation.ObjectValidator;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.User;
-import com.future.function.web.mapper.request.WebRequestMapper;
+import com.future.function.validation.RequestValidator;
 import com.future.function.web.model.request.core.UserWebRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,12 +19,10 @@ import java.util.Optional;
 @Component
 public class UserRequestMapper {
   
-  private final ObjectValidator validator;
+  private final RequestValidator validator;
   
   @Autowired
-  private UserRequestMapper(
-    WebRequestMapper requestMapper, ObjectValidator validator
-  ) {
+  private UserRequestMapper(RequestValidator validator) {
     
     this.validator = validator;
   }

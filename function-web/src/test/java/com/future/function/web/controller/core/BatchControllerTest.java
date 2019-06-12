@@ -1,8 +1,8 @@
 package com.future.function.web.controller.core;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.service.api.feature.core.BatchService;
+import com.future.function.web.JacksonTestHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.mapper.request.core.BatchRequestMapper;
 import com.future.function.web.mapper.response.core.BatchResponseMapper;
@@ -43,7 +43,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(BatchController.class)
-public class BatchControllerTest {
+public class BatchControllerTest extends JacksonTestHelper {
   
   private static final String FIRST_BATCH_ID = "id-1";
   
@@ -112,7 +112,7 @@ public class BatchControllerTest {
   @Before
   public void setUp() {
     
-    JacksonTester.initFields(this, new ObjectMapper());
+    super.setUp();
   }
   
   @After
@@ -202,7 +202,9 @@ public class BatchControllerTest {
     
     mockMvc.perform(delete("/api/core/batches/" + FIRST_BATCH_ID))
       .andExpect(status().isOk())
-      .andExpect(content().json(baseResponseJacksonTester.write(OK_BASE_RESPONSE).getJson()));
+      .andExpect(content().json(
+        baseResponseJacksonTester.write(OK_BASE_RESPONSE)
+          .getJson()));
     
     verify(batchService).deleteBatch(FIRST_BATCH_ID);
     verifyZeroInteractions(batchRequestMapper);

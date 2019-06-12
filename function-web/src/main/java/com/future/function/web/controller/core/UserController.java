@@ -41,7 +41,7 @@ public class UserController {
    *
    * @param data Data of new user in JSON format.
    *
-   * @return {@code DataResponse<UserWebResponse} - The created user data,
+   * @return {@code DataResponse<UserWebResponse>} - The created user data,
    * wrapped in
    * {@link com.future.function.web.model.response.base.DataResponse} and
    * {@link com.future.function.web.model.response.feature.core.UserWebResponse}
@@ -83,7 +83,7 @@ public class UserController {
    *
    * @param userId Id of user to be retrieved.
    *
-   * @return {@code DataResponse<UserWebResponse} - The retrieved user data,
+   * @return {@code DataResponse<UserWebResponse>} - The retrieved user data,
    * wrapped in
    * {@link com.future.function.web.model.response.base.DataResponse} and
    * {@link com.future.function.web.model.response.feature.core.UserWebResponse}
@@ -105,7 +105,7 @@ public class UserController {
    * @param role Specified role for data to be retrieved.
    * @param page Current page of data.
    *
-   * @return {@code PagingResponse<UserWebResponse} - The retrieved users data,
+   * @return {@code PagingResponse<UserWebResponse>} - The retrieved users data,
    * wrapped in
    * {@link com.future.function.web.model.response.base.PagingResponse} and
    * {@link com.future.function.web.model.response.feature.core.UserWebResponse}
@@ -130,7 +130,7 @@ public class UserController {
    * @param userId Id of to-be-updated user.
    * @param data   Data of existing user in JSON format.
    *
-   * @return {@code DataResponse<UserWebResponse} - The updated user data,
+   * @return {@code DataResponse<UserWebResponse>} - The updated user data,
    * wrapped in
    * {@link com.future.function.web.model.response.base.DataResponse} and
    * {@link com.future.function.web.model.response.feature.core.UserWebResponse}

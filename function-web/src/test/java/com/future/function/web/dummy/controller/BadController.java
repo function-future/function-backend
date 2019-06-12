@@ -62,4 +62,16 @@ public class BadController {
     throw new NotFoundException(MESSAGE, new Throwable());
   }
   
+  @GetMapping(value = "/unsupported-operation")
+  public String unsupportedOperation() {
+    
+    throw new UnsupportedOperationException(MESSAGE);
+  }
+  
+  @GetMapping(value = "/unsupported-operation-throwable")
+  public String unsupportedOperationThrowable() {
+    
+    throw new UnsupportedOperationException(MESSAGE, new Throwable());
+  }
+  
 }

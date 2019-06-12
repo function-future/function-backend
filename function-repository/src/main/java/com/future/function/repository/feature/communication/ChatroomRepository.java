@@ -1,7 +1,7 @@
 package com.future.function.repository.feature.communication;
 
 import com.future.function.common.enumeration.communication.ChatroomType;
-import com.future.function.model.entity.feature.communication.Chatroom;
+import com.future.function.model.entity.feature.communication.chatting.Chatroom;
 import com.future.function.model.entity.feature.core.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

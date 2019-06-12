@@ -1,8 +1,8 @@
 package com.future.function.web.mapper.request.core;
 
-import com.future.function.common.validation.ObjectValidator;
 import com.future.function.model.entity.feature.core.Announcement;
 import com.future.function.model.entity.feature.core.FileV2;
+import com.future.function.validation.RequestValidator;
 import com.future.function.web.mapper.request.WebRequestMapper;
 import com.future.function.web.model.request.core.AnnouncementWebRequest;
 import org.junit.After;
@@ -79,7 +79,7 @@ public class AnnouncementRequestMapperTest {
       .build();
   
   @Mock
-  private ObjectValidator validator;
+  private RequestValidator validator;
   
   @Mock
   private WebRequestMapper requestMapper;

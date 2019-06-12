@@ -1,8 +1,8 @@
 package com.future.function.repository.feature.communication;
 
-import com.future.function.model.entity.feature.communication.Chatroom;
-import com.future.function.model.entity.feature.communication.Message;
-import com.future.function.model.entity.feature.communication.MessageStatus;
+import com.future.function.model.entity.feature.communication.chatting.Chatroom;
+import com.future.function.model.entity.feature.communication.chatting.Message;
+import com.future.function.model.entity.feature.communication.chatting.MessageStatus;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.repository.TestApplication;
 import org.junit.After;

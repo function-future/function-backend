@@ -21,7 +21,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableMongoRepositories
 @EnableConfigurationProperties(FileProperties.class)
 public class FunctionApplication {
-  
+
   /**
    * The {@code main} function to be executed.
    *
@@ -29,8 +29,8 @@ public class FunctionApplication {
    *             application.
    */
   public static void main(String[] args) {
-    
+
     SpringApplication.run(FunctionApplication.class, args);
   }
-  
+
 }
