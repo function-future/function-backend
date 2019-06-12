@@ -25,7 +25,7 @@ public abstract class DocumentName {
 
   public static final String QUESTIONNAIRE = "questionnaires";
 
-  public static final String QUESTION = "questions";
+  public static final String QUESTION_QUESTIONNAIRE = "questions-questionnaire";
 
   public static final String QUESTION_RESPONSE = "question-responses";
 

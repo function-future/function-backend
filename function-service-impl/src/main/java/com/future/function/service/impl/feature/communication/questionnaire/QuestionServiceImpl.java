@@ -1,5 +1,6 @@
 package com.future.function.service.impl.feature.communication.questionnaire;
 
+import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.communication.questionnaire.Question;
 import com.future.function.model.entity.feature.communication.questionnaire.Questionnaire;
 import com.future.function.repository.feature.communication.questionnaire.QuestionRepository;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class QuestionServiceImpl implements QuestionService {
@@ -32,17 +34,23 @@ public class QuestionServiceImpl implements QuestionService {
 
   @Override
   public Question getQuestion(String questionId) {
-    return null;
+    return Optional.ofNullable(questionId)
+            .map(questionRepository::findOne)
+            .orElseThrow(() -> new NotFoundException("Get Question by id Not Found"));
   }
 
   @Override
   public Question createQuestion(Question question) {
-    return null;
+    return Optional.of(question)
+            .map(questionRepository::save)
+            .orElse(question);
   }
 
   @Override
   public Question updateQuestion(Question question) {
-    return null;
+    return Optional.of(Question)
+            .map(Question::getId)
+            .map();
   }
 
   @Override

@@ -109,9 +109,9 @@ public interface FieldName {
   }
 
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
-  abstract class Question {
+  abstract class QuestionQuestionnaire {
 
-    public static final String QUESIONNAIRE = "questionnaire";
+    public static final String QUESTIONNAIRE = "questionnaire";
 
     public static final String DESCRIPTION = "description";
 

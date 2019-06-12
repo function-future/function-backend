@@ -14,17 +14,17 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@Document(collection = DocumentName.QUESTION)
+@Document(collection = DocumentName.QUESTION_QUESTIONNAIRE)
 public class Question extends BaseEntity {
 
   @Id
   private String id;
 
-  @Field(FieldName.Question.QUESIONNAIRE)
+  @Field(FieldName.QuestionQuestionnaire.QUESTIONNAIRE)
   @DBRef(lazy = true)
   private Questionnaire questionnaire;
 
-  @Field(FieldName.Question.DESCRIPTION)
+  @Field(FieldName.QuestionQuestionnaire.DESCRIPTION)
   private String description;
 
 }
