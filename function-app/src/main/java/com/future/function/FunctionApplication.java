@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.config.EnableMongoAuditing;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 /**
@@ -22,6 +23,8 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableSwagger2
 @EnableWebSecurity
 @EnableRedisRepositories
+@EnableScheduling
+@EnableMongoAuditing
 @EnableMongoRepositories
 @EnableMongoAuditing(auditorAwareRef = "auditorAware")
 @EnableConfigurationProperties(value = {

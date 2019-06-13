@@ -43,6 +43,7 @@ public class FileRepositoryV2Test {
       .filePath(FILE_PATH)
       .fileUrl(FILE_URL)
       .asResource(true)
+      .used(true)
       .parentId(PARENT_ID)
       .build();
     
@@ -119,6 +120,23 @@ public class FileRepositoryV2Test {
     
     assertThat(foundFileOrFolder).isNotEqualTo(Optional.empty());
     assertThat(foundFileOrFolder.get()).isEqualTo(file);
+  }
+  
+  @Test
+  public void testGivenMethodCallByFindingMarkedDeletedFileReturnStreamOfFile() {
+    
+    FileV2 file1 = FileV2.builder()
+      .used(false)
+      .build();
+    
+    fileRepositoryV2.save(file1);
+    
+    Stream<FileV2> foundFiles = fileRepositoryV2.findAllByUsedFalse();
+    
+    assertThat(foundFiles).isNotEqualTo(Stream.empty());
+    assertThat(foundFiles.findFirst()).isEqualTo(Optional.of(file1));
+    
+    fileRepositoryV2.delete(file1.getId());
   }
   
 }

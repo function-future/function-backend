@@ -61,4 +61,12 @@ public interface FileRepositoryV2 extends MongoRepository<FileV2, String> {
    */
   Optional<FileV2> findByIdAndParentId(String id, String parentId);
   
+  /**
+   * Finds all file by its marking used is false.
+   *
+   * @return {@code Stream<FileV2>} - FileV2 objects found in database, if any
+   * exists.
+   */
+  Stream<FileV2> findAllByUsedFalse();
+  
 }
