@@ -55,6 +55,7 @@ public class FileController {
   @ResponseStatus(HttpStatus.OK)
   @GetMapping(value = "/{parentId}")
   public PagingResponse<FileWebResponse> getFilesAndFolders(
+    Session session,
     @PathVariable
       String parentId,
     @RequestParam(defaultValue = "1")
@@ -73,6 +74,7 @@ public class FileController {
   @ResponseStatus(HttpStatus.OK)
   @GetMapping(value = "/{parentId}/{fileOrFolderId}")
   public DataResponse<FileWebResponse> getFileOrFolder(
+    Session session,
     @PathVariable
       String parentId,
     @PathVariable
@@ -89,6 +91,7 @@ public class FileController {
                consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
                produces = MediaType.APPLICATION_JSON_VALUE)
   public DataResponse<FileWebResponse> createFileOrFolder(
+    Session session,
     @PathVariable
       String parentId,
     @RequestParam(required = false)
