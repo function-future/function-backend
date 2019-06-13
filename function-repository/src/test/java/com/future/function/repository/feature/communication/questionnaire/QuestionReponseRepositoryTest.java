@@ -1,9 +1,8 @@
 package com.future.function.repository.feature.communication.questionnaire;
 
-import com.future.function.model.entity.feature.communication.questionnaire.Question;
+import com.future.function.model.entity.feature.communication.questionnaire.QuestionQuestionnaire;
 import com.future.function.model.entity.feature.communication.questionnaire.QuestionResponse;
 import com.future.function.model.entity.feature.core.User;
-import com.future.function.model.util.constant.FieldName;
 import com.future.function.repository.TestApplication;
 import com.future.function.repository.feature.core.UserRepository;
 import org.junit.After;
@@ -30,7 +29,7 @@ public class QuestionReponseRepositoryTest {
 
   private static final String ID_USER_1 = "id_user1";
 
-  private Question question = Question.builder()
+  private QuestionQuestionnaire question = QuestionQuestionnaire.builder()
           .id(QUESTION_ID)
           .build();
 
@@ -45,7 +44,7 @@ public class QuestionReponseRepositoryTest {
   private UserRepository userRepository;
 
   @Autowired
-  private QuestionRepository questionRepository;
+  private QuestionQuestionnaireRepository questionQuestionnaireRepository;
 
   @Before
   public void SetUp() {
@@ -62,7 +61,7 @@ public class QuestionReponseRepositoryTest {
             .build();
 
     userRepository.save(appraisee);
-    questionRepository.save(question);
+    questionQuestionnaireRepository.save(question);
     questionResponseRepository.save(questionResponse1);
     questionResponseRepository.save(questionResponse2);
 
@@ -77,7 +76,7 @@ public class QuestionReponseRepositoryTest {
   @Test
   public void testGivenQuestionAndAppraiseeByFindingAllQuestionsReponseReturnedListQuestionsResponse() {
     List<QuestionResponse> questionResponses =
-            questionResponseRepository.findAllByQuestionAndAppraisee(question, appraisee);
+            questionResponseRepository.findAllByQuestionQuestionnaireAndAppraisee(question, appraisee);
 
     System.out.println(questionResponses.get(0).toString());
 

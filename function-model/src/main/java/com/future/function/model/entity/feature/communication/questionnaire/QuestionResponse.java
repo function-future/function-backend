@@ -22,8 +22,8 @@ public class QuestionResponse extends BaseEntity {
   private String id;
 
   @Field(FieldName.QuestionResponse.QUESTION)
-  @DBRef
-  private Question question;
+  @DBRef(lazy = true)
+  private QuestionQuestionnaire question;
 
   @Field(FieldName.QuestionResponse.APRAISER)
   @DBRef(lazy = true)

@@ -23,7 +23,7 @@ public class QuestionResponseSummary extends BaseEntity {
 
   @Field(FieldName.QuestionResponseSummary.QUESTION)
   @DBRef(lazy = true)
-  private Question question;
+  private QuestionQuestionnaire question;
 
   @Field(FieldName.QuestionResponseSummary.QUESTIONNAIRE)
   @DBRef(lazy = true)

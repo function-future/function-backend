@@ -1,6 +1,5 @@
 package com.future.function.repository.feature.communication.questionnaire;
 
-import com.future.function.model.entity.feature.communication.questionnaire.Question;
 import com.future.function.model.entity.feature.communication.questionnaire.QuestionResponse;
 import com.future.function.model.entity.feature.communication.questionnaire.Questionnaire;
 import com.future.function.model.entity.feature.communication.questionnaire.QuestionnaireResponse;

@@ -15,7 +15,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @Document(collection = DocumentName.QUESTION_QUESTIONNAIRE)
-public class Question extends BaseEntity {
+public class QuestionQuestionnaire extends BaseEntity {
 
   @Id
   private String id;

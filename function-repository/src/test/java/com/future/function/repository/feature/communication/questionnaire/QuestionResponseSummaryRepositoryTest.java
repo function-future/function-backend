@@ -1,7 +1,7 @@
 package com.future.function.repository.feature.communication.questionnaire;
 
 import com.future.function.model.entity.feature.communication.questionnaire.Answer;
-import com.future.function.model.entity.feature.communication.questionnaire.Question;
+import com.future.function.model.entity.feature.communication.questionnaire.QuestionQuestionnaire;
 import com.future.function.model.entity.feature.communication.questionnaire.QuestionResponseSummary;
 import com.future.function.model.entity.feature.communication.questionnaire.Questionnaire;
 import com.future.function.model.entity.feature.core.User;
@@ -13,8 +13,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.List;
@@ -42,11 +40,11 @@ public class QuestionResponseSummaryRepositoryTest {
           .id(ID_USER_1)
           .build();
 
-  private Question question1 = Question.builder()
+  private QuestionQuestionnaire question1 = QuestionQuestionnaire.builder()
           .id(QUESTION_ID1)
           .build();
 
-  private Question question2 = Question.builder()
+  private QuestionQuestionnaire question2 = QuestionQuestionnaire.builder()
           .id(QUESTION_ID2)
           .build();
 
@@ -67,7 +65,7 @@ public class QuestionResponseSummaryRepositoryTest {
   private QuestionnaireRepository questionnaireRepository;
 
   @Autowired
-  private QuestionRepository questionRepository;
+  private QuestionQuestionnaireRepository questionQuestionnaireRepository;
 
   @Autowired
   private UserRepository userRepository;
@@ -90,8 +88,8 @@ public class QuestionResponseSummaryRepositoryTest {
             .build();
 
     userRepository.save(appraisee);
-    questionRepository.save(question1);
-    questionRepository.save(question2);
+    questionQuestionnaireRepository.save(question1);
+    questionQuestionnaireRepository.save(question2);
     questionnaireRepository.save(questionnaire);
     questionResponseSummaryRepository.save(qRS1);
     questionResponseSummaryRepository.save(qRS2);
@@ -101,7 +99,7 @@ public class QuestionResponseSummaryRepositoryTest {
   public void TearDown() {
     questionResponseSummaryRepository.deleteAll();
     questionnaireRepository.deleteAll();
-    questionRepository.deleteAll();
+    questionQuestionnaireRepository.deleteAll();
     userRepository.deleteAll();
   }
 
@@ -120,7 +118,7 @@ public class QuestionResponseSummaryRepositoryTest {
   @Test
   public void testGivenAppraiseeAndQuestionByFindingQuestionResponseSummaryReturnedQuestionResponseSummary() {
     Optional<QuestionResponseSummary> questionResponseSummary =
-            questionResponseSummaryRepository.findAllByAppraiseeAndQuestion(appraisee,question1);
+            questionResponseSummaryRepository.findAllByAppraiseeAndQuestionQuestionnaire(appraisee,question1);
 
     assertThat(questionResponseSummary.get().getId()).isEqualTo(ID_1);
     assertThat(questionResponseSummary.get().getScoreSummary().getId()).isEqualTo(ANSWER_ID);

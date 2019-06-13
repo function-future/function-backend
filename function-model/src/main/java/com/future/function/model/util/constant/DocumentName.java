@@ -25,7 +25,7 @@ public abstract class DocumentName {
 
   public static final String QUESTIONNAIRE = "questionnaires";
 
-  public static final String QUESTION_QUESTIONNAIRE = "questions-questionnaire";
+  public static final String QUESTION_QUESTIONNAIRE = "question-questionnaires";
 
   public static final String QUESTION_RESPONSE = "question-responses";
 
@@ -62,7 +62,7 @@ public abstract class DocumentName {
 
   public static final String MESSAGE_STATUS = "message-status";
 
-  public static final String DISCUSSION = "discussions";
+//  public static final String DISCUSSION = "discussions";
   
   public static final String ACTIVITY_BLOG = "activity-blogs";
   

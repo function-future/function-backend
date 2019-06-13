@@ -1,6 +1,6 @@
 package com.future.function.repository.feature.communication.questionnaire;
 
-import com.future.function.model.entity.feature.communication.questionnaire.Question;
+import com.future.function.model.entity.feature.communication.questionnaire.QuestionQuestionnaire;
 import com.future.function.model.entity.feature.communication.questionnaire.QuestionResponseSummary;
 import com.future.function.model.entity.feature.communication.questionnaire.Questionnaire;
 import com.future.function.model.entity.feature.core.User;
@@ -31,6 +31,6 @@ public interface QuestionResponseSummaryRepository extends MongoRepository<Quest
    *
    * @return {@code QuestionResponseSummary} - Questions response summary paged from database
    */
-  Optional<QuestionResponseSummary> findAllByAppraiseeAndQuestion(User appraisee, Question question);
+  Optional<QuestionResponseSummary> findAllByAppraiseeAndQuestionQuestionnaire(User appraisee, QuestionQuestionnaire question);
 
 }
