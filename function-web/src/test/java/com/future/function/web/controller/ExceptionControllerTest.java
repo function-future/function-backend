@@ -110,6 +110,11 @@ public class ExceptionControllerTest extends TestHelper {
       .andExpect(content().json(
         baseResponseJacksonTester.write(NOT_FOUND_RESPONSE)
           .getJson()));
+    mockMvc.perform(get("/no-handler"))
+      .andExpect(status().is4xxClientError())
+      .andExpect(content().json(
+        baseResponseJacksonTester.write(NOT_FOUND_RESPONSE)
+          .getJson()));
   }
   
   @Test
@@ -117,11 +122,22 @@ public class ExceptionControllerTest extends TestHelper {
     throws Exception {
     
     mockMvc.perform(get("/unsupported-operation"))
-      .andExpect(status().isInternalServerError())
+      .andExpect(status().isBadRequest())
       .andExpect(content().json(
-        baseResponseJacksonTester.write(INTERNAL_SERVER_ERROR_RESPONSE)
+        baseResponseJacksonTester.write(BAD_REQUEST_RESPONSE)
           .getJson()));
     mockMvc.perform(get("/unsupported-operation-throwable"))
+      .andExpect(status().isBadRequest())
+      .andExpect(content().json(
+        baseResponseJacksonTester.write(BAD_REQUEST_RESPONSE)
+          .getJson()));
+  }
+  
+  @Test
+  public void givenThrowableRaisedByExceptionHandlingReturnErrorResponse()
+    throws Exception {
+    
+    mockMvc.perform(get("/throwable"))
       .andExpect(status().isInternalServerError())
       .andExpect(content().json(
         baseResponseJacksonTester.write(INTERNAL_SERVER_ERROR_RESPONSE)
