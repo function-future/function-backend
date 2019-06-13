@@ -1,5 +1,6 @@
 package com.future.function.web.model.response.feature.core;
 
+import com.future.function.web.model.response.base.AuthorWebResponse;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,24 +18,9 @@ public class DiscussionWebResponse {
   private String id;
   
   private String comment;
-  
-  private Author author;
+
+  private AuthorWebResponse author;
   
   private Long createdAt;
-  
-  /**
-   * Model representation for author in discussion web response.
-   */
-  @Data
-  @Builder
-  @NoArgsConstructor
-  @AllArgsConstructor
-  public static class Author {
-    
-    private String id;
-    
-    private String name;
-    
-  }
   
 }

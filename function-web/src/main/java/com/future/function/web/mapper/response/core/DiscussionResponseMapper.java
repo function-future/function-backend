@@ -4,6 +4,7 @@ import com.future.function.model.entity.feature.core.Discussion;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
+import com.future.function.web.model.response.base.AuthorWebResponse;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.feature.core.DiscussionWebResponse;
@@ -36,18 +37,18 @@ public class DiscussionResponseMapper {
     return DiscussionWebResponse.builder()
       .id(discussion.getId())
       .comment(discussion.getDescription())
-      .author(buildDiscussionWebResponseAuthorObject(discussion))
+            .author(buildAuthorWebResponseObject(discussion))
       .createdAt(discussion.getCreatedAt())
       .build();
   }
-  
-  private static DiscussionWebResponse.Author buildDiscussionWebResponseAuthorObject(
+
+  private static AuthorWebResponse buildAuthorWebResponseObject(
     Discussion discussion
   ) {
     
     User user = discussion.getUser();
-    
-    return DiscussionWebResponse.Author.builder()
+
+    return AuthorWebResponse.builder()
       .id(user.getId())
       .name(user.getName())
       .build();
