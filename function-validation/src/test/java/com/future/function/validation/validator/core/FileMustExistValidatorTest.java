@@ -1,7 +1,7 @@
 package com.future.function.validation.validator.core;
 
 import com.future.function.model.entity.feature.core.FileV2;
-import com.future.function.service.api.feature.core.ResourceService;
+import com.future.function.repository.feature.core.FileRepositoryV2;
 import com.future.function.validation.annotation.core.FileMustExist;
 import org.junit.After;
 import org.junit.Before;
@@ -26,7 +26,7 @@ public class FileMustExistValidatorTest {
   private FileMustExist annotation;
   
   @Mock
-  private ResourceService resourceService;
+  private FileRepositoryV2 fileRepositoryV2;
   
   @InjectMocks
   private FileMustExistValidator validator;
@@ -40,7 +40,7 @@ public class FileMustExistValidatorTest {
   @After
   public void tearDown() {
     
-    verifyNoMoreInteractions(annotation, resourceService);
+    verifyNoMoreInteractions(annotation, fileRepositoryV2);
   }
   
   @Test
@@ -48,7 +48,7 @@ public class FileMustExistValidatorTest {
     
     assertThat(validator.isValid(null, null)).isTrue();
     
-    verifyZeroInteractions(resourceService);
+    verifyZeroInteractions(fileRepositoryV2);
   }
   
   @Test
@@ -56,7 +56,7 @@ public class FileMustExistValidatorTest {
     
     assertThat(validator.isValid(Collections.emptyList(), null)).isTrue();
     
-    verifyZeroInteractions(resourceService);
+    verifyZeroInteractions(fileRepositoryV2);
   }
   
   @Test
@@ -64,12 +64,12 @@ public class FileMustExistValidatorTest {
     
     String fileId = "file-id";
     
-    when(resourceService.getFile(fileId)).thenReturn(new FileV2());
+    when(fileRepositoryV2.findOne(fileId)).thenReturn(new FileV2());
     
     assertThat(
       validator.isValid(Collections.singletonList(fileId), null)).isTrue();
     
-    verify(resourceService).getFile(fileId);
+    verify(fileRepositoryV2).findOne(fileId);
   }
   
   @Test
@@ -77,12 +77,12 @@ public class FileMustExistValidatorTest {
     
     String fileId = "file-id";
     
-    when(resourceService.getFile(fileId)).thenReturn(null);
+    when(fileRepositoryV2.findOne(fileId)).thenReturn(null);
     
     assertThat(
       validator.isValid(Collections.singletonList(fileId), null)).isFalse();
     
-    verify(resourceService).getFile(fileId);
+    verify(fileRepositoryV2).findOne(fileId);
   }
   
 }

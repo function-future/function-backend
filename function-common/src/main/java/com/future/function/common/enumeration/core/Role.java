@@ -53,8 +53,8 @@ public enum Role {
   private static boolean isNameEqualsAnyRole(String name) {
   
     return !Stream.of(Role.values())
-             .filter(role -> name.equals(role.name()))
-             .collect(Collectors.toList())
+      .filter(role -> name.equals(role.name()))
+      .collect(Collectors.toList())
       .isEmpty();
   }
   

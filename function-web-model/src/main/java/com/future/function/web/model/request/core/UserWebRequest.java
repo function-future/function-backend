@@ -1,6 +1,8 @@
 package com.future.function.web.model.request.core;
 
 import com.future.function.common.data.core.UserData;
+import com.future.function.validation.annotation.core.FileMustBeImage;
+import com.future.function.validation.annotation.core.EmailMustBeUnique;
 import com.future.function.validation.annotation.core.FileMustExist;
 import com.future.function.validation.annotation.core.Name;
 import com.future.function.validation.annotation.core.OnlyStudentCanHaveBatchAndUniversity;
@@ -13,6 +15,7 @@ import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.List;
 
 /**
@@ -28,6 +31,7 @@ public class UserWebRequest implements UserData {
   @NotNull(message = "NotNull")
   private String role;
   
+  @EmailMustBeUnique
   @Email(message = "Email")
   @NotBlank(message = "NotBlank")
   private String email;
@@ -46,7 +50,10 @@ public class UserWebRequest implements UserData {
   
   private String university;
   
+  @Size(max = 1,
+        message = "Size")
   @FileMustExist
+  @FileMustBeImage
   private List<String> avatar;
   
 }

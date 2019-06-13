@@ -20,7 +20,7 @@ import java.lang.annotation.Target;
 @Target({ ElementType.TYPE, ElementType.TYPE_USE })
 @Constraint(validatedBy = OnlyStudentCanHaveBatchAndUniversityValidator.class)
 public @interface OnlyStudentCanHaveBatchAndUniversity {
-  
+
   /**
    * Default message returned when a String field does not fulfill the
    * required values.
@@ -28,11 +28,11 @@ public @interface OnlyStudentCanHaveBatchAndUniversity {
    * @return {@code String} - The name of this annotation.
    */
   String message() default "OnlyStudentCanHaveBatchAndUniversity";
-  
+
   Class<?>[] groups() default {};
-  
+
   Class<? extends Payload>[] payload() default {};
-  
+
   /**
    * Declares which field of an object that causes this annotation's
    * validator to mark the object as invalid.
@@ -40,5 +40,5 @@ public @interface OnlyStudentCanHaveBatchAndUniversity {
    * @return {@code String} - The name of the field.
    */
   String field() default "role";
-  
+
 }

@@ -88,8 +88,14 @@ public final class CourseResponseMapper {
       .id(course.getId())
       .title(course.getTitle())
       .description(course.getDescription())
-      .material(CourseResponseMapper.getThumbnailUrl(course))
+      .material(CourseResponseMapper.getMaterial(course))
       .build();
+  }
+  
+  private static String getMaterial(Course course) {
+    
+    return Optional.ofNullable(CourseResponseMapper.getThumbnailUrl(course))
+      .orElseGet(() -> CourseResponseMapper.getFileUrl(course));
   }
   
   private static String getThumbnailUrl(Course course) {
