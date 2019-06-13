@@ -27,6 +27,21 @@ public abstract class DocumentName {
   
   public static final String ACTIVITY_BLOG = "activity-blogs";
 
+  public static final String QUESTIONNAIRE = "questionnaires";
+
+  public static final String QUESTION_QUESTIONNAIRE = "question-questionnaires";
+
+  public static final String QUESTION_RESPONSE = "question-responses";
+
+  public static final String QUESTION_RESPONSE_SUMMARY = "question-response-summaries";
+
+  public static final String QUESTIONNAIRE_RESPONSE = "questionnaire-responses";
+
+  public static final String QUESTIONNAIRE_RESPONSE_SUMMARY = "questionnaire-response-summaries";
+
+  public static final String QUESTIONNAIRE_PARTICIPANT = "questionnaire-participants";
+
+  public static final String USER_QUESTIONNAIRE_SUMMARY = "user-questionnaire-summary";
   public static final String ASSIGNMENT = "assignments";
 
   public static final String QUESTION_BANK = "question-banks";
