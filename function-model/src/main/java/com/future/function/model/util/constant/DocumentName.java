@@ -22,6 +22,10 @@ public abstract class DocumentName {
   public static final String ANNOUNCEMENT = "announcements";
 
   public static final String STICKY_NOTE = "sticky-notes";
+  
+  public static final String DISCUSSION = "discussions";
+  
+  public static final String ACTIVITY_BLOG = "activity-blogs";
 
   public static final String QUESTIONNAIRE = "questionnaires";
 
@@ -54,16 +58,10 @@ public abstract class DocumentName {
 
   public static final String OPTION = "options";
 
-  public static final String DISCUSSION = "discussions";
-
   public static final String CHATROOM = "chatrooms";
 
   public static final String MESSAGE = "messages";
 
   public static final String MESSAGE_STATUS = "message-status";
-
-//  public static final String DISCUSSION = "discussions";
-  
-  public static final String ACTIVITY_BLOG = "activity-blogs";
   
 }
