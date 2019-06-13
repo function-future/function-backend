@@ -1,6 +1,7 @@
 package com.future.function.web.controller;
 
-import com.future.function.web.JacksonTestHelper;
+import com.future.function.web.TestHelper;
+import com.future.function.web.TestSecurityConfiguration;
 import com.future.function.web.dummy.controller.BadController;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.model.response.base.BaseResponse;
@@ -8,19 +9,19 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
+@Import(TestSecurityConfiguration.class)
 @WebMvcTest(value = { ExceptionController.class, BadController.class })
-public class ExceptionControllerTest extends JacksonTestHelper {
+public class ExceptionControllerTest extends TestHelper {
   
   private static final BaseResponse BAD_REQUEST_RESPONSE =
     ResponseHelper.toBaseResponse(HttpStatus.BAD_REQUEST);
@@ -37,12 +38,10 @@ public class ExceptionControllerTest extends JacksonTestHelper {
   private static final BaseResponse INTERNAL_SERVER_ERROR_RESPONSE =
     ResponseHelper.toBaseResponse(HttpStatus.INTERNAL_SERVER_ERROR);
   
-  @Autowired
-  private MockMvc mockMvc;
-  
+  @Override
   @Before
   public void setUp() {
-  
+    
     super.setUp();
   }
   

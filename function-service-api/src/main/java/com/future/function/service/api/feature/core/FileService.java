@@ -1,6 +1,7 @@
 package com.future.function.service.api.feature.core;
 
 import com.future.function.model.entity.feature.core.FileV2;
+import com.future.function.session.model.Session;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -51,7 +52,7 @@ public interface FileService {
    * Updates file/folder object and saves any other data related to the
    * file/folder.
    *
-   * @param email          Email of current user.
+   * @param session        Current user's session.
    * @param fileOrFolderId Id of file/folder to-be-updated.
    * @param parentId       Id of parent of file/folder.
    * @param objectName     Name of file, to be stored as object's name.
@@ -61,17 +62,19 @@ public interface FileService {
    * @return {@code FileV2} - The file/folder object of the saved data.
    */
   FileV2 updateFileOrFolder(
-    String email, String fileOrFolderId, String parentId, String objectName,
+    Session session, String fileOrFolderId, String parentId, String objectName,
     String fileName, byte[] bytes
   );
   
   /**
    * Deletes file/folder object from database.
    *
-   * @param email        Email of current user.
+   * @param session      Current user's session.
    * @param parentId     Id of parent of file/folder.
    * @param fileFolderId Id of file/folder to be deleted.
    */
-  void deleteFileOrFolder(String email, String parentId, String fileFolderId);
+  void deleteFileOrFolder(
+    Session session, String parentId, String fileFolderId
+  );
   
 }

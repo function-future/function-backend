@@ -60,9 +60,16 @@ public class BatchResponseMapperTest {
   private static final Page<Batch> BATCH_PAGE = new PageImpl<>(
     BATCHES, PAGEABLE, BATCHES.size());
   
-  private static final DataResponse<BatchWebResponse> BATCH_DATA_RESPONSE =
+  private static final DataResponse<BatchWebResponse>
+    CREATED_BATCH_DATA_RESPONSE =
     DataResponse.<BatchWebResponse>builder().code(HttpStatus.CREATED.value())
       .status("CREATED")
+      .data(BATCH_WEB_RESPONSE_1)
+      .build();
+  
+  private static final DataResponse<BatchWebResponse> RETRIEVED_BATCH_DATA_RESPONSE =
+    DataResponse.<BatchWebResponse>builder().code(HttpStatus.OK.value())
+      .status("OK")
       .data(BATCH_WEB_RESPONSE_1)
       .build();
   
@@ -87,7 +94,17 @@ public class BatchResponseMapperTest {
       BatchResponseMapper.toBatchDataResponse(BATCH_1);
     
     assertThat(dataResponse).isNotNull();
-    assertThat(dataResponse).isEqualTo(BATCH_DATA_RESPONSE);
+    assertThat(dataResponse).isEqualTo(RETRIEVED_BATCH_DATA_RESPONSE);
+  }
+  
+  @Test
+  public void testGivenHttpStatusAndBatchDataByMappingToDataResponseReturnDataResponseObject() {
+    
+    DataResponse<BatchWebResponse> dataResponse =
+      BatchResponseMapper.toBatchDataResponse(HttpStatus.CREATED, BATCH_1);
+    
+    assertThat(dataResponse).isNotNull();
+    assertThat(dataResponse).isEqualTo(CREATED_BATCH_DATA_RESPONSE);
   }
   
   @Test

@@ -1,8 +1,10 @@
 package com.future.function.web.controller.core;
 
+import com.future.function.common.enumeration.core.Role;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.service.api.feature.core.BatchService;
-import com.future.function.web.JacksonTestHelper;
+import com.future.function.web.TestHelper;
+import com.future.function.web.TestSecurityConfiguration;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.mapper.request.core.BatchRequestMapper;
 import com.future.function.web.mapper.response.core.BatchResponseMapper;
@@ -15,10 +17,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -26,7 +28,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Arrays;
 
@@ -42,8 +43,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
-@WebMvcTest(BatchController.class)
-public class BatchControllerTest extends JacksonTestHelper {
+@Import(TestSecurityConfiguration.class)
+@WebMvcTest(value = BatchController.class)
+public class BatchControllerTest extends TestHelper {
   
   private static final String FIRST_BATCH_ID = "id-1";
   
@@ -92,27 +94,18 @@ public class BatchControllerTest extends JacksonTestHelper {
   
   private JacksonTester<BatchWebRequest> batchWebRequestJacksonTester;
   
-  private JacksonTester<PagingResponse<BatchWebResponse>>
-    pagingResponseJacksonTester;
-  
-  private JacksonTester<DataResponse<BatchWebResponse>>
-    dataResponseJacksonTester;
-  
-  private JacksonTester<BaseResponse> baseResponseJacksonTester;
-  
-  @Autowired
-  private MockMvc mockMvc;
-  
   @MockBean
   private BatchService batchService;
   
   @MockBean
   private BatchRequestMapper batchRequestMapper;
   
+  @Override
   @Before
   public void setUp() {
     
     super.setUp();
+    super.setCookie(Role.ADMIN);
   }
   
   @After
@@ -127,7 +120,7 @@ public class BatchControllerTest extends JacksonTestHelper {
     
     when(batchService.getBatches(PAGEABLE)).thenReturn(BATCH_PAGE);
     
-    mockMvc.perform(get("/api/core/batches"))
+    mockMvc.perform(get("/api/core/batches").cookie(cookies))
       .andExpect(status().isOk())
       .andExpect(content().json(
         pagingResponseJacksonTester.write(BATCHES_DATA_RESPONSE)
@@ -143,8 +136,8 @@ public class BatchControllerTest extends JacksonTestHelper {
     when(batchRequestMapper.toBatch(BATCH_WEB_REQUEST)).thenReturn(FIRST_BATCH);
     when(batchService.createBatch(FIRST_BATCH)).thenReturn(FIRST_BATCH);
     
-    mockMvc.perform(post("/api/core/batches").contentType(
-      MediaType.APPLICATION_JSON)
+    mockMvc.perform(post("/api/core/batches").cookie(cookies)
+                      .contentType(MediaType.APPLICATION_JSON)
                       .content(
                         batchWebRequestJacksonTester.write(BATCH_WEB_REQUEST)
                           .getJson()))
@@ -163,7 +156,7 @@ public class BatchControllerTest extends JacksonTestHelper {
     
     when(batchService.getBatchById(FIRST_BATCH_ID)).thenReturn(FIRST_BATCH);
     
-    mockMvc.perform(get("/api/core/batches/" + FIRST_BATCH_ID))
+    mockMvc.perform(get("/api/core/batches/" + FIRST_BATCH_ID).cookie(cookies))
       .andExpect(status().isOk())
       .andExpect(content().json(
         dataResponseJacksonTester.write(FIRST_BATCH_DATA_RESPONSE)
@@ -182,8 +175,8 @@ public class BatchControllerTest extends JacksonTestHelper {
       FIRST_BATCH);
     when(batchService.updateBatch(FIRST_BATCH)).thenReturn(FIRST_BATCH);
     
-    mockMvc.perform(put("/api/core/batches/" + FIRST_BATCH_ID).contentType(
-      MediaType.APPLICATION_JSON)
+    mockMvc.perform(put("/api/core/batches/" + FIRST_BATCH_ID).cookie(cookies)
+                      .contentType(MediaType.APPLICATION_JSON)
                       .content(
                         batchWebRequestJacksonTester.write(BATCH_WEB_REQUEST)
                           .getJson()))
@@ -200,7 +193,8 @@ public class BatchControllerTest extends JacksonTestHelper {
   public void testGivenCallToBatchesApiByDeletingBatchReturnBaseResponseObject()
     throws Exception {
     
-    mockMvc.perform(delete("/api/core/batches/" + FIRST_BATCH_ID))
+    mockMvc.perform(
+      delete("/api/core/batches/" + FIRST_BATCH_ID).cookie(cookies))
       .andExpect(status().isOk())
       .andExpect(content().json(
         baseResponseJacksonTester.write(OK_BASE_RESPONSE)
