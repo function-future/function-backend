@@ -169,6 +169,7 @@ public class SharedCourseServiceImpl implements SharedCourseService {
     String courseId, String batchCode, Course course
   ) {
     
+    // TODO Check on update file with empty material, throw NotFoundException
     return this.getBatch(batchCode)
       .flatMap(
         batch -> sharedCourseRepository.findByCourseIdAndBatch(courseId, batch))

@@ -159,6 +159,7 @@ public class FileServiceImpl implements FileService {
   
   private FileV2 updateFolder(Session session, FileV2 fileV2) {
     
+    // TODO Folder not updating (pass parameter name)
     return Optional.of(fileV2)
       .filter(
         file -> AuthorizationHelper.isAuthorizedForEdit(session.getEmail(),
@@ -174,6 +175,7 @@ public class FileServiceImpl implements FileService {
     String objectName, String fileName, byte[] bytes
   ) {
     
+    // TODO File name not updating (pass parameter name)
     return Optional.of(fileV2)
       .filter(
         file -> AuthorizationHelper.isAuthorizedForEdit(session.getEmail(),
@@ -204,6 +206,10 @@ public class FileServiceImpl implements FileService {
     Session session, String parentId, String fileFolderId
   ) {
     
+    // TODO Mark file/folder deleted
+    // TODO Test if student created file/folder can be removed by admin
+    // TODO Test if a user's created file/folder can't be updated by other
+    //  user with equal role
     Optional.ofNullable(fileFolderId)
       .filter(id -> !id.equalsIgnoreCase(fileProperties.getRootId()))
       .flatMap(id -> fileRepositoryV2.findByIdAndParentId(id, parentId))
