@@ -85,9 +85,11 @@ public class BatchControllerTest extends TestHelper {
   private static final PagingResponse<BatchWebResponse> BATCHES_DATA_RESPONSE =
     BatchResponseMapper.toBatchesPagingResponse(BATCH_PAGE);
   
-  private static final DataResponse<BatchWebResponse>
-    FIRST_BATCH_DATA_RESPONSE = BatchResponseMapper.toBatchDataResponse(
-    FIRST_BATCH);
+  private static final DataResponse<BatchWebResponse> RETRIEVED_DATA_RESPONSE =
+    BatchResponseMapper.toBatchDataResponse(FIRST_BATCH);
+  
+  private static final DataResponse<BatchWebResponse> CREATED_DATA_RESPONSE =
+    BatchResponseMapper.toBatchDataResponse(HttpStatus.CREATED, FIRST_BATCH);
   
   private static final BaseResponse OK_BASE_RESPONSE =
     ResponseHelper.toBaseResponse(HttpStatus.OK);
@@ -143,7 +145,7 @@ public class BatchControllerTest extends TestHelper {
                           .getJson()))
       .andExpect(status().isCreated())
       .andExpect(content().json(
-        dataResponseJacksonTester.write(FIRST_BATCH_DATA_RESPONSE)
+        dataResponseJacksonTester.write(CREATED_DATA_RESPONSE)
           .getJson()));
     
     verify(batchRequestMapper).toBatch(BATCH_WEB_REQUEST);
@@ -159,7 +161,7 @@ public class BatchControllerTest extends TestHelper {
     mockMvc.perform(get("/api/core/batches/" + FIRST_BATCH_ID).cookie(cookies))
       .andExpect(status().isOk())
       .andExpect(content().json(
-        dataResponseJacksonTester.write(FIRST_BATCH_DATA_RESPONSE)
+        dataResponseJacksonTester.write(RETRIEVED_DATA_RESPONSE)
           .getJson()));
     
     verify(batchService).getBatchById(FIRST_BATCH_ID);
@@ -182,7 +184,7 @@ public class BatchControllerTest extends TestHelper {
                           .getJson()))
       .andExpect(status().isOk())
       .andExpect(content().json(
-        dataResponseJacksonTester.write(FIRST_BATCH_DATA_RESPONSE)
+        dataResponseJacksonTester.write(RETRIEVED_DATA_RESPONSE)
           .getJson()));
     
     verify(batchRequestMapper).toBatch(FIRST_BATCH_ID, BATCH_WEB_REQUEST);
