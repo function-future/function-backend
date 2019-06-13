@@ -2,6 +2,8 @@ package com.future.function.web.mapper.response.communication;
 
 import com.future.function.model.entity.feature.communication.chatting.Chatroom;
 import com.future.function.model.entity.feature.communication.chatting.Message;
+import com.future.function.model.entity.feature.core.Batch;
+import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.service.api.feature.communication.ChatroomService;
 import com.future.function.service.api.feature.communication.MessageService;
@@ -9,9 +11,12 @@ import com.future.function.service.api.feature.communication.MessageStatusServic
 import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.mapper.response.core.BatchResponseMapper;
+import com.future.function.web.mapper.response.core.FileResponseMapper;
+import com.future.function.web.mapper.response.core.UserResponseMapper;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.feature.communication.chatting.*;
+import com.future.function.web.model.response.feature.core.BatchWebResponse;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +25,7 @@ import org.springframework.http.HttpStatus;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -32,12 +38,25 @@ public class ChatroomResponseMapper {
     private static ChatroomParticipantDetailResponse toChatroomParticipantDetailResponse(User user) {
         return ChatroomParticipantDetailResponse.builder()
                 .id(user.getId())
-                .avatar(user.getPictureV2().getThumbnailUrl())
-                .batch(BatchResponseMapper.toBatchDataResponse(user.getBatch()).getData())
+                .avatar(getAvatarThumbnailUrl(user.getPictureV2()))
+                .batch(getBatch(user.getBatch()))
                 .name(user.getName())
                 .type(user.getRole().name())
                 .university(user.getUniversity())
                 .build();
+    }
+
+    private static String getAvatarThumbnailUrl(FileV2 fileV2) {
+        return Optional.ofNullable(fileV2)
+                .map(FileV2::getThumbnailUrl)
+                .orElse(null);
+    }
+
+    private static BatchWebResponse getBatch(Batch batch) {
+        return Optional.ofNullable(batch)
+                .map(BatchResponseMapper::toBatchDataResponse)
+                .map(DataResponse::getData)
+                .orElse(null);
     }
 
     private static ChatroomDetailResponse toChatroomDetailResponse(Chatroom chatroom) {
@@ -59,7 +78,7 @@ public class ChatroomResponseMapper {
         return ChatroomParticipantResponse.builder()
                 .id(user.getId())
                 .name(user.getName())
-                .avatar(user.getPictureV2().getThumbnailUrl())
+                .avatar(getAvatarThumbnailUrl(user.getPictureV2()))
                 .build();
     }
 
@@ -101,11 +120,13 @@ public class ChatroomResponseMapper {
     }
 
     private static LastMessageResponse toLastMessageResponse(Message message, boolean isSeen) {
-        return LastMessageResponse.builder()
-                .isSeen(isSeen)
-                .message(message.getText())
-                .time(message.getCreatedAt())
-                .build();
+        return Optional.ofNullable(message)
+                .map(m -> LastMessageResponse.builder()
+                    .isSeen(isSeen)
+                    .message(m.getText())
+                    .time(m.getCreatedAt())
+                    .build())
+                .orElse(null);
     }
 
     private static MessageResponse toMessageResponse(Message message) {

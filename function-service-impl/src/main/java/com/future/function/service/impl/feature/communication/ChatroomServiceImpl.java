@@ -53,6 +53,7 @@ public class ChatroomServiceImpl implements ChatroomService {
 
   @Override
   public Chatroom getChatroom(String chatroomId) {
+    Chatroom chatroom = chatroomRepository.findOne(chatroomId);
     return Optional.ofNullable(chatroomId)
             .map(chatroomRepository::findOne)
             .orElseThrow(() -> new NotFoundException("Get Chatroom Not Found"));

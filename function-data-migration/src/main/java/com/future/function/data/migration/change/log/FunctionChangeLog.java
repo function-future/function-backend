@@ -165,7 +165,7 @@ public class FunctionChangeLog {
   public void insertMessage(MongoTemplate mongoTemplate) {
     User sender = mongoTemplate.findOne(query(where(FieldName.User.EMAIL).is("admin@admin.com")), User.class);
     Chatroom chatroom = mongoTemplate
-            .findOne(query(where(FieldName.Chatroom.TYPE).is(ChatroomType.PUBLIC.name())), Chatroom.class);
+            .findOne(query(where(FieldName.Chatroom.TYPE).is(ChatroomType.PUBLIC)), Chatroom.class);
     BasicDBObject message = new BasicDBObject();
     message.append(FieldName.Message.SENDER, new DBRef(DocumentName.USER, sender.getId()));
     message.append(FieldName.Message.TEXT, "Lorem ipsum dolor sit amet");
@@ -182,7 +182,7 @@ public class FunctionChangeLog {
     Message message = mongoTemplate.findAll(Message.class).get(0);
     List<User> users = mongoTemplate.findAll(User.class);
     Chatroom chatroom = mongoTemplate.findOne(query(where(FieldName.Chatroom.TYPE)
-            .is(ChatroomType.PUBLIC.name())), Chatroom.class);
+            .is(ChatroomType.PUBLIC)), Chatroom.class);
     users.forEach(user -> {
       BasicDBObject messageStatus = new BasicDBObject();
       messageStatus.append(FieldName.MessageStatus.IS_SEEN, user.getEmail().equals("admin@admin.com"));

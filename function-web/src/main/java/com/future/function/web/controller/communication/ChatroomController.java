@@ -43,7 +43,7 @@ public class ChatroomController {
     private MessageStatusService messageStatusService;
 
     //TODO: Replace below code with calling helper method to acquire authenticated userID
-    private final String userId = "5cfdc7aeb7d68d241c10dc0d";
+    private final String userId = "5d01be122dee811d8c5f32e7";
 
     @Autowired
     public ChatroomController(
@@ -115,11 +115,11 @@ public class ChatroomController {
         Message message = messageService.createMessage(messageRequestMapper.toMessage(messageRequest, userId, chatroomId));
         Chatroom chatroom = chatroomService.getChatroom(chatroomId);
         chatroom.getMembers().forEach(member -> messageStatusService.createMessageStatus(MessageStatus.builder()
-                .message(message)
-                .chatroom(chatroom)
-                .member(member)
-                .seen(false)
-                .build())
+                    .message(message)
+                    .chatroom(chatroom)
+                    .member(member)
+                    .seen(member.getId().equals(userId))
+                    .build())
         );
         return ResponseHelper.toBaseResponse(HttpStatus.CREATED);
     }
