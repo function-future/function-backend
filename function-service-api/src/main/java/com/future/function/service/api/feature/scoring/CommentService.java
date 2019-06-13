@@ -9,6 +9,6 @@ public interface CommentService {
 
     List<Comment> findAllCommentsByRoomId(String roomId);
 
-    Comment createCommentByRoom(Room room);
+    Comment createCommentByRoom(Room room, Comment comment);
 
 }

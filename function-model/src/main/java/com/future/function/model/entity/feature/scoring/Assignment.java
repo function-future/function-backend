@@ -1,6 +1,7 @@
 package com.future.function.model.entity.feature.scoring;
 
 import com.future.function.model.entity.base.BaseEntity;
+import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.util.constant.DocumentName;
 import lombok.*;
@@ -33,5 +34,8 @@ public class Assignment extends BaseEntity {
 
   @DBRef
   private FileV2 file;
+
+  @DBRef
+  private Batch batch;
 
 }
