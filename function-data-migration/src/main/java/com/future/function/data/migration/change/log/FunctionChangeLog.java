@@ -55,7 +55,7 @@ public class FunctionChangeLog {
     student.append("email", "student@student.com");
     student.append(FieldName.User.NAME, "Student");
     student.append(FieldName.User.ROLE, Role.STUDENT);
-    student.append(FieldName.User.PASSWORD, "studentfunctionapp");
+    student.append(FieldName.User.PASS, "studentfunctionapp");
     student.append(FieldName.User.PHONE, "081212341234");
     student.append(FieldName.User.ADDRESS, "Student Address");
     student.append(FieldName.User.BATCH, batchRef);
@@ -75,7 +75,7 @@ public class FunctionChangeLog {
     admin.append(FieldName.User.EMAIL, "admin@admin.com");
     admin.append(FieldName.User.NAME, "Admin Istrator");
     admin.append(FieldName.User.ROLE, Role.ADMIN);
-    admin.append(FieldName.User.PASSWORD, "administratorfunctionapp");
+    admin.append(FieldName.User.PASS, "administratorfunctionapp");
     admin.append(FieldName.User.PHONE, "+6281212341234");
     admin.append(FieldName.User.ADDRESS, "Admin Address");
     admin.append(FieldName.BaseEntity.CREATED_AT, System.currentTimeMillis());
@@ -93,7 +93,7 @@ public class FunctionChangeLog {
     mentor.append(FieldName.User.EMAIL, "mentor@mentor.com");
     mentor.append(FieldName.User.NAME, "Mentor");
     mentor.append(FieldName.User.ROLE, Role.MENTOR);
-    mentor.append(FieldName.User.PASSWORD, "mentorfunctionapp");
+    mentor.append(FieldName.User.PASS, "mentorfunctionapp");
     mentor.append(FieldName.User.PHONE, "+628121234123");
     mentor.append(FieldName.User.ADDRESS, "Mentor Address");
     mentor.append(FieldName.BaseEntity.CREATED_AT, System.currentTimeMillis());
@@ -111,7 +111,7 @@ public class FunctionChangeLog {
     judge.append(FieldName.User.EMAIL, "judge@judge.com");
     judge.append(FieldName.User.NAME, "Judge");
     judge.append(FieldName.User.ROLE, Role.JUDGE);
-    judge.append(FieldName.User.PASSWORD, "judgefunctionapp");
+    judge.append(FieldName.User.PASS, "judgefunctionapp");
     judge.append(FieldName.User.PHONE, "+62812123412345");
     judge.append(FieldName.User.ADDRESS, "Judge Address");
     judge.append(FieldName.BaseEntity.CREATED_AT, System.currentTimeMillis());

@@ -1,13 +1,12 @@
 package com.future.function.common.properties.core;
 
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 /**
  * Properties class for getting properties from {@code application
@@ -23,13 +22,13 @@ import java.util.List;
 @AllArgsConstructor
 @ConfigurationProperties("file")
 public class FileProperties {
-  
+
   private String storagePath;
-  
+
   private String thumbnailSuffix;
-  
+
   private String urlPrefix;
-  
+
   private List<String> imageExtensions;
   
   private String rootId;

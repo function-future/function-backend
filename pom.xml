@@ -16,8 +16,9 @@
   <packaging>pom</packaging>
 
   <name>function</name>
-  <description>Function is an application designed by Blibli.com FUTURE Program participants as phase 2 project. The
-    application is designed for upcoming FUTURE Program participants.</description>
+  <description>Function is an application designed by Blibli.com FUTURE
+        Program participants as phase 2 project. The
+        application is designed for upcoming FUTURE Program participants.</description>
 
   <modules>
     <module>function-app</module>
@@ -27,6 +28,7 @@
     <module>function-repository</module>
     <module>function-service-api</module>
     <module>function-service-impl</module>
+    <module>function-session</module>
     <module>function-validation</module>
     <module>function-web</module>
     <module>function-web-model</module>
@@ -43,13 +45,14 @@
     <mongobee.version>0.13</mongobee.version>
     <?SORTPOM IGNORE?>
     <sonar.coverage.exclusions>
-      **/FunctionApplication.java,
-      **/migration/**,
-      **/exception/**,
-      **/properties/**,
-      **/configuration/**,
-      **/model/**,
-      **/service/api/**
+        **/FunctionApplication.java,
+        **/migration/**,
+        **/exception/**,
+        **/properties/**,
+        **/configuration/**,
+        **/bean/**,
+        **/model/**,
+        **/service/api/**
     </sonar.coverage.exclusions>
     <?SORTPOM RESUME?>
     <powermock.version>1.7.4</powermock.version>
@@ -208,22 +211,22 @@
         <configuration>
           <predefinedSortOrder>recommended_2008_06</predefinedSortOrder>
           <?SORTPOM IGNORE?>
-          <sortDependencies>
-            groupId,
-            artifactId,
-            version,
-            scope,
-            exclusions
-          </sortDependencies>
+            <sortDependencies>
+                groupId,
+                artifactId,
+                version,
+                scope,
+                exclusions
+            </sortDependencies>
           <?SORTPOM RESUME?>
           <?SORTPOM IGNORE?>
-          <sortPlugins>
-            groupId,
-            artifactId,
-            version,
-            configuration,
-            executions
-          </sortPlugins>
+            <sortPlugins>
+                groupId,
+                artifactId,
+                version,
+                configuration,
+                executions
+            </sortPlugins>
           <?SORTPOM RESUME?>
           <sortProperties>true</sortProperties>
           <sortModules>true</sortModules>
@@ -288,6 +291,7 @@
             <exclude>**/exception/**,</exclude>
             <exclude>**/properties/**,</exclude>
             <exclude>**/configuration/**,</exclude>
+            <exclude>**/bean/**,</exclude>
             <exclude>**/model/**,</exclude>
             <exclude>**/service/api/**</exclude>
           </excludes>

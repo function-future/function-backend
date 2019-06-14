@@ -26,28 +26,28 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BaseEntity {
-  
+
   @Field(FieldName.BaseEntity.CREATED_AT)
   @CreatedDate
   private Long createdAt;
-  
+
   @Field(FieldName.BaseEntity.CREATED_BY)
   @CreatedBy
   private String createdBy;
-  
+
   @Field(FieldName.BaseEntity.UPDATED_AT)
   @LastModifiedDate
   private Long updatedAt;
-  
+
   @Field(FieldName.BaseEntity.UPDATED_BY)
   @LastModifiedBy
   private String updatedBy;
-  
+
   @Field(FieldName.BaseEntity.DELETED)
   private boolean deleted;
-  
+
   @Field(FieldName.BaseEntity.VERSION)
   @Version
   private Long version;
-  
+
 }

@@ -10,9 +10,9 @@ public interface FieldName {
   
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
   abstract class BaseEntity {
-    
+
     public static final String ID = "id";
-    
+
     public static final String CREATED_AT = "createdAt";
     
     public static final String CREATED_BY = "createdBy";
@@ -22,7 +22,7 @@ public interface FieldName {
     public static final String UPDATED_BY = "updatedBy";
     
     public static final String DELETED = "deleted";
-    
+  
     public static final String VERSION = "version";
     
   }
@@ -36,7 +36,7 @@ public interface FieldName {
     
     public static final String ROLE = "role";
     
-    public static final String PASSWORD = "password";
+    public static final String PASS = "password";
     
     public static final String PHONE = "phone";
     
@@ -98,6 +98,99 @@ public interface FieldName {
   }
 
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  abstract class Questionnaire {
+
+    public static final String TITLE = "title";
+
+    public static final String DESCRIPTION = "description";
+
+    public static final String START_DATE = "startDate";
+
+  }
+
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  abstract class QuestionQuestionnaire {
+
+    public static final String QUESTIONNAIRE = "questionnaire";
+
+    public static final String DESCRIPTION = "description";
+
+  }
+
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  abstract class QuestionResponse {
+
+    public static final String QUESTION = "question";
+
+    public static final String APRAISER = "apraiser";
+
+    public static final String APRAISEE = "apraisee";
+
+    public static final String SCORE = "score";
+
+    public static final String COMMENT = "comment";
+
+  }
+
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  abstract class QuestionResponseSummary {
+
+    public static final String QUESTION = "question";
+
+    public static final String QUESTIONNAIRE = "questionnaire";
+
+    public static final String APPRAISEE = "appraisee";
+
+    public static final String SCORE_SUMMARY = "scoreSummary";
+  }
+
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  abstract class QuestionnaireResponse {
+
+    public static final String QUESTIONNAIRE = "questionnaire";
+
+    public static final String APPRAISER = "appraiser";
+
+    public static final String APPRAISEE = "appraisee";
+
+    public static final String SCORE_SUMMARY = "scoreSummary";
+
+    public static final String DETAILS = "details";
+  }
+
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  abstract class QuestionnaireResponseSummary {
+
+    public static final String QUESTIONNAIRE = "questionnaire";
+
+    public static final String APPRAISEE = "appraisee";
+
+    public static final String SCORE_SUMMARY = "scoreSummary";
+  }
+
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  abstract class QuestionnairePartiipant {
+
+    public static final String QUESTIONNAIRE = "questionnaire";
+
+    public static final String MEMBER = "member";
+
+    public static final String TYPE = "type";
+  }
+
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  abstract class UserQuestionnairesSummary{
+
+    public static final String APPRAISEE = "appraisee";
+
+    public static final String BATCH = "batch";
+
+    public static final String SCORE_SUMMARY = "scoreSummary";
+
+  }
+
+
+
   abstract class Chatroom {
 
     public static final String MEMBERS = "members";
@@ -131,38 +224,126 @@ public interface FieldName {
     public static final String CHATROOM = "chatroom";
 
   }
+
   
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
   abstract class Course {
-    
+
+    public static final String TITLE = "title";
+
+    public static final String DESCRIPTION = "description";
+
+    public static final String FILE = "file";
+
+  }
+
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  abstract class SharedCourse {
+
+    public static final String BATCH = "batch";
+
+    public static final String COURSE = "course";
+
+  }
+
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  abstract class Discussion {
+
+    public static final String DESCRIPTION = "description";
+
+    public static final String USER = "user";
+
+    public static final String COURSE_ID = "course_id";
+
+    public static final String BATCH_CODE = "batch_code";
+
+  }
+
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  abstract class Quiz {
+
     public static final String TITLE = "title";
     
     public static final String DESCRIPTION = "description";
     
-    public static final String FILE = "file";
+    public static final String START_DATE = "startDate";
     
-  }
-  
-  @NoArgsConstructor(access = AccessLevel.PRIVATE)
-  abstract class SharedCourse {
+    public static final String END_DATE = "endDate";
+    
+    public static final String TIME_LIMIT = "timeLimit";
+    
+    public static final String TRIALS = "trials";
+    
+    public static final String QUESTION_BANK = "questionBanks";
+    
+    public static final String QUESTION_COUNT = "questionCount";
     
     public static final String BATCH = "batch";
     
-    public static final String COURSE = "course";
-    
   }
-  
+
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
-  abstract class Discussion {
-    
+  abstract class QuestionBank {
+
     public static final String DESCRIPTION = "description";
-    
-    public static final String USER = "user";
-    
-    public static final String COURSE_ID = "course_id";
-    
-    public static final String BATCH_CODE = "batch_code";
-    
+
+  }
+
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  abstract class Question {
+
+    public static final String TEXT = "text";
+
+    public static final String QUESTION_BANK = "questionBank";
+
+  }
+
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  abstract class Option {
+
+    public static final String LABEL = "text";
+
+    public static final String CORRECT = "correct";
+
+    public static final String QUESTION = "question";
+
+  }
+
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  abstract class StudentQuiz {
+
+    public static final String TRIALS = "TRIALS";
+
+    public static final String DONE = "done";
+
+    public static final String STUDENT = "student";
+
+    public static final String QUIZ = "quiz";
+
+  }
+
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  abstract class StudentQuizDetail {
+
+    public static final String POINT = "point";
+
+    public static final String STUDENT_QUIZ = "studentQuiz";
+
+  }
+
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  abstract class StudentQuestion {
+
+    public static final String STUDENT_QUIZ_DETAIL = "studentQuizDetail";
+
+    public static final String QUESTION = "question";
+
+    public static final String OPTION = "option";
+
+    public static final String CORRECT = "correct";
+
+    public static final String NUMBER = "number";
+
   }
   
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -175,6 +356,26 @@ public interface FieldName {
     public static final String USER = "user";
     
     public static final String FILES = "files";
+    
+  }
+  
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  abstract class Access {
+    
+    public static final String ROLE = "role";
+    
+    public static final String URL_REGEX = "urlRegex";
+    
+    public static final String COMPONENTS = "components";
+    
+  }
+  
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  abstract class Menu {
+    
+    public static final String ROLE = "role";
+    
+    public static final String SECTIONS = "sections";
     
   }
   

@@ -1,8 +1,9 @@
 package com.future.function.web.model.request.core;
 
 import com.future.function.common.data.core.UserData;
-import com.future.function.validation.annotation.core.FileMustBeImage;
+import com.future.function.validation.annotation.core.BatchMustExist;
 import com.future.function.validation.annotation.core.EmailMustBeUnique;
+import com.future.function.validation.annotation.core.FileMustBeImage;
 import com.future.function.validation.annotation.core.FileMustExist;
 import com.future.function.validation.annotation.core.Name;
 import com.future.function.validation.annotation.core.OnlyStudentCanHaveBatchAndUniversity;
@@ -46,6 +47,7 @@ public class UserWebRequest implements UserData {
   @NotBlank(message = "NotBlank")
   private String address;
   
+  @BatchMustExist
   private String batch;
   
   private String university;

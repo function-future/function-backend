@@ -2,6 +2,7 @@ package com.future.function.service.impl.feature.core;
 
 import com.future.function.common.enumeration.core.Role;
 import com.future.function.common.exception.NotFoundException;
+import com.future.function.common.exception.UnauthorizedException;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.User;
@@ -20,6 +21,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -85,6 +87,9 @@ public class UserServiceImplTest {
   @Mock
   private ResourceService resourceService;
   
+  @Mock
+  private BCryptPasswordEncoder encoder;
+  
   @InjectMocks
   private UserServiceImpl userService;
   
@@ -119,7 +124,8 @@ public class UserServiceImplTest {
   @After
   public void tearDown() {
     
-    verifyNoMoreInteractions(batchService, userRepository, resourceService);
+    verifyNoMoreInteractions(
+      batchService, userRepository, resourceService, encoder);
   }
   
   @Test
@@ -133,7 +139,7 @@ public class UserServiceImplTest {
     assertThat(foundUserStudent).isEqualTo(userStudent);
     
     verify(userRepository).findOne(STUDENT_ID);
-    verifyZeroInteractions(batchService, resourceService);
+    verifyZeroInteractions(batchService, resourceService, encoder);
   }
   
   @Test
@@ -147,7 +153,7 @@ public class UserServiceImplTest {
     assertThat(foundUserMentor).isEqualTo(userMentor);
     
     verify(userRepository).findOne(MENTOR_ID);
-    verifyZeroInteractions(batchService, resourceService);
+    verifyZeroInteractions(batchService, resourceService, encoder);
   }
   
   @Test
@@ -161,7 +167,7 @@ public class UserServiceImplTest {
     assertThat(caughtException().getMessage()).isEqualTo("Get User Not Found");
     
     verify(userRepository).findOne(NON_EXISTING_USER_ID);
-    verifyZeroInteractions(batchService, resourceService);
+    verifyZeroInteractions(batchService, resourceService, encoder);
   }
   
   @Test
@@ -192,7 +198,7 @@ public class UserServiceImplTest {
     assertThat(foundUserStudentsPage.getContent()).isEqualTo(studentsList);
     
     verify(userRepository).findAllByRole(Role.STUDENT, PAGEABLE);
-    verifyZeroInteractions(batchService, resourceService);
+    verifyZeroInteractions(batchService, resourceService, encoder);
   }
   
   @Test
@@ -221,7 +227,7 @@ public class UserServiceImplTest {
     assertThat(foundUserMentorsPage.getContent()).isEqualTo(mentorsList);
     
     verify(userRepository).findAllByRole(Role.MENTOR, PAGEABLE);
-    verifyZeroInteractions(batchService, resourceService);
+    verifyZeroInteractions(batchService, resourceService, encoder);
   }
   
   @Test
@@ -232,6 +238,7 @@ public class UserServiceImplTest {
     when(batchService.getBatchByCode(NUMBER)).thenReturn(BATCH);
     when(resourceService.markFilesUsed(FILE_IDS, true)).thenReturn(true);
     when(resourceService.getFile(PICTURE_ID)).thenReturn(PICTURE);
+    when(encoder.encode(PASSWORD)).thenReturn(PASSWORD);
     when(userRepository.save(userStudent)).thenReturn(userStudent);
     
     User createdUserStudent = userService.createUser(userStudent);
@@ -245,6 +252,7 @@ public class UserServiceImplTest {
     verify(batchService).getBatchByCode(NUMBER);
     verify(resourceService).markFilesUsed(FILE_IDS, true);
     verify(resourceService).getFile(PICTURE_ID);
+    verify(encoder).encode(PASSWORD);
     verify(userRepository).save(userStudent);
   }
   
@@ -255,6 +263,7 @@ public class UserServiceImplTest {
     
     when(resourceService.markFilesUsed(FILE_IDS, true)).thenReturn(true);
     when(resourceService.getFile(PICTURE_ID)).thenReturn(PICTURE);
+    when(encoder.encode(PASSWORD)).thenReturn(PASSWORD);
     when(userRepository.save(userMentor)).thenReturn(userMentor);
     
     User createdUserMentor = userService.createUser(userMentor);
@@ -265,6 +274,7 @@ public class UserServiceImplTest {
     
     verify(resourceService).markFilesUsed(FILE_IDS, true);
     verify(resourceService).getFile(PICTURE_ID);
+    verify(encoder).encode(PASSWORD);
     verify(userRepository).save(userMentor);
     verifyZeroInteractions(batchService);
   }
@@ -272,6 +282,7 @@ public class UserServiceImplTest {
   @Test
   public void testGivenMentorDataWithoutImageByCreatingUserReturnMentor() {
     
+    when(encoder.encode(PASSWORD)).thenReturn(PASSWORD);
     when(userRepository.save(userMentor)).thenReturn(userMentor);
     
     User createdUserMentor = userService.createUser(userMentor);
@@ -279,6 +290,7 @@ public class UserServiceImplTest {
     assertThat(createdUserMentor).isNotNull();
     assertThat(createdUserMentor.getPictureV2()).isNull();
     
+    verify(encoder).encode(PASSWORD);
     verify(userRepository).save(userMentor);
     verifyZeroInteractions(batchService, resourceService);
   }
@@ -309,6 +321,7 @@ public class UserServiceImplTest {
     verify(resourceService).markFilesUsed(FILE_IDS, true);
     verify(resourceService, times(2)).getFile(PICTURE_ID);
     verify(userRepository).save(userStudent);
+    verifyZeroInteractions(encoder);
   }
   
   @Test
@@ -333,7 +346,7 @@ public class UserServiceImplTest {
     verify(resourceService).markFilesUsed(FILE_IDS, true);
     verify(resourceService, times(2)).getFile(PICTURE_ID);
     verify(userRepository).save(userMentor);
-    verifyZeroInteractions(batchService);
+    verifyZeroInteractions(batchService, encoder);
   }
   
   @Test
@@ -359,7 +372,7 @@ public class UserServiceImplTest {
     verify(resourceService).markFilesUsed(FILE_IDS, false);
     verify(resourceService).getFile(PICTURE_ID);
     verify(userRepository).save(markedDeletedUserStudent);
-    verifyZeroInteractions(batchService);
+    verifyZeroInteractions(batchService, encoder);
   }
   
   @Test
@@ -384,7 +397,7 @@ public class UserServiceImplTest {
     verify(resourceService).markFilesUsed(FILE_IDS, false);
     verify(resourceService).getFile(PICTURE_ID);
     verify(userRepository).save(markedDeletedUserMentor);
-    verifyZeroInteractions(batchService);
+    verifyZeroInteractions(batchService, encoder);
   }
   
   @Test
@@ -403,7 +416,7 @@ public class UserServiceImplTest {
     
     verify(batchService).getBatchByCode(NUMBER);
     verify(userRepository).findAllByRoleAndBatch(Role.STUDENT, BATCH);
-    verifyZeroInteractions(resourceService);
+    verifyZeroInteractions(resourceService, encoder);
   }
   
   @Test
@@ -414,7 +427,8 @@ public class UserServiceImplTest {
     assertThat(foundStudents).isNotNull();
     assertThat(foundStudents).isEmpty();
     
-    verifyZeroInteractions(batchService, userRepository, resourceService);
+    verifyZeroInteractions(
+      batchService, userRepository, resourceService, encoder);
   }
   
   @Test
@@ -428,7 +442,7 @@ public class UserServiceImplTest {
     assertThat(caughtException().getClass()).isEqualTo(NotFoundException.class);
     
     verify(batchService).getBatchByCode(NUMBER);
-    verifyZeroInteractions(userRepository, resourceService);
+    verifyZeroInteractions(userRepository, resourceService, encoder);
   }
   
   @Test
@@ -445,7 +459,7 @@ public class UserServiceImplTest {
     
     verify(batchService).getBatchByCode(NUMBER);
     verify(userRepository).findAllByRoleAndBatch(Role.STUDENT, BATCH);
-    verifyZeroInteractions(resourceService);
+    verifyZeroInteractions(resourceService, encoder);
   }
   
   @Test
@@ -460,7 +474,7 @@ public class UserServiceImplTest {
     assertThat(retrievedUser).isEqualTo(userMentor);
     
     verify(userRepository).findByEmail(EMAIL_MENTOR);
-    verifyZeroInteractions(resourceService);
+    verifyZeroInteractions(resourceService, encoder);
   }
   
   @Test
@@ -474,6 +488,65 @@ public class UserServiceImplTest {
     assertThat(caughtException().getMessage()).isEqualTo("Get User Not Found");
     
     verify(userRepository).findByEmail(EMAIL_MENTOR);
+    verifyZeroInteractions(resourceService, encoder);
+  }
+  
+  @Test
+  public void testGivenEmailAndPasswordByGettingUserByEmailAndPasswordReturnUser() {
+    
+    when(userRepository.findByEmail(EMAIL_STUDENT)).thenReturn(
+      Optional.of(userStudent));
+    
+    String rawPassword = "pass";
+    when(encoder.matches(rawPassword, PASSWORD)).thenReturn(true);
+    
+    User retrievedUser = userService.getUserByEmailAndPassword(
+      EMAIL_STUDENT, rawPassword);
+    
+    assertThat(retrievedUser).isNotNull();
+    assertThat(retrievedUser).isEqualTo(userStudent);
+    
+    verify(userRepository).findByEmail(EMAIL_STUDENT);
+    verify(encoder).matches(rawPassword, PASSWORD);
+    verifyZeroInteractions(resourceService);
+  }
+  
+  @Test
+  public void testGivenEmailAndPasswordByGettingUserByEmailAndPasswordReturnUnauthorizedException() {
+    
+    when(userRepository.findByEmail(EMAIL_STUDENT)).thenReturn(
+      Optional.of(userStudent));
+    
+    String rawPassword = "pass";
+    when(encoder.matches(rawPassword, PASSWORD)).thenReturn(false);
+    
+    catchException(
+      () -> userService.getUserByEmailAndPassword(EMAIL_STUDENT, rawPassword));
+    
+    assertThat(caughtException().getClass()).isEqualTo(
+      UnauthorizedException.class);
+    assertThat(caughtException().getMessage()).isEqualTo(
+      "Invalid Email/Password");
+    
+    verify(userRepository).findByEmail(EMAIL_STUDENT);
+    verify(encoder).matches(rawPassword, PASSWORD);
+    verifyZeroInteractions(resourceService);
+  }
+  
+  @Test
+  public void testGivenEmailAndPasswordByChangingUserPasswordReturnSuccessfulChange() {
+    
+    when(userRepository.findByEmail(EMAIL_STUDENT)).thenReturn(
+      Optional.of(userStudent));
+    
+    String rawPassword = "pass";
+    when(encoder.encode(rawPassword)).thenReturn(PASSWORD);
+    
+    userService.changeUserPassword(EMAIL_STUDENT, rawPassword);
+    
+    verify(userRepository).findByEmail(EMAIL_STUDENT);
+    verify(encoder).encode(rawPassword);
+    verify(userRepository).save(userStudent);
     verifyZeroInteractions(resourceService);
   }
   

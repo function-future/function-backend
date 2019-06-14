@@ -1,8 +1,10 @@
 package com.future.function.web.controller.core;
 
+import com.future.function.common.enumeration.core.Role;
 import com.future.function.model.entity.feature.core.Course;
 import com.future.function.service.api.feature.core.CourseService;
-import com.future.function.web.JacksonTestHelper;
+import com.future.function.web.TestHelper;
+import com.future.function.web.TestSecurityConfiguration;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.mapper.request.core.CourseRequestMapper;
 import com.future.function.web.mapper.response.core.CourseResponseMapper;
@@ -15,10 +17,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -26,7 +28,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Collections;
 
@@ -42,8 +43,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
-@WebMvcTest(CourseController.class)
-public class CourseControllerTest extends JacksonTestHelper {
+@Import(TestSecurityConfiguration.class)
+@WebMvcTest(value = CourseController.class)
+public class CourseControllerTest extends TestHelper {
   
   private static final BaseResponse OK_BASE_RESPONSE =
     ResponseHelper.toBaseResponse(HttpStatus.OK);
@@ -82,10 +84,7 @@ public class CourseControllerTest extends JacksonTestHelper {
     CREATED_COURSE_WEB_RESPONSE = CourseResponseMapper.toCourseDataResponse(
     HttpStatus.CREATED, COURSE);
   
-  private JacksonTester<CourseWebRequest> courseWebRequestV2JacksonTester;
-  
-  @Autowired
-  private MockMvc mockMvc;
+  private JacksonTester<CourseWebRequest> courseWebRequestJacksonTester;
   
   @MockBean
   private CourseService courseService;
@@ -93,10 +92,12 @@ public class CourseControllerTest extends JacksonTestHelper {
   @MockBean
   private CourseRequestMapper courseRequestMapper;
   
+  @Override
   @Before
   public void setUp() {
     
     super.setUp();
+    super.setCookie(Role.JUDGE);
   }
   
   @After
@@ -112,11 +113,11 @@ public class CourseControllerTest extends JacksonTestHelper {
     when(courseRequestMapper.toCourse(COURSE_WEB_REQUEST)).thenReturn(COURSE);
     when(courseService.createCourse(COURSE)).thenReturn(COURSE);
     
-    mockMvc.perform(post("/api/core/courses").contentType(
-      MediaType.APPLICATION_JSON)
-                      .content(courseWebRequestV2JacksonTester.write(
-                        COURSE_WEB_REQUEST)
-                                 .getJson()))
+    mockMvc.perform(post("/api/core/courses").cookie(cookies)
+                      .contentType(MediaType.APPLICATION_JSON)
+                      .content(
+                        courseWebRequestJacksonTester.write(COURSE_WEB_REQUEST)
+                          .getJson()))
       .andExpect(status().isCreated())
       .andExpect(content().json(
         dataResponseJacksonTester.write(CREATED_COURSE_WEB_RESPONSE)
@@ -134,11 +135,11 @@ public class CourseControllerTest extends JacksonTestHelper {
       COURSE);
     when(courseService.updateCourse(COURSE)).thenReturn(COURSE);
     
-    mockMvc.perform(put("/api/core/courses/" + ID).contentType(
-      MediaType.APPLICATION_JSON)
-                      .content(courseWebRequestV2JacksonTester.write(
-                        COURSE_WEB_REQUEST)
-                                 .getJson()))
+    mockMvc.perform(put("/api/core/courses/" + ID).cookie(cookies)
+                      .contentType(MediaType.APPLICATION_JSON)
+                      .content(
+                        courseWebRequestJacksonTester.write(COURSE_WEB_REQUEST)
+                          .getJson()))
       .andExpect(status().isOk())
       .andExpect(content().json(
         dataResponseJacksonTester.write(RETRIEVED_COURSE_WEB_RESPONSE)
@@ -152,7 +153,7 @@ public class CourseControllerTest extends JacksonTestHelper {
   public void testGivenApiCallAndCourseIdByDeletingCourseReturnBaseResponseObject()
     throws Exception {
     
-    mockMvc.perform(delete("/api/core/courses/" + ID))
+    mockMvc.perform(delete("/api/core/courses/" + ID).cookie(cookies))
       .andExpect(status().isOk())
       .andExpect(content().json(
         baseResponseJacksonTester.write(OK_BASE_RESPONSE)
@@ -168,7 +169,8 @@ public class CourseControllerTest extends JacksonTestHelper {
     
     when(courseService.getCourses(PAGEABLE)).thenReturn(COURSE_PAGE);
     
-    mockMvc.perform(get("/api/core/courses").param("page", "1")
+    mockMvc.perform(get("/api/core/courses").cookie(cookies)
+                      .param("page", "1")
                       .param("size", "5"))
       .andExpect(status().isOk())
       .andExpect(content().json(
@@ -185,7 +187,7 @@ public class CourseControllerTest extends JacksonTestHelper {
     
     when(courseService.getCourse(ID)).thenReturn(COURSE);
     
-    mockMvc.perform(get("/api/core/courses/" + ID))
+    mockMvc.perform(get("/api/core/courses/" + ID).cookie(cookies))
       .andExpect(status().isOk())
       .andExpect(content().json(
         dataResponseJacksonTester.write(RETRIEVED_COURSE_WEB_RESPONSE)

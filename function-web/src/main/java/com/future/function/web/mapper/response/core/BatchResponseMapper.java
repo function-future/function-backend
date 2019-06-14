@@ -36,7 +36,26 @@ public class BatchResponseMapper {
   ) {
     
     return ResponseHelper.toDataResponse(
-      HttpStatus.CREATED, buildBatchWebResponse(batch));
+      HttpStatus.OK, buildBatchWebResponse(batch));
+  }
+  
+  /**
+   * Converts a batch data to {@code BatchWebResponse} object, wrapped in
+   * {@code DataResponse}.
+   *
+   * @param batch Batch data to be converted to response.
+   *
+   * @return {@code DataResponse<BatchWebResponse} - The converted batch data,
+   * wrapped in
+   * {@link com.future.function.web.model.response.base.DataResponse} and
+   * {@link com.future.function.web.model.response.feature.core.BatchWebResponse}
+   */
+  public static DataResponse<BatchWebResponse> toBatchDataResponse(
+    HttpStatus httpStatus, Batch batch
+  ) {
+    
+    return ResponseHelper.toDataResponse(
+      httpStatus, buildBatchWebResponse(batch));
   }
   
   private static BatchWebResponse buildBatchWebResponse(Batch batch) {

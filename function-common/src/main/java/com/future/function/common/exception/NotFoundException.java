@@ -7,15 +7,15 @@ package com.future.function.common.exception;
  * to be thrown in runtime.
  */
 public class NotFoundException extends RuntimeException {
-  
+
   public NotFoundException(String message) {
-    
+
     this(message, null);
   }
-  
+
   public NotFoundException(String message, Throwable cause) {
-    
+
     super(message, cause);
   }
-  
+
 }

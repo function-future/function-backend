@@ -1,6 +1,9 @@
 package com.future.function.web.controller.core;
 
+import com.future.function.common.enumeration.core.Role;
 import com.future.function.service.api.feature.core.BatchService;
+import com.future.function.session.annotation.WithAnyRole;
+import com.future.function.session.model.Session;
 import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.mapper.request.core.BatchRequestMapper;
@@ -43,7 +46,9 @@ public class BatchController {
    */
   @ResponseStatus(HttpStatus.OK)
   @GetMapping
+  @WithAnyRole(roles = { Role.ADMIN, Role.JUDGE, Role.MENTOR })
   public PagingResponse<BatchWebResponse> getBatches(
+    Session session,
     @RequestParam(required = false,
                   defaultValue = "1")
       int page,
@@ -66,18 +71,24 @@ public class BatchController {
    */
   @ResponseStatus(HttpStatus.CREATED)
   @PostMapping
+  @WithAnyRole(roles = Role.ADMIN)
   public DataResponse<BatchWebResponse> createBatch(
+    Session session,
     @RequestBody
       BatchWebRequest data
   ) {
     
     return BatchResponseMapper.toBatchDataResponse(
-      batchService.createBatch(batchRequestMapper.toBatch(data)));
+      HttpStatus.CREATED,
+      batchService.createBatch(batchRequestMapper.toBatch(data))
+    );
   }
   
   @ResponseStatus(HttpStatus.OK)
   @GetMapping(value = "/{batchId}")
+  @WithAnyRole(roles = Role.ADMIN)
   public DataResponse<BatchWebResponse> getBatch(
+    Session session,
     @PathVariable
       String batchId
   ) {
@@ -88,7 +99,9 @@ public class BatchController {
   
   @ResponseStatus(HttpStatus.OK)
   @PutMapping(value = "/{batchId}")
+  @WithAnyRole(roles = Role.ADMIN)
   public DataResponse<BatchWebResponse> updateBatch(
+    Session session,
     @PathVariable
       String batchId,
     @RequestBody
@@ -101,7 +114,9 @@ public class BatchController {
   
   @ResponseStatus(HttpStatus.OK)
   @DeleteMapping(value = "/{batchId}")
+  @WithAnyRole(roles = Role.ADMIN)
   public BaseResponse deleteBatch(
+    Session session,
     @PathVariable
       String batchId
   ) {

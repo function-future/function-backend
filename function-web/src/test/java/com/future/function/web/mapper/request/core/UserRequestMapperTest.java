@@ -28,8 +28,6 @@ public class UserRequestMapperTest {
   
   private static final String ADMIN_EMAIL = "admin@test.com";
   
-  private static final String BAD_JSON = "{}";
-  
   private static final String NAME = "name";
   
   private static final String PASSWORD = "namefunctionapp";
@@ -79,13 +77,6 @@ public class UserRequestMapperTest {
     .university(UNIVERSITY)
     .build();
   
-  private static final String STUDENT_JSON =
-    "{\n" + "    \"role\": \"STUDENT\",\n" + "    \"email\": \"" + ADMIN_EMAIL +
-    "\",\n" + "    \"name\": \"" + NAME + "\",\n" + "    \"phone\": \"" +
-    PHONE + "\",\n" + "    \"address\": \"" + ADDRESS + "\",\n" +
-    "    \"batch\": " + NUMBER + ",\n" + "    \"university\": \"" + UNIVERSITY +
-    "\"\n" + "}";
-  
   private static final UserWebRequest STUDENT_WEB_REQUEST =
     UserWebRequest.builder()
       .role(Role.STUDENT.name())
@@ -121,11 +112,6 @@ public class UserRequestMapperTest {
     .pictureV2(new FileV2())
     .build();
   
-  private static final String VALID_ADMIN_JSON =
-    "{\n" + "    \"role\": \"ADMIN\",\n" + "    \"email\": \"" + ADMIN_EMAIL +
-    "\",\n" + "    \"name\": \"" + NAME + "\",\n" + "    \"phone\": \"" +
-    PHONE + "\",\n" + "    \"address\": \"" + ADDRESS + "\"\n" + "}";
-  
   private static final UserWebRequest VALID_ADMIN_WEB_REQUEST =
     UserWebRequest.builder()
       .role(Role.ADMIN.name())
@@ -134,6 +120,26 @@ public class UserRequestMapperTest {
       .phone(PHONE)
       .address(ADDRESS)
       .build();
+  
+  private static final User VALID_ADMIN_WITH_EMPTY_AVATAR = User.builder()
+    .role(Role.ADMIN)
+    .email(ADMIN_EMAIL)
+    .name(NAME)
+    .password(PASSWORD)
+    .phone(PHONE)
+    .address(ADDRESS)
+    .pictureV2(new FileV2())
+    .build();
+  
+  private static final UserWebRequest
+    VALID_ADMIN_WEB_REQUEST_WITH_EMPTY_AVATAR = UserWebRequest.builder()
+    .role(Role.ADMIN.name())
+    .email(ADMIN_EMAIL)
+    .name(NAME)
+    .phone(PHONE)
+    .address(ADDRESS)
+    .avatar(Collections.emptyList())
+    .build();
   
   @InjectMocks
   private UserRequestMapper userRequestMapper;
@@ -148,6 +154,9 @@ public class UserRequestMapperTest {
       STUDENT_WEB_REQUEST);
     when(validator.validate(VALID_ADMIN_WEB_REQUEST)).thenReturn(
       VALID_ADMIN_WEB_REQUEST);
+    when(
+      validator.validate(VALID_ADMIN_WEB_REQUEST_WITH_EMPTY_AVATAR)).thenReturn(
+      VALID_ADMIN_WEB_REQUEST_WITH_EMPTY_AVATAR);
   }
   
   @After
@@ -167,8 +176,15 @@ public class UserRequestMapperTest {
     
     assertThat(parsedAdmin).isEqualTo(VALID_ADMIN);
     
+    User parsedAdminWithEmptyAvatar = userRequestMapper.toUser(
+      VALID_ADMIN_WEB_REQUEST_WITH_EMPTY_AVATAR);
+    
+    assertThat(parsedAdminWithEmptyAvatar).isEqualTo(
+      VALID_ADMIN_WITH_EMPTY_AVATAR);
+    
     verify(validator).validate(STUDENT_WEB_REQUEST);
     verify(validator).validate(VALID_ADMIN_WEB_REQUEST);
+    verify(validator).validate(VALID_ADMIN_WEB_REQUEST_WITH_EMPTY_AVATAR);
   }
   
   @Test

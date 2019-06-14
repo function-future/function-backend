@@ -14,45 +14,45 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 @RunWith(MockitoJUnitRunner.class)
 public class NameValidatorTest {
-  
+
   private static final String VALID_NAME = "Name Name";
-  
+
   private static final String INVALID_NAME = "Name 1";
-  
+
   @Mock
   private Name annotation;
-  
+
   @InjectMocks
   private NameValidator validator;
-  
+
   @Before
   public void setUp() {
-    
+
     validator.initialize(annotation);
   }
-  
+
   @After
   public void tearDown() {
-  
+
     verifyNoMoreInteractions(annotation);
   }
-  
+
   @Test
   public void testGivenValidStringAsNameByValidatingNameReturnTrue() {
-    
+
     assertThat(validator.isValid(VALID_NAME, null)).isTrue();
   }
-  
+
   @Test
   public void testGivenValidStringAsNameByValidatingNameReturnFalse() {
-    
+
     assertThat(validator.isValid(INVALID_NAME, null)).isFalse();
   }
-  
+
   @Test
   public void testGivenNullStringAsNameByValidatingNameReturnFalse() {
-    
+
     assertThat(validator.isValid(null, null)).isFalse();
   }
-  
+
 }

@@ -12,7 +12,7 @@ import javax.validation.ConstraintValidatorContext;
  * the second type being String as the validated data is String object.
  */
 public class NameValidator implements ConstraintValidator<Name, String> {
-  
+
   /**
    * Do initialization related to the annotation here.
    *
@@ -22,7 +22,7 @@ public class NameValidator implements ConstraintValidator<Name, String> {
   public void initialize(Name constraintAnnotation) {
     // No initialization needed for this validator.
   }
-  
+
   /**
    * Checks whether the String object is not null and matches the specified
    * regex pattern for alphabetical characters only.
@@ -34,8 +34,8 @@ public class NameValidator implements ConstraintValidator<Name, String> {
    */
   @Override
   public boolean isValid(String value, ConstraintValidatorContext context) {
-    
+
     return (value != null) && (value.matches("^([A-Za-z]+(( )[A-Za-z]+)*)+$"));
   }
-  
+
 }
