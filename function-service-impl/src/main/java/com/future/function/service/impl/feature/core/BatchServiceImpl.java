@@ -4,7 +4,7 @@ import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.repository.feature.core.BatchRepository;
 import com.future.function.service.api.feature.core.BatchService;
-import org.springframework.beans.BeanUtils;
+import com.future.function.service.impl.helper.CopyHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -86,7 +86,7 @@ public class BatchServiceImpl implements BatchService {
   
   private Batch copyPropertiesAndSaveBatch(Batch batch, Batch foundBatch) {
     
-    BeanUtils.copyProperties(batch, foundBatch);
+    CopyHelper.copyProperties(batch, foundBatch);
     return batchRepository.save(foundBatch);
   }
   

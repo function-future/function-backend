@@ -9,7 +9,7 @@ import com.future.function.repository.feature.core.UserRepository;
 import com.future.function.service.api.feature.core.BatchService;
 import com.future.function.service.api.feature.core.ResourceService;
 import com.future.function.service.api.feature.core.UserService;
-import org.springframework.beans.BeanUtils;
+import com.future.function.service.impl.helper.CopyHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -205,7 +205,7 @@ public class UserServiceImpl implements UserService {
   
   private User copyPropertiesAndSaveUser(User user, User foundUser) {
     
-    BeanUtils.copyProperties(user, foundUser);
+    CopyHelper.copyProperties(user, foundUser);
     return userRepository.save(foundUser);
   }
   

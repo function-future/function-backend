@@ -1,6 +1,7 @@
 package com.future.function.service.impl.feature.core;
 
 import com.future.function.common.enumeration.core.FileOrigin;
+import com.future.function.common.enumeration.core.Role;
 import com.future.function.common.exception.NotFoundException;
 import com.future.function.common.properties.core.FileProperties;
 import com.future.function.model.entity.feature.core.FileV2;
@@ -39,12 +40,6 @@ public class FileServiceImpl implements FileService {
     this.fileRepositoryV2 = fileRepositoryV2;
     this.resourceService = resourceService;
     this.fileProperties = fileProperties;
-  }
-  
-  private FileV2 copyPropertiesAndSaveFileV2(Pair<FileV2, FileV2> pair) {
-    
-    CopyHelper.copyProperties(pair.getFirst(), pair.getSecond());
-    return fileRepositoryV2.save(pair.getSecond());
   }
   
   /**
@@ -154,16 +149,17 @@ public class FileServiceImpl implements FileService {
       .map(file -> this.updateFile(file, session, fileOrFolderId, parentId,
                                    objectName, fileName, bytes
       ))
-      .orElseGet(() -> this.updateFolder(session, fileV2));
+      .orElseGet(() -> this.updateFolder(session, fileV2, objectName));
   }
   
-  private FileV2 updateFolder(Session session, FileV2 fileV2) {
+  private FileV2 updateFolder(Session session, FileV2 fileV2, String name) {
     
+    fileV2.setName(name);
     return Optional.of(fileV2)
       .filter(
         file -> AuthorizationHelper.isAuthorizedForEdit(session.getEmail(),
                                                         session.getRole(), file,
-                                                        AuthorizationHelper.AUTHENTICATED_ONLY
+                                                        Role.ADMIN
         ))
       .map(fileRepositoryV2::save)
       .orElse(fileV2);
@@ -178,7 +174,7 @@ public class FileServiceImpl implements FileService {
       .filter(
         file -> AuthorizationHelper.isAuthorizedForEdit(session.getEmail(),
                                                         session.getRole(), file,
-                                                        AuthorizationHelper.AUTHENTICATED_ONLY
+                                                        Role.ADMIN
         ))
       .map(ignored -> resourceService.storeFile(fileOrFolderId, parentId,
                                                 objectName, fileName, bytes,
@@ -191,6 +187,11 @@ public class FileServiceImpl implements FileService {
       .orElse(fileV2);
   }
   
+  private FileV2 copyPropertiesAndSaveFileV2(Pair<FileV2, FileV2> pair) {
+    
+    CopyHelper.copyProperties(pair.getFirst(), pair.getSecond());
+    return fileRepositoryV2.save(pair.getSecond());
+  }
   
   /**
    * {@inheritDoc}
@@ -210,12 +211,17 @@ public class FileServiceImpl implements FileService {
       .filter(
         file -> AuthorizationHelper.isAuthorizedForEdit(session.getEmail(),
                                                         session.getRole(), file,
-                                                        AuthorizationHelper.AUTHENTICATED_ONLY
+                                                        Role.ADMIN
         ))
-      .ifPresent(
-        file -> resourceService.markFilesUsed(this.getListOfIdToBeMarked(file),
-                                              false
-        ));
+      .ifPresent(file -> {
+        resourceService.markFilesUsed(this.getListOfIdToBeMarked(file), false);
+        
+        // Prevents optimistic locking
+        file = fileRepositoryV2.findOne(file.getId());
+        
+        file.setDeleted(true);
+        fileRepositoryV2.save(file);
+      });
   }
   
   private List<String> getListOfIdToBeMarked(FileV2 file) {

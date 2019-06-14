@@ -15,6 +15,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -144,6 +145,12 @@ public class FileServiceImplTest {
     when(resourceService.markFilesUsed(Collections.singletonList(ID),
                                        false
     )).thenReturn(true);
+    when(fileRepository.findOne(ID)).thenReturn(file);
+    
+    FileV2 markedDeletedFile = new FileV2();
+    BeanUtils.copyProperties(file, markedDeletedFile);
+    markedDeletedFile.setDeleted(true);
+    when(fileRepository.save(markedDeletedFile)).thenReturn(markedDeletedFile);
     
     fileService.deleteFileOrFolder(SESSION, PARENT_ID, ID);
     
@@ -151,6 +158,8 @@ public class FileServiceImplTest {
     verify(fileRepository).findByIdAndParentId(ID, PARENT_ID);
     verify(fileRepository).findAllByParentId(ID);
     verify(resourceService).markFilesUsed(Collections.singletonList(ID), false);
+    verify(fileRepository).findOne(ID);
+    verify(fileRepository).save(markedDeletedFile);
   }
   
   @Test

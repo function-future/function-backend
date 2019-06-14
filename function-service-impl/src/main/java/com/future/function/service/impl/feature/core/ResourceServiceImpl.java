@@ -82,7 +82,6 @@ public class ResourceServiceImpl implements ResourceService {
     FileV2 fileV2 = Optional.ofNullable(fileId)
       .map(id -> fileRepositoryV2.findOne(fileId))
       .orElseGet(() -> FileV2.builder()
-        .name(objectName)
         .build());
     
     if (!StringUtils.isEmpty(fileId)) {
@@ -92,6 +91,8 @@ public class ResourceServiceImpl implements ResourceService {
     if (!StringUtils.isEmpty(parentId)) {
       fileV2.setParentId(parentId);
     }
+    
+    fileV2.setName(objectName);
     
     return fileV2;
   }

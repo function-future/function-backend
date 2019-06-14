@@ -5,14 +5,13 @@ import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.Course;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.SharedCourse;
-import com.future.function.model.util.constant.FieldName;
 import com.future.function.repository.feature.core.SharedCourseRepository;
 import com.future.function.service.api.feature.core.BatchService;
 import com.future.function.service.api.feature.core.CourseService;
 import com.future.function.service.api.feature.core.ResourceService;
 import com.future.function.service.api.feature.core.SharedCourseService;
+import com.future.function.service.impl.helper.CopyHelper;
 import com.future.function.service.impl.helper.PageHelper;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -184,17 +183,15 @@ public class SharedCourseServiceImpl implements SharedCourseService {
     SharedCourse sharedCourse, Course course
   ) {
     
-    resourceService.markFilesUsed(Collections.singletonList(course.getFile()
-                                                              .getId()), true);
-    course.setFile(resourceService.getFile(course.getFile()
-                                             .getId()));
+    Optional.ofNullable(course)
+      .map(Course::getFile)
+      .map(FileV2::getId)
+      .ifPresent(fileId -> {
+        resourceService.markFilesUsed(Collections.singletonList(fileId), true);
+        course.setFile(resourceService.getFile(fileId));
+      });
     
-    BeanUtils.copyProperties(course, sharedCourse.getCourse(),
-                             FieldName.BaseEntity.ID,
-                             FieldName.BaseEntity.VERSION,
-                             FieldName.BaseEntity.CREATED_AT,
-                             FieldName.BaseEntity.CREATED_BY
-    );
+    CopyHelper.copyProperties(course, sharedCourse.getCourse());
     
     return sharedCourseRepository.save(sharedCourse);
   }
