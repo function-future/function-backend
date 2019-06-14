@@ -62,7 +62,7 @@ public class ChatroomController {
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public PagingResponse<ChatroomResponse> getChatrooms(
-            @RequestParam(required = false, defaultValue = "public") String type,
+            @RequestParam(required = false, defaultValue = "PUBLIC") String type,
             @RequestParam(required = false) String search,
             @RequestParam(required = false, defaultValue = "1") int page,
             @RequestParam(required = false, defaultValue = "10") int size) {
@@ -110,7 +110,8 @@ public class ChatroomController {
     @PostMapping( value = "/{chatroomId:.+}/messages",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public BaseResponse createChatting(@PathVariable String chatroomId, @RequestBody MessageRequest messageRequest) {
+    @ResponseStatus(value = HttpStatus.CREATED)
+    public BaseResponse createMessage(@PathVariable String chatroomId, @RequestBody MessageRequest messageRequest) {
 
         Message message = messageService.createMessage(messageRequestMapper.toMessage(messageRequest, userId, chatroomId));
         Chatroom chatroom = chatroomService.getChatroom(chatroomId);

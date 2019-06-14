@@ -22,6 +22,8 @@ public class ChatroomResponse {
 
   private String type;
 
+  private String name;
+
   private List<ChatroomParticipantResponse> participants;
 
   private LastMessageResponse lastMessage;

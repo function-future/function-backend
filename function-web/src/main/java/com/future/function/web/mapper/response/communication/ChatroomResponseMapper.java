@@ -1,18 +1,17 @@
 package com.future.function.web.mapper.response.communication;
 
+import com.future.function.common.enumeration.communication.ChatroomType;
+import com.future.function.common.enumeration.core.Role;
 import com.future.function.model.entity.feature.communication.chatting.Chatroom;
 import com.future.function.model.entity.feature.communication.chatting.Message;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.User;
-import com.future.function.service.api.feature.communication.ChatroomService;
 import com.future.function.service.api.feature.communication.MessageService;
 import com.future.function.service.api.feature.communication.MessageStatusService;
 import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.mapper.response.core.BatchResponseMapper;
-import com.future.function.web.mapper.response.core.FileResponseMapper;
-import com.future.function.web.mapper.response.core.UserResponseMapper;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.feature.communication.chatting.*;
@@ -41,9 +40,15 @@ public class ChatroomResponseMapper {
                 .avatar(getAvatarThumbnailUrl(user.getPictureV2()))
                 .batch(getBatch(user.getBatch()))
                 .name(user.getName())
-                .type(user.getRole().name())
+                .type(getRole(user))
                 .university(user.getUniversity())
                 .build();
+    }
+
+    private static String getRole(User user) {
+        return Optional.ofNullable(user.getRole())
+                .map(Role::name)
+                .orElse(null);
     }
 
     private static String getAvatarThumbnailUrl(FileV2 fileV2) {
@@ -89,8 +94,15 @@ public class ChatroomResponseMapper {
                 .id(chatroom.getId())
                 .participants(participants)
                 .lastMessage(toLastMessageResponse(lastMessage, isSeen))
-                .type(chatroom.getType().name())
+                .type(getType(chatroom))
+                .name(chatroom.getTitle())
                 .build();
+    }
+
+    private static String getType(Chatroom chatroom) {
+        return Optional.ofNullable(chatroom.getType())
+                .map(ChatroomType::name)
+                .orElse(null);
     }
 
     private static List<ChatroomResponse> toChatroomResponseList(
