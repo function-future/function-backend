@@ -1,6 +1,8 @@
 package com.future.function.web.controller.core;
 
 import com.future.function.common.enumeration.core.Role;
+import com.future.function.service.api.feature.core.AccessService;
+import com.future.function.service.api.feature.core.MenuService;
 import com.future.function.service.api.feature.core.UserService;
 import com.future.function.session.annotation.WithAnyRole;
 import com.future.function.session.model.Session;
@@ -16,26 +18,38 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/core/user")
-@WithAnyRole(roles = {
-  Role.STUDENT, Role.MENTOR, Role.JUDGE, Role.ADMIN
-})
 public class UserDetailController {
   
   private final UserService userService;
   
+  private final MenuService menuService;
+  
+  private final AccessService accessService;
+  
   @Autowired
-  public UserDetailController(UserService userService) {
+  public UserDetailController(
+    UserService userService, MenuService menuService,
+    AccessService accessService
+  ) {
     
     this.userService = userService;
+    this.menuService = menuService;
+    this.accessService = accessService;
   }
   
   @ResponseStatus(HttpStatus.OK)
   @GetMapping("/profile")
+  @WithAnyRole(roles = {
+    Role.STUDENT, Role.MENTOR, Role.JUDGE, Role.ADMIN
+  })
   public DataResponse<UserWebResponse> getProfile(
     Session session
   ) {
@@ -46,6 +60,9 @@ public class UserDetailController {
   
   @ResponseStatus(HttpStatus.OK)
   @PostMapping("/password")
+  @WithAnyRole(roles = {
+    Role.STUDENT, Role.MENTOR, Role.JUDGE, Role.ADMIN
+  })
   public BaseResponse changePassword(
     Session session,
     @RequestBody
@@ -55,6 +72,28 @@ public class UserDetailController {
     userService.changeUserPassword(
       session.getEmail(), request.getNewPassword());
     return ResponseHelper.toBaseResponse(HttpStatus.OK);
+  }
+  
+  @ResponseStatus(HttpStatus.OK)
+  @GetMapping("/menu-list")
+  public Map<String, Object> getMenuList(
+    @WithAnyRole(noUnauthorized = true)
+      Session session
+  ) {
+    
+    return menuService.getSectionsByRole(session.getRole());
+  }
+  
+  @ResponseStatus(HttpStatus.OK)
+  @GetMapping("/access-list")
+  public Map<String, Object> getAccessList(
+    @RequestParam(defaultValue = "")
+      String url,
+    @WithAnyRole(noUnauthorized = true)
+      Session session
+  ) {
+    
+    return accessService.getComponentsByUrlAndRole(url, session.getRole());
   }
   
 }
