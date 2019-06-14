@@ -67,6 +67,7 @@ public class UserRequestMapper {
     
     return Optional.of(request)
       .map(UserWebRequest::getAvatar)
+      .filter(avatarSingleList -> !avatarSingleList.isEmpty())
       .map(list -> list.get(0))
       .map(this::buildFileV2)
       .orElseGet(FileV2::new);
