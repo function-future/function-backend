@@ -4,7 +4,7 @@ import com.future.function.model.entity.feature.core.Discussion;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
-import com.future.function.web.model.response.base.AuthorWebResponse;
+import com.future.function.web.model.response.feature.embedded.AuthorWebResponse;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.feature.core.DiscussionWebResponse;
