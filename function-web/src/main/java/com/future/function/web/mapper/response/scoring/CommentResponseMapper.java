@@ -2,7 +2,7 @@ package com.future.function.web.mapper.response.scoring;
 
 import com.future.function.model.entity.feature.scoring.Comment;
 import com.future.function.web.mapper.helper.ResponseHelper;
-import com.future.function.web.model.response.base.AuthorWebResponse;
+import com.future.function.web.model.response.feature.embedded.AuthorWebResponse;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.feature.scoring.CommentWebResponse;
 import org.springframework.http.HttpStatus;
