@@ -1,10 +1,11 @@
 package com.future.function.web.model.response.base;
 
-import java.util.List;
-import java.util.Map;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * Model representation for error response; specifically
@@ -16,12 +17,11 @@ public class ErrorResponse extends BaseResponse {
 
   private Map<String, List<String>> errors;
 
-  public ErrorResponse() {
-  }
-
+  public ErrorResponse() {}
+  
   @Builder
   private ErrorResponse(
-          int code, String status, Map<String, List<String>> errors
+    int code, String status, Map<String, List<String>> errors
   ) {
 
     super(code, status);

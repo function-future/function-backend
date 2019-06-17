@@ -9,13 +9,12 @@ import com.future.function.repository.feature.core.DiscussionRepository;
 import com.future.function.service.api.feature.core.DiscussionService;
 import com.future.function.service.api.feature.core.SharedCourseService;
 import com.future.function.service.api.feature.core.UserService;
+import com.future.function.service.impl.helper.PageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.Optional;
 
 /**
@@ -61,7 +60,7 @@ public class DiscussionServiceImpl implements DiscussionService {
       .map(
         ignored -> discussionRepository.findAllByCourseIdAndBatchCodeOrderByCreatedAtDesc(
           courseId, batchCode, pageable))
-      .orElseGet(() -> new PageImpl<>(Collections.emptyList(), pageable, 0));
+      .orElseGet(() -> PageHelper.empty(pageable));
   }
   
   /**
@@ -88,16 +87,6 @@ public class DiscussionServiceImpl implements DiscussionService {
         () -> new UnsupportedOperationException("Create Discussion Failed"));
   }
   
-  private Discussion setDiscussionUser(Discussion discussion) {
-    
-    User user = userService.getUserByEmail(discussion.getUser()
-                                             .getEmail());
-    
-    discussion.setUser(user);
-    
-    return discussion;
-  }
-  
   private boolean isUserValidForAddingDiscussion(
     String email, String batchCode
   ) {
@@ -120,6 +109,16 @@ public class DiscussionServiceImpl implements DiscussionService {
     
     return sharedCourseService.getCourseByIdAndBatchCode(courseId, batchCode) !=
            null;
+  }
+  
+  private Discussion setDiscussionUser(Discussion discussion) {
+    
+    User user = userService.getUserByEmail(discussion.getUser()
+                                             .getEmail());
+    
+    discussion.setUser(user);
+    
+    return discussion;
   }
   
 }

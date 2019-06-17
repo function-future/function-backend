@@ -4,6 +4,7 @@ import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.util.constant.FieldName;
 import com.future.function.repository.feature.core.BatchRepository;
+import com.future.function.service.impl.helper.PageHelper;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -12,13 +13,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Optional;
 
 import static com.googlecode.catchexception.CatchException.catchException;
@@ -166,8 +165,8 @@ public class BatchServiceImplTest {
       .code(SECOND_BATCH_NUMBER)
       .build();
     
-    Page<Batch> batchPage = new PageImpl<>(
-      Arrays.asList(secondBatch, batch), PAGEABLE, 2);
+    Page<Batch> batchPage = PageHelper.toPage(
+      Arrays.asList(secondBatch, batch), PAGEABLE);
     
     when(batchRepository.findAllByIdIsNotNull(PAGEABLE)).thenReturn(batchPage);
     
@@ -182,9 +181,7 @@ public class BatchServiceImplTest {
   @Test
   public void testGivenNoExistingBatchInDatabaseByFindingBatchesReturnEmptyList() {
     
-    Page<Batch> batchPage = new PageImpl<>(Collections.emptyList(), PAGEABLE,
-                                           0
-    );
+    Page<Batch> batchPage = PageHelper.empty(PAGEABLE);
     
     when(batchRepository.findAllByIdIsNotNull(PAGEABLE)).thenReturn(batchPage);
     
@@ -229,14 +226,14 @@ public class BatchServiceImplTest {
   
   @Test
   public void testGivenMethodCallToUpdateNonExistingBatchByUpdatingBatchReturnRequestBatchObject() {
-  
+    
     when(batchRepository.findOne(ID_1)).thenReturn(null);
-  
+    
     Batch returnedButNotUpdatedBatch = batchService.updateBatch(batch);
-  
+    
     assertThat(returnedButNotUpdatedBatch).isNotNull();
     assertThat(returnedButNotUpdatedBatch).isEqualTo(batch);
-  
+    
     verify(batchRepository).findOne(ID_1);
   }
   

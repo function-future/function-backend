@@ -4,6 +4,7 @@ import com.future.function.common.enumeration.core.FileOrigin;
 import com.future.function.common.exception.NotFoundException;
 import com.future.function.common.properties.core.FileProperties;
 import com.future.function.model.entity.feature.core.FileV2;
+import com.future.function.model.entity.feature.core.embedded.Version;
 import com.future.function.repository.feature.core.FileRepositoryV2;
 import com.future.function.service.impl.helper.FileHelper;
 import org.junit.After;
@@ -44,6 +45,8 @@ public class ResourceServiceImplTest {
   
   private static final String FILE_PATH = "file-path";
   
+  private static final String FILE_URL = "file-url";
+  
   private static final String THUMBNAIL_PATH = "thumbnail-path";
   
   private static final FileV2 FILE_V2 = FileV2.builder()
@@ -51,6 +54,11 @@ public class ResourceServiceImplTest {
     .filePath(FILE_PATH)
     .thumbnailPath(THUMBNAIL_PATH)
     .asResource(FileOrigin.ANNOUNCEMENT.isAsResource())
+    .versions(Collections.singletonMap(1L,
+                                       new Version(System.currentTimeMillis(),
+                                                   FILE_PATH, FILE_URL
+                                       )
+    ))
     .build();
   
   private static final String THUMBNAIL_SUFFIX = "-thumbnail";
@@ -82,7 +90,7 @@ public class ResourceServiceImplTest {
   @AfterClass
   public static void tearDownClass() {
     
-    final int numberOfTestMethodInClass = 9;
+    final int numberOfTestMethodInClass = 11;
     
     verify(
       fileProperties, times(numberOfTestMethodInClass)).getImageExtensions();
@@ -188,8 +196,8 @@ public class ResourceServiceImplTest {
       .asResource(true)
       .build();
     when(fileRepositoryV2.save(any(FileV2.class))).thenReturn(expectedFileV2);
-    FileV2 fileV2 = resourceService.storeFile("", fileName, BYTES,
-                                              FileOrigin.ANNOUNCEMENT
+    FileV2 fileV2 = resourceService.storeAndSaveFile("", fileName, BYTES,
+                                                     FileOrigin.ANNOUNCEMENT
     );
     
     assertThat(fileV2.getId()).isNotBlank();
@@ -198,6 +206,53 @@ public class ResourceServiceImplTest {
     assertThat(fileV2.getThumbnailUrl()).isNull();
     
     verify(fileRepositoryV2).save(any(FileV2.class));
+  }
+  
+  @Test
+  public void testGivenMethodCallAndFileIdAndParentIdToStoreFileByStoringFileReturnFileV2Object()
+    throws Exception {
+    
+    File file = mock(File.class);
+    
+    mockStatic(File.class);
+    whenNew(File.class).withArguments(FILE_PATH)
+      .thenReturn(file);
+    
+    mockStatic(FileHelper.class);
+    doNothing().when(FileHelper.class, "createJavaIoFile", BYTES, FILE_PATH);
+    
+    String fileId = UUID.randomUUID()
+      .toString();
+    String fileName = fileId + ".doc";
+    String parentId = "parent-id";
+    
+    FileV2 returnedFileV2 = FileV2.builder()
+      .id(fileId)
+      .name("")
+      .asResource(true)
+      .parentId(parentId)
+      .filePath("")
+      .fileUrl("")
+      .build();
+    
+    when(fileRepositoryV2.findOne(fileId)).thenReturn(returnedFileV2);
+  
+    FileV2 expectedFileV2 = FileV2.builder()
+      .id(fileId)
+      .name("")
+      .asResource(true)
+      .parentId(parentId)
+      .filePath("\\announcement\\" + fileId + "-0\\" + fileName)
+      .fileUrl("/announcement/" + fileName)
+      .build();
+    
+    FileV2 fileV2 = resourceService.storeFile(fileId, parentId, "", fileName,
+                                              BYTES, FileOrigin.ANNOUNCEMENT
+    );
+    
+    assertThat(fileV2).isEqualTo(expectedFileV2);
+    
+    verify(fileRepositoryV2).findOne(fileId);
   }
   
   @Test
@@ -225,8 +280,8 @@ public class ResourceServiceImplTest {
       .asResource(true)
       .build();
     when(fileRepositoryV2.save(any(FileV2.class))).thenReturn(expectedFileV2);
-    FileV2 fileV2 = resourceService.storeFile("", fileName, BYTES,
-                                              FileOrigin.ANNOUNCEMENT
+    FileV2 fileV2 = resourceService.storeAndSaveFile("", fileName, BYTES,
+                                                     FileOrigin.ANNOUNCEMENT
     );
     
     assertThat(fileV2.getId()).isNotBlank();
@@ -260,7 +315,42 @@ public class ResourceServiceImplTest {
     doReturn(false).when(FileHelper.class, "isThumbnailName", fileName);
     
     byte[] bytes = resourceService.getFileAsByteArray(fileName,
-                                                      FileOrigin.ANNOUNCEMENT
+                                                      FileOrigin.ANNOUNCEMENT,
+                                                      null
+    );
+    
+    assertThat(bytes).isEqualTo(BYTES);
+    
+    verify(fileRepositoryV2).findByIdAndAsResource(fileId,
+                                                   FileOrigin.ANNOUNCEMENT.isAsResource()
+    );
+  }
+  
+  @Test
+  public void testGivenFileNameAndOriginAndVersionByGettingFileAsByteArrayReturnByteArray()
+    throws Exception {
+    
+    String fileId = UUID.randomUUID()
+      .toString();
+    when(fileRepositoryV2.findByIdAndAsResource(fileId,
+                                                FileOrigin.ANNOUNCEMENT.isAsResource()
+    )).thenReturn(Optional.of(FILE_V2));
+    
+    File file = mock(File.class);
+    
+    mockStatic(File.class);
+    whenNew(File.class).withArguments(FILE_PATH)
+      .thenReturn(file);
+    
+    mockStatic(FileHelper.class);
+    doReturn(BYTES).when(FileHelper.class, "toByteArray", any(File.class));
+    
+    String fileName = fileId + ".png";
+    doReturn(false).when(FileHelper.class, "isThumbnailName", fileName);
+    
+    byte[] bytes = resourceService.getFileAsByteArray(fileName,
+                                                      FileOrigin.ANNOUNCEMENT,
+                                                      1L
     );
     
     assertThat(bytes).isEqualTo(BYTES);
@@ -293,7 +383,8 @@ public class ResourceServiceImplTest {
     doReturn(true).when(FileHelper.class, "isThumbnailName", fileName);
     
     byte[] bytes = resourceService.getFileAsByteArray(fileName,
-                                                      FileOrigin.ANNOUNCEMENT
+                                                      FileOrigin.ANNOUNCEMENT,
+                                                      null
     );
     
     assertThat(bytes).isEqualTo(BYTES);
@@ -314,7 +405,8 @@ public class ResourceServiceImplTest {
     
     String fileName = fileId + ".png";
     catchException(() -> resourceService.getFileAsByteArray(fileName,
-                                                            FileOrigin.ANNOUNCEMENT
+                                                            FileOrigin.ANNOUNCEMENT,
+                                                            null
     ));
     
     assertThat(caughtException().getClass()).isEqualTo(NotFoundException.class);

@@ -5,16 +5,15 @@ import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.Course;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.SharedCourse;
-import com.future.function.model.util.constant.FieldName;
 import com.future.function.repository.feature.core.SharedCourseRepository;
 import com.future.function.service.api.feature.core.BatchService;
 import com.future.function.service.api.feature.core.CourseService;
 import com.future.function.service.api.feature.core.ResourceService;
 import com.future.function.service.api.feature.core.SharedCourseService;
-import org.springframework.beans.BeanUtils;
+import com.future.function.service.impl.helper.CopyHelper;
+import com.future.function.service.impl.helper.PageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
@@ -72,7 +71,7 @@ public class SharedCourseServiceImpl implements SharedCourseService {
     return this.getBatch(batchCode)
       .map(batch -> sharedCourseRepository.findAllByBatch(batch, pageable))
       .map(sharedCourses -> this.toCoursePage(sharedCourses, pageable))
-      .orElseGet(() -> new PageImpl<>(Collections.emptyList(), pageable, 0));
+      .orElseGet(() -> PageHelper.empty(pageable));
   }
   
   private Page<Course> toCoursePage(
@@ -81,7 +80,7 @@ public class SharedCourseServiceImpl implements SharedCourseService {
     
     List<Course> courses = toCourseList(sharedCourses);
     
-    return new PageImpl<>(courses, pageable, sharedCourses.getTotalElements());
+    return PageHelper.toPage(courses, pageable);
   }
   
   private List<Course> toCourseList(Page<SharedCourse> sharedCourses) {
@@ -184,17 +183,15 @@ public class SharedCourseServiceImpl implements SharedCourseService {
     SharedCourse sharedCourse, Course course
   ) {
     
-    resourceService.markFilesUsed(Collections.singletonList(course.getFile()
-                                                              .getId()), true);
-    course.setFile(resourceService.getFile(course.getFile()
-                                             .getId()));
+    Optional.ofNullable(course)
+      .map(Course::getFile)
+      .map(FileV2::getId)
+      .ifPresent(fileId -> {
+        resourceService.markFilesUsed(Collections.singletonList(fileId), true);
+        course.setFile(resourceService.getFile(fileId));
+      });
     
-    BeanUtils.copyProperties(course, sharedCourse.getCourse(),
-                             FieldName.BaseEntity.ID,
-                             FieldName.BaseEntity.VERSION,
-                             FieldName.BaseEntity.CREATED_AT,
-                             FieldName.BaseEntity.CREATED_BY
-    );
+    CopyHelper.copyProperties(course, sharedCourse.getCourse());
     
     return sharedCourseRepository.save(sharedCourse);
   }

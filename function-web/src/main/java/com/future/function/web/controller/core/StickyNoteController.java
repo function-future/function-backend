@@ -1,6 +1,8 @@
 package com.future.function.web.controller.core;
 
+import com.future.function.common.enumeration.core.Role;
 import com.future.function.service.api.feature.core.StickyNoteService;
+import com.future.function.session.annotation.WithAnyRole;
 import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.request.core.StickyNoteRequestMapper;
 import com.future.function.web.mapper.response.core.StickyNoteResponseMapper;
@@ -74,14 +76,17 @@ public class StickyNoteController {
    */
   @ResponseStatus(HttpStatus.CREATED)
   @PostMapping
+  @WithAnyRole(roles = Role.ADMIN)
   public DataResponse<StickyNoteWebResponse> createStickyNote(
     @RequestBody
       StickyNoteWebRequest request
   ) {
     
-    return StickyNoteResponseMapper.toStickyNoteDataResponse(
-      HttpStatus.CREATED, stickyNoteService.createStickyNote(
-        stickyNoteRequestMapper.toStickyNote(request)));
+    return StickyNoteResponseMapper.toStickyNoteDataResponse(HttpStatus.CREATED,
+                                                             stickyNoteService.createStickyNote(
+                                                               stickyNoteRequestMapper.toStickyNote(
+                                                                 request))
+    );
   }
   
 }

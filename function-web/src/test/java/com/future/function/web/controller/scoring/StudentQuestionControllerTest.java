@@ -3,6 +3,7 @@ package com.future.function.web.controller.scoring;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.future.function.model.entity.feature.scoring.*;
 import com.future.function.service.api.feature.scoring.StudentQuizService;
+import com.future.function.web.TestSecurityConfiguration;
 import com.future.function.web.mapper.request.scoring.StudentQuestionRequestMapper;
 import com.future.function.web.mapper.response.scoring.StudentQuizDetailResponseMapper;
 import com.future.function.web.model.request.scoring.StudentQuestionWebRequest;
@@ -18,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -32,6 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
+@Import(TestSecurityConfiguration.class)
 @WebMvcTest(StudentQuestionController.class)
 public class StudentQuestionControllerTest {
 

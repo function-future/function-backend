@@ -1,6 +1,7 @@
 package com.future.function.model.entity.feature.core;
 
 import com.future.function.model.entity.base.BaseEntity;
+import com.future.function.model.entity.feature.core.embedded.Version;
 import com.future.function.model.util.constant.DocumentName;
 import com.future.function.model.util.constant.FieldName;
 import lombok.AllArgsConstructor;
@@ -12,6 +13,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -58,5 +61,9 @@ public class FileV2 extends BaseEntity {
   
   @Field(FieldName.File.AS_RESOURCE)
   private boolean asResource;
+  
+  @Field(FieldName.File.VERSIONS)
+  @Builder.Default
+  private Map<Long, Version> versions = new LinkedHashMap<>();
   
 }

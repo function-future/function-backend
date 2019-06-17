@@ -5,6 +5,7 @@ import com.future.function.model.entity.feature.core.Course;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.repository.feature.core.CourseRepository;
 import com.future.function.service.api.feature.core.ResourceService;
+import com.future.function.service.impl.helper.PageHelper;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -13,7 +14,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
@@ -52,6 +52,7 @@ public class CourseServiceImplTest {
   
   @Before
   public void setUp() {
+    
     course = Course.builder()
       .id(ID)
       .title(TITLE)
@@ -157,8 +158,8 @@ public class CourseServiceImplTest {
   public void testGivenPageableByGettingCoursesReturnPageOfCourse() {
     
     Pageable pageable = new PageRequest(0, 5);
-    Page<Course> coursePage = new PageImpl<>(
-      Collections.singletonList(course), pageable, 1);
+    Page<Course> coursePage = PageHelper.toPage(
+      Collections.singletonList(course), pageable);
     when(courseRepository.findAll(pageable)).thenReturn(coursePage);
     
     Page<Course> retrievedCourses = courseService.getCourses(pageable);

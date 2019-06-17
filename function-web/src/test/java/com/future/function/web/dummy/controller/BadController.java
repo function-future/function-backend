@@ -4,8 +4,10 @@ import com.future.function.common.exception.BadRequestException;
 import com.future.function.common.exception.ForbiddenException;
 import com.future.function.common.exception.NotFoundException;
 import com.future.function.common.exception.UnauthorizedException;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 import java.util.Collections;
 
@@ -62,6 +64,12 @@ public class BadController {
     throw new NotFoundException(MESSAGE, new Throwable());
   }
   
+  @GetMapping(value = "/no-handler")
+  public String noHandler() throws Throwable {
+    
+    throw new NoHandlerFoundException("", "", new HttpHeaders());
+  }
+  
   @GetMapping(value = "/unsupported-operation")
   public String unsupportedOperation() {
     
@@ -72,6 +80,12 @@ public class BadController {
   public String unsupportedOperationThrowable() {
     
     throw new UnsupportedOperationException(MESSAGE, new Throwable());
+  }
+  
+  @GetMapping(value = "/throwable")
+  public String throwable() throws Throwable {
+    
+    throw new Throwable();
   }
   
 }

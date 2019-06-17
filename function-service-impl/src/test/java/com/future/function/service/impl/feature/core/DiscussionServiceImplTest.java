@@ -9,6 +9,7 @@ import com.future.function.model.entity.feature.core.User;
 import com.future.function.repository.feature.core.DiscussionRepository;
 import com.future.function.service.api.feature.core.SharedCourseService;
 import com.future.function.service.api.feature.core.UserService;
+import com.future.function.service.impl.helper.PageHelper;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -127,8 +128,8 @@ public class DiscussionServiceImplTest {
                                                        BATCH_CODE
     )).thenReturn(new Course());
     
-    PageImpl<Discussion> discussionPage = new PageImpl<>(
-      Collections.singletonList(DISCUSSION), PAGEABLE, 1);
+    Page<Discussion> discussionPage = PageHelper.toPage(
+      Collections.singletonList(DISCUSSION), PAGEABLE);
     when(discussionRepository.findAllByCourseIdAndBatchCodeOrderByCreatedAtDesc(
       COURSE_ID, BATCH_CODE, PAGEABLE)).thenReturn(discussionPage);
     
@@ -155,8 +156,7 @@ public class DiscussionServiceImplTest {
                                                        BATCH_CODE
     )).thenReturn(null);
     
-    PageImpl<Discussion> discussionPage = new PageImpl<>(
-      Collections.emptyList(), PAGEABLE, 0);
+    Page<Discussion> discussionPage = PageHelper.empty(PAGEABLE);
     
     Page<Discussion> discussions = discussionService.getDiscussions(
       EMAIL, COURSE_ID, BATCH_CODE, PAGEABLE);
@@ -198,8 +198,8 @@ public class DiscussionServiceImplTest {
     )).thenReturn(new Course());
     when(discussionRepository.save(DISCUSSION)).thenReturn(DISCUSSION);
     
-    Discussion discussion =
-      discussionService.createDiscussion(DISCUSSION_FROM_REQUEST);
+    Discussion discussion = discussionService.createDiscussion(
+      DISCUSSION_FROM_REQUEST);
     
     assertThat(discussion).isNotNull();
     assertThat(discussion).isEqualTo(DISCUSSION);

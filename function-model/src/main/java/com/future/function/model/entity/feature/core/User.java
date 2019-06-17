@@ -34,7 +34,7 @@ public class User extends BaseEntity {
   @Field(FieldName.User.NAME)
   private String name;
   
-  @Field(FieldName.User.PASSWORD)
+  @Field(FieldName.User.PASS)
   private String password;
   
   @Field(FieldName.User.ROLE)

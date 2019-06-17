@@ -30,5 +30,7 @@ public class FileProperties {
   private String urlPrefix;
 
   private List<String> imageExtensions;
-
+  
+  private String rootId;
+  
 }

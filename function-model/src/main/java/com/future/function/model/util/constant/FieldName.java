@@ -36,7 +36,7 @@ public interface FieldName {
     
     public static final String ROLE = "role";
     
-    public static final String PASSWORD = "password";
+    public static final String PASS = "password";
     
     public static final String PHONE = "phone";
     
@@ -80,6 +80,8 @@ public interface FieldName {
     
     public static final String AS_RESOURCE = "asResource";
     
+    public static final String VERSIONS = "versions";
+    
   }
   
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -95,6 +97,135 @@ public interface FieldName {
     
   }
 
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  abstract class Questionnaire {
+
+    public static final String TITLE = "title";
+
+    public static final String DESCRIPTION = "description";
+
+    public static final String START_DATE = "startDate";
+
+  }
+
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  abstract class QuestionQuestionnaire {
+
+    public static final String QUESTIONNAIRE = "questionnaire";
+
+    public static final String DESCRIPTION = "description";
+
+  }
+
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  abstract class QuestionResponse {
+
+    public static final String QUESTION = "question";
+
+    public static final String APRAISER = "apraiser";
+
+    public static final String APRAISEE = "apraisee";
+
+    public static final String SCORE = "score";
+
+    public static final String COMMENT = "comment";
+
+  }
+
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  abstract class QuestionResponseSummary {
+
+    public static final String QUESTION = "question";
+
+    public static final String QUESTIONNAIRE = "questionnaire";
+
+    public static final String APPRAISEE = "appraisee";
+
+    public static final String SCORE_SUMMARY = "scoreSummary";
+  }
+
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  abstract class QuestionnaireResponse {
+
+    public static final String QUESTIONNAIRE = "questionnaire";
+
+    public static final String APPRAISER = "appraiser";
+
+    public static final String APPRAISEE = "appraisee";
+
+    public static final String SCORE_SUMMARY = "scoreSummary";
+
+    public static final String DETAILS = "details";
+  }
+
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  abstract class QuestionnaireResponseSummary {
+
+    public static final String QUESTIONNAIRE = "questionnaire";
+
+    public static final String APPRAISEE = "appraisee";
+
+    public static final String SCORE_SUMMARY = "scoreSummary";
+  }
+
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  abstract class QuestionnairePartiipant {
+
+    public static final String QUESTIONNAIRE = "questionnaire";
+
+    public static final String MEMBER = "member";
+
+    public static final String TYPE = "type";
+  }
+
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  abstract class UserQuestionnairesSummary{
+
+    public static final String APPRAISEE = "appraisee";
+
+    public static final String BATCH = "batch";
+
+    public static final String SCORE_SUMMARY = "scoreSummary";
+
+  }
+
+
+
+  abstract class Chatroom {
+
+    public static final String MEMBERS = "members";
+
+    public static final String CHATROOM_TITLE = "chatroomTitle";
+
+    public static final String TYPE = "type";
+
+  }
+
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  abstract class Message {
+
+    public static final String TEXT = "text";
+
+    public static final String SENDER = "sender";
+
+    public static final String CHATROOM = "chatroom";
+
+  }
+
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  abstract class MessageStatus {
+
+    public static final String MEMBER = "member";
+
+    public static final String MESSAGE = "message";
+
+    public static final String IS_SEEN = "isSeen";
+
+    public static final String CHATROOM = "chatroom";
+
+  }
+
+  
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
   abstract class Course {
 
@@ -132,14 +263,23 @@ public interface FieldName {
   abstract class Quiz {
 
     public static final String TITLE = "title";
+    
     public static final String DESCRIPTION = "description";
+    
     public static final String START_DATE = "startDate";
+    
     public static final String END_DATE = "endDate";
+    
     public static final String TIME_LIMIT = "timeLimit";
+    
     public static final String TRIALS = "trials";
+    
     public static final String QUESTION_BANK = "questionBanks";
+    
     public static final String QUESTION_COUNT = "questionCount";
+    
     public static final String BATCH = "batch";
+    
   }
 
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -191,18 +331,52 @@ public interface FieldName {
 
   }
 
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    abstract class StudentQuestion {
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  abstract class StudentQuestion {
 
-        public static final String STUDENT_QUIZ_DETAIL = "studentQuizDetail";
+    public static final String STUDENT_QUIZ_DETAIL = "studentQuizDetail";
 
-        public static final String QUESTION = "question";
+    public static final String QUESTION = "question";
 
-        public static final String OPTION = "option";
+    public static final String OPTION = "option";
 
-        public static final String CORRECT = "correct";
+    public static final String CORRECT = "correct";
 
-        public static final String NUMBER = "number";
+    public static final String NUMBER = "number";
 
-    }
+  }
+  
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  abstract class ActivityBlog {
+    
+    public static final String TITLE = "title";
+    
+    public static final String DESCRIPTION = "description";
+    
+    public static final String USER = "user";
+    
+    public static final String FILES = "files";
+    
+  }
+  
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  abstract class Access {
+    
+    public static final String ROLE = "role";
+    
+    public static final String URL_REGEX = "urlRegex";
+    
+    public static final String COMPONENTS = "components";
+    
+  }
+  
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  abstract class Menu {
+    
+    public static final String ROLE = "role";
+    
+    public static final String SECTIONS = "sections";
+    
+  }
+  
 }
