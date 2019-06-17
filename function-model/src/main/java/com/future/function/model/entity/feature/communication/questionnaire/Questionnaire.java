@@ -28,4 +28,6 @@ public class Questionnaire extends BaseEntity {
   @Field(FieldName.Questionnaire.START_DATE)
   private long startDate;
 
+  @Field(FieldName.Questionnaire.DUE_DATE)
+  private long dueDate;
 }

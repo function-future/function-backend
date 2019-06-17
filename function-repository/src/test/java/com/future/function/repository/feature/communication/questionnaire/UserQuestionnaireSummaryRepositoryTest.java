@@ -1,6 +1,7 @@
 package com.future.function.repository.feature.communication.questionnaire;
 
 import com.future.function.model.entity.feature.communication.questionnaire.UserQuestionnaireSummary;
+import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.repository.TestApplication;
 import com.future.function.repository.feature.core.UserRepository;
@@ -41,6 +42,12 @@ public class UserQuestionnaireSummaryRepositoryTest {
           .id(ID_USER_2)
           .build();
 
+  private static final String BATCH_ID = "batch_id";
+
+  private Batch batch = Batch.builder()
+    .id(BATCH_ID)
+    .build();
+
   @Autowired
   private UserQuestionnaireSummaryRepository userQuestionnaireSummaryRepository;
 
@@ -52,11 +59,13 @@ public class UserQuestionnaireSummaryRepositoryTest {
     UserQuestionnaireSummary uQS1 = UserQuestionnaireSummary.builder()
             .id(ID_1)
             .appraisee(user1)
+            .batch(batch)
             .build();
 
     UserQuestionnaireSummary uQS2 = UserQuestionnaireSummary.builder()
             .id(ID_2)
             .appraisee(user2)
+            .batch(batch)
             .build();
 
     userRepository.save(user1);
@@ -87,5 +96,10 @@ public class UserQuestionnaireSummaryRepositoryTest {
 
     assertThat(userQuestionnaireSummary1.get().getAppraisee().getId()).isEqualTo(ID_USER_1);
     assertThat(userQuestionnaireSummary2.get().getAppraisee().getId()).isEqualTo(ID_USER_2);
+  }
+
+  @Test
+  public void testGivenBatchByFindingAllUserQuestionnaireSummaryReturnedPagedUserQuestionnaireSummary() {
+
   }
 }
