@@ -11,6 +11,8 @@ import java.io.File;
 @Component
 public class FileDeleteScheduler {
   
+  static final int HALF_HOUR = 1000 * 60 * 30;
+  
   private final FileRepositoryV2 fileRepository;
   
   public FileDeleteScheduler(FileRepositoryV2 fileRepository) {
@@ -27,10 +29,20 @@ public class FileDeleteScheduler {
   
   private void deleteFileRecursivelyAndFromDatabase(FileV2 fileV2) {
     
-    FileSystemUtils.deleteRecursively(
-      new File(this.getContainingFolderPath(fileV2)));
+    if (this.isCreatedAndUnusedFor30Minutes(fileV2)) {
+      FileSystemUtils.deleteRecursively(
+        new File(this.getContainingFolderPath(fileV2)));
+      
+      fileRepository.delete(fileV2);
+    }
+  }
+  
+  private boolean isCreatedAndUnusedFor30Minutes(FileV2 fileV2) {
     
-    fileRepository.delete(fileV2);
+    Long createdAt = fileV2.getCreatedAt();
+    long timeDiff = Math.abs(createdAt - System.currentTimeMillis());
+    
+    return timeDiff >= HALF_HOUR;
   }
   
   private String getContainingFolderPath(FileV2 fileV2) {
