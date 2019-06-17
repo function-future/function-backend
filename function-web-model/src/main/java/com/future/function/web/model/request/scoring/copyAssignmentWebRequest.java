@@ -10,7 +10,7 @@ import org.hibernate.validator.constraints.NotBlank;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CopyStudentAssignmentWebRequest {
+public class copyAssignmentWebRequest {
 
     @NotBlank(message = "NotBlank")
     private String targetBatch;

@@ -22,8 +22,6 @@ public class AssignmentWebResponse {
 
   private long deadline;
 
-  private String question;
-
   //TODO add file, batch, and rooms later
 
 }

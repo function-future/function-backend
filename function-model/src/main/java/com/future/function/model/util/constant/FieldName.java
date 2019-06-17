@@ -345,6 +345,21 @@ public interface FieldName {
     public static final String NUMBER = "number";
 
   }
+
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    abstract class Assignment {
+
+        public static final String TITLE = "title";
+
+        public static final String DESCRIPTION = "description";
+
+        public static final String DEADLINE = "deadline";
+
+        public static final String FILE = "file";
+
+        public static final String BATCH = "batch";
+
+    }
   
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
   abstract class ActivityBlog {

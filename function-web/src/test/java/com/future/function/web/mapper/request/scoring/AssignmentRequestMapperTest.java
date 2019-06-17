@@ -50,14 +50,12 @@ public class AssignmentRequestMapperTest {
             .id(null)
             .title(ASSIGNMENT_TITLE)
             .description(ASSIGNMENT_DESCRIPTION)
-            .question(ASSIGNMENT_QUESTION)
             .build();
 
     assignmentWebRequest = AssignmentWebRequest
             .builder()
             .title(ASSIGNMENT_TITLE)
             .description(ASSIGNMENT_DESCRIPTION)
-            .question(ASSIGNMENT_QUESTION)
             .build();
 
     when(validator.validate(assignmentWebRequest))
@@ -74,21 +72,19 @@ public class AssignmentRequestMapperTest {
 
   @Test
   public void testToAssignmentFromStringDataJson() {
-    Assignment actual = assignmentRequestMapper.toAssignment(ASSIGNMENT_REQUEST_JSON);
+      Assignment actual = assignmentRequestMapper.toAssignment(assignmentWebRequest);
     assertThat(actual).isEqualTo(assignment);
 
     verify(validator).validate(assignmentWebRequest);
-    verify(requestMapper).toWebRequestObject(ASSIGNMENT_REQUEST_JSON, AssignmentWebRequest.class);
   }
 
   @Test
   public void testToAssignmentFromStringDataJsonAndStringIdSuccess() {
     assignment.setId(ASSIGNMENT_ID);
     assignmentWebRequest.setId(ASSIGNMENT_ID);
-    Assignment actual = assignmentRequestMapper.toAssignmentWithId(ASSIGNMENT_ID, ASSIGNMENT_REQUEST_JSON);
+      Assignment actual = assignmentRequestMapper.toAssignmentWithId(ASSIGNMENT_ID, assignmentWebRequest);
     assertThat(actual).isEqualTo(assignment);
 
     verify(validator).validate(assignmentWebRequest);
-    verify(requestMapper).toWebRequestObject(ASSIGNMENT_REQUEST_JSON, AssignmentWebRequest.class);
   }
 }

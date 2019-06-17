@@ -4,10 +4,12 @@ import com.future.function.model.entity.base.BaseEntity;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.util.constant.DocumentName;
+import com.future.function.model.util.constant.FieldName;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.UUID;
 
@@ -26,16 +28,20 @@ public class Assignment extends BaseEntity {
   @Builder.Default
   private String id = UUID.randomUUID().toString();
 
+  @Field(FieldName.Assignment.TITLE)
   private String title;
 
+  @Field(FieldName.Assignment.DESCRIPTION)
   private String description;
 
+  @Field(FieldName.Assignment.DEADLINE)
   private long deadline;
 
-  @DBRef
+  @Field(FieldName.Assignment.FILE)
   private FileV2 file;
 
   @DBRef
+  @Field(FieldName.Assignment.BATCH)
   private Batch batch;
 
 }

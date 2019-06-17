@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/scoring/assignments/{assignmentId}/rooms/{roomId}/comments")
+@RequestMapping("/api/scoring/batches/{batchCode}/assignments/{assignmentId}/rooms/{roomId}/comments")
 public class CommentController {
 
     @Autowired
@@ -25,9 +25,9 @@ public class CommentController {
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<CommentWebResponse> findAllCommentsByRoomId(@PathVariable(value = "roomId") String roomId) {
+    public DataResponse<List<CommentWebResponse>> findAllCommentsByRoomId(@PathVariable(value = "roomId") String roomId) {
         return CommentResponseMapper
-                .toListCommentWebResponse(roomService.findAllCommentsByRoomId(roomId));
+                .toDataListCommentWebResponse(roomService.findAllCommentsByRoomId(roomId));
     }
 
     @ResponseStatus(HttpStatus.CREATED)
