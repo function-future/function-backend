@@ -2,7 +2,6 @@ package com.future.function.service.impl.feature.communication.questionnaire;
 
 import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.communication.questionnaire.QuestionQuestionnaire;
-import com.future.function.model.entity.feature.communication.questionnaire.Questionnaire;
 import com.future.function.repository.feature.communication.questionnaire.QuestionQuestionnaireRepository;
 import com.future.function.service.api.feature.communication.questionnaire.QuestionQuestionnaireService;
 import com.future.function.service.api.feature.communication.questionnaire.QuestionnaireService;
@@ -26,7 +25,10 @@ public class QuestionQuestionnaireServiceImpl implements QuestionQuestionnaireSe
 
   @Override
   public List<QuestionQuestionnaire> getQuestionQuestionnaireByQuestionnaire(String questionnaireId) {
-    return null;
+    return Optional.of(questionnaireId)
+            .map(questionnaireService::getQuestionnaire)
+            .map(questionQuestionnaireRepository::findAllByQuestionnaire)
+            .orElseThrow(() -> new NotFoundException("Questions Questionnaire not found"));
   }
 
   @Override
