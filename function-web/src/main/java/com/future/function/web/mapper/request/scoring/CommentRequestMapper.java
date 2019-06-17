@@ -22,7 +22,7 @@ public class CommentRequestMapper {
         request = validator.validate(request);
         return Comment
                 .builder()
-                .room(Room.builder().id(request.getRoomId()).build())
+                .room(Room.builder().id(roomId).build())
                 .author(User.builder().id(request.getUserId()).build())
                 .comment(request.getComment())
                 .build();

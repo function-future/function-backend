@@ -1,6 +1,6 @@
 package com.future.function.web.controller.scoring;
 
-import com.future.function.service.api.feature.scoring.RoomService;
+import com.future.function.service.api.feature.scoring.AssignmentService;
 import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.mapper.response.scoring.RoomResponseMapper;
@@ -15,11 +15,11 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/scoring/assignments/{assignmentId}/rooms")
+@RequestMapping("/api/scoring/batches/{batchCode}/assignments/{assignmentId}/rooms")
 public class RoomController {
 
     @Autowired
-    private RoomService roomService;
+    private AssignmentService assignmentService;
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
@@ -27,7 +27,7 @@ public class RoomController {
                                                                       @RequestParam(required = false, defaultValue = "1") int page,
                                                                       @RequestParam(required = false, defaultValue = "10") int size) {
         return RoomResponseMapper
-                .toPagingRoomWebResponse(roomService
+                .toPagingRoomWebResponse(assignmentService
                         .findAllRoomsByAssignmentId(assignmentId, PageHelper.toPageable(1, 10)));
     }
 
@@ -35,21 +35,21 @@ public class RoomController {
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public DataResponse<RoomWebResponse> findRoomById(@PathVariable(value = "id") String id) {
         return RoomResponseMapper
-                .toDataRoomWebResponse(roomService.findById(id));
+                .toDataRoomWebResponse(assignmentService.findRoomById(id));
     }
 
     @ResponseStatus(HttpStatus.OK)
     @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public DataResponse<RoomWebResponse> updateRoomScore(@PathVariable(value = "id") String id, @RequestBody RoomPointWebRequest request) {
         return RoomResponseMapper
-                .toDataRoomWebResponse(roomService
+                .toDataRoomWebResponse(assignmentService
                         .giveScoreToRoomByRoomId(id, request.getPoint()));
     }
 
     @ResponseStatus(HttpStatus.OK)
     @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public BaseResponse deleteRoomById(@PathVariable(value = "id") String id) {
-        roomService.deleteRoomById(id);
+        assignmentService.deleteRoomById(id);
         return ResponseHelper.toBaseResponse(HttpStatus.OK);
     }
 

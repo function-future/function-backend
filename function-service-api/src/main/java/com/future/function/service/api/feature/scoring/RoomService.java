@@ -18,7 +18,7 @@ public interface RoomService {
 
     Comment createComment(Comment comment);
 
-    List<Room> createRoomsByAssignment(Assignment assignment);
+    Assignment createRoomsByAssignment(Assignment assignment);
 
     Room giveScoreToRoomByRoomId(String roomId, Integer point);
 

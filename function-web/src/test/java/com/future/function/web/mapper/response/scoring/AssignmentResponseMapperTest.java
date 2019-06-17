@@ -45,7 +45,6 @@ public class AssignmentResponseMapperTest {
             .title(ASSIGNMENT_TITLE)
             .description(ASSIGNMENT_DESCRIPTION)
             .deadline(ASSIGNMENT_DEADLINE)
-            .question(ASSIGNMENT_QUESTION)
             .build();
 
     assignmentWebResponse = AssignmentWebResponse
@@ -53,7 +52,6 @@ public class AssignmentResponseMapperTest {
             .title(ASSIGNMENT_TITLE)
             .description(ASSIGNMENT_DESCRIPTION)
             .deadline(ASSIGNMENT_DEADLINE)
-            .question(ASSIGNMENT_QUESTION)
             .build();
 
     assignmentWebResponseDataResponse = DataResponse

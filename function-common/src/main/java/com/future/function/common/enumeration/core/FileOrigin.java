@@ -16,7 +16,8 @@ public enum FileOrigin {
   COURSE(true),
   BLOG(true),
   FILE(false),
-  UNKNOWN(false);
+    UNKNOWN(false),
+    ASSIGNMENT(true);
   
   private String lowCaseValue;
   

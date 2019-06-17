@@ -7,7 +7,6 @@ import com.future.function.model.entity.feature.scoring.Comment;
 import com.future.function.model.entity.feature.scoring.Room;
 import com.future.function.repository.feature.scoring.RoomRepository;
 import com.future.function.service.api.feature.core.UserService;
-import com.future.function.service.api.feature.scoring.AssignmentService;
 import com.future.function.service.api.feature.scoring.CommentService;
 import com.future.function.service.api.feature.scoring.RoomService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,16 +18,12 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class RoomServiceImpl implements RoomService {
 
     @Autowired
     private RoomRepository roomRepository;
-
-    @Autowired
-    private AssignmentService assignmentService;
 
     @Autowired
     private UserService userService;
@@ -40,7 +35,7 @@ public class RoomServiceImpl implements RoomService {
     public Page<Room> findAllRoomsByAssignmentId(String assignmentId, Pageable pageable) {
         return Optional.ofNullable(assignmentId)
                 .map(id -> roomRepository.findAllByAssignmentIdAndDeletedFalse(assignmentId, pageable))
-                .orElseGet(() -> createEmptyPage(pageable));
+                .orElseGet(() -> new PageImpl<>(new ArrayList<>(), pageable, 0));
     }
 
     @Override
@@ -48,10 +43,6 @@ public class RoomServiceImpl implements RoomService {
         return Optional.ofNullable(id)
                 .flatMap(roomRepository::findByIdAndDeletedFalse)
                 .orElseThrow(() -> new NotFoundException("Room not found"));
-    }
-
-    private PageImpl<Room> createEmptyPage(Pageable pageable) {
-        return new PageImpl<>(new ArrayList<>(), pageable, 0);
     }
 
     @Override
@@ -69,22 +60,21 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
-    public List<Room> createRoomsByAssignment(Assignment assignment) {
+    public Assignment createRoomsByAssignment(Assignment assignment) {
         List<User> userListFromBatch = userService.getStudentsByBatchCode(assignment.getBatch().getCode());
-        return userListFromBatch
-                .stream()
-                .map(user -> this.createRoomForUserAndSave(user, assignment))
-                .collect(Collectors.toList());
+        userListFromBatch
+                .forEach(user -> this.createRoomForUserAndSave(user, assignment));
+        return assignment;
     }
 
-    private Room createRoomForUserAndSave(User user, Assignment assignment) {
+    private void createRoomForUserAndSave(User user, Assignment assignment) {
         Room room = Room
                 .builder()
                 .assignment(assignment)
                 .point(0)
                 .student(user)
                 .build();
-        return roomRepository.save(room);
+        roomRepository.save(room);
     }
 
     @Override

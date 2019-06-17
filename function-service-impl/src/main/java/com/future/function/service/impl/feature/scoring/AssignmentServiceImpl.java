@@ -1,16 +1,25 @@
 package com.future.function.service.impl.feature.scoring;
 
 import com.future.function.common.exception.NotFoundException;
+import com.future.function.model.entity.feature.core.Batch;
+import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.scoring.Assignment;
+import com.future.function.model.entity.feature.scoring.Room;
+import com.future.function.model.util.constant.FieldName;
 import com.future.function.repository.feature.scoring.AssignmentRepository;
+import com.future.function.service.api.feature.core.BatchService;
+import com.future.function.service.api.feature.core.ResourceService;
 import com.future.function.service.api.feature.scoring.AssignmentService;
+import com.future.function.service.api.feature.scoring.RoomService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.util.StringUtils;
 
+import java.util.Collections;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -22,23 +31,31 @@ public class AssignmentServiceImpl implements AssignmentService {
 
   private AssignmentRepository assignmentRepository;
 
+  private RoomService roomService;
+
+  private ResourceService resourceService;
+
+  private BatchService batchService;
+
   @Autowired
-  public AssignmentServiceImpl(AssignmentRepository assignmentRepository) {
+  public AssignmentServiceImpl(AssignmentRepository assignmentRepository, RoomService roomService,
+                               ResourceService resourceService, BatchService batchService) {
     this.assignmentRepository = assignmentRepository;
+    this.roomService = roomService;
+    this.resourceService = resourceService;
+    this.batchService = batchService;
   }
 
   /**
    * Used to find All Assignment Object from Repository With Paging, Filtering, And Search Keyword
    *
    * @param pageable (Pageable Object)
-   * @param filter   (String)
-   * @param search   (String)
    * @return Page<Assignment>
    */
   @Override
-  public Page<Assignment> findAllByPageableAndFilterAndSearch(Pageable pageable, String filter, String search) {
-    //TODO using filter and search to find the asssignment page
-    return assignmentRepository.findAll(pageable);
+  public Page<Assignment> findAllByBatchCodeAndPageable(Pageable pageable, String batchCode) {
+    Batch batch = batchService.getBatchByCode(batchCode);
+    return assignmentRepository.findAllByBatchAndDeletedFalse(batch, pageable);
   }
 
   /**
@@ -57,34 +74,58 @@ public class AssignmentServiceImpl implements AssignmentService {
             .orElseThrow(() -> new NotFoundException("Assignment Not Found"));
   }
 
+  @Override
+  public Page<Room> findAllRoomsByAssignmentId(String assignmentId, Pageable pageable) {
+    return roomService.findAllRoomsByAssignmentId(assignmentId, pageable);
+  }
+
+  @Override
+  public Room findRoomById(String id) {
+    return roomService.findById(id);
+  }
+
+  @Override
+  public Assignment copyAssignment(String assignmentId, String targetBatchCode) {
+    Assignment assignment = this.findById(assignmentId);
+    Assignment newAssignment = Assignment.builder().build();
+    Batch targetBatchObj = batchService.getBatchByCode(targetBatchCode);
+    BeanUtils.copyProperties(assignment, newAssignment, "_id", "id",
+            FieldName.BaseEntity.CREATED_BY, FieldName.BaseEntity.CREATED_AT, FieldName.BaseEntity.VERSION);
+    newAssignment.setBatch(targetBatchObj);
+    return this.createAssignment(newAssignment);
+  }
+
   /**
    * Used to create new Assignment Data in Repository With / Without file
    *
-   * @param request (Assignment Object)
-   * @param file    (MultipartFile Object)
+   * @param assignment (Assignment Object)
    * @return Saved Assignment Object
    */
   @Override
-  public Assignment createAssignment(Assignment request, MultipartFile file) {
+  public Assignment createAssignment(Assignment assignment) {
     //TODO save batch to shared assignment entity
-    Assignment assignment = storeAssignmentFile(request, file);
-    return assignmentRepository.save(assignment);
+    assignment = storeAssignmentFile(assignment);
+    Batch batch = batchService.getBatchByCode(assignment.getBatch().getCode());
+    assignment.setBatch(batch);
+    assignment = assignmentRepository.save(assignment);
+    return roomService.createRoomsByAssignment(assignment);
   }
 
   /**
    * Used to store Multipart File by using FileService which sent with Assignment object
    *
    * @param assignment (Assignment Object)
-   * @param file    (MultipartFile Object)
    * @return Assignment with / without the saved file
    */
-  private Assignment storeAssignmentFile(Assignment assignment, MultipartFile file) {
-    //TODO uncomment when file service is ready
-    return Optional.ofNullable(file)
-//            .map(val -> fileService.storeFile(val, FileOrigin.ASSIGNMENT))
-//            .map(val -> fileService.getFile(val.getId()))
-            .map(val -> {
-//              request.setFile(val);
+  private Assignment storeAssignmentFile(Assignment assignment) {
+    return Optional.ofNullable(assignment)
+            .map(Assignment::getFile)
+            .map(FileV2::getId)
+            .map(fileId -> resourceService.markFilesUsed(Collections.singletonList(fileId), true))
+            .filter(condition -> condition)
+            .map(file -> resourceService.getFile(assignment.getFile().getId()))
+            .map(file -> {
+              assignment.setFile(file);
               return assignment;
             })
             .orElse(assignment);
@@ -94,17 +135,44 @@ public class AssignmentServiceImpl implements AssignmentService {
    * Used to update existed Assignment in Repository with Assignment Object request and / no Multipart File
    *
    * @param request (Assignment Object)
-   * @param file    (MultipartFile Object)
    * @return Saved Assignment Object
    */
   @Override
-  public Assignment updateAssignment(Assignment request, MultipartFile file) {
+  public Assignment updateAssignment(Assignment request) {
     //TODO save batch to shared assignment entity
     Assignment oldAssignment = this.findById(request.getId());
-    Assignment newAssignment = new Assignment();
-    BeanUtils.copyProperties(oldAssignment, newAssignment);
-    newAssignment = storeAssignmentFile(newAssignment, file);
-    return assignmentRepository.save(newAssignment);
+    boolean isBatchChanged = checkBatchChanged(request, oldAssignment);
+    boolean isFilesChanged = checkFilesChange(request, oldAssignment);
+    if (isFilesChanged) {
+      resourceService.markFilesUsed(Collections.singletonList(oldAssignment.getFile().getId()), false);
+    }
+    BeanUtils.copyProperties(request, oldAssignment, "_id", "id");
+
+    oldAssignment = storeAssignmentFile(oldAssignment);
+    oldAssignment = assignmentRepository.save(oldAssignment);
+    if (isBatchChanged) {
+      roomService.deleteAllRoomsByAssignmentId(oldAssignment.getId());
+      roomService.createRoomsByAssignment(oldAssignment);
+    }
+    return oldAssignment;
+  }
+
+  private boolean checkBatchChanged(Assignment request, Assignment oldAssignment) {
+    return !request.getBatch().getCode().equals(oldAssignment.getBatch().getCode());
+  }
+
+  private boolean checkFilesChange(Assignment request, Assignment oldAssignment) {
+    return !request.getFile().getId().equals(oldAssignment.getFile().getId());
+  }
+
+  @Override
+  public Room giveScoreToRoomByRoomId(String roomId, Integer point) {
+    return roomService.giveScoreToRoomByRoomId(roomId, point);
+  }
+
+  @Override
+  public void deleteRoomById(String id) {
+    roomService.deleteRoomById(id);
   }
 
   /**
@@ -117,9 +185,13 @@ public class AssignmentServiceImpl implements AssignmentService {
     //TODO delete file associated with the assignment
     Optional.ofNullable(id)
             .map(this::findById)
-            .ifPresent(val -> {
-              val.setDeleted(true);
-              assignmentRepository.save(val);
+            .ifPresent(assignment -> {
+              roomService.deleteAllRoomsByAssignmentId(assignment.getId());
+              if (Objects.nonNull(assignment.getFile()) && !StringUtils.isEmpty(assignment.getFile().getId())) {
+                resourceService.markFilesUsed(Collections.singletonList(assignment.getFile().getId()), false);
+              }
+              assignment.setDeleted(true);
+              assignmentRepository.save(assignment);
             });
   }
 }
