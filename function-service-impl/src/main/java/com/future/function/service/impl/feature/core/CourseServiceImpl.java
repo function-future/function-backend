@@ -6,7 +6,7 @@ import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.repository.feature.core.CourseRepository;
 import com.future.function.service.api.feature.core.CourseService;
 import com.future.function.service.api.feature.core.ResourceService;
-import org.springframework.beans.BeanUtils;
+import com.future.function.service.impl.helper.CopyHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -148,7 +148,7 @@ public class CourseServiceImpl implements CourseService {
     Course course, Course foundCourse
   ) {
     
-    BeanUtils.copyProperties(course, foundCourse);
+    CopyHelper.copyProperties(course, foundCourse);
     return courseRepository.save(foundCourse);
   }
   

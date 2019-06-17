@@ -1,6 +1,7 @@
 package com.future.function.web.mapper.response.core;
 
 import com.future.function.model.entity.feature.core.Course;
+import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.base.paging.Paging;
@@ -27,36 +28,53 @@ public class CourseResponseMapperTest {
   
   private static final String DESCRIPTION = "course-description";
   
+  private static final String FILE_URL = "file-url";
+  
+  private static final String THUMBNAIL_URL = "thumbnail-url";
+  
   private static final Course COURSE = Course.builder()
     .id(ID)
     .title(TITLE)
     .description(DESCRIPTION)
+    .file(FileV2.builder()
+            .fileUrl(FILE_URL)
+            .thumbnailUrl(THUMBNAIL_URL)
+            .build())
     .build();
   
-  private static final CourseWebResponse COURSE_WEB_RESPONSE =
+  private static final CourseWebResponse COURSE_WEB_RESPONSE_WITH_THUMBNAIL =
     CourseWebResponse.builder()
       .id(ID)
       .title(TITLE)
       .description(DESCRIPTION)
-      .material(null)
+      .material(THUMBNAIL_URL)
+      .build();
+  
+  private static final CourseWebResponse COURSE_WEB_RESPONSE_WITHOUT_THUMBNAIL =
+    CourseWebResponse.builder()
+      .id(ID)
+      .title(TITLE)
+      .description(DESCRIPTION)
+      .material(FILE_URL)
       .build();
   
   private static final DataResponse<CourseWebResponse> CREATED_DATA_RESPONSE =
     DataResponse.<CourseWebResponse>builder().code(201)
       .status("CREATED")
-      .data(COURSE_WEB_RESPONSE)
+      .data(COURSE_WEB_RESPONSE_WITHOUT_THUMBNAIL)
       .build();
   
-  private static final DataResponse<List<CourseWebResponse>> CREATED_DATA_RESPONSE_LIST =
+  private static final DataResponse<List<CourseWebResponse>>
+    CREATED_DATA_RESPONSE_LIST =
     DataResponse.<List<CourseWebResponse>>builder().code(201)
       .status("CREATED")
-      .data(Collections.singletonList(COURSE_WEB_RESPONSE))
+      .data(Collections.singletonList(COURSE_WEB_RESPONSE_WITH_THUMBNAIL))
       .build();
   
   private static final DataResponse<CourseWebResponse> RETRIEVED_DATA_RESPONSE =
     DataResponse.<CourseWebResponse>builder().code(200)
       .status("OK")
-      .data(COURSE_WEB_RESPONSE)
+      .data(COURSE_WEB_RESPONSE_WITHOUT_THUMBNAIL)
       .build();
   
   private static final Pageable PAGEABLE = new PageRequest(0, 2);
@@ -73,7 +91,7 @@ public class CourseResponseMapperTest {
   private static final PagingResponse<CourseWebResponse> PAGING_RESPONSE =
     PagingResponse.<CourseWebResponse>builder().code(200)
       .status("OK")
-      .data(Collections.singletonList(COURSE_WEB_RESPONSE))
+      .data(Collections.singletonList(COURSE_WEB_RESPONSE_WITH_THUMBNAIL))
       .paging(PAGING)
       .build();
   

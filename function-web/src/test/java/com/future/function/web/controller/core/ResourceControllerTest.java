@@ -1,9 +1,11 @@
 package com.future.function.web.controller.core;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.future.function.common.enumeration.core.FileOrigin;
+import com.future.function.common.enumeration.core.Role;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.service.api.feature.core.ResourceService;
+import com.future.function.web.TestHelper;
+import com.future.function.web.TestSecurityConfiguration;
 import com.future.function.web.mapper.request.core.MultipartFileRequestMapper;
 import com.future.function.web.mapper.response.core.ResourceResponseMapper;
 import com.future.function.web.model.response.base.DataResponse;
@@ -12,14 +14,12 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.util.Pair;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.multipart.MultipartFile;
 
 import static org.mockito.Matchers.any;
@@ -33,8 +33,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
-@WebMvcTest(ResourceController.class)
-public class ResourceControllerTest {
+@Import(TestSecurityConfiguration.class)
+@WebMvcTest(value = ResourceController.class)
+public class ResourceControllerTest extends TestHelper {
   
   private static final byte[] BYTES = new byte[0];
   
@@ -59,21 +60,18 @@ public class ResourceControllerTest {
     CREATED_DATA_RESPONSE_NULL_THUMBNAIL =
     ResourceResponseMapper.toResourceDataResponse(FILE_V2_NULL_THUMBNAIL);
   
-  private JacksonTester<DataResponse> dataResponseJacksonTester;
-  
-  @Autowired
-  private MockMvc mockMvc;
-  
   @MockBean
   private ResourceService resourceService;
   
   @MockBean
   private MultipartFileRequestMapper multipartFileRequestMapper;
   
+  @Override
   @Before
   public void setUp() {
     
-    JacksonTester.initFields(this, new ObjectMapper());
+    super.setUp();
+    super.setCookie(Role.MENTOR);
   }
   
   @After
@@ -90,15 +88,14 @@ public class ResourceControllerTest {
     
     when(multipartFileRequestMapper.toStringAndByteArrayPair(
       any(MultipartFile.class))).thenReturn(pair);
-    when(resourceService.storeFile(NAME, NAME, BYTES,
-                                   FileOrigin.ANNOUNCEMENT
+    when(resourceService.storeAndSaveFile(null, NAME, BYTES,
+                                          FileOrigin.ANNOUNCEMENT
     )).thenReturn(FILE_V2_NULL_THUMBNAIL);
     
-    mockMvc.perform(post("/api/resources").contentType(
-      MediaType.MULTIPART_FORM_DATA)
+    mockMvc.perform(post("/api/resources").cookie(cookies)
+                      .contentType(MediaType.MULTIPART_FORM_DATA)
                       .param("file", "")
-                      .param("origin", ORIGIN)
-                      .param("name", NAME))
+                      .param("origin", ORIGIN))
       .andExpect(status().isCreated())
       .andExpect(content().json(
         dataResponseJacksonTester.write(CREATED_DATA_RESPONSE_NULL_THUMBNAIL)
@@ -107,23 +104,26 @@ public class ResourceControllerTest {
     
     verify(multipartFileRequestMapper).toStringAndByteArrayPair(
       any(MultipartFile.class));
-    verify(resourceService).storeFile(
-      NAME, NAME, BYTES, FileOrigin.ANNOUNCEMENT);
+    verify(resourceService).storeAndSaveFile(
+      null, NAME, BYTES, FileOrigin.ANNOUNCEMENT);
   }
   
   @Test
   public void testGivenApiCallAndFileNameByGettingFileAsByteArrayReturnByteArray()
     throws Exception {
     
-    when(resourceService.getFileAsByteArray(NAME,
-                                            FileOrigin.ANNOUNCEMENT
+    when(resourceService.getFileAsByteArray(NAME, FileOrigin.ANNOUNCEMENT,
+                                            null
     )).thenReturn(BYTES);
     
-    mockMvc.perform(get("/api/resources/" + ORIGIN + "/" + ORIGINAL_NAME))
+    mockMvc.perform(
+      get("/api/resources/" + ORIGIN + "/" + ORIGINAL_NAME).cookie(cookies))
       .andExpect(status().isOk())
       .andExpect(content().bytes(BYTES));
     
-    verify(resourceService).getFileAsByteArray(NAME, FileOrigin.ANNOUNCEMENT);
+    verify(resourceService).getFileAsByteArray(NAME, FileOrigin.ANNOUNCEMENT,
+                                               null
+    );
     verifyZeroInteractions(multipartFileRequestMapper);
   }
   

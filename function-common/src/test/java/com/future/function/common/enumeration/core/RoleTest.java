@@ -9,13 +9,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class RoleTest {
 
   @Before
-  public void setUp() {
-  }
-
+  public void setUp() {}
+  
   @After
-  public void tearDown() {
-  }
-
+  public void tearDown() {}
+  
   @Test
   public void testGivenProperRoleStringByConvertingStringToRoleReturnProperRoleAsRole() {
 

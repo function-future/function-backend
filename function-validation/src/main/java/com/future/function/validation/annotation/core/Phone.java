@@ -1,13 +1,14 @@
 package com.future.function.validation.annotation.core;
 
 import com.future.function.validation.validator.core.PhoneValidator;
+
+import javax.validation.Constraint;
+import javax.validation.Payload;
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import javax.validation.Constraint;
-import javax.validation.Payload;
 
 /**
  * Annotation for checking if a String field is a phone, which can contain
@@ -15,7 +16,7 @@ import javax.validation.Payload;
  */
 @Documented
 @Constraint(validatedBy = PhoneValidator.class)
-@Target({ElementType.FIELD})
+@Target({ ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Phone {
 

@@ -1,14 +1,15 @@
 package com.future.function.web.mapper.helper;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
+import javax.validation.ConstraintViolation;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import javax.validation.ConstraintViolation;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 
 /**
  * Helper class for mapping errors from validation errors.
@@ -20,11 +21,12 @@ public class ErrorHelper {
    * Converts set of constraint violations to map object.
    *
    * @param violations Violations that occurred in validation.
+   *
    * @return {@code Map<String, List<String>>} - The mapped violations,
    * including which fields and what errors are caused by that field.
    */
   public static Map<String, List<String>> toErrors(
-          Set<ConstraintViolation<?>> violations
+    Set<ConstraintViolation<?>> violations
   ) {
 
     Map<String, List<String>> mappedViolations = new HashMap<>();
@@ -35,7 +37,7 @@ public class ErrorHelper {
   }
 
   private static void addToMap(
-          Map<String, List<String>> mappedViolations, ConstraintViolation violation
+    Map<String, List<String>> mappedViolations, ConstraintViolation violation
   ) {
 
     String key = getKey(violation);
@@ -45,17 +47,17 @@ public class ErrorHelper {
       mappedViolations.put(key, new ArrayList<>());
     }
     mappedViolations.get(key)
-            .add(value);
+      .add(value);
   }
 
   private static String getKey(ConstraintViolation violation) {
 
     return Optional.ofNullable(violation.getPropertyPath())
-            .map(String::valueOf)
-            .filter(s -> !s.equals(""))
-            .orElseGet(() -> String.valueOf(violation.getConstraintDescriptor()
-                    .getAttributes()
-                    .get("field")));
+      .map(String::valueOf)
+      .filter(s -> !s.equals(""))
+      .orElseGet(() -> String.valueOf(violation.getConstraintDescriptor()
+                                        .getAttributes()
+                                        .get("field")));
   }
 
 }

@@ -1,6 +1,8 @@
 package com.future.function.web.controller.core;
 
+import com.future.function.common.enumeration.core.Role;
 import com.future.function.service.api.feature.core.CourseService;
+import com.future.function.session.annotation.WithAnyRole;
 import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.mapper.request.core.CourseRequestMapper;
@@ -34,6 +36,7 @@ public class CourseController {
   
   @ResponseStatus(HttpStatus.OK)
   @GetMapping
+  @WithAnyRole(roles = { Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT })
   public PagingResponse<CourseWebResponse> getCourses(
     @RequestParam(defaultValue = "1")
       int page,
@@ -47,6 +50,7 @@ public class CourseController {
   
   @ResponseStatus(HttpStatus.OK)
   @GetMapping(value = "/{courseId}")
+  @WithAnyRole(roles = { Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT })
   public DataResponse<CourseWebResponse> getCourse(
     @PathVariable
       String courseId
@@ -58,6 +62,7 @@ public class CourseController {
   
   @ResponseStatus(HttpStatus.CREATED)
   @PostMapping
+  @WithAnyRole(roles = { Role.ADMIN, Role.JUDGE, Role.MENTOR })
   public DataResponse<CourseWebResponse> createCourse(
     @RequestBody
       CourseWebRequest request
@@ -71,6 +76,7 @@ public class CourseController {
   
   @ResponseStatus(HttpStatus.OK)
   @PutMapping("/{courseId}")
+  @WithAnyRole(roles = { Role.ADMIN, Role.JUDGE, Role.MENTOR })
   public DataResponse<CourseWebResponse> updateCourse(
     @PathVariable
       String courseId,
@@ -84,6 +90,7 @@ public class CourseController {
   
   @ResponseStatus(HttpStatus.OK)
   @DeleteMapping("/{courseId}")
+  @WithAnyRole(roles = { Role.ADMIN, Role.JUDGE, Role.MENTOR })
   public BaseResponse deleteCourse(
     @PathVariable
       String courseId

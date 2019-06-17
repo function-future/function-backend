@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 /**
  * Controller advice class for exception handling purposes.
@@ -77,7 +78,8 @@ public class ExceptionController {
   
   /**
    * Handles {@link com.future.function.common.exception.NotFoundException}
-   * exception thrown from service.
+   * or {@link NoHandlerFoundException} exception thrown from
+   * controller/service.
    *
    * @param e Exception that is thrown.
    *
@@ -85,8 +87,8 @@ public class ExceptionController {
    * - Response showing 'not found' message.
    */
   @ResponseStatus(HttpStatus.NOT_FOUND)
-  @ExceptionHandler(NotFoundException.class)
-  public BaseResponse notFoundException(NotFoundException e) {
+  @ExceptionHandler({ NotFoundException.class, NoHandlerFoundException.class })
+  public BaseResponse notFoundException(Exception e) {
     
     log.error(e.getMessage(), e.getCause());
     
@@ -102,10 +104,29 @@ public class ExceptionController {
    * @return {@link com.future.function.web.model.response.base.BaseResponse}
    * - Response showing 'unsupported operation' message.
    */
-  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
   @ExceptionHandler(UnsupportedOperationException.class)
   public BaseResponse unsupportedOperationException(
     UnsupportedOperationException e
+  ) {
+    
+    log.error(e.getMessage(), e.getCause());
+    
+    return ResponseHelper.toBaseResponse(HttpStatus.BAD_REQUEST);
+  }
+  
+  /**
+   * Handles any {@link Throwable} exception thrown from controller/service.
+   *
+   * @param e Exception that is thrown.
+   *
+   * @return {@link com.future.function.web.model.response.base.BaseResponse}
+   * - Response showing 'exception' message.
+   */
+  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+  @ExceptionHandler(Throwable.class)
+  public BaseResponse genericException(
+    Throwable e
   ) {
     
     log.error(e.getMessage(), e.getCause());
