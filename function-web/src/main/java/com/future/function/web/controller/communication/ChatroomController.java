@@ -1,11 +1,15 @@
 package com.future.function.web.controller.communication;
 
+import com.future.function.common.enumeration.core.Role;
 import com.future.function.model.entity.feature.communication.chatting.Chatroom;
 import com.future.function.model.entity.feature.communication.chatting.Message;
 import com.future.function.model.entity.feature.communication.chatting.MessageStatus;
 import com.future.function.service.api.feature.communication.ChatroomService;
 import com.future.function.service.api.feature.communication.MessageService;
 import com.future.function.service.api.feature.communication.MessageStatusService;
+import com.future.function.service.api.feature.core.UserService;
+import com.future.function.session.annotation.WithAnyRole;
+import com.future.function.session.model.Session;
 import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.mapper.request.communication.ChatroomRequestMapper;
@@ -30,6 +34,9 @@ import org.springframework.web.bind.annotation.*;
  */
 @RestController
 @RequestMapping(value = "/api/communication/chatrooms")
+@WithAnyRole(roles = {
+        Role.STUDENT, Role.MENTOR, Role.JUDGE, Role.ADMIN
+})
 public class ChatroomController {
 
     private ChatroomRequestMapper chatroomRequestMapper;
@@ -39,11 +46,10 @@ public class ChatroomController {
     private ChatroomService chatroomService;
 
     private MessageService messageService;
+    
+    private UserService userService;
 
     private MessageStatusService messageStatusService;
-
-    //TODO: Replace below code with calling helper method to acquire authenticated userID
-    private final String userId = "5d01be122dee811d8c5f32e7";
 
     @Autowired
     public ChatroomController(
@@ -51,11 +57,13 @@ public class ChatroomController {
             ChatroomService chatroomService,
             MessageService messageService,
             MessageStatusService messageStatusService,
-            MessageRequestMapper messageRequestMapper
+            MessageRequestMapper messageRequestMapper,
+            UserService userService
     ) {
         this.chatroomRequestMapper = chatroomRequestMapper;
         this.chatroomService = chatroomService;
         this.messageService = messageService;
+        this.userService = userService;
         this.messageStatusService = messageStatusService;
         this.messageRequestMapper = messageRequestMapper;
     }
@@ -65,28 +73,30 @@ public class ChatroomController {
             @RequestParam(required = false, defaultValue = "PUBLIC") String type,
             @RequestParam(required = false) String search,
             @RequestParam(required = false, defaultValue = "1") int page,
-            @RequestParam(required = false, defaultValue = "10") int size) {
+            @RequestParam(required = false, defaultValue = "10") int size,
+            Session session) {
 
         if (search != null) {
             return ChatroomResponseMapper.toPagingChatroomResponse(
-                    chatroomService.getChatroomsWithKeyword(search, userId, PageHelper.toPageable(page, size)),
+                    chatroomService.getChatroomsWithKeyword(search, getUserId(session), PageHelper.toPageable(page, size)),
                     messageService,
                     messageStatusService,
-                    userId
+                    getUserId(session)
             );
         }
         else {
             return ChatroomResponseMapper.toPagingChatroomResponse(
-                    chatroomService.getChatrooms(type, userId, PageHelper.toPageable(page, size)),
+                    chatroomService.getChatrooms(type, getUserId(session), PageHelper.toPageable(page, size)),
                     messageService,
                     messageStatusService,
-                    userId
+                    getUserId(session)
             );
         }
     }
 
     @GetMapping(value = "/{chatroomId:.+}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public DataResponse<ChatroomDetailResponse> getChatroom(@PathVariable String chatroomId) {
+    public DataResponse<ChatroomDetailResponse> getChatroom(@PathVariable String chatroomId,
+                                                            Session session) {
         return ChatroomResponseMapper.toChatroomDetailDataResponse(chatroomService.getChatroom(chatroomId));
     }
 
@@ -94,7 +104,8 @@ public class ChatroomController {
     public PagingResponse<MessageResponse> getMessages(
             @PathVariable String chatroomId,
             @RequestParam(required = false, defaultValue = "1") int page,
-            @RequestParam(required = false, defaultValue = "10") int size
+            @RequestParam(required = false, defaultValue = "10") int size,
+            Session session
     ) {
         return ChatroomResponseMapper.toMessagePagingResponse(
                 messageService.getMessages(chatroomId, PageHelper.toPageable(page, size)));
@@ -102,7 +113,8 @@ public class ChatroomController {
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public DataResponse<ChatroomDetailResponse> createChatroom(@RequestBody ChatroomRequest chatroomRequest) {
+    public DataResponse<ChatroomDetailResponse> createChatroom(@RequestBody ChatroomRequest chatroomRequest,
+                                                               Session session) {
         return ChatroomResponseMapper.toChatroomDetailDataResponse(chatroomService
                 .createChatroom(chatroomRequestMapper.toChatroom(chatroomRequest, null)));
     }
@@ -111,15 +123,16 @@ public class ChatroomController {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(value = HttpStatus.CREATED)
-    public BaseResponse createMessage(@PathVariable String chatroomId, @RequestBody MessageRequest messageRequest) {
+    public BaseResponse createMessage(@PathVariable String chatroomId, @RequestBody MessageRequest messageRequest,
+                                      Session session) {
 
-        Message message = messageService.createMessage(messageRequestMapper.toMessage(messageRequest, userId, chatroomId));
+        Message message = messageService.createMessage(messageRequestMapper.toMessage(messageRequest, getUserId(session), chatroomId));
         Chatroom chatroom = chatroomService.getChatroom(chatroomId);
         chatroom.getMembers().forEach(member -> messageStatusService.createMessageStatus(MessageStatus.builder()
                     .message(message)
                     .chatroom(chatroom)
                     .member(member)
-                    .seen(member.getId().equals(userId))
+                    .seen(member.getId().equals(getUserId(session)))
                     .build())
         );
         return ResponseHelper.toBaseResponse(HttpStatus.CREATED);
@@ -128,14 +141,20 @@ public class ChatroomController {
     @PutMapping(value = "/{chatroomId:.+}",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public DataResponse<ChatroomDetailResponse> updateChatroom(@PathVariable String chatroomId, @RequestBody ChatroomRequest chatroomRequest) {
+    public DataResponse<ChatroomDetailResponse> updateChatroom(@PathVariable String chatroomId, @RequestBody ChatroomRequest chatroomRequest,
+                                                               Session session) {
         return ChatroomResponseMapper.toChatroomDetailDataResponse(
                 chatroomService.updateChatroom(chatroomRequestMapper.toChatroom(chatroomRequest, chatroomId)));
     }
 
     @PutMapping(value = "/{chatroomId:.+}/messages/{messageId:.+}/_read", produces = MediaType.APPLICATION_JSON_VALUE)
-    public BaseResponse updateMessageStatus(@PathVariable String chatroomId, @PathVariable String messageId) {
-        messageStatusService.updateSeenStatus(chatroomId, messageId, userId);
+    public BaseResponse updateMessageStatus(@PathVariable String chatroomId, @PathVariable String messageId,
+                                            Session session) {
+        messageStatusService.updateSeenStatus(chatroomId, messageId, getUserId(session));
         return ResponseHelper.toBaseResponse(HttpStatus.OK);
+    }
+    
+    private String getUserId(Session session) {
+        return userService.getUserByEmail(session.getEmail()).getId();
     }
 }
