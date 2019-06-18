@@ -1,8 +1,11 @@
 package com.future.function.service.api.feature.communication.questionnaire;
 
+import com.future.function.model.entity.feature.communication.questionnaire.QuestionQuestionnaire;
 import com.future.function.model.entity.feature.communication.questionnaire.Questionnaire;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+
+import java.util.List;
 
 /**
  * Service interface class for questionnaire logic operations declaration.
@@ -22,4 +25,12 @@ public interface QuestionnaireService {
   Questionnaire updateQuestionnaire(Questionnaire questionnaire);
 
   void deleteQuestionnaire(String QuestionnaireId);
+
+  // '/api/communication.questionnaires/{questionnaireId}/questions
+  List<QuestionQuestionnaire> getQuestionsByIdQuestionnaire(Questionnaire questionnaire);
+
+  QuestionQuestionnaire createQuestionQuestionnaire(QuestionQuestionnaire questionQuestionnaire);
+
+
+
 }
