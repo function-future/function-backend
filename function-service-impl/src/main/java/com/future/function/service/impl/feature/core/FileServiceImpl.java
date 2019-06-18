@@ -18,9 +18,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.Set;
 
 @Service
 public class FileServiceImpl implements FileService {
@@ -214,25 +216,41 @@ public class FileServiceImpl implements FileService {
                                                         Role.ADMIN
         ))
       .ifPresent(file -> {
-        resourceService.markFilesUsed(this.getListOfIdToBeMarked(file), false);
+        List<String> fileIds = this.getListOfIdToBeMarked(file);
+        
+        resourceService.markFilesUsed(fileIds, false);
         
         // Prevents optimistic locking
-        file = fileRepositoryV2.findOne(file.getId());
+        Iterable<FileV2> files = fileRepositoryV2.findAll(fileIds);
         
-        file.setDeleted(true);
-        fileRepositoryV2.save(file);
+        files.forEach(fileV2 -> fileV2.setDeleted(true));
+        fileRepositoryV2.save(files);
       });
   }
   
   private List<String> getListOfIdToBeMarked(FileV2 file) {
     
-    List<String> fileIds = fileRepositoryV2.findAllByParentId(file.getId())
-      .map(FileV2::getId)
-      .collect(Collectors.toList());
+    Set<String> fileIds = new HashSet<>();
+  
+    String fileId = file.getId();
+  
+    List<FileV2> filesWithFileAsParent = fileRepositoryV2.findAllByParentId(
+      fileId);
+    if (!filesWithFileAsParent.isEmpty()) {
+      List<String> ids = filesWithFileAsParent
+        .stream()
+        .map(this::getListOfIdToBeMarked)
+        .reduce(new ArrayList<>(), (collectedFileIds, retrievedFileIds) -> {
+          collectedFileIds.addAll(retrievedFileIds);
+          return collectedFileIds;
+        });
     
-    fileIds.add(file.getId());
-    
-    return fileIds;
+      fileIds.addAll(ids);
+    }
+  
+    fileIds.add(fileId);
+  
+    return new ArrayList<>(fileIds);
   }
   
 }

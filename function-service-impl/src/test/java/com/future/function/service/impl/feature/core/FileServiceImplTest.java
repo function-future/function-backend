@@ -21,9 +21,10 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import static com.googlecode.catchexception.CatchException.catchException;
 import static com.googlecode.catchexception.CatchException.caughtException;
@@ -141,16 +142,20 @@ public class FileServiceImplTest {
     when(fileProperties.getRootId()).thenReturn(ROOT);
     when(fileRepository.findByIdAndParentId(ID, PARENT_ID)).thenReturn(
       Optional.of(file));
-    when(fileRepository.findAllByParentId(ID)).thenReturn(Stream.empty());
+    when(fileRepository.findAllByParentId(ID)).thenReturn(
+      Collections.emptyList());
     when(resourceService.markFilesUsed(Collections.singletonList(ID),
                                        false
     )).thenReturn(true);
-    when(fileRepository.findOne(ID)).thenReturn(file);
+    when(fileRepository.findAll(Collections.singletonList(ID))).thenReturn(
+      Collections.singletonList(file));
     
     FileV2 markedDeletedFile = new FileV2();
     BeanUtils.copyProperties(file, markedDeletedFile);
     markedDeletedFile.setDeleted(true);
-    when(fileRepository.save(markedDeletedFile)).thenReturn(markedDeletedFile);
+    when(fileRepository.save(
+      Collections.singletonList(markedDeletedFile))).thenReturn(
+      Collections.singletonList(markedDeletedFile));
     
     fileService.deleteFileOrFolder(SESSION, PARENT_ID, ID);
     
@@ -158,8 +163,85 @@ public class FileServiceImplTest {
     verify(fileRepository).findByIdAndParentId(ID, PARENT_ID);
     verify(fileRepository).findAllByParentId(ID);
     verify(resourceService).markFilesUsed(Collections.singletonList(ID), false);
-    verify(fileRepository).findOne(ID);
-    verify(fileRepository).save(markedDeletedFile);
+    verify(fileRepository).findAll(Collections.singletonList(ID));
+    verify(fileRepository).save(Collections.singletonList(markedDeletedFile));
+  }
+  
+  @Test
+  public void testGivenEmailAndParentIdAndFileOrFolderIdAndNestedFileOrFolderByDeletingFileOrFolderReturnSuccessfulDeletion() {
+    
+    FileV2 folder1 = FileV2.builder()
+      .id("folder-1")
+      .parentId(ROOT)
+      .markFolder(true)
+      .build();
+    FileV2 file1 = FileV2.builder()
+      .id("file-1")
+      .parentId(folder1.getId())
+      .build();
+    FileV2 folder2 = FileV2.builder()
+      .id("folder-2")
+      .parentId(folder1.getId())
+      .markFolder(true)
+      .build();
+    FileV2 file2 = FileV2.builder()
+      .id("file-2")
+      .parentId(folder2.getId())
+      .build();
+    FileV2 file3 = FileV2.builder()
+      .id("file-3")
+      .parentId(folder2.getId())
+      .build();
+    
+    when(fileProperties.getRootId()).thenReturn(ROOT);
+    
+    when(fileRepository.findByIdAndParentId(folder1.getId(),
+                                            folder1.getParentId()
+    )).thenReturn(Optional.of(folder1));
+    when(fileRepository.findAllByParentId(folder1.getId())).thenReturn(
+      Arrays.asList(file1, folder2));
+    
+    when(fileRepository.findAllByParentId(file1.getId())).thenReturn(
+      Collections.emptyList());
+    when(fileRepository.findAllByParentId(folder2.getId())).thenReturn(
+      Arrays.asList(file2, file3));
+    when(fileRepository.findAllByParentId(file2.getId())).thenReturn(
+      Collections.emptyList());
+    when(fileRepository.findAllByParentId(file3.getId())).thenReturn(
+      Collections.emptyList());
+    
+    List<String> fileIds = Arrays.asList(folder2.getId(), folder1.getId(),
+                                         file1.getId(), file2.getId(),
+                                         file3.getId()
+    );
+    when(resourceService.markFilesUsed(fileIds, false)).thenReturn(true);
+    
+    List<FileV2> fileV2s = Arrays.asList(folder2, folder1, file1, file2, file3);
+    when(fileRepository.findAll(fileIds)).thenReturn(fileV2s);
+    
+    folder2.setDeleted(true);
+    folder1.setDeleted(true);
+    file1.setDeleted(true);
+    file2.setDeleted(true);
+    file3.setDeleted(true);
+    when(fileRepository.save(fileV2s)).thenReturn(fileV2s);
+    
+    fileService.deleteFileOrFolder(SESSION, ROOT, folder1.getId());
+    
+    verify(fileProperties).getRootId();
+    
+    verify(fileRepository).findByIdAndParentId(
+      folder1.getId(), folder1.getParentId());
+    verify(fileRepository).findAllByParentId(folder1.getId());
+    verify(fileRepository).findAllByParentId(file1.getId());
+    verify(fileRepository).findAllByParentId(folder2.getId());
+    verify(fileRepository).findAllByParentId(file2.getId());
+    verify(fileRepository).findAllByParentId(file3.getId());
+    
+    verify(resourceService).markFilesUsed(fileIds, false);
+    
+    verify(fileRepository).findAll(fileIds);
+    verify(fileRepository).save(fileV2s);
   }
   
   @Test

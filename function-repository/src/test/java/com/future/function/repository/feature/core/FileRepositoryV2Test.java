@@ -13,6 +13,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -106,10 +108,10 @@ public class FileRepositoryV2Test {
   @Test
   public void testGivenParentIdByFindingFilesOrFoldersReturnStreamOfFileOrFolder() {
     
-    Stream<FileV2> foundFilesOrFolders = fileRepositoryV2.findAllByParentId(
+    List<FileV2> foundFilesOrFolders = fileRepositoryV2.findAllByParentId(
       PARENT_ID);
     
-    assertThat(foundFilesOrFolders).isNotEqualTo(Stream.empty());
+    assertThat(foundFilesOrFolders).isNotEqualTo(Collections.emptyList());
   }
   
   @Test
