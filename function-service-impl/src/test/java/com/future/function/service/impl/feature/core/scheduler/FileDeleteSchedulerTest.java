@@ -84,6 +84,30 @@ public class FileDeleteSchedulerTest {
   }
   
   @Test
+  public void testGivenMethodCallByDeletingUnusedFolderReturnSuccessfulDeletionWithoutFileSystemUtilsCall() {
+    
+    file.setCreatedAt(
+      System.currentTimeMillis() - FileDeleteScheduler.HALF_HOUR * 2);
+    file.setMarkFolder(true);
+    
+    Mockito.when(fileRepository.findAllByUsedFalse())
+      .thenReturn(Stream.of(file));
+    
+    PowerMockito.mockStatic(File.class);
+    
+    PowerMockito.mockStatic(FileSystemUtils.class);
+    
+    fileDeleteScheduler.deleteFileOnSchedule();
+    
+    Mockito.verify(fileRepository)
+      .findAllByUsedFalse();
+    Mockito.verify(fileRepository)
+      .delete(file);
+    
+    PowerMockito.verifyZeroInteractions(File.class, FileSystemUtils.class);
+  }
+  
+  @Test
   public void testGivenMethodCallAndBefore30MinutesByDeletingUnusedFileReturnNoDeletion() {
     
     file.setCreatedAt(System.currentTimeMillis());
