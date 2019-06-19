@@ -126,7 +126,7 @@
 //
 //    BASE_RESPONSE = ResponseHelper.toBaseResponse(HttpStatus.OK);
 //
-//    when(assignmentService.findAllByBatchCodeAndPageable(pageable, "", ""))
+//    when(assignmentService.findAllByBatchCode(pageable, "", ""))
 //            .thenReturn(assignmentPage);
 //    when(assignmentService.createAssignment(assignment))
 //            .thenReturn(assignmentWithFile);
@@ -234,7 +234,7 @@
 //                    pagingResponseJacksonTester.write(PAGING_RESPONSE)
 //                            .getJson()));
 //
-//    verify(assignmentService).findAllByBatchCodeAndPageable(pageable, "", "");
+//    verify(assignmentService).findAllByBatchCode(pageable, "", "");
 //    verifyZeroInteractions(assignmentRequestMapper);
 //  }
 //
@@ -249,7 +249,7 @@
 //                    pagingResponseJacksonTester.write(PAGING_RESPONSE)
 //                            .getJson()));
 //
-//    verify(assignmentService).findAllByBatchCodeAndPageable(pageable, "", "");
+//    verify(assignmentService).findAllByBatchCode(pageable, "", "");
 //    verifyZeroInteractions(assignmentRequestMapper);
 //  }
 //}

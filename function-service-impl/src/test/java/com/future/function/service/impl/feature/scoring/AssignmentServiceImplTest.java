@@ -100,7 +100,7 @@ public class AssignmentServiceImplTest {
 
     when(assignmentRepository.findByIdAndDeletedFalse(assignment.getId()))
             .thenReturn(Optional.of(assignment));
-    when(assignmentRepository.findAllByBatchAndDeletedFalse(batch, pageable))
+    when(assignmentRepository.findAllByBatchCode(batch.getCode(), pageable))
             .thenReturn(assignmentPage);
     when(assignmentRepository.save(assignment))
             .thenReturn(assignment);
@@ -121,12 +121,12 @@ public class AssignmentServiceImplTest {
 
   @Test
   public void testFindAllAssignmentWithPageable() {
-    Page<Assignment> result = assignmentService.findAllByBatchCodeAndPageable(pageable, BATCH_CODE);
+    Page<Assignment> result = assignmentService.findAllByBatchCodeAndPageable(BATCH_CODE, pageable);
     assertThat(result).isNotNull();
     assertThat(result.getContent().size()).isEqualTo(1);
     assertThat(result.getContent()).isEqualTo(assignmentList);
     verify(batchService).getBatchByCode(BATCH_CODE);
-    verify(assignmentRepository).findAllByBatchAndDeletedFalse(batch, pageable);
+    verify(assignmentRepository).findAllByBatchCode(batch.getCode(), pageable);
   }
 
   @Test

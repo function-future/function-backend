@@ -1,6 +1,5 @@
 package com.future.function.repository.feature.scoring;
 
-import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.scoring.Assignment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,6 +13,6 @@ public interface AssignmentRepository extends MongoRepository<Assignment, String
 
   Optional<Assignment> findByIdAndDeletedFalse(String id);
 
-  Page<Assignment> findAllByBatchAndDeletedFalse(Batch batch, Pageable pageable);
+    Page<Assignment> findAllByBatchCode(String batchCode, Pageable pageable);
 
 }

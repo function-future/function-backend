@@ -10,7 +10,7 @@ import org.springframework.data.domain.Pageable;
  */
 public interface AssignmentService {
 
-  Page<Assignment> findAllByBatchCodeAndPageable(Pageable pageable, String batchCode);
+  Page<Assignment> findAllByBatchCodeAndPageable(String batchCode, Pageable pageable);
 
   Assignment findById(String id);
 
