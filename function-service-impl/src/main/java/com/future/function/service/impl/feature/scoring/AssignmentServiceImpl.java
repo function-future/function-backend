@@ -179,7 +179,6 @@ public class AssignmentServiceImpl implements AssignmentService {
    */
   @Override
   public void deleteById(String id) {
-    //TODO delete file associated with the assignment
     Optional.ofNullable(id)
             .map(this::findById)
             .ifPresent(assignment -> {

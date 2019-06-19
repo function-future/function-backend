@@ -91,7 +91,6 @@ public class QuizRepositoryTest {
 
   @Test
   public void testFindAllQuizPageWithPageableFilterAndSearch() {
-    //TODO change find all to findAll with filter and search
     Page<Quiz> actual = quizRepository.findAll(pageable);
     assertThat(actual.getContent()).isEqualTo(quizList);
   }
