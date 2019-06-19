@@ -9,13 +9,13 @@ import com.future.function.repository.feature.scoring.RoomRepository;
 import com.future.function.service.api.feature.core.UserService;
 import com.future.function.service.api.feature.scoring.CommentService;
 import com.future.function.service.api.feature.scoring.RoomService;
+import com.future.function.service.impl.helper.PageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,7 +35,7 @@ public class RoomServiceImpl implements RoomService {
     public Page<Room> findAllRoomsByAssignmentId(String assignmentId, Pageable pageable) {
         return Optional.ofNullable(assignmentId)
                 .map(id -> roomRepository.findAllByAssignmentIdAndDeletedFalse(assignmentId, pageable))
-                .orElseGet(() -> new PageImpl<>(new ArrayList<>(), pageable, 0));
+                .orElseGet(() -> PageHelper.empty(pageable));
     }
 
     @Override
@@ -54,9 +54,15 @@ public class RoomServiceImpl implements RoomService {
     public Comment createComment(Comment comment) {
         Room room = this.findById(comment.getRoom().getId());
         User author = userService.getUser(comment.getAuthor().getId());
-        comment.setRoom(room);
-        comment.setAuthor(author);
-        return commentService.createCommentByRoom(room, comment);
+        return Optional.of(comment)
+                .filter(value -> room.getAssignment().getDeadline() > new Date().getTime())
+                .map(value -> {
+                    value.setRoom(room);
+                    value.setAuthor(author);
+                    return value;
+                })
+                .map(value -> commentService.createCommentByRoom(room, value))
+                .orElseThrow(() -> new UnsupportedOperationException("Deadline has passed"));
     }
 
     @Override
@@ -88,6 +94,10 @@ public class RoomServiceImpl implements RoomService {
     public void deleteRoomById(String id) {
         Optional.ofNullable(id)
                 .flatMap(roomRepository::findByIdAndDeletedFalse)
+                .map(room -> {
+                    commentService.deleteAllCommentByRoomId(room.getId());
+                    return room;
+                })
                 .ifPresent(this::setDeleteAsTrueAndSave);
     }
 
@@ -95,7 +105,10 @@ public class RoomServiceImpl implements RoomService {
     public void deleteAllRoomsByAssignmentId(String assignmentId) {
         Optional.ofNullable(assignmentId)
                 .map(roomRepository::findAllByAssignmentIdAndDeletedFalse)
-                .ifPresent(list -> list.forEach(this::setDeleteAsTrueAndSave));
+                .ifPresent(list -> list.forEach(room -> {
+                    commentService.deleteAllCommentByRoomId(room.getId());
+                    this.setDeleteAsTrueAndSave(room);
+                }));
     }
 
     private void setDeleteAsTrueAndSave(Room room) {

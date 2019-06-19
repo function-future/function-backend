@@ -1,5 +1,6 @@
 package com.future.function.web.mapper.request.scoring;
 
+import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.scoring.Assignment;
 import com.future.function.validation.RequestValidator;
 import com.future.function.web.mapper.request.WebRequestMapper;
@@ -11,6 +12,9 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import java.util.ArrayList;
+import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
@@ -56,6 +60,7 @@ public class AssignmentRequestMapperTest {
             .builder()
             .title(ASSIGNMENT_TITLE)
             .description(ASSIGNMENT_DESCRIPTION)
+            .files(new ArrayList<>())
             .build();
 
     when(validator.validate(assignmentWebRequest))
@@ -72,9 +77,19 @@ public class AssignmentRequestMapperTest {
 
   @Test
   public void testToAssignmentFromStringDataJson() {
-      Assignment actual = assignmentRequestMapper.toAssignment(assignmentWebRequest);
-    assertThat(actual).isEqualTo(assignment);
+    Assignment actual = assignmentRequestMapper.toAssignment(assignmentWebRequest);
+    assertThat(actual.getDescription()).isEqualTo(assignment.getDescription());
+    assertThat(actual.getTitle()).isEqualTo(assignment.getTitle());
+    verify(validator).validate(assignmentWebRequest);
+  }
 
+  @Test
+  public void testToAssignmentFromStringDataJsonFileExist() {
+    assignmentWebRequest.setFiles(Collections.singletonList("file-id"));
+    assignment.setFile(FileV2.builder().id("file-id").build());
+    Assignment actual = assignmentRequestMapper.toAssignment(assignmentWebRequest);
+    assertThat(actual.getDescription()).isEqualTo(assignment.getDescription());
+    assertThat(actual.getTitle()).isEqualTo(assignment.getTitle());
     verify(validator).validate(assignmentWebRequest);
   }
 
@@ -83,8 +98,8 @@ public class AssignmentRequestMapperTest {
     assignment.setId(ASSIGNMENT_ID);
     assignmentWebRequest.setId(ASSIGNMENT_ID);
       Assignment actual = assignmentRequestMapper.toAssignmentWithId(ASSIGNMENT_ID, assignmentWebRequest);
-    assertThat(actual).isEqualTo(assignment);
-
+    assertThat(actual.getDescription()).isEqualTo(assignment.getDescription());
+    assertThat(actual.getTitle()).isEqualTo(assignment.getTitle());
     verify(validator).validate(assignmentWebRequest);
   }
 }

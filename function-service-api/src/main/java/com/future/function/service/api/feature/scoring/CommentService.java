@@ -11,4 +11,5 @@ public interface CommentService {
 
     Comment createCommentByRoom(Room room, Comment comment);
 
+    void deleteAllCommentByRoomId(String roomId);
 }

@@ -1,5 +1,7 @@
 package com.future.function.web.mapper.response.scoring;
 
+import com.future.function.model.entity.feature.core.Batch;
+import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.scoring.Assignment;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.model.response.base.DataResponse;
@@ -25,11 +27,14 @@ public class AssignmentResponseMapperTest {
 
   private static final String ASSIGNMENT_TITLE = "assignment-title";
   private static final String ASSIGNMENT_DESCRIPTION = "assignment-description";
-  private static final String ASSIGNMENT_QUESTION = "assignment-question";
   private static final long ASSIGNMENT_DEADLINE = new Date().getTime();
+  private static final String BATCH_CODE = "batch-code";
+  private static final String FILE_URl = "file-url";
   private Paging paging;
   private Pageable pageable;
   private Assignment assignment;
+  private Batch batch;
+  private FileV2 fileV2;
   private List<Assignment> assignmentList;
   private Page<Assignment> assignmentPage;
   private AssignmentWebResponse assignmentWebResponse;
@@ -39,12 +44,18 @@ public class AssignmentResponseMapperTest {
 
   @Before
   public void setUp() throws Exception {
+
+    batch = Batch.builder().code(BATCH_CODE).build();
+    fileV2 = FileV2.builder().fileUrl(FILE_URl).build();
+
     assignment = Assignment
             .builder()
             .id(null)
             .title(ASSIGNMENT_TITLE)
             .description(ASSIGNMENT_DESCRIPTION)
             .deadline(ASSIGNMENT_DEADLINE)
+            .batch(batch)
+            .file(fileV2)
             .build();
 
     assignmentWebResponse = AssignmentWebResponse
@@ -52,6 +63,8 @@ public class AssignmentResponseMapperTest {
             .title(ASSIGNMENT_TITLE)
             .description(ASSIGNMENT_DESCRIPTION)
             .deadline(ASSIGNMENT_DEADLINE)
+            .batchCode(BATCH_CODE)
+            .file(FILE_URl)
             .build();
 
     assignmentWebResponseDataResponse = DataResponse
