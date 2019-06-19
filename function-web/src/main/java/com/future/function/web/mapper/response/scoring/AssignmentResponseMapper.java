@@ -51,6 +51,8 @@ public class AssignmentResponseMapper {
   private static AssignmentWebResponse buildAssignmentWebResponse(Assignment assignment) {
     AssignmentWebResponse response = new AssignmentWebResponse();
     BeanUtils.copyProperties(assignment, response);
+    response.setBatchCode(assignment.getBatch().getCode());
+    response.setFile(assignment.getFile().getFileUrl());
     return response;
   }
 

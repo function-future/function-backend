@@ -156,6 +156,37 @@ public class AssignmentServiceImplTest {
   }
 
   @Test
+  public void testDeleteByIdSuccessWithFile() {
+    assignment.setFile(FileV2.builder().id(FILE_ID).build());
+    assignmentService.deleteById(assignment.getId());
+    verify(assignmentRepository).findByIdAndDeletedFalse(assignment.getId());
+    verify(roomService).deleteAllRoomsByAssignmentId(assignment.getId());
+    verify(resourceService).markFilesUsed(Collections.singletonList(FILE_ID), false);
+    assignment.setDeleted(true);
+    verify(assignmentRepository).save(assignment);
+  }
+
+  @Test
+  public void testDeleteByIdSuccessWithFileIdBlank() {
+    assignment.setFile(FileV2.builder().id("").build());
+    assignmentService.deleteById(assignment.getId());
+    verify(assignmentRepository).findByIdAndDeletedFalse(assignment.getId());
+    verify(roomService).deleteAllRoomsByAssignmentId(assignment.getId());
+    assignment.setDeleted(true);
+    verify(assignmentRepository).save(assignment);
+  }
+
+  @Test
+  public void testDeleteByIdSuccessWithFileNull() {
+    assignment.setFile(null);
+    assignmentService.deleteById(assignment.getId());
+    verify(assignmentRepository).findByIdAndDeletedFalse(assignment.getId());
+    verify(roomService).deleteAllRoomsByAssignmentId(assignment.getId());
+    assignment.setDeleted(true);
+    verify(assignmentRepository).save(assignment);
+  }
+
+  @Test
   public void testCreateAssignmentSuccess() {
     Assignment actual = assignmentService.createAssignment(assignment);
     assertThat(actual.getFile()).isEqualTo(file);
