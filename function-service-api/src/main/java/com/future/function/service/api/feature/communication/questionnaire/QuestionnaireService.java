@@ -30,28 +30,28 @@ public interface QuestionnaireService {
 
   // Questionnaire Questions
   // '/api/communication.questionnaires/{questionnaireId}/questions
-  List<QuestionQuestionnaire> getQuestionsByIdQuestionnaire(Questionnaire questionnaire);
+  List<QuestionQuestionnaire> getQuestionsByIdQuestionnaire(String questionnaireId);
 
   QuestionQuestionnaire createQuestionQuestionnaire(QuestionQuestionnaire questionQuestionnaire);
 
   QuestionQuestionnaire updateQuestionQuestionnaire(QuestionQuestionnaire questionQuestionnaire);
 
-  void questionQuestionnaire(String QuestionquestionnaireId);
+  void deleteQuestionQuestionnaire(String QuestionquestionnaireId);
 
   //Questionnaire Appraiser
 
   Page<QuestionnaireParticipant> getQuestionnaireAppraiser(Questionnaire questionnaire,Pageable pageable);
 
-  QuestionnaireParticipant addQuestionnaireAppraiserToQuestionnaire(Questionnaire questionnaire);
+  QuestionnaireParticipant addQuestionnaireAppraiserToQuestionnaire(String questionnaireId, String appraiserId);
 
-  void deleteQuestionnaireAppraiserFromQuestionnaire(String questionnaireId);
+  void deleteQuestionnaireAppraiserFromQuestionnaire(String questionnaireId, String appraiserId);
 
   //Questionnaire Appraisee
 
   Page<QuestionnaireParticipant> getQuestionnaireAppraisee(Questionnaire questionnaire, Pageable pageable);
 
-  QuestionnaireParticipant addQuestionnaireAppraiseeToQuestionnaire(Questionnaire questionnaire);
+  QuestionnaireParticipant addQuestionnaireAppraiseeToQuestionnaire(String questionnaireId, String appraiseeId);
 
-  void deleteQuestionnaireAppraiseeFromQuestionnaire(String questionnaireId);
+  void deleteQuestionnaireAppraiseeFromQuestionnaire(String questionnaireId, String appraiseeId);
 
 }

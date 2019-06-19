@@ -1,33 +1,55 @@
 package com.future.function.service.impl.feature.communication.questionnaire;
 
 import com.future.function.common.exception.NotFoundException;
+import com.future.function.model.entity.feature.communication.questionnaire.QuestionQuestionnaire;
 import com.future.function.model.entity.feature.communication.questionnaire.Questionnaire;
+import com.future.function.model.entity.feature.communication.questionnaire.QuestionnaireParticipant;
+import com.future.function.model.entity.feature.core.User;
+import com.future.function.repository.feature.communication.questionnaire.QuestionQuestionnaireRepository;
+import com.future.function.repository.feature.communication.questionnaire.QuestionnaireParticipantRepository;
 import com.future.function.repository.feature.communication.questionnaire.QuestionnaireRepository;
 import com.future.function.service.api.feature.communication.questionnaire.QuestionnaireService;
+import com.future.function.service.api.feature.core.UserService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.Optional;
 
 public class QuestionnaireServiceImpl implements QuestionnaireService {
 
   private final QuestionnaireRepository questionnaireRepository;
 
+  private final QuestionQuestionnaireRepository questionQuestionnaireRepository;
+
+  private final QuestionnaireParticipant questionnaireParticipant;
+
+  private final UserService userService;
+
+  private final QuestionnaireParticipantRepository questionnaireParticipantRepository;
+
   @Autowired
-  public QuestionnaireServiceImpl(QuestionnaireRepository questionnaireRepository) {
-    this.questionnaireRepository = questionnaireRepository;
+  public QuestionnaireServiceImpl(
+          QuestionnaireRepository questionnaireRepository,
+          QuestionQuestionnaireRepository questionQuestionnaireRepository, QuestionnaireParticipant questionnaireParticipant, UserService userService,
+          QuestionnaireParticipantRepository questionnaireParticipantRepository) {
+      this.questionnaireRepository = questionnaireRepository;
+      this.questionQuestionnaireRepository = questionQuestionnaireRepository;
+      this.questionnaireParticipant = questionnaireParticipant;
+      this.userService = userService;
+      this.questionnaireParticipantRepository = questionnaireParticipantRepository;
   }
 
   @Override
   public Page<Questionnaire> getAllQuestionnaires(Pageable pageable) {
-    return null;
+    return questionnaireRepository.findAll(pageable);
   }
 
   @Override
   public Page<Questionnaire> getQuestionnairesWithKeyword(String keyword, Pageable pageable) {
-    return null;
+    return questionnaireRepository.findAllByTitleIgnoreCaseContaining(keyword, pageable);
   }
 
   @Override
@@ -41,12 +63,17 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
             .map(this.questionnaireRepository::findOne)
             .orElseThrow(() -> new NotFoundException("Questionnaire not Found"));
   }
-
   @Override
-  public Questionnaire createQuestionnaire(Questionnaire questionnaire) {
+  public Questionnaire createQuestionnaire(Questionnaire questionnaire, User author) {
     return Optional.of(questionnaire)
+            .map(questionnaire1 -> this.setAuthorHelper(questionnaire, author))
             .map(questionnaireRepository::save)
             .orElseThrow(UnsupportedOperationException::new);
+  }
+
+  private Questionnaire setAuthorHelper(Questionnaire questionnaire, User author) {
+    questionnaire.setAuthor(userService.getUser(author.getId()));
+    return questionnaire;
   }
 
   @Override
@@ -64,16 +91,90 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
   public void deleteQuestionnaire(String questionnaireId) {
     Optional.ofNullable(questionnaireId)
       .map(questionnaireRepository::findOne)
-      .ifPresent(this::softDeleteHelper);
+      .ifPresent(this::softDeleteHelperQuestionnaire);
   }
+
+  @Override
+  public List<QuestionQuestionnaire> getQuestionsByIdQuestionnaire(String questionnaireId) {
+    return Optional.of(questionnaireId)
+            .map(this::getQuestionnaire)
+            .map(questionQuestionnaireRepository::findAllByQuestionnaire)
+            .orElseThrow(() -> new NotFoundException("Questions Questionnaire not found"));
+  }
+
+  @Override
+  public QuestionQuestionnaire createQuestionQuestionnaire(QuestionQuestionnaire questionQuestionnaire) {
+    return Optional.of(questionQuestionnaire)
+            .map(target -> this.setQuestionnaire(questionQuestionnaire,target))
+            .map(questionQuestionnaireRepository::save)
+            .orElseThrow(UnsupportedOperationException::new);
+  }
+
+  @Override
+  public QuestionQuestionnaire updateQuestionQuestionnaire(QuestionQuestionnaire questionQuestionnaire) {
+    return Optional.of(questionQuestionnaire)
+            .map(QuestionQuestionnaire::getId)
+            .map(questionQuestionnaireRepository::findOne)
+            .map(target -> this.setQuestionnaire(questionQuestionnaire, target))
+            .map(target -> this.copyProperties(questionQuestionnaire,target))
+            .map(questionQuestionnaireRepository::save)
+            .orElse(questionQuestionnaire);
+  }
+
+  @Override
+  public void deleteQuestionQuestionnaire(String questionQuestionnaireId) {
+    Optional.ofNullable(questionQuestionnaireId)
+            .map(questionQuestionnaireRepository::findOne)
+            .ifPresent(this::softDeletedHelperQuestionQuestionnaire);
+  }
+
+  @Override
+  public Page<QuestionnaireParticipant> getQuestionnaireAppraiser(Questionnaire questionnaire, Pageable pageable) {
+    return questionnaireParticipantRepository.findAllByQuestionnaire(questionnaire, pageable);
+  }
+  @Override
+  public QuestionnaireParticipant addQuestionnaireAppraiserToQuestionnaire(String questionnaireId, String appraiserId){return null;}
+
+  @Override
+  public void deleteQuestionnaireAppraiserFromQuestionnaire(String questionnaireId, String appraiserId){}
+
+  @Override
+  public Page<QuestionnaireParticipant> getQuestionnaireAppraisee(Questionnaire questionnaire, Pageable pageable) {
+    return null;
+  }
+
+  @Override
+  public QuestionnaireParticipant addQuestionnaireAppraiseeToQuestionnaire(String questionnaireId, String appraiseeId){return null;}
+
+  @Override
+  public void deleteQuestionnaireAppraiseeFromQuestionnaire(String questionnaireId, String appraiseeId){} 5g
+
 
   private Questionnaire copyProperties(Questionnaire questionnaire, Questionnaire targetQuestionnaire) {
     BeanUtils.copyProperties(questionnaire,targetQuestionnaire);
     return targetQuestionnaire;
   }
 
-  private void softDeleteHelper(Questionnaire questionnaire){
+  private void softDeleteHelperQuestionnaire(Questionnaire questionnaire){
     questionnaire.setDeleted(true);
     questionnaireRepository.save(questionnaire);
+  }
+
+  private QuestionQuestionnaire setQuestionnaire (QuestionQuestionnaire questionQuestionnaire, QuestionQuestionnaire targetQuestionQuestionnaire) {
+    targetQuestionQuestionnaire.setQuestionnaire(
+            this.getQuestionnaire(questionQuestionnaire.getQuestionnaire().getId())
+    );
+    return targetQuestionQuestionnaire;
+  }
+
+  private QuestionQuestionnaire copyProperties (QuestionQuestionnaire questionQuestionnaire, QuestionQuestionnaire targetQuestionQuestionnaire) {
+    BeanUtils.copyProperties(questionQuestionnaire, targetQuestionQuestionnaire);
+    return targetQuestionQuestionnaire;
+  }
+
+  private void softDeletedHelperQuestionQuestionnaire(QuestionQuestionnaire questionQuestionnaire) {
+    questionQuestionnaire.setDeleted(true);
+    questionQuestionnaire.setQuestionnaire(null);
+    questionQuestionnaireRepository.save(questionQuestionnaire);
   }
 }

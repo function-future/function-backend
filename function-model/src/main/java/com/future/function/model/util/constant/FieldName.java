@@ -108,6 +108,8 @@ public interface FieldName {
 
     public static final String DUE_DATE = "dueDate";
 
+    public static final String AUTHOR = "author";
+
   }
 
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -171,7 +173,7 @@ public interface FieldName {
   }
 
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
-  abstract class QuestionnairePartiipant {
+  abstract class QuestionnaireParticipant {
 
     public static final String QUESTIONNAIRE = "questionnaire";
 

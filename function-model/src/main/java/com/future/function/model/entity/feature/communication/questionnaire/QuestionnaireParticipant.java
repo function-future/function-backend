@@ -22,15 +22,15 @@ public class QuestionnaireParticipant extends BaseEntity {
   @Id
   private String id;
 
-  @Field(FieldName.QuestionnairePartiipant.QUESTIONNAIRE)
+  @Field(FieldName.QuestionnaireParticipant.QUESTIONNAIRE)
   @DBRef(lazy = true)
   private Questionnaire questionnaire;
 
-  @Field(FieldName.QuestionnairePartiipant.MEMBER)
+  @Field(FieldName.QuestionnaireParticipant.MEMBER)
   @DBRef(lazy = true)
   private User member;
 
-  @Field(FieldName.QuestionnairePartiipant.TYPE)
+  @Field(FieldName.QuestionnaireParticipant.TYPE)
   private ParticipantType participantType;
 
 }

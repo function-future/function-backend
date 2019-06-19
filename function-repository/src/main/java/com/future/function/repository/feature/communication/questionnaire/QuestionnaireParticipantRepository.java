@@ -30,8 +30,9 @@ public interface QuestionnaireParticipantRepository extends MongoRepository<Ques
    * Find all questionnaire participant by questionnaire
    *
    * @param questionnaire questionnaire of questionnaire participant to be searched
+   * @param pageable pageable object for paging
    *
    * @return {@code List<QuestionnaireParticipant>} - all questionnaire participant filtered by the query
    */
-  List<QuestionnaireParticipant> findAllByQuestionnaire(Questionnaire questionnaire);
+  Page<QuestionnaireParticipant> findAllByQuestionnaire(Questionnaire questionnaire, Pageable pageable);
 }

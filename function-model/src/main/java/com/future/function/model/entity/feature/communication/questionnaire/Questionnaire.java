@@ -1,6 +1,7 @@
 package com.future.function.model.entity.feature.communication.questionnaire;
 
 import com.future.function.model.entity.base.BaseEntity;
+import com.future.function.model.entity.feature.core.User;
 import com.future.function.model.util.constant.DocumentName;
 import com.future.function.model.util.constant.FieldName;
 import lombok.*;
@@ -30,4 +31,7 @@ public class Questionnaire extends BaseEntity {
 
   @Field(FieldName.Questionnaire.DUE_DATE)
   private long dueDate;
+
+  @Field(FieldName.Questionnaire.AUTHOR)
+  private User author;
 }

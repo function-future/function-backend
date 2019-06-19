@@ -48,13 +48,14 @@ public class QuestionQuestionnaireServiceImpl implements QuestionQuestionnaireSe
 
   @Override
   public QuestionQuestionnaire updateQuestionQuestionnaire(QuestionQuestionnaire questionQuestionnaire) {
-    return Optional.of(questionQuestionnaire)
-            .map(QuestionQuestionnaire::getId)
-            .map(questionQuestionnaireRepository::findOne)
-            .map(target -> this.setQuestionnaire(questionQuestionnaire, target))
-            .map(target -> this.copyProperties(questionQuestionnaire,target))
-            .map(questionQuestionnaireRepository::save)
-            .orElse(questionQuestionnaire);
+//    return Optional.of(questionQuestionnaire)
+//            .map(QuestionQuestionnaire::getId)
+//            .map(questionQuestionnaireRepository::findOne)
+//            .map(target -> this.setQuestionnaire(questionQuestionnaire, target))
+//            .map(target -> this.copyProperties(questionQuestionnaire,target))
+//            .map(questionQuestionnaireRepository::save)
+//            .orElse(questionQuestionnaire);
+    return null;
   }
 
   @Override
