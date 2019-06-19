@@ -1,8 +1,8 @@
 package com.future.function.service.impl.feature.core;
 
 import com.future.function.common.enumeration.core.Role;
+import com.future.function.common.exception.ForbiddenException;
 import com.future.function.common.exception.NotFoundException;
-import com.future.function.common.exception.UnauthorizedException;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.User;
@@ -512,7 +512,7 @@ public class UserServiceImplTest {
   }
   
   @Test
-  public void testGivenEmailAndPasswordByGettingUserByEmailAndPasswordReturnUnauthorizedException() {
+  public void testGivenEmailAndPasswordByGettingUserByEmailAndPasswordReturnForbiddenException() {
     
     when(userRepository.findByEmail(EMAIL_STUDENT)).thenReturn(
       Optional.of(userStudent));
@@ -524,7 +524,7 @@ public class UserServiceImplTest {
       () -> userService.getUserByEmailAndPassword(EMAIL_STUDENT, rawPassword));
     
     assertThat(caughtException().getClass()).isEqualTo(
-      UnauthorizedException.class);
+      ForbiddenException.class);
     assertThat(caughtException().getMessage()).isEqualTo(
       "Invalid Email/Password");
     
