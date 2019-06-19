@@ -11,6 +11,7 @@ import com.future.function.service.api.feature.core.BatchService;
 import com.future.function.service.api.feature.core.ResourceService;
 import com.future.function.service.api.feature.scoring.AssignmentService;
 import com.future.function.service.api.feature.scoring.RoomService;
+import com.future.function.service.impl.helper.CopyHelper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -53,9 +54,9 @@ public class AssignmentServiceImpl implements AssignmentService {
    * @return Page<Assignment>
    */
   @Override
-  public Page<Assignment> findAllByBatchCodeAndPageable(Pageable pageable, String batchCode) {
+  public Page<Assignment> findAllByBatchCodeAndPageable(String batchCode, Pageable pageable) {
     Batch batch = batchService.getBatchByCode(batchCode);
-    return assignmentRepository.findAllByBatchAndDeletedFalse(batch, pageable);
+    return assignmentRepository.findAllByBatchCode(batch.getCode(), pageable);
   }
 
   /**
@@ -103,7 +104,6 @@ public class AssignmentServiceImpl implements AssignmentService {
    */
   @Override
   public Assignment createAssignment(Assignment assignment) {
-    //TODO save batch to shared assignment entity
     assignment = storeAssignmentFile(assignment);
     Batch batch = batchService.getBatchByCode(assignment.getBatch().getCode());
     assignment.setBatch(batch);
@@ -139,15 +139,12 @@ public class AssignmentServiceImpl implements AssignmentService {
    */
   @Override
   public Assignment updateAssignment(Assignment request) {
-    //TODO save batch to shared assignment entity
     Assignment oldAssignment = this.findById(request.getId());
-    boolean isBatchChanged = checkBatchChanged(request, oldAssignment);
-    boolean isFilesChanged = checkFilesChange(request, oldAssignment);
-    if (isFilesChanged) {
+    boolean isBatchChanged = isBatchChanged(request, oldAssignment);
+    if (isFilesChanged(request, oldAssignment)) {
       resourceService.markFilesUsed(Collections.singletonList(oldAssignment.getFile().getId()), false);
     }
-    BeanUtils.copyProperties(request, oldAssignment, "_id", "id");
-
+    CopyHelper.copyProperties(request, oldAssignment);
     oldAssignment = storeAssignmentFile(oldAssignment);
     oldAssignment = assignmentRepository.save(oldAssignment);
     if (isBatchChanged) {
@@ -157,11 +154,11 @@ public class AssignmentServiceImpl implements AssignmentService {
     return oldAssignment;
   }
 
-  private boolean checkBatchChanged(Assignment request, Assignment oldAssignment) {
+  private boolean isBatchChanged(Assignment request, Assignment oldAssignment) {
     return !request.getBatch().getCode().equals(oldAssignment.getBatch().getCode());
   }
 
-  private boolean checkFilesChange(Assignment request, Assignment oldAssignment) {
+  private boolean isFilesChanged(Assignment request, Assignment oldAssignment) {
     return !request.getFile().getId().equals(oldAssignment.getFile().getId());
   }
 
