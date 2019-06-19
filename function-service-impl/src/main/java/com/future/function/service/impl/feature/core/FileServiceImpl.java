@@ -56,7 +56,7 @@ public class FileServiceImpl implements FileService {
   public FileV2 getFileOrFolder(String fileFolderId, String parentId) {
     
     return Optional.ofNullable(fileFolderId)
-      .flatMap(id -> fileRepositoryV2.findByIdAndParentId(id, parentId))
+      .flatMap(id -> fileRepositoryV2.findByIdAndParentIdAndDeletedFalse(id, parentId))
       .orElseThrow(() -> new NotFoundException("Get File/Folder Not Found"));
   }
   
@@ -74,7 +74,7 @@ public class FileServiceImpl implements FileService {
     
     return Optional.ofNullable(parentId)
       .map(
-        id -> fileRepositoryV2.findAllByParentIdAndAsResourceFalseOrderByMarkFolderDesc(
+        id -> fileRepositoryV2.findAllByParentIdAndAsResourceFalseAndDeletedFalseOrderByMarkFolderDesc(
           id, pageable))
       .orElseGet(() -> PageHelper.empty(pageable));
   }
@@ -209,7 +209,7 @@ public class FileServiceImpl implements FileService {
     
     Optional.ofNullable(fileFolderId)
       .filter(id -> !id.equalsIgnoreCase(fileProperties.getRootId()))
-      .flatMap(id -> fileRepositoryV2.findByIdAndParentId(id, parentId))
+      .flatMap(id -> fileRepositoryV2.findByIdAndParentIdAndDeletedFalse(id, parentId))
       .filter(
         file -> AuthorizationHelper.isAuthorizedForEdit(session.getEmail(),
                                                         session.getRole(), file,
@@ -234,7 +234,7 @@ public class FileServiceImpl implements FileService {
   
     String fileId = file.getId();
   
-    List<FileV2> filesWithFileAsParent = fileRepositoryV2.findAllByParentId(
+    List<FileV2> filesWithFileAsParent = fileRepositoryV2.findAllByParentIdAndDeletedFalse(
       fileId);
     if (!filesWithFileAsParent.isEmpty()) {
       List<String> ids = filesWithFileAsParent

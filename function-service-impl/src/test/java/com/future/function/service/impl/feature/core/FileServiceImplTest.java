@@ -89,7 +89,7 @@ public class FileServiceImplTest {
   @Test
   public void testGivenFileOrFolderIdAndParentIdByGettingFileOrFolderReturnFileOrFolder() {
     
-    when(fileRepository.findByIdAndParentId(ID, PARENT_ID)).thenReturn(
+    when(fileRepository.findByIdAndParentIdAndDeletedFalse(ID, PARENT_ID)).thenReturn(
       Optional.of(file));
     
     FileV2 file = fileService.getFileOrFolder(ID, PARENT_ID);
@@ -97,14 +97,14 @@ public class FileServiceImplTest {
     assertThat(file).isNotNull();
     assertThat(file).isEqualTo(this.file);
     
-    verify(fileRepository).findByIdAndParentId(ID, PARENT_ID);
+    verify(fileRepository).findByIdAndParentIdAndDeletedFalse(ID, PARENT_ID);
     verifyZeroInteractions(resourceService, fileProperties);
   }
   
   @Test
   public void testGivenInvalidFileOrFolderIdAndParentIdByGettingFileOrFolderReturnNotFoundException() {
     
-    when(fileRepository.findByIdAndParentId(ID, PARENT_ID)).thenReturn(
+    when(fileRepository.findByIdAndParentIdAndDeletedFalse(ID, PARENT_ID)).thenReturn(
       Optional.empty());
     
     catchException(() -> fileService.getFileOrFolder(ID, PARENT_ID));
@@ -113,7 +113,7 @@ public class FileServiceImplTest {
     assertThat(caughtException().getMessage()).isEqualTo(
       "Get File/Folder Not Found");
     
-    verify(fileRepository).findByIdAndParentId(ID, PARENT_ID);
+    verify(fileRepository).findByIdAndParentIdAndDeletedFalse(ID, PARENT_ID);
     verifyZeroInteractions(resourceService, fileProperties);
   }
   
@@ -123,7 +123,7 @@ public class FileServiceImplTest {
     page = new PageImpl<>(Collections.singletonList(file), PAGEABLE, 1);
     
     when(
-      fileRepository.findAllByParentIdAndAsResourceFalseOrderByMarkFolderDesc(
+      fileRepository.findAllByParentIdAndAsResourceFalseAndDeletedFalseOrderByMarkFolderDesc(
         PARENT_ID, PAGEABLE)).thenReturn(page);
     
     Page<FileV2> page = fileService.getFilesAndFolders(PARENT_ID, PAGEABLE);
@@ -132,7 +132,7 @@ public class FileServiceImplTest {
     assertThat(page).isEqualTo(this.page);
     
     verify(
-      fileRepository).findAllByParentIdAndAsResourceFalseOrderByMarkFolderDesc(
+      fileRepository).findAllByParentIdAndAsResourceFalseAndDeletedFalseOrderByMarkFolderDesc(
       PARENT_ID, PAGEABLE);
   }
   
@@ -140,9 +140,9 @@ public class FileServiceImplTest {
   public void testGivenEmailAndParentIdAndFileOrFolderIdByDeletingFileOrFolderReturnSuccessfulDeletion() {
     
     when(fileProperties.getRootId()).thenReturn(ROOT);
-    when(fileRepository.findByIdAndParentId(ID, PARENT_ID)).thenReturn(
+    when(fileRepository.findByIdAndParentIdAndDeletedFalse(ID, PARENT_ID)).thenReturn(
       Optional.of(file));
-    when(fileRepository.findAllByParentId(ID)).thenReturn(
+    when(fileRepository.findAllByParentIdAndDeletedFalse(ID)).thenReturn(
       Collections.emptyList());
     when(resourceService.markFilesUsed(Collections.singletonList(ID),
                                        false
@@ -160,8 +160,8 @@ public class FileServiceImplTest {
     fileService.deleteFileOrFolder(SESSION, PARENT_ID, ID);
     
     verify(fileProperties).getRootId();
-    verify(fileRepository).findByIdAndParentId(ID, PARENT_ID);
-    verify(fileRepository).findAllByParentId(ID);
+    verify(fileRepository).findByIdAndParentIdAndDeletedFalse(ID, PARENT_ID);
+    verify(fileRepository).findAllByParentIdAndDeletedFalse(ID);
     verify(resourceService).markFilesUsed(Collections.singletonList(ID), false);
     verify(fileRepository).findAll(Collections.singletonList(ID));
     verify(fileRepository).save(Collections.singletonList(markedDeletedFile));
@@ -195,19 +195,19 @@ public class FileServiceImplTest {
     
     when(fileProperties.getRootId()).thenReturn(ROOT);
     
-    when(fileRepository.findByIdAndParentId(folder1.getId(),
-                                            folder1.getParentId()
+    when(fileRepository.findByIdAndParentIdAndDeletedFalse(folder1.getId(),
+                                                           folder1.getParentId()
     )).thenReturn(Optional.of(folder1));
-    when(fileRepository.findAllByParentId(folder1.getId())).thenReturn(
+    when(fileRepository.findAllByParentIdAndDeletedFalse(folder1.getId())).thenReturn(
       Arrays.asList(file1, folder2));
     
-    when(fileRepository.findAllByParentId(file1.getId())).thenReturn(
+    when(fileRepository.findAllByParentIdAndDeletedFalse(file1.getId())).thenReturn(
       Collections.emptyList());
-    when(fileRepository.findAllByParentId(folder2.getId())).thenReturn(
+    when(fileRepository.findAllByParentIdAndDeletedFalse(folder2.getId())).thenReturn(
       Arrays.asList(file2, file3));
-    when(fileRepository.findAllByParentId(file2.getId())).thenReturn(
+    when(fileRepository.findAllByParentIdAndDeletedFalse(file2.getId())).thenReturn(
       Collections.emptyList());
-    when(fileRepository.findAllByParentId(file3.getId())).thenReturn(
+    when(fileRepository.findAllByParentIdAndDeletedFalse(file3.getId())).thenReturn(
       Collections.emptyList());
     
     List<String> fileIds = Arrays.asList(folder2.getId(), folder1.getId(),
@@ -230,13 +230,13 @@ public class FileServiceImplTest {
     
     verify(fileProperties).getRootId();
     
-    verify(fileRepository).findByIdAndParentId(
+    verify(fileRepository).findByIdAndParentIdAndDeletedFalse(
       folder1.getId(), folder1.getParentId());
-    verify(fileRepository).findAllByParentId(folder1.getId());
-    verify(fileRepository).findAllByParentId(file1.getId());
-    verify(fileRepository).findAllByParentId(folder2.getId());
-    verify(fileRepository).findAllByParentId(file2.getId());
-    verify(fileRepository).findAllByParentId(file3.getId());
+    verify(fileRepository).findAllByParentIdAndDeletedFalse(folder1.getId());
+    verify(fileRepository).findAllByParentIdAndDeletedFalse(file1.getId());
+    verify(fileRepository).findAllByParentIdAndDeletedFalse(folder2.getId());
+    verify(fileRepository).findAllByParentIdAndDeletedFalse(file2.getId());
+    verify(fileRepository).findAllByParentIdAndDeletedFalse(file3.getId());
     
     verify(resourceService).markFilesUsed(fileIds, false);
     
@@ -319,7 +319,7 @@ public class FileServiceImplTest {
   @Test
   public void testGivenMethodCallAndNonEmptyByteArrayByUpdatingFileOrFolderReturnUpdatedFile() {
     
-    when(fileRepository.findByIdAndParentId(ID, PARENT_ID)).thenReturn(
+    when(fileRepository.findByIdAndParentIdAndDeletedFalse(ID, PARENT_ID)).thenReturn(
       Optional.of(file));
     when(resourceService.storeFile(ID, PARENT_ID, NAME, NAME, NAME.getBytes(),
                                    FileOrigin.FILE
@@ -333,7 +333,7 @@ public class FileServiceImplTest {
     assertThat(updatedFile).isNotNull();
     assertThat(updatedFile).isEqualTo(file);
     
-    verify(fileRepository).findByIdAndParentId(ID, PARENT_ID);
+    verify(fileRepository).findByIdAndParentIdAndDeletedFalse(ID, PARENT_ID);
     verify(resourceService).storeFile(
       ID, PARENT_ID, NAME, NAME, NAME.getBytes(), FileOrigin.FILE);
     verify(fileRepository).findOne(ID);
@@ -352,7 +352,7 @@ public class FileServiceImplTest {
       .build();
     
     when(
-      fileRepository.findByIdAndParentId(folder.getId(), PARENT_ID)).thenReturn(
+      fileRepository.findByIdAndParentIdAndDeletedFalse(folder.getId(), PARENT_ID)).thenReturn(
       Optional.of(folder));
     when(fileRepository.save(folder)).thenReturn(folder);
     
@@ -362,7 +362,7 @@ public class FileServiceImplTest {
     assertThat(updatedFolder).isNotNull();
     assertThat(updatedFolder).isEqualTo(folder);
     
-    verify(fileRepository).findByIdAndParentId(folder.getId(), PARENT_ID);
+    verify(fileRepository).findByIdAndParentIdAndDeletedFalse(folder.getId(), PARENT_ID);
     verify(fileRepository).save(folder);
     verifyZeroInteractions(resourceService, fileProperties);
   }
