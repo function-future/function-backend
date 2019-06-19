@@ -38,8 +38,6 @@ public class AssignmentController {
    *
    * @param page   (Int)
    * @param size   (Int)
-   * @param filter (String) (Not Required)
-   * @param search (String) (Not Required)
    * @return PagingResponse<AssignmentWebResponse> contains List of Assignment and the Paging Information
    */
   @ResponseStatus(value = HttpStatus.OK)
@@ -51,13 +49,7 @@ public class AssignmentController {
   ) {
     return AssignmentResponseMapper
             .toAssignmentsPagingResponse(
-                    assignmentService
-                            .findAllByBatchCodeAndPageable(
-                                    PageHelper
-                                            .toPageable(page, size),
-                                    batchCode
-                            )
-            );
+                    assignmentService.findAllByBatchCodeAndPageable(batchCode, PageHelper.toPageable(page, size)));
   }
 
   /**
@@ -68,14 +60,8 @@ public class AssignmentController {
    */
   @ResponseStatus(value = HttpStatus.OK)
   @GetMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-  public DataResponse<AssignmentWebResponse> findAssignmentById(
-          @PathVariable String id
-  ) {
-    return AssignmentResponseMapper
-            .toAssignmentDataResponse(
-                    assignmentService
-                            .findById(id)
-            );
+  public DataResponse<AssignmentWebResponse> findAssignmentById(@PathVariable String id) {
+      return AssignmentResponseMapper.toAssignmentDataResponse(assignmentService.findById(id));
   }
 
   /**
@@ -89,44 +75,30 @@ public class AssignmentController {
   @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
   public DataResponse<AssignmentWebResponse> createAssignment(@RequestBody AssignmentWebRequest data) {
     return AssignmentResponseMapper
-            .toAssignmentDataResponse(
-                    HttpStatus.CREATED,
-                    assignmentService
-                            .createAssignment(
-                                    assignmentRequestMapper
-                                            .toAssignment(data))
-            );
+            .toAssignmentDataResponse(HttpStatus.CREATED, assignmentService
+                    .createAssignment(assignmentRequestMapper.toAssignment(data)));
   }
 
     @ResponseStatus(value = HttpStatus.CREATED)
     @PostMapping(path = "/copy", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public DataResponse<AssignmentWebResponse> copyAssignment(@RequestBody copyAssignmentWebRequest request) {
         return AssignmentResponseMapper
-                .toAssignmentDataResponse(
-                        HttpStatus.CREATED,
-                        assignmentService
-                                .copyAssignment(request.getAssignmentId(), request.getTargetBatch())
-            );
+                .toAssignmentDataResponse(HttpStatus.CREATED, assignmentService
+                        .copyAssignment(request.getAssignmentId(), request.getTargetBatch()));
   }
 
   /**
    * Used to update existing Assignment By Passing the id, JSON containing Assignment attributes, and Uploaded File
    *
    * @param data (JSON)
-   * @param file (MultipartFile) (Not Required)
    * @return DataResponse<AssignmentWebResponse> containing updated Assignment
    */
   @ResponseStatus(value = HttpStatus.OK)
   @PutMapping(path = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
   public DataResponse<AssignmentWebResponse> updateAssignment(@PathVariable String id,
                                                               @RequestBody AssignmentWebRequest data) {
-    return AssignmentResponseMapper
-            .toAssignmentDataResponse(
-                    assignmentService
-                            .updateAssignment(
-                                    assignmentRequestMapper
-                                            .toAssignmentWithId(id, data))
-            );
+      return AssignmentResponseMapper.toAssignmentDataResponse(assignmentService
+              .updateAssignment(assignmentRequestMapper.toAssignmentWithId(id, data)));
   }
 
   /**
@@ -137,12 +109,9 @@ public class AssignmentController {
    */
   @ResponseStatus(value = HttpStatus.OK)
   @DeleteMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-  public BaseResponse deleteAssignmentById(
-          @PathVariable String id
-  ) {
+  public BaseResponse deleteAssignmentById(@PathVariable String id) {
     assignmentService.deleteById(id);
-    return ResponseHelper
-            .toBaseResponse(HttpStatus.OK);
+      return ResponseHelper.toBaseResponse(HttpStatus.OK);
   }
 
 }
