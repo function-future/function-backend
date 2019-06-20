@@ -18,9 +18,9 @@ import java.io.File;
 import java.util.stream.Stream;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({
-                  FileSystemUtils.class, File.class, FileDeleteScheduler.class
-                })
+@PrepareForTest(value = {
+  FileSystemUtils.class, File.class, FileDeleteScheduler.class
+})
 public class FileDeleteSchedulerTest {
   
   private static final String TRIMMED_PATH = "file";
@@ -28,10 +28,7 @@ public class FileDeleteSchedulerTest {
   private static final String FILE_PATH =
     TRIMMED_PATH + File.separator + "path";
   
-  private static final FileV2 FILE = FileV2.builder()
-    .used(false)
-    .filePath(FILE_PATH)
-    .build();
+  private FileV2 file;
   
   @Mock
   private FileRepositoryV2 fileRepository;
@@ -40,7 +37,13 @@ public class FileDeleteSchedulerTest {
   private FileDeleteScheduler fileDeleteScheduler;
   
   @Before
-  public void setUp() {}
+  public void setUp() {
+    
+    file = FileV2.builder()
+      .used(false)
+      .filePath(FILE_PATH)
+      .build();
+  }
   
   @After
   public void tearDown() {}
@@ -49,8 +52,11 @@ public class FileDeleteSchedulerTest {
   public void testGivenMethodCallByDeletingUnusedFileReturnSuccessfulDeletion()
     throws Exception {
     
+    file.setCreatedAt(
+      System.currentTimeMillis() - FileDeleteScheduler.HALF_HOUR * 2);
+    
     Mockito.when(fileRepository.findAllByUsedFalse())
-      .thenReturn(Stream.of(FILE));
+      .thenReturn(Stream.of(file));
     
     PowerMockito.mockStatic(File.class);
     File fileMock = PowerMockito.mock(File.class);
@@ -68,13 +74,32 @@ public class FileDeleteSchedulerTest {
     Mockito.verify(fileRepository)
       .findAllByUsedFalse();
     Mockito.verify(fileRepository)
-      .delete(FILE);
+      .delete(file);
     
     PowerMockito.verifyNew(File.class)
       .withArguments(TRIMMED_PATH);
     
     PowerMockito.verifyStatic(FileSystemUtils.class);
     FileSystemUtils.deleteRecursively(fileMock);
+  }
+  
+  @Test
+  public void testGivenMethodCallAndBefore30MinutesByDeletingUnusedFileReturnNoDeletion() {
+    
+    file.setCreatedAt(System.currentTimeMillis());
+    
+    Mockito.when(fileRepository.findAllByUsedFalse())
+      .thenReturn(Stream.of(file));
+    
+    PowerMockito.mockStatic(File.class);
+    PowerMockito.mockStatic(FileSystemUtils.class);
+    
+    fileDeleteScheduler.deleteFileOnSchedule();
+    
+    Mockito.verify(fileRepository)
+      .findAllByUsedFalse();
+    
+    PowerMockito.verifyZeroInteractions(File.class, FileSystemUtils.class);
   }
   
 }

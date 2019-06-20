@@ -13,6 +13,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -92,7 +94,7 @@ public class FileRepositoryV2Test {
     fileRepositoryV2.save(folder);
     
     Page<FileV2> foundFileV2s =
-      fileRepositoryV2.findAllByParentIdAndAsResourceFalseOrderByMarkFolderDesc(
+      fileRepositoryV2.findAllByParentIdAndAsResourceFalseAndDeletedFalseOrderByMarkFolderDesc(
         PARENT_ID, new PageRequest(0, 10));
     
     assertThat(foundFileV2s).isNotNull();
@@ -106,16 +108,16 @@ public class FileRepositoryV2Test {
   @Test
   public void testGivenParentIdByFindingFilesOrFoldersReturnStreamOfFileOrFolder() {
     
-    Stream<FileV2> foundFilesOrFolders = fileRepositoryV2.findAllByParentId(
+    List<FileV2> foundFilesOrFolders = fileRepositoryV2.findAllByParentIdAndDeletedFalse(
       PARENT_ID);
     
-    assertThat(foundFilesOrFolders).isNotEqualTo(Stream.empty());
+    assertThat(foundFilesOrFolders).isNotEqualTo(Collections.emptyList());
   }
   
   @Test
   public void testGivenIdAndParentIdByFindingFileOrFolderReturnFileOrFolderObject() {
     
-    Optional<FileV2> foundFileOrFolder = fileRepositoryV2.findByIdAndParentId(
+    Optional<FileV2> foundFileOrFolder = fileRepositoryV2.findByIdAndParentIdAndDeletedFalse(
       FILE_ID, PARENT_ID);
     
     assertThat(foundFileOrFolder).isNotEqualTo(Optional.empty());
