@@ -46,9 +46,9 @@ public class BatchController {
    */
   @ResponseStatus(HttpStatus.OK)
   @GetMapping
-  @WithAnyRole(roles = { Role.ADMIN, Role.JUDGE, Role.MENTOR })
   public PagingResponse<BatchWebResponse> getBatches(
-    Session session,
+    @WithAnyRole(roles = { Role.ADMIN, Role.JUDGE, Role.MENTOR })
+      Session session,
     @RequestParam(required = false,
                   defaultValue = "1")
       int page,
@@ -71,9 +71,9 @@ public class BatchController {
    */
   @ResponseStatus(HttpStatus.CREATED)
   @PostMapping
-  @WithAnyRole(roles = Role.ADMIN)
   public DataResponse<BatchWebResponse> createBatch(
-    Session session,
+    @WithAnyRole(roles = Role.ADMIN)
+      Session session,
     @RequestBody
       BatchWebRequest data
   ) {
@@ -86,9 +86,9 @@ public class BatchController {
   
   @ResponseStatus(HttpStatus.OK)
   @GetMapping(value = "/{batchId}")
-  @WithAnyRole(roles = Role.ADMIN)
   public DataResponse<BatchWebResponse> getBatch(
-    Session session,
+    @WithAnyRole(roles = Role.ADMIN)
+      Session session,
     @PathVariable
       String batchId
   ) {
@@ -99,9 +99,9 @@ public class BatchController {
   
   @ResponseStatus(HttpStatus.OK)
   @PutMapping(value = "/{batchId}")
-  @WithAnyRole(roles = Role.ADMIN)
   public DataResponse<BatchWebResponse> updateBatch(
-    Session session,
+    @WithAnyRole(roles = Role.ADMIN)
+      Session session,
     @PathVariable
       String batchId,
     @RequestBody
@@ -114,9 +114,9 @@ public class BatchController {
   
   @ResponseStatus(HttpStatus.OK)
   @DeleteMapping(value = "/{batchId}")
-  @WithAnyRole(roles = Role.ADMIN)
   public BaseResponse deleteBatch(
-    Session session,
+    @WithAnyRole(roles = Role.ADMIN)
+      Session session,
     @PathVariable
       String batchId
   ) {

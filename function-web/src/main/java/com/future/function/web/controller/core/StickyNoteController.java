@@ -77,18 +77,16 @@ public class StickyNoteController {
    */
   @ResponseStatus(HttpStatus.CREATED)
   @PostMapping
-  @WithAnyRole(roles = Role.ADMIN)
   public DataResponse<StickyNoteWebResponse> createStickyNote(
-    Session session,
+    @WithAnyRole(roles = Role.ADMIN)
+      Session session,
     @RequestBody
       StickyNoteWebRequest request
   ) {
     
-    return StickyNoteResponseMapper.toStickyNoteDataResponse(HttpStatus.CREATED,
-                                                             stickyNoteService.createStickyNote(
-                                                               stickyNoteRequestMapper.toStickyNote(
-                                                                 request))
-    );
+    return StickyNoteResponseMapper.toStickyNoteDataResponse(
+      HttpStatus.CREATED, stickyNoteService.createStickyNote(
+        stickyNoteRequestMapper.toStickyNote(request)));
   }
   
 }
