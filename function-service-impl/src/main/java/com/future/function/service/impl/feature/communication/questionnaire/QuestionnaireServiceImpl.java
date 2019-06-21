@@ -1,5 +1,6 @@
 package com.future.function.service.impl.feature.communication.questionnaire;
 
+import com.future.function.common.enumeration.communication.ParticipantType;
 import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.communication.questionnaire.QuestionQuestionnaire;
 import com.future.function.model.entity.feature.communication.questionnaire.Questionnaire;
@@ -134,22 +135,48 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
   }
   @Override
   public QuestionnaireParticipant addQuestionnaireAppraiserToQuestionnaire(String questionnaireId, String appraiserId){
-    return null;
+    QuestionnaireParticipant questionnaireParticipant = new QuestionnaireParticipant().builder()
+            .participantType(ParticipantType.APPRAISER)
+            .member(userService.getUser(appraiserId))
+            .questionnaire(questionnaireRepository.findOne(questionnaireId))
+            .build();
+
+    return Optional.of(questionnaireParticipant)
+            .map(questionnaireParticipantRepository::save)
+            .orElse(null);
   }
 
   @Override
-  public void deleteQuestionnaireAppraiserFromQuestionnaire(String questionnaireParticipantId){}
+  public void deleteQuestionnaireAppraiserFromQuestionnaire(String questionnaireParticipantId){
+    Optional.ofNullable(questionnaireParticipantId)
+            .map(questionQuestionnaireRepository::findOne)
+            .ifPresent(this::softDeletedHelperQuestionQuestionnaire);
+  }
 
   @Override
   public Page<QuestionnaireParticipant> getQuestionnaireAppraisee(Questionnaire questionnaire, Pageable pageable) {
-    return null;
+    return questionnaireParticipantRepository.findAllByQuestionnaireAndDeletedFalse(questionnaire, pageable);
   }
 
   @Override
-  public QuestionnaireParticipant addQuestionnaireAppraiseeToQuestionnaire(String questionnaireId, String appraiseeId){return null;}
+  public QuestionnaireParticipant addQuestionnaireAppraiseeToQuestionnaire(String questionnaireId, String appraiseeId){
+    QuestionnaireParticipant questionnaireParticipant = new QuestionnaireParticipant().builder()
+          .participantType(ParticipantType.APPRAISEE)
+          .member(userService.getUser(appraiseeId))
+          .questionnaire(questionnaireRepository.findOne(questionnaireId))
+          .build();
+
+    return Optional.of(questionnaireParticipant)
+            .map(questionnaireParticipantRepository::save)
+            .orElse(null);
+  }
 
   @Override
-  public void deleteQuestionnaireAppraiseeFromQuestionnaire(String questionnaireParticipantId){}
+  public void deleteQuestionnaireAppraiseeFromQuestionnaire(String questionnaireParticipantId){
+    Optional.ofNullable(questionnaireParticipantId)
+            .map(questionnaireParticipantRepository::findOne)
+            .ifPresent(this::softDeletedHelperQuestionnaireParticipant);
+  }
 
 
   private Questionnaire copyProperties(Questionnaire questionnaire, Questionnaire targetQuestionnaire) {
@@ -178,5 +205,13 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
     questionQuestionnaire.setDeleted(true);
     questionQuestionnaire.setQuestionnaire(null);
     questionQuestionnaireRepository.save(questionQuestionnaire);
+  }
+
+  private void softDeletedHelperQuestionnaireParticipant(QuestionnaireParticipant questionnaireParticipant) {
+    questionnaireParticipant.setDeleted(true);
+    questionnaireParticipant.setMember(null);
+    questionnaireParticipant.setParticipantType(ParticipantType.UNKNOWN);
+    questionnaireParticipant.setQuestionnaire(null);
+    questionnaireParticipantRepository.save(questionnaireParticipant);
   }
 }
