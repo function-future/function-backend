@@ -189,6 +189,8 @@ public interface FieldName {
 
     public static final String BATCH = "batch";
 
+    public static final String ROLE = "role";
+
     public static final String SCORE_SUMMARY = "scoreSummary";
 
   }

@@ -17,6 +17,6 @@ public interface QuestionResponseRepository extends MongoRepository<QuestionResp
    * @param question
    * @return {@code List<QuestionResponse>} - question list from data base
    */
-  List<QuestionResponse> findAllByQuestionQuestionnaireAndAppraisee(QuestionQuestionnaire question, User apraisee);
+  List<QuestionResponse> findAllByQuestionQuestionnaireAndAppraiseeAndDeletedFalse(QuestionQuestionnaire question, User apraisee);
 
 }

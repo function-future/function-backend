@@ -21,7 +21,7 @@ public interface QuestionResponseSummaryRepository extends MongoRepository<Quest
    *
    * @return {@code List<QuestionsResponseSummary>} - Questions Response Summary list from database
    */
-  List<QuestionResponseSummary> findAllByQuestionnaireAndAppraisee(Questionnaire questionnaire, User appraisee);
+  List<QuestionResponseSummary> findAllByQuestionnaireAndAppraiseeAndDeletedFalse(Questionnaire questionnaire, User appraisee);
 
   /**
    * Find all question response summary from appraisee and question
@@ -31,6 +31,6 @@ public interface QuestionResponseSummaryRepository extends MongoRepository<Quest
    *
    * @return {@code QuestionResponseSummary} - Questions response summary paged from database
    */
-  Optional<QuestionResponseSummary> findAllByAppraiseeAndQuestionQuestionnaire(User appraisee, QuestionQuestionnaire question);
+  Optional<QuestionResponseSummary> findAllByAppraiseeAndQuestionQuestionnaireAndDeletedFalse(User appraisee, QuestionQuestionnaire question);
 
 }

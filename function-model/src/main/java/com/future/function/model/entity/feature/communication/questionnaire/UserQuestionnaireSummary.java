@@ -1,5 +1,6 @@
 package com.future.function.model.entity.feature.communication.questionnaire;
 
+import com.future.function.common.enumeration.core.Role;
 import com.future.function.model.entity.base.BaseEntity;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.User;
@@ -29,6 +30,9 @@ public class UserQuestionnaireSummary extends BaseEntity {
   @Field(FieldName.UserQuestionnairesSummary.BATCH)
   @DBRef(lazy = true)
   private Batch batch;
+
+  @Field(FieldName.UserQuestionnairesSummary.ROLE)
+  private Role role;
 
   @Field(FieldName.UserQuestionnairesSummary.SCORE_SUMMARY)
   private Answer scoreSummary;
