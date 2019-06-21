@@ -6,7 +6,7 @@ import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.mapper.request.scoring.AssignmentRequestMapper;
 import com.future.function.web.mapper.response.scoring.AssignmentResponseMapper;
 import com.future.function.web.model.request.scoring.AssignmentWebRequest;
-import com.future.function.web.model.request.scoring.copyAssignmentWebRequest;
+import com.future.function.web.model.request.scoring.CopyAssignmentWebRequest;
 import com.future.function.web.model.response.base.BaseResponse;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
@@ -81,7 +81,7 @@ public class AssignmentController {
 
     @ResponseStatus(value = HttpStatus.CREATED)
     @PostMapping(path = "/copy", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public DataResponse<AssignmentWebResponse> copyAssignment(@RequestBody copyAssignmentWebRequest request) {
+    public DataResponse<AssignmentWebResponse> copyAssignment(@RequestBody CopyAssignmentWebRequest request) {
         return AssignmentResponseMapper
                 .toAssignmentDataResponse(HttpStatus.CREATED, assignmentService
                         .copyAssignment(request.getAssignmentId(), request.getTargetBatch()));

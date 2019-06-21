@@ -22,8 +22,8 @@ public class AssignmentWebResponse {
 
   private long deadline;
 
-    private String batchCode;
+  private String batchCode;
 
-    private String file;
+  private String file;
 
 }

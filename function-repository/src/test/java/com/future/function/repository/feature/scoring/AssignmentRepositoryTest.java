@@ -22,7 +22,6 @@ public class AssignmentRepositoryTest {
   private static final String ASSIGNMENT_TITLE = "assignment-title";
   private static final String ASSIGNMENT_DESCRIPTION = "assignment-description";
   private static final long ASSIGNMENT_DEADLINE = new Date().getTime();
-  private static final String ASSIGNMENT_QUESTION = "assignment-question";
 
   @Autowired
   private AssignmentRepository assignmentRepository;
