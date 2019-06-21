@@ -25,7 +25,7 @@ public interface UserRepository extends MongoRepository<User, String> {
    * @return {@code Optional<User>} - Optional of user found, if any exists;
    * otherwise return {@link java.util.Optional#empty()}
    */
-  Optional<User> findByEmail(String email);
+  Optional<User> findByEmailAndDeletedFalse(String email);
   
   /**
    * Finds users by role and page data

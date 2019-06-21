@@ -465,7 +465,7 @@ public class UserServiceImplTest {
   @Test
   public void testGivenEmailByGettingUserByEmailReturnUser() {
     
-    when(userRepository.findByEmail(EMAIL_MENTOR)).thenReturn(
+    when(userRepository.findByEmailAndDeletedFalse(EMAIL_MENTOR)).thenReturn(
       Optional.of(userMentor));
     
     User retrievedUser = userService.getUserByEmail(EMAIL_MENTOR);
@@ -473,28 +473,28 @@ public class UserServiceImplTest {
     assertThat(retrievedUser).isNotNull();
     assertThat(retrievedUser).isEqualTo(userMentor);
     
-    verify(userRepository).findByEmail(EMAIL_MENTOR);
+    verify(userRepository).findByEmailAndDeletedFalse(EMAIL_MENTOR);
     verifyZeroInteractions(resourceService, encoder);
   }
   
   @Test
   public void testGivenNonExistingEmailByGettingUserByEmailReturnNotFoundException() {
     
-    when(userRepository.findByEmail(EMAIL_MENTOR)).thenReturn(Optional.empty());
+    when(userRepository.findByEmailAndDeletedFalse(EMAIL_MENTOR)).thenReturn(Optional.empty());
     
     catchException(() -> userService.getUserByEmail(EMAIL_MENTOR));
     
     assertThat(caughtException().getClass()).isEqualTo(NotFoundException.class);
     assertThat(caughtException().getMessage()).isEqualTo("Get User Not Found");
     
-    verify(userRepository).findByEmail(EMAIL_MENTOR);
+    verify(userRepository).findByEmailAndDeletedFalse(EMAIL_MENTOR);
     verifyZeroInteractions(resourceService, encoder);
   }
   
   @Test
   public void testGivenEmailAndPasswordByGettingUserByEmailAndPasswordReturnUser() {
     
-    when(userRepository.findByEmail(EMAIL_STUDENT)).thenReturn(
+    when(userRepository.findByEmailAndDeletedFalse(EMAIL_STUDENT)).thenReturn(
       Optional.of(userStudent));
     
     String rawPassword = "pass";
@@ -506,7 +506,7 @@ public class UserServiceImplTest {
     assertThat(retrievedUser).isNotNull();
     assertThat(retrievedUser).isEqualTo(userStudent);
     
-    verify(userRepository).findByEmail(EMAIL_STUDENT);
+    verify(userRepository).findByEmailAndDeletedFalse(EMAIL_STUDENT);
     verify(encoder).matches(rawPassword, PASSWORD);
     verifyZeroInteractions(resourceService);
   }
@@ -514,7 +514,7 @@ public class UserServiceImplTest {
   @Test
   public void testGivenEmailAndPasswordByGettingUserByEmailAndPasswordReturnForbiddenException() {
     
-    when(userRepository.findByEmail(EMAIL_STUDENT)).thenReturn(
+    when(userRepository.findByEmailAndDeletedFalse(EMAIL_STUDENT)).thenReturn(
       Optional.of(userStudent));
     
     String rawPassword = "pass";
@@ -528,7 +528,7 @@ public class UserServiceImplTest {
     assertThat(caughtException().getMessage()).isEqualTo(
       "Invalid Email/Password");
     
-    verify(userRepository).findByEmail(EMAIL_STUDENT);
+    verify(userRepository).findByEmailAndDeletedFalse(EMAIL_STUDENT);
     verify(encoder).matches(rawPassword, PASSWORD);
     verifyZeroInteractions(resourceService);
   }
@@ -536,7 +536,7 @@ public class UserServiceImplTest {
   @Test
   public void testGivenEmailAndPasswordByChangingUserPasswordReturnSuccessfulChange() {
     
-    when(userRepository.findByEmail(EMAIL_STUDENT)).thenReturn(
+    when(userRepository.findByEmailAndDeletedFalse(EMAIL_STUDENT)).thenReturn(
       Optional.of(userStudent));
     
     String rawPassword = "pass";
@@ -544,7 +544,7 @@ public class UserServiceImplTest {
     
     userService.changeUserPassword(EMAIL_STUDENT, rawPassword);
     
-    verify(userRepository).findByEmail(EMAIL_STUDENT);
+    verify(userRepository).findByEmailAndDeletedFalse(EMAIL_STUDENT);
     verify(encoder).encode(rawPassword);
     verify(userRepository).save(userStudent);
     verifyZeroInteractions(resourceService);

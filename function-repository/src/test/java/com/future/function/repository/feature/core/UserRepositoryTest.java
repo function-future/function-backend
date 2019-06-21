@@ -69,7 +69,7 @@ public class UserRepositoryTest {
   @Test
   public void testGivenUserEmailByFindingUserByEmailReturnUserData() {
     
-    Optional<User> foundUser1 = userRepository.findByEmail(EMAIL_1);
+    Optional<User> foundUser1 = userRepository.findByEmailAndDeletedFalse(EMAIL_1);
     
     assertThat(foundUser1).isNotEqualTo(Optional.empty());
     assertThat(foundUser1.get()
@@ -77,7 +77,7 @@ public class UserRepositoryTest {
                  .name()).isEqualTo(user1.getRole()
                                       .name());
     
-    Optional<User> foundUser2 = userRepository.findByEmail(EMAIL_2);
+    Optional<User> foundUser2 = userRepository.findByEmailAndDeletedFalse(EMAIL_2);
     
     assertThat(foundUser2).isNotEqualTo(Optional.empty());
     assertThat(foundUser2.get()
