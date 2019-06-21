@@ -49,7 +49,7 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
 
   @Override
   public Page<Questionnaire> getQuestionnairesWithKeyword(String keyword, Pageable pageable) {
-    return questionnaireRepository.findAllByTitleIgnoreCaseContaining(keyword, pageable);
+    return questionnaireRepository.findAllByTitleIgnoreCaseContainingAndDeletedFalse(keyword, pageable);
   }
 
   @Override
@@ -130,13 +130,15 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
 
   @Override
   public Page<QuestionnaireParticipant> getQuestionnaireAppraiser(Questionnaire questionnaire, Pageable pageable) {
-    return questionnaireParticipantRepository.findAllByQuestionnaire(questionnaire, pageable);
+    return questionnaireParticipantRepository.findAllByQuestionnaireAndDeletedFalse(questionnaire, pageable);
   }
   @Override
-  public QuestionnaireParticipant addQuestionnaireAppraiserToQuestionnaire(String questionnaireId, String appraiserId){return null;}
+  public QuestionnaireParticipant addQuestionnaireAppraiserToQuestionnaire(String questionnaireId, String appraiserId){
+    return null;
+  }
 
   @Override
-  public void deleteQuestionnaireAppraiserFromQuestionnaire(String questionnaireId, String appraiserId){}
+  public void deleteQuestionnaireAppraiserFromQuestionnaire(String questionnaireParticipantId){}
 
   @Override
   public Page<QuestionnaireParticipant> getQuestionnaireAppraisee(Questionnaire questionnaire, Pageable pageable) {
@@ -147,7 +149,7 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
   public QuestionnaireParticipant addQuestionnaireAppraiseeToQuestionnaire(String questionnaireId, String appraiseeId){return null;}
 
   @Override
-  public void deleteQuestionnaireAppraiseeFromQuestionnaire(String questionnaireId, String appraiseeId){} 5g
+  public void deleteQuestionnaireAppraiseeFromQuestionnaire(String questionnaireParticipantId){}
 
 
   private Questionnaire copyProperties(Questionnaire questionnaire, Questionnaire targetQuestionnaire) {

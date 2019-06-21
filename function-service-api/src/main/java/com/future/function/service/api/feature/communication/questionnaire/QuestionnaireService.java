@@ -44,7 +44,7 @@ public interface QuestionnaireService {
 
   QuestionnaireParticipant addQuestionnaireAppraiserToQuestionnaire(String questionnaireId, String appraiserId);
 
-  void deleteQuestionnaireAppraiserFromQuestionnaire(String questionnaireId, String appraiserId);
+  void deleteQuestionnaireAppraiserFromQuestionnaire(String questionnaireParticipantId);
 
   //Questionnaire Appraisee
 
@@ -52,6 +52,6 @@ public interface QuestionnaireService {
 
   QuestionnaireParticipant addQuestionnaireAppraiseeToQuestionnaire(String questionnaireId, String appraiseeId);
 
-  void deleteQuestionnaireAppraiseeFromQuestionnaire(String questionnaireId, String appraiseeId);
+  void deleteQuestionnaireAppraiseeFromQuestionnaire(String questionnaireParticipantId);
 
 }
