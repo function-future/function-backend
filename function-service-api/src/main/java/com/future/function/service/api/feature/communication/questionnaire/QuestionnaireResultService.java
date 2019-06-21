@@ -12,4 +12,5 @@ public interface QuestionnaireResultService {
 
   Page<UserQuestionnaireSummary> getAppraisalsQuestionnaireSummary(Batch batch, String search, Pageable pageable);
 
+  Page<UserQuestionnaireSummary> getAppraisalsQuestionnaireSummary(Batch batch, Pageable pageable);
 }
