@@ -1,10 +1,13 @@
 package com.future.function.service.impl.feature.communication;
 
 import com.future.function.common.exception.NotFoundException;
+import com.future.function.model.entity.feature.communication.chatting.Chatroom;
 import com.future.function.model.entity.feature.communication.chatting.Message;
+import com.future.function.model.entity.feature.communication.chatting.MessageStatus;
 import com.future.function.repository.feature.communication.MessageRepository;
 import com.future.function.service.api.feature.communication.ChatroomService;
 import com.future.function.service.api.feature.communication.MessageService;
+import com.future.function.service.api.feature.communication.MessageStatusService;
 import com.future.function.service.api.feature.core.UserService;
 import com.future.function.service.impl.helper.PageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,11 +30,14 @@ public class MessageServiceImpl implements MessageService {
 
   private final UserService userService;
 
+  private final MessageStatusService messageStatusService;
+
   @Autowired
-  public MessageServiceImpl(MessageRepository messageRepository, ChatroomService chatroomService, UserService userService) {
+  public MessageServiceImpl(MessageRepository messageRepository, MessageStatusService messageStatusService, ChatroomService chatroomService, UserService userService) {
     this.messageRepository = messageRepository;
     this.chatroomService = chatroomService;
     this.userService = userService;
+    this.messageStatusService = messageStatusService;
   }
 
   @Override
@@ -64,6 +70,19 @@ public class MessageServiceImpl implements MessageService {
             .map(this::setChatroom)
             .map(messageRepository::save)
             .orElseThrow(UnsupportedOperationException::new);
+  }
+
+  @Override
+  public void setMessageToAChatroom(Message message, String chatroomId, String userId) {
+    Message messageCreated = createMessage(message);
+    Chatroom chatroom = chatroomService.getChatroom(chatroomId);
+    chatroom.getMembers().forEach(member -> messageStatusService.createMessageStatus(MessageStatus.builder()
+            .message(messageCreated)
+            .chatroom(chatroom)
+            .member(member)
+            .seen(member.getId().equals(userId))
+            .build())
+    );
   }
 
   private Message setSender(Message message) {

@@ -125,16 +125,8 @@ public class ChatroomController {
     @ResponseStatus(value = HttpStatus.CREATED)
     public BaseResponse createMessage(@PathVariable String chatroomId, @RequestBody MessageRequest messageRequest,
                                       Session session) {
-
-        Message message = messageService.createMessage(messageRequestMapper.toMessage(messageRequest, getUserId(session), chatroomId));
-        Chatroom chatroom = chatroomService.getChatroom(chatroomId);
-        chatroom.getMembers().forEach(member -> messageStatusService.createMessageStatus(MessageStatus.builder()
-                    .message(message)
-                    .chatroom(chatroom)
-                    .member(member)
-                    .seen(member.getId().equals(getUserId(session)))
-                    .build())
-        );
+        messageService.setMessageToAChatroom(messageRequestMapper
+                .toMessage(messageRequest, getUserId(session), chatroomId), chatroomId, getUserId(session));
         return ResponseHelper.toBaseResponse(HttpStatus.CREATED);
     }
 
