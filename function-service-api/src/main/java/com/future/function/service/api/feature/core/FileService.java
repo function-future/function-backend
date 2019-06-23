@@ -37,6 +37,7 @@ public interface FileService {
    * Creates file/folder object and saves any other data related to the
    * file/folder.
    *
+   * @param session        Current user's session.
    * @param parentId   Id of parent of file/folder.
    * @param objectName Name of file, to be stored as object's name.
    * @param fileName   Original name of file.
@@ -45,7 +46,8 @@ public interface FileService {
    * @return {@code FileV2} - The file/folder object of the saved data.
    */
   FileV2 createFileOrFolder(
-    String parentId, String objectName, String fileName, byte[] bytes
+    Session session, String parentId, String objectName, String fileName,
+    byte[] bytes
   );
   
   /**

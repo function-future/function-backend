@@ -2,6 +2,7 @@ package com.future.function.service.impl.feature.core;
 
 import com.future.function.common.enumeration.core.FileOrigin;
 import com.future.function.common.enumeration.core.Role;
+import com.future.function.common.exception.ForbiddenException;
 import com.future.function.common.exception.NotFoundException;
 import com.future.function.common.properties.core.FileProperties;
 import com.future.function.model.entity.feature.core.FileV2;
@@ -256,7 +257,7 @@ public class FileServiceImplTest {
   }
   
   @Test
-  public void testGivenMethodCallAndNonEmptyByteArrayByCreatingFileOrFolderReturnNewFile() {
+  public void testGivenMethodCallAndNonEmptyByteArrayByCreatingFileReturnNewFile() {
     
     FileV2 returnedFile = FileV2.builder()
       .parentId(PARENT_ID)
@@ -274,7 +275,7 @@ public class FileServiceImplTest {
     when(fileRepository.save(any(FileV2.class))).thenReturn(savedFile);
     
     FileV2 createdFile = fileService.createFileOrFolder(
-      PARENT_ID, NAME, NAME, NAME.getBytes());
+      new Session("", "", Role.ADMIN), PARENT_ID, NAME, NAME, NAME.getBytes());
     
     assertThat(createdFile).isNotNull();
     assertThat(createdFile.getId()).isNotBlank();
@@ -290,7 +291,7 @@ public class FileServiceImplTest {
   }
   
   @Test
-  public void testGivenMethodCallAndEmptyByteArrayByCreatingFileOrFolderReturnNewFolder() {
+  public void testGivenMethodCallAndEmptyByteArrayByCreatingFolderReturnNewFolder() {
     
     FileV2 returnedFolder = FileV2.builder()
       .name(NAME)
@@ -301,9 +302,8 @@ public class FileServiceImplTest {
     
     when(fileRepository.save(any(FileV2.class))).thenReturn(returnedFolder);
     
-    FileV2 createdFolder = fileService.createFileOrFolder(PARENT_ID, NAME, NAME,
-                                                          new byte[] {}
-    );
+    FileV2 createdFolder = fileService.createFileOrFolder(
+      new Session("", "", Role.ADMIN), PARENT_ID, NAME, NAME, new byte[] {});
     
     assertThat(createdFolder).isNotNull();
     assertThat(createdFolder.getId()).isNotBlank();
@@ -314,6 +314,22 @@ public class FileServiceImplTest {
     
     verify(fileRepository).save(any(FileV2.class));
     verifyZeroInteractions(resourceService, fileProperties);
+  }
+  
+  @Test
+  public void testGivenMethodCallAndEmptyByteArrayAndInvalidRoleByCreatingFolderReturnForbiddenException() {
+  
+    catchException(
+      () -> fileService.createFileOrFolder(new Session("", "", Role.MENTOR),
+                                           PARENT_ID, NAME, NAME, new byte[] {}
+      ));
+  
+    assertThat(caughtException().getClass()).isEqualTo(
+      ForbiddenException.class);
+    assertThat(caughtException().getMessage()).isEqualTo(
+      "Invalid Role For Creating Folder");
+  
+    verifyZeroInteractions(fileRepository, resourceService, fileProperties);
   }
   
   @Test

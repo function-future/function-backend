@@ -149,8 +149,9 @@ public class FileControllerTest extends TestHelper {
     when(fileRequestMapper.toFileWebRequest(JSON, ID.getBytes())).thenReturn(
       request);
     
-    when(fileService.createFileOrFolder(PARENT_ID, "NAME", "NAME",
-                                        ID.getBytes()
+    when(
+      fileService.createFileOrFolder(ADMIN_SESSION, PARENT_ID, "NAME", "NAME",
+                                     ID.getBytes()
     )).thenReturn(FILE);
     
     mockMvc.perform(post("/api/core/files/" + PARENT_ID).cookie(cookies)
@@ -166,7 +167,7 @@ public class FileControllerTest extends TestHelper {
       any(MultipartFile.class));
     verify(fileRequestMapper).toFileWebRequest(JSON, ID.getBytes());
     verify(fileService).createFileOrFolder(
-      PARENT_ID, "NAME", "NAME", ID.getBytes());
+      ADMIN_SESSION, PARENT_ID, "NAME", "NAME", ID.getBytes());
   }
   
   @Test

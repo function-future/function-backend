@@ -2,6 +2,7 @@ package com.future.function.service.impl.feature.core;
 
 import com.future.function.common.enumeration.core.FileOrigin;
 import com.future.function.common.enumeration.core.Role;
+import com.future.function.common.exception.ForbiddenException;
 import com.future.function.common.exception.NotFoundException;
 import com.future.function.common.properties.core.FileProperties;
 import com.future.function.model.entity.feature.core.FileV2;
@@ -90,18 +91,27 @@ public class FileServiceImpl implements FileService {
    */
   @Override
   public FileV2 createFileOrFolder(
-    String parentId, String objectName, String fileName, byte[] bytes
+    Session session, String parentId, String objectName, String fileName,
+    byte[] bytes
   ) {
     
     return Optional.of(bytes)
       .filter(b -> b.length != 0)
       .map(b -> this.createAndSaveFile(parentId, objectName, fileName, b))
-      .orElseGet(() -> this.createAndSaveFolder(parentId, objectName));
+      .orElseGet(() -> this.createAndSaveFolder(session, parentId, objectName));
   }
   
-  private FileV2 createAndSaveFolder(String parentId, String objectName) {
+  private FileV2 createAndSaveFolder(
+    Session session, String parentId, String objectName
+  ) {
     
-    return fileRepositoryV2.save(this.buildFolder(parentId, objectName));
+    return Optional.of(session)
+      .filter(sess -> AuthorizationHelper.isRoleValidForEdit(sess.getRole(),
+                                                             Role.ADMIN
+      ))
+      .map(ignored -> fileRepositoryV2.save(this.buildFolder(parentId, objectName)))
+      .orElseThrow(
+        () -> new ForbiddenException("Invalid Role For Creating Folder"));
   }
   
   private FileV2 createAndSaveFile(

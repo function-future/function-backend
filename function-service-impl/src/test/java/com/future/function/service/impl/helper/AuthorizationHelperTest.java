@@ -77,4 +77,12 @@ public class AuthorizationHelperTest {
     assertThat(caughtException().getMessage()).isEqualTo("Invalid User Role");
   }
   
+  @Test
+  public void testGivenRoleAndAllowedRolesReturnBoolean() {
+  
+    assertThat(
+      AuthorizationHelper.isRoleValidForEdit(Role.ADMIN, Role.ADMIN)).isTrue();
+    assertThat(AuthorizationHelper.isRoleValidForEdit(Role.ADMIN)).isFalse();
+  }
+  
 }
