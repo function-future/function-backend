@@ -17,11 +17,15 @@ import java.util.List;
 @RequestMapping("/api/scoring/batches/{batchCode}/assignments/{assignmentId}/rooms/{roomId}/comments")
 public class CommentController {
 
-    @Autowired
     private RoomService roomService;
 
-    @Autowired
     private CommentRequestMapper requestMapper;
+
+    @Autowired
+    public CommentController(RoomService roomService, CommentRequestMapper requestMapper) {
+        this.roomService = roomService;
+        this.requestMapper = requestMapper;
+    }
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)

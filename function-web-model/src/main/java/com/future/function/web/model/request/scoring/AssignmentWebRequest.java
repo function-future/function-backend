@@ -31,7 +31,7 @@ public class AssignmentWebRequest {
   private String description;
 
   @NotNull(message = "NotNull")
-  private long deadline;
+  private Long deadline;
 
   @NotEmpty(message = "NotEmpty")
   private String batchCode;

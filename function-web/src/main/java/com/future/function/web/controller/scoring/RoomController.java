@@ -18,8 +18,12 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/scoring/batches/{batchCode}/assignments/{assignmentId}/rooms")
 public class RoomController {
 
-    @Autowired
     private AssignmentService assignmentService;
+
+    @Autowired
+    public RoomController(AssignmentService assignmentService) {
+        this.assignmentService = assignmentService;
+    }
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)

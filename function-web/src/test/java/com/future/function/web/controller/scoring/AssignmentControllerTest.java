@@ -5,6 +5,7 @@ import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.scoring.Assignment;
 import com.future.function.service.api.feature.scoring.AssignmentService;
+import com.future.function.web.TestHelper;
 import com.future.function.web.TestSecurityConfiguration;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.mapper.request.scoring.AssignmentRequestMapper;
@@ -15,14 +16,10 @@ import com.future.function.web.model.response.base.BaseResponse;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.feature.scoring.AssignmentWebResponse;
-import java.io.IOException;
-import java.util.Collections;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -33,14 +30,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -50,7 +42,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @Import(TestSecurityConfiguration.class)
 @WebMvcTest(AssignmentController.class)
-public class AssignmentControllerTest {
+public class AssignmentControllerTest extends TestHelper {
 
   private static final String ASSIGNMENT_TITLE = "assignment-title";
   private static final String ASSIGNMENT_DESCRIPTION = "assignment-description";
@@ -74,18 +66,9 @@ public class AssignmentControllerTest {
 
   private BaseResponse BASE_RESPONSE;
 
-  private JacksonTester<DataResponse<AssignmentWebResponse>> dataResponseJacksonTester;
-
-  private JacksonTester<PagingResponse<AssignmentWebResponse>> pagingResponseJacksonTester;
-
-  private JacksonTester<BaseResponse> baseResponseJacksonTester;
-
   private JacksonTester<AssignmentWebRequest> assignmentWebRequestJacksonTester;
 
   private JacksonTester<CopyAssignmentWebRequest> copyAssignmentWebRequestJacksonTester;
-
-  @Autowired
-  private MockMvc mockMvc;
 
   @MockBean
   private AssignmentService assignmentService;
@@ -94,7 +77,7 @@ public class AssignmentControllerTest {
   private AssignmentRequestMapper assignmentRequestMapper;
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
 
     JacksonTester.initFields(this, new ObjectMapper());
 

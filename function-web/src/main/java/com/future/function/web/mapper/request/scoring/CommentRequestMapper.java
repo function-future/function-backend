@@ -11,8 +11,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class CommentRequestMapper {
 
-    @Autowired
     private RequestValidator validator;
+
+    @Autowired
+    public CommentRequestMapper(RequestValidator validator) {
+        this.validator = validator;
+    }
 
     public Comment toCommentFromRequestWithRoomId(CommentWebRequest request, String roomId) {
         return toValidatedComment(request, roomId);

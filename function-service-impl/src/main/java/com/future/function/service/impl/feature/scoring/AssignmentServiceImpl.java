@@ -5,14 +5,12 @@ import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.scoring.Assignment;
 import com.future.function.model.entity.feature.scoring.Room;
-import com.future.function.model.util.constant.FieldName;
 import com.future.function.repository.feature.scoring.AssignmentRepository;
 import com.future.function.service.api.feature.core.BatchService;
 import com.future.function.service.api.feature.core.ResourceService;
 import com.future.function.service.api.feature.scoring.AssignmentService;
 import com.future.function.service.api.feature.scoring.RoomService;
 import com.future.function.service.impl.helper.CopyHelper;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -90,8 +88,7 @@ public class AssignmentServiceImpl implements AssignmentService {
     Assignment assignment = this.findById(assignmentId);
     Assignment newAssignment = Assignment.builder().build();
     Batch targetBatchObj = batchService.getBatchByCode(targetBatchCode);
-    BeanUtils.copyProperties(assignment, newAssignment, "_id", "id",
-            FieldName.BaseEntity.CREATED_BY, FieldName.BaseEntity.CREATED_AT, FieldName.BaseEntity.VERSION);
+    CopyHelper.copyProperties(assignment, newAssignment);
     newAssignment.setBatch(targetBatchObj);
     return this.createAssignment(newAssignment);
   }

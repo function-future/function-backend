@@ -2,8 +2,11 @@ package com.future.function.model.entity.feature.scoring;
 
 import com.future.function.model.entity.base.BaseEntity;
 import com.future.function.model.entity.feature.core.User;
+import com.future.function.model.util.constant.DocumentName;
+import com.future.function.model.util.constant.FieldName;
 import lombok.*;
 import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.UUID;
@@ -13,20 +16,21 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Document(collection = DocumentName.ROOM)
 public class Room extends BaseEntity {
 
     @Builder.Default
     private String id = UUID.randomUUID().toString();
 
     @DBRef
-    @Field
+    @Field(FieldName.Room.STUDENT)
     private User student;
 
     @DBRef
-    @Field
+    @Field(FieldName.Room.ASSIGNMENT)
     private Assignment assignment;
 
-    @Field
+    @Field(FieldName.Room.POINT)
     private Integer point;
 
 }

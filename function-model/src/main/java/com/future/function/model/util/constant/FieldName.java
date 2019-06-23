@@ -349,17 +349,39 @@ public interface FieldName {
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     abstract class Assignment {
 
-        public static final String TITLE = "title";
+      public static final String TITLE = "title";
 
-        public static final String DESCRIPTION = "description";
+      public static final String DESCRIPTION = "description";
 
-        public static final String DEADLINE = "deadline";
+      public static final String DEADLINE = "deadline";
 
-        public static final String FILE = "file";
+      public static final String FILE = "file";
 
-        public static final String BATCH = "batch";
+      public static final String BATCH = "batch";
 
     }
+
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  abstract class Room {
+
+    public static final String STUDENT = "student";
+
+    public static final String ASSIGNMENT = "assignment";
+
+    public static final String POINT = "point";
+
+  }
+
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  abstract class Comment {
+
+    public static final String AUTHOR = "author";
+
+    public static final String TEXT = "text";
+
+    public static final String ROOM = "room";
+
+  }
   
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
   abstract class ActivityBlog {

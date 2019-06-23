@@ -22,14 +22,18 @@ import java.util.Optional;
 @Service
 public class RoomServiceImpl implements RoomService {
 
-    @Autowired
     private RoomRepository roomRepository;
 
-    @Autowired
     private UserService userService;
 
-    @Autowired
     private CommentService commentService;
+
+    @Autowired
+    public RoomServiceImpl(RoomRepository roomRepository, UserService userService, CommentService commentService) {
+        this.roomRepository = roomRepository;
+        this.userService = userService;
+        this.commentService = commentService;
+    }
 
     @Override
     public Page<Room> findAllRoomsByAssignmentId(String assignmentId, Pageable pageable) {
