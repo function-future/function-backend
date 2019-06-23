@@ -1,5 +1,6 @@
 package com.future.function.service.impl.feature.core.scheduler;
 
+import com.future.function.common.properties.core.FileProperties;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.repository.feature.core.FileRepositoryV2;
 import org.junit.After;
@@ -28,10 +29,15 @@ public class FileDeleteSchedulerTest {
   private static final String FILE_PATH =
     TRIMMED_PATH + File.separator + "path";
   
+  private static final long MINIMUM_CREATED_PERIOD = 1800;
+  
   private FileV2 file;
   
   @Mock
   private FileRepositoryV2 fileRepository;
+  
+  @Mock
+  private FileProperties fileProperties;
   
   @InjectMocks
   private FileDeleteScheduler fileDeleteScheduler;
@@ -46,17 +52,21 @@ public class FileDeleteSchedulerTest {
   }
   
   @After
-  public void tearDown() {}
+  public void tearDown() {
+    
+    Mockito.verifyNoMoreInteractions(fileRepository, fileProperties);
+  }
   
   @Test
   public void testGivenMethodCallByDeletingUnusedFileReturnSuccessfulDeletion()
     throws Exception {
     
-    file.setCreatedAt(
-      System.currentTimeMillis() - FileDeleteScheduler.HALF_HOUR * 2);
+    file.setCreatedAt(System.currentTimeMillis() - MINIMUM_CREATED_PERIOD * 2);
     
     Mockito.when(fileRepository.findAllByUsedFalse())
       .thenReturn(Stream.of(file));
+    Mockito.when(fileProperties.getMinimumFileCreatedPeriod())
+      .thenReturn(MINIMUM_CREATED_PERIOD);
     
     PowerMockito.mockStatic(File.class);
     File fileMock = PowerMockito.mock(File.class);
@@ -73,6 +83,8 @@ public class FileDeleteSchedulerTest {
     
     Mockito.verify(fileRepository)
       .findAllByUsedFalse();
+    Mockito.verify(fileProperties)
+      .getMinimumFileCreatedPeriod();
     Mockito.verify(fileRepository)
       .delete(file);
     
@@ -86,12 +98,13 @@ public class FileDeleteSchedulerTest {
   @Test
   public void testGivenMethodCallByDeletingUnusedFolderReturnSuccessfulDeletionWithoutFileSystemUtilsCall() {
     
-    file.setCreatedAt(
-      System.currentTimeMillis() - FileDeleteScheduler.HALF_HOUR * 2);
+    file.setCreatedAt(System.currentTimeMillis() - MINIMUM_CREATED_PERIOD * 2);
     file.setMarkFolder(true);
     
     Mockito.when(fileRepository.findAllByUsedFalse())
       .thenReturn(Stream.of(file));
+    Mockito.when(fileProperties.getMinimumFileCreatedPeriod())
+      .thenReturn(MINIMUM_CREATED_PERIOD);
     
     PowerMockito.mockStatic(File.class);
     
@@ -101,6 +114,8 @@ public class FileDeleteSchedulerTest {
     
     Mockito.verify(fileRepository)
       .findAllByUsedFalse();
+    Mockito.verify(fileProperties)
+      .getMinimumFileCreatedPeriod();
     Mockito.verify(fileRepository)
       .delete(file);
     
@@ -114,6 +129,8 @@ public class FileDeleteSchedulerTest {
     
     Mockito.when(fileRepository.findAllByUsedFalse())
       .thenReturn(Stream.of(file));
+    Mockito.when(fileProperties.getMinimumFileCreatedPeriod())
+      .thenReturn(MINIMUM_CREATED_PERIOD);
     
     PowerMockito.mockStatic(File.class);
     PowerMockito.mockStatic(FileSystemUtils.class);
@@ -122,6 +139,8 @@ public class FileDeleteSchedulerTest {
     
     Mockito.verify(fileRepository)
       .findAllByUsedFalse();
+    Mockito.verify(fileProperties)
+      .getMinimumFileCreatedPeriod();
     
     PowerMockito.verifyZeroInteractions(File.class, FileSystemUtils.class);
   }
