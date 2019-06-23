@@ -4,6 +4,7 @@ import com.future.function.model.entity.feature.core.Announcement;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
+import com.future.function.web.mapper.response.core.embedded.EmbeddedFileWebResponseMapper;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.feature.core.AnnouncementWebResponse;
@@ -73,26 +74,10 @@ public class AnnouncementResponseMapper {
       .title(announcement.getTitle())
       .summary(announcement.getSummary())
       .description(announcement.getDescription())
-      .files(getFiles(announcement))
+      .files(EmbeddedFileWebResponseMapper.toEmbeddedFileWebResponses(
+        announcement.getFileV2s()))
       .updatedAt(announcement.getUpdatedAt())
       .build();
-  }
-  
-  private static List<FileWebResponse> getFiles(Announcement announcement) {
-    
-    return Optional.of(announcement)
-      .map(Announcement::getFileV2s)
-      .map(AnnouncementResponseMapper::toFileWebResponseList)
-      .orElseGet(Collections::emptyList);
-  }
-  
-  private static List<FileWebResponse> toFileWebResponseList(
-    List<FileV2> list
-  ) {
-    
-    return list.stream()
-      .map(ResourceResponseMapper::buildFileWebResponse)
-      .collect(Collectors.toList());
   }
   
   /**
