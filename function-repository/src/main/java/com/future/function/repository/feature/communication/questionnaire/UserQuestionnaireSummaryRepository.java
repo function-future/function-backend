@@ -52,7 +52,7 @@ public interface UserQuestionnaireSummaryRepository extends MongoRepository<User
    */
   Page<UserQuestionnaireSummary> findAllByRoleAndDeletedFalse (Role role, Pageable pageable);
 
-  @Query()
-  Page<UserQuestionnaireSummary> findAllByRoleAndBatchAndDeletedFalseAndMemberNameIgnoreCaseContaining(Role role, Batch batch, String keyword,Pageable pageable)
+//  @Query()
+//  Page<UserQuestionnaireSummary> findAllByRoleAndBatchAndDeletedFalseAndMemberNameIgnoreCaseContaining(Role role, Batch batch, String keyword,Pageable pageable)
 
 }

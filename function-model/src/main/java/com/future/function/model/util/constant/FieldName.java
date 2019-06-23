@@ -146,6 +146,8 @@ public interface FieldName {
     public static final String APPRAISEE = "appraisee";
 
     public static final String SCORE_SUMMARY = "scoreSummary";
+
+    public static final String COUNTER = "counter";
   }
 
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -170,6 +172,8 @@ public interface FieldName {
     public static final String APPRAISEE = "appraisee";
 
     public static final String SCORE_SUMMARY = "scoreSummary";
+
+    public static final String COUNTER = "counter";
   }
 
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -192,6 +196,8 @@ public interface FieldName {
     public static final String ROLE = "role";
 
     public static final String SCORE_SUMMARY = "scoreSummary";
+
+    public static final String COUNTER = "counter";
 
   }
 

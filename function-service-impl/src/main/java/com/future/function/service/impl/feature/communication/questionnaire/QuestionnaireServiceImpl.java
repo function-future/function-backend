@@ -54,7 +54,7 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
   }
 
   @Override
-  public Page<Questionnaire> getQuestionnairesBelongToAppraisee(String appraoseeId, Pageable pageable) {
+  public Page<Questionnaire> getQuestionnairesBelongToAppraisee(String appraiseeId, Pageable pageable) {
     return null;
   }
 
@@ -131,7 +131,7 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
 
   @Override
   public Page<QuestionnaireParticipant> getQuestionnaireAppraiser(Questionnaire questionnaire, Pageable pageable) {
-    return questionnaireParticipantRepository.findAllByQuestionnaireAndDeletedFalse(questionnaire, pageable);
+    return questionnaireParticipantRepository.findAllByQuestionnaireAndParticipantTypeAndDeletedFalse(questionnaire, ParticipantType.APPRAISER, pageable);
   }
   @Override
   public QuestionnaireParticipant addQuestionnaireAppraiserToQuestionnaire(String questionnaireId, String appraiserId){
@@ -155,7 +155,7 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
 
   @Override
   public Page<QuestionnaireParticipant> getQuestionnaireAppraisee(Questionnaire questionnaire, Pageable pageable) {
-    return questionnaireParticipantRepository.findAllByQuestionnaireAndDeletedFalse(questionnaire, pageable);
+    return questionnaireParticipantRepository.findAllByQuestionnaireAndParticipantTypeAndDeletedFalse(questionnaire,ParticipantType.APPRAISEE ,pageable);
   }
 
   @Override

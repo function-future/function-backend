@@ -13,8 +13,13 @@ import org.springframework.stereotype.Service;
 @Service
 public class QuestionnaireResultServiceImpl implements QuestionnaireResultService {
 
+
+  private final UserQuestionnaireSummaryRepository userQuestionnaireSummaryRepository;
+
   @Autowired
-  UserQuestionnaireSummaryRepository userQuestionnaireSummaryRepository;
+  public QuestionnaireResultServiceImpl(UserQuestionnaireSummaryRepository userQuestionnaireSummaryRepository) {
+    this.userQuestionnaireSummaryRepository = userQuestionnaireSummaryRepository;
+  }
 
   @Override
   public Page<UserQuestionnaireSummary> getAppraisalsQuestionnaireSummary(Batch batch, Pageable pageable) {

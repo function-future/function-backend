@@ -31,4 +31,7 @@ public class QuestionnaireResponseSummary extends BaseEntity {
 
   @Field(FieldName.QuestionnaireResponseSummary.SCORE_SUMMARY)
   private Answer scoreSummary;
+
+  @Field(FieldName.QuestionnaireResponseSummary.COUNTER)
+  private int counter;
 }
