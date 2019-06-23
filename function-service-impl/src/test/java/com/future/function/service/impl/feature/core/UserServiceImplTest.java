@@ -74,6 +74,10 @@ public class UserServiceImplTest {
   
   private static final String MENTOR_ID = "mentor-id";
   
+  private static final String OLD_PASSWORD = "old-password";
+  
+  private static final String NEW_PASSWORD = "new-password";
+  
   private User userStudent;
   
   private User userMentor;
@@ -539,14 +543,43 @@ public class UserServiceImplTest {
     when(userRepository.findByEmailAndDeletedFalse(EMAIL_STUDENT)).thenReturn(
       Optional.of(userStudent));
     
-    String rawPassword = "pass";
-    when(encoder.encode(rawPassword)).thenReturn(PASSWORD);
+    when(encoder.matches(userStudent.getPassword(), OLD_PASSWORD)).thenReturn(
+      true);
     
-    userService.changeUserPassword(EMAIL_STUDENT, rawPassword);
+    when(encoder.encode(NEW_PASSWORD)).thenReturn(PASSWORD);
+    
+    when(userRepository.save(userStudent)).thenReturn(userStudent);
+    
+    userService.changeUserPassword(EMAIL_STUDENT, OLD_PASSWORD, NEW_PASSWORD);
     
     verify(userRepository).findByEmailAndDeletedFalse(EMAIL_STUDENT);
-    verify(encoder).encode(rawPassword);
+    verify(encoder).matches(userStudent.getPassword(), OLD_PASSWORD);
+    verify(encoder).encode(NEW_PASSWORD);
     verify(userRepository).save(userStudent);
+    verifyZeroInteractions(resourceService);
+  }
+  
+  @Test
+  public void testGivenEmailAndInvalidOldPasswordAndNewPasswordByChangingUserPasswordReturnUnauthorizedException() {
+    
+    when(userRepository.findByEmailAndDeletedFalse(EMAIL_STUDENT)).thenReturn(
+      Optional.of(userStudent));
+    
+    when(encoder.matches(userStudent.getPassword(), OLD_PASSWORD)).thenReturn(
+      false);
+  
+    catchException(
+      () -> userService.changeUserPassword(EMAIL_STUDENT, OLD_PASSWORD,
+                                           NEW_PASSWORD
+      ));
+  
+    assertThat(caughtException().getClass()).isEqualTo(
+      UnauthorizedException.class);
+    assertThat(caughtException().getMessage()).isEqualTo(
+      "Invalid Old Password");
+    
+    verify(userRepository).findByEmailAndDeletedFalse(EMAIL_STUDENT);
+    verify(encoder).matches(userStudent.getPassword(), OLD_PASSWORD);
     verifyZeroInteractions(resourceService);
   }
   

@@ -177,13 +177,17 @@ public class UserServiceImpl implements UserService {
   }
   
   @Override
-  public void changeUserPassword(String email, String newPassword) {
+  public void changeUserPassword(
+    String email, String oldPassword, String newPassword
+  ) {
     
     userRepository.findByEmailAndDeletedFalse(email)
-      .ifPresent(user -> {
+      .filter(user -> encoder.matches(user.getPassword(), oldPassword))
+      .map(user -> {
         user.setPassword(encoder.encode(newPassword));
-        userRepository.save(user);
-      });
+        return userRepository.save(user);
+      })
+      .orElseThrow(() -> new UnauthorizedException("Invalid Old Password"));
   }
   
   private User setUserPicture(User user, User foundUser) {

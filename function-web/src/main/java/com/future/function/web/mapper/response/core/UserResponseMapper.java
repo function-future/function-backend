@@ -7,6 +7,7 @@ import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
+import com.future.function.web.model.response.feature.core.BatchWebResponse;
 import com.future.function.web.model.response.feature.core.UserWebResponse;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -71,23 +72,22 @@ public class UserResponseMapper {
       .address(user.getAddress())
       .deleted(user.isDeleted())
       .avatar(UserResponseMapper.getFileUrl(user.getPictureV2()))
-      .batch(BatchResponseMapper.toBatchWebResponse(user.getBatch()))
+      .batch(UserResponseMapper.getBatch(user))
       .university(user.getUniversity())
       .build();
+  }
+  
+  private static BatchWebResponse getBatch(User user) {
+    
+    return Optional.ofNullable(user.getBatch())
+             .map(BatchResponseMapper::toBatchWebResponse)
+             .orElse(null);
   }
   
   private static String getFileUrl(FileV2 fileV2) {
     
     return Optional.ofNullable(fileV2)
       .map(FileV2::getFileUrl)
-      .orElse(null);
-  }
-  
-  private static String getBatch(User user) {
-    
-    return Optional.of(user)
-      .map(User::getBatch)
-      .map(Batch::getCode)
       .orElse(null);
   }
   
