@@ -89,7 +89,7 @@ public class UserServiceImpl implements UserService {
   @Override
   public Page<User> getUsers(Role role, Pageable pageable) {
     
-    return userRepository.findAllByRole(role, pageable);
+    return userRepository.findAllByRoleAndDeletedFalse(role, pageable);
   }
   
   /**
@@ -165,7 +165,7 @@ public class UserServiceImpl implements UserService {
     
     return Optional.ofNullable(batchCode)
       .map(batchService::getBatchByCode)
-      .map(batch -> userRepository.findAllByRoleAndBatch(Role.STUDENT, batch))
+      .map(batch -> userRepository.findAllByRoleAndBatchAndDeletedFalse(Role.STUDENT, batch))
       .orElseGet(Collections::emptyList);
   }
   
