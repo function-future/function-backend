@@ -71,7 +71,7 @@ public class UserResponseMapper {
       .address(user.getAddress())
       .deleted(user.isDeleted())
       .avatar(UserResponseMapper.getFileUrl(user.getPictureV2()))
-      .batch(UserResponseMapper.getBatch(user))
+      .batch(BatchResponseMapper.toBatchWebResponse(user.getBatch()))
       .university(user.getUniversity())
       .build();
   }
