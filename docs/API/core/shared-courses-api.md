@@ -95,7 +95,7 @@ otherwise 401 response is returned; if available; otherwise 404 response is retu
             "status": "BAD_REQUEST",
             "errors": {
                 "targetBatch": ["BatchesMustExist"],
-                "courses": ["CoursesMustExist", "CoursesMustBeDistinct", "NotEmpty"]
+                "courses": ["CourseMustExist", "CourseMustBeDistinct", "NotEmpty"]
             }
         }
 
