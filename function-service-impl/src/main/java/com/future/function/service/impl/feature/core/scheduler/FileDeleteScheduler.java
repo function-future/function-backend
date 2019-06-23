@@ -1,5 +1,6 @@
 package com.future.function.service.impl.feature.core.scheduler;
 
+import com.future.function.common.properties.core.FileProperties;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.repository.feature.core.FileRepositoryV2;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -12,16 +13,19 @@ import java.util.Optional;
 @Component
 public class FileDeleteScheduler {
   
-  static final int HALF_HOUR = 1000 * 60 * 30;
-  
   private final FileRepositoryV2 fileRepository;
   
-  public FileDeleteScheduler(FileRepositoryV2 fileRepository) {
+  private final FileProperties fileProperties;
+  
+  public FileDeleteScheduler(
+    FileRepositoryV2 fileRepository, FileProperties fileProperties
+  ) {
     
     this.fileRepository = fileRepository;
+    this.fileProperties = fileProperties;
   }
   
-  @Scheduled(fixedDelay = 1000 * 60 * 60 * 24)
+  @Scheduled(fixedDelayString = "#{@fileProperties.schedulerActivePeriod}")
   public void deleteFileOnSchedule() {
     
     fileRepository.findAllByUsedFalse()
@@ -31,7 +35,7 @@ public class FileDeleteScheduler {
   private void deleteFileRecursivelyAndFromDatabase(FileV2 fileV2) {
     
     Optional.ofNullable(fileV2)
-      .filter(this::isCreatedAndUnusedMoreThan30Minutes)
+      .filter(this::isCreatedAndUnusedMoreThanDefinedPeriod)
       .ifPresent(file -> {
         this.deleteFileFromSystemIfNotFolder(file);
         fileRepository.delete(file);
@@ -46,12 +50,12 @@ public class FileDeleteScheduler {
         new File(this.getContainingFolderPath(file))));
   }
   
-  private boolean isCreatedAndUnusedMoreThan30Minutes(FileV2 fileV2) {
+  private boolean isCreatedAndUnusedMoreThanDefinedPeriod(FileV2 fileV2) {
     
-    Long createdAt = fileV2.getCreatedAt();
+    long createdAt = fileV2.getCreatedAt();
     long timeDiff = Math.abs(createdAt - System.currentTimeMillis());
     
-    return timeDiff >= HALF_HOUR;
+    return timeDiff >= fileProperties.getMinimumFileCreatedPeriod();
   }
   
   private String getContainingFolderPath(FileV2 fileV2) {
