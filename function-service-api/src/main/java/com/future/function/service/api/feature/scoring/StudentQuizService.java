@@ -14,6 +14,8 @@ public interface StudentQuizService {
 
     Page<StudentQuiz> findAllByStudentId(String studentId, Pageable pageable);
 
+    List<StudentQuizDetail> findAllStudentQuizDetailByStudentId(String studentId);
+
     StudentQuiz findById(String id);
 
     List<StudentQuestion> findAllQuestionsByStudentQuizId(String studentQuizId);

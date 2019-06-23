@@ -12,6 +12,8 @@ public interface RoomService {
 
     Page<Room> findAllRoomsByAssignmentId(String assignmentId, Pageable pageable);
 
+    List<Room> findAllRoomsByStudentId(String studentId);
+
     Room findById(String id);
 
     List<Comment> findAllCommentsByRoomId(String roomId);

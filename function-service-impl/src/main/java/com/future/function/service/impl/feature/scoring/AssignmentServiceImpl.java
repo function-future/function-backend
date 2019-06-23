@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -79,6 +80,11 @@ public class AssignmentServiceImpl implements AssignmentService {
   public Page<Room> findAllRoomsByAssignmentId(String assignmentId, Pageable pageable) {
     return roomService.findAllRoomsByAssignmentId(assignmentId, pageable);
   }
+
+    @Override
+    public List<Room> findAllRoomsByStudentId(String studentId) {
+        return roomService.findAllRoomsByStudentId(studentId);
+    }
 
   @Override
   public Room findRoomById(String id) {

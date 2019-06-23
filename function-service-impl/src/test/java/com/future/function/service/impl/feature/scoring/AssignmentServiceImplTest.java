@@ -3,6 +3,7 @@ package com.future.function.service.impl.feature.scoring;
 import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.FileV2;
+import com.future.function.model.entity.feature.core.User;
 import com.future.function.model.entity.feature.scoring.Assignment;
 import com.future.function.model.entity.feature.scoring.Room;
 import com.future.function.repository.feature.scoring.AssignmentRepository;
@@ -38,6 +39,7 @@ public class AssignmentServiceImplTest {
   private static final String BATCH_CODE = "batchCode";
 
   private static final String ROOM_ID = "room-id";
+    private static final String STUDENT_ID = "student-id";
 
   private static final String ERROR_MSG_NOT_FOUND = "Assignment Not Found";
 
@@ -88,7 +90,7 @@ public class AssignmentServiceImplTest {
             .file(file)
             .build();
 
-    room = Room.builder().id(ROOM_ID).build();
+      room = Room.builder().id(ROOM_ID).student(User.builder().id(STUDENT_ID).build()).build();
 
     pageable = new PageRequest(0, 10);
 
@@ -112,6 +114,7 @@ public class AssignmentServiceImplTest {
     when(roomService.findById(ROOM_ID)).thenReturn(room);
     when(roomService.findAllRoomsByAssignmentId(any(String.class), eq(pageable))).thenReturn(roomPage);
     when(roomService.giveScoreToRoomByRoomId(ROOM_ID, 100)).thenReturn(room);
+      when(roomService.findAllRoomsByStudentId(STUDENT_ID)).thenReturn(Collections.singletonList(room));
   }
 
   @After
@@ -128,6 +131,14 @@ public class AssignmentServiceImplTest {
     verify(batchService).getBatchByCode(BATCH_CODE);
     verify(assignmentRepository).findAllByBatchCode(batch.getCode(), pageable);
   }
+
+    @Test
+    public void testFindAllRoomsByStudentId() {
+        List<Room> actual = assignmentService.findAllRoomsByStudentId(STUDENT_ID);
+        assertThat(actual.size()).isEqualTo(1);
+        assertThat(actual.get(0)).isEqualTo(room);
+        verify(roomService).findAllRoomsByStudentId(STUDENT_ID);
+    }
 
   @Test
   public void testFindByIdSuccess() {

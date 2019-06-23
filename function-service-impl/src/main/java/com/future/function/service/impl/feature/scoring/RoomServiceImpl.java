@@ -15,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -36,6 +37,13 @@ public class RoomServiceImpl implements RoomService {
         return Optional.ofNullable(assignmentId)
                 .map(id -> roomRepository.findAllByAssignmentIdAndDeletedFalse(assignmentId, pageable))
                 .orElseGet(() -> PageHelper.empty(pageable));
+    }
+
+    @Override
+    public List<Room> findAllRoomsByStudentId(String studentId) {
+        return Optional.ofNullable(studentId)
+                .map(roomRepository::findAllByStudentIdAndDeletedFalse)
+                .orElseGet(ArrayList::new);
     }
 
     @Override

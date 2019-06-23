@@ -124,6 +124,7 @@ public class StudentQuizServiceImplTest {
                 .builder()
                 .id(STUDENT_QUIZ_DETAIL_ID)
                 .studentQuiz(studentQuiz)
+                .point(100)
                 .build();
 
         studentQuestion = StudentQuestion
@@ -139,9 +140,11 @@ public class StudentQuizServiceImplTest {
 
         studentQuizPage = new PageImpl<>(Collections.singletonList(studentQuiz), pageable, 1);
 
-        when(studentQuizRepository.findAllByStudentId(USER_ID, pageable))
+        when(studentQuizRepository.findAllByStudentIdAndDeletedFalse(USER_ID, pageable))
                 .thenReturn(studentQuizPage);
-        when(studentQuizRepository.findByStudentIdAndQuizId(USER_ID, QUIZ_ID))
+        when(studentQuizRepository.findAllByStudentIdAndDeletedFalse(USER_ID))
+                .thenReturn(Collections.singletonList(studentQuiz));
+        when(studentQuizRepository.findByStudentIdAndQuizIdAndDeletedFalse(USER_ID, QUIZ_ID))
                 .thenReturn(Optional.of(studentQuiz));
         when(studentQuizRepository.findByIdAndDeletedFalse(STUDENT_QUIZ_ID))
                 .thenReturn(Optional.of(studentQuiz));
@@ -164,6 +167,7 @@ public class StudentQuizServiceImplTest {
                 .thenReturn(Collections.singletonList(studentQuestion));
         when(studentQuizDetailService.findAllQuestionsByStudentQuizId(STUDENT_QUIZ_ID))
                 .thenReturn(Collections.singletonList(studentQuestion));
+        when(studentQuizDetailService.findLatestByStudentQuizId(STUDENT_QUIZ_ID)).thenReturn(studentQuizDetail);
         when(studentQuizDetailService.answerStudentQuiz(STUDENT_QUIZ_ID, Collections.singletonList(studentQuestion)))
                 .thenReturn(studentQuizDetail);
 
@@ -181,7 +185,16 @@ public class StudentQuizServiceImplTest {
         assertThat(actual.getTotalElements()).isEqualTo(1);
         assertThat(actual.getContent().get(0).getId()).isEqualTo(STUDENT_QUIZ_ID);
         assertThat(actual.getContent().get(0).getTrials()).isEqualTo(QUIZ_TRIALS);
-        verify(studentQuizRepository).findAllByStudentId(USER_ID, pageable);
+        verify(studentQuizRepository).findAllByStudentIdAndDeletedFalse(USER_ID, pageable);
+    }
+
+    @Test
+    public void findAllStudentQuizDetailByStudentId() {
+        List<StudentQuizDetail> actual = studentQuizService.findAllStudentQuizDetailByStudentId(USER_ID);
+        assertThat(actual.size()).isEqualTo(1);
+        assertThat(actual.get(0).getPoint()).isEqualTo(100);
+        verify(studentQuizRepository).findAllByStudentIdAndDeletedFalse(USER_ID);
+        verify(studentQuizDetailService).findLatestByStudentQuizId(STUDENT_QUIZ_ID);
     }
 
     @Test
@@ -272,7 +285,7 @@ public class StudentQuizServiceImplTest {
         studentQuizService.deleteByBatchCodeAndQuiz(BATCH_CODE, QUIZ_ID);
         verify(userService).getStudentsByBatchCode(BATCH_CODE);
         verify(studentQuizDetailService).deleteByStudentQuiz(studentQuiz);
-        verify(studentQuizRepository).findByStudentIdAndQuizId(USER_ID, QUIZ_ID);
+        verify(studentQuizRepository).findByStudentIdAndQuizIdAndDeletedFalse(USER_ID, QUIZ_ID);
         verify(studentQuizRepository).save(studentQuiz);
     }
 }

@@ -5,6 +5,8 @@ import com.future.function.model.entity.feature.scoring.Room;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 /**
  * Interface to act as Assignment Service API
  */
@@ -15,6 +17,8 @@ public interface AssignmentService {
   Assignment findById(String id);
 
   Page<Room> findAllRoomsByAssignmentId(String assignmentId, Pageable pageable);
+
+    List<Room> findAllRoomsByStudentId(String studentId);
 
   Room findRoomById(String id);
 

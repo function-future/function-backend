@@ -18,6 +18,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -40,7 +41,22 @@ public class StudentQuizServiceImpl implements StudentQuizService {
 
     @Override
     public Page<StudentQuiz> findAllByStudentId(String studentId, Pageable pageable) {
-        return studentQuizRepository.findAllByStudentId(studentId, pageable);
+        return studentQuizRepository.findAllByStudentIdAndDeletedFalse(studentId, pageable);
+    }
+
+    @Override
+    public List<StudentQuizDetail> findAllStudentQuizDetailByStudentId(String studentId) {
+        return Optional.ofNullable(studentId)
+                .map(studentQuizRepository::findAllByStudentIdAndDeletedFalse)
+                .map(this::toStudentQuizDetailList)
+                .orElseGet(ArrayList::new);
+    }
+
+    private List<StudentQuizDetail> toStudentQuizDetailList(List<StudentQuiz> studentQuizList) {
+        return studentQuizList.stream()
+                .map(StudentQuiz::getId)
+                .map(studentQuizDetailService::findLatestByStudentQuizId)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -138,7 +154,7 @@ public class StudentQuizServiceImpl implements StudentQuizService {
         List<User> userList = userService.getStudentsByBatchCode(batchCode);
         userList.stream()
                 .map(User::getId)
-                .map(id -> studentQuizRepository.findByStudentIdAndQuizId(id, quizId))
+                .map(id -> studentQuizRepository.findByStudentIdAndQuizIdAndDeletedFalse(id, quizId))
                 .forEach(studentQuizOptional -> studentQuizOptional
                         .ifPresent(studentQuiz -> {
                             studentQuiz.setDeleted(true);

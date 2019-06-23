@@ -73,6 +73,7 @@ public class RoomServiceImplTest {
         when(roomRepository.findAllByAssignmentIdAndDeletedFalse(ASSIGNMENT_ID, new PageRequest(0, 10)))
                 .thenReturn(PageHelper.toPage(Collections.singletonList(room), new PageRequest(0, 10)));
         when(roomRepository.save(any(Room.class))).thenReturn(room);
+        when(roomRepository.findAllByStudentIdAndDeletedFalse(USER_ID)).thenReturn(Collections.singletonList(room));
         when(commentService.findAllCommentsByRoomId(ROOM_ID)).thenReturn(Collections.singletonList(comment));
         when(commentService.createCommentByRoom(room, comment)).thenReturn(comment);
     }
@@ -88,6 +89,14 @@ public class RoomServiceImplTest {
         assertThat(actual.getTotalElements()).isEqualTo(1);
         assertThat(actual.getContent().get(0)).isEqualTo(room);
         verify(roomRepository).findAllByAssignmentIdAndDeletedFalse(ASSIGNMENT_ID, new PageRequest(0, 10));
+    }
+
+    @Test
+    public void findAllRoomsByStudentId() {
+        List<Room> actual = roomService.findAllRoomsByStudentId(USER_ID);
+        assertThat(actual.size()).isEqualTo(1);
+        assertThat(actual.get(0)).isEqualTo(room);
+        verify(roomRepository).findAllByStudentIdAndDeletedFalse(USER_ID);
     }
 
     @Test
