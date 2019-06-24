@@ -36,9 +36,7 @@ public class UserQuestionnaireSummaryRepositoryImpl
   private boolean isUserIdInUserIds(
     List<String> userIds, UserQuestionnaireSummary summary
   ) {
-    
-    return userIds.contains(summary.getAppraisee()
-                                          .getId());
+    return userIds.contains(summary.getAppraisee().getId());
   }
   
   private List<String> getUserIds(String name) {
