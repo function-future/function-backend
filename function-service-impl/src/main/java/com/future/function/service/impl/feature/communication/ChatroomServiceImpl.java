@@ -32,30 +32,11 @@ public class ChatroomServiceImpl implements ChatroomService {
 
   private final ChatroomRepository chatroomRepository;
 
-  private final MessageService messageService;
-
-  private final MessageStatusService messageStatusService;
 
   @Autowired
-  public ChatroomServiceImpl(MessageService messageService, MessageStatusService messageStatusService,
-                             UserService userService, ChatroomRepository chatroomRepository) {
+  public ChatroomServiceImpl(UserService userService, ChatroomRepository chatroomRepository) {
     this.userService = userService;
     this.chatroomRepository = chatroomRepository;
-    this.messageService = messageService;
-    this.messageStatusService = messageStatusService;
-  }
-
-  @Override
-  public void setMessageToAChatroom(Message message, String chatroomId, String userId) {
-    Message messageCreated = messageService.createMessage(message);
-    Chatroom chatroom = getChatroom(chatroomId);
-    chatroom.getMembers().forEach(member -> messageStatusService.createMessageStatus(MessageStatus.builder()
-            .message(messageCreated)
-            .chatroom(chatroom)
-            .member(member)
-            .seen(member.getId().equals(userId))
-            .build())
-    );
   }
 
   @Override

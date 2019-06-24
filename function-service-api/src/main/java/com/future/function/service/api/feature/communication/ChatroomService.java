@@ -21,7 +21,4 @@ public interface ChatroomService {
 
   Chatroom updateChatroom(Chatroom chatroom);
 
-  void setMessageToAChatroom(Message message, String chatroomId, String userId);
-
-
 }

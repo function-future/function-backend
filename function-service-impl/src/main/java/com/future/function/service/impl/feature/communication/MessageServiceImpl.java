@@ -30,14 +30,11 @@ public class MessageServiceImpl implements MessageService {
 
   private final UserService userService;
 
-  private final MessageStatusService messageStatusService;
-
   @Autowired
-  public MessageServiceImpl(MessageRepository messageRepository, MessageStatusService messageStatusService, ChatroomService chatroomService, UserService userService) {
+  public MessageServiceImpl(MessageRepository messageRepository, ChatroomService chatroomService, UserService userService) {
     this.messageRepository = messageRepository;
     this.chatroomService = chatroomService;
     this.userService = userService;
-    this.messageStatusService = messageStatusService;
   }
 
   @Override
