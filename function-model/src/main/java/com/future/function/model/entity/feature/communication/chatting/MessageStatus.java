@@ -30,15 +30,15 @@ public class MessageStatus extends BaseEntity {
   private boolean seen;
 
   @Field(FieldName.MessageStatus.MEMBER)
-  @DBRef
+  @DBRef(lazy = true)
   private User member;
 
   @Field(FieldName.MessageStatus.MESSAGE)
-  @DBRef
+  @DBRef(lazy = true)
   private Message message;
 
   @Field(FieldName.MessageStatus.CHATROOM)
-  @DBRef
+  @DBRef(lazy = true)
   private Chatroom chatroom;
 
 }

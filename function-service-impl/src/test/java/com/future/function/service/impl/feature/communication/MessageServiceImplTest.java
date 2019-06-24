@@ -145,18 +145,6 @@ public class MessageServiceImplTest {
   }
 
   @Test
-  public void testGivenChatroomByGettingLastMessageByChatroomReturnNotFoundException() {
-    when(chatroomService.getChatroom(CHATROOM_ID)).thenReturn(null);
-
-    catchException(() -> messageService.getLastMessage(CHATROOM_ID));
-
-    assertThat(caughtException().getClass()).isEqualTo(NotFoundException.class);
-    assertThat(caughtException().getMessage()).isEqualTo("No message was found");
-
-    verify(chatroomService).getChatroom(CHATROOM_ID);
-  }
-
-  @Test
   public void testGivenChatroomByCreatingChatroomReturnChatroom() {
     when(messageRepository.save(message1)).thenReturn(message1);
     when(userService.getUser(USER_ID)).thenReturn(USER);
