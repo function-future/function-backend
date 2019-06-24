@@ -241,7 +241,7 @@ public class ChatroomControllerTest extends TestHelper {
         super.setCookie(Role.ADMIN);
 
         when(messageRequestMapper.toMessage(MESSAGE_REQUEST, MEMBER_ID_1, CHATROOM_ID)).thenReturn(MESSAGE);
-        doNothing().when(messageService).setMessageToAChatroom(MESSAGE, CHATROOM_ID, MEMBER_ID_1);
+        doNothing().when(chatroomService).setMessageToAChatroom(MESSAGE, CHATROOM_ID, MEMBER_ID_1);
 
         mockMvc.perform(post("/api/communication/chatrooms/" + CHATROOM_ID + "/messages").cookie(cookies)
             .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -250,7 +250,7 @@ public class ChatroomControllerTest extends TestHelper {
                 .andExpect(content().json(baseResponseJacksonTester.write(ResponseHelper.toBaseResponse(HttpStatus.CREATED)).getJson()));
 
         verify(messageRequestMapper).toMessage(MESSAGE_REQUEST, MEMBER_ID_1, CHATROOM_ID);
-        verify(messageService).setMessageToAChatroom(MESSAGE, CHATROOM_ID, MEMBER_ID_1);
+        verify(chatroomService).setMessageToAChatroom(MESSAGE, CHATROOM_ID, MEMBER_ID_1);
     }
 
     @Test

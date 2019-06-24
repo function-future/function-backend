@@ -72,19 +72,6 @@ public class MessageServiceImpl implements MessageService {
             .orElseThrow(UnsupportedOperationException::new);
   }
 
-  @Override
-  public void setMessageToAChatroom(Message message, String chatroomId, String userId) {
-    Message messageCreated = createMessage(message);
-    Chatroom chatroom = chatroomService.getChatroom(chatroomId);
-    chatroom.getMembers().forEach(member -> messageStatusService.createMessageStatus(MessageStatus.builder()
-            .message(messageCreated)
-            .chatroom(chatroom)
-            .member(member)
-            .seen(member.getId().equals(userId))
-            .build())
-    );
-  }
-
   private Message setSender(Message message) {
     message.setSender(userService.getUser(message.getSender().getId()));
     return message;

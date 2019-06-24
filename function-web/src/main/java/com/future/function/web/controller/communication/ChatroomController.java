@@ -130,7 +130,7 @@ public class ChatroomController {
     @ResponseStatus(value = HttpStatus.CREATED)
     public BaseResponse createMessage(@PathVariable String chatroomId, @RequestBody MessageRequest messageRequest,
                                       Session session) {
-        messageService.setMessageToAChatroom(messageRequestMapper
+        chatroomService.setMessageToAChatroom(messageRequestMapper
                 .toMessage(messageRequest, getUserId(session), chatroomId), chatroomId, getUserId(session));
         return ResponseHelper.toBaseResponse(HttpStatus.CREATED);
     }

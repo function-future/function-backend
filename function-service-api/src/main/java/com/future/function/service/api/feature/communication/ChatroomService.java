@@ -1,6 +1,7 @@
 package com.future.function.service.api.feature.communication;
 
 import com.future.function.model.entity.feature.communication.chatting.Chatroom;
+import com.future.function.model.entity.feature.communication.chatting.Message;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -19,5 +20,8 @@ public interface ChatroomService {
   Chatroom createChatroom(Chatroom chatroom);
 
   Chatroom updateChatroom(Chatroom chatroom);
+
+  void setMessageToAChatroom(Message message, String chatroomId, String userId);
+
 
 }
