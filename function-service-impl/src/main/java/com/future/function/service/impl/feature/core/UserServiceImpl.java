@@ -73,7 +73,7 @@ public class UserServiceImpl implements UserService {
   public User getUserByEmailAndPassword(String email, String password) {
     
     return Optional.ofNullable(email)
-      .flatMap(userRepository::findByEmail)
+      .flatMap(userRepository::findByEmailAndDeletedFalse)
       .filter(user -> encoder.matches(password, user.getPassword()))
       .orElseThrow(() -> new ForbiddenException("Invalid Email/Password"));
   }
@@ -89,7 +89,7 @@ public class UserServiceImpl implements UserService {
   @Override
   public Page<User> getUsers(Role role, Pageable pageable) {
     
-    return userRepository.findAllByRole(role, pageable);
+    return userRepository.findAllByRoleAndDeletedFalse(role, pageable);
   }
   
   /**
@@ -165,21 +165,21 @@ public class UserServiceImpl implements UserService {
     
     return Optional.ofNullable(batchCode)
       .map(batchService::getBatchByCode)
-      .map(batch -> userRepository.findAllByRoleAndBatch(Role.STUDENT, batch))
+      .map(batch -> userRepository.findAllByRoleAndBatchAndDeletedFalse(Role.STUDENT, batch))
       .orElseGet(Collections::emptyList);
   }
   
   @Override
   public User getUserByEmail(String email) {
     
-    return userRepository.findByEmail(email)
+    return userRepository.findByEmailAndDeletedFalse(email)
       .orElseThrow(() -> new NotFoundException("Get User Not Found"));
   }
   
   @Override
   public void changeUserPassword(String email, String newPassword) {
     
-    userRepository.findByEmail(email)
+    userRepository.findByEmailAndDeletedFalse(email)
       .ifPresent(user -> {
         user.setPassword(encoder.encode(newPassword));
         userRepository.save(user);
