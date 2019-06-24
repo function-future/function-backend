@@ -50,6 +50,7 @@ public class AuthServiceImpl implements AuthService {
     User user = userService.getUserByEmailAndPassword(email, password);
     
     Session session = Session.builder()
+      .userId(user.getId())
       .email(user.getEmail())
       .role(user.getRole())
       .build();
