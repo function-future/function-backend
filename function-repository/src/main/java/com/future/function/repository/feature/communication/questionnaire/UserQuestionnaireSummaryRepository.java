@@ -13,7 +13,9 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface UserQuestionnaireSummaryRepository extends MongoRepository<UserQuestionnaireSummary, String> {
+public interface UserQuestionnaireSummaryRepository
+  extends MongoRepository<UserQuestionnaireSummary, String>,
+  UserQuestionnaireSummaryRepositoryCustom {
 
   /**
    * Find all user questionnaire summary
