@@ -8,6 +8,10 @@ import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.base.paging.Paging;
 import com.future.function.web.model.response.feature.scoring.AssignmentWebResponse;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 import org.assertj.core.api.Assertions;
 import org.junit.After;
 import org.junit.Before;
@@ -17,11 +21,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
 
 public class AssignmentResponseMapperTest {
 
@@ -49,30 +48,30 @@ public class AssignmentResponseMapperTest {
     fileV2 = FileV2.builder().fileUrl(FILE_URl).build();
 
     assignment = Assignment
-            .builder()
-            .id(null)
-            .title(ASSIGNMENT_TITLE)
-            .description(ASSIGNMENT_DESCRIPTION)
-            .deadline(ASSIGNMENT_DEADLINE)
-            .batch(batch)
-            .file(fileV2)
-            .build();
+        .builder()
+        .id(null)
+        .title(ASSIGNMENT_TITLE)
+        .description(ASSIGNMENT_DESCRIPTION)
+        .deadline(ASSIGNMENT_DEADLINE)
+        .batch(batch)
+        .file(fileV2)
+        .build();
 
     assignmentWebResponse = AssignmentWebResponse
-            .builder()
-            .title(ASSIGNMENT_TITLE)
-            .description(ASSIGNMENT_DESCRIPTION)
-            .deadline(ASSIGNMENT_DEADLINE)
-            .batchCode(BATCH_CODE)
-            .file(FILE_URl)
-            .build();
+        .builder()
+        .title(ASSIGNMENT_TITLE)
+        .description(ASSIGNMENT_DESCRIPTION)
+        .deadline(ASSIGNMENT_DEADLINE)
+        .batchCode(BATCH_CODE)
+        .file(FILE_URl)
+        .build();
 
     assignmentWebResponseDataResponse = DataResponse
-            .<AssignmentWebResponse>builder()
-            .data(assignmentWebResponse)
-            .code(HttpStatus.OK.value())
-            .status(ResponseHelper.toProperStatusFormat(HttpStatus.OK.getReasonPhrase()))
-            .build();
+        .<AssignmentWebResponse>builder()
+        .data(assignmentWebResponse)
+        .code(HttpStatus.OK.value())
+        .status(ResponseHelper.toProperStatusFormat(HttpStatus.OK.getReasonPhrase()))
+        .build();
 
     pageable = new PageRequest(0, 10);
 
@@ -82,19 +81,19 @@ public class AssignmentResponseMapperTest {
     assignmentPage = new PageImpl<>(assignmentList, pageable, 10);
 
     paging = Paging
-            .builder()
-            .page(assignmentPage.getNumber())
-            .size(assignmentPage.getSize())
-            .totalRecords(assignmentPage.getTotalElements())
-            .build();
+        .builder()
+        .page(assignmentPage.getNumber())
+        .size(assignmentPage.getSize())
+        .totalRecords(assignmentPage.getTotalElements())
+        .build();
 
     assignmentWebResponsePagingResponse = PagingResponse
-            .<AssignmentWebResponse>builder()
-            .data(Collections.singletonList(assignmentWebResponse))
-            .code(HttpStatus.OK.value())
-            .status(ResponseHelper.toProperStatusFormat(HttpStatus.OK.getReasonPhrase()))
-            .paging(paging)
-            .build();
+        .<AssignmentWebResponse>builder()
+        .data(Collections.singletonList(assignmentWebResponse))
+        .code(HttpStatus.OK.value())
+        .status(ResponseHelper.toProperStatusFormat(HttpStatus.OK.getReasonPhrase()))
+        .paging(paging)
+        .build();
   }
 
   @After
@@ -114,7 +113,7 @@ public class AssignmentResponseMapperTest {
     assignmentWebResponseDataResponse.setCode(HttpStatus.CREATED.value());
     assignmentWebResponseDataResponse.setStatus(ResponseHelper.toProperStatusFormat(HttpStatus.CREATED.getReasonPhrase()));
     DataResponse<AssignmentWebResponse> actual = AssignmentResponseMapper
-            .toAssignmentDataResponse(HttpStatus.CREATED, assignment);
+        .toAssignmentDataResponse(HttpStatus.CREATED, assignment);
     Assertions.assertThat(actual.getData()).isEqualTo(assignmentWebResponseDataResponse.getData());
     Assertions.assertThat(actual.getCode()).isEqualTo(assignmentWebResponseDataResponse.getCode());
     Assertions.assertThat(actual.getStatus()).isEqualTo(assignmentWebResponseDataResponse.getStatus());

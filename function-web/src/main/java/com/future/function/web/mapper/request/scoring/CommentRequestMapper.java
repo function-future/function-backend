@@ -28,7 +28,7 @@ public class CommentRequestMapper {
                 .builder()
                 .room(Room.builder().id(roomId).build())
                 .author(User.builder().id(request.getUserId()).build())
-                .comment(request.getComment())
+                .text(request.getComment())
                 .build();
     }
 

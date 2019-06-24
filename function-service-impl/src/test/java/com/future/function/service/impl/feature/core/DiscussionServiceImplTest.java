@@ -38,7 +38,7 @@ public class DiscussionServiceImplTest {
   
   private static final String ID = "id";
   
-  private static final String COMMENT = "comment";
+  private static final String COMMENT = "text";
   
   private static final String EMAIL = "email";
   

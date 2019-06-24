@@ -1,7 +1,6 @@
 package com.future.function.service.api.feature.scoring;
 
 import com.future.function.model.entity.feature.scoring.QuestionBank;
-import com.future.function.model.util.constant.FieldName;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

@@ -22,11 +22,11 @@ public class Room extends BaseEntity {
     @Builder.Default
     private String id = UUID.randomUUID().toString();
 
-    @DBRef
+    @DBRef(lazy = true)
     @Field(FieldName.Room.STUDENT)
     private User student;
 
-    @DBRef
+    @DBRef(lazy = true)
     @Field(FieldName.Room.ASSIGNMENT)
     private Assignment assignment;
 

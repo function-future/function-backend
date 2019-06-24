@@ -14,7 +14,16 @@ import com.future.function.web.model.response.feature.scoring.QuizWebResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Controller class used to interact with http request for quiz entity
@@ -35,8 +44,9 @@ public class QuizController {
 
   /**
    * Used to get list of quiz entity object with paging, filter, and search parameters
-   * @param page (int, required false)
-   * @param size (int, required false)
+   *
+   * @param page   (int, required false)
+   * @param size   (int, required false)
    * @param filter (String, required false)
    * @param search (String, required false)
    * @return PagingResponse<QuizWebResponse> with status OK
@@ -44,24 +54,25 @@ public class QuizController {
   @ResponseStatus(value = HttpStatus.OK)
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   public PagingResponse<QuizWebResponse> getAllQuiz(
-          @RequestParam(required = false, defaultValue = "1") int page,
-          @RequestParam(required = false, defaultValue = "10") int size,
-          @RequestParam(required = false, defaultValue = "") String filter,
-          @RequestParam(required = false, defaultValue = "") String search
+      @RequestParam(required = false, defaultValue = "1") int page,
+      @RequestParam(required = false, defaultValue = "10") int size,
+      @RequestParam(required = false, defaultValue = "") String filter,
+      @RequestParam(required = false, defaultValue = "") String search
   ) {
     return QuizResponseMapper
-            .toQuizWebPagingResponse(
-                    quizService
-                      .findAllByPageableAndFilterAndSearch(
-                              PageHelper.toPageable(page, size),
-                              filter,
-                              search
-                      )
-            );
+        .toQuizWebPagingResponse(
+            quizService
+                .findAllByPageableAndFilterAndSearch(
+                    PageHelper.toPageable(page, size),
+                    filter,
+                    search
+                )
+        );
   }
 
   /**
    * Used to get specific quiz by passing the id in the path variable
+   *
    * @param id (String)
    * @return DataResponse<QuizWebResponse> with status OK
    */
@@ -69,10 +80,10 @@ public class QuizController {
   @GetMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
   public DataResponse<QuizWebResponse> getQuizById(@PathVariable String id) {
     return QuizResponseMapper
-            .toQuizWebDataResponse(
-                    quizService
-                      .findById(id)
-            );
+        .toQuizWebDataResponse(
+            quizService
+                .findById(id)
+        );
   }
 
   @ResponseStatus(HttpStatus.CREATED)
@@ -80,15 +91,17 @@ public class QuizController {
   public DataResponse<QuizWebResponse> copyQuiz(@RequestBody CopyQuizWebRequest request) {
     request = quizRequestMapper.validateCopyQuizWebRequest(request);
     return QuizResponseMapper
-            .toQuizWebDataResponse(
-                    HttpStatus.CREATED,
-                    quizService.copyQuizWithTargetBatch(
-                            request.getBatchCode(),
-                            quizService.findById(request.getQuizId())
-                    ));
+        .toQuizWebDataResponse(
+            HttpStatus.CREATED,
+            quizService.copyQuizWithTargetBatch(
+                request.getBatchCode(),
+                quizService.findById(request.getQuizId())
+            ));
   }
+
   /**
    * Used to create new quiz by passing the QuizWebRequest object as JSON
+   *
    * @param quizWebRequest (JSON)
    * @return DataResponse<QuizWebResponse> with status CREATED
    */
@@ -96,40 +109,42 @@ public class QuizController {
   @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
   public DataResponse<QuizWebResponse> createQuiz(@RequestBody QuizWebRequest quizWebRequest) {
     return QuizResponseMapper
-            .toQuizWebDataResponse(
-                    HttpStatus.CREATED,
-                    quizService
-                      .createQuiz(
-                              quizRequestMapper
-                                .toQuiz(quizWebRequest)
-                      )
-            );
+        .toQuizWebDataResponse(
+            HttpStatus.CREATED,
+            quizService
+                .createQuiz(
+                    quizRequestMapper
+                        .toQuiz(quizWebRequest)
+                )
+        );
   }
 
   /**
    * Used to update existing quiz by passing the QuizWebRequest object in the body and quiz id in path variable
-   * @param id (String)
+   *
+   * @param id      (String)
    * @param request (JSON)
    * @return DataResponse<QuizWebResponse> with status OK
    */
   @ResponseStatus(value = HttpStatus.OK)
   @PutMapping(path = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
   public DataResponse<QuizWebResponse> updateQuiz(
-          @PathVariable String id,
-          @RequestBody QuizWebRequest request
+      @PathVariable String id,
+      @RequestBody QuizWebRequest request
   ) {
     return QuizResponseMapper
-            .toQuizWebDataResponse(
-                    quizService
-                      .updateQuiz(
-                              quizRequestMapper
-                                .toQuiz(id, request)
-                      )
-            );
+        .toQuizWebDataResponse(
+            quizService
+                .updateQuiz(
+                    quizRequestMapper
+                        .toQuiz(id, request)
+                )
+        );
   }
 
   /**
    * Used to delete existing quiz by passing the quiz id in path variable
+   *
    * @param id (String)
    * @return BaseResponse with status OK
    */
@@ -138,7 +153,7 @@ public class QuizController {
   public BaseResponse deleteQuizById(@PathVariable String id) {
     quizService.deleteById(id);
     return ResponseHelper
-            .toBaseResponse(HttpStatus.OK);
+        .toBaseResponse(HttpStatus.OK);
   }
 
 }

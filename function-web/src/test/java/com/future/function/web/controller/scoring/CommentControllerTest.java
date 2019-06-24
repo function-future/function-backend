@@ -46,8 +46,8 @@ public class CommentControllerTest extends TestHelper {
   private static final String ROOM_ID = "room-id";
   private static final String USER_ID = "user-id";
   private static final String USER_NAME = "user-name";
-  private static final String COMMENT_ID = "comment-id";
-  private static final String COMMENT = "comment";
+  private static final String COMMENT_ID = "text-id";
+  private static final String COMMENT = "text";
   private static final String ASSIGNMENT_ID = "assignment-id";
 
 
@@ -95,7 +95,7 @@ public class CommentControllerTest extends TestHelper {
         .point(0)
         .build();
 
-    comment = Comment.builder().author(user).comment(COMMENT).id(COMMENT_ID).room(room).build();
+    comment = Comment.builder().author(user).text(COMMENT).id(COMMENT_ID).room(room).build();
 
     commentWebRequest = CommentWebRequest.builder().userId(USER_ID).comment(COMMENT).build();
 

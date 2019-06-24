@@ -22,14 +22,14 @@ public class Comment extends BaseEntity {
     @Builder.Default
     private String id = UUID.randomUUID().toString();
 
-    @DBRef
+    @DBRef(lazy = true)
     @Field(FieldName.Comment.AUTHOR)
     private User author;
 
     @Field(FieldName.Comment.TEXT)
-    private String comment;
+    private String text;
 
-    @DBRef
+    @DBRef(lazy = true)
     @Field(FieldName.Comment.ROOM)
     private Room room;
 
