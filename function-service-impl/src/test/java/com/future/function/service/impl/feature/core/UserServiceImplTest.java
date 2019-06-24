@@ -261,6 +261,30 @@ public class UserServiceImplTest {
   }
   
   @Test
+  public void testGivenStudentDataButErrorOccurredByCreatingUserReturnUnsupportedOperationException() {
+    
+    userStudent.setPictureV2(PICTURE);
+    
+    when(batchService.getBatchByCode(NUMBER)).thenReturn(BATCH);
+    when(resourceService.markFilesUsed(FILE_IDS, true)).thenReturn(true);
+    when(resourceService.getFile(PICTURE_ID)).thenReturn(PICTURE);
+    when(encoder.encode(PASSWORD)).thenReturn(PASSWORD);
+    when(userRepository.save(userStudent)).thenReturn(null);
+  
+    catchException(() -> userService.createUser(userStudent));
+  
+    assertThat(caughtException().getClass()).isEqualTo(
+      UnsupportedOperationException.class);
+    assertThat(caughtException().getMessage()).isEqualTo("Failed Create User");
+    
+    verify(batchService).getBatchByCode(NUMBER);
+    verify(resourceService).markFilesUsed(FILE_IDS, true);
+    verify(resourceService).getFile(PICTURE_ID);
+    verify(encoder).encode(PASSWORD);
+    verify(userRepository).save(userStudent);
+  }
+  
+  @Test
   public void testGivenMentorDataByCreatingUserReturnMentor() {
     
     userMentor.setPictureV2(PICTURE);
@@ -436,7 +460,7 @@ public class UserServiceImplTest {
   }
   
   @Test
-  public void testGivenNonExistingBatchCodeByGettingStudentsByBatchCodeNotFoundException() {
+  public void testGivenNonExistingBatchCodeByGettingStudentsByBatchCodeReturnNotFoundException() {
     
     when(batchService.getBatchByCode(NUMBER)).thenThrow(
       new NotFoundException(""));
@@ -450,7 +474,7 @@ public class UserServiceImplTest {
   }
   
   @Test
-  public void testGivenBatchCodeWithNoStudentRegisteredForThatCodeByGettingStudentsByBatchCodeEmptyList() {
+  public void testGivenBatchCodeWithNoStudentRegisteredForThatCodeByGettingStudentsByBatchCodeReturnEmptyList() {
     
     when(batchService.getBatchByCode(NUMBER)).thenReturn(BATCH);
     when(userRepository.findAllByRoleAndBatchAndDeletedFalse(Role.STUDENT, BATCH)).thenReturn(
@@ -516,7 +540,7 @@ public class UserServiceImplTest {
   }
   
   @Test
-  public void testGivenEmailAndPasswordByGettingUserByEmailAndPasswordReturnForbiddenException() {
+  public void testGivenEmailAndPasswordByGettingUserByEmailAndPasswordReturnUnauthorizedException() {
     
     when(userRepository.findByEmailAndDeletedFalse(EMAIL_STUDENT)).thenReturn(
       Optional.of(userStudent));

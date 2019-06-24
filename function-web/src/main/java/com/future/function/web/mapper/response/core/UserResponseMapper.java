@@ -1,6 +1,5 @@
 package com.future.function.web.mapper.response.core;
 
-import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.web.mapper.helper.PageHelper;
@@ -80,8 +79,8 @@ public class UserResponseMapper {
   private static BatchWebResponse getBatch(User user) {
     
     return Optional.ofNullable(user.getBatch())
-             .map(BatchResponseMapper::toBatchWebResponse)
-             .orElse(null);
+      .map(BatchResponseMapper::toBatchWebResponse)
+      .orElse(null);
   }
   
   private static String getFileUrl(FileV2 fileV2) {

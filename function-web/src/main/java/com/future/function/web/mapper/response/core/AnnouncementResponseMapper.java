@@ -1,22 +1,18 @@
 package com.future.function.web.mapper.response.core;
 
 import com.future.function.model.entity.feature.core.Announcement;
-import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.mapper.response.core.embedded.EmbeddedFileWebResponseMapper;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.feature.core.AnnouncementWebResponse;
-import com.future.function.web.model.response.feature.core.FileWebResponse;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**

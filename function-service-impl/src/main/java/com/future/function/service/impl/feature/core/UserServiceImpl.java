@@ -111,7 +111,8 @@ public class UserServiceImpl implements UserService {
       .map(this::setDefaultEncryptedPassword)
       .map(this::setUserPicture)
       .map(userRepository::save)
-      .orElse(user);
+      .orElseThrow(
+        () -> new UnsupportedOperationException("Failed Create User"));
   }
   
   /**
@@ -177,17 +178,22 @@ public class UserServiceImpl implements UserService {
   }
   
   @Override
+  @SuppressWarnings("squid:S2201")
   public void changeUserPassword(
     String email, String oldPassword, String newPassword
   ) {
     
     userRepository.findByEmailAndDeletedFalse(email)
       .filter(user -> encoder.matches(user.getPassword(), oldPassword))
-      .map(user -> {
-        user.setPassword(encoder.encode(newPassword));
-        return userRepository.save(user);
-      })
+      .map(user -> this.setEncryptedPassword(user, newPassword))
+      .map(userRepository::save)
       .orElseThrow(() -> new UnauthorizedException("Invalid Old Password"));
+  }
+  
+  private User setEncryptedPassword(User user, String password) {
+    
+    user.setPassword(encoder.encode(password));
+    return user;
   }
   
   private User setUserPicture(User user, User foundUser) {
@@ -240,8 +246,7 @@ public class UserServiceImpl implements UserService {
   
   private User setDefaultEncryptedPassword(User user) {
     
-    user.setPassword(encoder.encode(user.getPassword()));
-    return user;
+    return this.setEncryptedPassword(user, user.getPassword());
   }
   
 }
