@@ -55,7 +55,6 @@ public class ChatroomController {
 
     private MessageService messageService;
     
-    private UserService userService;
 
     private MessageStatusService messageStatusService;
 
@@ -65,13 +64,11 @@ public class ChatroomController {
             ChatroomService chatroomService,
             MessageService messageService,
             MessageStatusService messageStatusService,
-            MessageRequestMapper messageRequestMapper,
-            UserService userService
+            MessageRequestMapper messageRequestMapper
     ) {
         this.chatroomRequestMapper = chatroomRequestMapper;
         this.chatroomService = chatroomService;
         this.messageService = messageService;
-        this.userService = userService;
         this.messageStatusService = messageStatusService;
         this.messageRequestMapper = messageRequestMapper;
     }
@@ -86,18 +83,18 @@ public class ChatroomController {
 
         if (search != null) {
             return ChatroomResponseMapper.toPagingChatroomResponse(
-                    chatroomService.getChatroomsWithKeyword(search, getUserId(session), PageHelper.toPageable(page, size)),
+                    chatroomService.getChatroomsWithKeyword(search, session.getUserId(), PageHelper.toPageable(page, size)),
                     messageService,
                     messageStatusService,
-                    getUserId(session)
+                    session.getUserId()
             );
         }
         else {
             return ChatroomResponseMapper.toPagingChatroomResponse(
-                    chatroomService.getChatrooms(type, getUserId(session), PageHelper.toPageable(page, size)),
+                    chatroomService.getChatrooms(type, session.getUserId(), PageHelper.toPageable(page, size)),
                     messageService,
                     messageStatusService,
-                    getUserId(session)
+                    session.getUserId()
             );
         }
     }
@@ -133,13 +130,13 @@ public class ChatroomController {
     @ResponseStatus(value = HttpStatus.CREATED)
     public BaseResponse createMessage(@PathVariable String chatroomId, @RequestBody MessageRequest messageRequest,
                                       Session session) {
-        Message message = messageService.createMessage(messageRequestMapper.toMessage(messageRequest, getUserId(session), chatroomId));
+        Message message = messageService.createMessage(messageRequestMapper.toMessage(messageRequest, session.getUserId(), chatroomId));
         Chatroom chatroom = chatroomService.getChatroom(chatroomId);
         chatroom.getMembers().forEach(member -> messageStatusService.createMessageStatus(MessageStatus.builder()
                 .message(message)
                 .chatroom(chatroom)
                 .member(member)
-                .seen(member.getId().equals(getUserId(session)))
+                .seen(member.getId().equals(session.getUserId()))
                 .build())
         );
         return ResponseHelper.toBaseResponse(HttpStatus.CREATED);
@@ -157,11 +154,8 @@ public class ChatroomController {
     @PutMapping(value = "/{chatroomId:.+}/messages/{messageId:.+}/_read", produces = MediaType.APPLICATION_JSON_VALUE)
     public BaseResponse updateMessageStatus(@PathVariable String chatroomId, @PathVariable String messageId,
                                             Session session) {
-        messageStatusService.updateSeenStatus(chatroomId, messageId, getUserId(session));
+        messageStatusService.updateSeenStatus(chatroomId, messageId, session.getUserId());
         return ResponseHelper.toBaseResponse(HttpStatus.OK);
     }
-    
-    private String getUserId(Session session) {
-        return userService.getUserByEmail(session.getEmail()).getId();
-    }
+
 }
