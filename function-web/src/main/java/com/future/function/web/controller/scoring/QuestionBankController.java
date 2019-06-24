@@ -1,6 +1,8 @@
 package com.future.function.web.controller.scoring;
 
+import com.future.function.common.enumeration.core.Role;
 import com.future.function.service.api.feature.scoring.QuestionBankService;
+import com.future.function.session.annotation.WithAnyRole;
 import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.mapper.request.scoring.QuestionBankRequestMapper;
@@ -40,66 +42,47 @@ public class QuestionBankController {
 
   @ResponseStatus(value = HttpStatus.OK)
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+  @WithAnyRole(roles = Role.ADMIN)
   public PagingResponse<QuestionBankWebResponse> findAllQuestionBank(
       @RequestParam(required = false, defaultValue = "1") int page,
-      @RequestParam(required = false, defaultValue = "10") int size,
-      @RequestParam(required = false, defaultValue = "") String filter,
-      @RequestParam(required = false, defaultValue = "") String search
+      @RequestParam(required = false, defaultValue = "10") int size
   ) {
     return QuestionBankResponseMapper
-        .toPagingQuestionBankWebResponse(
-            questionBankService
-                .findAllByPageableFilterAndSearch(
-                    PageHelper.toPageable(page, size),
-                    filter,
-                    search
-                )
-        );
+        .toPagingQuestionBankWebResponse(questionBankService.findAllByPageable(PageHelper.toPageable(page, size)));
   }
 
   @ResponseStatus(value = HttpStatus.OK)
   @GetMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+  @WithAnyRole(roles = Role.ADMIN)
   public DataResponse<QuestionBankWebResponse> findQuestionBankById(@PathVariable String id) {
     return QuestionBankResponseMapper
-        .toQuestionBankWebResponse(
-            questionBankService
-                .findById(id)
-        );
+        .toQuestionBankWebResponse(questionBankService.findById(id));
   }
 
   @ResponseStatus(value = HttpStatus.CREATED)
   @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+  @WithAnyRole(roles = Role.ADMIN)
   public DataResponse<QuestionBankWebResponse> createQuestionBank(@RequestBody QuestionBankWebRequest request) {
     return QuestionBankResponseMapper
         .toQuestionBankWebResponse(
-            HttpStatus.CREATED,
-            questionBankService
-                .createQuestionBank(
-                    requestMapper
-                        .toQuestionBank(request)
-                )
-        );
+            HttpStatus.CREATED, questionBankService.createQuestionBank(requestMapper.toQuestionBank(request)));
   }
 
   @ResponseStatus(value = HttpStatus.OK)
   @PutMapping(path = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-  public DataResponse<QuestionBankWebResponse> updateQuestionBank(@PathVariable String id, @RequestBody QuestionBankWebRequest request) {
+  @WithAnyRole(roles = Role.ADMIN)
+  public DataResponse<QuestionBankWebResponse> updateQuestionBank(@PathVariable String id,
+      @RequestBody QuestionBankWebRequest request) {
     return QuestionBankResponseMapper
-        .toQuestionBankWebResponse(
-            questionBankService
-                .updateQuestionBank(
-                    requestMapper
-                        .toQuestionBank(id, request)
-                )
-        );
+        .toQuestionBankWebResponse(questionBankService.updateQuestionBank(requestMapper.toQuestionBank(id, request)));
   }
 
   @ResponseStatus(value = HttpStatus.OK)
   @DeleteMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+  @WithAnyRole(roles = Role.ADMIN)
   public BaseResponse deleteQuestionBankById(@PathVariable String id) {
     questionBankService.deleteById(id);
-    return ResponseHelper
-        .toBaseResponse(HttpStatus.OK);
+    return ResponseHelper.toBaseResponse(HttpStatus.OK);
   }
 
 }

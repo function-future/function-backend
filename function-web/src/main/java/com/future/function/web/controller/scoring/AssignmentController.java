@@ -1,6 +1,8 @@
 package com.future.function.web.controller.scoring;
 
+import com.future.function.common.enumeration.core.Role;
 import com.future.function.service.api.feature.scoring.AssignmentService;
+import com.future.function.session.annotation.WithAnyRole;
 import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.mapper.request.scoring.AssignmentRequestMapper;
@@ -51,6 +53,7 @@ public class AssignmentController {
    */
   @ResponseStatus(value = HttpStatus.OK)
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+  @WithAnyRole(roles = {Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT})
   public PagingResponse<AssignmentWebResponse> findAllAssignment(
       @PathVariable(value = "batchCode") String batchCode,
       @RequestParam(required = false, defaultValue = "1") int page,
@@ -82,6 +85,7 @@ public class AssignmentController {
    */
   @ResponseStatus(value = HttpStatus.CREATED)
   @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+  @WithAnyRole(roles = Role.ADMIN)
   public DataResponse<AssignmentWebResponse> createAssignment(@RequestBody AssignmentWebRequest data) {
     return AssignmentResponseMapper
         .toAssignmentDataResponse(HttpStatus.CREATED, assignmentService
@@ -90,6 +94,7 @@ public class AssignmentController {
 
   @ResponseStatus(value = HttpStatus.CREATED)
   @PostMapping(path = "/copy", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+  @WithAnyRole(roles = Role.ADMIN)
   public DataResponse<AssignmentWebResponse> copyAssignment(@RequestBody CopyAssignmentWebRequest request) {
     return AssignmentResponseMapper
         .toAssignmentDataResponse(HttpStatus.CREATED, assignmentService
@@ -104,6 +109,7 @@ public class AssignmentController {
    */
   @ResponseStatus(value = HttpStatus.OK)
   @PutMapping(path = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+  @WithAnyRole(roles = Role.ADMIN)
   public DataResponse<AssignmentWebResponse> updateAssignment(@PathVariable String id,
       @RequestBody AssignmentWebRequest data) {
     return AssignmentResponseMapper.toAssignmentDataResponse(assignmentService
@@ -118,6 +124,7 @@ public class AssignmentController {
    */
   @ResponseStatus(value = HttpStatus.OK)
   @DeleteMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+  @WithAnyRole(roles = Role.ADMIN)
   public BaseResponse deleteAssignmentById(@PathVariable String id) {
     assignmentService.deleteById(id);
     return ResponseHelper.toBaseResponse(HttpStatus.OK);

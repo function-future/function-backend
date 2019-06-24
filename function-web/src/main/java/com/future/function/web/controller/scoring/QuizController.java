@@ -1,6 +1,8 @@
 package com.future.function.web.controller.scoring;
 
+import com.future.function.common.enumeration.core.Role;
 import com.future.function.service.api.feature.scoring.QuizService;
+import com.future.function.session.annotation.WithAnyRole;
 import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.mapper.request.scoring.QuizRequestMapper;
@@ -29,7 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
  * Controller class used to interact with http request for quiz entity
  */
 @RestController
-@RequestMapping(path = "/api/scoring/quizzes")
+@RequestMapping(path = "/api/scoring/batches/{batchCode}/quizzes")
 public class QuizController {
 
   private QuizService quizService;
@@ -47,27 +49,19 @@ public class QuizController {
    *
    * @param page   (int, required false)
    * @param size   (int, required false)
-   * @param filter (String, required false)
-   * @param search (String, required false)
    * @return PagingResponse<QuizWebResponse> with status OK
    */
   @ResponseStatus(value = HttpStatus.OK)
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+  @WithAnyRole(roles = {Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT})
   public PagingResponse<QuizWebResponse> getAllQuiz(
+      @PathVariable(value = "batchCode") String batchCode,
       @RequestParam(required = false, defaultValue = "1") int page,
-      @RequestParam(required = false, defaultValue = "10") int size,
-      @RequestParam(required = false, defaultValue = "") String filter,
-      @RequestParam(required = false, defaultValue = "") String search
+      @RequestParam(required = false, defaultValue = "10") int size
   ) {
     return QuizResponseMapper
         .toQuizWebPagingResponse(
-            quizService
-                .findAllByPageableAndFilterAndSearch(
-                    PageHelper.toPageable(page, size),
-                    filter,
-                    search
-                )
-        );
+            quizService.findAllByBatchCodeAndPageable(batchCode, PageHelper.toPageable(page, size)));
   }
 
   /**
@@ -78,25 +72,20 @@ public class QuizController {
    */
   @ResponseStatus(value = HttpStatus.OK)
   @GetMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+  @WithAnyRole(roles = {Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT})
   public DataResponse<QuizWebResponse> getQuizById(@PathVariable String id) {
-    return QuizResponseMapper
-        .toQuizWebDataResponse(
-            quizService
-                .findById(id)
-        );
+    return QuizResponseMapper.toQuizWebDataResponse(quizService.findById(id));
   }
 
   @ResponseStatus(HttpStatus.CREATED)
   @PostMapping(value = "/copy", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+  @WithAnyRole(roles = Role.ADMIN)
   public DataResponse<QuizWebResponse> copyQuiz(@RequestBody CopyQuizWebRequest request) {
     request = quizRequestMapper.validateCopyQuizWebRequest(request);
     return QuizResponseMapper
         .toQuizWebDataResponse(
             HttpStatus.CREATED,
-            quizService.copyQuizWithTargetBatch(
-                request.getBatchCode(),
-                quizService.findById(request.getQuizId())
-            ));
+            quizService.copyQuizWithTargetBatch(request.getBatchCode(), quizService.findById(request.getQuizId())));
   }
 
   /**
@@ -107,16 +96,10 @@ public class QuizController {
    */
   @ResponseStatus(value = HttpStatus.CREATED)
   @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+  @WithAnyRole(roles = Role.ADMIN)
   public DataResponse<QuizWebResponse> createQuiz(@RequestBody QuizWebRequest quizWebRequest) {
     return QuizResponseMapper
-        .toQuizWebDataResponse(
-            HttpStatus.CREATED,
-            quizService
-                .createQuiz(
-                    quizRequestMapper
-                        .toQuiz(quizWebRequest)
-                )
-        );
+        .toQuizWebDataResponse(HttpStatus.CREATED, quizService.createQuiz(quizRequestMapper.toQuiz(quizWebRequest)));
   }
 
   /**
@@ -128,18 +111,9 @@ public class QuizController {
    */
   @ResponseStatus(value = HttpStatus.OK)
   @PutMapping(path = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-  public DataResponse<QuizWebResponse> updateQuiz(
-      @PathVariable String id,
-      @RequestBody QuizWebRequest request
-  ) {
-    return QuizResponseMapper
-        .toQuizWebDataResponse(
-            quizService
-                .updateQuiz(
-                    quizRequestMapper
-                        .toQuiz(id, request)
-                )
-        );
+  @WithAnyRole(roles = Role.ADMIN)
+  public DataResponse<QuizWebResponse> updateQuiz(@PathVariable String id, @RequestBody QuizWebRequest request) {
+    return QuizResponseMapper.toQuizWebDataResponse(quizService.updateQuiz(quizRequestMapper.toQuiz(id, request)));
   }
 
   /**
@@ -150,10 +124,10 @@ public class QuizController {
    */
   @ResponseStatus(value = HttpStatus.OK)
   @DeleteMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+  @WithAnyRole(roles = Role.ADMIN)
   public BaseResponse deleteQuizById(@PathVariable String id) {
     quizService.deleteById(id);
-    return ResponseHelper
-        .toBaseResponse(HttpStatus.OK);
+    return ResponseHelper.toBaseResponse(HttpStatus.OK);
   }
 
 }

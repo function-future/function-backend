@@ -11,7 +11,7 @@ public interface RoomService {
 
   Page<Room> findAllRoomsByAssignmentId(String assignmentId, Pageable pageable);
 
-  Room findById(String id);
+  Room findById(String id, String userId);
 
   List<Comment> findAllCommentsByRoomId(String roomId);
 
@@ -19,7 +19,7 @@ public interface RoomService {
 
   Assignment createRoomsByAssignment(Assignment assignment);
 
-  Room giveScoreToRoomByRoomId(String roomId, Integer point);
+  Room giveScoreToRoomByRoomId(String roomId, String userId, Integer point);
 
   void deleteRoomById(String id);
 

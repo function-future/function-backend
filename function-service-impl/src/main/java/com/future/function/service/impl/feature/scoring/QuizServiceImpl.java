@@ -63,12 +63,11 @@ public class QuizServiceImpl implements QuizService {
    * Used to find all quiz from repository in paging format by passing pageable, filter, and search parameter
    *
    * @param pageable (Pageable)
-   * @param filter   (String)
-   * @param search   (String)
+   * @param batchCode (String)
    * @return Page<Quiz> object
    */
   @Override
-  public Page<Quiz> findAllByPageableAndFilterAndSearch(Pageable pageable, String filter, String search) {
+  public Page<Quiz> findAllByBatchCodeAndPageable(String batchCode, Pageable pageable) {
     return quizRepository.findAllByDeletedFalse(pageable);
   }
 

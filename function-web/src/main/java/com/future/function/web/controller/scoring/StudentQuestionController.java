@@ -1,6 +1,9 @@
 package com.future.function.web.controller.scoring;
 
+import com.future.function.common.enumeration.core.Role;
 import com.future.function.service.api.feature.scoring.StudentQuizService;
+import com.future.function.session.annotation.WithAnyRole;
+import com.future.function.session.model.Session;
 import com.future.function.web.mapper.request.scoring.StudentQuestionRequestMapper;
 import com.future.function.web.mapper.response.scoring.StudentQuizDetailResponseMapper;
 import com.future.function.web.model.request.scoring.StudentQuestionWebRequest;
@@ -33,33 +36,36 @@ public class StudentQuestionController {
 
   @ResponseStatus(HttpStatus.OK)
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+  @WithAnyRole(roles = Role.STUDENT)
   public PagingResponse<StudentQuestionWebResponse> findStudentQuestionsByStudentQuizId(@PathVariable(value = "studentQuizId")
-      String studentQuizId) {
+      String studentQuizId, Session session) {
     return StudentQuizDetailResponseMapper
         .toStudentQuestionWebResponses(
             studentQuizService
-                .findAllQuestionsByStudentQuizId(studentQuizId));
+                .findAllQuestionsByStudentQuizId(studentQuizId, session.getId()));
   }
 
   @ResponseStatus(HttpStatus.OK)
   @GetMapping(value = "/start", produces = MediaType.APPLICATION_JSON_VALUE)
+  @WithAnyRole(roles = Role.STUDENT)
   public PagingResponse<StudentQuestionWebResponse> findUnansweredStudentQuestionsByStudentQuizId(
-      @PathVariable(value = "studentQuizId") String studentQuizId) {
+      @PathVariable(value = "studentQuizId") String studentQuizId, Session session) {
     return StudentQuizDetailResponseMapper
         .toStudentQuestionWebResponses(
             studentQuizService
-                .findAllUnansweredQuestionByStudentQuizId(studentQuizId));
+                .findAllUnansweredQuestionByStudentQuizId(studentQuizId, session.getId()));
   }
 
   @ResponseStatus(HttpStatus.CREATED)
   @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
   public DataResponse<StudentQuizDetailWebResponse> postAnswersForQuestions(@PathVariable(value = "studentQuizId") String studentQuizId,
-      @RequestBody List<StudentQuestionWebRequest> answerRequests) {
+      @RequestBody List<StudentQuestionWebRequest> answerRequests, Session session) {
     return StudentQuizDetailResponseMapper
         .toStudentQuizDetailWebResponse(
             studentQuizService
                 .answerQuestionsByStudentQuizId(
                     studentQuizId,
+                    session.getId(),
                     studentQuestionRequestMapper
                         .toStudentQuestionList(answerRequests)));
   }

@@ -1,5 +1,7 @@
 package com.future.function.service.impl.feature.scoring;
 
+import com.future.function.common.enumeration.core.Role;
+import com.future.function.common.exception.ForbiddenException;
 import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.User;
@@ -12,6 +14,8 @@ import com.future.function.repository.feature.scoring.StudentQuizRepository;
 import com.future.function.service.api.feature.core.UserService;
 import com.future.function.service.api.feature.scoring.StudentQuizDetailService;
 import com.future.function.service.api.feature.scoring.StudentQuizService;
+import com.future.function.service.impl.helper.PageHelper;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -38,37 +42,70 @@ public class StudentQuizServiceImpl implements StudentQuizService {
   }
 
   @Override
-  public Page<StudentQuiz> findAllByStudentId(String studentId, Pageable pageable) {
-    return studentQuizRepository.findAllByStudentId(studentId, pageable);
+  public Page<StudentQuiz> findAllByStudentId(String studentId, Pageable pageable, String userId) {
+    return Optional.of(userId)
+        .map(userService::getUser)
+        .map(user -> checkUserEligibilityAndReturnStudentId(user, studentId))
+        .map(id -> studentQuizRepository.findAllByStudentId(studentId, pageable))
+        .orElseGet(() -> PageHelper.empty(pageable));
+  }
+
+  private String checkUserEligibilityAndReturnStudentId(User user, String studentId) {
+    return Optional.of(user)
+        .filter(value -> value.getRole().equals(Role.STUDENT))
+        .map(value -> isUserIdEqualsStudentId(studentId, value))
+        .map(User::getId)
+        .orElse(studentId);
+  }
+
+  private User isUserIdEqualsStudentId(String studentId, User value) {
+    if (value.getId().equals(studentId))
+      return value;
+    throw new ForbiddenException("User not allowed");
   }
 
   @Override
-  public StudentQuiz findById(String id) {
+  public StudentQuiz findById(String id, String userId) {
+    User user = userService.getUser(userId);
     return Optional.ofNullable(id)
         .flatMap(studentQuizRepository::findByIdAndDeletedFalse)
+        .map(studentQuiz -> {
+          if (user.getRole().equals(Role.STUDENT) && !studentQuiz.getStudent().getId().equals(userId))
+            throw new ForbiddenException("User not allowed");
+          return studentQuiz;
+        })
         .orElseThrow(() -> new NotFoundException("Quiz not found"));
   }
 
   @Override
-  public List<StudentQuestion> findAllQuestionsByStudentQuizId(String studentQuizId) {
-    return studentQuizDetailService.findAllQuestionsByStudentQuizId(studentQuizId);
+  public List<StudentQuestion> findAllQuestionsByStudentQuizId(String studentQuizId, String userId) {
+    return Optional.of(studentQuizId)
+        .flatMap(studentQuizRepository::findByIdAndDeletedFalse)
+        .map(StudentQuiz::getStudent)
+        .map(user -> checkUserEligibilityAndReturnStudentId(user, userId))
+        .map(studentQuizDetailService::findAllQuestionsByStudentQuizId)
+        .orElseGet(ArrayList::new);
   }
 
   @Override
-  public List<StudentQuestion> findAllUnansweredQuestionByStudentQuizId(String studentQuizId) {
-    StudentQuiz studentQuiz = findAndUpdateTrials(studentQuizId);
+  public List<StudentQuestion> findAllUnansweredQuestionByStudentQuizId(String studentQuizId, String userId) {
+    StudentQuiz studentQuiz = findAndUpdateTrials(studentQuizId, userId);
     return studentQuizDetailService.findAllUnansweredQuestionsByStudentQuizId(studentQuiz.getId());
   }
 
-  private StudentQuiz findAndUpdateTrials(String studentQuizId) {
-    StudentQuiz studentQuiz = this.findById(studentQuizId);
+  private StudentQuiz findAndUpdateTrials(String studentQuizId, String userId) {
+    StudentQuiz studentQuiz = this.findById(studentQuizId, userId);
     studentQuiz.setTrials(studentQuiz.getTrials() - 1);
     return studentQuizRepository.save(studentQuiz);
   }
 
   @Override
-  public StudentQuizDetail answerQuestionsByStudentQuizId(String studentQuizId, List<StudentQuestion> answers) {
-    return studentQuizDetailService.answerStudentQuiz(studentQuizId, answers);
+  public StudentQuizDetail answerQuestionsByStudentQuizId(String studentQuizId, String userId, List<StudentQuestion> answers) {
+    return Optional.of(userId)
+        .map(userService::getUser)
+        .map(user -> this.checkUserEligibilityAndReturnStudentId(user, studentQuizId))
+        .map(id -> studentQuizDetailService.answerStudentQuiz(id, answers))
+        .orElseThrow(() -> new UnsupportedOperationException("Answer Questions Failed"));
   }
 
   @Override

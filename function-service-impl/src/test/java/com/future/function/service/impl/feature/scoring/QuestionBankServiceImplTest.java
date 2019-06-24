@@ -96,7 +96,7 @@ public class QuestionBankServiceImplTest {
     when(questionBankRepository.findAllByDeletedFalse(pageable))
         .thenReturn(questionBankPage);
 
-    Page<QuestionBank> actual = questionBankService.findAllByPageableFilterAndSearch(pageable, "", "");
+    Page<QuestionBank> actual = questionBankService.findAllByPageable(pageable, "", "");
 
     assertThat(actual.getContent()).isEqualTo(questionBankList);
     assertThat(actual.getTotalElements()).isEqualTo(questionBankPage.getTotalElements());

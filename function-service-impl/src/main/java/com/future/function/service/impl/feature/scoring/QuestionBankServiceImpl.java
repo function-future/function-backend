@@ -22,7 +22,7 @@ public class QuestionBankServiceImpl implements QuestionBankService {
   }
 
   @Override
-  public Page<QuestionBank> findAllByPageableFilterAndSearch(Pageable pageable, String filter, String search) {
+  public Page<QuestionBank> findAllByPageable(Pageable pageable) {
     return questionBankRepository.findAllByDeletedFalse(pageable);
   }
 

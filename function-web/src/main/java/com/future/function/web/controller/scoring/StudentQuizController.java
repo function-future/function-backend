@@ -1,6 +1,9 @@
 package com.future.function.web.controller.scoring;
 
+import com.future.function.common.enumeration.core.Role;
 import com.future.function.service.api.feature.scoring.StudentQuizService;
+import com.future.function.session.annotation.WithAnyRole;
+import com.future.function.session.model.Session;
 import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.response.scoring.StudentQuizResponseMapper;
 import com.future.function.web.model.response.base.DataResponse;
@@ -29,26 +32,28 @@ public class StudentQuizController {
 
   @ResponseStatus(HttpStatus.OK)
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+  @WithAnyRole(roles = {Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT})
   public PagingResponse<StudentQuizWebResponse> getAllStudentQuiz(@PathVariable String studentId,
-      @RequestParam(required = false,
-          defaultValue = "1") int page,
-      @RequestParam(required = false,
-          defaultValue = "10") int size) {
+      @RequestParam(required = false, defaultValue = "1") int page,
+      @RequestParam(required = false, defaultValue = "10") int size,
+      Session session) {
     return StudentQuizResponseMapper
         .toPagingStudentQuizWebResponse(
             studentQuizService
-                .findAllByStudentId(studentId, PageHelper.toPageable(page, size))
+                .findAllByStudentId(studentId, PageHelper.toPageable(page, size), session.getId())
         );
 
   }
 
   @ResponseStatus(HttpStatus.OK)
   @GetMapping(path = "/{studentQuizId}", produces = MediaType.APPLICATION_JSON_VALUE)
-  public DataResponse<StudentQuizWebResponse> getStudentQuizById(@PathVariable(value = "studentQuizId") String studentQuizId) {
+  @WithAnyRole(roles = {Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT})
+  public DataResponse<StudentQuizWebResponse> getStudentQuizById(@PathVariable(value = "studentQuizId") String studentQuizId,
+      Session session) {
     return StudentQuizResponseMapper
         .toStudentQuizWebResponse(
             studentQuizService
-                .findById(studentQuizId)
+                .findById(studentQuizId, session.getId())
         );
   }
 

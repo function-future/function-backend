@@ -160,7 +160,7 @@ public class QuestionBankControllerTest {
   @Test
   public void testFindQuestionBankWithPagingParameters() throws Exception {
 
-    when(questionBankService.findAllByPageableFilterAndSearch(pageable, "", ""))
+    when(questionBankService.findAllByPageable(pageable, "", ""))
         .thenReturn(questionBankPage);
 
     mockMvc.perform(
@@ -174,13 +174,13 @@ public class QuestionBankControllerTest {
                 .getJson()
         ));
 
-    verify(questionBankService).findAllByPageableFilterAndSearch(pageable, "", "");
+    verify(questionBankService).findAllByPageable(pageable, "", "");
   }
 
   @Test
   public void testFindQuestionBankWithNoPagingParameters() throws Exception {
 
-    when(questionBankService.findAllByPageableFilterAndSearch(pageable, "", ""))
+    when(questionBankService.findAllByPageable(pageable, "", ""))
         .thenReturn(questionBankPage);
 
     mockMvc.perform(
@@ -192,7 +192,7 @@ public class QuestionBankControllerTest {
                 .getJson()
         ));
 
-    verify(questionBankService).findAllByPageableFilterAndSearch(pageable, "", "");
+    verify(questionBankService).findAllByPageable(pageable, "", "");
   }
 
   @Test

@@ -16,7 +16,7 @@ public interface AssignmentService {
 
   Page<Room> findAllRoomsByAssignmentId(String assignmentId, Pageable pageable);
 
-  Room findRoomById(String id);
+  Room findRoomById(String id, String studentId);
 
   Assignment copyAssignment(String assignmentId, String targetBatchCode);
 
@@ -24,7 +24,7 @@ public interface AssignmentService {
 
   Assignment updateAssignment(Assignment request);
 
-  Room giveScoreToRoomByRoomId(String roomId, Integer point);
+  Room giveScoreToRoomByRoomId(String roomId, String userId, Integer point);
 
   void deleteRoomById(String id);
 

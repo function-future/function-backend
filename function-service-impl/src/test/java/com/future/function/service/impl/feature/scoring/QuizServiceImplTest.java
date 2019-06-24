@@ -164,7 +164,7 @@ public class QuizServiceImplTest {
 
   @Test
   public void testFindPageOfQuizWithPageableFilterAndSearch() {
-    Page<Quiz> actual = quizService.findAllByPageableAndFilterAndSearch(pageable, "", "");
+    Page<Quiz> actual = quizService.findAllByBatchCodeAndPageable(pageable, "", "");
     assertThat(actual.getContent()).isEqualTo(quizList);
     assertThat(actual.getTotalElements()).isEqualTo(TOTAL);
     assertThat(actual).isEqualTo(quizPage);
@@ -174,7 +174,7 @@ public class QuizServiceImplTest {
 
   @Test
   public void testFindPageOfQuizWithPageableFilterNullAndSearchNull() {
-    Page<Quiz> actual = quizService.findAllByPageableAndFilterAndSearch(pageable, null, null);
+    Page<Quiz> actual = quizService.findAllByBatchCodeAndPageable(pageable, null, null);
 
     assertThat(actual.getContent()).isEqualTo(quizList);
     assertThat(actual.getTotalElements()).isEqualTo(TOTAL);

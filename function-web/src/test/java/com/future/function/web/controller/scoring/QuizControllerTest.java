@@ -168,7 +168,7 @@ public class QuizControllerTest {
     when(quizService.findById(QUIZ_ID)).thenReturn(quiz);
     when(quizService.createQuiz(quiz)).thenReturn(quiz);
     when(quizService.updateQuiz(quiz)).thenReturn(quiz);
-    when(quizService.findAllByPageableAndFilterAndSearch(pageable, "", ""))
+    when(quizService.findAllByBatchCodeAndPageable(pageable, "", ""))
         .thenReturn(quizPage);
     when(quizService.copyQuizWithTargetBatch(QUIZ_BATCH_CODE, quiz)).thenReturn(quiz);
     when(requestMapper.toQuiz(quizWebRequest)).thenReturn(quiz);
@@ -219,7 +219,7 @@ public class QuizControllerTest {
                 .getJson()
         ));
 
-    verify(quizService).findAllByPageableAndFilterAndSearch(pageable, "", "");
+    verify(quizService).findAllByBatchCodeAndPageable(pageable, "", "");
   }
 
   @Test
@@ -232,7 +232,7 @@ public class QuizControllerTest {
                 .getJson()
         ));
 
-    verify(quizService).findAllByPageableAndFilterAndSearch(pageable, "", "");
+    verify(quizService).findAllByBatchCodeAndPageable(pageable, "", "");
   }
 
   @Test
