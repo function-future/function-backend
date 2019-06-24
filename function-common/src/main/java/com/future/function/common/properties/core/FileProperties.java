@@ -33,4 +33,8 @@ public class FileProperties {
   
   private String rootId;
   
+  private long schedulerActivePeriod;
+  
+  private long minimumFileCreatedPeriod;
+  
 }

@@ -1,6 +1,7 @@
 package com.future.function.session.resolver;
 
 import com.future.function.common.enumeration.core.Role;
+import com.future.function.common.exception.ForbiddenException;
 import com.future.function.common.exception.UnauthorizedException;
 import com.future.function.common.properties.core.SessionProperties;
 import com.future.function.session.annotation.WithAnyRole;
@@ -248,7 +249,7 @@ public class SessionResolverTest {
       ));
     
     assertThat(caughtException().getClass()).isEqualTo(
-      UnauthorizedException.class);
+      ForbiddenException.class);
     assertThat(caughtException().getMessage()).isEqualTo("Invalid Role");
     
     verify(servletRequest).getCookies();

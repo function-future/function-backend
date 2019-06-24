@@ -512,7 +512,7 @@ public class UserServiceImplTest {
   }
   
   @Test
-  public void testGivenEmailAndPasswordByGettingUserByEmailAndPasswordReturnUnauthorizedException() {
+  public void testGivenEmailAndPasswordByGettingUserByEmailAndPasswordReturnForbiddenException() {
     
     when(userRepository.findByEmail(EMAIL_STUDENT)).thenReturn(
       Optional.of(userStudent));
