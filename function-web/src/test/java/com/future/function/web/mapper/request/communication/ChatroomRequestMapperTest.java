@@ -5,7 +5,6 @@ import com.future.function.model.entity.feature.communication.chatting.Chatroom;
 import com.future.function.validation.RequestValidator;
 import com.future.function.web.model.request.communication.ChatroomRequest;
 import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -16,7 +15,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 /**
  * Author: priagung.satyagama

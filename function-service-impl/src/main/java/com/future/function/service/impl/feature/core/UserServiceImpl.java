@@ -1,8 +1,8 @@
 package com.future.function.service.impl.feature.core;
 
 import com.future.function.common.enumeration.core.Role;
+import com.future.function.common.exception.ForbiddenException;
 import com.future.function.common.exception.NotFoundException;
-import com.future.function.common.exception.UnauthorizedException;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.repository.feature.core.UserRepository;
@@ -75,7 +75,7 @@ public class UserServiceImpl implements UserService {
     return Optional.ofNullable(email)
       .flatMap(userRepository::findByEmail)
       .filter(user -> encoder.matches(password, user.getPassword()))
-      .orElseThrow(() -> new UnauthorizedException("Invalid Email/Password"));
+      .orElseThrow(() -> new ForbiddenException("Invalid Email/Password"));
   }
   
   /**

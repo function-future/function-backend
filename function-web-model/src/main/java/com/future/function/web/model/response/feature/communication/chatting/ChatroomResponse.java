@@ -1,6 +1,5 @@
 package com.future.function.web.model.response.feature.communication.chatting;
 
-import com.future.function.common.enumeration.communication.ChatroomType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

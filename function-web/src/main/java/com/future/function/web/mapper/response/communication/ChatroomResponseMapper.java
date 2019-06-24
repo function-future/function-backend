@@ -14,11 +14,15 @@ import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.mapper.response.core.BatchResponseMapper;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
-import com.future.function.web.model.response.feature.communication.chatting.*;
+import com.future.function.web.model.response.feature.communication.chatting.ChatroomDetailResponse;
+import com.future.function.web.model.response.feature.communication.chatting.ChatroomParticipantDetailResponse;
+import com.future.function.web.model.response.feature.communication.chatting.ChatroomParticipantResponse;
+import com.future.function.web.model.response.feature.communication.chatting.ChatroomResponse;
+import com.future.function.web.model.response.feature.communication.chatting.LastMessageResponse;
+import com.future.function.web.model.response.feature.communication.chatting.MessageResponse;
 import com.future.function.web.model.response.feature.core.BatchWebResponse;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 

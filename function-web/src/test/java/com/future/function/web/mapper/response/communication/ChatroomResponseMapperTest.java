@@ -13,23 +13,22 @@ import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.feature.communication.chatting.ChatroomDetailResponse;
-import com.future.function.web.model.response.feature.communication.chatting.ChatroomParticipantDetailResponse;
 import com.future.function.web.model.response.feature.communication.chatting.ChatroomResponse;
 import com.future.function.web.model.response.feature.communication.chatting.MessageResponse;
 import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.http.HttpStatus;
 
 import java.util.Arrays;
 import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 /**
  * Author: priagung.satyagama
