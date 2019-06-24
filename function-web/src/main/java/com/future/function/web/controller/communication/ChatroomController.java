@@ -1,6 +1,9 @@
 package com.future.function.web.controller.communication;
 
 import com.future.function.common.enumeration.core.Role;
+import com.future.function.model.entity.feature.communication.chatting.Chatroom;
+import com.future.function.model.entity.feature.communication.chatting.Message;
+import com.future.function.model.entity.feature.communication.chatting.MessageStatus;
 import com.future.function.service.api.feature.communication.ChatroomService;
 import com.future.function.service.api.feature.communication.MessageService;
 import com.future.function.service.api.feature.communication.MessageStatusService;
@@ -130,8 +133,15 @@ public class ChatroomController {
     @ResponseStatus(value = HttpStatus.CREATED)
     public BaseResponse createMessage(@PathVariable String chatroomId, @RequestBody MessageRequest messageRequest,
                                       Session session) {
-        messageService.setMessageToAChatroom(messageRequestMapper
-                .toMessage(messageRequest, getUserId(session), chatroomId), chatroomId, getUserId(session));
+        Message message = messageService.createMessage(messageRequestMapper.toMessage(messageRequest, getUserId(session), chatroomId));
+        Chatroom chatroom = chatroomService.getChatroom(chatroomId);
+        chatroom.getMembers().forEach(member -> messageStatusService.createMessageStatus(MessageStatus.builder()
+                .message(message)
+                .chatroom(chatroom)
+                .member(member)
+                .seen(member.getId().equals(getUserId(session)))
+                .build())
+        );
         return ResponseHelper.toBaseResponse(HttpStatus.CREATED);
     }
 

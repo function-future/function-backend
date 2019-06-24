@@ -30,14 +30,11 @@ public class MessageServiceImpl implements MessageService {
 
   private final UserService userService;
 
-  private final MessageStatusService messageStatusService;
-
   @Autowired
-  public MessageServiceImpl(MessageRepository messageRepository, MessageStatusService messageStatusService, ChatroomService chatroomService, UserService userService) {
+  public MessageServiceImpl(MessageRepository messageRepository, ChatroomService chatroomService, UserService userService) {
     this.messageRepository = messageRepository;
     this.chatroomService = chatroomService;
     this.userService = userService;
-    this.messageStatusService = messageStatusService;
   }
 
   @Override
@@ -70,19 +67,6 @@ public class MessageServiceImpl implements MessageService {
             .map(this::setChatroom)
             .map(messageRepository::save)
             .orElseThrow(UnsupportedOperationException::new);
-  }
-
-  @Override
-  public void setMessageToAChatroom(Message message, String chatroomId, String userId) {
-    Message messageCreated = createMessage(message);
-    Chatroom chatroom = chatroomService.getChatroom(chatroomId);
-    chatroom.getMembers().forEach(member -> messageStatusService.createMessageStatus(MessageStatus.builder()
-            .message(messageCreated)
-            .chatroom(chatroom)
-            .member(member)
-            .seen(member.getId().equals(userId))
-            .build())
-    );
   }
 
   private Message setSender(Message message) {
