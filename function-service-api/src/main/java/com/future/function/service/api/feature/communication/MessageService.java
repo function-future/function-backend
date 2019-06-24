@@ -18,4 +18,6 @@ public interface MessageService {
 
   Message createMessage(Message message);
 
+  void setMessageToAChatroom(Message message, String chatroomId, String userId);
+
 }

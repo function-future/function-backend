@@ -78,9 +78,11 @@ public class MessageStatusServiceImpl implements MessageStatusService {
             .map(messageService::getMessage)
             .map(Message::getCreatedAt)
             .orElse(0L);
-    this.getUnseenMessageStatusBeforeTimestamp(chatroomId, userId, timestamp).forEach(messageStatus -> {
-      messageStatus.setSeen(true);
-      this.updateMessageStatus(messageStatus);
+    this.getUnseenMessageStatus(chatroomId, userId).forEach(messageStatus -> {
+      if (messageStatus.getMessage().getCreatedAt() <= timestamp) {
+        messageStatus.setSeen(true);
+        this.updateMessageStatus(messageStatus);
+      }
     });
   }
 
