@@ -27,6 +27,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -122,6 +123,7 @@ public class ChatroomResponseMapper {
                         messageService.getLastMessage(content.getId()),
                         messageStatusService.getSeenStatus(content.getId(), userId))
                 )
+                .sorted((o1, o2) -> o2.getLastMessage().getTime().compareTo(o1.getLastMessage().getTime()))
                 .collect(Collectors.toList());
     }
 
