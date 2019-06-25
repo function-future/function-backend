@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>1.5.19.RELEASE</version>
+    <relativePath />
+  </parent>
+
+  <groupId>com.future.function</groupId>
+  <artifactId>function</artifactId>
+  <version>0.0.0</version>
+  <packaging>pom</packaging>
+
+  <name>function</name>
+  <description>Function is an application designed by Blibli.com FUTURE
+        Program participants as phase 2 project. The
+        application is designed for upcoming FUTURE Program participants.</description>
+
+  <modules>
+    <module>function-app</module>
+    <module>function-common</module>
+    <module>function-data-migration</module>
+    <module>function-model</module>
+    <module>function-repository</module>
+    <module>function-service-api</module>
+    <module>function-service-impl</module>
+    <module>function-session</module>
+    <module>function-validation</module>
+    <module>function-web</module>
+    <module>function-web-model</module>
+  </modules>
+
+  <properties>
+    <catch-exception.version>2.0</catch-exception.version>
+    <commons-io.version>2.6</commons-io.version>
+    <guava.version>27.1-jre</guava.version>
+    <jackson-annotations.version>2.8.0</jackson-annotations.version>
+    <jacoco.version>0.8.4</jacoco.version>
+    <java.version>1.8</java.version>
+    <maven-javadoc-plugin.version>3.1.0</maven-javadoc-plugin.version>
+    <mongobee.version>0.13</mongobee.version>
+    <?SORTPOM IGNORE?>
+    <sonar.coverage.exclusions>
+        **/FunctionApplication.java,
+        **/migration/**,
+        **/exception/**,
+        **/properties/**,
+        **/configuration/**,
+        **/bean/**,
+        **/model/**,
+        **/service/api/**
+    </sonar.coverage.exclusions>
+    <?SORTPOM RESUME?>
+    <powermock.version>1.7.4</powermock.version>
+    <sortpom-maven-plugin.version>2.8.0</sortpom-maven-plugin.version>
+    <spring-security-test.version>5.1.4.RELEASE</spring-security-test.version>
+    <swagger.version>2.9.2</swagger.version>
+    <thumbnailator.version>0.4.8</thumbnailator.version>
+  </properties>
+
+  <dependencyManagement>
+
+    <dependencies>
+
+      <dependency>
+        <groupId>com.github.mongobee</groupId>
+        <artifactId>mongobee</artifactId>
+        <version>${mongobee.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongo-java-driver</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+
+      <dependency>
+        <groupId>com.google.guava</groupId>
+        <artifactId>guava</artifactId>
+        <version>${guava.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>commons-io</groupId>
+        <artifactId>commons-io</artifactId>
+        <version>${commons-io.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>eu.codearte.catch-exception</groupId>
+        <artifactId>catch-exception</artifactId>
+        <version>${catch-exception.version}</version>
+        <scope>test</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>io.springfox</groupId>
+        <artifactId>springfox-swagger-ui</artifactId>
+        <version>${swagger.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.springfox</groupId>
+        <artifactId>springfox-swagger2</artifactId>
+        <version>${swagger.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>net.coobird</groupId>
+        <artifactId>thumbnailator</artifactId>
+        <version>${thumbnailator.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.jacoco</groupId>
+        <artifactId>org.jacoco.agent</artifactId>
+        <version>${jacoco.version}</version>
+        <classifier>runtime</classifier>
+      </dependency>
+
+      <dependency>
+        <groupId>org.powermock</groupId>
+        <artifactId>powermock-api-mockito</artifactId>
+        <version>${powermock.version}</version>
+        <scope>test</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>org.powermock</groupId>
+        <artifactId>powermock-module-junit4</artifactId>
+        <version>${powermock.version}</version>
+        <scope>test</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>org.springframework.security</groupId>
+        <artifactId>spring-security-test</artifactId>
+        <version>${spring-security-test.version}</version>
+        <scope>test</scope>
+      </dependency>
+
+    </dependencies>
+
+  </dependencyManagement>
+
+  <dependencies>
+
+    <dependency>
+      <groupId>org.jacoco</groupId>
+      <artifactId>org.jacoco.agent</artifactId>
+      <classifier>runtime</classifier>
+    </dependency>
+
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <optional>true</optional>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-configuration-processor</artifactId>
+      <optional>true</optional>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+  </dependencies>
+
+  <build>
+
+    <pluginManagement>
+
+      <plugins>
+
+        <plugin>
+          <groupId>com.github.ekryd.sortpom</groupId>
+          <artifactId>sortpom-maven-plugin</artifactId>
+          <version>${sortpom-maven-plugin.version}</version>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <version>${maven-javadoc-plugin.version}</version>
+        </plugin>
+
+        <plugin>
+          <groupId>org.jacoco</groupId>
+          <artifactId>jacoco-maven-plugin</artifactId>
+          <version>${jacoco.version}</version>
+        </plugin>
+
+      </plugins>
+
+    </pluginManagement>
+
+    <plugins>
+
+      <plugin>
+        <groupId>com.github.ekryd.sortpom</groupId>
+        <artifactId>sortpom-maven-plugin</artifactId>
+        <configuration>
+          <predefinedSortOrder>recommended_2008_06</predefinedSortOrder>
+          <?SORTPOM IGNORE?>
+            <sortDependencies>
+                groupId,
+                artifactId,
+                version,
+                scope,
+                exclusions
+            </sortDependencies>
+          <?SORTPOM RESUME?>
+          <?SORTPOM IGNORE?>
+            <sortPlugins>
+                groupId,
+                artifactId,
+                version,
+                configuration,
+                executions
+            </sortPlugins>
+          <?SORTPOM RESUME?>
+          <sortProperties>true</sortProperties>
+          <sortModules>true</sortModules>
+          <createBackupFile>false</createBackupFile>
+          <expandEmptyElements>false</expandEmptyElements>
+          <keepBlankLines>true</keepBlankLines>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>sort</goal>
+            </goals>
+            <phase>verify</phase>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <configuration>
+          <sourceFileExcludes>**/**Test**.java</sourceFileExcludes>
+          <sourceFileExcludes>**/Dummy**.java</sourceFileExcludes>
+          <sourceFileExcludes>**/BadController.java</sourceFileExcludes>
+        </configuration>
+        <executions>
+          <execution>
+            <id>aggregate</id>
+            <goals>
+              <goal>aggregate</goal>
+            </goals>
+            <phase>site</phase>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <configuration>
+          <rules>
+            <rule implementation="org.jacoco.maven.RuleConfiguration">
+              <element>BUNDLE</element>
+              <limits>
+                <limit implementation="org.jacoco.report.check.Limit">
+                  <counter>INSTRUCTION</counter>
+                  <value>COVEREDRATIO</value>
+                  <minimum>0.9</minimum>
+                </limit>
+                <limit implementation="org.jacoco.report.check.Limit">
+                  <counter>LINE</counter>
+                  <value>COVEREDRATIO</value>
+                  <minimum>0.9</minimum>
+                </limit>
+              </limits>
+            </rule>
+          </rules>
+          <?SORTPOM IGNORE?>
+          <excludes>
+            <exclude>**/FunctionApplication.java,</exclude>
+            <exclude>**/migration/**,</exclude>
+            <exclude>**/exception/**,</exclude>
+            <exclude>**/properties/**,</exclude>
+            <exclude>**/configuration/**,</exclude>
+            <exclude>**/bean/**,</exclude>
+            <exclude>**/model/**,</exclude>
+            <exclude>**/service/api/**</exclude>
+          </excludes>
+          <?SORTPOM RESUME?>
+        </configuration>
+        <executions>
+          <execution>
+            <id>jacoco-instrument</id>
+            <goals>
+              <goal>instrument</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>jacoco-restore-instrumented-classes</id>
+            <goals>
+              <goal>restore-instrumented-classes</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>jacoco-report</id>
+            <goals>
+              <goal>report</goal>
+            </goals>
+            <phase>package</phase>
+          </execution>
+        </executions>
+      </plugin>
+
+    </plugins>
+
+  </build>
+
+</project>
