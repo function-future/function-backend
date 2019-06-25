@@ -42,9 +42,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping(value = "/api/communication/chatrooms")
-@WithAnyRole(roles = {
-        Role.STUDENT, Role.MENTOR, Role.JUDGE, Role.ADMIN
-})
+@WithAnyRole
 public class ChatroomController {
 
     private ChatroomRequestMapper chatroomRequestMapper;
@@ -75,11 +73,12 @@ public class ChatroomController {
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public PagingResponse<ChatroomResponse> getChatrooms(
+            Session session,
             @RequestParam(required = false, defaultValue = "PUBLIC") String type,
             @RequestParam(required = false) String search,
             @RequestParam(required = false, defaultValue = "1") int page,
-            @RequestParam(required = false, defaultValue = "10") int size,
-            Session session) {
+            @RequestParam(required = false, defaultValue = "10") int size
+            ) {
 
         if (search != null) {
             return ChatroomResponseMapper.toPagingChatroomResponse(
@@ -100,17 +99,27 @@ public class ChatroomController {
     }
 
     @GetMapping(value = "/{chatroomId:.+}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public DataResponse<ChatroomDetailResponse> getChatroom(@PathVariable String chatroomId,
-                                                            Session session) {
+    public DataResponse<ChatroomDetailResponse> getChatroom(Session session,
+                                                            @PathVariable String chatroomId) {
         return ChatroomResponseMapper.toChatroomDetailDataResponse(chatroomService.getChatroom(chatroomId));
+    }
+
+    @GetMapping(value = "/public/messsages", produces = MediaType.APPLICATION_JSON_VALUE)
+    public PagingResponse<MessageResponse> getPublicMessages(
+            Session session,
+            @RequestParam(required = false, defaultValue = "1") int page,
+            @RequestParam(required = false, defaultValue = "10") int size
+    ) {
+        return ChatroomResponseMapper.toMessagePagingResponse(
+                messageService.getMessages(chatroomService.getPublicChatroom().getId(), PageHelper.toPageable(page, size)));
     }
 
     @GetMapping(value = "/{chatroomId:.+}/messages", produces = MediaType.APPLICATION_JSON_VALUE)
     public PagingResponse<MessageResponse> getMessages(
+            Session session,
             @PathVariable String chatroomId,
             @RequestParam(required = false, defaultValue = "1") int page,
-            @RequestParam(required = false, defaultValue = "10") int size,
-            Session session
+            @RequestParam(required = false, defaultValue = "10") int size
     ) {
         return ChatroomResponseMapper.toMessagePagingResponse(
                 messageService.getMessages(chatroomId, PageHelper.toPageable(page, size)));
@@ -118,8 +127,8 @@ public class ChatroomController {
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public DataResponse<ChatroomDetailResponse> createChatroom(@RequestBody ChatroomRequest chatroomRequest,
-                                                               Session session) {
+    public DataResponse<ChatroomDetailResponse> createChatroom(Session session,
+                                                               @RequestBody ChatroomRequest chatroomRequest) {
         return ChatroomResponseMapper.toChatroomDetailDataResponse(chatroomService
                 .createChatroom(chatroomRequestMapper.toChatroom(chatroomRequest, null)));
     }
@@ -128,8 +137,8 @@ public class ChatroomController {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(value = HttpStatus.CREATED)
-    public BaseResponse createMessage(@PathVariable String chatroomId, @RequestBody MessageRequest messageRequest,
-                                      Session session) {
+    public BaseResponse createMessage(Session session,
+                                      @PathVariable String chatroomId, @RequestBody MessageRequest messageRequest) {
         Message message = messageService.createMessage(messageRequestMapper.toMessage(messageRequest, session.getUserId(), chatroomId));
         Chatroom chatroom = chatroomService.getChatroom(chatroomId);
         chatroom.getMembers().forEach(member -> messageStatusService.createMessageStatus(MessageStatus.builder()
@@ -145,15 +154,15 @@ public class ChatroomController {
     @PutMapping(value = "/{chatroomId:.+}",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public DataResponse<ChatroomDetailResponse> updateChatroom(@PathVariable String chatroomId, @RequestBody ChatroomRequest chatroomRequest,
-                                                               Session session) {
+    public DataResponse<ChatroomDetailResponse> updateChatroom(Session session, @PathVariable String chatroomId,
+                                                               @RequestBody ChatroomRequest chatroomRequest) {
         return ChatroomResponseMapper.toChatroomDetailDataResponse(
                 chatroomService.updateChatroom(chatroomRequestMapper.toChatroom(chatroomRequest, chatroomId)));
     }
 
     @PutMapping(value = "/{chatroomId:.+}/messages/{messageId:.+}/_read", produces = MediaType.APPLICATION_JSON_VALUE)
-    public BaseResponse updateMessageStatus(@PathVariable String chatroomId, @PathVariable String messageId,
-                                            Session session) {
+    public BaseResponse updateMessageStatus(Session session, @PathVariable String chatroomId,
+                                            @PathVariable String messageId) {
         messageStatusService.updateSeenStatus(chatroomId, messageId, session.getUserId());
         return ResponseHelper.toBaseResponse(HttpStatus.OK);
     }

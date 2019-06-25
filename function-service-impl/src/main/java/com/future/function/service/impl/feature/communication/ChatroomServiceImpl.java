@@ -84,6 +84,12 @@ public class ChatroomServiceImpl implements ChatroomService {
             .orElse(chatroom);
   }
 
+  @Override
+  public Chatroom getPublicChatroom() {
+    return chatroomRepository.findByType(ChatroomType.PUBLIC.name())
+            .orElseThrow(() -> new NotFoundException("Chatroom not found"));
+  }
+
   private Chatroom setChatroomName(Chatroom chatroom) {
     if (chatroom.getType().equals(ChatroomType.PRIVATE)) {
       chatroom.setTitle(chatroom.getMembers().get(0).getName() + " " + chatroom.getMembers().get(1).getName());
