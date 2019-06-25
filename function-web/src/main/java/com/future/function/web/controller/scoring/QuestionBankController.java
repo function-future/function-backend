@@ -3,6 +3,7 @@ package com.future.function.web.controller.scoring;
 import com.future.function.common.enumeration.core.Role;
 import com.future.function.service.api.feature.scoring.QuestionBankService;
 import com.future.function.session.annotation.WithAnyRole;
+import com.future.function.session.model.Session;
 import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.mapper.request.scoring.QuestionBankRequestMapper;
@@ -54,7 +55,7 @@ public class QuestionBankController {
   @ResponseStatus(value = HttpStatus.OK)
   @GetMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
   @WithAnyRole(roles = Role.ADMIN)
-  public DataResponse<QuestionBankWebResponse> findQuestionBankById(@PathVariable String id) {
+  public DataResponse<QuestionBankWebResponse> findQuestionBankById(@PathVariable String id, Session session) {
     return QuestionBankResponseMapper
         .toQuestionBankWebResponse(questionBankService.findById(id));
   }
@@ -62,7 +63,8 @@ public class QuestionBankController {
   @ResponseStatus(value = HttpStatus.CREATED)
   @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
   @WithAnyRole(roles = Role.ADMIN)
-  public DataResponse<QuestionBankWebResponse> createQuestionBank(@RequestBody QuestionBankWebRequest request) {
+  public DataResponse<QuestionBankWebResponse> createQuestionBank(@RequestBody QuestionBankWebRequest request,
+      Session session) {
     return QuestionBankResponseMapper
         .toQuestionBankWebResponse(
             HttpStatus.CREATED, questionBankService.createQuestionBank(requestMapper.toQuestionBank(request)));
@@ -72,7 +74,7 @@ public class QuestionBankController {
   @PutMapping(path = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
   @WithAnyRole(roles = Role.ADMIN)
   public DataResponse<QuestionBankWebResponse> updateQuestionBank(@PathVariable String id,
-      @RequestBody QuestionBankWebRequest request) {
+      @RequestBody QuestionBankWebRequest request, Session session) {
     return QuestionBankResponseMapper
         .toQuestionBankWebResponse(questionBankService.updateQuestionBank(requestMapper.toQuestionBank(id, request)));
   }
@@ -80,7 +82,7 @@ public class QuestionBankController {
   @ResponseStatus(value = HttpStatus.OK)
   @DeleteMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
   @WithAnyRole(roles = Role.ADMIN)
-  public BaseResponse deleteQuestionBankById(@PathVariable String id) {
+  public BaseResponse deleteQuestionBankById(@PathVariable String id, Session session) {
     questionBankService.deleteById(id);
     return ResponseHelper.toBaseResponse(HttpStatus.OK);
   }

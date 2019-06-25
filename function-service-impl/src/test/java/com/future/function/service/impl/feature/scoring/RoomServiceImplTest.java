@@ -94,7 +94,7 @@ public class RoomServiceImplTest {
 
   @Test
   public void findById() {
-    Room actual = roomService.findById(ROOM_ID);
+    Room actual = roomService.findById(ROOM_ID, USER_ID);
     assertThat(actual).isEqualTo(room);
     verify(roomRepository).findByIdAndDeletedFalse(ROOM_ID);
   }
@@ -137,7 +137,7 @@ public class RoomServiceImplTest {
   @Test
   public void giveScoreToRoomByRoomId() {
     room.setPoint(100);
-    Room actual = roomService.giveScoreToRoomByRoomId(ROOM_ID, 100);
+    Room actual = roomService.giveScoreToRoomByRoomId(ROOM_ID, USER_ID, 100);
     assertThat(actual.getId()).isEqualTo(ROOM_ID);
     assertThat(actual.getPoint()).isEqualTo(100);
     verify(roomRepository).findByIdAndDeletedFalse(ROOM_ID);

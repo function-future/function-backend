@@ -3,6 +3,7 @@ package com.future.function.web.controller.scoring;
 import com.future.function.common.enumeration.core.Role;
 import com.future.function.service.api.feature.scoring.RoomService;
 import com.future.function.session.annotation.WithAnyRole;
+import com.future.function.session.model.Session;
 import com.future.function.web.mapper.request.scoring.CommentRequestMapper;
 import com.future.function.web.mapper.response.scoring.CommentResponseMapper;
 import com.future.function.web.model.request.scoring.CommentWebRequest;
@@ -37,7 +38,8 @@ public class CommentController {
     @ResponseStatus(HttpStatus.OK)
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @WithAnyRole(roles = {Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT})
-    public DataResponse<List<CommentWebResponse>> findAllCommentsByRoomId(@PathVariable(value = "roomId") String roomId) {
+    public DataResponse<List<CommentWebResponse>> findAllCommentsByRoomId(@PathVariable(value = "roomId") String roomId,
+        Session session) {
         return CommentResponseMapper
                 .toDataListCommentWebResponse(roomService.findAllCommentsByRoomId(roomId));
     }
@@ -46,7 +48,7 @@ public class CommentController {
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @WithAnyRole(roles = {Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT})
     public DataResponse<CommentWebResponse> createComment(@PathVariable(value = "roomId") String roomId,
-                                                          @RequestBody CommentWebRequest webRequest) {
+        @RequestBody CommentWebRequest webRequest, Session session) {
         return CommentResponseMapper
                 .toDataCommentWebResponse(
                         HttpStatus.CREATED,

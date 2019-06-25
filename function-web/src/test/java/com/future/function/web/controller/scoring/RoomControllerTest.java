@@ -121,9 +121,9 @@ public class RoomControllerTest extends TestHelper {
 
     when(assignmentService.findAllRoomsByAssignmentId(ASSIGNMENT_ID, pageable))
         .thenReturn(roomPage);
-    when(assignmentService.giveScoreToRoomByRoomId(ROOM_ID, 100))
+    when(assignmentService.giveScoreToRoomByRoomId(ROOM_ID, USER_ID, 100))
         .thenReturn(room);
-    when(assignmentService.findRoomById(ROOM_ID))
+    when(assignmentService.findRoomById(ROOM_ID, USER_ID))
         .thenReturn(room);
   }
 
@@ -154,7 +154,8 @@ public class RoomControllerTest extends TestHelper {
         .andExpect(content().json(
             dataResponseJacksonTester.write(DATA_RESPONSE)
                 .getJson()));
-    verify(assignmentService).findRoomById(ROOM_ID);
+    verify(assignmentService).findRoomById(ROOM_ID, USER_ID);
+
   }
 
   @Test
@@ -166,7 +167,7 @@ public class RoomControllerTest extends TestHelper {
         .andExpect(status().isOk())
         .andExpect(content().json(
             dataResponseJacksonTester.write(DATA_RESPONSE).getJson()));
-    verify(assignmentService).giveScoreToRoomByRoomId(ROOM_ID, 100);
+    verify(assignmentService).giveScoreToRoomByRoomId(ROOM_ID, USER_ID, 100);
   }
 
   @Test

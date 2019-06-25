@@ -41,7 +41,8 @@ public class RoomController {
     @WithAnyRole(roles = {Role.ADMIN, Role.JUDGE, Role.MENTOR})
     public PagingResponse<RoomWebResponse> findAllRoomsByAssignmentId(@PathVariable(value = "assignmentId") String assignmentId,
                                                                       @RequestParam(required = false, defaultValue = "1") int page,
-                                                                      @RequestParam(required = false, defaultValue = "10") int size) {
+        @RequestParam(required = false, defaultValue = "10") int size,
+        Session session) {
         return RoomResponseMapper
                 .toPagingRoomWebResponse(assignmentService
                         .findAllRoomsByAssignmentId(assignmentId, PageHelper.toPageable(1, 10)));
@@ -68,7 +69,7 @@ public class RoomController {
     @ResponseStatus(HttpStatus.OK)
     @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @WithAnyRole(roles = Role.ADMIN)
-    public BaseResponse deleteRoomById(@PathVariable(value = "id") String id) {
+    public BaseResponse deleteRoomById(@PathVariable(value = "id") String id, Session session) {
         assignmentService.deleteRoomById(id);
         return ResponseHelper.toBaseResponse(HttpStatus.OK);
     }

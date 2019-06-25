@@ -3,6 +3,7 @@ package com.future.function.web.controller.scoring;
 import com.future.function.common.enumeration.core.Role;
 import com.future.function.service.api.feature.scoring.QuizService;
 import com.future.function.session.annotation.WithAnyRole;
+import com.future.function.session.model.Session;
 import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.mapper.request.scoring.QuizRequestMapper;
@@ -57,7 +58,8 @@ public class QuizController {
   public PagingResponse<QuizWebResponse> getAllQuiz(
       @PathVariable(value = "batchCode") String batchCode,
       @RequestParam(required = false, defaultValue = "1") int page,
-      @RequestParam(required = false, defaultValue = "10") int size
+      @RequestParam(required = false, defaultValue = "10") int size,
+      Session session
   ) {
     return QuizResponseMapper
         .toQuizWebPagingResponse(
@@ -73,14 +75,14 @@ public class QuizController {
   @ResponseStatus(value = HttpStatus.OK)
   @GetMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
   @WithAnyRole(roles = {Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT})
-  public DataResponse<QuizWebResponse> getQuizById(@PathVariable String id) {
+  public DataResponse<QuizWebResponse> getQuizById(@PathVariable String id, Session session) {
     return QuizResponseMapper.toQuizWebDataResponse(quizService.findById(id));
   }
 
   @ResponseStatus(HttpStatus.CREATED)
   @PostMapping(value = "/copy", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
   @WithAnyRole(roles = Role.ADMIN)
-  public DataResponse<QuizWebResponse> copyQuiz(@RequestBody CopyQuizWebRequest request) {
+  public DataResponse<QuizWebResponse> copyQuiz(@RequestBody CopyQuizWebRequest request, Session session) {
     request = quizRequestMapper.validateCopyQuizWebRequest(request);
     return QuizResponseMapper
         .toQuizWebDataResponse(
@@ -97,7 +99,7 @@ public class QuizController {
   @ResponseStatus(value = HttpStatus.CREATED)
   @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
   @WithAnyRole(roles = Role.ADMIN)
-  public DataResponse<QuizWebResponse> createQuiz(@RequestBody QuizWebRequest quizWebRequest) {
+  public DataResponse<QuizWebResponse> createQuiz(@RequestBody QuizWebRequest quizWebRequest, Session session) {
     return QuizResponseMapper
         .toQuizWebDataResponse(HttpStatus.CREATED, quizService.createQuiz(quizRequestMapper.toQuiz(quizWebRequest)));
   }
@@ -112,7 +114,8 @@ public class QuizController {
   @ResponseStatus(value = HttpStatus.OK)
   @PutMapping(path = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
   @WithAnyRole(roles = Role.ADMIN)
-  public DataResponse<QuizWebResponse> updateQuiz(@PathVariable String id, @RequestBody QuizWebRequest request) {
+  public DataResponse<QuizWebResponse> updateQuiz(@PathVariable String id, @RequestBody QuizWebRequest request,
+      Session session) {
     return QuizResponseMapper.toQuizWebDataResponse(quizService.updateQuiz(quizRequestMapper.toQuiz(id, request)));
   }
 
@@ -125,7 +128,7 @@ public class QuizController {
   @ResponseStatus(value = HttpStatus.OK)
   @DeleteMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
   @WithAnyRole(roles = Role.ADMIN)
-  public BaseResponse deleteQuizById(@PathVariable String id) {
+  public BaseResponse deleteQuizById(@PathVariable String id, Session session) {
     quizService.deleteById(id);
     return ResponseHelper.toBaseResponse(HttpStatus.OK);
   }

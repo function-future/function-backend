@@ -3,6 +3,7 @@ package com.future.function.web.controller.scoring;
 import com.future.function.common.enumeration.core.Role;
 import com.future.function.service.api.feature.scoring.QuestionService;
 import com.future.function.session.annotation.WithAnyRole;
+import com.future.function.session.model.Session;
 import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.mapper.request.scoring.QuestionRequestMapper;
@@ -46,7 +47,8 @@ public class QuestionController {
   @WithAnyRole(roles = Role.ADMIN)
   public PagingResponse<QuestionWebResponse> getAllQuestionForQuestionBank(@PathVariable String questionBankId,
       @RequestParam(required = false, defaultValue = "1") int page,
-      @RequestParam(required = false, defaultValue = "10") int size) {
+      @RequestParam(required = false, defaultValue = "10") int size,
+      Session session) {
     return QuestionResponseMapper
         .toQuestionPagingResponse(
             questionService.findAllByQuestionBankId(questionBankId, PageHelper.toPageable(page, size)));
@@ -55,7 +57,7 @@ public class QuestionController {
   @ResponseStatus(HttpStatus.OK)
   @GetMapping(path = "/{questionId}", produces = MediaType.APPLICATION_JSON_VALUE)
   @WithAnyRole(roles = Role.ADMIN)
-  public DataResponse<QuestionWebResponse> getQuestionDetailById(@PathVariable String questionId) {
+  public DataResponse<QuestionWebResponse> getQuestionDetailById(@PathVariable String questionId, Session session) {
     return QuestionResponseMapper.toQuestionWebResponse(questionService.findById(questionId));
   }
 
@@ -63,7 +65,7 @@ public class QuestionController {
   @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
   @WithAnyRole(roles = Role.ADMIN)
   public DataResponse<QuestionWebResponse> createQuestionForQuestionBank(@PathVariable String questionBankId,
-      @RequestBody QuestionWebRequest request) {
+      @RequestBody QuestionWebRequest request, Session session) {
     return QuestionResponseMapper
         .toQuestionWebResponse(
             HttpStatus.CREATED,
@@ -76,7 +78,7 @@ public class QuestionController {
   @WithAnyRole(roles = Role.ADMIN)
   public DataResponse<QuestionWebResponse> updateQuestionForQuestionBank(@PathVariable String questionBankId,
       @PathVariable String questionId,
-      @RequestBody QuestionWebRequest request) {
+      @RequestBody QuestionWebRequest request, Session session) {
     return QuestionResponseMapper
         .toQuestionWebResponse(
             HttpStatus.OK,
@@ -86,7 +88,7 @@ public class QuestionController {
   @ResponseStatus(HttpStatus.OK)
   @DeleteMapping(path = "/{questionId}", produces = MediaType.APPLICATION_JSON_VALUE)
   @WithAnyRole(roles = Role.ADMIN)
-  public BaseResponse deleteQuestionFromQuestionBank(@PathVariable String questionId) {
+  public BaseResponse deleteQuestionFromQuestionBank(@PathVariable String questionId, Session session) {
     questionService.deleteById(questionId);
     return ResponseHelper.toBaseResponse(HttpStatus.OK);
   }

@@ -127,9 +127,9 @@ public class StudentQuizControllerTest {
     pagingResponse = StudentQuizResponseMapper
         .toPagingStudentQuizWebResponse(studentQuizPage);
 
-    when(studentQuizService.findAllByStudentId(STUDENT_ID, pageable))
+    when(studentQuizService.findAllByStudentId(STUDENT_ID, pageable, STUDENT_ID))
         .thenReturn(studentQuizPage);
-    when(studentQuizService.findById(STUDENT_QUIZ_ID))
+    when(studentQuizService.findById(STUDENT_QUIZ_ID, STUDENT_ID))
         .thenReturn(studentQuiz);
   }
 
@@ -149,7 +149,7 @@ public class StudentQuizControllerTest {
             pagingResponseJacksonTester.write(
                 pagingResponse).getJson()
         ));
-    verify(studentQuizService).findAllByStudentId(STUDENT_ID, pageable);
+    verify(studentQuizService).findAllByStudentId(STUDENT_ID, pageable, STUDENT_ID);
   }
 
   @Test
@@ -161,6 +161,6 @@ public class StudentQuizControllerTest {
             dataResponseJacksonTester.write(
                 dataResponse).getJson()
         ));
-    verify(studentQuizService).findById(STUDENT_QUIZ_ID);
+    verify(studentQuizService).findById(STUDENT_QUIZ_ID, STUDENT_ID);
   }
 }

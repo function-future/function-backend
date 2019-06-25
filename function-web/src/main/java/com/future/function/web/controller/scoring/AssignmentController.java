@@ -3,6 +3,7 @@ package com.future.function.web.controller.scoring;
 import com.future.function.common.enumeration.core.Role;
 import com.future.function.service.api.feature.scoring.AssignmentService;
 import com.future.function.session.annotation.WithAnyRole;
+import com.future.function.session.model.Session;
 import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.mapper.request.scoring.AssignmentRequestMapper;
@@ -57,8 +58,8 @@ public class AssignmentController {
   public PagingResponse<AssignmentWebResponse> findAllAssignment(
       @PathVariable(value = "batchCode") String batchCode,
       @RequestParam(required = false, defaultValue = "1") int page,
-      @RequestParam(required = false, defaultValue = "10") int size
-  ) {
+      @RequestParam(required = false, defaultValue = "10") int size,
+      Session session) {
     return AssignmentResponseMapper
         .toAssignmentsPagingResponse(
             assignmentService.findAllByBatchCodeAndPageable(batchCode, PageHelper.toPageable(page, size)));
@@ -72,7 +73,8 @@ public class AssignmentController {
    */
   @ResponseStatus(value = HttpStatus.OK)
   @GetMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-  public DataResponse<AssignmentWebResponse> findAssignmentById(@PathVariable String id) {
+  @WithAnyRole(roles = {Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT})
+  public DataResponse<AssignmentWebResponse> findAssignmentById(@PathVariable String id, Session session) {
     return AssignmentResponseMapper.toAssignmentDataResponse(assignmentService.findById(id));
   }
 
@@ -86,7 +88,7 @@ public class AssignmentController {
   @ResponseStatus(value = HttpStatus.CREATED)
   @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
   @WithAnyRole(roles = Role.ADMIN)
-  public DataResponse<AssignmentWebResponse> createAssignment(@RequestBody AssignmentWebRequest data) {
+  public DataResponse<AssignmentWebResponse> createAssignment(@RequestBody AssignmentWebRequest data, Session session) {
     return AssignmentResponseMapper
         .toAssignmentDataResponse(HttpStatus.CREATED, assignmentService
             .createAssignment(assignmentRequestMapper.toAssignment(data)));
@@ -95,7 +97,8 @@ public class AssignmentController {
   @ResponseStatus(value = HttpStatus.CREATED)
   @PostMapping(path = "/copy", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
   @WithAnyRole(roles = Role.ADMIN)
-  public DataResponse<AssignmentWebResponse> copyAssignment(@RequestBody CopyAssignmentWebRequest request) {
+  public DataResponse<AssignmentWebResponse> copyAssignment(@RequestBody CopyAssignmentWebRequest request,
+      Session session) {
     return AssignmentResponseMapper
         .toAssignmentDataResponse(HttpStatus.CREATED, assignmentService
             .copyAssignment(request.getAssignmentId(), request.getTargetBatch()));
@@ -111,7 +114,7 @@ public class AssignmentController {
   @PutMapping(path = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
   @WithAnyRole(roles = Role.ADMIN)
   public DataResponse<AssignmentWebResponse> updateAssignment(@PathVariable String id,
-      @RequestBody AssignmentWebRequest data) {
+      @RequestBody AssignmentWebRequest data, Session session) {
     return AssignmentResponseMapper.toAssignmentDataResponse(assignmentService
         .updateAssignment(assignmentRequestMapper.toAssignmentWithId(id, data)));
   }
@@ -125,7 +128,7 @@ public class AssignmentController {
   @ResponseStatus(value = HttpStatus.OK)
   @DeleteMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
   @WithAnyRole(roles = Role.ADMIN)
-  public BaseResponse deleteAssignmentById(@PathVariable String id) {
+  public BaseResponse deleteAssignmentById(@PathVariable String id, Session session) {
     assignmentService.deleteById(id);
     return ResponseHelper.toBaseResponse(HttpStatus.OK);
   }

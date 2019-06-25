@@ -184,7 +184,7 @@ public class StudentQuizServiceImplTest {
 
   @Test
   public void findAllByStudentId() {
-    Page<StudentQuiz> actual = studentQuizService.findAllByStudentId(USER_ID, pageable);
+    Page<StudentQuiz> actual = studentQuizService.findAllByStudentId(USER_ID, pageable, USER_ID);
     assertThat(actual.getTotalElements()).isEqualTo(1);
     assertThat(actual.getContent().get(0).getId()).isEqualTo(STUDENT_QUIZ_ID);
     assertThat(actual.getContent().get(0).getTrials()).isEqualTo(QUIZ_TRIALS);
@@ -193,7 +193,7 @@ public class StudentQuizServiceImplTest {
 
   @Test
   public void findById() {
-    StudentQuiz studentQuiz = studentQuizService.findById(STUDENT_QUIZ_ID);
+    StudentQuiz studentQuiz = studentQuizService.findById(STUDENT_QUIZ_ID, USER_ID);
     assertThat(studentQuiz.getId()).isEqualTo(STUDENT_QUIZ_ID);
     assertThat(studentQuiz.getTrials()).isEqualTo(QUIZ_TRIALS);
     verify(studentQuizRepository).findByIdAndDeletedFalse(STUDENT_QUIZ_ID);
@@ -201,14 +201,14 @@ public class StudentQuizServiceImplTest {
 
   @Test
   public void findAllQuestionsByStudentQuizId() {
-    List<StudentQuestion> actual = studentQuizService.findAllQuestionsByStudentQuizId(STUDENT_QUIZ_ID);
+    List<StudentQuestion> actual = studentQuizService.findAllQuestionsByStudentQuizId(STUDENT_QUIZ_ID, USER_ID);
     assertThat(actual.size()).isEqualTo(1);
     verify(studentQuizDetailService).findAllQuestionsByStudentQuizId(STUDENT_QUIZ_ID);
   }
 
   @Test
   public void findAllUnansweredQuestionsByStudentQuizId() {
-    List<StudentQuestion> actual = studentQuizService.findAllUnansweredQuestionByStudentQuizId(STUDENT_QUIZ_ID);
+    List<StudentQuestion> actual = studentQuizService.findAllUnansweredQuestionByStudentQuizId(STUDENT_QUIZ_ID, USER_ID);
     assertThat(actual.size()).isEqualTo(1);
     verify(studentQuizDetailService).findAllUnansweredQuestionsByStudentQuizId(STUDENT_QUIZ_ID);
     verify(studentQuizRepository).findByIdAndDeletedFalse(STUDENT_QUIZ_ID);
@@ -218,7 +218,7 @@ public class StudentQuizServiceImplTest {
 
   @Test
   public void answerQuestionsByStudentQuizId() {
-    StudentQuizDetail actual = studentQuizService.answerQuestionsByStudentQuizId(STUDENT_QUIZ_ID,
+    StudentQuizDetail actual = studentQuizService.answerQuestionsByStudentQuizId(STUDENT_QUIZ_ID, USER_ID,
         Collections.singletonList(studentQuestion));
     assertThat(actual.getStudentQuiz().getId()).isEqualTo(STUDENT_QUIZ_ID);
     verify(studentQuizDetailService).answerStudentQuiz(STUDENT_QUIZ_ID, Collections.singletonList(studentQuestion));

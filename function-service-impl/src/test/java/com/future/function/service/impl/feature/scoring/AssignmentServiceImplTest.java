@@ -45,6 +45,7 @@ public class AssignmentServiceImplTest {
   private static final String ASSIGNMENT_DESCRIPTION = "assignment-description";
   private static final long ASSIGNMENT_DEADLINE = new Date().getTime();
   private static final String BATCH_CODE = "batchCode";
+  private static final String USER_ID = "userId";
 
   private static final String ROOM_ID = "room-id";
 
@@ -118,9 +119,9 @@ public class AssignmentServiceImplTest {
     when(resourceService.markFilesUsed(Collections.singletonList(FILE_ID), true)).thenReturn(true);
     when(resourceService.markFilesUsed(Collections.singletonList(FILE_ID), false)).thenReturn(true);
     when(roomService.createRoomsByAssignment(assignment)).thenReturn(assignment);
-    when(roomService.findById(ROOM_ID)).thenReturn(room);
+    when(roomService.findById(ROOM_ID, USER_ID)).thenReturn(room);
     when(roomService.findAllRoomsByAssignmentId(any(String.class), eq(pageable))).thenReturn(roomPage);
-    when(roomService.giveScoreToRoomByRoomId(ROOM_ID, 100)).thenReturn(room);
+    when(roomService.giveScoreToRoomByRoomId(ROOM_ID, USER_ID, 100)).thenReturn(room);
   }
 
   @After
@@ -267,17 +268,17 @@ public class AssignmentServiceImplTest {
 
   @Test
   public void findRoomByIdTest() {
-    Room actual = assignmentService.findRoomById(ROOM_ID);
+    Room actual = assignmentService.findRoomById(ROOM_ID, USER_ID);
     assertThat(actual).isNotNull();
     assertThat(actual).isEqualTo(room);
-    verify(roomService).findById(ROOM_ID);
+    verify(roomService).findById(ROOM_ID, USER_ID);
   }
 
   @Test
   public void giveScoreToRoom() {
-    Room actual = assignmentService.giveScoreToRoomByRoomId(ROOM_ID, 100);
+    Room actual = assignmentService.giveScoreToRoomByRoomId(ROOM_ID, USER_ID, 100);
     assertThat(actual).isEqualTo(room);
-    verify(roomService).giveScoreToRoomByRoomId(ROOM_ID, 100);
+    verify(roomService).giveScoreToRoomByRoomId(ROOM_ID, USER_ID, 100);
   }
 
   @Test

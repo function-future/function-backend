@@ -126,7 +126,7 @@ public class StudentQuizServiceImpl implements StudentQuizService {
         .map(studentQuiz -> studentQuiz.get(0))
         .map(this::createStudentQuizDetailAndSave)
         .map(returnValue -> quiz)
-        .orElseThrow(() -> new UnsupportedOperationException("Batch code is null"));
+        .orElseThrow(() -> new UnsupportedOperationException("Create Student Quiz Failed"));
   }
 
   private StudentQuizDetail createStudentQuizDetailAndSave(StudentQuiz studentQuiz) {
