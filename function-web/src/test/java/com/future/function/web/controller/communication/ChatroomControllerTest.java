@@ -4,6 +4,7 @@ import com.future.function.common.enumeration.communication.ChatroomType;
 import com.future.function.common.enumeration.core.Role;
 import com.future.function.model.entity.feature.communication.chatting.Chatroom;
 import com.future.function.model.entity.feature.communication.chatting.Message;
+import com.future.function.model.entity.feature.communication.chatting.MessageStatus;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.service.api.feature.communication.ChatroomService;
 import com.future.function.service.api.feature.communication.MessageService;
@@ -241,16 +242,20 @@ public class ChatroomControllerTest extends TestHelper {
         super.setCookie(Role.ADMIN);
 
         when(messageRequestMapper.toMessage(MESSAGE_REQUEST, MEMBER_ID_1, CHATROOM_ID)).thenReturn(MESSAGE);
-        doNothing().when(messageService).setMessageToAChatroom(MESSAGE, CHATROOM_ID, MEMBER_ID_1);
+        when(messageService.createMessage(MESSAGE)).thenReturn(MESSAGE);
+        when(chatroomService.getChatroom(CHATROOM_ID)).thenReturn(CHATROOM);
+        when(messageStatusService.createMessageStatus(any(MessageStatus.class))).thenReturn(null);
 
         mockMvc.perform(post("/api/communication/chatrooms/" + CHATROOM_ID + "/messages").cookie(cookies)
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .content(messageRequestJacksonTester.write(MESSAGE_REQUEST).getJson()))
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(messageRequestJacksonTester.write(MESSAGE_REQUEST).getJson()))
                 .andExpect(status().isCreated())
                 .andExpect(content().json(baseResponseJacksonTester.write(ResponseHelper.toBaseResponse(HttpStatus.CREATED)).getJson()));
 
         verify(messageRequestMapper).toMessage(MESSAGE_REQUEST, MEMBER_ID_1, CHATROOM_ID);
-        verify(messageService).setMessageToAChatroom(MESSAGE, CHATROOM_ID, MEMBER_ID_1);
+        verify(messageService).createMessage(MESSAGE);
+        verify(messageStatusService, times(2)).createMessageStatus(any(MessageStatus.class));
+        verify(chatroomService).getChatroom(CHATROOM_ID);
     }
 
     @Test
