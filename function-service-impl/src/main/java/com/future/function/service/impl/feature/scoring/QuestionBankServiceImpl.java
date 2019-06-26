@@ -4,6 +4,7 @@ import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.scoring.QuestionBank;
 import com.future.function.repository.feature.scoring.QuestionBankRepository;
 import com.future.function.service.api.feature.scoring.QuestionBankService;
+import com.future.function.service.impl.helper.CopyHelper;
 import java.util.Optional;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +50,7 @@ public class QuestionBankServiceImpl implements QuestionBankService {
   }
 
   private QuestionBank mergeFoundAndNewQuestionBankThenSave(QuestionBank foundQuestionBank, QuestionBank questionBank) {
-    BeanUtils.copyProperties(questionBank, foundQuestionBank);
+    CopyHelper.copyProperties(questionBank, foundQuestionBank);
     return questionBankRepository.save(foundQuestionBank);
   }
 

@@ -127,7 +127,7 @@ public class QuestionBankControllerTest extends TestHelper {
         .thenReturn(questionBank);
 
     mockMvc.perform(
-        get("/api/question-banks/" + QUESTION_BANK_ID)
+        get("/api/scoring/question-banks/" + QUESTION_BANK_ID)
             .cookie(cookies)
     )
         .andExpect(status().isOk())
@@ -142,7 +142,7 @@ public class QuestionBankControllerTest extends TestHelper {
   @Test
   public void testDeleteQuestionBankById() throws Exception {
     mockMvc.perform(
-        delete("/api/question-banks/" + QUESTION_BANK_ID)
+        delete("/api/scoring/question-banks/" + QUESTION_BANK_ID)
             .cookie(cookies)
     )
         .andExpect(status().isOk())
@@ -161,7 +161,7 @@ public class QuestionBankControllerTest extends TestHelper {
         .thenReturn(questionBankPage);
 
     mockMvc.perform(
-        get("/api/question-banks")
+        get("/api/scoring/question-banks")
             .param("page", "1")
             .param("size", "10")
     )
@@ -181,7 +181,7 @@ public class QuestionBankControllerTest extends TestHelper {
         .thenReturn(questionBankPage);
 
     mockMvc.perform(
-        get("/api/question-banks")
+        get("/api/scoring/question-banks")
     )
         .andExpect(status().isOk())
         .andExpect(content().json(
@@ -201,7 +201,7 @@ public class QuestionBankControllerTest extends TestHelper {
         .thenReturn(questionBank);
 
     mockMvc.perform(
-        post("/api/question-banks")
+        post("/api/scoring/question-banks")
             .cookie(cookies)
             .content(QUESTION_BANK_CREATE_REQUEST_JSON)
             .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -225,7 +225,7 @@ public class QuestionBankControllerTest extends TestHelper {
         .thenReturn(questionBank);
 
     mockMvc.perform(
-        put("/api/question-banks/" + QUESTION_BANK_ID)
+        put("/api/scoring/question-banks/" + QUESTION_BANK_ID)
             .cookie(cookies)
             .content(QUESTION_BANK_UPDATE_REQUEST_JSON)
             .contentType(MediaType.APPLICATION_JSON_VALUE)

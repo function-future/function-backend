@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(value = "/api/question-banks")
+@RequestMapping(value = "/api/scoring/question-banks")
 public class QuestionBankController {
 
   private QuestionBankService questionBankService;

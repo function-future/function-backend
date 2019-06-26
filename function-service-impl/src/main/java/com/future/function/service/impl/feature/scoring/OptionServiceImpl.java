@@ -4,6 +4,7 @@ import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.scoring.Option;
 import com.future.function.repository.feature.scoring.OptionRepository;
 import com.future.function.service.api.feature.scoring.OptionService;
+import com.future.function.service.impl.helper.CopyHelper;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.BeanUtils;
@@ -45,7 +46,7 @@ public class OptionServiceImpl implements OptionService {
         .map(Option::getId)
         .flatMap(optionRepository::findByIdAndDeletedFalse)
         .map(oldOption -> {
-          BeanUtils.copyProperties(option, oldOption);
+          CopyHelper.copyProperties(option, oldOption);
           return optionRepository.save(oldOption);
         })
         .orElse(option);

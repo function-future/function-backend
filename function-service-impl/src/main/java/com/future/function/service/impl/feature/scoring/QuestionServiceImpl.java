@@ -8,10 +8,12 @@ import com.future.function.repository.feature.scoring.QuestionRepository;
 import com.future.function.service.api.feature.scoring.OptionService;
 import com.future.function.service.api.feature.scoring.QuestionBankService;
 import com.future.function.service.api.feature.scoring.QuestionService;
+import com.future.function.service.impl.helper.CopyHelper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Function;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -69,18 +71,20 @@ public class QuestionServiceImpl implements QuestionService {
     return list;
   }
 
-  private void searchOptionsForQuestion(Question question) {
+  private Question searchOptionsForQuestion(Question question) {
     question.setOptions(
         optionService
             .getOptionListByQuestionId(question.getId()
             )
     );
+    return question;
   }
 
   @Override
   public Question findById(String id) {
     return Optional.ofNullable(id)
         .flatMap(questionRepository::findByIdAndDeletedFalse)
+        .map(this::searchOptionsForQuestion)
         .orElseThrow(() -> new NotFoundException("Question not found"));
   }
 
@@ -123,7 +127,7 @@ public class QuestionServiceImpl implements QuestionService {
   }
 
   private Question convertAndSaveQuestion(Question question, List<Option> options, Question foundQuestion) {
-    BeanUtils.copyProperties(question, foundQuestion);
+    CopyHelper.copyProperties(question, foundQuestion);
     foundQuestion.setOptions(null);
     foundQuestion = questionRepository.save(foundQuestion);
     foundQuestion.setOptions(options);

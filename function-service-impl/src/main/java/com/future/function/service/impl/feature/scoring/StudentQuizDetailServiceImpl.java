@@ -7,6 +7,7 @@ import com.future.function.model.entity.feature.scoring.StudentQuizDetail;
 import com.future.function.repository.feature.scoring.StudentQuizDetailRepository;
 import com.future.function.service.api.feature.scoring.StudentQuestionService;
 import com.future.function.service.api.feature.scoring.StudentQuizDetailService;
+import com.future.function.service.impl.helper.CopyHelper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -60,9 +61,9 @@ public class StudentQuizDetailServiceImpl implements StudentQuizDetailService {
   }
 
   private StudentQuizDetail createNewStudentQuizDetail(String studentQuizId) {
-    StudentQuizDetail detail = new StudentQuizDetail();
+    StudentQuizDetail detail = StudentQuizDetail.builder().build();
     StudentQuizDetail source = this.findLatestByStudentQuizId(studentQuizId);
-    BeanUtils.copyProperties(source, detail, "_id");
+    CopyHelper.copyProperties(source, detail);
     return studentQuizDetailRepository.save(detail);
   }
 

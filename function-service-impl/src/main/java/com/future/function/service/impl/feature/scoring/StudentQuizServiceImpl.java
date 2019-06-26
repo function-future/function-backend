@@ -152,7 +152,7 @@ public class StudentQuizServiceImpl implements StudentQuizService {
   }
 
   private Quiz createNewQuiz(Quiz quiz) {
-    Quiz newQuiz = new Quiz();
+    Quiz newQuiz = Quiz.builder().build();
     BeanUtils.copyProperties(
         quiz,
         newQuiz,
