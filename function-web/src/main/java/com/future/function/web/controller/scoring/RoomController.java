@@ -40,7 +40,7 @@ public class RoomController {
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @WithAnyRole(roles = {Role.ADMIN, Role.JUDGE, Role.MENTOR})
     public PagingResponse<RoomWebResponse> findAllRoomsByAssignmentId(@PathVariable(value = "assignmentId") String assignmentId,
-                                                                      @RequestParam(required = false, defaultValue = "1") int page,
+        @RequestParam(required = false, defaultValue = "1") int page,
         @RequestParam(required = false, defaultValue = "10") int size,
         Session session) {
         return RoomResponseMapper

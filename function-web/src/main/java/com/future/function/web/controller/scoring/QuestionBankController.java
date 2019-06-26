@@ -46,7 +46,8 @@ public class QuestionBankController {
   @WithAnyRole(roles = Role.ADMIN)
   public PagingResponse<QuestionBankWebResponse> findAllQuestionBank(
       @RequestParam(required = false, defaultValue = "1") int page,
-      @RequestParam(required = false, defaultValue = "10") int size
+      @RequestParam(required = false, defaultValue = "10") int size,
+      Session session
   ) {
     return QuestionBankResponseMapper
         .toPagingQuestionBankWebResponse(questionBankService.findAllByPageable(PageHelper.toPageable(page, size)));
