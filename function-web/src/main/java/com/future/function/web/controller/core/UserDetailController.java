@@ -47,11 +47,9 @@ public class UserDetailController {
   
   @ResponseStatus(HttpStatus.OK)
   @GetMapping("/profile")
-  @WithAnyRole(roles = {
-    Role.STUDENT, Role.MENTOR, Role.JUDGE, Role.ADMIN
-  })
   public DataResponse<UserWebResponse> getProfile(
-    Session session
+    @WithAnyRole(roles = { Role.STUDENT, Role.MENTOR, Role.JUDGE, Role.ADMIN })
+      Session session
   ) {
     
     return UserResponseMapper.toUserDataResponse(
@@ -60,11 +58,9 @@ public class UserDetailController {
   
   @ResponseStatus(HttpStatus.OK)
   @PostMapping("/password")
-  @WithAnyRole(roles = {
-    Role.STUDENT, Role.MENTOR, Role.JUDGE, Role.ADMIN
-  })
   public BaseResponse changePassword(
-    Session session,
+    @WithAnyRole(roles = { Role.STUDENT, Role.MENTOR, Role.JUDGE, Role.ADMIN })
+      Session session,
     @RequestBody
       ChangePasswordWebRequest request
   ) {

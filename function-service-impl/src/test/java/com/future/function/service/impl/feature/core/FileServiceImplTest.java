@@ -50,8 +50,8 @@ public class FileServiceImplTest {
   
   private static final String NAME = "name";
   
-  private static final Session SESSION = new Session("session-id", EMAIL,
-                                                     Role.ADMIN
+  private static final Session SESSION = new Session( "session-id","user-id",
+                                                     EMAIL, Role.ADMIN
   );
   
   private FileV2 file = FileV2.builder()

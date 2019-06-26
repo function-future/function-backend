@@ -35,12 +35,14 @@ public class AuthServiceImplTest {
   
   private static final String SESSION_ID = "session-id";
   
+  private static final String USER_ID = "user-id";
+  
   private static final String EMAIL = "email";
   
   private static final String PASSWORD = "password";
   
   private static final Session SESSION = new Session(
-    SESSION_ID, EMAIL, Role.MENTOR);
+    SESSION_ID, USER_ID, EMAIL, Role.MENTOR);
   
   private static final User USER = User.builder()
     .id("id")

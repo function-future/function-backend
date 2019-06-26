@@ -1,7 +1,7 @@
 package com.future.function.service.impl.helper;
 
 import com.future.function.common.enumeration.core.Role;
-import com.future.function.common.exception.UnauthorizedException;
+import com.future.function.common.exception.ForbiddenException;
 import com.future.function.model.entity.base.BaseEntity;
 import org.junit.After;
 import org.junit.Before;
@@ -35,13 +35,13 @@ public class AuthorizationHelperTest {
   }
   
   @Test
-  public void testGivenEmailAndEntityAndInequalEmailAndEntityCreatorByCheckingIfUserWithEmailIsAuthorizedForEditReturnUnauthorizedException() {
+  public void testGivenEmailAndEntityAndInequalEmailAndEntityCreatorByCheckingIfUserWithEmailIsAuthorizedForEditReturnForbiddenException() {
     
     catchException(
       () -> AuthorizationHelper.isAuthorizedForEdit("", BASE_ENTITY));
     
     assertThat(caughtException().getClass()).isEqualTo(
-      UnauthorizedException.class);
+      ForbiddenException.class);
     assertThat(caughtException().getMessage()).isEqualTo("Invalid User Email");
   }
   
@@ -64,7 +64,7 @@ public class AuthorizationHelperTest {
   }
   
   @Test
-  public void testGivenEmailAndRoleAndEntityAndAllowedRolesAndNotMatchingAnyAllowedRolesReturnUnauthorizedException() {
+  public void testGivenEmailAndRoleAndEntityAndAllowedRolesAndNotMatchingAnyAllowedRolesReturnForbiddenException() {
     
     catchException(
       () -> AuthorizationHelper.isAuthorizedForEdit("", Role.STUDENT,
@@ -73,7 +73,7 @@ public class AuthorizationHelperTest {
       ));
     
     assertThat(caughtException().getClass()).isEqualTo(
-      UnauthorizedException.class);
+      ForbiddenException.class);
     assertThat(caughtException().getMessage()).isEqualTo("Invalid User Role");
   }
   

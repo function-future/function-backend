@@ -1,7 +1,7 @@
 package com.future.function.service.impl.feature.core;
 
 import com.future.function.common.enumeration.core.Role;
-import com.future.function.common.exception.UnauthorizedException;
+import com.future.function.common.exception.ForbiddenException;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.Course;
 import com.future.function.model.entity.feature.core.Discussion;
@@ -18,7 +18,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
@@ -52,14 +51,6 @@ public class DiscussionServiceImplTest {
   
   private static final Pageable PAGEABLE = new PageRequest(PAGE - 1, SIZE);
   
-  private static final Discussion DISCUSSION_FROM_REQUEST = Discussion.builder()
-    .id(ID)
-    .courseId(COURSE_ID)
-    .batchCode(BATCH_CODE)
-    .description(COMMENT)
-    .user(buildUser(null, null))
-    .build();
-  
   private static final User VALID_USER_MENTOR = User.builder()
     .id(USER_ID)
     .role(Role.MENTOR)
@@ -88,6 +79,8 @@ public class DiscussionServiceImplTest {
              .build())
     .build();
   
+  private Discussion discussionFromRequest;
+  
   @Mock
   private DiscussionRepository discussionRepository;
   
@@ -100,24 +93,26 @@ public class DiscussionServiceImplTest {
   @InjectMocks
   private DiscussionServiceImpl discussionService;
   
-  private static User buildUser(String id, String name) {
+  @Before
+  public void setUp() {
     
-    return User.builder()
-      .id(id)
+    User user = User.builder()
       .email(EMAIL)
-      .name(name)
+      .build();
+    discussionFromRequest = Discussion.builder()
+      .id(ID)
+      .courseId(COURSE_ID)
+      .batchCode(BATCH_CODE)
+      .description(COMMENT)
+      .user(user)
       .build();
   }
-  
-  @Before
-  public void setUp() {}
   
   @After
   public void tearDown() {
     
-    verifyNoMoreInteractions(discussionRepository, userService,
-                             sharedCourseService
-    );
+    verifyNoMoreInteractions(
+      discussionRepository, userService, sharedCourseService);
   }
   
   @Test
@@ -182,7 +177,7 @@ public class DiscussionServiceImplTest {
       ));
     
     assertThat(caughtException().getClass()).isEqualTo(
-      UnauthorizedException.class);
+      ForbiddenException.class);
     assertThat(caughtException().getMessage()).isEqualTo("Invalid Batch");
     
     verify(userService).getUserByEmail(EMAIL);
@@ -199,7 +194,7 @@ public class DiscussionServiceImplTest {
     when(discussionRepository.save(DISCUSSION)).thenReturn(DISCUSSION);
     
     Discussion discussion = discussionService.createDiscussion(
-      DISCUSSION_FROM_REQUEST);
+      discussionFromRequest);
     
     assertThat(discussion).isNotNull();
     assertThat(discussion).isEqualTo(DISCUSSION);
@@ -221,7 +216,7 @@ public class DiscussionServiceImplTest {
     )).thenReturn(null);
     
     catchException(
-      () -> discussionService.createDiscussion(DISCUSSION_FROM_REQUEST));
+      () -> discussionService.createDiscussion(discussionFromRequest));
     
     assertThat(caughtException().getClass()).isEqualTo(
       UnsupportedOperationException.class);
@@ -236,15 +231,15 @@ public class DiscussionServiceImplTest {
   }
   
   @Test
-  public void testGivenDiscussionWithInvalidUserByCreatingDiscussionReturnUnsupportedOperationException() {
+  public void testGivenDiscussionWithInvalidUserByCreatingDiscussionReturnForbiddenException() {
     
     when(userService.getUserByEmail(EMAIL)).thenReturn(INVALID_USER_STUDENT);
     
     catchException(
-      () -> discussionService.createDiscussion(DISCUSSION_FROM_REQUEST));
+      () -> discussionService.createDiscussion(discussionFromRequest));
     
     assertThat(caughtException().getClass()).isEqualTo(
-      UnauthorizedException.class);
+      ForbiddenException.class);
     assertThat(caughtException().getMessage()).isEqualTo("Invalid Batch");
     
     verify(userService).getUserByEmail(EMAIL);

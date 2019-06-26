@@ -41,8 +41,9 @@ public class AuthController {
       AuthWebRequest request, HttpServletResponse response
   ) {
     
-    return AuthResponseMapper.toAuthDataResponse(
-      authService.login(request.getEmail(), request.getPassword(), response));
+    return AuthResponseMapper.toAuthDataResponse(authService.login(
+      request.getEmail()
+        .toLowerCase(), request.getPassword(), response));
   }
   
   @ResponseStatus(HttpStatus.OK)
