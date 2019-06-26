@@ -264,7 +264,7 @@ public interface FieldName {
 
     public static final String COURSE_ID = "courseId";
 
-    public static final String BATCH_CODE = "batchCode";
+    public static final String BATCH_ID = "batchId";
 
   }
 
