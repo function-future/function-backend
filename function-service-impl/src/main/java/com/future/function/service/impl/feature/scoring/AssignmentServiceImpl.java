@@ -53,7 +53,7 @@ public class AssignmentServiceImpl implements AssignmentService {
   @Override
   public Page<Assignment> findAllByBatchCodeAndPageable(String batchCode, Pageable pageable) {
     Batch batch = batchService.getBatchByCode(batchCode);
-    return assignmentRepository.findAllByBatchCode(batch.getCode(), pageable);
+    return assignmentRepository.findAllByBatch(batch, pageable);
   }
 
   /**

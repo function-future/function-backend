@@ -124,9 +124,9 @@ public class StudentQuizControllerTest extends TestHelper {
     pagingResponse = StudentQuizResponseMapper
         .toPagingStudentQuizWebResponse(studentQuizPage);
 
-    when(studentQuizService.findAllByStudentId(STUDENT_ID, pageable, ADMIN_SESSION_ID))
+    when(studentQuizService.findAllByStudentId(STUDENT_ID, pageable, ADMIN_ID))
         .thenReturn(studentQuizPage);
-    when(studentQuizService.findById(STUDENT_QUIZ_ID, ADMIN_SESSION_ID))
+    when(studentQuizService.findById(STUDENT_QUIZ_ID, ADMIN_ID))
         .thenReturn(studentQuiz);
   }
 
@@ -147,7 +147,7 @@ public class StudentQuizControllerTest extends TestHelper {
             pagingResponseJacksonTester.write(
                 pagingResponse).getJson()
         ));
-    verify(studentQuizService).findAllByStudentId(STUDENT_ID, pageable, ADMIN_SESSION_ID);
+    verify(studentQuizService).findAllByStudentId(STUDENT_ID, pageable, ADMIN_ID);
   }
 
   @Test
@@ -160,6 +160,6 @@ public class StudentQuizControllerTest extends TestHelper {
             dataResponseJacksonTester.write(
                 dataResponse).getJson()
         ));
-    verify(studentQuizService).findById(STUDENT_QUIZ_ID, ADMIN_SESSION_ID);
+    verify(studentQuizService).findById(STUDENT_QUIZ_ID, ADMIN_ID);
   }
 }

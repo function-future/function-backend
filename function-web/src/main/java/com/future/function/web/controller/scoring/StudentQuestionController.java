@@ -42,7 +42,7 @@ public class StudentQuestionController {
     return StudentQuizDetailResponseMapper
         .toStudentQuestionWebResponses(
             studentQuizService
-                .findAllQuestionsByStudentQuizId(studentQuizId, session.getId()));
+                .findAllQuestionsByStudentQuizId(studentQuizId, session.getUserId()));
   }
 
   @ResponseStatus(HttpStatus.OK)
@@ -53,7 +53,7 @@ public class StudentQuestionController {
     return StudentQuizDetailResponseMapper
         .toStudentQuestionWebResponses(
             studentQuizService
-                .findAllUnansweredQuestionByStudentQuizId(studentQuizId, session.getId()));
+                .findAllUnansweredQuestionByStudentQuizId(studentQuizId, session.getUserId()));
   }
 
   @ResponseStatus(HttpStatus.CREATED)
@@ -66,7 +66,7 @@ public class StudentQuestionController {
             studentQuizService
                 .answerQuestionsByStudentQuizId(
                     studentQuizId,
-                    session.getId(),
+                    session.getUserId(),
                     studentQuestionRequestMapper
                         .toStudentQuestionList(answerRequests)));
   }

@@ -111,7 +111,7 @@ public class CommentControllerTest extends TestHelper {
 
     when(roomService.findAllCommentsByRoomId(ROOM_ID))
         .thenReturn(Collections.singletonList(comment));
-    when(roomService.createComment(comment, STUDENT_SESSION_ID))
+    when(roomService.createComment(comment, STUDENT_ID))
         .thenReturn(comment);
     when(commentRequestMapper.toCommentFromRequestWithRoomId(commentWebRequest, ROOM_ID))
         .thenReturn(comment);
@@ -144,7 +144,7 @@ public class CommentControllerTest extends TestHelper {
         .andExpect(status().isCreated())
         .andExpect(content().json(
             dataResponseJacksonTester.write(CREATED_DATA_RESPONSE).getJson()));
-    verify(roomService).createComment(comment, STUDENT_SESSION_ID);
+    verify(roomService).createComment(comment, STUDENT_ID);
     verify(commentRequestMapper).toCommentFromRequestWithRoomId(commentWebRequest, ROOM_ID);
   }
 }

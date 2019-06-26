@@ -53,7 +53,7 @@ public class RoomController {
     @WithAnyRole(roles = {Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT})
     public DataResponse<RoomWebResponse> findRoomById(@PathVariable(value = "id") String id, Session session) {
         return RoomResponseMapper
-            .toDataRoomWebResponse(assignmentService.findRoomById(id, session.getId()));
+            .toDataRoomWebResponse(assignmentService.findRoomById(id, session.getUserId()));
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -63,7 +63,7 @@ public class RoomController {
         @RequestBody RoomPointWebRequest request, Session session) {
         return RoomResponseMapper
                 .toDataRoomWebResponse(assignmentService
-                    .giveScoreToRoomByRoomId(id, session.getId(), request.getPoint()));
+                    .giveScoreToRoomByRoomId(id, session.getUserId(), request.getPoint()));
     }
 
     @ResponseStatus(HttpStatus.OK)

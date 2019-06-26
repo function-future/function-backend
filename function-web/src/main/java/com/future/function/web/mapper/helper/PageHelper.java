@@ -12,7 +12,7 @@ import org.springframework.data.domain.Pageable;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class PageHelper {
-  
+
   /**
    * Creates {@link org.springframework.data.domain.Pageable} object.
    *
@@ -24,10 +24,10 @@ public class PageHelper {
    * of {@code Pageable} interface.
    */
   public static Pageable toPageable(int page, int size) {
-    
+
     return new PageRequest(page - 1, size);
   }
-  
+
   /**
    * Constructs paging response given paged data.
    *
@@ -38,12 +38,12 @@ public class PageHelper {
    * that will be exposed to end-users.
    */
   public static <T> Paging toPaging(Page<T> data) {
-    
+
     return Paging.builder()
-      .page(data.getNumber())
+      .page(data.getNumber() + 1)
       .size(data.getSize())
       .totalRecords(data.getTotalElements())
       .build();
   }
-  
+
 }

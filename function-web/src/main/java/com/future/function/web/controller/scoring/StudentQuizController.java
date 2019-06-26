@@ -40,7 +40,7 @@ public class StudentQuizController {
     return StudentQuizResponseMapper
         .toPagingStudentQuizWebResponse(
             studentQuizService
-                .findAllByStudentId(studentId, PageHelper.toPageable(page, size), session.getId())
+                .findAllByStudentId(studentId, PageHelper.toPageable(page, size), session.getUserId())
         );
 
   }
@@ -53,7 +53,7 @@ public class StudentQuizController {
     return StudentQuizResponseMapper
         .toStudentQuizWebResponse(
             studentQuizService
-                .findById(studentQuizId, session.getId())
+                .findById(studentQuizId, session.getUserId())
         );
   }
 

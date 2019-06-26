@@ -122,12 +122,12 @@ public class StudentQuestionControllerTest extends TestHelper {
     pagingResponse = StudentQuizDetailResponseMapper
         .toStudentQuestionWebResponses(Collections.singletonList(studentQuestion));
 
-    when(studentQuizService.answerQuestionsByStudentQuizId(STUDENT_QUIZ_ID, STUDENT_SESSION_ID,
+    when(studentQuizService.answerQuestionsByStudentQuizId(STUDENT_QUIZ_ID, STUDENT_ID,
         Collections.singletonList(studentQuestion)))
         .thenReturn(studentQuizDetail);
-    when(studentQuizService.findAllQuestionsByStudentQuizId(STUDENT_QUIZ_ID, STUDENT_SESSION_ID))
+    when(studentQuizService.findAllQuestionsByStudentQuizId(STUDENT_QUIZ_ID, STUDENT_ID))
         .thenReturn(Collections.singletonList(studentQuestion));
-    when(studentQuizService.findAllUnansweredQuestionByStudentQuizId(STUDENT_QUIZ_ID, STUDENT_SESSION_ID))
+    when(studentQuizService.findAllUnansweredQuestionByStudentQuizId(STUDENT_QUIZ_ID, STUDENT_ID))
         .thenReturn(Collections.singletonList(studentQuestion));
     when(requestMapper.toStudentQuestionList(Collections.singletonList(studentQuestionWebRequest)))
         .thenReturn(Collections.singletonList(studentQuestion));
@@ -150,7 +150,7 @@ public class StudentQuestionControllerTest extends TestHelper {
             pagingResponseJacksonTester.write(
                 pagingResponse).getJson()
         ));
-    verify(studentQuizService).findAllQuestionsByStudentQuizId(STUDENT_QUIZ_ID, STUDENT_SESSION_ID);
+    verify(studentQuizService).findAllQuestionsByStudentQuizId(STUDENT_QUIZ_ID, STUDENT_ID);
   }
 
   @Test
@@ -159,7 +159,7 @@ public class StudentQuestionControllerTest extends TestHelper {
     mockMvc.perform(
         get("/api/scoring/students/studentId/quizzes/" + STUDENT_QUIZ_ID + "/questions")
             .cookie(cookies))
-        .andExpect(status().isUnauthorized());
+        .andExpect(status().isForbidden());
   }
 
   @Test
@@ -172,7 +172,7 @@ public class StudentQuestionControllerTest extends TestHelper {
             pagingResponseJacksonTester.write(
                 pagingResponse).getJson()
         ));
-    verify(studentQuizService).findAllUnansweredQuestionByStudentQuizId(STUDENT_QUIZ_ID, STUDENT_SESSION_ID);
+    verify(studentQuizService).findAllUnansweredQuestionByStudentQuizId(STUDENT_QUIZ_ID, STUDENT_ID);
   }
 
   @Test
@@ -189,7 +189,7 @@ public class StudentQuestionControllerTest extends TestHelper {
             dataResponseJacksonTester.write(
                 studentQuizDetailWebResponseDataResponse).getJson()
         ));
-    verify(studentQuizService).answerQuestionsByStudentQuizId(STUDENT_QUIZ_ID, STUDENT_SESSION_ID,
+    verify(studentQuizService).answerQuestionsByStudentQuizId(STUDENT_QUIZ_ID, STUDENT_ID,
         Collections.singletonList(studentQuestion));
     verify(requestMapper).toStudentQuestionList(Collections.singletonList(studentQuestionWebRequest));
   }

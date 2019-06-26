@@ -54,7 +54,7 @@ public class CommentController {
                         HttpStatus.CREATED,
                     roomService.createComment(
                         requestMapper.toCommentFromRequestWithRoomId(webRequest, roomId),
-                        session.getId()));
+                        session.getUserId()));
     }
 
 }

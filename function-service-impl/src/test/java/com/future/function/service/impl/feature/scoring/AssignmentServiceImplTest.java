@@ -110,7 +110,7 @@ public class AssignmentServiceImplTest {
 
     when(assignmentRepository.findByIdAndDeletedFalse(assignment.getId()))
         .thenReturn(Optional.of(assignment));
-    when(assignmentRepository.findAllByBatchCode(batch.getCode(), pageable))
+    when(assignmentRepository.findAllByBatch(batch, pageable))
         .thenReturn(assignmentPage);
     when(assignmentRepository.save(assignment))
         .thenReturn(assignment);
@@ -136,7 +136,7 @@ public class AssignmentServiceImplTest {
     assertThat(result.getContent().size()).isEqualTo(1);
     assertThat(result.getContent()).isEqualTo(assignmentList);
     verify(batchService).getBatchByCode(BATCH_CODE);
-    verify(assignmentRepository).findAllByBatchCode(batch.getCode(), pageable);
+    verify(assignmentRepository).findAllByBatch(batch, pageable);
   }
 
   @Test
