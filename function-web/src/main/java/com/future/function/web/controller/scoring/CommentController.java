@@ -52,10 +52,9 @@ public class CommentController {
         return CommentResponseMapper
                 .toDataCommentWebResponse(
                         HttpStatus.CREATED,
-                        roomService
-                                .createComment(requestMapper
-                                        .toCommentFromRequestWithRoomId(webRequest, roomId)
-                                ));
+                    roomService.createComment(
+                        requestMapper.toCommentFromRequestWithRoomId(webRequest, roomId),
+                        session.getId()));
     }
 
 }

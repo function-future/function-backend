@@ -53,7 +53,9 @@ public class RoomServiceImpl implements RoomService {
     }
 
   private Room checkStudentEligibility(User user, Room room) {
-    if (user.getRole().equals(Role.STUDENT) && room.getStudent().getId().equals(user.getId())) {
+    if (!user.getRole().equals(Role.STUDENT)) {
+      return room;
+    } else if (room.getStudent().getId().equals(user.getId())) {
       return room;
     }
     throw new ForbiddenException("User not allowed");
@@ -65,15 +67,17 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
-    public Comment createComment(Comment comment) {
+    public Comment createComment(Comment comment, String userId) {
       Room room = this.findById(comment.getRoom().getId(), comment.getAuthor().getId());
         User author = userService.getUser(comment.getAuthor().getId());
         return Optional.of(comment)
                 .filter(value -> room.getAssignment().getDeadline() > new Date().getTime())
+            .filter(value -> author.getId().equals(userId))
+            .map(value -> checkStudentEligibility(author, room))
                 .map(value -> {
-                    value.setRoom(room);
-                    value.setAuthor(author);
-                    return value;
+                  comment.setRoom(room);
+                  comment.setAuthor(author);
+                  return comment;
                 })
                 .map(value -> commentService.createCommentByRoom(room, value))
                 .orElseThrow(() -> new UnsupportedOperationException("Deadline has passed"));

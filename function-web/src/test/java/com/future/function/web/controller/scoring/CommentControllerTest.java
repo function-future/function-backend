@@ -44,7 +44,7 @@ public class CommentControllerTest extends TestHelper {
 
   private static final String BATCH_CODE = "3";
   private static final String ROOM_ID = "room-id";
-  private static final String USER_ID = "user-id";
+  private static final String USER_ID = STUDENT_SESSION_ID;
   private static final String USER_NAME = "user-name";
   private static final String COMMENT_ID = "text-id";
   private static final String COMMENT = "text";
@@ -78,6 +78,7 @@ public class CommentControllerTest extends TestHelper {
   @Before
   public void setUp() {
     super.setUp();
+    super.setCookie(Role.STUDENT);
     user = User.builder().id(USER_ID)
         .name(USER_NAME)
         .address("address")
@@ -110,7 +111,7 @@ public class CommentControllerTest extends TestHelper {
 
     when(roomService.findAllCommentsByRoomId(ROOM_ID))
         .thenReturn(Collections.singletonList(comment));
-    when(roomService.createComment(comment))
+    when(roomService.createComment(comment, STUDENT_SESSION_ID))
         .thenReturn(comment);
     when(commentRequestMapper.toCommentFromRequestWithRoomId(commentWebRequest, ROOM_ID))
         .thenReturn(comment);
@@ -125,7 +126,7 @@ public class CommentControllerTest extends TestHelper {
   public void findAllCommentsByRoomId() throws Exception {
     mockMvc.perform(
         get("/api/scoring/batches/" + BATCH_CODE + "/assignments/" + ASSIGNMENT_ID + "/rooms/" + ROOM_ID +
-            "/comments"))
+            "/comments").cookie(cookies))
         .andExpect(status().isOk())
         .andExpect(content().json(
             pagingResponseJacksonTester.write(LIST_DATA_RESPONSE).getJson()));
@@ -137,12 +138,13 @@ public class CommentControllerTest extends TestHelper {
     mockMvc.perform(
         post("/api/scoring/batches/" + BATCH_CODE + "/assignments/" + ASSIGNMENT_ID + "/rooms/" + ROOM_ID +
             "/comments")
+            .cookie(cookies)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .content(roomPointWebRequestJacksonTester.write(commentWebRequest).getJson()))
         .andExpect(status().isCreated())
         .andExpect(content().json(
             dataResponseJacksonTester.write(CREATED_DATA_RESPONSE).getJson()));
-    verify(roomService).createComment(comment);
+    verify(roomService).createComment(comment, STUDENT_SESSION_ID);
     verify(commentRequestMapper).toCommentFromRequestWithRoomId(commentWebRequest, ROOM_ID);
   }
 }

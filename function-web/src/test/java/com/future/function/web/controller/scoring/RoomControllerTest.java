@@ -79,6 +79,7 @@ public class RoomControllerTest extends TestHelper {
   @Before
   public void setUp() {
     super.setUp();
+    super.setCookie(Role.ADMIN);
     assignment = Assignment
         .builder()
         .id(ASSIGNMENT_ID)
@@ -121,9 +122,9 @@ public class RoomControllerTest extends TestHelper {
 
     when(assignmentService.findAllRoomsByAssignmentId(ASSIGNMENT_ID, pageable))
         .thenReturn(roomPage);
-    when(assignmentService.giveScoreToRoomByRoomId(ROOM_ID, USER_ID, 100))
+    when(assignmentService.giveScoreToRoomByRoomId(ROOM_ID, MENTOR_SESSION_ID, 100))
         .thenReturn(room);
-    when(assignmentService.findRoomById(ROOM_ID, USER_ID))
+    when(assignmentService.findRoomById(ROOM_ID, ADMIN_SESSION_ID))
         .thenReturn(room);
   }
 
@@ -136,6 +137,7 @@ public class RoomControllerTest extends TestHelper {
   public void findAllRoomsByAssignmentId() throws Exception {
     mockMvc.perform(
         get("/api/scoring/batches/" + BATCH_CODE + "/assignments/" + ASSIGNMENT_ID + "/rooms")
+            .cookie(cookies)
         .param("page", "1")
         .param("size", "10"))
         .andExpect(status().isOk())
@@ -149,31 +151,46 @@ public class RoomControllerTest extends TestHelper {
   public void findRoomById() throws Exception {
     mockMvc.perform(
         get("/api/scoring/batches/" + BATCH_CODE + "/assignments/" + ASSIGNMENT_ID + "/rooms/" + ROOM_ID)
+            .cookie(cookies)
             .param("roomId", ROOM_ID))
         .andExpect(status().isOk())
         .andExpect(content().json(
             dataResponseJacksonTester.write(DATA_RESPONSE)
                 .getJson()));
-    verify(assignmentService).findRoomById(ROOM_ID, USER_ID);
+    verify(assignmentService).findRoomById(ROOM_ID, ADMIN_SESSION_ID);
 
   }
 
   @Test
-  public void updateRoomScore() throws Exception {
+  public void updateRoomScoreByMentor() throws Exception {
+    super.setCookie(Role.MENTOR);
     mockMvc.perform(
         put("/api/scoring/batches/" + BATCH_CODE + "/assignments/" + ASSIGNMENT_ID + "/rooms/" + ROOM_ID)
+            .cookie(cookies)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .content(roomPointWebRequestJacksonTester.write(roomPointWebRequest).getJson()))
         .andExpect(status().isOk())
         .andExpect(content().json(
             dataResponseJacksonTester.write(DATA_RESPONSE).getJson()));
-    verify(assignmentService).giveScoreToRoomByRoomId(ROOM_ID, USER_ID, 100);
+    verify(assignmentService).giveScoreToRoomByRoomId(ROOM_ID, MENTOR_SESSION_ID, 100);
+  }
+
+  @Test
+  public void updateRoomScoreByAdmin() throws Exception {
+    super.setCookie(Role.ADMIN);
+    mockMvc.perform(
+        put("/api/scoring/batches/" + BATCH_CODE + "/assignments/" + ASSIGNMENT_ID + "/rooms/" + ROOM_ID)
+            .cookie(cookies)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .content(roomPointWebRequestJacksonTester.write(roomPointWebRequest).getJson()))
+        .andExpect(status().isUnauthorized());
   }
 
   @Test
   public void deleteRoomById() throws Exception {
     mockMvc.perform(
-        delete("/api/scoring/batches/" + BATCH_CODE + "/assignments/" + ASSIGNMENT_ID + "/rooms/" + ROOM_ID))
+        delete("/api/scoring/batches/" + BATCH_CODE + "/assignments/" + ASSIGNMENT_ID + "/rooms/" + ROOM_ID)
+            .cookie(cookies))
         .andExpect(status().isOk())
         .andExpect(content().json(
             baseResponseJacksonTester.write(BASE_RESPONSE).getJson()));

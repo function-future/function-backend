@@ -53,12 +53,12 @@ public class StudentQuizServiceImpl implements StudentQuizService {
   private String checkUserEligibilityAndReturnStudentId(User user, String studentId) {
     return Optional.of(user)
         .filter(value -> value.getRole().equals(Role.STUDENT))
-        .map(value -> isUserIdEqualsStudentId(studentId, value))
+        .map(value -> isUserIdEqualStudentId(studentId, value))
         .map(User::getId)
         .orElse(studentId);
   }
 
-  private User isUserIdEqualsStudentId(String studentId, User value) {
+  private User isUserIdEqualStudentId(String studentId, User value) {
     if (value.getId().equals(studentId))
       return value;
     throw new ForbiddenException("User not allowed");
@@ -83,7 +83,7 @@ public class StudentQuizServiceImpl implements StudentQuizService {
         .flatMap(studentQuizRepository::findByIdAndDeletedFalse)
         .map(StudentQuiz::getStudent)
         .map(user -> checkUserEligibilityAndReturnStudentId(user, userId))
-        .map(studentQuizDetailService::findAllQuestionsByStudentQuizId)
+        .map(id -> studentQuizDetailService.findAllQuestionsByStudentQuizId(studentQuizId))
         .orElseGet(ArrayList::new);
   }
 
@@ -101,10 +101,16 @@ public class StudentQuizServiceImpl implements StudentQuizService {
 
   @Override
   public StudentQuizDetail answerQuestionsByStudentQuizId(String studentQuizId, String userId, List<StudentQuestion> answers) {
+    StudentQuiz studentQuiz = this.findById(studentQuizId, userId);
+    String studentId = Optional.ofNullable(studentQuiz)
+        .map(StudentQuiz::getStudent)
+        .map(User::getId)
+        .orElse("");
     return Optional.of(userId)
         .map(userService::getUser)
-        .map(user -> this.checkUserEligibilityAndReturnStudentId(user, studentQuizId))
-        .map(id -> studentQuizDetailService.answerStudentQuiz(id, answers))
+        .filter(user -> user.getRole().equals(Role.STUDENT))
+        .map(user -> this.checkUserEligibilityAndReturnStudentId(user, studentId))
+        .map(id -> studentQuizDetailService.answerStudentQuiz(studentQuizId, answers))
         .orElseThrow(() -> new UnsupportedOperationException("Answer Questions Failed"));
   }
 

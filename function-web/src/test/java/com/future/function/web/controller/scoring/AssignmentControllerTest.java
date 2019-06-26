@@ -1,5 +1,6 @@
 package com.future.function.web.controller.scoring;
 
+import com.future.function.common.enumeration.core.Role;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.scoring.Assignment;
@@ -57,9 +58,7 @@ public class AssignmentControllerTest extends TestHelper {
   private static final long ASSIGNMENT_DEADLINE = new Date().getTime();
   private static final String BATCH_CODE = "3";
   private static final String ASSIGNMENT_FILE_PATH = "assignment-file-path";
-  private static final String ASSIGNMENT_FILE = "file";
   private static String ASSIGNMENT_ID = UUID.randomUUID().toString();
-  private FileV2 file;
   private Pageable pageable;
   private Assignment assignment;
   private AssignmentWebRequest assignmentWebRequest;
@@ -87,6 +86,7 @@ public class AssignmentControllerTest extends TestHelper {
   @Before
   public void setUp() {
     super.setUp();
+    super.setCookie(Role.ADMIN);
     assignment = Assignment
             .builder()
             .id(ASSIGNMENT_ID)
@@ -117,12 +117,6 @@ public class AssignmentControllerTest extends TestHelper {
     pageable = new PageRequest(0, 10);
 
     assignmentPage = new PageImpl<>(assignmentList, pageable, 10);
-
-    file = FileV2
-            .builder()
-            .id("FILE_ID")
-            .filePath(ASSIGNMENT_FILE_PATH)
-            .build();
 
     ASSIGNMENT_ID = assignment.getId();
 
@@ -162,6 +156,7 @@ public class AssignmentControllerTest extends TestHelper {
   public void testCopyAssignmentByCopyAssignmentWebRequest() throws Exception {
     mockMvc.perform(
         post("/api/scoring/batches/" + BATCH_CODE + "/assignments/copy")
+            .cookie(cookies)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .content(copyAssignmentWebRequestJacksonTester.write(copyAssignmentWebRequest).getJson()))
         .andExpect(status().isCreated())
@@ -175,7 +170,8 @@ public class AssignmentControllerTest extends TestHelper {
   public void testFindAssignmentByIdDataResponseAssignment() throws Exception {
 
     mockMvc.perform(
-            get("/api/scoring/batches/" + BATCH_CODE + "/assignments/" + ASSIGNMENT_ID))
+        get("/api/scoring/batches/" + BATCH_CODE + "/assignments/" + ASSIGNMENT_ID)
+            .cookie(cookies))
             .andExpect(status().isOk())
             .andExpect(content().json(
                     dataResponseJacksonTester.write(DATA_RESPONSE)
@@ -189,7 +185,8 @@ public class AssignmentControllerTest extends TestHelper {
   @Test
   public void testDeleteAssignmentByIdBaseResponseOk() throws Exception {
     mockMvc.perform(
-            delete("/api/scoring/batches/" + BATCH_CODE + "/assignments/" + ASSIGNMENT_ID))
+        delete("/api/scoring/batches/" + BATCH_CODE + "/assignments/" + ASSIGNMENT_ID)
+            .cookie(cookies))
             .andExpect(status().isOk())
             .andExpect(content().json(
                     baseResponseJacksonTester.write(BASE_RESPONSE)
@@ -203,6 +200,7 @@ public class AssignmentControllerTest extends TestHelper {
   public void testCreateAssignment() throws Exception {
     mockMvc.perform(
             post("/api/scoring/batches/" + BATCH_CODE + "/assignments")
+                .cookie(cookies)
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
                     .content(assignmentWebRequestJacksonTester.write(assignmentWebRequest).getJson()))
             .andExpect(status().isCreated())
@@ -220,6 +218,7 @@ public class AssignmentControllerTest extends TestHelper {
   public void testUpdateAssignmentWithRequest() throws Exception {
     mockMvc.perform(
             put("/api/scoring/batches/" + BATCH_CODE + "/assignments/" + ASSIGNMENT_ID)
+                .cookie(cookies)
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
                     .content(assignmentWebRequestJacksonTester.write(assignmentWebRequest).getJson()))
             .andExpect(status().isOk())
@@ -234,7 +233,8 @@ public class AssignmentControllerTest extends TestHelper {
   @Test
   public void testFindAllAssignmentWithNoPagingParameters() throws Exception {
     mockMvc.perform(
-            get("/api/scoring/batches/" + BATCH_CODE + "/assignments"))
+        get("/api/scoring/batches/" + BATCH_CODE + "/assignments")
+            .cookie(cookies))
             .andExpect(status().isOk())
             .andExpect(content().json(
                     pagingResponseJacksonTester.write(PAGING_RESPONSE)
@@ -248,6 +248,7 @@ public class AssignmentControllerTest extends TestHelper {
   public void testFindAllAssignmentWithPagingParameters() throws Exception {
     mockMvc.perform(
             get("/api/scoring/batches/" + BATCH_CODE + "/assignments")
+                .cookie(cookies)
                 .param("page", "1")
                 .param("size", "10"))
             .andExpect(status().isOk())

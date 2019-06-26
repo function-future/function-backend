@@ -1,12 +1,13 @@
 package com.future.function.web.controller.scoring;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.future.function.common.enumeration.core.Role;
 import com.future.function.model.entity.feature.scoring.Option;
 import com.future.function.model.entity.feature.scoring.Question;
 import com.future.function.model.entity.feature.scoring.StudentQuestion;
 import com.future.function.model.entity.feature.scoring.StudentQuiz;
 import com.future.function.model.entity.feature.scoring.StudentQuizDetail;
 import com.future.function.service.api.feature.scoring.StudentQuizService;
+import com.future.function.web.TestHelper;
 import com.future.function.web.TestSecurityConfiguration;
 import com.future.function.web.mapper.request.scoring.StudentQuestionRequestMapper;
 import com.future.function.web.mapper.response.scoring.StudentQuizDetailResponseMapper;
@@ -41,14 +42,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @Import(TestSecurityConfiguration.class)
 @WebMvcTest(StudentQuestionController.class)
-public class StudentQuestionControllerTest {
+public class StudentQuestionControllerTest extends TestHelper {
 
   private static final String STUDENT_QUIZ_ID = "student-quiz-id";
   private static final String STUDENT_QUIZ_DETAIL_ID = "student-quiz-detail-id";
   private static final String STUDENT_QUESTION_ID = "student-question-id";
   private static final String QUESTION_ID = "question-id";
   private static final String OPTION_ID = "option-id";
-  private static final String USER_ID = "user-id";
 
   private StudentQuiz studentQuiz;
   private StudentQuizDetail studentQuizDetail;
@@ -60,8 +60,6 @@ public class StudentQuestionControllerTest {
   private DataResponse<StudentQuizDetailWebResponse> studentQuizDetailWebResponseDataResponse;
   private PagingResponse<StudentQuestionWebResponse> pagingResponse;
 
-  private JacksonTester<DataResponse<StudentQuizDetailWebResponse>> dataResponseJacksonTester;
-  private JacksonTester<PagingResponse<StudentQuestionWebResponse>> pagingResponseJacksonTester;
   private JacksonTester<List<StudentQuestionWebRequest>> webRequestJacksonTester;
 
   @Autowired
@@ -74,9 +72,9 @@ public class StudentQuestionControllerTest {
   private StudentQuestionRequestMapper requestMapper;
 
   @Before
-  public void setUp() throws Exception {
-
-    JacksonTester.initFields(this, ObjectMapper::new);
+  public void setUp() {
+    super.setUp();
+    super.setCookie(Role.STUDENT);
 
     studentQuiz = StudentQuiz
         .builder()
@@ -124,11 +122,12 @@ public class StudentQuestionControllerTest {
     pagingResponse = StudentQuizDetailResponseMapper
         .toStudentQuestionWebResponses(Collections.singletonList(studentQuestion));
 
-    when(studentQuizService.answerQuestionsByStudentQuizId(STUDENT_QUIZ_ID, USER_ID, Collections.singletonList(studentQuestion)))
+    when(studentQuizService.answerQuestionsByStudentQuizId(STUDENT_QUIZ_ID, STUDENT_SESSION_ID,
+        Collections.singletonList(studentQuestion)))
         .thenReturn(studentQuizDetail);
-    when(studentQuizService.findAllQuestionsByStudentQuizId(STUDENT_QUIZ_ID, USER_ID))
+    when(studentQuizService.findAllQuestionsByStudentQuizId(STUDENT_QUIZ_ID, STUDENT_SESSION_ID))
         .thenReturn(Collections.singletonList(studentQuestion));
-    when(studentQuizService.findAllUnansweredQuestionByStudentQuizId(STUDENT_QUIZ_ID, USER_ID))
+    when(studentQuizService.findAllUnansweredQuestionByStudentQuizId(STUDENT_QUIZ_ID, STUDENT_SESSION_ID))
         .thenReturn(Collections.singletonList(studentQuestion));
     when(requestMapper.toStudentQuestionList(Collections.singletonList(studentQuestionWebRequest)))
         .thenReturn(Collections.singletonList(studentQuestion));
@@ -144,31 +143,43 @@ public class StudentQuestionControllerTest {
   @Test
   public void findStudentQuestionsByStudentQuizIdTest() throws Exception {
     mockMvc.perform(
-        get("/api/scoring/students/studentId/quizzes/" + STUDENT_QUIZ_ID + "/questions"))
+        get("/api/scoring/students/studentId/quizzes/" + STUDENT_QUIZ_ID + "/questions")
+            .cookie(cookies))
         .andExpect(status().isOk())
         .andExpect(content().json(
             pagingResponseJacksonTester.write(
                 pagingResponse).getJson()
         ));
-    verify(studentQuizService).findAllQuestionsByStudentQuizId(STUDENT_QUIZ_ID, USER_ID);
+    verify(studentQuizService).findAllQuestionsByStudentQuizId(STUDENT_QUIZ_ID, STUDENT_SESSION_ID);
+  }
+
+  @Test
+  public void findStudentQuestionsByStudentQuizIdAccessedByAdminTest() throws Exception {
+    super.setCookie(Role.ADMIN);
+    mockMvc.perform(
+        get("/api/scoring/students/studentId/quizzes/" + STUDENT_QUIZ_ID + "/questions")
+            .cookie(cookies))
+        .andExpect(status().isUnauthorized());
   }
 
   @Test
   public void findUnansweredQuestionsByStudentQuizIdTest() throws Exception {
     mockMvc.perform(
-        get("/api/scoring/students/studentId/quizzes/" + STUDENT_QUIZ_ID + "/questions/start"))
+        get("/api/scoring/students/studentId/quizzes/" + STUDENT_QUIZ_ID + "/questions/start")
+            .cookie(cookies))
         .andExpect(status().isOk())
         .andExpect(content().json(
             pagingResponseJacksonTester.write(
                 pagingResponse).getJson()
         ));
-    verify(studentQuizService).findAllUnansweredQuestionByStudentQuizId(STUDENT_QUIZ_ID, USER_ID);
+    verify(studentQuizService).findAllUnansweredQuestionByStudentQuizId(STUDENT_QUIZ_ID, STUDENT_SESSION_ID);
   }
 
   @Test
   public void postAnswersForQuestionsTest() throws Exception {
     mockMvc.perform(
         post("/api/scoring/students/studentId/quizzes/" + STUDENT_QUIZ_ID + "/questions")
+            .cookie(cookies)
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .content(webRequestJacksonTester
                 .write(Collections.singletonList(studentQuestionWebRequest))
@@ -178,7 +189,8 @@ public class StudentQuestionControllerTest {
             dataResponseJacksonTester.write(
                 studentQuizDetailWebResponseDataResponse).getJson()
         ));
-    verify(studentQuizService).answerQuestionsByStudentQuizId(STUDENT_QUIZ_ID, USER_ID, Collections.singletonList(studentQuestion));
+    verify(studentQuizService).answerQuestionsByStudentQuizId(STUDENT_QUIZ_ID, STUDENT_SESSION_ID,
+        Collections.singletonList(studentQuestion));
     verify(requestMapper).toStudentQuestionList(Collections.singletonList(studentQuestionWebRequest));
   }
 }

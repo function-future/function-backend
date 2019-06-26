@@ -1,5 +1,7 @@
 package com.future.function.service.impl.feature.scoring;
 
+import com.future.function.common.enumeration.core.Role;
+import com.future.function.common.exception.ForbiddenException;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.model.entity.feature.scoring.Option;
@@ -31,6 +33,7 @@ import static com.googlecode.catchexception.CatchException.catchException;
 import static com.googlecode.catchexception.CatchException.caughtException;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -105,6 +108,7 @@ public class StudentQuizServiceImplTest {
         .builder()
         .id(USER_ID)
         .name(USER_NAME)
+        .role(Role.STUDENT)
         .build();
 
     batch = Batch
@@ -188,7 +192,16 @@ public class StudentQuizServiceImplTest {
     assertThat(actual.getTotalElements()).isEqualTo(1);
     assertThat(actual.getContent().get(0).getId()).isEqualTo(STUDENT_QUIZ_ID);
     assertThat(actual.getContent().get(0).getTrials()).isEqualTo(QUIZ_TRIALS);
+    verify(userService).getUser(USER_ID);
     verify(studentQuizRepository).findAllByStudentId(USER_ID, pageable);
+  }
+
+  @Test
+  public void findAllByStudentIdAccessedByAnotherStudent() {
+    when(userService.getUser("student-2")).thenReturn(User.builder().id("student-2").role(Role.STUDENT).build());
+    catchException(() -> studentQuizService.findAllByStudentId(USER_ID, pageable, "student-2"));
+    assertThat(caughtException().getClass()).isEqualTo(ForbiddenException.class);
+    verify(userService).getUser("student-2");
   }
 
   @Test
@@ -196,6 +209,16 @@ public class StudentQuizServiceImplTest {
     StudentQuiz studentQuiz = studentQuizService.findById(STUDENT_QUIZ_ID, USER_ID);
     assertThat(studentQuiz.getId()).isEqualTo(STUDENT_QUIZ_ID);
     assertThat(studentQuiz.getTrials()).isEqualTo(QUIZ_TRIALS);
+    verify(userService).getUser(USER_ID);
+    verify(studentQuizRepository).findByIdAndDeletedFalse(STUDENT_QUIZ_ID);
+  }
+
+  @Test
+  public void findByIdAnotherStudentAndThrowForbiddenException() {
+    when(userService.getUser("student-2")).thenReturn(User.builder().id("student-2").role(Role.STUDENT).build());
+    catchException(() -> studentQuizService.findById(STUDENT_QUIZ_ID, "student-2"));
+    assertThat(caughtException().getClass()).isEqualTo(ForbiddenException.class);
+    verify(userService).getUser("student-2");
     verify(studentQuizRepository).findByIdAndDeletedFalse(STUDENT_QUIZ_ID);
   }
 
@@ -203,6 +226,7 @@ public class StudentQuizServiceImplTest {
   public void findAllQuestionsByStudentQuizId() {
     List<StudentQuestion> actual = studentQuizService.findAllQuestionsByStudentQuizId(STUDENT_QUIZ_ID, USER_ID);
     assertThat(actual.size()).isEqualTo(1);
+    verify(studentQuizRepository).findByIdAndDeletedFalse(STUDENT_QUIZ_ID);
     verify(studentQuizDetailService).findAllQuestionsByStudentQuizId(STUDENT_QUIZ_ID);
   }
 
@@ -213,6 +237,7 @@ public class StudentQuizServiceImplTest {
     verify(studentQuizDetailService).findAllUnansweredQuestionsByStudentQuizId(STUDENT_QUIZ_ID);
     verify(studentQuizRepository).findByIdAndDeletedFalse(STUDENT_QUIZ_ID);
     studentQuiz.setTrials(QUIZ_TRIALS - 1);
+    verify(userService).getUser(USER_ID);
     verify(studentQuizRepository).save(studentQuiz);
   }
 
@@ -221,6 +246,8 @@ public class StudentQuizServiceImplTest {
     StudentQuizDetail actual = studentQuizService.answerQuestionsByStudentQuizId(STUDENT_QUIZ_ID, USER_ID,
         Collections.singletonList(studentQuestion));
     assertThat(actual.getStudentQuiz().getId()).isEqualTo(STUDENT_QUIZ_ID);
+    verify(userService, times(2)).getUser(USER_ID);
+    verify(studentQuizRepository).findByIdAndDeletedFalse(STUDENT_QUIZ_ID);
     verify(studentQuizDetailService).answerStudentQuiz(STUDENT_QUIZ_ID, Collections.singletonList(studentQuestion));
   }
 

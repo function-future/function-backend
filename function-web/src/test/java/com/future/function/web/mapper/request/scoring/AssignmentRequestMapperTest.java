@@ -27,6 +27,7 @@ public class AssignmentRequestMapperTest {
   private static final String ASSIGNMENT_DESCRIPTION = "assignment-description";
   private static final String ASSIGNMENT_QUESTION = "assignment-question";
   private static final String ASSIGNMENT_BATCH = "[2, 3]";
+  private static final long ASSIGNMENT_DEADLINE = 1561520805;
   private static final String NULL_VALUE = null;
   private static final String STRING_EMPTY = "";
   private static final String BAD_REQUEST_EXCEPTION_MSG = "Bad Request";
@@ -55,6 +56,7 @@ public class AssignmentRequestMapperTest {
         .id(null)
         .title(ASSIGNMENT_TITLE)
         .description(ASSIGNMENT_DESCRIPTION)
+        .deadline(ASSIGNMENT_DEADLINE)
         .build();
 
     assignmentWebRequest = AssignmentWebRequest
@@ -62,6 +64,7 @@ public class AssignmentRequestMapperTest {
         .title(ASSIGNMENT_TITLE)
         .description(ASSIGNMENT_DESCRIPTION)
         .files(new ArrayList<>())
+        .deadline(ASSIGNMENT_DEADLINE)
         .build();
 
     when(validator.validate(assignmentWebRequest))

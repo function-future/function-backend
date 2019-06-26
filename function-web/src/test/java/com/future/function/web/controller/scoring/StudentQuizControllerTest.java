@@ -1,11 +1,12 @@
 package com.future.function.web.controller.scoring;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.future.function.common.enumeration.core.Role;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.model.entity.feature.scoring.Quiz;
 import com.future.function.model.entity.feature.scoring.StudentQuiz;
 import com.future.function.service.api.feature.scoring.StudentQuizService;
+import com.future.function.web.TestHelper;
 import com.future.function.web.TestSecurityConfiguration;
 import com.future.function.web.mapper.response.scoring.StudentQuizResponseMapper;
 import com.future.function.web.model.response.base.DataResponse;
@@ -19,7 +20,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
@@ -39,7 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @Import(TestSecurityConfiguration.class)
 @WebMvcTest(StudentQuizController.class)
-public class StudentQuizControllerTest {
+public class StudentQuizControllerTest extends TestHelper {
 
   private static final String QUIZ_ID = "quiz-id";
   private static final String QUIZ_TITLE = "quiz-title";
@@ -62,10 +62,6 @@ public class StudentQuizControllerTest {
 
   private PagingResponse<StudentQuizWebResponse> pagingResponse;
 
-  private JacksonTester<DataResponse<StudentQuizWebResponse>> dataResponseJacksonTester;
-
-  private JacksonTester<PagingResponse<StudentQuizWebResponse>> pagingResponseJacksonTester;
-
   @Autowired
   private MockMvc mockMvc;
 
@@ -73,9 +69,10 @@ public class StudentQuizControllerTest {
   private StudentQuizService studentQuizService;
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
 
-    JacksonTester.initFields(this, ObjectMapper::new);
+    super.setUp();
+    super.setCookie(Role.ADMIN);
 
     batch = Batch
         .builder()
@@ -127,9 +124,9 @@ public class StudentQuizControllerTest {
     pagingResponse = StudentQuizResponseMapper
         .toPagingStudentQuizWebResponse(studentQuizPage);
 
-    when(studentQuizService.findAllByStudentId(STUDENT_ID, pageable, STUDENT_ID))
+    when(studentQuizService.findAllByStudentId(STUDENT_ID, pageable, ADMIN_SESSION_ID))
         .thenReturn(studentQuizPage);
-    when(studentQuizService.findById(STUDENT_QUIZ_ID, STUDENT_ID))
+    when(studentQuizService.findById(STUDENT_QUIZ_ID, ADMIN_SESSION_ID))
         .thenReturn(studentQuiz);
   }
 
@@ -142,6 +139,7 @@ public class StudentQuizControllerTest {
   public void getAllStudentQuiz() throws Exception {
     mockMvc.perform(
         get("/api/scoring/students/" + STUDENT_ID + "/quizzes")
+            .cookie(cookies)
             .param("page", "1")
             .param("size", "10"))
         .andExpect(status().isOk())
@@ -149,18 +147,19 @@ public class StudentQuizControllerTest {
             pagingResponseJacksonTester.write(
                 pagingResponse).getJson()
         ));
-    verify(studentQuizService).findAllByStudentId(STUDENT_ID, pageable, STUDENT_ID);
+    verify(studentQuizService).findAllByStudentId(STUDENT_ID, pageable, ADMIN_SESSION_ID);
   }
 
   @Test
   public void getStudentQuizById() throws Exception {
     mockMvc.perform(
-        get("/api/scoring/students/" + STUDENT_ID + "/quizzes/" + STUDENT_QUIZ_ID))
+        get("/api/scoring/students/" + STUDENT_ID + "/quizzes/" + STUDENT_QUIZ_ID)
+            .cookie(cookies))
         .andExpect(status().isOk())
         .andExpect(content().json(
             dataResponseJacksonTester.write(
                 dataResponse).getJson()
         ));
-    verify(studentQuizService).findById(STUDENT_QUIZ_ID, STUDENT_ID);
+    verify(studentQuizService).findById(STUDENT_QUIZ_ID, ADMIN_SESSION_ID);
   }
 }

@@ -58,6 +58,7 @@ public class StudentQuestionController {
 
   @ResponseStatus(HttpStatus.CREATED)
   @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+  @WithAnyRole(roles = Role.STUDENT)
   public DataResponse<StudentQuizDetailWebResponse> postAnswersForQuestions(@PathVariable(value = "studentQuizId") String studentQuizId,
       @RequestBody List<StudentQuestionWebRequest> answerRequests, Session session) {
     return StudentQuizDetailResponseMapper

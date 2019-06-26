@@ -1,9 +1,10 @@
 package com.future.function.web.controller.scoring;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.future.function.common.enumeration.core.Role;
 import com.future.function.model.entity.feature.scoring.Option;
 import com.future.function.model.entity.feature.scoring.Question;
 import com.future.function.service.api.feature.scoring.QuestionService;
+import com.future.function.web.TestHelper;
 import com.future.function.web.TestSecurityConfiguration;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.mapper.request.scoring.QuestionRequestMapper;
@@ -22,7 +23,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
@@ -47,7 +47,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @Import(TestSecurityConfiguration.class)
 @WebMvcTest(QuestionController.class)
-public class QuestionControllerTest {
+public class QuestionControllerTest extends TestHelper {
 
   private static final String QUESTION_ID = "question-id";
   private static final String QUESTION_TEXT = "question-text";
@@ -85,10 +85,6 @@ public class QuestionControllerTest {
   private PagingResponse<QuestionWebResponse> PAGING_RESPONSE;
   private BaseResponse BASE_RESPONSE;
 
-  private JacksonTester<DataResponse<QuestionWebResponse>> dataResponseJacksonTester;
-  private JacksonTester<PagingResponse<QuestionWebResponse>> pagingResponseJacksonTester;
-  private JacksonTester<BaseResponse> baseResponseJacksonTester;
-
   @Autowired
   private MockMvc mockMvc;
 
@@ -99,9 +95,10 @@ public class QuestionControllerTest {
   private QuestionRequestMapper questionRequestMapper;
 
   @Before
-  public void setUp() throws Exception {
+  public void setUp() {
 
-    JacksonTester.initFields(this, new ObjectMapper());
+    super.setUp();
+    super.setCookie(Role.ADMIN);
 
     option = Option
         .builder()
@@ -166,6 +163,7 @@ public class QuestionControllerTest {
 
     mockMvc.perform(
         get("/api/scoring/question-banks/" + QUESTION_BANK_ID + "/questions")
+            .cookie(cookies)
             .param("page", "1")
             .param("size", "10")
     )
@@ -185,6 +183,7 @@ public class QuestionControllerTest {
 
     mockMvc.perform(
         get("/api/scoring/question-banks/" + QUESTION_BANK_ID + "/questions/" + QUESTION_ID)
+            .cookie(cookies)
     )
         .andExpect(status().isOk())
         .andExpect(content().json(
@@ -202,6 +201,7 @@ public class QuestionControllerTest {
 
     mockMvc.perform(
         post("/api/scoring/question-banks/" + QUESTION_BANK_ID + "/questions")
+            .cookie(cookies)
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .content(QUESTION_CREATE_REQUEST_JSON)
     )
@@ -225,6 +225,7 @@ public class QuestionControllerTest {
 
     mockMvc.perform(
         put("/api/scoring/question-banks/" + QUESTION_BANK_ID + "/questions/" + QUESTION_ID)
+            .cookie(cookies)
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .content(QUESTION_UPDATE_REQUEST_JSON)
     )
@@ -241,6 +242,7 @@ public class QuestionControllerTest {
   public void deleteQuestionFromQuestionBank() throws Exception {
     mockMvc.perform(
         delete("/api/scoring/question-banks/" + QUESTION_BANK_ID + "/questions/" + QUESTION_ID)
+            .cookie(cookies)
     )
         .andExpect(status().isOk())
         .andExpect(content().json(

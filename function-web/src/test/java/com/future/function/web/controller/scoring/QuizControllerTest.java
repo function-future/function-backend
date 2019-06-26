@@ -1,10 +1,11 @@
 package com.future.function.web.controller.scoring;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.future.function.common.enumeration.core.Role;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.scoring.QuestionBank;
 import com.future.function.model.entity.feature.scoring.Quiz;
 import com.future.function.service.api.feature.scoring.QuizService;
+import com.future.function.web.TestHelper;
 import com.future.function.web.TestSecurityConfiguration;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.mapper.request.scoring.QuizRequestMapper;
@@ -49,7 +50,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @Import(TestSecurityConfiguration.class)
 @WebMvcTest(QuizController.class)
-public class QuizControllerTest {
+public class QuizControllerTest extends TestHelper {
 
   private static final String QUIZ_ID = "quiz-id";
   private static final String QUIZ_TITLE = "assignment-title";
@@ -78,12 +79,6 @@ public class QuizControllerTest {
 
   private BaseResponse BASE_RESPONSE;
 
-  private JacksonTester<DataResponse<QuizWebResponse>> dataResponseJacksonTester;
-
-  private JacksonTester<PagingResponse<QuizWebResponse>> pagingResponseJacksonTester;
-
-  private JacksonTester<BaseResponse> baseResponseJacksonTester;
-
   private JacksonTester<QuizWebRequest> webRequestJacksonTester;
 
   private JacksonTester<CopyQuizWebRequest> copyQuizWebRequestJacksonTester;
@@ -98,8 +93,9 @@ public class QuizControllerTest {
   private QuizRequestMapper requestMapper;
 
   @Before
-  public void setUp() throws Exception {
-    JacksonTester.initFields(this, ObjectMapper::new);
+  public void setUp() {
+    super.setUp();
+    super.setCookie(Role.ADMIN);
 
     questionBank = QuestionBank
         .builder()
@@ -184,7 +180,8 @@ public class QuizControllerTest {
   @Test
   public void testFindQuizById() throws Exception {
     mockMvc.perform(
-        get("/api/scoring/quizzes/" + QUIZ_ID))
+        get("/api/scoring/batches/" + QUIZ_BATCH_CODE + "/quizzes/" + QUIZ_ID)
+            .cookie(cookies))
         .andExpect(status().isOk())
         .andExpect(content().json(
             dataResponseJacksonTester.write(DATA_RESPONSE)
@@ -197,7 +194,8 @@ public class QuizControllerTest {
   @Test
   public void testDeleteQuizById() throws Exception {
     mockMvc.perform(
-        delete("/api/scoring/quizzes/" + QUIZ_ID))
+        delete("/api/scoring/batches/" + QUIZ_BATCH_CODE + "/quizzes/" + QUIZ_ID)
+            .cookie(cookies))
         .andExpect(status().isOk())
         .andExpect(content().json(
             baseResponseJacksonTester.write(BASE_RESPONSE)
@@ -210,7 +208,8 @@ public class QuizControllerTest {
   @Test
   public void testFindAllQuizByPagingParameters() throws Exception {
     mockMvc.perform(
-        get("/api/scoring/quizzes")
+        get("/api/scoring/batches/" + QUIZ_BATCH_CODE + "/quizzes")
+            .cookie(cookies)
             .param("page", "1")
             .param("size", "10"))
         .andExpect(status().isOk())
@@ -225,7 +224,8 @@ public class QuizControllerTest {
   @Test
   public void testFindAllQuizWithoutPagingParameters() throws Exception {
     mockMvc.perform(
-        get("/api/scoring/quizzes"))
+        get("/api/scoring/batches/" + QUIZ_BATCH_CODE + "/quizzes")
+            .cookie(cookies))
         .andExpect(status().isOk())
         .andExpect(content().json(
             pagingResponseJacksonTester.write(PAGING_RESPONSE)
@@ -238,7 +238,8 @@ public class QuizControllerTest {
   @Test
   public void testCreateQuizPassQuizWebRequest() throws Exception {
     mockMvc.perform(
-        post("/api/scoring/quizzes")
+        post("/api/scoring/batches/" + QUIZ_BATCH_CODE + "/quizzes")
+            .cookie(cookies)
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .content(webRequestJacksonTester.write(
                 quizWebRequest).getJson()))
@@ -255,7 +256,8 @@ public class QuizControllerTest {
   @Test
   public void testCopyQuizWithTargetBatch() throws Exception {
     mockMvc.perform(
-        post("/api/scoring/quizzes/copy")
+        post("/api/scoring/batches/" + QUIZ_BATCH_CODE + "/quizzes/copy")
+            .cookie(cookies)
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .content(copyQuizWebRequestJacksonTester.write(
                 copyQuizWebRequest).getJson()))
@@ -272,7 +274,8 @@ public class QuizControllerTest {
   @Test
   public void testUpdateQuizPassQuizWebRequestAndId() throws Exception {
     mockMvc.perform(
-        put("/api/scoring/quizzes/" + QUIZ_ID)
+        put("/api/scoring/batches/" + QUIZ_BATCH_CODE + "/quizzes/" + QUIZ_ID)
+            .cookie(cookies)
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .content(webRequestJacksonTester.write(
                 quizWebRequest).getJson()))

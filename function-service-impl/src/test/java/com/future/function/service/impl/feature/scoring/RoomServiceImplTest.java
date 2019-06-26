@@ -1,5 +1,7 @@
 package com.future.function.service.impl.feature.scoring;
 
+import com.future.function.common.enumeration.core.Role;
+import com.future.function.common.exception.ForbiddenException;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.model.entity.feature.scoring.Assignment;
@@ -27,6 +29,7 @@ import static com.googlecode.catchexception.CatchException.catchException;
 import static com.googlecode.catchexception.CatchException.caughtException;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -40,6 +43,7 @@ public class RoomServiceImplTest {
   private static final String USER_ID = "userId";
   private static final String USERNAME = "userName";
   private static final String BATCH_CODE = "batchCode";
+  private static final String MENTOR_ID = "mentor-id";
 
   private Room room;
   private Assignment assignment;
@@ -64,10 +68,9 @@ public class RoomServiceImplTest {
     batch = Batch.builder().code(BATCH_CODE).build();
     assignment = Assignment.builder().id(ASSIGNMENT_ID).batch(batch)
         .deadline(new Date(2019, 11, 12).getTime()).build();
-    student = User.builder().id(USER_ID).name(USERNAME).build();
+    student = User.builder().id(USER_ID).name(USERNAME).role(Role.STUDENT).build();
     room = Room.builder().assignment(assignment).id(ROOM_ID).student(student).point(0).build();
     comment = Comment.builder().room(room).author(student).build();
-
     when(userService.getStudentsByBatchCode(BATCH_CODE)).thenReturn(Collections.singletonList(student));
     when(userService.getUser(USER_ID)).thenReturn(student);
     when(roomRepository.findByIdAndDeletedFalse(ROOM_ID)).thenReturn(Optional.of(room));
@@ -96,6 +99,7 @@ public class RoomServiceImplTest {
   public void findById() {
     Room actual = roomService.findById(ROOM_ID, USER_ID);
     assertThat(actual).isEqualTo(room);
+    verify(userService).getUser(USER_ID);
     verify(roomRepository).findByIdAndDeletedFalse(ROOM_ID);
   }
 
@@ -109,21 +113,32 @@ public class RoomServiceImplTest {
 
   @Test
   public void createComment() {
-    Comment actual = roomService.createComment(comment);
+    Comment actual = roomService.createComment(comment, USER_ID);
     assertThat(actual.getRoom()).isEqualTo(room);
     assertThat(actual.getAuthor()).isEqualTo(student);
     verify(roomRepository).findByIdAndDeletedFalse(ROOM_ID);
-    verify(userService).getUser(USER_ID);
+    verify(userService, times(2)).getUser(USER_ID);
     verify(commentService).createCommentByRoom(room, comment);
+  }
+
+  @Test
+  public void createCommentDifferentStudent() {
+    User anotherStudent = User.builder().id("student-2").role(Role.STUDENT).build();
+    comment.setAuthor(anotherStudent);
+    when(userService.getUser("student-2")).thenReturn(anotherStudent);
+    catchException(() -> roomService.createComment(comment, "student-2"));
+    assertThat(caughtException().getClass()).isEqualTo(ForbiddenException.class);
+    verify(roomRepository).findByIdAndDeletedFalse(ROOM_ID);
+    verify(userService, times(1)).getUser("student-2");
   }
 
   @Test
   public void createCommentDeadlineHasPassed() {
     assignment.setDeadline(1500000);
-    catchException(() -> roomService.createComment(comment));
+    catchException(() -> roomService.createComment(comment, USER_ID));
     assertThat(caughtException().getClass()).isEqualTo(UnsupportedOperationException.class);
     verify(roomRepository).findByIdAndDeletedFalse(ROOM_ID);
-    verify(userService).getUser(USER_ID);
+    verify(userService, times(2)).getUser(USER_ID);
   }
 
   @Test
@@ -136,12 +151,24 @@ public class RoomServiceImplTest {
 
   @Test
   public void giveScoreToRoomByRoomId() {
+    student.setBatch(batch);
+    User mentor = User.builder().id(MENTOR_ID).role(Role.MENTOR).batch(batch).build();
+    when(userService.getUser(MENTOR_ID)).thenReturn(mentor);
     room.setPoint(100);
-    Room actual = roomService.giveScoreToRoomByRoomId(ROOM_ID, USER_ID, 100);
+    Room actual = roomService.giveScoreToRoomByRoomId(ROOM_ID, MENTOR_ID, 100);
     assertThat(actual.getId()).isEqualTo(ROOM_ID);
     assertThat(actual.getPoint()).isEqualTo(100);
     verify(roomRepository).findByIdAndDeletedFalse(ROOM_ID);
+    verify(userService, times(2)).getUser(MENTOR_ID);
     verify(roomRepository).save(room);
+  }
+
+  @Test
+  public void giveScoreToRoomByRoomIdByStudent() {
+    room.setPoint(100);
+    catchException(() -> roomService.giveScoreToRoomByRoomId(ROOM_ID, USER_ID, 100));
+    verify(userService).getUser(USER_ID);
+    assertThat(caughtException().getClass()).isEqualTo(ForbiddenException.class);
   }
 
   @Test

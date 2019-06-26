@@ -15,7 +15,7 @@ public interface RoomService {
 
   List<Comment> findAllCommentsByRoomId(String roomId);
 
-  Comment createComment(Comment comment);
+  Comment createComment(Comment comment, String userId);
 
   Assignment createRoomsByAssignment(Assignment assignment);
 
