@@ -87,6 +87,7 @@ public class AuthServiceImpl implements AuthService {
     Cookie cookie = new Cookie(sessionProperties.getCookieName(), sessionId);
     cookie.setMaxAge(maxAge);
     cookie.setHttpOnly(true);
+    cookie.setPath("/");
     
     response.addCookie(cookie);
   }
