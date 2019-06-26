@@ -1,6 +1,9 @@
 package com.future.function.web.controller.core;
 
+import com.future.function.common.enumeration.core.Role;
 import com.future.function.service.api.feature.core.SharedCourseService;
+import com.future.function.session.annotation.WithAnyRole;
+import com.future.function.session.model.Session;
 import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.mapper.request.core.SharedCourseRequestMapper;
@@ -42,6 +45,8 @@ public class SharedCourseController {
   @ResponseStatus(HttpStatus.OK)
   @GetMapping
   public PagingResponse<CourseWebResponse> getCoursesForBatch(
+    @WithAnyRole(roles = { Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT })
+      Session session,
     @RequestParam(defaultValue = "1")
       int page,
     @RequestParam(defaultValue = "5")
@@ -61,6 +66,8 @@ public class SharedCourseController {
   @ResponseStatus(HttpStatus.OK)
   @GetMapping(value = "/{courseId}")
   public DataResponse<CourseWebResponse> getCourseForBatch(
+    @WithAnyRole(roles = { Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT })
+      Session session,
     @PathVariable
       String courseId,
     @PathVariable
@@ -74,6 +81,8 @@ public class SharedCourseController {
   @ResponseStatus(HttpStatus.OK)
   @DeleteMapping(value = "/{courseId}")
   public BaseResponse deleteCourseForBatch(
+    @WithAnyRole(roles = { Role.ADMIN, Role.JUDGE, Role.MENTOR })
+      Session session,
     @PathVariable
       String courseId,
     @PathVariable
@@ -87,6 +96,8 @@ public class SharedCourseController {
   @ResponseStatus(HttpStatus.CREATED)
   @PostMapping
   public DataResponse<List<CourseWebResponse>> createCourseForBatch(
+    @WithAnyRole(roles = { Role.ADMIN, Role.JUDGE, Role.MENTOR })
+      Session session,
     @PathVariable
       String batchCode,
     @RequestBody
@@ -106,6 +117,8 @@ public class SharedCourseController {
   @ResponseStatus(HttpStatus.OK)
   @PutMapping("/{courseId}")
   public DataResponse<CourseWebResponse> updateCourseForBatch(
+    @WithAnyRole(roles = { Role.ADMIN, Role.JUDGE, Role.MENTOR })
+      Session session,
     @PathVariable
       String courseId,
     @PathVariable

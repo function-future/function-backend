@@ -3,6 +3,8 @@ package com.future.function.repository.feature.communication.questionnaire;
 import com.future.function.model.entity.feature.communication.questionnaire.UserQuestionnaireSummary;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.model.util.constant.FieldName;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -11,12 +13,14 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Primary
 @Repository
 public class UserQuestionnaireSummaryRepositoryImpl
   implements UserQuestionnaireSummaryRepositoryCustom {
   
   private final MongoTemplate mongoTemplate;
-  
+
+  @Autowired
   public UserQuestionnaireSummaryRepositoryImpl(MongoTemplate mongoTemplate) {
     
     this.mongoTemplate = mongoTemplate;
@@ -34,10 +38,11 @@ public class UserQuestionnaireSummaryRepositoryImpl
   }
   
   private boolean isUserIdInUserIds(
-    List<String> userIds, UserQuestionnaireSummary summary
+    List<String> userIds, UserQuestionnaireSummary summaryUser
   ) {
-    return userIds.contains(summary.getAppraisee().getId());
+    return userIds.contains(summaryUser.getAppraisee().getId());
   }
+
   
   private List<String> getUserIds(String name) {
     

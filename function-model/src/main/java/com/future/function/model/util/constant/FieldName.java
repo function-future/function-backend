@@ -36,7 +36,7 @@ public interface FieldName {
 
     public static final String ROLE = "role";
 
-    public static final String PASSWORD = "password";
+    public static final String PASS = "password";
 
     public static final String PHONE = "phone";
 
@@ -369,6 +369,27 @@ public interface FieldName {
 
     public static final String FILES = "files";
 
+  }
+
+  
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  abstract class Access {
+    
+    public static final String ROLE = "role";
+    
+    public static final String URL_REGEX = "urlRegex";
+    
+    public static final String COMPONENTS = "components";
+    
+  }
+  
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  abstract class Menu {
+    
+    public static final String ROLE = "role";
+    
+    public static final String SECTIONS = "sections";
+    
   }
 
 }

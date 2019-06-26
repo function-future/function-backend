@@ -1,6 +1,7 @@
 package com.future.function.service.impl.feature.core;
 
 import com.future.function.common.enumeration.core.Role;
+import com.future.function.common.exception.ForbiddenException;
 import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.User;
@@ -8,10 +9,11 @@ import com.future.function.repository.feature.core.UserRepository;
 import com.future.function.service.api.feature.core.BatchService;
 import com.future.function.service.api.feature.core.ResourceService;
 import com.future.function.service.api.feature.core.UserService;
-import org.springframework.beans.BeanUtils;
+import com.future.function.service.impl.helper.CopyHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -30,15 +32,18 @@ public class UserServiceImpl implements UserService {
   
   private final ResourceService resourceService;
   
+  private final BCryptPasswordEncoder encoder;
+  
   @Autowired
   public UserServiceImpl(
     BatchService batchService, UserRepository userRepository,
-    ResourceService resourceService
+    ResourceService resourceService, BCryptPasswordEncoder encoder
   ) {
     
     this.batchService = batchService;
     this.userRepository = userRepository;
     this.resourceService = resourceService;
+    this.encoder = encoder;
   }
   
   /**
@@ -59,6 +64,23 @@ public class UserServiceImpl implements UserService {
   /**
    * {@inheritDoc}
    *
+   * @param email    Email of user to be retrieved.
+   * @param password Password of user.
+   *
+   * @return {@code User} - The user object found in database.
+   */
+  @Override
+  public User getUserByEmailAndPassword(String email, String password) {
+    
+    return Optional.ofNullable(email)
+      .flatMap(userRepository::findByEmailAndDeletedFalse)
+      .filter(user -> encoder.matches(password, user.getPassword()))
+      .orElseThrow(() -> new ForbiddenException("Invalid Email/Password"));
+  }
+  
+  /**
+   * {@inheritDoc}
+   *
    * @param role     Role enum of to-be-retrieved users
    * @param pageable Pageable object for paging data
    *
@@ -67,7 +89,7 @@ public class UserServiceImpl implements UserService {
   @Override
   public Page<User> getUsers(Role role, Pageable pageable) {
     
-    return userRepository.findAllByRole(role, pageable);
+    return userRepository.findAllByRoleAndDeletedFalse(role, pageable);
   }
   
   /**
@@ -143,15 +165,48 @@ public class UserServiceImpl implements UserService {
     
     return Optional.ofNullable(batchCode)
       .map(batchService::getBatchByCode)
-      .map(batch -> userRepository.findAllByRoleAndBatch(Role.STUDENT, batch))
+      .map(batch -> userRepository.findAllByRoleAndBatchAndDeletedFalse(Role.STUDENT, batch))
       .orElseGet(Collections::emptyList);
   }
   
   @Override
   public User getUserByEmail(String email) {
     
-    return userRepository.findByEmail(email)
+    return userRepository.findByEmailAndDeletedFalse(email)
       .orElseThrow(() -> new NotFoundException("Get User Not Found"));
+  }
+  
+  @Override
+  public void changeUserPassword(String email, String newPassword) {
+    
+    userRepository.findByEmailAndDeletedFalse(email)
+      .ifPresent(user -> {
+        user.setPassword(encoder.encode(newPassword));
+        userRepository.save(user);
+      });
+  }
+  
+  private User setUserPicture(User user, User foundUser) {
+    
+    return Optional.of(foundUser)
+      .map(User::getPictureV2)
+      .map(FileV2::getId)
+      .map(fileId -> this.markAndSetUserPicture(user, fileId, true))
+      .map(ignored -> foundUser)
+      .orElse(foundUser);
+  }
+  
+  private User markAndSetUserPicture(User user, String fileId, boolean used) {
+    
+    resourceService.markFilesUsed(Collections.singletonList(fileId), used);
+    user.setPictureV2(resourceService.getFile(fileId));
+    return user;
+  }
+  
+  private User copyPropertiesAndSaveUser(User user, User foundUser) {
+    
+    CopyHelper.copyProperties(user, foundUser);
+    return userRepository.save(foundUser);
   }
   
   private void markDeleted(User user) {
@@ -170,22 +225,6 @@ public class UserServiceImpl implements UserService {
       .orElse(user);
   }
   
-  private User setUserPicture(User user, User foundUser) {
-    
-    return Optional.of(foundUser)
-      .map(User::getPictureV2)
-      .map(FileV2::getId)
-      .map(fileId -> this.markAndSetUserPicture(user, fileId, true))
-      .map(ignored -> foundUser)
-      .orElse(foundUser);
-  }
-  
-  private User copyPropertiesAndSaveUser(User user, User foundUser) {
-    
-    BeanUtils.copyProperties(user, foundUser);
-    return userRepository.save(foundUser);
-  }
-  
   private User setUserPicture(User user) {
     
     return Optional.of(user)
@@ -195,16 +234,9 @@ public class UserServiceImpl implements UserService {
       .orElse(user);
   }
   
-  private User markAndSetUserPicture(User user, String fileId, boolean used) {
-    
-    resourceService.markFilesUsed(Collections.singletonList(fileId), used);
-    user.setPictureV2(resourceService.getFile(fileId));
-    return user;
-  }
-  
   private User setDefaultEncryptedPassword(User user) {
     
-    // TODO encrypt password when auth is developed
+    user.setPassword(encoder.encode(user.getPassword()));
     return user;
   }
   

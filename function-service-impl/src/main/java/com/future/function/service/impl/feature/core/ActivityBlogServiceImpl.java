@@ -8,6 +8,7 @@ import com.future.function.repository.feature.core.ActivityBlogRepository;
 import com.future.function.service.api.feature.core.ActivityBlogService;
 import com.future.function.service.api.feature.core.ResourceService;
 import com.future.function.service.api.feature.core.UserService;
+import com.future.function.service.impl.helper.AuthorizationHelper;
 import com.future.function.service.impl.helper.CopyHelper;
 import com.future.function.service.impl.helper.PageHelper;
 import org.springframework.data.domain.Page;
@@ -108,22 +109,15 @@ public class ActivityBlogServiceImpl implements ActivityBlogService {
     return Optional.of(activityBlog)
       .map(ActivityBlog::getId)
       .map(activityBlogRepository::findOne)
-      .filter(foundActivityBlog -> this.isUserValidForEditing(
-        foundActivityBlog.getUser(), activityBlog.getUser()))
+      .filter(foundActivityBlog -> AuthorizationHelper.isAuthorizedForEdit(
+        activityBlog.getUser()
+          .getEmail(), foundActivityBlog))
       .map(this::deleteActivityBlogFiles)
       .map(
         foundActivityBlog -> this.setFileV2s(foundActivityBlog, activityBlog))
       .map(foundActivityBlog -> this.copyPropertiesAndSaveActivityBlog(
         foundActivityBlog, activityBlog))
       .orElse(activityBlog);
-  }
-  
-  private boolean isUserValidForEditing(
-    User foundActivityBlogUser, User requestActivityBlogUser
-  ) {
-    
-    return foundActivityBlogUser.getEmail()
-      .equalsIgnoreCase(requestActivityBlogUser.getEmail());
   }
   
   private ActivityBlog copyPropertiesAndSaveActivityBlog(
@@ -139,6 +133,7 @@ public class ActivityBlogServiceImpl implements ActivityBlogService {
   /**
    * {@inheritDoc}
    *
+   * @param email          Email of current user.
    * @param activityBlogId Id of activity blog to be deleted.
    */
   @Override
@@ -146,8 +141,10 @@ public class ActivityBlogServiceImpl implements ActivityBlogService {
     
     Optional.ofNullable(activityBlogId)
       .map(activityBlogRepository::findOne)
-      // .filter(
-      //   activityBlog -> email.equalsIgnoreCase(activityBlog.getCreatedBy()))
+      .filter(
+        foundActivityBlog -> AuthorizationHelper.isAuthorizedForEdit(email,
+                                                                     foundActivityBlog
+        ))
       .ifPresent(activityBlog -> {
         this.deleteActivityBlogFiles(activityBlog);
         activityBlogRepository.delete(activityBlog);
@@ -175,21 +172,6 @@ public class ActivityBlogServiceImpl implements ActivityBlogService {
     return foundActivityBlog;
   }
   
-  private List<String> getFileIds(ActivityBlog activityBlog) {
-    
-    return activityBlog.getFiles()
-      .stream()
-      .map(FileV2::getId)
-      .collect(Collectors.toList());
-  }
-  
-  private List<FileV2> getFileV2s(List<String> fileIds) {
-    
-    return fileIds.stream()
-      .map(resourceService::getFile)
-      .collect(Collectors.toList());
-  }
-  
   private ActivityBlog setUser(ActivityBlog activityBlog) {
     
     Optional.of(activityBlog)
@@ -210,6 +192,21 @@ public class ActivityBlogServiceImpl implements ActivityBlogService {
     resourceService.markFilesUsed(fileIds, true);
     
     return activityBlog;
+  }
+  
+  private List<String> getFileIds(ActivityBlog activityBlog) {
+    
+    return activityBlog.getFiles()
+      .stream()
+      .map(FileV2::getId)
+      .collect(Collectors.toList());
+  }
+  
+  private List<FileV2> getFileV2s(List<String> fileIds) {
+    
+    return fileIds.stream()
+      .map(resourceService::getFile)
+      .collect(Collectors.toList());
   }
   
 }

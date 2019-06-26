@@ -1,9 +1,11 @@
 package com.future.function.web.controller.core;
 
+import com.future.function.common.enumeration.core.Role;
 import com.future.function.model.entity.feature.core.ActivityBlog;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.service.api.feature.core.ActivityBlogService;
-import com.future.function.web.JacksonTestHelper;
+import com.future.function.web.TestHelper;
+import com.future.function.web.TestSecurityConfiguration;
 import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.mapper.request.core.ActivityBlogRequestMapper;
@@ -17,16 +19,15 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Collections;
 
@@ -42,8 +43,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
+@Import(TestSecurityConfiguration.class)
 @WebMvcTest(ActivityBlogController.class)
-public class ActivityBlogControllerTest extends JacksonTestHelper {
+public class ActivityBlogControllerTest extends TestHelper {
   
   private static final int PAGE = 1;
   
@@ -111,9 +113,7 @@ public class ActivityBlogControllerTest extends JacksonTestHelper {
   @MockBean
   private ActivityBlogRequestMapper activityBlogRequestMapper;
   
-  @Autowired
-  private MockMvc mockMvc;
-  
+  @Override
   @Before
   public void setUp() {
     
@@ -164,12 +164,15 @@ public class ActivityBlogControllerTest extends JacksonTestHelper {
   public void testGivenApiCallAndActivityBlogDataAndEmailByCreatingActivityBlogReturnDataResponse()
     throws Exception {
     
-    when(activityBlogRequestMapper.toActivityBlog(EMAIL, REQUEST)).thenReturn(
-      ACTIVITY_BLOG);
+    super.setCookie(Role.STUDENT);
+    
+    when(activityBlogRequestMapper.toActivityBlog(STUDENT_EMAIL,
+                                                  REQUEST
+    )).thenReturn(ACTIVITY_BLOG);
     when(activityBlogService.createActivityBlog(ACTIVITY_BLOG)).thenReturn(
       ACTIVITY_BLOG);
     
-    mockMvc.perform(post("/api/core/activity-blogs").param("email", EMAIL)
+    mockMvc.perform(post("/api/core/activity-blogs").cookie(cookies)
                       .contentType(MediaType.APPLICATION_JSON)
                       .content(
                         activityBlogWebRequestJacksonTester.write(REQUEST)
@@ -179,7 +182,7 @@ public class ActivityBlogControllerTest extends JacksonTestHelper {
         dataResponseJacksonTester.write(CREATED_DATA_RESPONSE)
           .getJson()));
     
-    verify(activityBlogRequestMapper).toActivityBlog(EMAIL, REQUEST);
+    verify(activityBlogRequestMapper).toActivityBlog(STUDENT_EMAIL, REQUEST);
     verify(activityBlogService).createActivityBlog(ACTIVITY_BLOG);
   }
   
@@ -187,13 +190,15 @@ public class ActivityBlogControllerTest extends JacksonTestHelper {
   public void testGivenApiCallAndActivityBlogDataAndActivityBlogIdAndEmailByUpdatingActivityBlogReturnDataResponse()
     throws Exception {
     
-    when(
-      activityBlogRequestMapper.toActivityBlog(EMAIL, ID, REQUEST)).thenReturn(
-      ACTIVITY_BLOG);
+    super.setCookie(Role.STUDENT);
+    
+    when(activityBlogRequestMapper.toActivityBlog(STUDENT_EMAIL, ID,
+                                                  REQUEST
+    )).thenReturn(ACTIVITY_BLOG);
     when(activityBlogService.updateActivityBlog(ACTIVITY_BLOG)).thenReturn(
       ACTIVITY_BLOG);
     
-    mockMvc.perform(put("/api/core/activity-blogs/" + ID).param("email", EMAIL)
+    mockMvc.perform(put("/api/core/activity-blogs/" + ID).cookie(cookies)
                       .contentType(MediaType.APPLICATION_JSON)
                       .content(
                         activityBlogWebRequestJacksonTester.write(REQUEST)
@@ -203,7 +208,8 @@ public class ActivityBlogControllerTest extends JacksonTestHelper {
         dataResponseJacksonTester.write(RETRIEVED_DATA_RESPONSE)
           .getJson()));
     
-    verify(activityBlogRequestMapper).toActivityBlog(EMAIL, ID, REQUEST);
+    verify(activityBlogRequestMapper).toActivityBlog(
+      STUDENT_EMAIL, ID, REQUEST);
     verify(activityBlogService).updateActivityBlog(ACTIVITY_BLOG);
   }
   
@@ -211,14 +217,15 @@ public class ActivityBlogControllerTest extends JacksonTestHelper {
   public void testGivenApiCallAndActivityBlogIdAndEmailByDeletingActivityBlogReturnBaseResponse()
     throws Exception {
     
-    mockMvc.perform(
-      delete("/api/core/activity-blogs/" + ID).param("email", EMAIL))
+    super.setCookie(Role.STUDENT);
+    
+    mockMvc.perform(delete("/api/core/activity-blogs/" + ID).cookie(cookies))
       .andExpect(status().isOk())
       .andExpect(content().json(
         baseResponseJacksonTester.write(OK_BASE_RESPONSE)
           .getJson()));
     
-    verify(activityBlogService).deleteActivityBlog(EMAIL, ID);
+    verify(activityBlogService).deleteActivityBlog(STUDENT_EMAIL, ID);
     verifyZeroInteractions(activityBlogRequestMapper);
   }
   

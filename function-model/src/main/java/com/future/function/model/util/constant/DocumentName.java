@@ -64,4 +64,8 @@ public abstract class DocumentName {
 
   public static final String MESSAGE_STATUS = "message-status";
   
+  public static final String ACCESS = "accesses";
+  
+  public static final String MENU = "menus";
+  
 }

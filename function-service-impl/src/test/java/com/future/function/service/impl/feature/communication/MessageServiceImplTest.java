@@ -24,7 +24,9 @@ import java.util.Arrays;
 import static com.googlecode.catchexception.CatchException.catchException;
 import static com.googlecode.catchexception.CatchException.caughtException;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 /**
  * Author: PriagungSatyagama
@@ -142,18 +144,6 @@ public class MessageServiceImplTest {
 
     verify(chatroomService).getChatroom(CHATROOM_ID);
     verify(messageRepository).findFirstByChatroomOrderByCreatedAtDesc(CHATROOM);
-  }
-
-  @Test
-  public void testGivenChatroomByGettingLastMessageByChatroomReturnNotFoundException() {
-    when(chatroomService.getChatroom(CHATROOM_ID)).thenReturn(null);
-
-    catchException(() -> messageService.getLastMessage(CHATROOM_ID));
-
-    assertThat(caughtException().getClass()).isEqualTo(NotFoundException.class);
-    assertThat(caughtException().getMessage()).isEqualTo("No message was found");
-
-    verify(chatroomService).getChatroom(CHATROOM_ID);
   }
 
   @Test

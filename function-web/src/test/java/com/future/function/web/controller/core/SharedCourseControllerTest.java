@@ -1,9 +1,11 @@
 package com.future.function.web.controller.core;
 
+import com.future.function.common.enumeration.core.Role;
 import com.future.function.model.entity.feature.core.Course;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.service.api.feature.core.SharedCourseService;
-import com.future.function.web.JacksonTestHelper;
+import com.future.function.web.TestHelper;
+import com.future.function.web.TestSecurityConfiguration;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.mapper.request.core.SharedCourseRequestMapper;
 import com.future.function.web.mapper.response.core.CourseResponseMapper;
@@ -17,10 +19,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -29,7 +31,6 @@ import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Collections;
 import java.util.List;
@@ -46,8 +47,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
-@WebMvcTest(SharedCourseController.class)
-public class SharedCourseControllerTest extends JacksonTestHelper {
+@Import(TestSecurityConfiguration.class)
+@WebMvcTest(value = SharedCourseController.class)
+public class SharedCourseControllerTest extends TestHelper {
   
   private static final String ORIGIN_BATCH_CODE = "origin-batch-code";
   
@@ -125,22 +127,21 @@ public class SharedCourseControllerTest extends JacksonTestHelper {
   
   private JacksonTester<CourseWebRequest> courseWebRequestJacksonTester;
   
+  private JacksonTester<SharedCourseWebRequest>
+    sharedCourseWebRequestJacksonTester;
+  
   @MockBean
   private SharedCourseService sharedCourseService;
   
   @MockBean
   private SharedCourseRequestMapper sharedCourseRequestMapper;
   
-  @Autowired
-  private MockMvc mockMvc;
-  
-  private JacksonTester<SharedCourseWebRequest>
-    sharedCourseWebRequestJacksonTester;
-  
+  @Override
   @Before
   public void setUp() {
     
     super.setUp();
+    super.setCookie(Role.JUDGE);
   }
   
   @After
@@ -153,8 +154,9 @@ public class SharedCourseControllerTest extends JacksonTestHelper {
   public void testGivenApiCallByDeletingCourseForBatchReturnBaseResponse()
     throws Exception {
     
-    mockMvc.perform(
-      delete("/api/core/batches/" + BATCH_CODE + "/courses/" + COURSE_ID))
+    mockMvc.perform(delete(
+      "/api/core/batches/" + BATCH_CODE + "/courses/" + COURSE_ID).cookie(
+      cookies))
       .andExpect(status().isOk())
       .andExpect(content().json(
         baseResponseJacksonTester.write(OK_BASE_RESPONSE)
@@ -175,7 +177,8 @@ public class SharedCourseControllerTest extends JacksonTestHelper {
     )).thenReturn(COURSE);
     
     mockMvc.perform(
-      get("/api/core/batches/" + BATCH_CODE + "/courses/" + COURSE_ID))
+      get("/api/core/batches/" + BATCH_CODE + "/courses/" + COURSE_ID).cookie(
+        cookies))
       .andExpect(status().isOk())
       .andExpect(content().json(
         dataResponseJacksonTester.write(RETRIEVED_DATA_RESPONSE)
@@ -195,7 +198,8 @@ public class SharedCourseControllerTest extends JacksonTestHelper {
                                                    PAGEABLE
     )).thenReturn(COURSE_PAGE);
     
-    mockMvc.perform(get("/api/core/batches/" + BATCH_CODE + "/courses"))
+    mockMvc.perform(
+      get("/api/core/batches/" + BATCH_CODE + "/courses").cookie(cookies))
       .andExpect(status().isOk())
       .andExpect(content().json(
         pagingResponseJacksonTester.write(PAGING_RESPONSE)
@@ -217,8 +221,9 @@ public class SharedCourseControllerTest extends JacksonTestHelper {
     )).thenReturn(COURSE);
     
     mockMvc.perform(put(
-      "/api/core/batches/" + BATCH_CODE + "/courses/" + COURSE_ID).contentType(
-      MediaType.APPLICATION_JSON)
+      "/api/core/batches/" + BATCH_CODE + "/courses/" + COURSE_ID).cookie(
+      cookies)
+                      .contentType(MediaType.APPLICATION_JSON)
                       .content(
                         courseWebRequestJacksonTester.write(COURSE_WEB_REQUEST)
                           .getJson()))
@@ -245,9 +250,9 @@ public class SharedCourseControllerTest extends JacksonTestHelper {
                                                   BATCH_CODE
     )).thenReturn(COURSES);
     
-    mockMvc.perform(post(
-      "/api/core/batches/" + BATCH_CODE + "/courses").contentType(
-      MediaType.APPLICATION_JSON)
+    mockMvc.perform(post("/api/core/batches/" + BATCH_CODE + "/courses").cookie(
+      cookies)
+                      .contentType(MediaType.APPLICATION_JSON)
                       .content(sharedCourseWebRequestJacksonTester.write(
                         SHARED_COURSE_WEB_REQUEST)
                                  .getJson()))

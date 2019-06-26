@@ -1,6 +1,9 @@
 package com.future.function.web.controller.core;
 
+import com.future.function.common.enumeration.core.Role;
 import com.future.function.service.api.feature.core.DiscussionService;
+import com.future.function.session.annotation.WithAnyRole;
+import com.future.function.session.model.Session;
 import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.request.core.DiscussionRequestMapper;
 import com.future.function.web.mapper.response.core.DiscussionResponseMapper;
@@ -21,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping(value = "/api/core/batches/{batchCode}/courses/{courseId" +
                         "}/discussions")
+@WithAnyRole(roles = { Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT })
 public class DiscussionController {
   
   private final DiscussionService discussionService;
@@ -39,12 +43,11 @@ public class DiscussionController {
   @ResponseStatus(HttpStatus.OK)
   @GetMapping
   public PagingResponse<DiscussionWebResponse> getDiscussions(
+    Session session,
     @PathVariable
       String batchCode,
     @PathVariable
       String courseId,
-    @RequestParam
-      String email,
     @RequestParam(defaultValue = "1")
       int page,
     @RequestParam(defaultValue = "4")
@@ -52,7 +55,7 @@ public class DiscussionController {
   ) {
     
     return DiscussionResponseMapper.toDiscussionPagingResponse(
-      discussionService.getDiscussions(email, courseId, batchCode,
+      discussionService.getDiscussions(session.getEmail(), courseId, batchCode,
                                        PageHelper.toPageable(page, size)
       ));
   }
@@ -60,20 +63,19 @@ public class DiscussionController {
   @ResponseStatus(HttpStatus.CREATED)
   @PostMapping
   public DataResponse<DiscussionWebResponse> createDiscussion(
+    Session session,
     @PathVariable
       String batchCode,
     @PathVariable
       String courseId,
-    @RequestParam
-      String email,
     @RequestBody
       DiscussionWebRequest request
   ) {
     
     return DiscussionResponseMapper.toDiscussionDataResponse(
       discussionService.createDiscussion(
-        discussionRequestMapper.toDiscussion(request, email, courseId,
-                                             batchCode
+        discussionRequestMapper.toDiscussion(request, session.getEmail(),
+                                             courseId, batchCode
         )));
   }
   
