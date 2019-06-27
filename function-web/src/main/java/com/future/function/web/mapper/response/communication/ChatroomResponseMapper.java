@@ -123,7 +123,20 @@ public class ChatroomResponseMapper {
                         messageService.getLastMessage(content.getId()),
                         messageStatusService.getSeenStatus(content.getId(), userId))
                 )
-                .sorted((o1, o2) -> o2.getLastMessage().getTime().compareTo(o1.getLastMessage().getTime()))
+                .sorted((o1, o2) -> {
+                    if (o2.getLastMessage() == null && o1.getLastMessage() == null) {
+                        return 0;
+                    }
+                    else if (o2.getLastMessage() == null) {
+                        return -1;
+                    }
+                    else if (o1.getLastMessage() == null) {
+                        return 1;
+                    }
+                    else {
+                        return o2.getLastMessage().getTime().compareTo(o1.getLastMessage().getTime());
+                    }
+                })
                 .collect(Collectors.toList());
     }
 
