@@ -47,21 +47,21 @@ public class EmailMustBeUniqueValidatorTest {
   @Test
   public void testGivenUniqueEmailByValidatingEmailIsUniqueInDatabaseReturnTrue() {
     
-    when(userRepository.findByEmail(EMAIL)).thenReturn(Optional.empty());
+    when(userRepository.findByEmailAndDeletedFalse(EMAIL)).thenReturn(Optional.empty());
   
     assertThat(validator.isValid(EMAIL, null)).isTrue();
     
-    verify(userRepository).findByEmail(EMAIL);
+    verify(userRepository).findByEmailAndDeletedFalse(EMAIL);
   }
   
   @Test
   public void testGivenExistingEmailByValidatingEmailIsUniqueInDatabaseReturnFalse() {
     
-    when(userRepository.findByEmail(EMAIL)).thenReturn(Optional.of(new User()));
+    when(userRepository.findByEmailAndDeletedFalse(EMAIL)).thenReturn(Optional.of(new User()));
   
     assertThat(validator.isValid(EMAIL, null)).isFalse();
     
-    verify(userRepository).findByEmail(EMAIL);
+    verify(userRepository).findByEmailAndDeletedFalse(EMAIL);
   }
   
 }

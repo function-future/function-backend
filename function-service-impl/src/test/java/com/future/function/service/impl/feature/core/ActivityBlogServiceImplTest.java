@@ -1,7 +1,7 @@
 package com.future.function.service.impl.feature.core;
 
+import com.future.function.common.exception.ForbiddenException;
 import com.future.function.common.exception.NotFoundException;
-import com.future.function.common.exception.UnauthorizedException;
 import com.future.function.model.entity.feature.core.ActivityBlog;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.User;
@@ -42,7 +42,7 @@ public class ActivityBlogServiceImplTest {
   
   private static final String FILE_ID = "file-id";
   
-  public static final List<String> FILE_IDS = Collections.singletonList(
+  private static final List<String> FILE_IDS = Collections.singletonList(
     FILE_ID);
   
   private static final FileV2 FILE_V2 = FileV2.builder()
@@ -181,7 +181,7 @@ public class ActivityBlogServiceImplTest {
   }
   
   @Test
-  public void testGivenEmailAndInvalidUserByDeletingActivityBlogsReturnUnauthorizedException() {
+  public void testGivenEmailAndInvalidUserByDeletingActivityBlogsReturnForbiddenException() {
     
     when(activityBlogRepository.findOne(ID)).thenReturn(activityBlog);
     
@@ -189,7 +189,7 @@ public class ActivityBlogServiceImplTest {
       () -> activityBlogService.deleteActivityBlog(EMAIL + "2", ID));
     
     assertThat(caughtException().getClass()).isEqualTo(
-      UnauthorizedException.class);
+      ForbiddenException.class);
     assertThat(caughtException().getMessage()).isEqualTo("Invalid User Email");
     
     verify(activityBlogRepository).findOne(ID);
@@ -276,7 +276,7 @@ public class ActivityBlogServiceImplTest {
   }
   
   @Test
-  public void testGivenActivityBlogDataAndInvalidUserByUpdatingActivityBlogReturnUnauthorizedException() {
+  public void testGivenActivityBlogDataAndInvalidUserByUpdatingActivityBlogReturnForbiddenException() {
     
     when(activityBlogRepository.findOne(ID)).thenReturn(activityBlog);
     
@@ -291,7 +291,7 @@ public class ActivityBlogServiceImplTest {
     catchException(() -> activityBlogService.updateActivityBlog(activityBlog));
     
     assertThat(caughtException().getClass()).isEqualTo(
-      UnauthorizedException.class);
+      ForbiddenException.class);
     assertThat(caughtException().getMessage()).isEqualTo("Invalid User Email");
     
     verify(activityBlogRepository).findOne(ID);

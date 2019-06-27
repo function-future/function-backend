@@ -1,15 +1,14 @@
 package com.future.function.web.model.request.scoring;
 
+import java.util.List;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.NotBlank;
-
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-import java.util.List;
 
 @Data
 @Builder
@@ -35,8 +34,8 @@ public class QuizWebRequest {
   @Min(value = 1, message = "MinimalOnePositiveNumber")
   private Integer trials;
 
-    @NotBlank(message = "NotBlank")
-    private String batchCode;
+  @NotBlank(message = "NotBlank")
+  private String batchCode;
 
   @Min(value = 1, message = "MinimalOnePositiveNumber")
   private Integer questionCount;

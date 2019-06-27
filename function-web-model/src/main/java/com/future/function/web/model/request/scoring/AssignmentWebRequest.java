@@ -2,15 +2,14 @@ package com.future.function.web.model.request.scoring;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.future.function.validation.annotation.core.FileMustExist;
+import java.util.List;
+import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
-
-import javax.validation.constraints.NotNull;
-import java.util.List;
 
 /**
  * Represent the assignment request in the web as AssignmentWebRequest
@@ -31,11 +30,11 @@ public class AssignmentWebRequest {
   private String description;
 
   @NotNull(message = "NotNull")
-  private long deadline;
+  private Long deadline;
 
   @NotEmpty(message = "NotEmpty")
   private String batchCode;
 
-    @FileMustExist
-    private List<String> files;
+  @FileMustExist
+  private List<String> files;
 }

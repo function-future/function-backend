@@ -25,7 +25,7 @@ public interface UserRepository extends MongoRepository<User, String> {
    * @return {@code Optional<User>} - Optional of user found, if any exists;
    * otherwise return {@link java.util.Optional#empty()}
    */
-  Optional<User> findByEmail(String email);
+  Optional<User> findByEmailAndDeletedFalse(String email);
   
   /**
    * Finds users by role and page data
@@ -36,7 +36,7 @@ public interface UserRepository extends MongoRepository<User, String> {
    *
    * @return {@code Page<User>} - Page of users found in database.
    */
-  Page<User> findAllByRole(Role role, Pageable pageable);
+  Page<User> findAllByRoleAndDeletedFalse(Role role, Pageable pageable);
   
   /**
    * Finds users by role and batch data.
@@ -46,6 +46,6 @@ public interface UserRepository extends MongoRepository<User, String> {
    *
    * @return {@code List<User>} - List of users (students) found in database.
    */
-  List<User> findAllByRoleAndBatch(Role role, Batch batch);
+  List<User> findAllByRoleAndBatchAndDeletedFalse(Role role, Batch batch);
   
 }

@@ -12,10 +12,10 @@ import org.hibernate.validator.constraints.NotBlank;
 @AllArgsConstructor
 public class CommentWebRequest {
 
-    @NotBlank(message = "NotBlank")
-    private String userId;
+  @NotBlank(message = "NotBlank")
+  private String userId;
 
-    @NotBlank(message = "NotBlank")
-    private String comment;
+  @NotBlank(message = "NotBlank")
+  private String comment;
 
 }

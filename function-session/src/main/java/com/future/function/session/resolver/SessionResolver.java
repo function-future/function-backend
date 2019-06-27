@@ -1,6 +1,7 @@
 package com.future.function.session.resolver;
 
 import com.future.function.common.enumeration.core.Role;
+import com.future.function.common.exception.ForbiddenException;
 import com.future.function.common.exception.UnauthorizedException;
 import com.future.function.common.properties.core.SessionProperties;
 import com.future.function.session.annotation.WithAnyRole;
@@ -73,7 +74,7 @@ public class SessionResolver implements HandlerMethodArgumentResolver {
       .map(this::getCookies)
       .map(cookies -> this.getSession(cookies, parameterAnnotation))
       .filter(session -> this.isUserOfValidRole(session, parameterAnnotation))
-      .orElseThrow(() -> new UnauthorizedException("Invalid Role"));
+      .orElseThrow(() -> new ForbiddenException("Invalid Role"));
   }
   
   private boolean isUserOfValidRole(

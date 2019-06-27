@@ -23,7 +23,7 @@ public class EmailMustBeUniqueValidator
   public boolean isValid(String email, ConstraintValidatorContext context) {
     
     return !Optional.ofNullable(email)
-      .flatMap(userRepository::findByEmail)
+      .flatMap(userRepository::findByEmailAndDeletedFalse)
       .isPresent();
   }
   

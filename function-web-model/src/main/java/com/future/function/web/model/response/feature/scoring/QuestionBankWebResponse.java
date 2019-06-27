@@ -15,6 +15,8 @@ public class QuestionBankWebResponse {
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private String id;
 
+  private String title;
+
   private String description;
 
 }

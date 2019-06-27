@@ -1,12 +1,11 @@
 package com.future.function.web.model.request.scoring;
 
+import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.NotBlank;
-
-import javax.validation.constraints.NotNull;
 
 @Data
 @Builder
@@ -14,10 +13,10 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 public class StudentQuestionWebRequest {
 
-    @NotNull(message = "NotNull")
-    private Integer number;
+  @NotNull(message = "NotNull")
+  private Integer number;
 
-    @NotBlank(message = "NotBlank")
-    private String optionId;
+  @NotBlank(message = "NotBlank")
+  private String optionId;
 
 }

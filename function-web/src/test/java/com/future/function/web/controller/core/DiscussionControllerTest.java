@@ -48,7 +48,7 @@ public class DiscussionControllerTest extends TestHelper {
   
   private static final String ID = "id";
   
-  private static final String COMMENT = "comment";
+  private static final String COMMENT = "text";
   
   private static final String USER_ID = "user-id";
   

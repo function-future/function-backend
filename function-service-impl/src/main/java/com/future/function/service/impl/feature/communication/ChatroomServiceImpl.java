@@ -3,9 +3,13 @@ package com.future.function.service.impl.feature.communication;
 import com.future.function.common.enumeration.communication.ChatroomType;
 import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.communication.chatting.Chatroom;
+import com.future.function.model.entity.feature.communication.chatting.Message;
+import com.future.function.model.entity.feature.communication.chatting.MessageStatus;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.repository.feature.communication.ChatroomRepository;
 import com.future.function.service.api.feature.communication.ChatroomService;
+import com.future.function.service.api.feature.communication.MessageService;
+import com.future.function.service.api.feature.communication.MessageStatusService;
 import com.future.function.service.api.feature.core.UserService;
 import com.future.function.service.impl.helper.PageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +31,7 @@ public class ChatroomServiceImpl implements ChatroomService {
   private final UserService userService;
 
   private final ChatroomRepository chatroomRepository;
+
 
   @Autowired
   public ChatroomServiceImpl(UserService userService, ChatroomRepository chatroomRepository) {
@@ -62,6 +67,7 @@ public class ChatroomServiceImpl implements ChatroomService {
   public Chatroom createChatroom(Chatroom chatroom) {
     return Optional.of(chatroom)
             .map(this::setMembers)
+            .map(this::setChatroomName)
             .map(chatroomRepository::save)
             .orElseThrow(UnsupportedOperationException::new);
   }
@@ -76,6 +82,13 @@ public class ChatroomServiceImpl implements ChatroomService {
             .map(room -> this.updateType(room, chatroom))
             .map(chatroomRepository::save)
             .orElse(chatroom);
+  }
+
+  private Chatroom setChatroomName(Chatroom chatroom) {
+    if (chatroom.getType().equals(ChatroomType.PRIVATE)) {
+      chatroom.setTitle(chatroom.getMembers().get(0).getName() + " " + chatroom.getMembers().get(1).getName());
+    }
+    return chatroom;
   }
 
   private Chatroom updateMember(Chatroom existingChatroom, Chatroom newChatroom) {

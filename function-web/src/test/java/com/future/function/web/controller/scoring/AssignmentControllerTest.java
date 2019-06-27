@@ -1,10 +1,11 @@
 package com.future.function.web.controller.scoring;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.future.function.common.enumeration.core.Role;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.scoring.Assignment;
 import com.future.function.service.api.feature.scoring.AssignmentService;
+import com.future.function.web.TestHelper;
 import com.future.function.web.TestSecurityConfiguration;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.mapper.request.scoring.AssignmentRequestMapper;
@@ -15,14 +16,15 @@ import com.future.function.web.model.response.base.BaseResponse;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.feature.scoring.AssignmentWebResponse;
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -33,33 +35,30 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
-
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
 @Import(TestSecurityConfiguration.class)
 @WebMvcTest(AssignmentController.class)
-public class AssignmentControllerTest {
+public class AssignmentControllerTest extends TestHelper {
 
   private static final String ASSIGNMENT_TITLE = "assignment-title";
   private static final String ASSIGNMENT_DESCRIPTION = "assignment-description";
   private static final long ASSIGNMENT_DEADLINE = new Date().getTime();
   private static final String BATCH_CODE = "3";
   private static final String ASSIGNMENT_FILE_PATH = "assignment-file-path";
-  private static final String ASSIGNMENT_FILE = "file";
   private static String ASSIGNMENT_ID = UUID.randomUUID().toString();
-  private FileV2 file;
   private Pageable pageable;
   private Assignment assignment;
   private AssignmentWebRequest assignmentWebRequest;
@@ -74,18 +73,9 @@ public class AssignmentControllerTest {
 
   private BaseResponse BASE_RESPONSE;
 
-  private JacksonTester<DataResponse<AssignmentWebResponse>> dataResponseJacksonTester;
-
-  private JacksonTester<PagingResponse<AssignmentWebResponse>> pagingResponseJacksonTester;
-
-  private JacksonTester<BaseResponse> baseResponseJacksonTester;
-
   private JacksonTester<AssignmentWebRequest> assignmentWebRequestJacksonTester;
 
   private JacksonTester<CopyAssignmentWebRequest> copyAssignmentWebRequestJacksonTester;
-
-  @Autowired
-  private MockMvc mockMvc;
 
   @MockBean
   private AssignmentService assignmentService;
@@ -94,10 +84,9 @@ public class AssignmentControllerTest {
   private AssignmentRequestMapper assignmentRequestMapper;
 
   @Before
-  public void setUp() throws Exception {
-
-    JacksonTester.initFields(this, new ObjectMapper());
-
+  public void setUp() {
+    super.setUp();
+    super.setCookie(Role.ADMIN);
     assignment = Assignment
             .builder()
             .id(ASSIGNMENT_ID)
@@ -128,12 +117,6 @@ public class AssignmentControllerTest {
     pageable = new PageRequest(0, 10);
 
     assignmentPage = new PageImpl<>(assignmentList, pageable, 10);
-
-    file = FileV2
-            .builder()
-            .id("FILE_ID")
-            .filePath(ASSIGNMENT_FILE_PATH)
-            .build();
 
     ASSIGNMENT_ID = assignment.getId();
 
@@ -173,6 +156,7 @@ public class AssignmentControllerTest {
   public void testCopyAssignmentByCopyAssignmentWebRequest() throws Exception {
     mockMvc.perform(
         post("/api/scoring/batches/" + BATCH_CODE + "/assignments/copy")
+            .cookie(cookies)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .content(copyAssignmentWebRequestJacksonTester.write(copyAssignmentWebRequest).getJson()))
         .andExpect(status().isCreated())
@@ -186,7 +170,8 @@ public class AssignmentControllerTest {
   public void testFindAssignmentByIdDataResponseAssignment() throws Exception {
 
     mockMvc.perform(
-            get("/api/scoring/batches/" + BATCH_CODE + "/assignments/" + ASSIGNMENT_ID))
+        get("/api/scoring/batches/" + BATCH_CODE + "/assignments/" + ASSIGNMENT_ID)
+            .cookie(cookies))
             .andExpect(status().isOk())
             .andExpect(content().json(
                     dataResponseJacksonTester.write(DATA_RESPONSE)
@@ -200,7 +185,8 @@ public class AssignmentControllerTest {
   @Test
   public void testDeleteAssignmentByIdBaseResponseOk() throws Exception {
     mockMvc.perform(
-            delete("/api/scoring/batches/" + BATCH_CODE + "/assignments/" + ASSIGNMENT_ID))
+        delete("/api/scoring/batches/" + BATCH_CODE + "/assignments/" + ASSIGNMENT_ID)
+            .cookie(cookies))
             .andExpect(status().isOk())
             .andExpect(content().json(
                     baseResponseJacksonTester.write(BASE_RESPONSE)
@@ -214,6 +200,7 @@ public class AssignmentControllerTest {
   public void testCreateAssignment() throws Exception {
     mockMvc.perform(
             post("/api/scoring/batches/" + BATCH_CODE + "/assignments")
+                .cookie(cookies)
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
                     .content(assignmentWebRequestJacksonTester.write(assignmentWebRequest).getJson()))
             .andExpect(status().isCreated())
@@ -231,6 +218,7 @@ public class AssignmentControllerTest {
   public void testUpdateAssignmentWithRequest() throws Exception {
     mockMvc.perform(
             put("/api/scoring/batches/" + BATCH_CODE + "/assignments/" + ASSIGNMENT_ID)
+                .cookie(cookies)
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
                     .content(assignmentWebRequestJacksonTester.write(assignmentWebRequest).getJson()))
             .andExpect(status().isOk())
@@ -245,7 +233,8 @@ public class AssignmentControllerTest {
   @Test
   public void testFindAllAssignmentWithNoPagingParameters() throws Exception {
     mockMvc.perform(
-            get("/api/scoring/batches/" + BATCH_CODE + "/assignments"))
+        get("/api/scoring/batches/" + BATCH_CODE + "/assignments")
+            .cookie(cookies))
             .andExpect(status().isOk())
             .andExpect(content().json(
                     pagingResponseJacksonTester.write(PAGING_RESPONSE)
@@ -259,6 +248,7 @@ public class AssignmentControllerTest {
   public void testFindAllAssignmentWithPagingParameters() throws Exception {
     mockMvc.perform(
             get("/api/scoring/batches/" + BATCH_CODE + "/assignments")
+                .cookie(cookies)
                 .param("page", "1")
                 .param("size", "10"))
             .andExpect(status().isOk())
