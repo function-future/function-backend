@@ -13,6 +13,6 @@ public interface AssignmentRepository extends MongoRepository<Assignment, String
 
   Optional<Assignment> findByIdAndDeletedFalse(String id);
 
-  Page<Assignment> findAllByBatch(Batch batch, Pageable pageable);
+  Page<Assignment> findAllByBatchAndDeletedFalse(Batch batch, Pageable pageable);
 
 }

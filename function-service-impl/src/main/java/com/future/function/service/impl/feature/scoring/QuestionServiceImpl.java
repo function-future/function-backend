@@ -13,8 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.function.Function;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -38,7 +36,7 @@ public class QuestionServiceImpl implements QuestionService {
   @Override
   public Page<Question> findAllByQuestionBankId(String questionBankId, Pageable pageable) {
     return Optional.ofNullable(questionBankId)
-        .map(id -> questionRepository.findAllByQuestionBankId(id, pageable))
+        .map(id -> questionRepository.findAllByQuestionBankIdAndDeletedFalse(id, pageable))
         .map(this::findListFromQuestionPage)
         .orElseThrow(() -> new NotFoundException("Question Bank is not found"));
   }
@@ -51,7 +49,7 @@ public class QuestionServiceImpl implements QuestionService {
         .map(list -> {
           list
               .stream()
-              .map(questionRepository::findAllByQuestionBankId)
+              .map(questionRepository::findAllByQuestionBankIdAndDeletedFalse)
               .forEach(questionList::addAll);
           return questionList;
         })

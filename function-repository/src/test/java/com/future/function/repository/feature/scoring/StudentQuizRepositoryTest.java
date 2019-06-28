@@ -83,7 +83,7 @@ public class StudentQuizRepositoryTest {
 
   @Test
   public void testFindAllByStudentIdAndPageable() {
-    Page<StudentQuiz> actual = repository.findAllByStudentId(USER_ID, pageable);
+    Page<StudentQuiz> actual = repository.findAllByStudentIdAndDeletedFalse(USER_ID, pageable);
 
     assertThat(actual.getContent()).isNotEmpty();
     assertThat(actual.getTotalElements()).isEqualTo(1);
@@ -92,7 +92,7 @@ public class StudentQuizRepositoryTest {
 
   @Test
   public void testFindByStudentIdAndQuizId() {
-    Optional<StudentQuiz> actual = repository.findByStudentIdAndQuizId(USER_ID, QUIZ_ID);
+    Optional<StudentQuiz> actual = repository.findByStudentIdAndQuizIdAndDeletedFalse(USER_ID, QUIZ_ID);
 
     assertThat(actual.get().getTrials()).isEqualTo(studentQuiz.getTrials());
   }

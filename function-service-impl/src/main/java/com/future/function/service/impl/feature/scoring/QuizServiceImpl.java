@@ -123,6 +123,7 @@ public class QuizServiceImpl implements QuizService {
           BeanUtils.copyProperties(
               request,
               quiz,
+              FieldName.Quiz.BATCH,
               FieldName.BaseEntity.CREATED_AT,
               FieldName.BaseEntity.CREATED_BY,
               FieldName.BaseEntity.VERSION
@@ -163,6 +164,8 @@ public class QuizServiceImpl implements QuizService {
   private void checkAndEditBatchCodeByRequest(Quiz quiz, String requestedBatchCode) {
     if (!quiz.getBatch().getCode().equals(requestedBatchCode)) {
       studentQuizService.deleteByBatchCodeAndQuiz(quiz.getBatch().getCode(), quiz.getId());
+      Batch batch = batchService.getBatchByCode(requestedBatchCode);
+      quiz.setBatch(batch);
       studentQuizService.createStudentQuizByBatchCode(requestedBatchCode, quiz);
     }
   }

@@ -32,16 +32,13 @@ public class StudentQuestionServiceImpl implements StudentQuestionService {
 
   @Override
   public List<StudentQuestion> findAllByStudentQuizDetailId(String studentQuizDetailId) {
-    Sort sort = new Sort(Sort.DEFAULT_DIRECTION, "number");
-
     return Optional.ofNullable(studentQuizDetailId)
-        .map(id -> studentQuestionRepository.findAllByStudentQuizDetailId(id, sort))
+        .map(studentQuestionRepository::findAllByStudentQuizDetailIdAndDeletedFalseOrderByNumberAsc)
         .orElseGet(ArrayList::new);
   }
 
   @Override
-  public List<Question> findAllQuestionsFromMultipleQuestionBank(boolean random,
-      List<QuestionBank> questionBanks,
+  public List<Question> findAllQuestionsFromMultipleQuestionBank(boolean random, List<QuestionBank> questionBanks,
       int questionCount) {
     return Optional.of(questionBanks)
         .filter(list -> !list.isEmpty())

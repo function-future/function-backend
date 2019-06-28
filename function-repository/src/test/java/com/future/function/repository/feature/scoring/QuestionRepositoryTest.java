@@ -70,7 +70,7 @@ public class QuestionRepositoryTest {
 
   @Test
   public void findAllByQuestionBankIdPageableTest() {
-    Page<Question> actual = repository.findAllByQuestionBankId(QUESTION_BANK_ID, pageable);
+    Page<Question> actual = repository.findAllByQuestionBankIdAndDeletedFalse(QUESTION_BANK_ID, pageable);
     assertThat(actual.getTotalElements()).isEqualTo(1);
     question.setQuestionBank(null);
     assertThat(actual.getContent().get(0).getText()).isEqualTo(question.getText());
@@ -78,7 +78,7 @@ public class QuestionRepositoryTest {
 
   @Test
   public void findAllByQuestionBankIdListTest() {
-    List<Question> actual = repository.findAllByQuestionBankId(QUESTION_BANK_ID);
+    List<Question> actual = repository.findAllByQuestionBankIdAndDeletedFalse(QUESTION_BANK_ID);
     assertThat(actual.size()).isEqualTo(1);
     assertThat(actual.get(0).getText()).isEqualTo(question.getText());
   }

@@ -7,6 +7,6 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 public interface StudentQuestionRepository extends MongoRepository<StudentQuestion, String> {
 
-  List<StudentQuestion> findAllByStudentQuizDetailId(String studentQuizDetailId, Sort sort);
+  List<StudentQuestion> findAllByStudentQuizDetailIdAndDeletedFalseOrderByNumberAsc(String studentQuizDetailId);
 
 }

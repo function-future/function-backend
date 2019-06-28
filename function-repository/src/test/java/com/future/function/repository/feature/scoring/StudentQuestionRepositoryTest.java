@@ -44,7 +44,8 @@ public class StudentQuestionRepositoryTest {
     studentQuestion = StudentQuestion.builder().number(1).correct(true).studentQuizDetail(detail).build();
     studentQuestionRepository.save(studentQuestion);
 
-    List<StudentQuestion> actual = studentQuestionRepository.findAllByStudentQuizDetailId(STUDENT_QUIZ_DETAIL_ID, sort);
+    List<StudentQuestion> actual = studentQuestionRepository
+        .findAllByStudentQuizDetailIdAndDeletedFalseOrderByNumberAsc(STUDENT_QUIZ_DETAIL_ID);
 
     assertThat(actual.size()).isEqualTo(1);
     assertThat(actual.get(0).getNumber()).isEqualTo(1);

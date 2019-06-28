@@ -46,7 +46,7 @@ public class StudentQuizServiceImpl implements StudentQuizService {
     return Optional.of(userId)
         .map(userService::getUser)
         .map(user -> checkUserEligibilityAndReturnStudentId(user, studentId))
-        .map(id -> studentQuizRepository.findAllByStudentId(studentId, pageable))
+        .map(id -> studentQuizRepository.findAllByStudentIdAndDeletedFalse(studentId, pageable))
         .orElseGet(() -> PageHelper.empty(pageable));
   }
 
@@ -90,13 +90,19 @@ public class StudentQuizServiceImpl implements StudentQuizService {
   @Override
   public List<StudentQuestion> findAllUnansweredQuestionByStudentQuizId(String studentQuizId, String userId) {
     StudentQuiz studentQuiz = findAndUpdateTrials(studentQuizId, userId);
-    return studentQuizDetailService.findAllUnansweredQuestionsByStudentQuizId(studentQuiz.getId());
+    return Optional.of(studentQuiz)
+        .filter(value -> value.getTrials() > 0)
+        .map(val -> studentQuizDetailService.findAllUnansweredQuestionsByStudentQuizId(val.getId()))
+        .orElseGet(ArrayList::new);
   }
 
   private StudentQuiz findAndUpdateTrials(String studentQuizId, String userId) {
     StudentQuiz studentQuiz = this.findById(studentQuizId, userId);
-    studentQuiz.setTrials(studentQuiz.getTrials() - 1);
-    return studentQuizRepository.save(studentQuiz);
+    if(studentQuiz.getTrials() > 0) {
+      studentQuiz.setTrials(studentQuiz.getTrials() - 1);
+      return studentQuizRepository.save(studentQuiz);
+    }
+    return studentQuiz;
   }
 
   @Override
@@ -180,13 +186,16 @@ public class StudentQuizServiceImpl implements StudentQuizService {
     List<User> userList = userService.getStudentsByBatchCode(batchCode);
     userList.stream()
         .map(User::getId)
-        .map(id -> studentQuizRepository.findByStudentIdAndQuizId(id, quizId))
-        .forEach(studentQuizOptional -> studentQuizOptional
-            .ifPresent(studentQuiz -> {
-              studentQuiz.setDeleted(true);
-              studentQuizRepository.save(studentQuiz);
-              studentQuizDetailService.deleteByStudentQuiz(studentQuiz);
-            }));
+        .map(id -> studentQuizRepository.findByStudentIdAndQuizIdAndDeletedFalse(id, quizId))
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .forEach(this::checkAndDeleteStudentQuiz);
+  }
+
+  private void checkAndDeleteStudentQuiz(StudentQuiz studentQuiz) {
+    studentQuiz.setDeleted(true);
+    studentQuizRepository.save(studentQuiz);
+    studentQuizDetailService.deleteByStudentQuiz(studentQuiz);
   }
 
   private List<StudentQuiz> createStudentQuizFromUserList(Quiz quiz, List<User> userList) {

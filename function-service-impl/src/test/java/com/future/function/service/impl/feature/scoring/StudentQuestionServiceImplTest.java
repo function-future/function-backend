@@ -98,7 +98,7 @@ public class StudentQuestionServiceImplTest {
 
     sort = new Sort(Sort.DEFAULT_DIRECTION, "number");
 
-    when(studentQuestionRepository.findAllByStudentQuizDetailId(STUDENT_QUIZ_DETAIL_ID, sort))
+    when(studentQuestionRepository.findAllByStudentQuizDetailIdAndDeletedFalseOrderByNumberAsc(STUDENT_QUIZ_DETAIL_ID))
         .thenReturn(Collections.singletonList(studentQuestion));
     when(studentQuestionRepository.save(studentQuestion)).thenReturn(studentQuestion);
     when(questionService.findAllByMultipleQuestionBankId(Collections.singletonList(QUESTION_BANK_ID)))
@@ -116,7 +116,7 @@ public class StudentQuestionServiceImplTest {
     assertThat(actual.size()).isEqualTo(1);
     assertThat(actual.get(0).getQuestion().getText()).isEqualTo(QUESTION_TEXT);
     assertThat(actual.get(0).getOption().getLabel()).isEqualTo(OPTION_LABEL);
-    verify(studentQuestionRepository).findAllByStudentQuizDetailId(STUDENT_QUIZ_DETAIL_ID, sort);
+    verify(studentQuestionRepository).findAllByStudentQuizDetailIdAndDeletedFalseOrderByNumberAsc(STUDENT_QUIZ_DETAIL_ID);
   }
 
   @Test
@@ -165,7 +165,7 @@ public class StudentQuestionServiceImplTest {
     Integer actual = studentQuestionService
         .postAnswerForAllStudentQuestion(Collections.singletonList(studentQuestion));
     assertThat(actual).isEqualTo(100);
-    verify(studentQuestionRepository).findAllByStudentQuizDetailId(STUDENT_QUIZ_DETAIL_ID, sort);
+    verify(studentQuestionRepository).findAllByStudentQuizDetailIdAndDeletedFalseOrderByNumberAsc(STUDENT_QUIZ_DETAIL_ID);
     verify(studentQuestionRepository).save(studentQuestion);
   }
 
@@ -198,7 +198,7 @@ public class StudentQuestionServiceImplTest {
   public void deleteAllByStudentQuizDetailId() {
     studentQuestion.setDeleted(true);
     studentQuestionService.deleteAllByStudentQuizDetailId(STUDENT_QUIZ_DETAIL_ID);
-    verify(studentQuestionRepository).findAllByStudentQuizDetailId(STUDENT_QUIZ_DETAIL_ID, sort);
+    verify(studentQuestionRepository).findAllByStudentQuizDetailIdAndDeletedFalseOrderByNumberAsc(STUDENT_QUIZ_DETAIL_ID);
     verify(studentQuestionRepository).save(studentQuestion);
   }
 }
