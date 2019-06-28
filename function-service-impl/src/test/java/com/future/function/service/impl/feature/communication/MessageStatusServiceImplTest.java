@@ -203,8 +203,8 @@ public class MessageStatusServiceImplTest {
   public void testGivenChatroomIdAndMessageIdByUpdatingSeenStatusReturnVoid() {
     when(userService.getUser(USER_ID)).thenReturn(USER);
     when(chatroomService.getChatroom(CHATROOM_ID)).thenReturn(CHATROOM);
-    when(messageStatusRepository.findAllByChatroomAndMemberAndCreatedAtLessThanEqualAndSeenIsFalseOrderByCreatedAtDesc(
-            CHATROOM, USER, MESSAGE_3.getCreatedAt())).thenReturn(Arrays.asList(messageStatus3, messageStatus2));
+    when(messageStatusRepository.findAllByChatroomAndMemberAndSeenIsFalseOrderByCreatedAtDesc(
+            CHATROOM, USER)).thenReturn(Arrays.asList(messageStatus3, messageStatus2));
     when(messageService.getMessage(MESSAGE_ID_3)).thenReturn(MESSAGE_3);
     when(messageService.getMessage(MESSAGE_ID_2)).thenReturn(MESSAGE_2);
     when(messageStatusRepository.save(messageStatus2)).thenReturn(messageStatus2);
@@ -214,8 +214,8 @@ public class MessageStatusServiceImplTest {
 
     verify(userService, times(3)).getUser(USER_ID);
     verify(chatroomService, times(3)).getChatroom(CHATROOM_ID);
-    verify(messageStatusRepository).findAllByChatroomAndMemberAndCreatedAtLessThanEqualAndSeenIsFalseOrderByCreatedAtDesc(
-            CHATROOM, USER, MESSAGE_3.getCreatedAt());
+    verify(messageStatusRepository).findAllByChatroomAndMemberAndSeenIsFalseOrderByCreatedAtDesc(
+            CHATROOM, USER);
     verify(messageService, times(2)).getMessage(MESSAGE_ID_3);
     verify(messageService).getMessage(MESSAGE_ID_2);
     verify(messageStatusRepository).save(messageStatus2);

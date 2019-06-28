@@ -69,7 +69,7 @@ public class UserRepositoryTest {
   @Test
   public void testGivenUserEmailByFindingUserByEmailReturnUserData() {
     
-    Optional<User> foundUser1 = userRepository.findByEmail(EMAIL_1);
+    Optional<User> foundUser1 = userRepository.findByEmailAndDeletedFalse(EMAIL_1);
     
     assertThat(foundUser1).isNotEqualTo(Optional.empty());
     assertThat(foundUser1.get()
@@ -77,7 +77,7 @@ public class UserRepositoryTest {
                  .name()).isEqualTo(user1.getRole()
                                       .name());
     
-    Optional<User> foundUser2 = userRepository.findByEmail(EMAIL_2);
+    Optional<User> foundUser2 = userRepository.findByEmailAndDeletedFalse(EMAIL_2);
     
     assertThat(foundUser2).isNotEqualTo(Optional.empty());
     assertThat(foundUser2.get()
@@ -89,14 +89,14 @@ public class UserRepositoryTest {
   @Test
   public void testGivenRoleAndPageableByFindingUsersByRoleAndPageableReturnPageOfUsers() {
     
-    Page<User> foundUsersPage1 = userRepository.findAllByRole(
+    Page<User> foundUsersPage1 = userRepository.findAllByRoleAndDeletedFalse(
       Role.ADMIN, new PageRequest(0, 5));
     
     assertThat(foundUsersPage1).isNotNull();
     assertThat(foundUsersPage1.getContent()).isNotEmpty();
     assertThat(foundUsersPage1.getNumberOfElements()).isEqualTo(1);
     
-    Page<User> foundUsersPage2 = userRepository.findAllByRole(
+    Page<User> foundUsersPage2 = userRepository.findAllByRoleAndDeletedFalse(
       Role.JUDGE, new PageRequest(0, 5));
     
     assertThat(foundUsersPage2).isNotNull();
@@ -107,8 +107,8 @@ public class UserRepositoryTest {
   @Test
   public void testGivenRoleAndBatchByFindingUsersByRoleAndBatchReturnListOfUsers() {
     
-    List<User> foundUsers = userRepository.findAllByRoleAndBatch(Role.STUDENT,
-                                                                 BATCH);
+    List<User> foundUsers = userRepository.findAllByRoleAndBatchAndDeletedFalse(Role.STUDENT,
+                                                                                BATCH);
     
     assertThat(foundUsers).isNotEmpty();
     assertThat(foundUsers.size()).isEqualTo(1);

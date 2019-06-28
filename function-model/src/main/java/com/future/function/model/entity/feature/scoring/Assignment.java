@@ -5,13 +5,16 @@ import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.util.constant.DocumentName;
 import com.future.function.model.util.constant.FieldName;
-import lombok.*;
+import java.util.UUID;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
-
-import java.util.UUID;
 
 /**
  * Entity representation for assignments.
@@ -40,7 +43,7 @@ public class Assignment extends BaseEntity {
   @Field(FieldName.Assignment.FILE)
   private FileV2 file;
 
-  @DBRef
+  @DBRef(lazy = true)
   @Field(FieldName.Assignment.BATCH)
   private Batch batch;
 

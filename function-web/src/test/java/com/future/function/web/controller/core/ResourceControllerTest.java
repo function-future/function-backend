@@ -6,7 +6,7 @@ import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.service.api.feature.core.ResourceService;
 import com.future.function.web.TestHelper;
 import com.future.function.web.TestSecurityConfiguration;
-import com.future.function.web.mapper.request.core.MultipartFileRequestMapper;
+import com.future.function.web.mapper.request.core.ResourceRequestMapper;
 import com.future.function.web.mapper.response.core.ResourceResponseMapper;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.feature.core.FileWebResponse;
@@ -18,11 +18,15 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.util.Pair;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
+
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -30,6 +34,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
@@ -64,7 +69,7 @@ public class ResourceControllerTest extends TestHelper {
   private ResourceService resourceService;
   
   @MockBean
-  private MultipartFileRequestMapper multipartFileRequestMapper;
+  private ResourceRequestMapper resourceRequestMapper;
   
   @Override
   @Before
@@ -77,7 +82,7 @@ public class ResourceControllerTest extends TestHelper {
   @After
   public void tearDown() {
     
-    verifyNoMoreInteractions(resourceService, multipartFileRequestMapper);
+    verifyNoMoreInteractions(resourceService, resourceRequestMapper);
   }
   
   @Test
@@ -86,7 +91,7 @@ public class ResourceControllerTest extends TestHelper {
     
     Pair<String, byte[]> pair = Pair.of(NAME, BYTES);
     
-    when(multipartFileRequestMapper.toStringAndByteArrayPair(
+    when(resourceRequestMapper.toStringAndByteArrayPair(
       any(MultipartFile.class))).thenReturn(pair);
     when(resourceService.storeAndSaveFile(null, NAME, BYTES,
                                           FileOrigin.ANNOUNCEMENT
@@ -101,8 +106,7 @@ public class ResourceControllerTest extends TestHelper {
         dataResponseJacksonTester.write(CREATED_DATA_RESPONSE_NULL_THUMBNAIL)
           .getJson()));
     
-    
-    verify(multipartFileRequestMapper).toStringAndByteArrayPair(
+    verify(resourceRequestMapper).toStringAndByteArrayPair(
       any(MultipartFile.class));
     verify(resourceService).storeAndSaveFile(
       null, NAME, BYTES, FileOrigin.ANNOUNCEMENT);
@@ -112,19 +116,28 @@ public class ResourceControllerTest extends TestHelper {
   public void testGivenApiCallAndFileNameByGettingFileAsByteArrayReturnByteArray()
     throws Exception {
     
-    when(resourceService.getFileAsByteArray(NAME, FileOrigin.ANNOUNCEMENT,
-                                            null
-    )).thenReturn(BYTES);
+    when(resourceRequestMapper.getMediaType(eq(ORIGINAL_NAME),
+                                            any(HttpServletRequest.class)
+    )).thenReturn(MediaType.TEXT_PLAIN);
+    when(
+      resourceService.getFileAsByteArray(ORIGINAL_NAME, FileOrigin.ANNOUNCEMENT,
+                                         null
+      )).thenReturn(BYTES);
     
     mockMvc.perform(
       get("/api/resources/" + ORIGIN + "/" + ORIGINAL_NAME).cookie(cookies))
       .andExpect(status().isOk())
+      .andExpect(header().string(HttpHeaders.CONTENT_DISPOSITION,
+                                 "attachment; filename=\"" + ORIGINAL_NAME +
+                                 "\""
+      ))
       .andExpect(content().bytes(BYTES));
     
-    verify(resourceService).getFileAsByteArray(NAME, FileOrigin.ANNOUNCEMENT,
-                                               null
-    );
-    verifyZeroInteractions(multipartFileRequestMapper);
+    verify(resourceRequestMapper).getMediaType(
+      eq(ORIGINAL_NAME), any(HttpServletRequest.class));
+    verify(resourceService).getFileAsByteArray(
+      ORIGINAL_NAME, FileOrigin.ANNOUNCEMENT, null);
+    verifyZeroInteractions(resourceRequestMapper);
   }
   
 }

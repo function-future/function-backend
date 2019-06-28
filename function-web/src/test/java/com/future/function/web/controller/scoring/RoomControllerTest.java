@@ -1,43 +1,28 @@
 package com.future.function.web.controller.scoring;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.future.function.common.enumeration.core.Role;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.model.entity.feature.scoring.Assignment;
-import com.future.function.model.entity.feature.scoring.Comment;
 import com.future.function.model.entity.feature.scoring.Room;
 import com.future.function.service.api.feature.scoring.AssignmentService;
+import com.future.function.web.TestHelper;
 import com.future.function.web.TestSecurityConfiguration;
 import com.future.function.web.mapper.helper.ResponseHelper;
-import com.future.function.web.mapper.request.scoring.AssignmentRequestMapper;
-import com.future.function.web.mapper.response.scoring.AssignmentResponseMapper;
-import com.future.function.web.mapper.response.scoring.CommentResponseMapper;
 import com.future.function.web.mapper.response.scoring.RoomResponseMapper;
-import com.future.function.web.mapper.response.scoring.RoomResponseMapperTest;
-import com.future.function.web.model.request.scoring.AssignmentWebRequest;
-import com.future.function.web.model.request.scoring.CommentWebRequest;
-import com.future.function.web.model.request.scoring.CopyAssignmentWebRequest;
 import com.future.function.web.model.request.scoring.RoomPointWebRequest;
 import com.future.function.web.model.response.base.BaseResponse;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
-import com.future.function.web.model.response.feature.scoring.AssignmentWebResponse;
-import com.future.function.web.model.response.feature.scoring.CommentWebResponse;
 import com.future.function.web.model.response.feature.scoring.RoomWebResponse;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
-import java.util.List;
 import java.util.UUID;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -49,9 +34,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
 
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -64,21 +47,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @Import(TestSecurityConfiguration.class)
 @WebMvcTest(RoomController.class)
-public class RoomControllerTest {
+public class RoomControllerTest extends TestHelper {
 
   private static final String ASSIGNMENT_TITLE = "assignment-title";
   private static final String ASSIGNMENT_DESCRIPTION = "assignment-description";
   private static final long ASSIGNMENT_DEADLINE = new Date().getTime();
   private static final String BATCH_CODE = "3";
-  private static final String ASSIGNMENT_FILE_PATH = "assignment-file-path";
-  private static final String ASSIGNMENT_FILE = "file";
   private static String ASSIGNMENT_ID = UUID.randomUUID().toString();
   private static final String ROOM_ID = "room-id";
   private static final String USER_ID = "user-id";
   private static final String USER_NAME = "user-name";
 
-
-  private FileV2 file;
   private Pageable pageable;
   private Assignment assignment;
   private Room room;
@@ -92,25 +71,15 @@ public class RoomControllerTest {
 
   private BaseResponse BASE_RESPONSE;
 
-  private JacksonTester<DataResponse<RoomWebResponse>> dataResponseJacksonTester;
-
-  private JacksonTester<PagingResponse<RoomWebResponse>> pagingResponseJacksonTester;
-
-  private JacksonTester<BaseResponse> baseResponseJacksonTester;
-
   private JacksonTester<RoomPointWebRequest> roomPointWebRequestJacksonTester;
-
-  @Autowired
-  private MockMvc mockMvc;
 
   @MockBean
   private AssignmentService assignmentService;
 
   @Before
-  public void setUp() throws Exception {
-
-    JacksonTester.initFields(this, new ObjectMapper());
-
+  public void setUp() {
+    super.setUp();
+    super.setCookie(Role.ADMIN);
     assignment = Assignment
         .builder()
         .id(ASSIGNMENT_ID)
@@ -153,9 +122,9 @@ public class RoomControllerTest {
 
     when(assignmentService.findAllRoomsByAssignmentId(ASSIGNMENT_ID, pageable))
         .thenReturn(roomPage);
-    when(assignmentService.giveScoreToRoomByRoomId(ROOM_ID, 100))
+    when(assignmentService.giveScoreToRoomByRoomId(ROOM_ID, MENTOR_ID, 100))
         .thenReturn(room);
-    when(assignmentService.findRoomById(ROOM_ID))
+    when(assignmentService.findRoomById(ROOM_ID, ADMIN_ID))
         .thenReturn(room);
   }
 
@@ -168,6 +137,7 @@ public class RoomControllerTest {
   public void findAllRoomsByAssignmentId() throws Exception {
     mockMvc.perform(
         get("/api/scoring/batches/" + BATCH_CODE + "/assignments/" + ASSIGNMENT_ID + "/rooms")
+            .cookie(cookies)
         .param("page", "1")
         .param("size", "10"))
         .andExpect(status().isOk())
@@ -181,30 +151,46 @@ public class RoomControllerTest {
   public void findRoomById() throws Exception {
     mockMvc.perform(
         get("/api/scoring/batches/" + BATCH_CODE + "/assignments/" + ASSIGNMENT_ID + "/rooms/" + ROOM_ID)
+            .cookie(cookies)
             .param("roomId", ROOM_ID))
         .andExpect(status().isOk())
         .andExpect(content().json(
             dataResponseJacksonTester.write(DATA_RESPONSE)
                 .getJson()));
-    verify(assignmentService).findRoomById(ROOM_ID);
+    verify(assignmentService).findRoomById(ROOM_ID, ADMIN_ID);
+
   }
 
   @Test
-  public void updateRoomScore() throws Exception {
+  public void updateRoomScoreByMentor() throws Exception {
+    super.setCookie(Role.MENTOR);
     mockMvc.perform(
         put("/api/scoring/batches/" + BATCH_CODE + "/assignments/" + ASSIGNMENT_ID + "/rooms/" + ROOM_ID)
+            .cookie(cookies)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .content(roomPointWebRequestJacksonTester.write(roomPointWebRequest).getJson()))
         .andExpect(status().isOk())
         .andExpect(content().json(
             dataResponseJacksonTester.write(DATA_RESPONSE).getJson()));
-    verify(assignmentService).giveScoreToRoomByRoomId(ROOM_ID, 100);
+    verify(assignmentService).giveScoreToRoomByRoomId(ROOM_ID, MENTOR_ID, 100);
+  }
+
+  @Test
+  public void updateRoomScoreByAdmin() throws Exception {
+    super.setCookie(Role.ADMIN);
+    mockMvc.perform(
+        put("/api/scoring/batches/" + BATCH_CODE + "/assignments/" + ASSIGNMENT_ID + "/rooms/" + ROOM_ID)
+            .cookie(cookies)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .content(roomPointWebRequestJacksonTester.write(roomPointWebRequest).getJson()))
+        .andExpect(status().isForbidden());
   }
 
   @Test
   public void deleteRoomById() throws Exception {
     mockMvc.perform(
-        delete("/api/scoring/batches/" + BATCH_CODE + "/assignments/" + ASSIGNMENT_ID + "/rooms/" + ROOM_ID))
+        delete("/api/scoring/batches/" + BATCH_CODE + "/assignments/" + ASSIGNMENT_ID + "/rooms/" + ROOM_ID)
+            .cookie(cookies))
         .andExpect(status().isOk())
         .andExpect(content().json(
             baseResponseJacksonTester.write(BASE_RESPONSE).getJson()));

@@ -11,8 +11,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class CommentRequestMapper {
 
-    @Autowired
     private RequestValidator validator;
+
+    @Autowired
+    public CommentRequestMapper(RequestValidator validator) {
+        this.validator = validator;
+    }
 
     public Comment toCommentFromRequestWithRoomId(CommentWebRequest request, String roomId) {
         return toValidatedComment(request, roomId);
@@ -24,7 +28,7 @@ public class CommentRequestMapper {
                 .builder()
                 .room(Room.builder().id(roomId).build())
                 .author(User.builder().id(request.getUserId()).build())
-                .comment(request.getComment())
+                .text(request.getComment())
                 .build();
     }
 

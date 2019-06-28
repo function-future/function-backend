@@ -12,9 +12,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class RoomWebResponse {
 
-    private String id;
-    private UserWebResponse student;
-    private AssignmentWebResponse assignment;
-    private Integer point;
+  private String id;
+  private UserWebResponse student;
+  private AssignmentWebResponse assignment;
+  private Integer point;
 
 }

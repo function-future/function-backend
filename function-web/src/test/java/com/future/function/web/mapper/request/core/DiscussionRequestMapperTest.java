@@ -38,7 +38,7 @@ public class DiscussionRequestMapperTest {
   @Test
   public void testGivenWebRequestAndParametersByParsingToDiscussionClassReturnDiscussionObject() {
     
-    String comment = "comment";
+    String comment = "text";
     DiscussionWebRequest discussionWebRequest = DiscussionWebRequest.builder()
       .comment(comment)
       .build();

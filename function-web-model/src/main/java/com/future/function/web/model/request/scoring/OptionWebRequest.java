@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.NotBlank;
-import org.hibernate.validator.constraints.NotEmpty;
 
 @Data
 @Builder
@@ -13,11 +12,11 @@ import org.hibernate.validator.constraints.NotEmpty;
 @AllArgsConstructor
 public class OptionWebRequest {
 
-    private String id;
+  private String id;
 
-    @NotBlank(message = "NotBlank")
-    private String label;
+  @NotBlank(message = "NotBlank")
+  private String label;
 
-    private Boolean correct;
+  private Boolean correct;
 
 }

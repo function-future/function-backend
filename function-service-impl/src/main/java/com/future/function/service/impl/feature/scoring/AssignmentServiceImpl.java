@@ -5,24 +5,20 @@ import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.scoring.Assignment;
 import com.future.function.model.entity.feature.scoring.Room;
-import com.future.function.model.util.constant.FieldName;
 import com.future.function.repository.feature.scoring.AssignmentRepository;
 import com.future.function.service.api.feature.core.BatchService;
 import com.future.function.service.api.feature.core.ResourceService;
 import com.future.function.service.api.feature.scoring.AssignmentService;
 import com.future.function.service.api.feature.scoring.RoomService;
 import com.future.function.service.impl.helper.CopyHelper;
-import org.springframework.beans.BeanUtils;
+import java.util.Collections;
+import java.util.Objects;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 
 /**
  * Service class used to manipulate Assignment Entity
@@ -57,7 +53,7 @@ public class AssignmentServiceImpl implements AssignmentService {
   @Override
   public Page<Assignment> findAllByBatchCodeAndPageable(String batchCode, Pageable pageable) {
     Batch batch = batchService.getBatchByCode(batchCode);
-    return assignmentRepository.findAllByBatchCode(batch.getCode(), pageable);
+    return assignmentRepository.findAllByBatchAndDeletedFalse(batch, pageable);
   }
 
   /**
@@ -81,14 +77,9 @@ public class AssignmentServiceImpl implements AssignmentService {
     return roomService.findAllRoomsByAssignmentId(assignmentId, pageable);
   }
 
-    @Override
-    public List<Room> findAllRoomsByStudentId(String studentId) {
-        return roomService.findAllRoomsByStudentId(studentId);
-    }
-
   @Override
-  public Room findRoomById(String id) {
-    return roomService.findById(id);
+  public Room findRoomById(String id, String userId) {
+    return roomService.findById(id, userId);
   }
 
   @Override
@@ -96,8 +87,7 @@ public class AssignmentServiceImpl implements AssignmentService {
     Assignment assignment = this.findById(assignmentId);
     Assignment newAssignment = Assignment.builder().build();
     Batch targetBatchObj = batchService.getBatchByCode(targetBatchCode);
-    BeanUtils.copyProperties(assignment, newAssignment, "_id", "id",
-            FieldName.BaseEntity.CREATED_BY, FieldName.BaseEntity.CREATED_AT, FieldName.BaseEntity.VERSION);
+    CopyHelper.copyProperties(assignment, newAssignment);
     newAssignment.setBatch(targetBatchObj);
     return this.createAssignment(newAssignment);
   }
@@ -169,8 +159,8 @@ public class AssignmentServiceImpl implements AssignmentService {
   }
 
   @Override
-  public Room giveScoreToRoomByRoomId(String roomId, Integer point) {
-    return roomService.giveScoreToRoomByRoomId(roomId, point);
+  public Room giveScoreToRoomByRoomId(String roomId, String userId, Integer point) {
+    return roomService.giveScoreToRoomByRoomId(roomId, userId, point);
   }
 
   @Override

@@ -14,8 +14,12 @@ import java.util.Optional;
 @Service
 public class CommentServiceImpl implements CommentService {
 
-    @Autowired
     private CommentRepository commentRepository;
+
+    @Autowired
+    public CommentServiceImpl(CommentRepository commentRepository) {
+        this.commentRepository = commentRepository;
+    }
 
     @Override
     public List<Comment> findAllCommentsByRoomId(String roomId) {

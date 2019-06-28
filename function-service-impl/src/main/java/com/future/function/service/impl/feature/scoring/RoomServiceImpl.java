@@ -1,5 +1,7 @@
 package com.future.function.service.impl.feature.scoring;
 
+import com.future.function.common.enumeration.core.Role;
+import com.future.function.common.exception.ForbiddenException;
 import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.model.entity.feature.scoring.Assignment;
@@ -10,27 +12,29 @@ import com.future.function.service.api.feature.core.UserService;
 import com.future.function.service.api.feature.scoring.CommentService;
 import com.future.function.service.api.feature.scoring.RoomService;
 import com.future.function.service.impl.helper.PageHelper;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-
 @Service
 public class RoomServiceImpl implements RoomService {
 
-    @Autowired
     private RoomRepository roomRepository;
 
-    @Autowired
     private UserService userService;
 
-    @Autowired
     private CommentService commentService;
+
+    @Autowired
+    public RoomServiceImpl(RoomRepository roomRepository, UserService userService, CommentService commentService) {
+        this.roomRepository = roomRepository;
+        this.userService = userService;
+        this.commentService = commentService;
+    }
 
     @Override
     public Page<Room> findAllRoomsByAssignmentId(String assignmentId, Pageable pageable) {
@@ -40,18 +44,22 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
-    public List<Room> findAllRoomsByStudentId(String studentId) {
-        return Optional.ofNullable(studentId)
-                .map(roomRepository::findAllByStudentIdAndDeletedFalse)
-                .orElseGet(ArrayList::new);
-    }
-
-    @Override
-    public Room findById(String id) {
+    public Room findById(String id, String userId) {
+      User user = userService.getUser(userId);
         return Optional.ofNullable(id)
                 .flatMap(roomRepository::findByIdAndDeletedFalse)
+            .map(room -> checkStudentEligibility(user, room))
                 .orElseThrow(() -> new NotFoundException("Room not found"));
     }
+
+  private Room checkStudentEligibility(User user, Room room) {
+    if (!user.getRole().equals(Role.STUDENT)) {
+      return room;
+    } else if (room.getStudent().getId().equals(user.getId())) {
+      return room;
+    }
+    throw new ForbiddenException("User not allowed");
+  }
 
     @Override
     public List<Comment> findAllCommentsByRoomId(String roomId) {
@@ -59,15 +67,17 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
-    public Comment createComment(Comment comment) {
-        Room room = this.findById(comment.getRoom().getId());
+    public Comment createComment(Comment comment, String userId) {
+      Room room = this.findById(comment.getRoom().getId(), comment.getAuthor().getId());
         User author = userService.getUser(comment.getAuthor().getId());
         return Optional.of(comment)
                 .filter(value -> room.getAssignment().getDeadline() > new Date().getTime())
+            .filter(value -> author.getId().equals(userId))
+            .map(value -> checkStudentEligibility(author, room))
                 .map(value -> {
-                    value.setRoom(room);
-                    value.setAuthor(author);
-                    return value;
+                  comment.setRoom(room);
+                  comment.setAuthor(author);
+                  return comment;
                 })
                 .map(value -> commentService.createCommentByRoom(room, value))
                 .orElseThrow(() -> new UnsupportedOperationException("Deadline has passed"));
@@ -92,10 +102,22 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
-    public Room giveScoreToRoomByRoomId(String roomId, Integer point) {
-        Room room = this.findById(roomId);
-        room.setPoint(point);
-        return roomRepository.save(room);
+    public Room giveScoreToRoomByRoomId(String roomId, String userId, Integer point) {
+      User user = userService.getUser(userId);
+      return Optional.ofNullable(roomId)
+          .filter(condition -> user.getRole().equals(Role.MENTOR))
+          .map(id -> this.findById(id, user.getId()))
+          .filter(room -> validateMentorBatch(user, room))
+          .map(room -> {
+            room.setPoint(point);
+            return room;
+          })
+          .map(roomRepository::save)
+          .orElseThrow(() -> new ForbiddenException("User not allowed"));
+    }
+
+  private boolean validateMentorBatch(User user, Room room) {
+    return room.getStudent().getBatch().getCode().equals(user.getBatch().getCode());
     }
 
     @Override
