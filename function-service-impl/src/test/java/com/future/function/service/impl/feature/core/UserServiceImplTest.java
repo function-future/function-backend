@@ -1,8 +1,8 @@
 package com.future.function.service.impl.feature.core;
 
 import com.future.function.common.enumeration.core.Role;
+import com.future.function.common.exception.ForbiddenException;
 import com.future.function.common.exception.NotFoundException;
-import com.future.function.common.exception.UnauthorizedException;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.User;
@@ -42,7 +42,9 @@ public class UserServiceImplTest {
   
   private static final String EMAIL_STUDENT = "student@test.com";
   
-  private static final String NAME = "test-name";
+  private static final String NAME_MENTOR = "name-mentor";
+  
+  private static final String NAME_STUDENT = "name-student";
   
   private static final String PASSWORD = "password";
   
@@ -100,7 +102,7 @@ public class UserServiceImplTest {
       .id(STUDENT_ID)
       .role(Role.STUDENT)
       .email(EMAIL_STUDENT)
-      .name(NAME)
+      .name(NAME_STUDENT)
       .password(PASSWORD)
       .phone(PHONE)
       .address(ADDRESS)
@@ -113,7 +115,7 @@ public class UserServiceImplTest {
       .id(MENTOR_ID)
       .role(Role.MENTOR)
       .email(EMAIL_MENTOR)
-      .name(NAME)
+      .name(NAME_MENTOR)
       .password(PASSWORD)
       .phone(PHONE)
       .address(ADDRESS)
@@ -176,7 +178,7 @@ public class UserServiceImplTest {
     User additionalUser = User.builder()
       .role(Role.STUDENT)
       .email(EMAIL_STUDENT)
-      .name(NAME)
+      .name(NAME_STUDENT)
       .password(PASSWORD)
       .phone(PHONE)
       .address(ADDRESS)
@@ -207,7 +209,7 @@ public class UserServiceImplTest {
     User additionalUser = User.builder()
       .role(Role.MENTOR)
       .email(EMAIL_MENTOR)
-      .name(NAME)
+      .name(NAME_STUDENT)
       .password(PASSWORD)
       .phone(PHONE)
       .address(ADDRESS)
@@ -524,7 +526,7 @@ public class UserServiceImplTest {
       () -> userService.getUserByEmailAndPassword(EMAIL_STUDENT, rawPassword));
     
     assertThat(caughtException().getClass()).isEqualTo(
-      UnauthorizedException.class);
+      ForbiddenException.class);
     assertThat(caughtException().getMessage()).isEqualTo(
       "Invalid Email/Password");
     
@@ -548,6 +550,25 @@ public class UserServiceImplTest {
     verify(encoder).encode(rawPassword);
     verify(userRepository).save(userStudent);
     verifyZeroInteractions(resourceService);
+  }
+  
+  @Test
+  public void testGivenNameByGettingUsersByNameContainsIgnoreCaseReturnListOfUsers() {
+    
+    String namePart = "AM";
+    when(userRepository.findAllByNameContainsIgnoreCaseAndDeletedFalse(
+      namePart)).thenReturn(Arrays.asList(userStudent, userMentor));
+  
+    List<User> retrievedUsers = userService.getUsersByNameContainsIgnoreCase(
+      namePart);
+    
+    assertThat(retrievedUsers).isNotEmpty();
+    assertThat(retrievedUsers).isEqualTo(
+      Arrays.asList(userStudent, userMentor));
+    
+    verify(userRepository).findAllByNameContainsIgnoreCaseAndDeletedFalse(
+      namePart);
+    verifyZeroInteractions(resourceService, encoder);
   }
   
 }
