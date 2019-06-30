@@ -28,6 +28,7 @@ public class ChatroomServiceImpl implements ChatroomService {
 
   private final ChatroomRepository chatroomRepository;
 
+
   @Autowired
   public ChatroomServiceImpl(UserService userService, ChatroomRepository chatroomRepository) {
     this.userService = userService;
@@ -62,6 +63,7 @@ public class ChatroomServiceImpl implements ChatroomService {
   public Chatroom createChatroom(Chatroom chatroom) {
     return Optional.of(chatroom)
             .map(this::setMembers)
+            .map(this::setChatroomName)
             .map(chatroomRepository::save)
             .orElseThrow(UnsupportedOperationException::new);
   }
@@ -76,6 +78,13 @@ public class ChatroomServiceImpl implements ChatroomService {
             .map(room -> this.updateType(room, chatroom))
             .map(chatroomRepository::save)
             .orElse(chatroom);
+  }
+
+  private Chatroom setChatroomName(Chatroom chatroom) {
+    if (chatroom.getType().equals(ChatroomType.PRIVATE)) {
+      chatroom.setTitle(chatroom.getMembers().get(0).getName() + " " + chatroom.getMembers().get(1).getName());
+    }
+    return chatroom;
   }
 
   private Chatroom updateMember(Chatroom existingChatroom, Chatroom newChatroom) {

@@ -28,6 +28,7 @@ Accessible for all users. Attempt login for a user based on request he/she sent 
                 "code": 200,
                 "status": "OK",
                 "data": {
+                    "id": "sample-id",
                     "role": "STUDENT",
                     "email": "user@user.com",
                     "name": "User Name",
@@ -60,6 +61,7 @@ Accessible for all users. Check whether the user is logged in or not; if valid u
                 "code": 200,
                 "status": "OK",
                 "data": {
+                    "id": "sample-id",
                     "role": "STUDENT",
                     "email": "user@user.com",
                     "name": "User Name",
