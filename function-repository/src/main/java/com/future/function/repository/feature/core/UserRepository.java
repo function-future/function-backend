@@ -31,7 +31,7 @@ public interface UserRepository extends MongoRepository<User, String> {
    * Finds users by role and page data
    * ({@link org.springframework.data.domain.Pageable}).
    *
-   * @param role Enum of available roles.
+   * @param role     Enum of available roles.
    * @param pageable Pageable object for paging data.
    *
    * @return {@code Page<User>} - Page of users found in database.
@@ -41,11 +41,21 @@ public interface UserRepository extends MongoRepository<User, String> {
   /**
    * Finds users by role and batch data.
    *
-   * @param role Enum of available roles.
+   * @param role  Enum of available roles.
    * @param batch Batch object obtained from batchCode.
    *
    * @return {@code List<User>} - List of users (students) found in database.
    */
   List<User> findAllByRoleAndBatchAndDeletedFalse(Role role, Batch batch);
+  
+  /**
+   * Finds user by name containing search query and matches search query
+   * case-insensitively.
+   *
+   * @param name Search query of name of user.
+   *
+   * @return {@code List<User>} - List or users found in database.
+   */
+  List<User> findAllByNameContainsIgnoreCaseAndDeletedFalse(String name);
   
 }

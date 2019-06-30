@@ -51,8 +51,8 @@ public class FileServiceImplTest {
   
   private static final String NAME = "name";
   
-  private static final Session SESSION = new Session("session-id", EMAIL,
-                                                     Role.ADMIN
+  private static final Session SESSION = new Session("session-id", "user-id",
+                                                     EMAIL, Role.ADMIN
   );
   
   private FileV2 file = FileV2.builder()
@@ -90,8 +90,9 @@ public class FileServiceImplTest {
   @Test
   public void testGivenFileOrFolderIdAndParentIdByGettingFileOrFolderReturnFileOrFolder() {
     
-    when(fileRepository.findByIdAndParentIdAndDeletedFalse(ID, PARENT_ID)).thenReturn(
-      Optional.of(file));
+    when(fileRepository.findByIdAndParentIdAndDeletedFalse(ID,
+                                                           PARENT_ID
+    )).thenReturn(Optional.of(file));
     
     FileV2 file = fileService.getFileOrFolder(ID, PARENT_ID);
     
@@ -105,8 +106,9 @@ public class FileServiceImplTest {
   @Test
   public void testGivenInvalidFileOrFolderIdAndParentIdByGettingFileOrFolderReturnNotFoundException() {
     
-    when(fileRepository.findByIdAndParentIdAndDeletedFalse(ID, PARENT_ID)).thenReturn(
-      Optional.empty());
+    when(fileRepository.findByIdAndParentIdAndDeletedFalse(ID,
+                                                           PARENT_ID
+    )).thenReturn(Optional.empty());
     
     catchException(() -> fileService.getFileOrFolder(ID, PARENT_ID));
     
@@ -141,8 +143,9 @@ public class FileServiceImplTest {
   public void testGivenEmailAndParentIdAndFileOrFolderIdByDeletingFileOrFolderReturnSuccessfulDeletion() {
     
     when(fileProperties.getRootId()).thenReturn(ROOT);
-    when(fileRepository.findByIdAndParentIdAndDeletedFalse(ID, PARENT_ID)).thenReturn(
-      Optional.of(file));
+    when(fileRepository.findByIdAndParentIdAndDeletedFalse(ID,
+                                                           PARENT_ID
+    )).thenReturn(Optional.of(file));
     when(fileRepository.findAllByParentIdAndDeletedFalse(ID)).thenReturn(
       Collections.emptyList());
     when(resourceService.markFilesUsed(Collections.singletonList(ID),
@@ -199,17 +202,17 @@ public class FileServiceImplTest {
     when(fileRepository.findByIdAndParentIdAndDeletedFalse(folder1.getId(),
                                                            folder1.getParentId()
     )).thenReturn(Optional.of(folder1));
-    when(fileRepository.findAllByParentIdAndDeletedFalse(folder1.getId())).thenReturn(
-      Arrays.asList(file1, folder2));
+    when(fileRepository.findAllByParentIdAndDeletedFalse(
+      folder1.getId())).thenReturn(Arrays.asList(file1, folder2));
     
-    when(fileRepository.findAllByParentIdAndDeletedFalse(file1.getId())).thenReturn(
-      Collections.emptyList());
-    when(fileRepository.findAllByParentIdAndDeletedFalse(folder2.getId())).thenReturn(
-      Arrays.asList(file2, file3));
-    when(fileRepository.findAllByParentIdAndDeletedFalse(file2.getId())).thenReturn(
-      Collections.emptyList());
-    when(fileRepository.findAllByParentIdAndDeletedFalse(file3.getId())).thenReturn(
-      Collections.emptyList());
+    when(fileRepository.findAllByParentIdAndDeletedFalse(
+      file1.getId())).thenReturn(Collections.emptyList());
+    when(fileRepository.findAllByParentIdAndDeletedFalse(
+      folder2.getId())).thenReturn(Arrays.asList(file2, file3));
+    when(fileRepository.findAllByParentIdAndDeletedFalse(
+      file2.getId())).thenReturn(Collections.emptyList());
+    when(fileRepository.findAllByParentIdAndDeletedFalse(
+      file3.getId())).thenReturn(Collections.emptyList());
     
     List<String> fileIds = Arrays.asList(folder2.getId(), folder1.getId(),
                                          file1.getId(), file2.getId(),
@@ -275,7 +278,9 @@ public class FileServiceImplTest {
     when(fileRepository.save(any(FileV2.class))).thenReturn(savedFile);
     
     FileV2 createdFile = fileService.createFileOrFolder(
-      new Session("", "", Role.ADMIN), PARENT_ID, NAME, NAME, NAME.getBytes());
+      new Session("", "", EMAIL, Role.ADMIN), PARENT_ID, NAME, NAME,
+      NAME.getBytes()
+    );
     
     assertThat(createdFile).isNotNull();
     assertThat(createdFile.getId()).isNotBlank();
@@ -303,7 +308,9 @@ public class FileServiceImplTest {
     when(fileRepository.save(any(FileV2.class))).thenReturn(returnedFolder);
     
     FileV2 createdFolder = fileService.createFileOrFolder(
-      new Session("", "", Role.ADMIN), PARENT_ID, NAME, NAME, new byte[] {});
+      new Session("", "", EMAIL, Role.ADMIN), PARENT_ID, NAME, NAME,
+      new byte[] {}
+    );
     
     assertThat(createdFolder).isNotNull();
     assertThat(createdFolder.getId()).isNotBlank();
@@ -320,7 +327,7 @@ public class FileServiceImplTest {
   public void testGivenMethodCallAndEmptyByteArrayAndInvalidRoleByCreatingFolderReturnForbiddenException() {
   
     catchException(
-      () -> fileService.createFileOrFolder(new Session("", "", Role.MENTOR),
+      () -> fileService.createFileOrFolder(new Session("", "", EMAIL, Role.MENTOR),
                                            PARENT_ID, NAME, NAME, new byte[] {}
       ));
   
@@ -335,8 +342,9 @@ public class FileServiceImplTest {
   @Test
   public void testGivenMethodCallAndNonEmptyByteArrayByUpdatingFileOrFolderReturnUpdatedFile() {
     
-    when(fileRepository.findByIdAndParentIdAndDeletedFalse(ID, PARENT_ID)).thenReturn(
-      Optional.of(file));
+    when(fileRepository.findByIdAndParentIdAndDeletedFalse(ID,
+                                                           PARENT_ID
+    )).thenReturn(Optional.of(file));
     when(resourceService.storeFile(ID, PARENT_ID, NAME, NAME, NAME.getBytes(),
                                    FileOrigin.FILE
     )).thenReturn(file);
@@ -367,9 +375,9 @@ public class FileServiceImplTest {
       .markFolder(true)
       .build();
     
-    when(
-      fileRepository.findByIdAndParentIdAndDeletedFalse(folder.getId(), PARENT_ID)).thenReturn(
-      Optional.of(folder));
+    when(fileRepository.findByIdAndParentIdAndDeletedFalse(folder.getId(),
+                                                           PARENT_ID
+    )).thenReturn(Optional.of(folder));
     when(fileRepository.save(folder)).thenReturn(folder);
     
     FileV2 updatedFolder = fileService.updateFileOrFolder(
@@ -378,7 +386,8 @@ public class FileServiceImplTest {
     assertThat(updatedFolder).isNotNull();
     assertThat(updatedFolder).isEqualTo(folder);
     
-    verify(fileRepository).findByIdAndParentIdAndDeletedFalse(folder.getId(), PARENT_ID);
+    verify(fileRepository).findByIdAndParentIdAndDeletedFalse(
+      folder.getId(), PARENT_ID);
     verify(fileRepository).save(folder);
     verifyZeroInteractions(resourceService, fileProperties);
   }

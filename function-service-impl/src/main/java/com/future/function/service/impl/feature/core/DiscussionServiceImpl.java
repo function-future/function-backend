@@ -6,6 +6,7 @@ import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.Discussion;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.repository.feature.core.DiscussionRepository;
+import com.future.function.service.api.feature.core.BatchService;
 import com.future.function.service.api.feature.core.DiscussionService;
 import com.future.function.service.api.feature.core.SharedCourseService;
 import com.future.function.service.api.feature.core.UserService;
@@ -29,15 +30,18 @@ public class DiscussionServiceImpl implements DiscussionService {
   
   private final SharedCourseService sharedCourseService;
   
+  private final BatchService batchService;
+  
   @Autowired
   public DiscussionServiceImpl(
     DiscussionRepository discussionRepository, UserService userService,
-    SharedCourseService sharedCourseService
+    SharedCourseService sharedCourseService, BatchService batchService
   ) {
     
     this.discussionRepository = discussionRepository;
     this.userService = userService;
     this.sharedCourseService = sharedCourseService;
+    this.batchService = batchService;
   }
   
   /**
@@ -57,9 +61,10 @@ public class DiscussionServiceImpl implements DiscussionService {
     return Optional.of(email)
       .filter(e -> this.isUserValidForAddingDiscussion(e, batchCode))
       .filter(ignored -> this.isSharedCourseExist(courseId, batchCode))
+      .map(ignored -> this.getBatchId(batchCode))
       .map(
-        ignored -> discussionRepository.findAllByCourseIdAndBatchCodeOrderByCreatedAtDesc(
-          courseId, batchCode, pageable))
+        batchId -> discussionRepository.findAllByCourseIdAndBatchIdOrderByCreatedAtDesc(
+          courseId, batchId, pageable))
       .orElseGet(() -> PageHelper.empty(pageable));
   }
   
@@ -82,9 +87,23 @@ public class DiscussionServiceImpl implements DiscussionService {
       .filter(ignored -> this.isUserValidForAddingDiscussion(email, batchCode))
       .filter(ignored -> this.isSharedCourseExist(courseId, batchCode))
       .map(this::setDiscussionUser)
+      .map(this::setDiscussionBatch)
       .map(discussionRepository::save)
       .orElseThrow(
         () -> new UnsupportedOperationException("Create Discussion Failed"));
+  }
+  
+  private Discussion setDiscussionBatch(Discussion discussion) {
+    
+    discussion.setBatchId(this.getBatchId(discussion.getBatchCode()));
+    
+    return discussion;
+  }
+  
+  private String getBatchId(String batchCode) {
+    
+    return batchService.getBatchByCode(batchCode)
+      .getId();
   }
   
   private boolean isUserValidForAddingDiscussion(

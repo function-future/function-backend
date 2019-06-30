@@ -54,7 +54,7 @@ public class MessageServiceImpl implements MessageService {
     return Optional.of(chatroomId)
             .map(chatroomService::getChatroom)
             .map(messageRepository::findFirstByChatroomOrderByCreatedAtDesc)
-            .orElseThrow(() -> new NotFoundException("No message was found"));
+            .orElse(null);
   }
 
   @Override

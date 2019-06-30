@@ -19,6 +19,8 @@ public class Session implements Serializable {
   private String id = UUID.randomUUID()
     .toString();
   
+  private String userId;
+  
   private String email;
   
   private Role role;

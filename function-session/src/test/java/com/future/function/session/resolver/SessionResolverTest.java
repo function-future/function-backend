@@ -39,7 +39,7 @@ public class SessionResolverTest {
   private static final String COOKIE_VALUE = "cookie-value";
   
   private static final Session SESSION = new Session(
-    COOKIE_VALUE, "", Role.MENTOR);
+    COOKIE_VALUE, "", "", Role.MENTOR);
   
   private static RedisTemplate<String, Session> redisTemplate;
   
