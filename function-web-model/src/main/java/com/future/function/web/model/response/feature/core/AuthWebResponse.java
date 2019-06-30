@@ -11,6 +11,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class AuthWebResponse {
   
+  private String id;
+  
   private String name;
   
   private String role;
