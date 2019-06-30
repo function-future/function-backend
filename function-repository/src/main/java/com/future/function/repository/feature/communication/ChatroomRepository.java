@@ -26,7 +26,7 @@ public interface ChatroomRepository extends MongoRepository<Chatroom, String> {
    *
    * @return {@code Page<Chatroom>} - Paged chatting list from database
    */
-  Page<Chatroom> findAllByTypeAndMembersOrderByCreatedAtDesc(ChatroomType type, User member, Pageable pageable);
+  Page<Chatroom> findAllByTypeAndMembersOrderByUpdatedAtDesc(ChatroomType type, User member, Pageable pageable);
 
   /**
    * Find all paged chatting by title keyword and member
@@ -37,7 +37,7 @@ public interface ChatroomRepository extends MongoRepository<Chatroom, String> {
    *
    * @return {@code Page<Chatroom} - Paged chatting list from database
    */
-  Page<Chatroom> findAllByTitleContainingIgnoreCaseAndMembersOrderByCreatedAtDesc(String titleKeyword, User member, Pageable pageable);
+  Page<Chatroom> findAllByTitleContainingIgnoreCaseAndMembersOrderByUpdatedAtDesc(String titleKeyword, User member, Pageable pageable);
 
   Optional<Chatroom> findByType(String type);
 }

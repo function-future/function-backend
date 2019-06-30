@@ -43,7 +43,7 @@ public class ChatroomServiceImpl implements ChatroomService {
   public Page<Chatroom> getChatrooms(String type, String userId, Pageable pageable) {
     ChatroomType chatroomType = ChatroomType.fromString(type);
     User user = userService.getUser(userId);
-    return chatroomRepository.findAllByTypeAndMembersOrderByCreatedAtDesc(
+    return chatroomRepository.findAllByTypeAndMembersOrderByUpdatedAtDesc(
             chatroomType, user, pageable);
   }
 
@@ -51,7 +51,7 @@ public class ChatroomServiceImpl implements ChatroomService {
   public Page<Chatroom> getChatroomsWithKeyword(String keyword, String userId, Pageable pageable) {
     return Optional.of(userId)
             .map(userService::getUser)
-            .map(user -> chatroomRepository.findAllByTitleContainingIgnoreCaseAndMembersOrderByCreatedAtDesc(
+            .map(user -> chatroomRepository.findAllByTitleContainingIgnoreCaseAndMembersOrderByUpdatedAtDesc(
                     keyword, user, pageable))
             .orElse(PageHelper.empty(pageable));
   }
@@ -115,9 +115,11 @@ public class ChatroomServiceImpl implements ChatroomService {
 
   private Chatroom setMembers(Chatroom chatroom) {
     List<User> members = new ArrayList<>();
-    chatroom.getMembers().forEach(member -> {
-      members.add(userService.getUser(member.getId()));
-    });
+    if (chatroom.getMembers() != null) {
+      chatroom.getMembers().forEach(member -> {
+        members.add(userService.getUser(member.getId()));
+      });
+    }
     chatroom.setMembers(members);
     return chatroom;
   }
