@@ -93,4 +93,14 @@ public interface UserService {
   
   void changeUserPassword(String email, String newPassword);
   
+  /**
+   * Retrieves users from database which contains and case-insensitively
+   * matches given name.
+   *
+   * @param name Part of name of user(s) to be retrieved.
+   *
+   * @return {@code List<User>} - List of users found in database.
+   */
+  List<User> getUsersByNameContainsIgnoreCase(String name);
+  
 }
