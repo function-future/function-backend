@@ -53,7 +53,7 @@ public class ChatroomServiceImpl implements ChatroomService {
             .map(userService::getUser)
             .map(user -> chatroomRepository.findAllByTitleContainingIgnoreCaseAndMembersOrderByUpdatedAtDesc(
                     keyword, user, pageable))
-            .orElse(PageHelper.empty(pageable));
+            .orElseGet(() -> PageHelper.empty(pageable));
   }
 
   @Override

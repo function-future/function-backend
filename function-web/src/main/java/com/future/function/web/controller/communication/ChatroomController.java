@@ -43,7 +43,9 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping(value = "/api/communication/chatrooms")
-@WithAnyRole
+@WithAnyRole(roles = {
+        Role.STUDENT, Role.MENTOR, Role.ADMIN, Role.JUDGE
+})
 public class ChatroomController {
 
     private ChatroomRequestMapper chatroomRequestMapper;
