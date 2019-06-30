@@ -27,8 +27,6 @@ public class UserWebResponse {
   
   private String address;
   
-  private boolean deleted;
-  
   @JsonInclude(value = JsonInclude.Include.NON_NULL)
   private String avatar;
   
