@@ -188,19 +188,10 @@ public class QuestionnaireController {
           produces = MediaType.APPLICATION_JSON_VALUE)
   public PagingResponse<ParticipantDescriptionResponse> getAppraiserQuestionnaire(
           @PathVariable String questionnaireId,
-          @RequestParam(required = false) String search,
           @RequestParam(required = false, defaultValue = "1") int page,
-          @RequestParam(required = false, defaultValue = "10") int size,
+          @RequestParam(required = false, defaultValue = "10") int size
   ) {
-    if (search != null) {
-      return ParticipantResponseMapper.toPagingParticipantResponse(
-        questionnaireService.getQuestionnaireAppraiser(
-                questionnaireService.getQ(search, PageHelper.toPageable(page, size)),
 
-
-        )
-      )
-    }
     return ParticipantResponseMapper.toPagingParticipantResponse(
             questionnaireService.getQuestionnaireAppraiser(
                     questionnaireService.getQuestionnaire(questionnaireId),
