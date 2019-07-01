@@ -76,7 +76,7 @@ public class StudentQuizResponseMapperTest {
   @Test
   public void toPagingStudentQuizWebResponse() {
     PagingResponse<StudentQuizWebResponse> response = StudentQuizResponseMapper.toPagingStudentQuizWebResponse(studentQuizPage);
-    assertThat(response.getPaging().getPage()).isEqualTo(0);
+    assertThat(response.getPaging().getPage()).isEqualTo(1);
     assertThat(response.getPaging().getSize()).isEqualTo(10);
     assertThat(response.getPaging().getTotalRecords()).isEqualTo(1);
     assertThat(response.getData().get(0).getQuiz().getId()).isEqualTo(quiz.getId());

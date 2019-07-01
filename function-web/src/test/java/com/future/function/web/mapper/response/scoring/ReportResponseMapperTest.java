@@ -15,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -59,6 +60,15 @@ public class ReportResponseMapperTest {
     assertThat(actual.getData().getTitle()).isEqualTo(NAME);
     assertThat(actual.getData().getDescription()).isEqualTo(DESCRIPTION);
     assertThat(actual.getData().getStudentCount()).isEqualTo(1);
+  }
+
+  @Test
+  public void toDataReportWebResponseCreated() {
+    DataResponse<ReportWebResponse> actual = ReportResponseMapper.toDataReportWebResponse(HttpStatus.CREATED, report);
+    assertThat(actual.getData().getTitle()).isEqualTo(NAME);
+    assertThat(actual.getData().getDescription()).isEqualTo(DESCRIPTION);
+    assertThat(actual.getData().getStudentCount()).isEqualTo(1);
+    assertThat(actual.getCode()).isEqualTo(201);
   }
 
   @Test

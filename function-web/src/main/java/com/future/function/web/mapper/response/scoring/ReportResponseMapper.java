@@ -10,9 +10,12 @@ import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ReportResponseMapper {
 
   public static DataResponse<ReportWebResponse> toDataReportWebResponse(Report report) {

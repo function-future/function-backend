@@ -123,13 +123,13 @@ public class RoomServiceImplTest {
 
   @Test
   public void createCommentDifferentStudent() {
-    User anotherStudent = User.builder().id("student-2").role(Role.STUDENT).build();
-    comment.setAuthor(anotherStudent);
-    when(userService.getUser("student-2")).thenReturn(anotherStudent);
+    User anotherStudent = User.builder().id("student").role(Role.STUDENT).build();
+    room.setStudent(anotherStudent);
+    when(userService.getUser("student-2")).thenReturn(student);
     catchException(() -> roomService.createComment(comment, "student-2"));
     assertThat(caughtException().getClass()).isEqualTo(ForbiddenException.class);
     verify(roomRepository).findByIdAndDeletedFalse(ROOM_ID);
-    verify(userService, times(1)).getUser("student-2");
+    verify(userService).getUser("student-2");
   }
 
   @Test

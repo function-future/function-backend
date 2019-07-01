@@ -25,7 +25,7 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class QuestionRequestMapperTest {
 
-  private static final String QUESTION_TEXT = "question-text";
+  private static final String QUESTION_TEXT = "question-label";
   private static final String QUESTION_ID = "question-id";
 
   private static final String OPTION_LABEL = "option-label";
@@ -61,13 +61,13 @@ public class QuestionRequestMapperTest {
 
     questionWebRequest = QuestionWebRequest
         .builder()
-        .text(QUESTION_TEXT)
+        .label(QUESTION_TEXT)
         .options(Collections.singletonList(optionWebRequest))
         .build();
 
     question = Question
         .builder()
-        .text(QUESTION_TEXT)
+        .label(QUESTION_TEXT)
         .options(Collections.singletonList(option))
         .build();
 
@@ -87,7 +87,7 @@ public class QuestionRequestMapperTest {
     Question actual = requestMapper.toQuestion(questionWebRequest);
 
     assertThat(actual.getOptions().get(0).getLabel()).isEqualTo(option.getLabel());
-    assertThat(actual.getText()).isEqualTo(question.getText());
+    assertThat(actual.getLabel()).isEqualTo(question.getLabel());
 
     verify(validator).validate(questionWebRequest);
     verify(optionRequestMapper).toOption(optionWebRequest);
@@ -107,7 +107,7 @@ public class QuestionRequestMapperTest {
     when(optionRequestMapper.toOption(optionWebRequest)).thenReturn(option);
 
     Question actual = requestMapper.toQuestion(questionWebRequest, QUESTION_ID);
-    assertThat(actual.getText()).isEqualTo(question.getText());
+    assertThat(actual.getLabel()).isEqualTo(question.getLabel());
     assertThat(actual.getOptions().get(0).getLabel()).isEqualTo(option.getLabel());
 
     verify(validator).validate(questionWebRequest);

@@ -26,7 +26,7 @@ public class Question extends BaseEntity {
   private String id = UUID.randomUUID().toString();
 
   @Field(FieldName.Question.TEXT)
-  private String text;
+  private String label;
 
   @Field(FieldName.Question.QUESTION_BANK)
   @DBRef(lazy = true)

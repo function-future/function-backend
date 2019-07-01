@@ -21,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class QuestionResponseMapperTest {
 
-  private static final String QUESTION_TEXT = "question-text";
+  private static final String QUESTION_TEXT = "question-label";
   private static final String OPTION_LABEL = "option-label";
 
   private Question question;
@@ -46,13 +46,13 @@ public class QuestionResponseMapperTest {
 
     questionWebResponse = QuestionWebResponse
         .builder()
-        .text(QUESTION_TEXT)
+        .label(QUESTION_TEXT)
         .options(Collections.singletonList(optionWebResponse))
         .build();
 
     question = Question
         .builder()
-        .text(QUESTION_TEXT)
+        .label(QUESTION_TEXT)
         .options(Collections.singletonList(option))
         .build();
 
@@ -70,7 +70,7 @@ public class QuestionResponseMapperTest {
   public void toQuestionWebResponse() {
     DataResponse<QuestionWebResponse> actual = QuestionResponseMapper.toQuestionWebResponse(question);
     assertThat(actual.getCode()).isEqualTo(200);
-    assertThat(actual.getData().getText()).isEqualTo(QUESTION_TEXT);
+    assertThat(actual.getData().getLabel()).isEqualTo(QUESTION_TEXT);
     assertThat(actual.getData().getOptions().get(0).getLabel()).isEqualTo(OPTION_LABEL);
   }
 
@@ -78,7 +78,7 @@ public class QuestionResponseMapperTest {
   public void toQuestionWebResponseCreated() {
     DataResponse<QuestionWebResponse> actual = QuestionResponseMapper.toQuestionWebResponse(HttpStatus.CREATED, question);
     assertThat(actual.getCode()).isEqualTo(201);
-    assertThat(actual.getData().getText()).isEqualTo(QUESTION_TEXT);
+    assertThat(actual.getData().getLabel()).isEqualTo(QUESTION_TEXT);
     assertThat(actual.getData().getOptions().get(0).getLabel()).isEqualTo(OPTION_LABEL);
   }
 
@@ -87,7 +87,7 @@ public class QuestionResponseMapperTest {
     PagingResponse<QuestionWebResponse> actual = QuestionResponseMapper.toQuestionPagingResponse(questionPage);
 
     assertThat(actual.getCode()).isEqualTo(200);
-    assertThat(actual.getData().get(0).getText()).isEqualTo(QUESTION_TEXT);
+    assertThat(actual.getData().get(0).getLabel()).isEqualTo(QUESTION_TEXT);
     assertThat(actual.getData().get(0).getOptions().get(0).getLabel()).isEqualTo(OPTION_LABEL);
   }
 }

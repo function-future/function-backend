@@ -13,9 +13,6 @@ import org.hibernate.validator.constraints.NotBlank;
 public class CommentWebRequest {
 
   @NotBlank(message = "NotBlank")
-  private String userId;
-
-  @NotBlank(message = "NotBlank")
   private String comment;
 
 }
