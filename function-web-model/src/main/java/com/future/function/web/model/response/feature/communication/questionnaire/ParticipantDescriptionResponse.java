@@ -19,6 +19,6 @@ public class ParticipantDescriptionResponse {
 
   private String role;
 
-  private Integer batch;
+  private String batch;
 
 }

@@ -4,6 +4,7 @@ import com.future.function.model.entity.feature.communication.questionnaire.Ques
 import com.future.function.model.entity.feature.communication.questionnaire.Questionnaire;
 import com.future.function.model.entity.feature.communication.questionnaire.QuestionnaireParticipant;
 import com.future.function.model.entity.feature.core.User;
+import com.future.function.model.entity.feature.scoring.Question;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -31,6 +32,8 @@ public interface QuestionnaireService {
   // Questionnaire Questions
   // '/api/communication.questionnaires/{questionnaireId}/questions
   List<QuestionQuestionnaire> getQuestionsByIdQuestionnaire(String questionnaireId);
+
+  QuestionQuestionnaire getQuestionQuestionnaire(String questionQuestionnaireId);
 
   QuestionQuestionnaire createQuestionQuestionnaire(QuestionQuestionnaire questionQuestionnaire);
 

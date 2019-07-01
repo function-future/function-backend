@@ -106,6 +106,14 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
   }
 
   @Override
+  public QuestionQuestionnaire getQuestionQuestionnaire(String questionQuestionnaireId){
+    return Optional.of(questionQuestionnaireId)
+            .map(questionQuestionnaireRepository::findOne)
+            .orElseThrow(() -> new NotFoundException("Question with Id" + questionQuestionnaireId + "not found"));
+
+  }
+
+  @Override
   public QuestionQuestionnaire createQuestionQuestionnaire(QuestionQuestionnaire questionQuestionnaire) {
     return Optional.of(questionQuestionnaire)
             .map(target -> this.setQuestionnaire(questionQuestionnaire,target))
