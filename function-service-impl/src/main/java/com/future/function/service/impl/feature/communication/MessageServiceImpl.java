@@ -15,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.Optional;
 
 /**
@@ -75,7 +76,9 @@ public class MessageServiceImpl implements MessageService {
   }
 
   private Message setChatroom(Message message) {
-    message.setChatroom(chatroomService.getChatroom(message.getChatroom().getId()));
+    Chatroom chatroom = chatroomService.getChatroom(message.getChatroom().getId());
+    chatroom.setUpdatedAt(new Date().getTime());
+    message.setChatroom(chatroomService.updateChatroom(chatroom));
     return message;
   }
 

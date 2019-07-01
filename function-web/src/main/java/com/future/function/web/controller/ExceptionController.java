@@ -128,9 +128,9 @@ public class ExceptionController {
   public BaseResponse genericException(
     Throwable e
   ) {
-    
+
     log.error(e.getMessage(), e.getCause());
-    
+
     return ResponseHelper.toBaseResponse(HttpStatus.INTERNAL_SERVER_ERROR);
   }
   

@@ -21,4 +21,6 @@ public interface ChatroomService {
 
   Chatroom updateChatroom(Chatroom chatroom);
 
+  Chatroom getPublicChatroom();
+
 }

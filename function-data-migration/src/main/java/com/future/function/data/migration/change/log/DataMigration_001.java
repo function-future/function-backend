@@ -37,6 +37,7 @@ public class DataMigration_001 {
     admin.append(FieldName.BaseEntity.UPDATED_AT, System.currentTimeMillis());
     admin.append(FieldName.BaseEntity.UPDATED_BY, ADMIN_EMAIL);
     admin.append(FieldName.BaseEntity.VERSION, 0);
+    admin.append(FieldName.BaseEntity.DELETED, false);
     
     mongoTemplate.insert(admin, DocumentName.USER);
   }
