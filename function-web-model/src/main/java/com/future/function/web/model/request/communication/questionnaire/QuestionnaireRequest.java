@@ -27,7 +27,5 @@ public class QuestionnaireRequest {
   @NotNull(message = "DueDate")
   private Long dueDate;
 
-  @NotNull(message = "authorId")
-  private String authorId;
 
 }
