@@ -83,7 +83,7 @@ public class CourseResponseMapperTest {
     Collections.singletonList(COURSE), PAGEABLE, 1);
   
   private static final Paging PAGING = Paging.builder()
-    .page(0)
+    .page(1)
     .size(2)
     .totalRecords(1)
     .build();
