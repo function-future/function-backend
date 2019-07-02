@@ -58,6 +58,7 @@ public class ChatroomRepositoryTest {
             .type(ChatroomType.GROUP)
             .build();
     chatroom1.setCreatedAt(5L);
+    chatroom1.setUpdatedAt(5L);
 
     Chatroom chatroom2 = Chatroom.builder()
             .members(Collections.singletonList(member1))
@@ -65,6 +66,7 @@ public class ChatroomRepositoryTest {
             .type(ChatroomType.GROUP)
             .build();
     chatroom2.setCreatedAt(10L);
+    chatroom2.setUpdatedAt(10L);
 
     Chatroom chatroom3 = Chatroom.builder()
             .members(Arrays.asList(member1, member2))
@@ -72,6 +74,7 @@ public class ChatroomRepositoryTest {
             .type(ChatroomType.PRIVATE)
             .build();
     chatroom3.setCreatedAt(15L);
+    chatroom3.setUpdatedAt(15L);
 
     chatroomRepository.save(chatroom1);
     chatroomRepository.save(chatroom2);
@@ -86,7 +89,7 @@ public class ChatroomRepositoryTest {
   @Test
   public void testGivenTypeAndMemberByFindingAllChatroomReturnPagedChatrooms() {
     Page<Chatroom> chatrooms = chatroomRepository
-            .findAllByTypeAndMembersOrderByCreatedAtDesc(ChatroomType.GROUP, member1, PAGEABLE);
+            .findAllByTypeAndMembersOrderByUpdatedAtDesc(ChatroomType.GROUP, member1, PAGEABLE);
 
     assertThat(chatrooms.getTotalElements()).isEqualTo(2);
     assertThat(chatrooms.getContent().get(0).getTitle()).isEqualTo(TITLE_2);
@@ -95,7 +98,7 @@ public class ChatroomRepositoryTest {
 
   @Test
   public void testGivenTypeAndMemberAndKeywordByFindingAllChatroomReturnPagedChatrooms() {
-    Page<Chatroom> chatrooms = chatroomRepository.findAllByTitleContainingIgnoreCaseAndMembersOrderByCreatedAtDesc(KEYWORD, member1, PAGEABLE);
+    Page<Chatroom> chatrooms = chatroomRepository.findAllByTitleContainingIgnoreCaseAndMembersOrderByUpdatedAtDesc(KEYWORD, member1, PAGEABLE);
 
     assertThat(chatrooms.getTotalElements()).isEqualTo(2);
     assertThat(chatrooms.getContent().get(0).getTitle()).isEqualTo(TITLE_3);

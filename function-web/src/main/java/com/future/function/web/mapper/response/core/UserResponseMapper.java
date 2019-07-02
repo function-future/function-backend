@@ -69,7 +69,6 @@ public class UserResponseMapper {
       .name(user.getName())
       .phone(user.getPhone())
       .address(user.getAddress())
-      .deleted(user.isDeleted())
       .avatar(UserResponseMapper.getFileUrl(user.getPictureV2()))
       .batch(UserResponseMapper.getBatch(user))
       .university(user.getUniversity())

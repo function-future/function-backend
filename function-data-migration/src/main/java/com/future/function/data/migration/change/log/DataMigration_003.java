@@ -30,14 +30,9 @@ public class DataMigration_003 {
             id ="chatroomMigration",
             order = "0001")
     public void insertChatroom(MongoTemplate mongoTemplate) {
-        List<DBRef> memberIds = new ArrayList<>();
-        mongoTemplate.findAll(User.class).forEach(member -> {
-            memberIds.add(new DBRef(DocumentName.USER, new ObjectId(member.getId())));
-        });
         BasicDBObject chatroom = new BasicDBObject();
         chatroom.append(FieldName.Chatroom.CHATROOM_TITLE, "Public Chatroom");
         chatroom.append(FieldName.Chatroom.TYPE, ChatroomType.PUBLIC);
-        chatroom.append(FieldName.Chatroom.MEMBERS, memberIds);
         chatroom.append("_class", "com.future.function.model.entity.feature.communication.chatting.Chatroom");
         chatroom.append(
                 FieldName.BaseEntity.CREATED_AT, System.currentTimeMillis());
