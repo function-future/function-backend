@@ -152,8 +152,8 @@ public class DataMigration_004 {
       );
     mongoDatabase.getCollection(DocumentName.ACTIVITY_BLOG)
       .createIndex(
-        Indexes.ascending(ACTIVITY_BLOG_USER_ID.getFields()),
-        new IndexOptions().name(ACTIVITY_BLOG_USER_ID.name())
+        Indexes.ascending(ACTIVITY_BLOG_USER_ID_TITLE_DESCRIPTION.getFields()),
+        new IndexOptions().name(ACTIVITY_BLOG_USER_ID_TITLE_DESCRIPTION.name())
       );
   }
   
