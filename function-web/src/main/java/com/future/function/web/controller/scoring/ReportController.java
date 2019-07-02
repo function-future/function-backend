@@ -44,7 +44,7 @@ public class ReportController {
       @RequestParam(defaultValue = "1", required = false) int page,
       @RequestParam(defaultValue = "10", required = false) int size,
       Session session) {
-    return ReportResponseMapper.toPagingReportWebResponse(reportService.findAllReport(PageHelper.toPageable(page, size)));
+    return ReportResponseMapper.toPagingReportWebResponse(reportService.findAllReport(session.getUserId(), PageHelper.toPageable(page, size)));
   }
 
   @ResponseStatus(HttpStatus.OK)
