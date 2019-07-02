@@ -1,5 +1,6 @@
 package com.future.function.service.impl.feature.scoring;
 
+import com.future.function.common.enumeration.core.Role;
 import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.model.entity.feature.scoring.Report;
@@ -14,8 +15,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -32,8 +34,13 @@ public class ReportServiceImpl implements ReportService {
     private UserService userService;
 
     @Override
-    public Page<Report> findAllReport(Pageable pageable) {
-        return reportRepository.findAll(pageable);
+    public Page<Report> findAllReport(String userId, Pageable pageable) {
+        User user = userService.getUser(userId);
+        if (user.getRole().equals(Role.ADMIN)) {
+            return reportRepository.findAll(pageable);
+        } else {
+            return reportRepository.findAllByUsedAtEqualsAndDeletedFalse(LocalDate.now(ZoneId.systemDefault()), pageable);
+        }
     }
 
     @Override
@@ -57,23 +64,26 @@ public class ReportServiceImpl implements ReportService {
                 .map(userService::getUser)
                 .map(student -> reportDetailService.createReportDetailByReport(report, student))
                 .findFirst()
+                .map(value -> {
+                    value.setStudentIds(null);
+                    return value;
+                })
                 .orElse(null);
     }
 
     @Override
     public Report updateReport(Report report) {
-
-        Optional.ofNullable(report)
+        return Optional.ofNullable(report)
                 .map(this::checkStudentIdsChangedAndDeleteIfChanged)
                 .map(Report::getId)
-                .flatMap(reportRepository::findByIdAndDeletedFalse)
+                .map(this::findById)
                 .map(foundReport -> {
                     CopyHelper.copyProperties(report, foundReport);
+                    foundReport.setStudentIds(null);
                     return foundReport;
                 })
                 .map(reportRepository::save)
                 .orElseThrow(() -> new UnsupportedOperationException("Failed to update report"));
-        return null;
     }
 
     private Report checkStudentIdsChangedAndDeleteIfChanged(Report report) {
@@ -83,15 +93,35 @@ public class ReportServiceImpl implements ReportService {
                 .collect(Collectors.toList());
         return Optional.ofNullable(report)
                 .map(Report::getStudentIds)
-                .filter(list -> Objects.nonNull(list) && !list.isEmpty())
+                .map(this::validateList)
                 .filter(foundStudentIds::containsAll)
                 .map(value -> report)
                 .orElseGet(() -> deleteAllDetailByReportId(report));
     }
 
+    private List<String> validateList(List<String> list) {
+        if (list.isEmpty())
+            throw new UnsupportedOperationException("Update failed: student list empty");
+        return list;
+    }
+
     private Report deleteAllDetailByReportId(Report report) {
-        reportDetailService.deleteAllByReportId(report.getId());
-        return report;
+        return Optional.ofNullable(report)
+                .map(Report::getId)
+                .map(reportId -> {
+                    reportDetailService.deleteAllByReportId(reportId);
+                    return this.createReportDetailByReportAndStudentId(report, report.getStudentIds());
+                })
+                .orElseThrow(() -> new UnsupportedOperationException("Update failed at #deleteAllReportByReportId"));
+    }
+
+    @Override
+    public Report giveScoreToEachStudent(String reportId, List<ReportDetail> reportDetailList, String userId) {
+        return Optional.ofNullable(reportId)
+                .map(this::findById)
+                .map(Report::getId)
+                .map(id -> reportDetailService.giveScoreToEachStudentInDetail(id, reportDetailList, userId))
+                .orElseThrow(() -> new UnsupportedOperationException("give score failed at #giveScoreToEachStudent"));
     }
 
     @Override
@@ -99,6 +129,7 @@ public class ReportServiceImpl implements ReportService {
         Optional.ofNullable(id)
                 .flatMap(reportRepository::findByIdAndDeletedFalse)
                 .ifPresent(report -> {
+                    reportDetailService.deleteAllByReportId(report.getId());
                     report.setDeleted(true);
                     reportRepository.save(report);
                 });

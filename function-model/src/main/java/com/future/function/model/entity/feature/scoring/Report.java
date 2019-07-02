@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -28,7 +29,7 @@ public class Report extends BaseEntity {
     private String description;
 
     @Field
-    private long usedAt;
+    private LocalDate usedAt;
 
     private List<String> studentIds;
 

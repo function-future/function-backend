@@ -12,13 +12,14 @@ import com.future.function.service.api.feature.core.UserService;
 import com.future.function.service.api.feature.scoring.CommentService;
 import com.future.function.service.api.feature.scoring.RoomService;
 import com.future.function.service.impl.helper.PageHelper;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class RoomServiceImpl implements RoomService {
@@ -64,6 +65,15 @@ public class RoomServiceImpl implements RoomService {
     @Override
     public List<Comment> findAllCommentsByRoomId(String roomId) {
         return commentService.findAllCommentsByRoomId(roomId);
+    }
+
+    @Override
+    public Page<Room> findAllByStudentId(String studentId, Pageable pageable) {
+        return Optional.ofNullable(studentId)
+                .map(userService::getUser)
+                .map(User::getId)
+                .map(id -> roomRepository.findAllByStudentIdAndDeletedFalse(id, pageable))
+                .orElseGet(() -> PageHelper.empty(pageable));
     }
 
     @Override

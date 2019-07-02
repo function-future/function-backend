@@ -11,14 +11,15 @@ import com.future.function.service.api.feature.core.ResourceService;
 import com.future.function.service.api.feature.scoring.AssignmentService;
 import com.future.function.service.api.feature.scoring.RoomService;
 import com.future.function.service.impl.helper.CopyHelper;
-import java.util.Collections;
-import java.util.Objects;
-import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+
+import java.util.Collections;
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Service class used to manipulate Assignment Entity
@@ -75,6 +76,11 @@ public class AssignmentServiceImpl implements AssignmentService {
   @Override
   public Page<Room> findAllRoomsByAssignmentId(String assignmentId, Pageable pageable) {
     return roomService.findAllRoomsByAssignmentId(assignmentId, pageable);
+  }
+
+  @Override
+  public Page<Room> findAllRoomsByStudentId(String studentId, Pageable pageable) {
+    return roomService.findAllByStudentId(studentId, pageable);
   }
 
   @Override

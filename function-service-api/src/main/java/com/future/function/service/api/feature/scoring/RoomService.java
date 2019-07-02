@@ -3,9 +3,10 @@ package com.future.function.service.api.feature.scoring;
 import com.future.function.model.entity.feature.scoring.Assignment;
 import com.future.function.model.entity.feature.scoring.Comment;
 import com.future.function.model.entity.feature.scoring.Room;
-import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+
+import java.util.List;
 
 public interface RoomService {
 
@@ -14,6 +15,8 @@ public interface RoomService {
   Room findById(String id, String userId);
 
   List<Comment> findAllCommentsByRoomId(String roomId);
+
+  Page<Room> findAllByStudentId(String studentId, Pageable pageable);
 
   Comment createComment(Comment comment, String userId);
 
