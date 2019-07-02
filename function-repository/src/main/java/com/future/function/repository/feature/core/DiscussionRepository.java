@@ -13,7 +13,7 @@ import org.springframework.stereotype.Repository;
 public interface DiscussionRepository
   extends MongoRepository<Discussion, String> {
   
-  Page<Discussion> findAllByCourseIdAndBatchCodeOrderByCreatedAtDesc(
+  Page<Discussion> findAllByCourseIdAndBatchIdOrderByCreatedAtDesc(
     String courseId, String batchCode, Pageable pageable
   );
   

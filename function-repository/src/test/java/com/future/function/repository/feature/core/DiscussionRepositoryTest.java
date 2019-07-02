@@ -21,7 +21,7 @@ public class DiscussionRepositoryTest {
   
   private static final String COURSE_ID = "course-id";
   
-  private static final String BATCH_CODE = "batch-code";
+  private static final String BATCH_ID = "batch-id";
   
   @Autowired
   private DiscussionRepository discussionRepository;
@@ -31,7 +31,7 @@ public class DiscussionRepositoryTest {
     
     Discussion discussion = Discussion.builder()
       .courseId(COURSE_ID)
-      .batchCode(BATCH_CODE)
+      .batchId(BATCH_ID)
       .build();
     
     discussionRepository.save(discussion);
@@ -48,8 +48,8 @@ public class DiscussionRepositoryTest {
     
     Pageable pageable = new PageRequest(0, 10);
     Page<Discussion> discussions =
-      discussionRepository.findAllByCourseIdAndBatchCodeOrderByCreatedAtDesc(
-        COURSE_ID, BATCH_CODE, pageable);
+      discussionRepository.findAllByCourseIdAndBatchIdOrderByCreatedAtDesc(
+        COURSE_ID, BATCH_ID, pageable);
     
     assertThat(discussions).isNotNull();
     assertThat(discussions.getContent()).isNotEmpty();
@@ -58,7 +58,7 @@ public class DiscussionRepositoryTest {
                  .getCourseId()).isEqualTo(COURSE_ID);
     assertThat(discussions.getContent()
                  .get(0)
-                 .getBatchCode()).isEqualTo(BATCH_CODE);
+                 .getBatchId()).isEqualTo(BATCH_ID);
   }
   
 }
