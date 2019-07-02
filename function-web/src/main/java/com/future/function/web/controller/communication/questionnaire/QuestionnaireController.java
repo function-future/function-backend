@@ -59,8 +59,7 @@ public class QuestionnaireController {
   public PagingResponse<QuestionnaireDetailResponse> getQuestionnaires(
           @RequestParam(required = false) String search,
           @RequestParam(required = false, defaultValue = "1") int page,
-          @RequestParam(required = false, defaultValue = "10") int size,
-          Session session
+          @RequestParam(required = false, defaultValue = "10") int size
   ){
     if( search != null) {
       return QuestionnaireResponseMapper
@@ -250,6 +249,15 @@ public class QuestionnaireController {
             questionnaireService.addQuestionnaireAppraiseeToQuestionnaire(questionnaireId, questionnaireParticipant.getId()),
             HttpStatus.OK
     );
+  }
+
+  @ResponseStatus(HttpStatus.OK)
+  @DeleteMapping(value = "/{questionnaireId}/appraisee/{questionnaireParticipantId}")
+  public BaseResponse deleteAppraisee(@PathVariable String questionnaireId,
+                                      @PathVariable String questionnaireParticipantId
+  ){
+    questionnaireService.deleteQuestionnaireAppraiseeFromQuestionnaire(questionnaireParticipantId);
+    return ResponseHelper.toBaseResponse(HttpStatus.OK);
   }
 
 }
