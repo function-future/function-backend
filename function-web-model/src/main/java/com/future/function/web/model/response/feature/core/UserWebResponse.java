@@ -27,13 +27,11 @@ public class UserWebResponse {
   
   private String address;
   
-  private boolean deleted;
-  
   @JsonInclude(value = JsonInclude.Include.NON_NULL)
   private String avatar;
   
   @JsonInclude(value = JsonInclude.Include.NON_NULL)
-  private String batch;
+  private BatchWebResponse batch;
   
   @JsonInclude(value = JsonInclude.Include.NON_NULL)
   private String university;

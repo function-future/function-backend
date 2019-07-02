@@ -8,7 +8,6 @@ import com.future.function.model.entity.feature.communication.chatting.MessageSt
 import com.future.function.service.api.feature.communication.ChatroomService;
 import com.future.function.service.api.feature.communication.MessageService;
 import com.future.function.service.api.feature.communication.MessageStatusService;
-import com.future.function.service.api.feature.core.UserService;
 import com.future.function.session.annotation.WithAnyRole;
 import com.future.function.session.model.Session;
 import com.future.function.web.mapper.helper.PageHelper;

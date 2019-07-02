@@ -9,6 +9,7 @@ import com.future.function.service.api.feature.core.UserService;
 import com.future.function.web.TestHelper;
 import com.future.function.web.TestSecurityConfiguration;
 import com.future.function.web.mapper.helper.ResponseHelper;
+import com.future.function.web.mapper.request.core.UserDetailRequestMapper;
 import com.future.function.web.mapper.response.core.UserResponseMapper;
 import com.future.function.web.model.request.core.ChangePasswordWebRequest;
 import com.future.function.web.model.response.base.BaseResponse;
@@ -22,6 +23,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -55,10 +57,12 @@ public class UserDetailControllerTest extends TestHelper {
                  .build())
     .build();
   
+  private static final String OLD_PASSWORD = "old-password";
+  
   private static final String NEW_PASSWORD = "new-password";
   
   private static final ChangePasswordWebRequest CHANGE_PASSWORD_WEB_REQUEST =
-    new ChangePasswordWebRequest(NEW_PASSWORD);
+    new ChangePasswordWebRequest(OLD_PASSWORD, NEW_PASSWORD);
   
   private static final DataResponse<UserWebResponse> DATA_RESPONSE =
     UserResponseMapper.toUserDataResponse(USER);
@@ -83,6 +87,9 @@ public class UserDetailControllerTest extends TestHelper {
   @MockBean
   private AccessService accessService;
   
+  @MockBean
+  private UserDetailRequestMapper userDetailRequestMapper;
+  
   @Override
   @Before
   public void setUp() {
@@ -93,7 +100,8 @@ public class UserDetailControllerTest extends TestHelper {
   @After
   public void tearDown() {
     
-    verifyNoMoreInteractions(userService, menuService, accessService);
+    verifyNoMoreInteractions(
+      userService, menuService, accessService, userDetailRequestMapper);
   }
   
   @Test
@@ -110,6 +118,7 @@ public class UserDetailControllerTest extends TestHelper {
                                   .getJson()));
     
     verify(userService).getUserByEmail(MENTOR_EMAIL);
+    verifyZeroInteractions(accessService, menuService, userDetailRequestMapper);
   }
   
   @Test
@@ -122,7 +131,8 @@ public class UserDetailControllerTest extends TestHelper {
         baseResponseJacksonTester.write(UNAUTHORIZED_BASE_RESPONSE)
           .getJson()));
     
-    verifyZeroInteractions(userService);
+    verifyZeroInteractions(
+      userService, accessService, menuService, userDetailRequestMapper);
   }
   
   @Test
@@ -130,6 +140,10 @@ public class UserDetailControllerTest extends TestHelper {
     throws Exception {
     
     super.setCookie(Role.MENTOR);
+  
+    when(userDetailRequestMapper.toOldAndNewPasswordPair(
+      CHANGE_PASSWORD_WEB_REQUEST)).thenReturn(
+      Pair.of(OLD_PASSWORD, NEW_PASSWORD));
     
     mockMvc.perform(post("/api/core/user/password").cookie(cookies)
                       .contentType(MediaType.APPLICATION_JSON)
@@ -141,7 +155,11 @@ public class UserDetailControllerTest extends TestHelper {
         baseResponseJacksonTester.write(OK_BASE_RESPONSE)
           .getJson()));
     
-    verify(userService).changeUserPassword(MENTOR_EMAIL, NEW_PASSWORD);
+    verify(userDetailRequestMapper).toOldAndNewPasswordPair(
+      CHANGE_PASSWORD_WEB_REQUEST);
+    verify(userService).changeUserPassword(
+      MENTOR_EMAIL, OLD_PASSWORD, NEW_PASSWORD);
+    verifyZeroInteractions(accessService, menuService);
   }
   
   @Test
@@ -159,6 +177,7 @@ public class UserDetailControllerTest extends TestHelper {
                                   .getJson()));
     
     verify(menuService).getSectionsByRole(Role.JUDGE);
+    verifyZeroInteractions(userService, accessService, userDetailRequestMapper);
   }
   
   @Test
@@ -174,6 +193,7 @@ public class UserDetailControllerTest extends TestHelper {
                                   .getJson()));
     
     verify(menuService).getSectionsByRole(null);
+    verifyZeroInteractions(userService, accessService, userDetailRequestMapper);
   }
   
   @Test
@@ -194,6 +214,7 @@ public class UserDetailControllerTest extends TestHelper {
                                   .getJson()));
     
     verify(accessService).getComponentsByUrlAndRole(url, Role.JUDGE);
+    verifyZeroInteractions(userService, menuService, userDetailRequestMapper);
   }
   
   @Test
@@ -211,6 +232,7 @@ public class UserDetailControllerTest extends TestHelper {
                                   .getJson()));
     
     verify(accessService).getComponentsByUrlAndRole(url, null);
+    verifyZeroInteractions(userService, menuService, userDetailRequestMapper);
   }
   
   @Test
@@ -227,6 +249,7 @@ public class UserDetailControllerTest extends TestHelper {
                                   .getJson()));
     
     verify(accessService).getComponentsByUrlAndRole("", null);
+    verifyZeroInteractions(userService, menuService, userDetailRequestMapper);
   }
   
 }
