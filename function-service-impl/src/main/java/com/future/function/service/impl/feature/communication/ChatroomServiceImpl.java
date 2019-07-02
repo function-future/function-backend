@@ -16,6 +16,8 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Author: PriagungSatyagama
@@ -61,6 +63,25 @@ public class ChatroomServiceImpl implements ChatroomService {
 
   @Override
   public Chatroom createChatroom(Chatroom chatroom) {
+    List<String> memberIds = chatroom.getMembers().stream()
+            .map(User::getId)
+            .collect(Collectors.toList());
+
+    List<User> members = chatroom.getMembers().stream()
+            .map(member -> userService.getUser(member.getId()))
+            .collect(Collectors.toList());
+
+    List<Chatroom> filteredChatroom = chatroomRepository.findByMembersContaining(members).stream()
+            .filter(room -> room.getType().equals(ChatroomType.PRIVATE))
+            .filter(room -> {
+              return memberIds.contains(room.getMembers().get(0).getId()) &&
+                      memberIds.contains(room.getMembers().get(1).getId());
+            }).collect(Collectors.toList());
+
+    if (filteredChatroom.size() > 0) {
+      return filteredChatroom.get(0);
+    }
+
     return Optional.of(chatroom)
             .map(this::setMembers)
             .map(this::setChatroomName)
