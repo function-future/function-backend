@@ -1,6 +1,7 @@
 package com.future.function.model.entity.feature.scoring;
 
 import com.future.function.model.entity.base.BaseEntity;
+import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

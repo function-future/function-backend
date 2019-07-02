@@ -28,7 +28,7 @@ public final class QuestionResponseMapper {
   private static QuestionWebResponse buildQuestionWebResponse(Question question, List<Option> options) {
     return QuestionWebResponse.builder()
         .id(question.getId())
-        .text(question.getText())
+        .label(question.getLabel())
         .options(OptionResponseMapper.toListOfOptionWebResponse(options))
         .build();
   }

@@ -13,7 +13,7 @@ public class ReportDetailEmbeddedWebResponse {
 
     private String id;
     private String type;
-    private String name;
+    private String title;
     private int point;
 
 }

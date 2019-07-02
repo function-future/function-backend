@@ -50,7 +50,7 @@ public final class StudentQuizDetailResponseMapper {
   private static StudentQuestionWebResponse toStudentQuestionWebResponse(StudentQuestion studentQuestion) {
     return StudentQuestionWebResponse
         .builder()
-        .text(studentQuestion.getQuestion().getText())
+        .text(studentQuestion.getQuestion().getLabel())
         .number(studentQuestion.getNumber())
         .options(StudentQuizDetailResponseMapper
             .removeCorrectField(OptionResponseMapper

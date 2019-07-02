@@ -129,7 +129,7 @@ public class RoomServiceImplTest {
     catchException(() -> roomService.createComment(comment, "student-2"));
     assertThat(caughtException().getClass()).isEqualTo(ForbiddenException.class);
     verify(roomRepository).findByIdAndDeletedFalse(ROOM_ID);
-    verify(userService, times(1)).getUser("student-2");
+    verify(userService).getUser("student-2");
   }
 
   @Test

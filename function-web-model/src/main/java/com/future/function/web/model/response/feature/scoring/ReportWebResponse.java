@@ -13,7 +13,7 @@ public class ReportWebResponse {
 
     private String title;
     private String description;
-    private String usedAt;
+    private long usedAt;
     private int studentCount;
 
 }

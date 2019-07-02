@@ -16,7 +16,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 public class QuestionWebRequest {
 
   @NotBlank(message = "NotBlank")
-  private String text;
+  private String label;
 
   @NotEmpty(message = "NotEmpty")
   @Size(message = "Size", max = 4, min = 4)

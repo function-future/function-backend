@@ -78,12 +78,10 @@ public class RoomServiceImpl implements RoomService {
 
     @Override
     public Comment createComment(Comment comment, String userId) {
-      Room room = this.findById(comment.getRoom().getId(), comment.getAuthor().getId());
-        User author = userService.getUser(comment.getAuthor().getId());
+      Room room = this.findById(comment.getRoom().getId(), userId);
+      User author = userService.getUser(userId);
         return Optional.of(comment)
                 .filter(value -> room.getAssignment().getDeadline() > new Date().getTime())
-            .filter(value -> author.getId().equals(userId))
-            .map(value -> checkStudentEligibility(author, room))
                 .map(value -> {
                   comment.setRoom(room);
                   comment.setAuthor(author);
