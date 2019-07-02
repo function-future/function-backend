@@ -27,7 +27,6 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
 
   private final QuestionQuestionnaireRepository questionQuestionnaireRepository;
 
-  private final QuestionnaireParticipant questionnaireParticipant;
 
   private final UserService userService;
 
@@ -36,11 +35,11 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
   @Autowired
   public QuestionnaireServiceImpl(
           QuestionnaireRepository questionnaireRepository,
-          QuestionQuestionnaireRepository questionQuestionnaireRepository, QuestionnaireParticipant questionnaireParticipant, UserService userService,
+          QuestionQuestionnaireRepository questionQuestionnaireRepository,
+          UserService userService,
           QuestionnaireParticipantRepository questionnaireParticipantRepository) {
       this.questionnaireRepository = questionnaireRepository;
       this.questionQuestionnaireRepository = questionQuestionnaireRepository;
-      this.questionnaireParticipant = questionnaireParticipant;
       this.userService = userService;
       this.questionnaireParticipantRepository = questionnaireParticipantRepository;
   }
@@ -145,6 +144,7 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
   }
   @Override
   public QuestionnaireParticipant addQuestionnaireAppraiserToQuestionnaire(String questionnaireId, String appraiserId){
+
     QuestionnaireParticipant questionnaireParticipant = new QuestionnaireParticipant().builder()
             .participantType(ParticipantType.APPRAISER)
             .member(userService.getUser(appraiserId))
@@ -154,6 +154,17 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
     return Optional.of(questionnaireParticipant)
             .map(questionnaireParticipantRepository::save)
             .orElse(null);
+//    return Optional.of(questionnaireParticipant)
+//            .map(q ->
+//                  questionnaireParticipantRepository.findByQuestionnaireAndMemberAndParticipantTypeAndDeletedFalse(
+//                          q.getQuestionnaire(),
+//                          q.getMember(),
+//                          q.getParticipantType())
+//                  .get()
+//            )
+//            .orElse(questionnaireParticipantRepository.save(questionnaireParticipant))
+//            .map(questionnaireParticipantRepository::save)
+//            .orElse(null);
   }
 
   @Override
@@ -224,4 +235,18 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
     questionnaireParticipant.setQuestionnaire(null);
     questionnaireParticipantRepository.save(questionnaireParticipant);
   }
+
+  private QuestionnaireParticipant verifyQuestionnaireParticipant(String questionnaireId, String appraiserId, ParticipantType participantType)
+    throws Exception
+  {
+    Optional<QuestionnaireParticipant> questionnaireParticipantTemp =
+            questionnaireParticipantRepository.findByQuestionnaireAndMemberAndParticipantTypeAndDeletedFalse(
+                    this.getQuestionnaire(questionnaireId), userService.getUser(appraiserId), participantType
+            );
+    if (questionnaireParticipantTemp.get() == null){
+      throw new Exception("error user have been paticipant");
+    }
+    return questionnaireParticipantTemp.get();
+  }
+
 }
