@@ -46,8 +46,8 @@ public enum IndexName {
   ACTIVITY_BLOG_TITLE_DESCRIPTION(FieldName.ActivityBlog.TITLE,
                                   FieldName.ActivityBlog.DESCRIPTION
   ),
-  ACTIVITY_BLOG_USER_ID(
-    FieldName.ActivityBlog.USER + "." + FieldName.BaseEntity.ID,
+  ACTIVITY_BLOG_USER_ID_TITLE_DESCRIPTION(
+    FieldName.ActivityBlog.USER + ".$" + FieldName.BaseEntity.ID,
     FieldName.ActivityBlog.TITLE, FieldName.ActivityBlog.DESCRIPTION
   ),
   MENU_ROLE(FieldName.Menu.ROLE),
