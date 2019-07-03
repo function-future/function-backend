@@ -100,7 +100,7 @@ public class MyQuestionnaireServiceImpl implements MyQuestionnaireService {
       User memberLogin,
       User appraisee) {
 
-    Answer scoreSummary = new Answer().builder()
+    Answer scoreSummary = Answer.builder()
             .maximum(Float.valueOf(0))
             .minimum(Float.valueOf(6))
             .build();
@@ -119,13 +119,13 @@ public class MyQuestionnaireServiceImpl implements MyQuestionnaireService {
     scoreSummary.setAverage(avarageScore);
 
     QuestionnaireResponse questionnaireResponse =
-            new QuestionnaireResponse().builder()
-              .questionnaire(questionnaire)
-              .details(questionResponses)
-              .appraisee(appraisee)
-              .appraiser(memberLogin)
-              .scoreSummary(scoreSummary)
-              .build();
+      QuestionnaireResponse.builder()
+      .questionnaire(questionnaire)
+      .details(questionResponses)
+      .appraisee(appraisee)
+      .appraiser(memberLogin)
+      .scoreSummary(scoreSummary)
+      .build();
 
     QuestionnaireResponseSummary questionnaireResponseSummary = updateQuestionnaireResponseSummary(questionnaireResponse);
 
@@ -137,30 +137,31 @@ public class MyQuestionnaireServiceImpl implements MyQuestionnaireService {
   public void updateQuestionResponseSummary(Questionnaire questionnaire, QuestionResponse questionResponse){
     QuestionResponseSummary questionResponseSummary =
             questionResponseSummaryRepository
-                    .findAllByAppraiseeAndQuestionQuestionnaireAndDeletedFalse(questionResponse.getAppraisee(), questionResponse.getQuestion()).get();
+                    .findByAppraiseeAndQuestionQuestionnaireAndDeletedFalse(questionResponse.getAppraisee(), questionResponse.getQuestion()).get();
 
     if(questionResponseSummary == null) {
-      Answer tempAnswerSummary = new Answer()
-              .builder()
-              .average(questionResponse.getScore())
-              .maximum(questionResponse.getScore())
-              .minimum(questionResponse.getScore())
-              .build();
+      Answer tempAnswerSummary =
+        Answer.builder()
+        .average(questionResponse.getScore())
+        .maximum(questionResponse.getScore())
+        .minimum(questionResponse.getScore())
+        .build();
 
-      questionResponseSummary = new QuestionResponseSummary().builder()
-              .questionnaire(questionnaire)
-              .question(questionResponse.getQuestion())
-              .appraisee(questionResponse.getAppraisee())
-              .scoreSummary(tempAnswerSummary)
-              .counter(1)
-              .build();
+      questionResponseSummary =
+        QuestionResponseSummary.builder()
+        .questionnaire(questionnaire)
+        .question(questionResponse.getQuestion())
+        .appraisee(questionResponse.getAppraisee())
+        .scoreSummary(tempAnswerSummary)
+        .counter(1)
+        .build();
     } else {
-      Answer tempAnswerSummary = new Answer()
-              .builder()
-              .average(questionResponse.getScore())
-              .maximum(questionResponse.getScore())
-              .minimum(questionResponse.getScore())
-              .build();
+      Answer tempAnswerSummary =
+        Answer.builder()
+        .average(questionResponse.getScore())
+        .maximum(questionResponse.getScore())
+        .minimum(questionResponse.getScore())
+        .build();
 
       float average = questionResponseSummary.getScoreSummary().getAverage();
       int count = questionResponseSummary.getCounter();
@@ -185,14 +186,14 @@ public class MyQuestionnaireServiceImpl implements MyQuestionnaireService {
       .get();
 
     if (questionnaireResponseSummary == null) {
-      questionnaireResponseSummary = new QuestionnaireResponseSummary().builder()
+      questionnaireResponseSummary = QuestionnaireResponseSummary.builder()
               .questionnaire(questionnaireResponse.getQuestionnaire())
               .appraisee(questionnaireResponse.getAppraisee())
               .scoreSummary(questionnaireResponse.getScoreSummary())
               .counter(1)
               .build();
     } else {
-      Answer tempAnswerSummary = new Answer()
+      Answer tempAnswerSummary = Answer
               .builder()
               .average(0)
               .maximum(0)
@@ -216,7 +217,7 @@ public class MyQuestionnaireServiceImpl implements MyQuestionnaireService {
             userQuestionnaireSummaryRepository
                     .findFirstByAppraiseeAndDeletedFalse(questionnaireResponseSummary.getAppraisee()).get();
 
-    Answer tempAnswerSummary = new Answer()
+    Answer tempAnswerSummary = Answer
             .builder()
             .average(0)
             .maximum(0)

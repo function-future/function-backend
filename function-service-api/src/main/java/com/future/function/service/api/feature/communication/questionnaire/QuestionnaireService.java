@@ -19,8 +19,6 @@ public interface QuestionnaireService {
 
   Page<Questionnaire> getQuestionnairesWithKeyword(String keyword, Pageable pageable);
 
-  Page<Questionnaire> getQuestionnairesBelongToAppraisee(String appraoseeId, Pageable pageable);
-
   Questionnaire getQuestionnaire(String questionnaireId);
 
   Questionnaire createQuestionnaire(Questionnaire questionnaire, User author);

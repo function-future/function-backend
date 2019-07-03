@@ -31,6 +31,6 @@ public interface QuestionResponseSummaryRepository extends MongoRepository<Quest
    *
    * @return {@code QuestionResponseSummary} - Questions response summary paged from database
    */
-  Optional<QuestionResponseSummary> findAllByAppraiseeAndQuestionQuestionnaireAndDeletedFalse(User appraisee, QuestionQuestionnaire question);
+  Optional<QuestionResponseSummary> findByAppraiseeAndQuestionQuestionnaireAndDeletedFalse(User appraisee, QuestionQuestionnaire question);
 
 }

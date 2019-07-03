@@ -138,13 +138,13 @@ public class QuestionResponseSummaryRepositoryTest {
   @Test
   public void testGivenAppraiseeAndQuestionByFindingQuestionResponseSummaryReturnedQuestionResponseSummary() {
     Optional<QuestionResponseSummary> questionResponseSummary =
-            questionResponseSummaryRepository.findAllByAppraiseeAndQuestionQuestionnaireAndDeletedFalse(appraisee,question1);
+            questionResponseSummaryRepository.findByAppraiseeAndQuestionQuestionnaireAndDeletedFalse(appraisee,question1);
 
     assertThat(questionResponseSummary.get().getId()).isEqualTo(ID_1);
     assertThat(questionResponseSummary.get().getScoreSummary().getId()).isEqualTo(ANSWER_ID);
 
     Optional<QuestionResponseSummary> questionResponseSummary2 =
-      questionResponseSummaryRepository.findAllByAppraiseeAndQuestionQuestionnaireAndDeletedFalse(appraisee,question3);
+      questionResponseSummaryRepository.findByAppraiseeAndQuestionQuestionnaireAndDeletedFalse(appraisee,question3);
 
     System.out.println(questionResponseSummary.get());
     assertThat(questionResponseSummary2.isPresent()).isEqualTo(false);

@@ -54,10 +54,6 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
     return questionnaireRepository.findAllByTitleIgnoreCaseContainingAndDeletedFalse(keyword, pageable);
   }
 
-  @Override
-  public Page<Questionnaire> getQuestionnairesBelongToAppraisee(String appraiseeId, Pageable pageable) {
-    return null;
-  }
 
   @Override
   public Questionnaire getQuestionnaire(String questionnaireId) {
@@ -154,17 +150,6 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
     return Optional.of(questionnaireParticipant)
             .map(questionnaireParticipantRepository::save)
             .orElse(null);
-//    return Optional.of(questionnaireParticipant)
-//            .map(q ->
-//                  questionnaireParticipantRepository.findByQuestionnaireAndMemberAndParticipantTypeAndDeletedFalse(
-//                          q.getQuestionnaire(),
-//                          q.getMember(),
-//                          q.getParticipantType())
-//                  .get()
-//            )
-//            .orElse(questionnaireParticipantRepository.save(questionnaireParticipant))
-//            .map(questionnaireParticipantRepository::save)
-//            .orElse(null);
   }
 
   @Override
