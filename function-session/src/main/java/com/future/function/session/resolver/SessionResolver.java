@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
@@ -105,7 +107,18 @@ public class SessionResolver implements HandlerMethodArgumentResolver {
     
     return this.getCustomCookieValue(cookies)
       .map(valueOperations::get)
+      .map(this::reSetSecurityContextHolderAuthentication)
       .orElseGet(() -> this.returnEmptySessionOrException(parameterAnnotation));
+  }
+  
+  private Session reSetSecurityContextHolderAuthentication(Session session) {
+  
+    UsernamePasswordAuthenticationToken authentication =
+      new UsernamePasswordAuthenticationToken(session.getEmail(), "");
+    SecurityContextHolder.getContext()
+      .setAuthentication(authentication);
+    
+    return session;
   }
   
   private Session returnEmptySessionOrException(

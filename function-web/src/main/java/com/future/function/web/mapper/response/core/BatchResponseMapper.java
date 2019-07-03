@@ -36,7 +36,7 @@ public class BatchResponseMapper {
   ) {
     
     return ResponseHelper.toDataResponse(
-      HttpStatus.OK, buildBatchWebResponse(batch));
+      HttpStatus.OK, toBatchWebResponse(batch));
   }
   
   /**
@@ -55,10 +55,10 @@ public class BatchResponseMapper {
   ) {
     
     return ResponseHelper.toDataResponse(
-      httpStatus, buildBatchWebResponse(batch));
+      httpStatus, toBatchWebResponse(batch));
   }
   
-  private static BatchWebResponse buildBatchWebResponse(Batch batch) {
+  public static BatchWebResponse toBatchWebResponse(Batch batch) {
     
     return BatchWebResponse.builder()
       .id(batch.getId())
@@ -91,7 +91,7 @@ public class BatchResponseMapper {
     
     return data.getContent()
       .stream()
-      .map(BatchResponseMapper::buildBatchWebResponse)
+      .map(BatchResponseMapper::toBatchWebResponse)
       .collect(Collectors.toList());
   }
   

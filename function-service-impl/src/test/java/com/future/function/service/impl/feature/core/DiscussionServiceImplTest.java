@@ -7,6 +7,7 @@ import com.future.function.model.entity.feature.core.Course;
 import com.future.function.model.entity.feature.core.Discussion;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.repository.feature.core.DiscussionRepository;
+import com.future.function.service.api.feature.core.BatchService;
 import com.future.function.service.api.feature.core.SharedCourseService;
 import com.future.function.service.api.feature.core.UserService;
 import com.future.function.service.impl.helper.PageHelper;
@@ -31,8 +32,15 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class DiscussionServiceImplTest {
   
+  private static final String BATCH_ID = "batch-id";
+  
   private static final String BATCH_CODE = "batch-code";
-
+  
+  private static final Batch BATCH = Batch.builder()
+    .id(BATCH_ID)
+    .code(BATCH_CODE)
+    .build();
+  
   private static final String COURSE_ID = "course-id";
 
   private static final String ID = "id";
@@ -60,6 +68,7 @@ public class DiscussionServiceImplTest {
   private static final Discussion DISCUSSION = Discussion.builder()
     .id(ID)
     .courseId(COURSE_ID)
+    .batchId(BATCH_ID)
     .batchCode(BATCH_CODE)
     .description(COMMENT)
     .user(VALID_USER_MENTOR)
@@ -90,6 +99,9 @@ public class DiscussionServiceImplTest {
   @Mock
   private SharedCourseService sharedCourseService;
 
+  @Mock
+  private BatchService batchService;
+
   @InjectMocks
   private DiscussionServiceImpl discussionService;
 
@@ -112,7 +124,7 @@ public class DiscussionServiceImplTest {
   public void tearDown() {
 
     verifyNoMoreInteractions(
-      discussionRepository, userService, sharedCourseService);
+      discussionRepository, userService, sharedCourseService, batchService);
   }
 
   @Test
@@ -123,11 +135,13 @@ public class DiscussionServiceImplTest {
                                                        BATCH_CODE
     )).thenReturn(new Course());
 
+    when(batchService.getBatchByCode(BATCH_CODE)).thenReturn(BATCH);
+    
     Page<Discussion> discussionPage = PageHelper.toPage(
       Collections.singletonList(DISCUSSION), PAGEABLE);
-    when(discussionRepository.findAllByCourseIdAndBatchCodeOrderByCreatedAtDesc(
-      COURSE_ID, BATCH_CODE, PAGEABLE)).thenReturn(discussionPage);
-
+    when(discussionRepository.findAllByCourseIdAndBatchIdOrderByCreatedAtDesc(
+      COURSE_ID, BATCH_ID, PAGEABLE)).thenReturn(discussionPage);
+    
     Page<Discussion> discussions = discussionService.getDiscussions(
       EMAIL, COURSE_ID, BATCH_CODE, PAGEABLE);
 
@@ -135,12 +149,12 @@ public class DiscussionServiceImplTest {
     assertThat(discussions).isEqualTo(discussionPage);
 
     verify(userService).getUserByEmail(EMAIL);
-    verify(sharedCourseService).getCourseByIdAndBatchCode(COURSE_ID,
-                                                          BATCH_CODE
-    );
+    verify(sharedCourseService).getCourseByIdAndBatchCode(
+      COURSE_ID, BATCH_CODE);
     verify(
-      discussionRepository).findAllByCourseIdAndBatchCodeOrderByCreatedAtDesc(
-      COURSE_ID, BATCH_CODE, PAGEABLE);
+      discussionRepository).findAllByCourseIdAndBatchIdOrderByCreatedAtDesc(
+      COURSE_ID, BATCH_ID, PAGEABLE);
+    verify(batchService).getBatchByCode(BATCH_CODE);
   }
 
   @Test
@@ -160,10 +174,9 @@ public class DiscussionServiceImplTest {
     assertThat(discussions).isEqualTo(discussionPage);
 
     verify(userService).getUserByEmail(EMAIL);
-    verify(sharedCourseService).getCourseByIdAndBatchCode(COURSE_ID,
-                                                          BATCH_CODE
-    );
-    verifyZeroInteractions(discussionRepository);
+    verify(sharedCourseService).getCourseByIdAndBatchCode(
+      COURSE_ID, BATCH_CODE);
+    verifyZeroInteractions(discussionRepository, batchService);
   }
 
   @Test
@@ -181,7 +194,8 @@ public class DiscussionServiceImplTest {
     assertThat(caughtException().getMessage()).isEqualTo("Invalid Batch");
 
     verify(userService).getUserByEmail(EMAIL);
-    verifyZeroInteractions(discussionRepository, sharedCourseService);
+    verifyZeroInteractions(
+      discussionRepository, sharedCourseService, batchService);
   }
 
   @Test
@@ -191,6 +205,7 @@ public class DiscussionServiceImplTest {
     when(sharedCourseService.getCourseByIdAndBatchCode(COURSE_ID,
                                                        BATCH_CODE
     )).thenReturn(new Course());
+    when(batchService.getBatchByCode(BATCH_CODE)).thenReturn(BATCH);
     when(discussionRepository.save(DISCUSSION)).thenReturn(DISCUSSION);
 
     Discussion discussion = discussionService.createDiscussion(
@@ -204,6 +219,7 @@ public class DiscussionServiceImplTest {
                                                           BATCH_CODE
     );
     verify(discussionRepository).save(DISCUSSION);
+    verify(batchService).getBatchByCode(BATCH_CODE);
   }
 
   @Test
@@ -227,7 +243,7 @@ public class DiscussionServiceImplTest {
     verify(sharedCourseService).getCourseByIdAndBatchCode(COURSE_ID,
                                                           BATCH_CODE
     );
-    verifyZeroInteractions(discussionRepository);
+    verifyZeroInteractions(discussionRepository, batchService);
   }
 
   @Test

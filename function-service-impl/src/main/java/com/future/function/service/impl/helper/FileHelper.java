@@ -30,7 +30,6 @@ public final class FileHelper {
    * @param bytes Data to be 'inserted' to file.
    * @param path  Path of the created file.
    */
-  @SuppressWarnings("ResultOfMethodCallIgnored")
   public static void createJavaIoFile(byte[] bytes, String path) {
     
     Optional.ofNullable(FileHelper.toJavaIoFile(bytes, path))
@@ -69,7 +68,6 @@ public final class FileHelper {
    * @param bytes Data to be 'inserted' to file.
    * @param path  Path of the created file.
    */
-  @SuppressWarnings("ResultOfMethodCallIgnored")
   public static void createThumbnail(
     byte[] bytes, String path, String extension
   ) {

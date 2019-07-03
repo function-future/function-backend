@@ -1,6 +1,7 @@
 package com.future.function.web.model.response.feature.core;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.future.function.web.model.response.feature.core.embedded.EmbeddedFileWebResponse;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -26,7 +27,7 @@ public class AnnouncementWebResponse {
   
   private String description;
   
-  private List<FileWebResponse> files;
+  private List<EmbeddedFileWebResponse> files;
   
   @JsonInclude(value = JsonInclude.Include.NON_NULL)
   private String announcementFileUrl;

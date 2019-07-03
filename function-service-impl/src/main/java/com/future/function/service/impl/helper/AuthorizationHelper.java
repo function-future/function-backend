@@ -64,6 +64,17 @@ public final class AuthorizationHelper {
       ));
   }
   
+  public static boolean isRoleValidForEdit(
+    Role currentUserRole, Role... allowedRoles
+  ) {
+  
+    List<Role> roles = Arrays.asList(allowedRoles);
+    
+    return Optional.ofNullable(currentUserRole)
+      .filter(roles::contains)
+      .isPresent();
+  }
+  
   private static boolean isRoleValidForEdit(
     Role currentUserRole, List<Role> allowedRoles
   ) {
