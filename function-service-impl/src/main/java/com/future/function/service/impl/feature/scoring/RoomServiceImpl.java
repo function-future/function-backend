@@ -107,17 +107,12 @@ public class RoomServiceImpl implements RoomService {
       return Optional.ofNullable(roomId)
           .filter(condition -> user.getRole().equals(Role.MENTOR))
           .map(id -> this.findById(id, user.getId()))
-          .filter(room -> validateMentorBatch(user, room))
           .map(room -> {
             room.setPoint(point);
             return room;
           })
           .map(roomRepository::save)
           .orElseThrow(() -> new ForbiddenException("User not allowed"));
-    }
-
-  private boolean validateMentorBatch(User user, Room room) {
-    return room.getStudent().getBatch().getCode().equals(user.getBatch().getCode());
     }
 
     @Override

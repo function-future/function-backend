@@ -128,7 +128,7 @@ public interface FieldName {
 
     public static final String SCORE = "score";
 
-    public static final String COMMENT = "text";
+    public static final String COMMENT = "comment";
 
   }
 

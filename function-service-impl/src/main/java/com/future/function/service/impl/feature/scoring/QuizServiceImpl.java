@@ -95,7 +95,7 @@ public class QuizServiceImpl implements QuizService {
         })
         .map(quizRepository::save)
         .map(quiz -> studentQuizService.createStudentQuizByBatchCode(quiz.getBatch().getCode(), quiz))
-        .orElseThrow(() -> new BadRequestException("Bad Request"));
+        .orElseThrow(() -> new UnsupportedOperationException("Failed on #createQuiz"));
   }
 
   private List<QuestionBank> getQuestionBanksFromService(List<QuestionBank> questionBanks) {
@@ -131,7 +131,7 @@ public class QuizServiceImpl implements QuizService {
           return quiz;
         })
         .map(quizRepository::save)
-        .orElseThrow(() -> new BadRequestException("Bad Request"));
+        .orElseThrow(() -> new UnsupportedOperationException("Failed on #updateQuiz"));
   }
 
   /**

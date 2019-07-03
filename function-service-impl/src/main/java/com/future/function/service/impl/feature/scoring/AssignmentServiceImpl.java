@@ -117,9 +117,8 @@ public class AssignmentServiceImpl implements AssignmentService {
     return Optional.ofNullable(assignment)
             .map(Assignment::getFile)
             .map(FileV2::getId)
-            .map(fileId -> resourceService.markFilesUsed(Collections.singletonList(fileId), true))
-            .filter(condition -> condition)
-            .map(file -> resourceService.getFile(assignment.getFile().getId()))
+            .filter(fileId -> resourceService.markFilesUsed(Collections.singletonList(fileId), true))
+            .map(resourceService::getFile)
             .map(file -> {
               assignment.setFile(file);
               return assignment;
