@@ -9,11 +9,17 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class QuestionAnswerResponse {
+public class QuestionnaireSimpleSummaryResponse {
 
-    private String name;
+  String id;
 
-    private String avatar;
+  String title;
 
-    private Float score;
+  String desc;
+
+  String status;
+
+  Long duedate;
+
+  float score;
 }

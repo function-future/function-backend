@@ -1,7 +1,6 @@
 package com.future.function.web.mapper.response.communication.questionnaire;
 
-import com.future.function.model.entity.feature.communication.questionnaire.Questionnaire;
-import com.future.function.model.entity.feature.communication.questionnaire.QuestionnaireResponseSummary;
+import com.future.function.model.entity.feature.communication.questionnaire.*;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.web.mapper.helper.ResponseHelper;
@@ -11,7 +10,9 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
 
+import javax.xml.ws.Response;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class QuestionnaireResponseSummaryResponseMapper {
@@ -59,7 +60,71 @@ public class QuestionnaireResponseSummaryResponseMapper {
       .build();
   }
 
-  public static DataResponse<List<QuestionQuestionnaireSummaryResponse>> toDataResponseQuestionQuestionnaireSummaryResponse(
+  public static DataResponse<List<QuestionQuestionnaireSummaryResponse>> toDataResponseQuestionQuestionnaireSummaryResponseList(List<QuestionResponseSummary> data) {
+    return ResponseHelper.toDataResponse(HttpStatus.OK, toListQuestionQuestionnaireSummaryResponse(data));
+  }
 
-  )
+  private static List<QuestionQuestionnaireSummaryResponse> toListQuestionQuestionnaireSummaryResponse(List<QuestionResponseSummary> data) {
+    return data.stream()
+            .map(questionResponseSummary -> toQuestionQuestionnaireSummaryResponse(questionResponseSummary))
+            .collect(Collectors.toList());
+  }
+
+  public static  DataResponse<QuestionQuestionnaireSummaryResponse> toDataResponseQuestionQuestionnaireSummaryResponse(QuestionResponseSummary questionnaireResponseSummary){
+
+    return ResponseHelper.toDataResponse(HttpStatus.OK, toQuestionQuestionnaireSummaryResponse(questionnaireResponseSummary));
+  }
+
+  private static QuestionQuestionnaireSummaryResponse toQuestionQuestionnaireSummaryResponse(QuestionResponseSummary questionnaireResponseSummary){
+    return QuestionQuestionnaireSummaryResponse.builder()
+            .id(questionnaireResponseSummary.getId())
+            .question(toQuestionQuestionnaireResponse(questionnaireResponseSummary.getQuestion()))
+            .score(questionnaireResponseSummary.getScoreSummary().getAverage())
+            .build();
+  }
+
+  private static QuestionQuestionnaireResponse toQuestionQuestionnaireResponse (QuestionQuestionnaire questionQuestionnaire) {
+    return QuestionQuestionnaireResponse.builder()
+            .id(questionQuestionnaire.getId())
+            .questionnaireId(questionQuestionnaire.getQuestionnaire().getId())
+            .desc(questionQuestionnaire.getDescription())
+            .build();
+  }
+
+
+  public static DataResponse<QuestionAnswerDetailResponse> toDataResponseQuestionAnswerDetailResponse(QuestionnaireResponseSummary questionnaireResponseSummary, QuestionResponseSummary questionResponseSummary, List<QuestionResponse> questionResponseByQuestionResponseSummary) {
+    return ResponseHelper.toDataResponse(
+            HttpStatus.OK,
+            toQuestionAnswerDetailResponse(
+                    questionnaireResponseSummary,
+                    questionResponseSummary,
+                    questionResponseByQuestionResponseSummary)
+    );
+  }
+
+  private static QuestionAnswerDetailResponse toQuestionAnswerDetailResponse(QuestionnaireResponseSummary questionnaireResponseSummary, QuestionResponseSummary questionResponseSummary, List<QuestionResponse> questionResponseByQuestionResponseSummary) {
+
+    return QuestionAnswerDetailResponse.builder()
+            .questionnaireSummary(toQuestionnaireSummaryDescriptionResponse(questionnaireResponseSummary))
+            .questionSummary(toQuestionQuestionnaireSummaryResponse(questionResponseSummary))
+            .QuestionResponse(toQuestionAnswerReponseList(questionResponseByQuestionResponseSummary))
+            .build();
+  }
+
+  private static List<QuestionAnswerResponse> toQuestionAnswerReponseList(List<QuestionResponse> data) {
+    return data.stream()
+            .map(questionResponse -> toQuestionAnswerReponse(questionResponse))
+            .collect(Collectors.toList());
+
+  }
+
+  private static QuestionAnswerResponse toQuestionAnswerReponse(QuestionResponse questionResponse) {
+    return QuestionAnswerResponse.builder()
+            .name(questionResponse.getAppraiser().getName())
+            .avatar(questionResponse.getAppraiser().getPictureV2().getThumbnailUrl())
+            .score(questionResponse.getScore())
+            .build();
+
+  }
+
 }

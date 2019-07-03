@@ -15,7 +15,7 @@ public class QuestionAnswerDetailResponse {
 
   private QuestionnaireSummaryDescriptionResponse questionnaireSummary;
 
-  private QuestionQuestionnaireSummaryResponse questinSummary;
+  private QuestionQuestionnaireSummaryResponse questionSummary;
 
   private List<QuestionAnswerResponse> QuestionResponse;
 }

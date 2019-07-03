@@ -20,5 +20,5 @@ public interface QuestionnaireResponseSummaryService {
 
   QuestionResponseSummary getQuestionResponseSummaryById(String questionResponseSummaryId);
 
-  QuestionResponse getQuestionResponseByQuestionResponseSummaryId(String questionResponseSummaryId);
+  List<QuestionResponse> getQuestionResponseByQuestionResponseSummaryId(String questionResponseSummaryId);
 }
