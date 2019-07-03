@@ -53,7 +53,6 @@ public class OptionRepositoryTest {
   public void findAllByQuestionId() {
     List<Option> optionList = optionRepository.findAllByQuestionId(QUESTION_ID);
     assertThat(optionList.size()).isEqualTo(1);
-    option.setQuestion(null);
     assertThat(optionList.get(0).getLabel()).isEqualTo(option.getLabel());
   }
 }

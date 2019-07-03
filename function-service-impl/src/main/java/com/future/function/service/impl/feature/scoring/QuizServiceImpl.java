@@ -53,9 +53,7 @@ public class QuizServiceImpl implements QuizService {
   public Quiz findById(String id) {
     return Optional.ofNullable(id)
         .filter(val -> !val.isEmpty())
-        .map(quizRepository::findByIdAndDeletedFalse)
-        .filter(Optional::isPresent)
-        .map(Optional::get)
+        .flatMap(quizRepository::findByIdAndDeletedFalse)
         .orElseThrow(() -> new NotFoundException("Quiz Not Found"));
   }
 
@@ -131,7 +129,7 @@ public class QuizServiceImpl implements QuizService {
           return quiz;
         })
         .map(quizRepository::save)
-        .orElseThrow(() -> new UnsupportedOperationException("Failed on #updateQuiz"));
+        .orElse(request);
   }
 
   /**

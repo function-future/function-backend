@@ -136,15 +136,18 @@ public class StudentQuestionServiceImpl implements StudentQuestionService {
   @Override
   public List<StudentQuestion> createStudentQuestionsByStudentQuizDetail(StudentQuizDetail studentQuizDetail,
       List<StudentQuestion> studentQuestions) {
-    for (int i = 0; i < studentQuestions.size(); i++) {
-      studentQuestions.get(i).setStudentQuizDetail(studentQuizDetail);
-      studentQuestions.get(i).setNumber(i + 1);
-    }
-
-    return studentQuestions
-        .stream()
+    return IntStream.range(0, studentQuestions.size())
+        .mapToObj(i -> Pair.of(i, studentQuestions.get(i)))
+        .map(pair -> setStudentQuizDetailAndNumber(studentQuizDetail, pair))
+        .map(Pair::getSecond)
         .map(studentQuestionRepository::save)
         .collect(Collectors.toList());
+  }
+
+  private Pair<Integer, StudentQuestion> setStudentQuizDetailAndNumber(StudentQuizDetail studentQuizDetail, Pair<Integer, StudentQuestion> pair) {
+    pair.getSecond().setStudentQuizDetail(studentQuizDetail);
+    pair.getSecond().setNumber(pair.getFirst() + 1);
+    return pair;
   }
 
   @Override
