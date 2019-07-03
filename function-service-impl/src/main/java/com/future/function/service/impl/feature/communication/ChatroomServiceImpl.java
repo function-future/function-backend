@@ -3,13 +3,9 @@ package com.future.function.service.impl.feature.communication;
 import com.future.function.common.enumeration.communication.ChatroomType;
 import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.communication.chatting.Chatroom;
-import com.future.function.model.entity.feature.communication.chatting.Message;
-import com.future.function.model.entity.feature.communication.chatting.MessageStatus;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.repository.feature.communication.ChatroomRepository;
 import com.future.function.service.api.feature.communication.ChatroomService;
-import com.future.function.service.api.feature.communication.MessageService;
-import com.future.function.service.api.feature.communication.MessageStatusService;
 import com.future.function.service.api.feature.core.UserService;
 import com.future.function.service.impl.helper.PageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +39,7 @@ public class ChatroomServiceImpl implements ChatroomService {
   public Page<Chatroom> getChatrooms(String type, String userId, Pageable pageable) {
     ChatroomType chatroomType = ChatroomType.fromString(type);
     User user = userService.getUser(userId);
-    return chatroomRepository.findAllByTypeAndMembersOrderByCreatedAtDesc(
+    return chatroomRepository.findAllByTypeAndMembersOrderByUpdatedAtDesc(
             chatroomType, user, pageable);
   }
 
@@ -51,9 +47,9 @@ public class ChatroomServiceImpl implements ChatroomService {
   public Page<Chatroom> getChatroomsWithKeyword(String keyword, String userId, Pageable pageable) {
     return Optional.of(userId)
             .map(userService::getUser)
-            .map(user -> chatroomRepository.findAllByTitleContainingIgnoreCaseAndMembersOrderByCreatedAtDesc(
+            .map(user -> chatroomRepository.findAllByTitleContainingIgnoreCaseAndMembersOrderByUpdatedAtDesc(
                     keyword, user, pageable))
-            .orElse(PageHelper.empty(pageable));
+            .orElseGet(() -> PageHelper.empty(pageable));
   }
 
   @Override
@@ -84,6 +80,12 @@ public class ChatroomServiceImpl implements ChatroomService {
             .orElse(chatroom);
   }
 
+  @Override
+  public Chatroom getPublicChatroom() {
+    return chatroomRepository.findByType(ChatroomType.PUBLIC.name())
+            .orElseThrow(() -> new NotFoundException("Chatroom not found"));
+  }
+
   private Chatroom setChatroomName(Chatroom chatroom) {
     if (chatroom.getType().equals(ChatroomType.PRIVATE)) {
       chatroom.setTitle(chatroom.getMembers().get(0).getName() + " " + chatroom.getMembers().get(1).getName());
@@ -109,9 +111,11 @@ public class ChatroomServiceImpl implements ChatroomService {
 
   private Chatroom setMembers(Chatroom chatroom) {
     List<User> members = new ArrayList<>();
-    chatroom.getMembers().forEach(member -> {
-      members.add(userService.getUser(member.getId()));
-    });
+    if (chatroom.getMembers() != null) {
+      chatroom.getMembers().forEach(member -> {
+        members.add(userService.getUser(member.getId()));
+      });
+    }
     chatroom.setMembers(members);
     return chatroom;
   }

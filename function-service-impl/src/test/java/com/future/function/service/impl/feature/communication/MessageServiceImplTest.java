@@ -151,6 +151,7 @@ public class MessageServiceImplTest {
     when(messageRepository.save(message1)).thenReturn(message1);
     when(userService.getUser(USER_ID)).thenReturn(USER);
     when(chatroomService.getChatroom(CHATROOM_ID)).thenReturn(CHATROOM);
+    when(chatroomService.updateChatroom(CHATROOM)).thenReturn(CHATROOM);
 
     message1.setChatroom(CHATROOM);
     message1.setSender(USER);
@@ -164,6 +165,7 @@ public class MessageServiceImplTest {
     verify(messageRepository).save(message1);
     verify(userService).getUser(USER_ID);
     verify(chatroomService).getChatroom(CHATROOM_ID);
+    verify(chatroomService).updateChatroom(CHATROOM);
   }
 
 

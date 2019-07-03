@@ -51,6 +51,15 @@ public interface FieldName {
   }
 
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  abstract class StickyNote {
+
+    public static final String TITLE = "title";
+
+    public static final String DESCRIPTION = "description";
+
+  }
+
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
   abstract class Batch {
 
     public static final String NAME = "name";
@@ -265,9 +274,9 @@ public interface FieldName {
 
     public static final String USER = "user";
 
-    public static final String COURSE_ID = "course_id";
+    public static final String COURSE_ID = "courseId";
 
-    public static final String BATCH_CODE = "batch_code";
+    public static final String BATCH_ID = "batchId";
 
   }
 
@@ -371,25 +380,24 @@ public interface FieldName {
 
   }
 
-  
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
   abstract class Access {
-    
+
     public static final String ROLE = "role";
-    
+
     public static final String URL_REGEX = "urlRegex";
-    
+
     public static final String COMPONENTS = "components";
-    
+
   }
-  
+
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
   abstract class Menu {
-    
+
     public static final String ROLE = "role";
-    
+
     public static final String SECTIONS = "sections";
-    
+
   }
 
 }

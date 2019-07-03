@@ -10,13 +10,15 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AuthWebResponse {
-  
+
+  private String id;
+
   private String name;
-  
+
   private String role;
-  
+
   private String email;
-  
+
   private String avatar;
-  
+
 }

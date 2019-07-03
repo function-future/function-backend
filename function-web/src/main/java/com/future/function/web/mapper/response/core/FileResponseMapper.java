@@ -14,7 +14,9 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -77,11 +79,14 @@ public final class FileResponseMapper {
     Map<Long, Version> fileVersions
   ) {
     
-    Map<Long, VersionWebResponse> versions = new HashMap<>();
+    Map<Long, VersionWebResponse> versions = new LinkedHashMap<>();
     
-    fileVersions.forEach((key, value) -> versions.put(key,
-                                                      FileResponseMapper.toVersionWebResponse(
-                                                        value)
+    List<Long> versionKeys = new ArrayList<>(fileVersions.keySet());
+    Collections.reverse(versionKeys);
+  
+    versionKeys.forEach(key -> versions.put(key,
+                                            FileResponseMapper.toVersionWebResponse(
+                                              fileVersions.get(key))
     ));
     
     return versions;

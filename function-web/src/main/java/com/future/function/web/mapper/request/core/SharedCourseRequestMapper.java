@@ -9,6 +9,7 @@ import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class SharedCourseRequestMapper {
@@ -37,7 +38,16 @@ public class SharedCourseRequestMapper {
     
     validator.validate(request);
     
-    return Pair.of(request.getCourses(), request.getOriginBatch());
+    return Pair.of(request.getCourses(),
+                   this.getOriginBatchOrEmptyString(request)
+    );
+  }
+  
+  private String getOriginBatchOrEmptyString(SharedCourseWebRequest request) {
+    
+    return Optional.of(request)
+      .map(SharedCourseWebRequest::getOriginBatch)
+      .orElse("");
   }
   
 }

@@ -65,7 +65,7 @@ public class ChatroomControllerTest extends TestHelper {
 
     private final String MESSAGE_ID = "messageId";
 
-    private final String MEMBER_ID_1 = "5d01be122dee811d8c5f32e7";
+    private final String MEMBER_ID_1 = "admin-id";
 
     private final String MEMBER_ID_2 = "idUser2";
 
@@ -89,7 +89,7 @@ public class ChatroomControllerTest extends TestHelper {
             .name(CHATROOM_TITLE)
             .build();
 
-    private final Message MESSAGE = Message.builder()
+    private Message MESSAGE = Message.builder()
             .id(MESSAGE_ID)
             .chatroom(CHATROOM)
             .text("test")
@@ -151,10 +151,12 @@ public class ChatroomControllerTest extends TestHelper {
         verify(chatroomService).getChatroom(CHATROOM_ID);
     }
 
-//    @Test
+    @Test
     public void testGivenCallToChatroomsWithKeywordApiByGettingChatroomsReturnPagingResponse() throws Exception {
 
         String KEYWORD = "chat";
+        MESSAGE.setCreatedAt(1L);
+
         when(chatroomService.getChatroomsWithKeyword(KEYWORD, MEMBER_ID_1, PAGEABLE)).thenReturn(
                 new PageImpl<>(Arrays.asList(CHATROOM, CHATROOM), PAGEABLE, 2)
         );
@@ -177,8 +179,10 @@ public class ChatroomControllerTest extends TestHelper {
         verify(messageStatusService, times(4)).getSeenStatus(CHATROOM_ID, MEMBER_ID_1);
     }
 
-//    @Test
+    @Test
     public void testGivenCallToChatroomsApiByGettingChatroomsReturnPagingResponse() throws Exception {
+
+        MESSAGE.setCreatedAt(1L);
 
         when(chatroomService.getChatrooms("GROUP", MEMBER_ID_1, PAGEABLE)).thenReturn(
                 new PageImpl<>(Arrays.asList(CHATROOM, CHATROOM), PAGEABLE, 2)
@@ -236,7 +240,7 @@ public class ChatroomControllerTest extends TestHelper {
         verify(chatroomService).createChatroom(CHATROOM);
     }
 
-//    @Test
+    @Test
     public void testGivenMessageDataByCreatingMessageReturnBaseResponseCreated() throws Exception {
 
         super.setCookie(Role.ADMIN);
@@ -274,7 +278,7 @@ public class ChatroomControllerTest extends TestHelper {
         verify(chatroomService).updateChatroom(CHATROOM);
     }
 
-//    @Test
+    @Test
     public void testGivenCallToChatroomsApiByUpdatingMessageStatusReturnBaseResponseOk() throws Exception {
         super.setCookie(Role.ADMIN);
 

@@ -22,8 +22,6 @@ public class DiscussionResponseMapperTest {
   
   private static final String COURSE_ID = "course-id";
   
-  private static final String BATCH_CODE = "batch-code";
-  
   private static final String DESCRIPTION = "description";
   
   private static final String USER_ID = "user-id";
@@ -72,7 +70,6 @@ public class DiscussionResponseMapperTest {
     discussion = Discussion.builder()
       .id(ID)
       .courseId(COURSE_ID)
-      .batchCode(BATCH_CODE)
       .description(DESCRIPTION)
       .user(USER)
       .build();

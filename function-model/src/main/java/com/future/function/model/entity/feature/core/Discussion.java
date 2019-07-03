@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
@@ -37,7 +38,10 @@ public class Discussion extends BaseEntity {
   @Field(FieldName.Discussion.COURSE_ID)
   private String courseId;
   
-  @Field(FieldName.Discussion.BATCH_CODE)
+  @Field(FieldName.Discussion.BATCH_ID)
+  private String batchId;
+  
+  @Transient
   private String batchCode;
   
 }

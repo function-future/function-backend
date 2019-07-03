@@ -20,7 +20,7 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 @Slf4j
 @RestControllerAdvice
 public class ExceptionController {
-  
+
   /**
    * Handles {@link com.future.function.common.exception.BadRequestException}
    * exception thrown from service.
@@ -33,13 +33,13 @@ public class ExceptionController {
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   @ExceptionHandler(BadRequestException.class)
   public ErrorResponse badRequestException(BadRequestException e) {
-    
+
     log.error(e.getMessage(), e.getCause(), e.getConstraintViolations());
-    
+
     return ResponseHelper.toErrorResponse(
       HttpStatus.BAD_REQUEST, e.getConstraintViolations());
   }
-  
+
   /**
    * Handles {@link com.future.function.common.exception.UnauthorizedException}
    * exception thrown from service.
@@ -52,12 +52,12 @@ public class ExceptionController {
   @ResponseStatus(HttpStatus.UNAUTHORIZED)
   @ExceptionHandler(UnauthorizedException.class)
   public BaseResponse unauthorizedException(UnauthorizedException e) {
-    
+
     log.error(e.getMessage(), e.getCause());
-    
+
     return ResponseHelper.toBaseResponse(HttpStatus.UNAUTHORIZED);
   }
-  
+
   /**
    * Handles {@link com.future.function.common.exception.ForbiddenException}
    * exception thrown from service.
@@ -70,12 +70,12 @@ public class ExceptionController {
   @ResponseStatus(HttpStatus.FORBIDDEN)
   @ExceptionHandler(ForbiddenException.class)
   public BaseResponse forbiddenException(ForbiddenException e) {
-    
+
     log.error(e.getMessage(), e.getCause());
-    
+
     return ResponseHelper.toBaseResponse(HttpStatus.FORBIDDEN);
   }
-  
+
   /**
    * Handles {@link com.future.function.common.exception.NotFoundException}
    * or {@link NoHandlerFoundException} exception thrown from
@@ -89,12 +89,12 @@ public class ExceptionController {
   @ResponseStatus(HttpStatus.NOT_FOUND)
   @ExceptionHandler({ NotFoundException.class, NoHandlerFoundException.class })
   public BaseResponse notFoundException(Exception e) {
-    
+
     log.error(e.getMessage(), e.getCause());
-    
+
     return ResponseHelper.toBaseResponse(HttpStatus.NOT_FOUND);
   }
-  
+
   /**
    * Handles {@link UnsupportedOperationException} exception thrown from
    * service.
@@ -109,12 +109,12 @@ public class ExceptionController {
   public BaseResponse unsupportedOperationException(
     UnsupportedOperationException e
   ) {
-    
+
     log.error(e.getMessage(), e.getCause());
-    
+
     return ResponseHelper.toBaseResponse(HttpStatus.BAD_REQUEST);
   }
-  
+
   /**
    * Handles any {@link Throwable} exception thrown from controller/service.
    *
@@ -128,10 +128,10 @@ public class ExceptionController {
   public BaseResponse genericException(
     Throwable e
   ) {
-    
+
     log.error(e.getMessage(), e.getCause());
-    
+
     return ResponseHelper.toBaseResponse(HttpStatus.INTERNAL_SERVER_ERROR);
   }
-  
+
 }

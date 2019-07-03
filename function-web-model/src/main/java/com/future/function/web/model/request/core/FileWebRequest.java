@@ -20,7 +20,6 @@ public class FileWebRequest implements FileData {
   private String name;
   
   @TypeMustExist
-  @NotBlank(message = "NotBlank")
   private String type;
   
   private byte[] bytes;
