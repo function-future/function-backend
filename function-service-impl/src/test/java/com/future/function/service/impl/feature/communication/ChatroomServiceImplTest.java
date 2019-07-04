@@ -19,6 +19,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
@@ -167,6 +168,7 @@ public class ChatroomServiceImplTest {
     when(userService.getUser(USER_ID_1)).thenReturn(MEMBER_1);
     when(userService.getUser(USER_ID_2)).thenReturn(MEMBER_2);
     when(chatroomRepository.save(chatroom)).thenReturn(chatroom);
+    when(chatroomRepository.findByMembersContaining(Arrays.asList(MEMBER_1, MEMBER_2))).thenReturn(new ArrayList<>());
 
     Chatroom chatroomResult = chatroomService.createChatroom(chatroom);
 
@@ -175,9 +177,10 @@ public class ChatroomServiceImplTest {
     assertThat(chatroomResult.getTitle()).isEqualTo(TITLE_GROUP);
     assertThat(chatroomResult.getType()).isEqualTo(TYPE);
 
-    verify(userService).getUser(USER_ID_1);
-    verify(userService).getUser(USER_ID_2);
+    verify(userService, times(2)).getUser(USER_ID_1);
+    verify(userService, times(2)).getUser(USER_ID_2);
     verify(chatroomRepository).save(chatroom);
+    verify(chatroomRepository).findByMembersContaining(Arrays.asList(MEMBER_1, MEMBER_2));
   }
 
   @Test
