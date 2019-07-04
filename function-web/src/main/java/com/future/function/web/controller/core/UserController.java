@@ -18,12 +18,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * Controller class for user APIs.
  */
 @RestController
 @RequestMapping(value = "/api/core/users")
-@WithAnyRole(roles = Role.ADMIN)
 public class UserController {
   
   private UserRequestMapper userRequestMapper;
@@ -53,7 +54,8 @@ public class UserController {
   @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE,
                produces = MediaType.APPLICATION_JSON_VALUE)
   public DataResponse<UserWebResponse> createUser(
-    Session session,
+    @WithAnyRole(roles = Role.ADMIN)
+      Session session,
     @RequestBody
       UserWebRequest data
   ) {
@@ -75,7 +77,8 @@ public class UserController {
   @DeleteMapping(value = "/{userId:.+}",
                  produces = MediaType.APPLICATION_JSON_VALUE)
   public BaseResponse deleteUser(
-    Session session,
+    @WithAnyRole(roles = Role.ADMIN)
+      Session session,
     @PathVariable
       String userId
   ) {
@@ -98,7 +101,8 @@ public class UserController {
   @GetMapping(value = "/{userId:.+}",
               produces = MediaType.APPLICATION_JSON_VALUE)
   public DataResponse<UserWebResponse> getUser(
-    Session session,
+    @WithAnyRole(roles = Role.ADMIN)
+      Session session,
     @PathVariable
       String userId
   ) {
@@ -120,7 +124,8 @@ public class UserController {
   @ResponseStatus(HttpStatus.OK)
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   public PagingResponse<UserWebResponse> getUsers(
-    Session session,
+    @WithAnyRole(roles = Role.ADMIN)
+      Session session,
     @RequestParam(required = false)
       String role,
     @RequestParam(required = false,
@@ -148,7 +153,8 @@ public class UserController {
               consumes = MediaType.APPLICATION_JSON_VALUE,
               produces = MediaType.APPLICATION_JSON_VALUE)
   public DataResponse<UserWebResponse> updateUser(
-    Session session,
+    @WithAnyRole(roles = Role.ADMIN)
+      Session session,
     @PathVariable
       String userId,
     @RequestBody
@@ -157,6 +163,19 @@ public class UserController {
     
     return UserResponseMapper.toUserDataResponse(
       userService.updateUser(userRequestMapper.toUser(userId, data)));
+  }
+  
+  @ResponseStatus(HttpStatus.OK)
+  @GetMapping(value = "/search")
+  public DataResponse<List<UserWebResponse>> getUsersByName(
+    @WithAnyRole(roles = { Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT })
+      Session session,
+    @RequestParam(defaultValue = "")
+      String name
+  ) {
+    
+    return UserResponseMapper.toUsersDataResponse(
+      userService.getUsersByNameContainsIgnoreCase(name));
   }
   
 }

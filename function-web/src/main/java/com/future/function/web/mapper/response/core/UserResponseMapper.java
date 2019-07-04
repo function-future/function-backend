@@ -116,4 +116,14 @@ public class UserResponseMapper {
       .collect(Collectors.toList());
   }
   
+  public static DataResponse<List<UserWebResponse>> toUsersDataResponse(
+    List<User> users
+  ) {
+    
+    return ResponseHelper.toDataResponse(
+      HttpStatus.OK, users.stream()
+        .map(UserResponseMapper::buildUserWebResponse)
+        .collect(Collectors.toList()));
+  }
+  
 }
