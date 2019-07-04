@@ -6,6 +6,6 @@ import java.util.List;
 
 public interface SummaryService {
 
-    List<SummaryDTO> findAllPointSummaryByStudentId(String studentId);
+    List<SummaryDTO> findAllPointSummaryByStudentId(String studentId, String userId);
 
 }

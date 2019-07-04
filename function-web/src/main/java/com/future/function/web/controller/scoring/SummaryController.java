@@ -1,6 +1,9 @@
 package com.future.function.web.controller.scoring;
 
+import com.future.function.common.enumeration.core.Role;
 import com.future.function.service.api.feature.scoring.SummaryService;
+import com.future.function.session.annotation.WithAnyRole;
+import com.future.function.session.model.Session;
 import com.future.function.web.mapper.response.scoring.ScoreSummaryResponseMapper;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.feature.scoring.SummaryResponse;
@@ -20,8 +23,9 @@ public class SummaryController {
   private SummaryService summaryService;
 
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-  public DataResponse<List<SummaryResponse>> findAllSummaryByStudentId(@PathVariable(value = "studentId") String studentId) {
-    return ScoreSummaryResponseMapper.toDataListSummaryResponse(summaryService.findAllPointSummaryByStudentId(studentId));
+  @WithAnyRole(roles = {Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT})
+  public DataResponse<List<SummaryResponse>> findAllSummaryByStudentId(@PathVariable(value = "studentId") String studentId, Session session) {
+    return ScoreSummaryResponseMapper.toDataListSummaryResponse(summaryService.findAllPointSummaryByStudentId(studentId, session.getUserId()));
   }
 
 }
