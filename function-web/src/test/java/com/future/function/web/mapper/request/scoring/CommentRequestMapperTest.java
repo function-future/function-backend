@@ -14,9 +14,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CommentRequestMapperTest {
@@ -39,7 +37,7 @@ public class CommentRequestMapperTest {
   @Before
   public void setUp() throws Exception {
 
-    commentWebRequest = CommentWebRequest.builder().userId(USER_ID).comment(COMMENT).build();
+      commentWebRequest = CommentWebRequest.builder().comment(COMMENT).build();
     room = Room.builder().id(ROOM_ID).build();
     user = User.builder().id(USER_ID).build();
     comment = Comment.builder().room(room).author(user).build();

@@ -9,9 +9,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ReportDetailEmbeddedWebResponse {
+public class SummaryResponse {
 
-    private String id;
     private String type;
     private String title;
     private int point;

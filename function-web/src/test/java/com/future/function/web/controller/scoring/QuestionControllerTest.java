@@ -16,7 +16,6 @@ import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.feature.scoring.OptionWebResponse;
 import com.future.function.web.model.response.feature.scoring.QuestionWebResponse;
-import java.util.Collections;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,13 +33,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import java.util.Collections;
+
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -108,7 +104,7 @@ public class QuestionControllerTest extends TestHelper {
 
     question = Question
         .builder()
-        .text(QUESTION_TEXT)
+            .label(QUESTION_TEXT)
         .options(Collections.singletonList(option))
         .build();
 
@@ -120,7 +116,7 @@ public class QuestionControllerTest extends TestHelper {
 
     questionWebRequest = QuestionWebRequest
         .builder()
-        .text(QUESTION_TEXT)
+            .label(QUESTION_TEXT)
         .options(Collections.singletonList(optionWebRequest))
         .build();
 
@@ -132,7 +128,7 @@ public class QuestionControllerTest extends TestHelper {
 
     questionWebResponse = QuestionWebResponse
         .builder()
-        .text(QUESTION_TEXT)
+            .label(QUESTION_TEXT)
         .options(Collections.singletonList(optionWebResponse))
         .build();
 

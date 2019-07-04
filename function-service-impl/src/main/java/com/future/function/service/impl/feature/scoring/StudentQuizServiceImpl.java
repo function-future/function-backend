@@ -15,16 +15,17 @@ import com.future.function.service.api.feature.core.UserService;
 import com.future.function.service.api.feature.scoring.StudentQuizDetailService;
 import com.future.function.service.api.feature.scoring.StudentQuizService;
 import com.future.function.service.impl.helper.PageHelper;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class StudentQuizServiceImpl implements StudentQuizService {
@@ -48,6 +49,21 @@ public class StudentQuizServiceImpl implements StudentQuizService {
         .map(user -> checkUserEligibilityAndReturnStudentId(user, studentId))
         .map(id -> studentQuizRepository.findAllByStudentIdAndDeletedFalse(studentId, pageable))
         .orElseGet(() -> PageHelper.empty(pageable));
+  }
+
+  @Override
+  public List<StudentQuizDetail> findAllQuizByStudentId(String studentId) {
+    return Optional.ofNullable(studentId)
+            .map(studentQuizRepository::findAllByStudentIdAndDeletedFalse)
+            .map(this::mapStudentQuizzesToDetail)
+            .orElseGet(ArrayList::new);
+  }
+
+  private List<StudentQuizDetail> mapStudentQuizzesToDetail(List<StudentQuiz> quizList) {
+    return quizList.stream()
+            .map(StudentQuiz::getId)
+            .map(studentQuizDetailService::findLatestByStudentQuizId)
+            .collect(Collectors.toList());
   }
 
   private String checkUserEligibilityAndReturnStudentId(User user, String studentId) {

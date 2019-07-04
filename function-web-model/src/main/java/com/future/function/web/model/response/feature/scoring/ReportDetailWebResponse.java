@@ -16,6 +16,6 @@ public class ReportDetailWebResponse {
     private String id;
     private String studentName;
     private String batchCode;
-    private List<ReportDetailEmbeddedWebResponse> scores;
+    private List<SummaryResponse> scores;
 
 }

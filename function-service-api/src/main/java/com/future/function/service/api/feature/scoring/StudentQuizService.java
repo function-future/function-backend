@@ -5,13 +5,16 @@ import com.future.function.model.entity.feature.scoring.Quiz;
 import com.future.function.model.entity.feature.scoring.StudentQuestion;
 import com.future.function.model.entity.feature.scoring.StudentQuiz;
 import com.future.function.model.entity.feature.scoring.StudentQuizDetail;
-import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+
+import java.util.List;
 
 public interface StudentQuizService {
 
   Page<StudentQuiz> findAllByStudentId(String studentId, Pageable pageable, String userId);
+
+    List<StudentQuizDetail> findAllQuizByStudentId(String studentId);
 
   StudentQuiz findById(String id, String userId);
 

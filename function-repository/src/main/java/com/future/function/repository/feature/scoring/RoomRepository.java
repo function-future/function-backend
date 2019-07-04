@@ -16,5 +16,7 @@ public interface RoomRepository extends MongoRepository<Room, String> {
 
   Page<Room> findAllByStudentIdAndDeletedFalse(String studentId, Pageable pageable);
 
+    List<Room> findAllByStudentIdAndDeletedFalse(String studentId);
+
   Optional<Room> findByIdAndDeletedFalse(String id);
 }

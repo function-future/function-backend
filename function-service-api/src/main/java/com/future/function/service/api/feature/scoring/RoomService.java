@@ -18,6 +18,8 @@ public interface RoomService {
 
   Page<Room> findAllByStudentId(String studentId, Pageable pageable);
 
+    List<Room> findAllByStudentId(String studentId);
+
   Comment createComment(Comment comment, String userId);
 
   Assignment createRoomsByAssignment(Assignment assignment);
