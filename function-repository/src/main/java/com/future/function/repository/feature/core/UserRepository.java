@@ -56,6 +56,7 @@ public interface UserRepository extends MongoRepository<User, String> {
    *
    * @return {@code List<User>} - List or users found in database.
    */
-  List<User> findAllByNameContainsIgnoreCaseAndDeletedFalse(String name);
+  Page<User> findAllByNameContainsIgnoreCaseAndDeletedFalse(String name,
+                                                            Pageable pageable);
   
 }

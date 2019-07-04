@@ -129,11 +129,15 @@ public class UserRepositoryTest {
   @Test
   public void testGivenNameByFindingUsersByNameContainsIgnoreCaseReturnListOfUsers() {
     
-    List<User> foundUsers =
-      userRepository.findAllByNameContainsIgnoreCaseAndDeletedFalse("E-1");
+    Page<User> foundUsers =
+      userRepository.findAllByNameContainsIgnoreCaseAndDeletedFalse("E-1",
+                                                                    new PageRequest(
+                                                                      0, 10)
+      );
     
-    assertThat(foundUsers).isNotEmpty();
-    assertThat(foundUsers).isEqualTo(Collections.singletonList(user1));
+    assertThat(foundUsers.getContent()).isNotEmpty();
+    assertThat(foundUsers.getContent()).isEqualTo(
+      Collections.singletonList(user1));
   }
   
 }

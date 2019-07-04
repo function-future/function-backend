@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @RestController
 @RequestMapping(value = "/api/core/courses")
+@WithAnyRole(roles = { Role.ADMIN, Role.JUDGE, Role.MENTOR })
 public class CourseController {
   
   private final CourseService courseService;
@@ -38,7 +39,6 @@ public class CourseController {
   @ResponseStatus(HttpStatus.OK)
   @GetMapping
   public PagingResponse<CourseWebResponse> getCourses(
-    @WithAnyRole(roles = { Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT })
       Session session,
     @RequestParam(defaultValue = "1")
       int page,
@@ -53,7 +53,6 @@ public class CourseController {
   @ResponseStatus(HttpStatus.OK)
   @GetMapping(value = "/{courseId}")
   public DataResponse<CourseWebResponse> getCourse(
-    @WithAnyRole(roles = { Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT })
       Session session,
     @PathVariable
       String courseId
@@ -66,7 +65,6 @@ public class CourseController {
   @ResponseStatus(HttpStatus.CREATED)
   @PostMapping
   public DataResponse<CourseWebResponse> createCourse(
-    @WithAnyRole(roles = { Role.ADMIN, Role.JUDGE, Role.MENTOR })
       Session session,
     @RequestBody
       CourseWebRequest request
@@ -81,7 +79,6 @@ public class CourseController {
   @ResponseStatus(HttpStatus.OK)
   @PutMapping("/{courseId}")
   public DataResponse<CourseWebResponse> updateCourse(
-    @WithAnyRole(roles = { Role.ADMIN, Role.JUDGE, Role.MENTOR })
       Session session,
     @PathVariable
       String courseId,
@@ -96,7 +93,6 @@ public class CourseController {
   @ResponseStatus(HttpStatus.OK)
   @DeleteMapping("/{courseId}")
   public BaseResponse deleteCourse(
-    @WithAnyRole(roles = { Role.ADMIN, Role.JUDGE, Role.MENTOR })
       Session session,
     @PathVariable
       String courseId
