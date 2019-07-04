@@ -197,9 +197,10 @@ public class UserServiceImpl implements UserService {
   }
   
   @Override
-  public List<User> getUsersByNameContainsIgnoreCase(String name) {
+  public Page<User> getUsersByNameContainsIgnoreCase(String name, Pageable pageable) {
     
-    return userRepository.findAllByNameContainsIgnoreCaseAndDeletedFalse(name);
+    return userRepository.findAllByNameContainsIgnoreCaseAndDeletedFalse(name
+      , pageable);
   }
   
   private User setUserPicture(User user, User foundUser) {
