@@ -47,6 +47,7 @@ public class TypeMustExistValidatorTest {
   public void testGivenInvalidFileTypeByValidatingTypeMustBeValidFromFileWebRequestReturnTrue() {
     
     assertThat(validator.isValid("SAMPLE", null)).isFalse();
+    assertThat(validator.isValid(null, null)).isFalse();
     
     verifyZeroInteractions(annotation);
   }

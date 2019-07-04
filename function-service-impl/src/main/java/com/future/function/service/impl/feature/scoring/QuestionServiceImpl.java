@@ -53,7 +53,7 @@ public class QuestionServiceImpl implements QuestionService {
               .forEach(questionList::addAll);
           return questionList;
         })
-        .map(this::findListFromQuestionList)
+        .map(this::setOptionsForQuestions)
         .orElse(questionList);
   }
 
@@ -63,7 +63,7 @@ public class QuestionServiceImpl implements QuestionService {
     return page;
   }
 
-  private List<Question> findListFromQuestionList(List<Question> list) {
+  private List<Question> setOptionsForQuestions(List<Question> list) {
     list
         .forEach(this::searchOptionsForQuestion);
     return list;
@@ -105,7 +105,6 @@ public class QuestionServiceImpl implements QuestionService {
     options
         .stream()
         .map(option -> {
-          option.setId(UUID.randomUUID().toString());
           option.setQuestion(question);
           return option;
         })

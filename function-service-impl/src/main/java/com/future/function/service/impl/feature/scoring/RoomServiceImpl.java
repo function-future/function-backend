@@ -3,6 +3,7 @@ package com.future.function.service.impl.feature.scoring;
 import com.future.function.common.enumeration.core.Role;
 import com.future.function.common.exception.ForbiddenException;
 import com.future.function.common.exception.NotFoundException;
+import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.model.entity.feature.scoring.Assignment;
 import com.future.function.model.entity.feature.scoring.Comment;
@@ -50,7 +51,7 @@ public class RoomServiceImpl implements RoomService {
       User user = userService.getUser(userId);
         return Optional.ofNullable(id)
                 .flatMap(roomRepository::findByIdAndDeletedFalse)
-            .map(room -> checkStudentEligibility(user, room))
+                .map(room -> checkStudentEligibility(user, room))
                 .orElseThrow(() -> new NotFoundException("Room not found"));
     }
 
@@ -101,13 +102,21 @@ public class RoomServiceImpl implements RoomService {
 
     @Override
     public Assignment createRoomsByAssignment(Assignment assignment) {
-        List<User> userListFromBatch = userService.getStudentsByBatchCode(assignment.getBatch().getCode());
-        userListFromBatch
-                .forEach(user -> this.createRoomForUserAndSave(user, assignment));
-        return assignment;
+        return Optional.ofNullable(assignment)
+            .map(Assignment::getBatch)
+            .map(Batch::getCode)
+            .map(userService::getStudentsByBatchCode)
+            .map(list -> mapEveryStudentToRoom(assignment, list))
+            .map(object -> assignment)
+            .orElseThrow(() -> new UnsupportedOperationException("Failed on #createRoomsByAssignment"));
     }
 
-    private void createRoomForUserAndSave(User user, Assignment assignment) {
+  private List<User> mapEveryStudentToRoom(Assignment assignment, List<User> list) {
+    list.forEach(user -> this.createRoomForUserAndSave(user, assignment));
+    return list;
+  }
+
+  private void createRoomForUserAndSave(User user, Assignment assignment) {
         Room room = Room
                 .builder()
                 .assignment(assignment)
@@ -123,17 +132,12 @@ public class RoomServiceImpl implements RoomService {
       return Optional.ofNullable(roomId)
           .filter(condition -> user.getRole().equals(Role.MENTOR))
           .map(id -> this.findById(id, user.getId()))
-          .filter(room -> validateMentorBatch(user, room))
           .map(room -> {
             room.setPoint(point);
             return room;
           })
           .map(roomRepository::save)
-          .orElseThrow(() -> new ForbiddenException("User not allowed"));
-    }
-
-  private boolean validateMentorBatch(User user, Room room) {
-    return room.getStudent().getBatch().getCode().equals(user.getBatch().getCode());
+          .orElseGet(() -> this.findById(roomId, userId));
     }
 
     @Override

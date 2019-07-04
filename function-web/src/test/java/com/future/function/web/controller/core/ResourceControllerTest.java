@@ -97,7 +97,7 @@ public class ResourceControllerTest extends TestHelper {
                                           FileOrigin.ANNOUNCEMENT
     )).thenReturn(FILE_V2_NULL_THUMBNAIL);
     
-    mockMvc.perform(post("/api/resources").cookie(cookies)
+    mockMvc.perform(post("/api/core/resources").cookie(cookies)
                       .contentType(MediaType.MULTIPART_FORM_DATA)
                       .param("file", "")
                       .param("origin", ORIGIN))
@@ -125,7 +125,7 @@ public class ResourceControllerTest extends TestHelper {
       )).thenReturn(BYTES);
     
     mockMvc.perform(
-      get("/api/resources/" + ORIGIN + "/" + ORIGINAL_NAME).cookie(cookies))
+      get("/api/core/resources/" + ORIGIN + "/" + ORIGINAL_NAME).cookie(cookies))
       .andExpect(status().isOk())
       .andExpect(header().string(HttpHeaders.CONTENT_DISPOSITION,
                                  "attachment; filename=\"" + ORIGINAL_NAME +

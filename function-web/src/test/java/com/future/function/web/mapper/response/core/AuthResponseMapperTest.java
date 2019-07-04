@@ -35,6 +35,7 @@ public class AuthResponseMapperTest {
       .build();
     
     AuthWebResponse authWebResponse = AuthWebResponse.builder()
+      .id("id")
       .name("name")
       .email("email")
       .avatar("file-url")

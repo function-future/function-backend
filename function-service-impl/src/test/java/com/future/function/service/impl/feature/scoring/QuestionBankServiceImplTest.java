@@ -88,6 +88,7 @@ public class QuestionBankServiceImplTest {
     catchException(() -> questionBankService.findById(""));
 
     assertThat(caughtException().getClass()).isEqualTo(NotFoundException.class);
+    verify(questionBankRepository).findByIdAndDeletedFalse("");
   }
 
   @Test

@@ -1,8 +1,8 @@
 package com.future.function.service.impl.feature.core;
 
 import com.future.function.common.enumeration.core.Role;
-import com.future.function.common.exception.ForbiddenException;
 import com.future.function.common.exception.NotFoundException;
+import com.future.function.common.exception.UnauthorizedException;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.repository.feature.core.UserRepository;
@@ -75,7 +75,7 @@ public class UserServiceImpl implements UserService {
     return Optional.ofNullable(email)
       .flatMap(userRepository::findByEmailAndDeletedFalse)
       .filter(user -> encoder.matches(password, user.getPassword()))
-      .orElseThrow(() -> new ForbiddenException("Invalid Email/Password"));
+      .orElseThrow(() -> new UnauthorizedException("Invalid Email/Password"));
   }
   
   /**
@@ -111,7 +111,8 @@ public class UserServiceImpl implements UserService {
       .map(this::setDefaultEncryptedPassword)
       .map(this::setUserPicture)
       .map(userRepository::save)
-      .orElse(user);
+      .orElseThrow(
+        () -> new UnsupportedOperationException("Failed Create User"));
   }
   
   /**
@@ -177,13 +178,28 @@ public class UserServiceImpl implements UserService {
   }
   
   @Override
-  public void changeUserPassword(String email, String newPassword) {
+  @SuppressWarnings("squid:S2201")
+  public void changeUserPassword(
+    String email, String oldPassword, String newPassword
+  ) {
     
     userRepository.findByEmailAndDeletedFalse(email)
-      .ifPresent(user -> {
-        user.setPassword(encoder.encode(newPassword));
-        userRepository.save(user);
-      });
+      .filter(user -> encoder.matches(user.getPassword(), oldPassword))
+      .map(user -> this.setEncryptedPassword(user, newPassword))
+      .map(userRepository::save)
+      .orElseThrow(() -> new UnauthorizedException("Invalid Old Password"));
+  }
+  
+  private User setEncryptedPassword(User user, String password) {
+    
+    user.setPassword(encoder.encode(password));
+    return user;
+  }
+  
+  @Override
+  public List<User> getUsersByNameContainsIgnoreCase(String name) {
+    
+    return userRepository.findAllByNameContainsIgnoreCaseAndDeletedFalse(name);
   }
   
   private User setUserPicture(User user, User foundUser) {
@@ -236,8 +252,7 @@ public class UserServiceImpl implements UserService {
   
   private User setDefaultEncryptedPassword(User user) {
     
-    user.setPassword(encoder.encode(user.getPassword()));
-    return user;
+    return this.setEncryptedPassword(user, user.getPassword());
   }
   
 }

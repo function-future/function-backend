@@ -14,8 +14,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -57,18 +58,19 @@ public class StudentQuestionServiceImpl implements StudentQuestionService {
 
   @Override
   public List<StudentQuestion> createStudentQuestionsFromQuestionList(List<Question> questionList, StudentQuizDetail studentQuizDetail) {
-    List<StudentQuestion> studentQuestionList = new ArrayList<>();
-    for (int i = 0; i < questionList.size(); i++) {
-      Question question = questionList.get(i);
-      StudentQuestion studentQuestion = StudentQuestion
-          .builder()
-          .question(question)
-          .option(findCorrectOptionFromQuestion(question))
-          .number(i + 1)
-          .studentQuizDetail(studentQuizDetail).build();
-      studentQuestionList.add(studentQuestion);
-    }
-    return studentQuestionList;
+    return IntStream.range(0, questionList.size())
+        .mapToObj(i -> Pair.of(i, questionList.get(i)))
+        .map(pair -> mapStudentQuizDetail(studentQuizDetail, pair))
+        .collect(Collectors.toList());
+  }
+
+  private StudentQuestion mapStudentQuizDetail(StudentQuizDetail studentQuizDetail, Pair<Integer, Question> pair) {
+    return StudentQuestion
+        .builder()
+        .question(pair.getSecond())
+        .option(findCorrectOptionFromQuestion(pair.getSecond()))
+        .number(pair.getFirst() + 1)
+        .studentQuizDetail(studentQuizDetail).build();
   }
 
   private Option findCorrectOptionFromQuestion(Question question) {
@@ -134,15 +136,18 @@ public class StudentQuestionServiceImpl implements StudentQuestionService {
   @Override
   public List<StudentQuestion> createStudentQuestionsByStudentQuizDetail(StudentQuizDetail studentQuizDetail,
       List<StudentQuestion> studentQuestions) {
-    for (int i = 0; i < studentQuestions.size(); i++) {
-      studentQuestions.get(i).setStudentQuizDetail(studentQuizDetail);
-      studentQuestions.get(i).setNumber(i + 1);
-    }
-
-    return studentQuestions
-        .stream()
+    return IntStream.range(0, studentQuestions.size())
+        .mapToObj(i -> Pair.of(i, studentQuestions.get(i)))
+        .map(pair -> setStudentQuizDetailAndNumber(studentQuizDetail, pair))
+        .map(Pair::getSecond)
         .map(studentQuestionRepository::save)
         .collect(Collectors.toList());
+  }
+
+  private Pair<Integer, StudentQuestion> setStudentQuizDetailAndNumber(StudentQuizDetail studentQuizDetail, Pair<Integer, StudentQuestion> pair) {
+    pair.getSecond().setStudentQuizDetail(studentQuizDetail);
+    pair.getSecond().setNumber(pair.getFirst() + 1);
+    return pair;
   }
 
   @Override

@@ -66,9 +66,8 @@ public class UserResponseMapperTest {
       .name(NAME)
       .phone(PHONE)
       .address(ADDRESS)
-      .deleted(false)
       .avatar(PICTURE.getFileUrl())
-      .batch(BATCH.getCode())
+      .batch(BatchResponseMapper.toBatchWebResponse(BATCH))
       .university(UNIVERSITY)
       .build();
   
@@ -97,7 +96,6 @@ public class UserResponseMapperTest {
       .name(NAME)
       .phone(PHONE)
       .address(ADDRESS)
-      .deleted(false)
       .avatar(PICTURE.getFileUrl())
       .build();
   

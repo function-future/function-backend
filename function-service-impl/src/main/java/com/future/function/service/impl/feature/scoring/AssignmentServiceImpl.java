@@ -67,9 +67,7 @@ public class AssignmentServiceImpl implements AssignmentService {
   @Override
   public Assignment findById(String id) {
     return Optional.ofNullable(id)
-            .map(assignmentRepository::findByIdAndDeletedFalse)
-            .filter(Optional::isPresent)
-            .map(Optional::get)
+            .flatMap(assignmentRepository::findByIdAndDeletedFalse)
             .orElseThrow(() -> new NotFoundException("Assignment Not Found"));
   }
 
@@ -123,9 +121,8 @@ public class AssignmentServiceImpl implements AssignmentService {
     return Optional.ofNullable(assignment)
             .map(Assignment::getFile)
             .map(FileV2::getId)
-            .map(fileId -> resourceService.markFilesUsed(Collections.singletonList(fileId), true))
-            .filter(condition -> condition)
-            .map(file -> resourceService.getFile(assignment.getFile().getId()))
+            .filter(fileId -> resourceService.markFilesUsed(Collections.singletonList(fileId), true))
+            .map(resourceService::getFile)
             .map(file -> {
               assignment.setFile(file);
               return assignment;

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.future.function.validation.annotation.core.FileMustExist;
 import java.util.List;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -36,5 +37,6 @@ public class AssignmentWebRequest {
   private String batchCode;
 
   @FileMustExist
+  @Size(max = 1, message = "Size")
   private List<String> files;
 }

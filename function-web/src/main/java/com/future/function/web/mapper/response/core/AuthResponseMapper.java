@@ -25,6 +25,7 @@ public final class AuthResponseMapper {
   private static AuthWebResponse buildAuthWebResponse(User user) {
     
     return AuthWebResponse.builder()
+      .id(user.getId())
       .name(user.getName())
       .email(user.getEmail())
       .role(user.getRole()

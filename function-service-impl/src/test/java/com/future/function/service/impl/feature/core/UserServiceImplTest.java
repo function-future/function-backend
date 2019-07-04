@@ -3,6 +3,7 @@ package com.future.function.service.impl.feature.core;
 import com.future.function.common.enumeration.core.Role;
 import com.future.function.common.exception.ForbiddenException;
 import com.future.function.common.exception.NotFoundException;
+import com.future.function.common.exception.UnauthorizedException;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.User;
@@ -42,7 +43,9 @@ public class UserServiceImplTest {
   
   private static final String EMAIL_STUDENT = "student@test.com";
   
-  private static final String NAME = "test-name";
+  private static final String NAME_MENTOR = "name-mentor";
+  
+  private static final String NAME_STUDENT = "name-student";
   
   private static final String PASSWORD = "password";
   
@@ -74,6 +77,10 @@ public class UserServiceImplTest {
   
   private static final String MENTOR_ID = "mentor-id";
   
+  private static final String OLD_PASSWORD = "old-password";
+  
+  private static final String NEW_PASSWORD = "new-password";
+  
   private User userStudent;
   
   private User userMentor;
@@ -100,7 +107,7 @@ public class UserServiceImplTest {
       .id(STUDENT_ID)
       .role(Role.STUDENT)
       .email(EMAIL_STUDENT)
-      .name(NAME)
+      .name(NAME_STUDENT)
       .password(PASSWORD)
       .phone(PHONE)
       .address(ADDRESS)
@@ -113,7 +120,7 @@ public class UserServiceImplTest {
       .id(MENTOR_ID)
       .role(Role.MENTOR)
       .email(EMAIL_MENTOR)
-      .name(NAME)
+      .name(NAME_MENTOR)
       .password(PASSWORD)
       .phone(PHONE)
       .address(ADDRESS)
@@ -176,7 +183,7 @@ public class UserServiceImplTest {
     User additionalUser = User.builder()
       .role(Role.STUDENT)
       .email(EMAIL_STUDENT)
-      .name(NAME)
+      .name(NAME_STUDENT)
       .password(PASSWORD)
       .phone(PHONE)
       .address(ADDRESS)
@@ -207,7 +214,7 @@ public class UserServiceImplTest {
     User additionalUser = User.builder()
       .role(Role.MENTOR)
       .email(EMAIL_MENTOR)
-      .name(NAME)
+      .name(NAME_STUDENT)
       .password(PASSWORD)
       .phone(PHONE)
       .address(ADDRESS)
@@ -248,6 +255,30 @@ public class UserServiceImplTest {
     assertThat(createdUserStudent.getBatch()).isEqualTo(BATCH);
     assertThat(createdUserStudent.getPictureV2()).isNotNull();
     assertThat(createdUserStudent.getPictureV2()).isEqualTo(PICTURE);
+    
+    verify(batchService).getBatchByCode(NUMBER);
+    verify(resourceService).markFilesUsed(FILE_IDS, true);
+    verify(resourceService).getFile(PICTURE_ID);
+    verify(encoder).encode(PASSWORD);
+    verify(userRepository).save(userStudent);
+  }
+  
+  @Test
+  public void testGivenStudentDataButErrorOccurredByCreatingUserReturnUnsupportedOperationException() {
+    
+    userStudent.setPictureV2(PICTURE);
+    
+    when(batchService.getBatchByCode(NUMBER)).thenReturn(BATCH);
+    when(resourceService.markFilesUsed(FILE_IDS, true)).thenReturn(true);
+    when(resourceService.getFile(PICTURE_ID)).thenReturn(PICTURE);
+    when(encoder.encode(PASSWORD)).thenReturn(PASSWORD);
+    when(userRepository.save(userStudent)).thenReturn(null);
+  
+    catchException(() -> userService.createUser(userStudent));
+  
+    assertThat(caughtException().getClass()).isEqualTo(
+      UnsupportedOperationException.class);
+    assertThat(caughtException().getMessage()).isEqualTo("Failed Create User");
     
     verify(batchService).getBatchByCode(NUMBER);
     verify(resourceService).markFilesUsed(FILE_IDS, true);
@@ -432,7 +463,7 @@ public class UserServiceImplTest {
   }
   
   @Test
-  public void testGivenNonExistingBatchCodeByGettingStudentsByBatchCodeNotFoundException() {
+  public void testGivenNonExistingBatchCodeByGettingStudentsByBatchCodeReturnNotFoundException() {
     
     when(batchService.getBatchByCode(NUMBER)).thenThrow(
       new NotFoundException(""));
@@ -446,7 +477,7 @@ public class UserServiceImplTest {
   }
   
   @Test
-  public void testGivenBatchCodeWithNoStudentRegisteredForThatCodeByGettingStudentsByBatchCodeEmptyList() {
+  public void testGivenBatchCodeWithNoStudentRegisteredForThatCodeByGettingStudentsByBatchCodeReturnEmptyList() {
     
     when(batchService.getBatchByCode(NUMBER)).thenReturn(BATCH);
     when(userRepository.findAllByRoleAndBatchAndDeletedFalse(Role.STUDENT, BATCH)).thenReturn(
@@ -512,7 +543,7 @@ public class UserServiceImplTest {
   }
   
   @Test
-  public void testGivenEmailAndPasswordByGettingUserByEmailAndPasswordReturnForbiddenException() {
+  public void testGivenEmailAndPasswordByGettingUserByEmailAndPasswordReturnUnauthorizedException() {
     
     when(userRepository.findByEmailAndDeletedFalse(EMAIL_STUDENT)).thenReturn(
       Optional.of(userStudent));
@@ -524,7 +555,7 @@ public class UserServiceImplTest {
       () -> userService.getUserByEmailAndPassword(EMAIL_STUDENT, rawPassword));
     
     assertThat(caughtException().getClass()).isEqualTo(
-      ForbiddenException.class);
+      UnauthorizedException.class);
     assertThat(caughtException().getMessage()).isEqualTo(
       "Invalid Email/Password");
     
@@ -539,15 +570,63 @@ public class UserServiceImplTest {
     when(userRepository.findByEmailAndDeletedFalse(EMAIL_STUDENT)).thenReturn(
       Optional.of(userStudent));
     
-    String rawPassword = "pass";
-    when(encoder.encode(rawPassword)).thenReturn(PASSWORD);
+    when(encoder.matches(userStudent.getPassword(), OLD_PASSWORD)).thenReturn(
+      true);
     
-    userService.changeUserPassword(EMAIL_STUDENT, rawPassword);
+    when(encoder.encode(NEW_PASSWORD)).thenReturn(PASSWORD);
+    
+    when(userRepository.save(userStudent)).thenReturn(userStudent);
+    
+    userService.changeUserPassword(EMAIL_STUDENT, OLD_PASSWORD, NEW_PASSWORD);
     
     verify(userRepository).findByEmailAndDeletedFalse(EMAIL_STUDENT);
-    verify(encoder).encode(rawPassword);
+    verify(encoder).matches(userStudent.getPassword(), OLD_PASSWORD);
+    verify(encoder).encode(NEW_PASSWORD);
     verify(userRepository).save(userStudent);
     verifyZeroInteractions(resourceService);
+  }
+  
+  @Test
+  public void testGivenEmailAndInvalidOldPasswordAndNewPasswordByChangingUserPasswordReturnUnauthorizedException() {
+    
+    when(userRepository.findByEmailAndDeletedFalse(EMAIL_STUDENT)).thenReturn(
+      Optional.of(userStudent));
+    
+    when(encoder.matches(userStudent.getPassword(), OLD_PASSWORD)).thenReturn(
+      false);
+  
+    catchException(
+      () -> userService.changeUserPassword(EMAIL_STUDENT, OLD_PASSWORD,
+                                           NEW_PASSWORD
+      ));
+  
+    assertThat(caughtException().getClass()).isEqualTo(
+      UnauthorizedException.class);
+    assertThat(caughtException().getMessage()).isEqualTo(
+      "Invalid Old Password");
+    
+    verify(userRepository).findByEmailAndDeletedFalse(EMAIL_STUDENT);
+    verify(encoder).matches(userStudent.getPassword(), OLD_PASSWORD);
+    verifyZeroInteractions(resourceService);
+  }
+  
+  @Test
+  public void testGivenNameByGettingUsersByNameContainsIgnoreCaseReturnListOfUsers() {
+    
+    String namePart = "AM";
+    when(userRepository.findAllByNameContainsIgnoreCaseAndDeletedFalse(
+      namePart)).thenReturn(Arrays.asList(userStudent, userMentor));
+  
+    List<User> retrievedUsers = userService.getUsersByNameContainsIgnoreCase(
+      namePart);
+    
+    assertThat(retrievedUsers).isNotEmpty();
+    assertThat(retrievedUsers).isEqualTo(
+      Arrays.asList(userStudent, userMentor));
+    
+    verify(userRepository).findAllByNameContainsIgnoreCaseAndDeletedFalse(
+      namePart);
+    verifyZeroInteractions(resourceService, encoder);
   }
   
 }

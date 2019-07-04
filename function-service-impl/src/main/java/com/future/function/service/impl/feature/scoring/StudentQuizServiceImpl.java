@@ -14,7 +14,14 @@ import com.future.function.repository.feature.scoring.StudentQuizRepository;
 import com.future.function.service.api.feature.core.UserService;
 import com.future.function.service.api.feature.scoring.StudentQuizDetailService;
 import com.future.function.service.api.feature.scoring.StudentQuizService;
+import com.future.function.service.impl.helper.CopyHelper;
 import com.future.function.service.impl.helper.PageHelper;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -86,8 +93,7 @@ public class StudentQuizServiceImpl implements StudentQuizService {
     return Optional.ofNullable(id)
         .flatMap(studentQuizRepository::findByIdAndDeletedFalse)
         .map(studentQuiz -> {
-          if (user.getRole().equals(Role.STUDENT) && !studentQuiz.getStudent().getId().equals(userId))
-            throw new ForbiddenException("User not allowed");
+          checkUserEligibilityAndReturnStudentId(user, studentQuiz.getStudent().getId());
           return studentQuiz;
         })
         .orElseThrow(() -> new NotFoundException("Quiz not found"));
@@ -175,15 +181,8 @@ public class StudentQuizServiceImpl implements StudentQuizService {
 
   private Quiz createNewQuiz(Quiz quiz) {
     Quiz newQuiz = Quiz.builder().build();
-    BeanUtils.copyProperties(
-        quiz,
-        newQuiz,
-        "_id",
-        "id",
-        FieldName.BaseEntity.CREATED_AT,
-        FieldName.BaseEntity.CREATED_BY,
-        FieldName.BaseEntity.VERSION
-    );
+    CopyHelper.copyProperties(quiz, newQuiz);
+    newQuiz.setId(UUID.randomUUID().toString());
     return newQuiz;
   }
 
