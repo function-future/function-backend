@@ -98,7 +98,7 @@ public class QuizServiceImplTest {
     question = Question
         .builder()
         .questionBank(questionBank)
-        .text(QUESTION_TEXT)
+        .label(QUESTION_TEXT)
         .build();
 
     quiz = Quiz

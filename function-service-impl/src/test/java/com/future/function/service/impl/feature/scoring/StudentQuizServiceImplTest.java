@@ -93,7 +93,7 @@ public class StudentQuizServiceImplTest {
     question = Question
         .builder()
         .id(QUESTION_ID)
-        .text(QUESTION_TEXT)
+        .label(QUESTION_TEXT)
         .build();
 
     option = Option

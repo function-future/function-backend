@@ -75,7 +75,7 @@ public class StudentQuestionServiceImplTest {
         .builder()
         .id(QUESTION_ID)
         .questionBank(questionBank)
-        .text(QUESTION_TEXT)
+        .label(QUESTION_TEXT)
         .build();
 
     option = Option
@@ -114,7 +114,7 @@ public class StudentQuestionServiceImplTest {
   public void findAllByStudentQuizDetailId() {
     List<StudentQuestion> actual = studentQuestionService.findAllByStudentQuizDetailId(STUDENT_QUIZ_DETAIL_ID);
     assertThat(actual.size()).isEqualTo(1);
-    assertThat(actual.get(0).getQuestion().getText()).isEqualTo(QUESTION_TEXT);
+    assertThat(actual.get(0).getQuestion().getLabel()).isEqualTo(QUESTION_TEXT);
     assertThat(actual.get(0).getOption().getLabel()).isEqualTo(OPTION_LABEL);
     verify(studentQuestionRepository).findAllByStudentQuizDetailIdAndDeletedFalseOrderByNumberAsc(STUDENT_QUIZ_DETAIL_ID);
   }
@@ -124,7 +124,7 @@ public class StudentQuestionServiceImplTest {
     List<Question> actual = studentQuestionService.findAllQuestionsFromMultipleQuestionBank(true,
         Collections.singletonList(questionBank), QUESTION_COUNT);
     assertThat(actual.size()).isEqualTo(1);
-    assertThat(actual.get(0).getText()).isEqualTo(QUESTION_TEXT);
+    assertThat(actual.get(0).getLabel()).isEqualTo(QUESTION_TEXT);
     verify(questionService).findAllByMultipleQuestionBankId(Collections.singletonList(QUESTION_BANK_ID));
   }
 
@@ -149,7 +149,7 @@ public class StudentQuestionServiceImplTest {
         .createStudentQuestionsFromQuestionList(Collections.singletonList(question), studentQuizDetail);
     assertThat(actual.size()).isEqualTo(1);
     assertThat(actual.get(0).getNumber()).isEqualTo(1);
-    assertThat(actual.get(0).getQuestion().getText()).isEqualTo(QUESTION_TEXT);
+    assertThat(actual.get(0).getQuestion().getLabel()).isEqualTo(QUESTION_TEXT);
   }
 
   @Test
@@ -189,7 +189,7 @@ public class StudentQuestionServiceImplTest {
     List<StudentQuestion> actual = studentQuestionService.createStudentQuestionsByStudentQuizDetail(
         StudentQuizDetail.builder().id(STUDENT_QUIZ_DETAIL_ID).build(), Collections.singletonList(studentQuestion));
     assertThat(actual.size()).isEqualTo(1);
-    assertThat(actual.get(0).getQuestion().getText()).isEqualTo(QUESTION_TEXT);
+    assertThat(actual.get(0).getQuestion().getLabel()).isEqualTo(QUESTION_TEXT);
     assertThat(actual.get(0).getOption().getLabel()).isEqualTo(OPTION_LABEL);
     verify(studentQuestionRepository).save(studentQuestion);
   }

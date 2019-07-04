@@ -10,6 +10,7 @@ import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.base.paging.Paging;
+import com.future.function.web.model.response.feature.core.BatchWebResponse;
 import com.future.function.web.model.response.feature.core.UserWebResponse;
 import com.future.function.web.model.response.feature.scoring.AssignmentWebResponse;
 import com.future.function.web.model.response.feature.scoring.RoomWebResponse;
@@ -46,6 +47,7 @@ public class RoomResponseMapperTest {
   private AssignmentWebResponse assignmentWebResponse;
   private RoomWebResponse roomWebResponse;
   private UserWebResponse userWebResponse;
+  private BatchWebResponse batchWebResponse;
   private DataResponse<RoomWebResponse> roomWebResponseDataResponse;
   private PagingResponse<RoomWebResponse> roomWebResponsePagingResponse;
 
@@ -72,9 +74,11 @@ public class RoomResponseMapperTest {
         .build();
     student = User.builder().id(USER_ID).name("name").address("address").batch(batch).email("email")
         .password("password").phone("phone").pictureV2(fileV2).role(Role.STUDENT).build();
+    batchWebResponse = new BatchWebResponse();
+    BeanUtils.copyProperties(batch, batchWebResponse);
     userWebResponse = new UserWebResponse();
     BeanUtils.copyProperties(student, userWebResponse);
-    userWebResponse.setBatch(BATCH_CODE);
+    userWebResponse.setBatch(batchWebResponse);
     userWebResponse.setAvatar(FILE_URl);
     userWebResponse.setRole("STUDENT");
     room = Room.builder().assignment(assignment).student(student).point(0).build();

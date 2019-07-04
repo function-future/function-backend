@@ -72,7 +72,7 @@ public class StudentQuizDetailServiceImplTest {
     question = Question
         .builder()
         .id(QUESTION_ID)
-        .text(QUESTION_TEXT)
+        .label(QUESTION_TEXT)
         .questionBank(questionBank)
         .build();
 
@@ -157,7 +157,7 @@ public class StudentQuizDetailServiceImplTest {
   public void findAllUnansweredQuestionsByStudentQuizId() {
     List<StudentQuestion> actual = studentQuizDetailService.findAllUnansweredQuestionsByStudentQuizId(STUDENT_QUIZ_ID);
     assertThat(actual.get(0).getNumber()).isEqualTo(1);
-    assertThat(actual.get(0).getQuestion().getText()).isEqualTo(QUESTION_TEXT);
+    assertThat(actual.get(0).getQuestion().getLabel()).isEqualTo(QUESTION_TEXT);
     verify(studentQuizDetailRepository, times(2)).findFirstByStudentQuizIdAndDeletedFalse(STUDENT_QUIZ_ID);
     verify(studentQuizDetailRepository).save(any(StudentQuizDetail.class));
     verify(studentQuestionService).findAllQuestionsFromMultipleQuestionBank(true,
@@ -198,7 +198,7 @@ public class StudentQuizDetailServiceImplTest {
         Collections.singletonList(studentQuestion));
     assertThat(actual.size()).isEqualTo(1);
     assertThat(actual.get(0).getOption().getLabel()).isEqualTo(OPTION_LABEL);
-    assertThat(actual.get(0).getQuestion().getText()).isEqualTo(QUESTION_TEXT);
+    assertThat(actual.get(0).getQuestion().getLabel()).isEqualTo(QUESTION_TEXT);
     verify(studentQuestionService).createStudentQuestionsByStudentQuizDetail(studentQuizDetail,
         Collections.singletonList(studentQuestion));
   }
