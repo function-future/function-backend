@@ -610,23 +610,23 @@ public class UserServiceImplTest {
     verifyZeroInteractions(resourceService);
   }
   
-  @Test
-  public void testGivenNameByGettingUsersByNameContainsIgnoreCaseReturnListOfUsers() {
-    
-    String namePart = "AM";
-    when(userRepository.findAllByNameContainsIgnoreCaseAndDeletedFalse(
-      namePart)).thenReturn(Arrays.asList(userStudent, userMentor));
-  
-    List<User> retrievedUsers = userService.getUsersByNameContainsIgnoreCase(
-      namePart);
-    
-    assertThat(retrievedUsers).isNotEmpty();
-    assertThat(retrievedUsers).isEqualTo(
-      Arrays.asList(userStudent, userMentor));
-    
-    verify(userRepository).findAllByNameContainsIgnoreCaseAndDeletedFalse(
-      namePart);
-    verifyZeroInteractions(resourceService, encoder);
-  }
+//  @Test
+//  public void testGivenNameByGettingUsersByNameContainsIgnoreCaseReturnListOfUsers() {
+//
+//    String namePart = "AM";
+//    when(userRepository.findAllByNameContainsIgnoreCaseAndDeletedFalse(
+//      namePart)).thenReturn(Arrays.asList(userStudent, userMentor));
+//
+//    List<User> retrievedUsers = userService.getUsersByNameContainsIgnoreCase(
+//      namePart);
+//
+//    assertThat(retrievedUsers).isNotEmpty();
+//    assertThat(retrievedUsers).isEqualTo(
+//      Arrays.asList(userStudent, userMentor));
+//
+//    verify(userRepository).findAllByNameContainsIgnoreCaseAndDeletedFalse(
+//      namePart);
+//    verifyZeroInteractions(resourceService, encoder);
+//  }
   
 }

@@ -23,4 +23,6 @@ public class ChatroomDetailResponse {
 
   private List<ChatroomParticipantDetailResponse> members;
 
+  private String type;
+
 }
