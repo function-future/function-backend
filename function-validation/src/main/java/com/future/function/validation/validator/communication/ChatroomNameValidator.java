@@ -18,6 +18,6 @@ public class ChatroomNameValidator implements ConstraintValidator<ChatroomName, 
 
   @Override
   public boolean isValid(String name, ConstraintValidatorContext constraintValidatorContext) {
-    return name == null || name.matches("^([A-Za-z0-9]+(( )[A-Za-z0-9]+)*)+$");
+    return name == null || name.length() < 30;
   }
 }
