@@ -11,6 +11,7 @@ import com.future.function.service.api.feature.core.ResourceService;
 import com.future.function.service.api.feature.scoring.AssignmentService;
 import com.future.function.service.api.feature.scoring.RoomService;
 import com.future.function.service.impl.helper.CopyHelper;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -145,6 +146,8 @@ public class AssignmentServiceImpl implements AssignmentService {
     }
     CopyHelper.copyProperties(request, oldAssignment);
     oldAssignment = storeAssignmentFile(oldAssignment);
+    Batch batch = batchService.getBatchByCode(request.getBatch().getCode());
+    oldAssignment.setBatch(batch);
     oldAssignment = assignmentRepository.save(oldAssignment);
     if (isBatchChanged) {
       roomService.deleteAllRoomsByAssignmentId(oldAssignment.getId());
@@ -158,7 +161,11 @@ public class AssignmentServiceImpl implements AssignmentService {
   }
 
   private boolean isFilesChanged(Assignment request, Assignment oldAssignment) {
-    return !request.getFile().getId().equals(oldAssignment.getFile().getId());
+    return Optional.ofNullable(request)
+        .map(Assignment::getFile)
+        .map(FileV2::getId)
+        .map(id -> !id.equals(oldAssignment.getFile().getId()))
+        .orElse(false);
   }
 
   @Override
