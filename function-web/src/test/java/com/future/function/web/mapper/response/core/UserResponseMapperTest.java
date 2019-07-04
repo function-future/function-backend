@@ -163,20 +163,4 @@ public class UserResponseMapperTest {
     assertThat(pagingResponse).isEqualTo(PAGING_RESPONSE);
   }
   
-  @Test
-  public void testGivenUsersDataByMappingToDataResponseReturnDataResponseObject() {
-    
-    DataResponse<List<UserWebResponse>> dataResponse =
-      UserResponseMapper.toUsersDataResponse(USERS);
-    
-    DataResponse<List<UserWebResponse>> expectedDataResponse =
-      DataResponse.<List<UserWebResponse>>builder().code(200)
-        .status("OK")
-        .data(USER_WEB_RESPONSES)
-        .build();
-    
-    assertThat(dataResponse).isNotNull();
-    assertThat(dataResponse).isEqualTo(expectedDataResponse);
-  }
-  
 }

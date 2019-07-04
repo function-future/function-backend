@@ -271,18 +271,20 @@ public class UserControllerTest extends TestHelper {
       .build();
     
     List<User> users = Collections.singletonList(student);
-    given(userService.getUsersByNameContainsIgnoreCase(NAME)).willReturn(users);
+    given(userService.getUsersByNameContainsIgnoreCase(NAME, PAGEABLE)).willReturn(new PageImpl<>(users, PAGEABLE
+      , users.size()));
     
-    DataResponse<List<UserWebResponse>> dataResponse =
-      UserResponseMapper.toUsersDataResponse(users);
+    PagingResponse<UserWebResponse> pagingResponse =
+      UserResponseMapper.toUsersPagingResponse(new PageImpl<>(users, PAGEABLE
+        , users.size()));
     
     mockMvc.perform(get("/api/core/users/search").cookie(cookies)
                       .param("name", NAME))
       .andExpect(status().isOk())
-      .andExpect(content().json(dataResponseJacksonTester.write(dataResponse)
+      .andExpect(content().json(pagingResponseJacksonTester.write(pagingResponse)
                                   .getJson()));
     
-    verify(userService).getUsersByNameContainsIgnoreCase(NAME);
+    verify(userService).getUsersByNameContainsIgnoreCase(NAME, PAGEABLE);
     verifyZeroInteractions(userRequestMapper);
   }
   
