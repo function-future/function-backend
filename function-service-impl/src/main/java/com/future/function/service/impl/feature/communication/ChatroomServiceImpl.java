@@ -98,7 +98,6 @@ public class ChatroomServiceImpl implements ChatroomService {
             .map(chatroomRepository::findOne)
             .map(room -> this.updateMember(room, chatroom))
             .map(room -> this.updateTitle(room, chatroom))
-            .map(room -> this.updateType(room, chatroom))
             .map(chatroomRepository::save)
             .orElse(chatroom);
   }
@@ -124,11 +123,6 @@ public class ChatroomServiceImpl implements ChatroomService {
 
   private Chatroom updateTitle(Chatroom existingChatroom, Chatroom newChatroom) {
     existingChatroom.setTitle(newChatroom.getTitle());
-    return existingChatroom;
-  }
-
-  private Chatroom updateType(Chatroom existingChatroom, Chatroom newChatroom) {
-    existingChatroom.setType(newChatroom.getType());
     return existingChatroom;
   }
 
