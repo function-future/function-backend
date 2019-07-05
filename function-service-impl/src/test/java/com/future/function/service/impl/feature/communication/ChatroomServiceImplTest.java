@@ -19,6 +19,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
@@ -178,6 +179,27 @@ public class ChatroomServiceImplTest {
     verify(userService).getUser(USER_ID_1);
     verify(userService).getUser(USER_ID_2);
     verify(chatroomRepository).save(chatroom);
+  }
+
+  @Test
+  public void testGivenChatroomByCreatingPrivateChatroomReturnExistingChatroom() {
+    when(userService.getUser(USER_ID_1)).thenReturn(MEMBER_1);
+    when(userService.getUser(USER_ID_2)).thenReturn(MEMBER_2);
+    when(chatroomRepository.save(chatroom)).thenReturn(chatroom);
+    when(chatroomRepository.findAllByMembersContaining(Arrays.asList(MEMBER_1, MEMBER_2))).thenReturn(new ArrayList<>());
+
+    chatroom.setType(ChatroomType.PRIVATE);
+
+    Chatroom chatroomResult = chatroomService.createChatroom(chatroom);
+
+    assertThat(chatroomResult).isNotNull();
+    assertThat(chatroomResult.getId()).isEqualTo(CHATROOM_ID);
+    assertThat(chatroomResult.getType()).isEqualTo(ChatroomType.PRIVATE);
+
+    verify(userService, times(2)).getUser(USER_ID_1);
+    verify(userService, times(2)).getUser(USER_ID_2);
+    verify(chatroomRepository).save(chatroom);
+    verify(chatroomRepository).findAllByMembersContaining(Arrays.asList(MEMBER_1, MEMBER_2));
   }
 
   @Test
