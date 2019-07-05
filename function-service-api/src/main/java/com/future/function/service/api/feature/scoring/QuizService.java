@@ -11,7 +11,7 @@ public interface QuizService {
 
   Quiz findById(String id);
 
-  Page<Quiz> findAllByPageableAndFilterAndSearch(Pageable pageable, String filter, String search);
+  Page<Quiz> findAllByBatchCodeAndPageable(String batchCode, Pageable pageable);
 
   Quiz copyQuizWithTargetBatch(String targetBatch, Quiz quiz);
 

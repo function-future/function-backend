@@ -21,7 +21,6 @@ public class AssignmentRepositoryTest {
   private static final String ASSIGNMENT_TITLE = "assignment-title";
   private static final String ASSIGNMENT_DESCRIPTION = "assignment-description";
   private static final long ASSIGNMENT_DEADLINE = new Date().getTime();
-  private static final String ASSIGNMENT_QUESTION = "assignment-question";
 
   @Autowired
   private AssignmentRepository assignmentRepository;
@@ -38,12 +37,11 @@ public class AssignmentRepositoryTest {
   @Test
   public void findAssignmentByIdAndDeletedFalse() {
     Assignment assignment = Assignment
-            .builder()
-            .title(ASSIGNMENT_TITLE)
-            .description(ASSIGNMENT_DESCRIPTION)
-            .deadline(ASSIGNMENT_DEADLINE)
-            .question(ASSIGNMENT_QUESTION)
-            .build();
+        .builder()
+        .title(ASSIGNMENT_TITLE)
+        .description(ASSIGNMENT_DESCRIPTION)
+        .deadline(ASSIGNMENT_DEADLINE)
+        .build();
 
     assignmentRepository.save(assignment);
 

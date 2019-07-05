@@ -6,6 +6,7 @@ import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.base.paging.Paging;
 import com.future.function.web.model.response.feature.scoring.QuestionBankWebResponse;
+import java.util.Collections;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,8 +15,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-
-import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -37,42 +36,42 @@ public class QuestionBankResponseMapperTest {
   public void setUp() throws Exception {
 
     questionBank = QuestionBank
-            .builder()
-            .id(QUESTION_BANK_ID)
-            .description(QUESTION_BANK_DESCRIPTION)
-            .build();
+        .builder()
+        .id(QUESTION_BANK_ID)
+        .description(QUESTION_BANK_DESCRIPTION)
+        .build();
 
     questionBankWebResponse = QuestionBankWebResponse
-            .builder()
-            .id(QUESTION_BANK_ID)
-            .description(QUESTION_BANK_DESCRIPTION)
-            .build();
+        .builder()
+        .id(QUESTION_BANK_ID)
+        .description(QUESTION_BANK_DESCRIPTION)
+        .build();
 
     questionBankWebResponseDataResponse = DataResponse
-            .<QuestionBankWebResponse>builder()
-            .data(questionBankWebResponse)
-            .code(HttpStatus.OK.value())
-            .status(ResponseHelper.toProperStatusFormat(HttpStatus.OK.getReasonPhrase()))
-            .build();
+        .<QuestionBankWebResponse>builder()
+        .data(questionBankWebResponse)
+        .code(HttpStatus.OK.value())
+        .status(ResponseHelper.toProperStatusFormat(HttpStatus.OK.getReasonPhrase()))
+        .build();
 
     pageable = new PageRequest(0, 10);
 
     questionBankPage = new PageImpl<>(Collections.singletonList(questionBank), pageable, 1);
 
     paging = Paging
-            .builder()
-            .page(questionBankPage.getNumber())
-            .size(questionBankPage.getSize())
-            .totalRecords(questionBankPage.getTotalElements())
-            .build();
+        .builder()
+        .page(questionBankPage.getNumber())
+        .size(questionBankPage.getSize())
+        .totalRecords(questionBankPage.getTotalElements())
+        .build();
 
     questionBankWebResponsePagingResponse = PagingResponse
-            .<QuestionBankWebResponse>builder()
-            .data(Collections.singletonList(questionBankWebResponse))
-            .code(HttpStatus.OK.value())
-            .status(ResponseHelper.toProperStatusFormat(HttpStatus.OK.getReasonPhrase()))
-            .paging(paging)
-            .build();
+        .<QuestionBankWebResponse>builder()
+        .data(Collections.singletonList(questionBankWebResponse))
+        .code(HttpStatus.OK.value())
+        .status(ResponseHelper.toProperStatusFormat(HttpStatus.OK.getReasonPhrase()))
+        .paging(paging)
+        .build();
 
   }
 
