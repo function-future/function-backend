@@ -168,7 +168,6 @@ public class ChatroomServiceImplTest {
     when(userService.getUser(USER_ID_1)).thenReturn(MEMBER_1);
     when(userService.getUser(USER_ID_2)).thenReturn(MEMBER_2);
     when(chatroomRepository.save(chatroom)).thenReturn(chatroom);
-    when(chatroomRepository.findByMembersContaining(Arrays.asList(MEMBER_1, MEMBER_2))).thenReturn(new ArrayList<>());
 
     Chatroom chatroomResult = chatroomService.createChatroom(chatroom);
 
@@ -176,6 +175,26 @@ public class ChatroomServiceImplTest {
     assertThat(chatroomResult.getId()).isEqualTo(CHATROOM_ID);
     assertThat(chatroomResult.getTitle()).isEqualTo(TITLE_GROUP);
     assertThat(chatroomResult.getType()).isEqualTo(TYPE);
+
+    verify(userService).getUser(USER_ID_1);
+    verify(userService).getUser(USER_ID_2);
+    verify(chatroomRepository).save(chatroom);
+  }
+
+  @Test
+  public void testGivenChatroomByCreatingPrivateChatroomReturnExistingChatroom() {
+    when(userService.getUser(USER_ID_1)).thenReturn(MEMBER_1);
+    when(userService.getUser(USER_ID_2)).thenReturn(MEMBER_2);
+    when(chatroomRepository.save(chatroom)).thenReturn(chatroom);
+    when(chatroomRepository.findByMembersContaining(Arrays.asList(MEMBER_1, MEMBER_2))).thenReturn(new ArrayList<>());
+
+    chatroom.setType(ChatroomType.PRIVATE);
+
+    Chatroom chatroomResult = chatroomService.createChatroom(chatroom);
+
+    assertThat(chatroomResult).isNotNull();
+    assertThat(chatroomResult.getId()).isEqualTo(CHATROOM_ID);
+    assertThat(chatroomResult.getType()).isEqualTo(ChatroomType.PRIVATE);
 
     verify(userService, times(2)).getUser(USER_ID_1);
     verify(userService, times(2)).getUser(USER_ID_2);
