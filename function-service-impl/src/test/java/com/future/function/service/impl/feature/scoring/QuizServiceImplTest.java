@@ -31,6 +31,7 @@ import static com.googlecode.catchexception.CatchException.catchException;
 import static com.googlecode.catchexception.CatchException.caughtException;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -228,11 +229,8 @@ public class QuizServiceImplTest {
   @Test
   public void testUpdateQuizFindByIdNotFound() {
     quiz.setId("randomId");
-    catchException(() -> quizService.updateQuiz(quiz));
-
-    assertThat(caughtException().getClass()).isEqualTo(NotFoundException.class);
-    assertThat(caughtException().getMessage()).isEqualTo(NOT_FOUND_MSG);
-
+    Quiz actual = quizService.updateQuiz(quiz);
+    assertThat(actual).isEqualTo(quiz);
     verify(quizRepository).findByIdAndDeletedFalse("randomId");
   }
 

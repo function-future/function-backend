@@ -167,8 +167,8 @@ public class RoomServiceImplTest {
   public void giveScoreToRoomByRoomIdByStudent() {
     room.setPoint(100);
     catchException(() -> roomService.giveScoreToRoomByRoomId(ROOM_ID, USER_ID, 100));
-    verify(userService).getUser(USER_ID);
     assertThat(caughtException().getClass()).isEqualTo(ForbiddenException.class);
+    verify(userService).getUser(USER_ID);
   }
 
   @Test

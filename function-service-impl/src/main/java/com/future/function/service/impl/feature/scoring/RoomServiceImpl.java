@@ -1,5 +1,6 @@
 package com.future.function.service.impl.feature.scoring;
 
+import com.future.function.common.enumeration.core.FileOrigin;
 import com.future.function.common.enumeration.core.Role;
 import com.future.function.common.exception.ForbiddenException;
 import com.future.function.common.exception.NotFoundException;
@@ -137,7 +138,7 @@ public class RoomServiceImpl implements RoomService {
             return room;
           })
           .map(roomRepository::save)
-          .orElseGet(() -> this.findById(roomId, userId));
+          .orElseThrow(() -> new ForbiddenException("User not allowed"));
     }
 
     @Override

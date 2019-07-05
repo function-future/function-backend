@@ -229,6 +229,7 @@ public class AssignmentServiceImplTest {
     assertThat(actual.getFile()).isEqualTo(file);
     assertThat(actual).isEqualTo(assignment);
     verify(resourceService).getFile(FILE_ID);
+    verify(batchService).getBatchByCode(BATCH_CODE);
     verify(resourceService).markFilesUsed(Collections.singletonList(FILE_ID), true);
     verify(assignmentRepository).save(assignment);
     verify(assignmentRepository).findByIdAndDeletedFalse(assignmentWithFile.getId());
@@ -240,7 +241,9 @@ public class AssignmentServiceImplTest {
     FileV2 anotherFile = FileV2.builder().id("id").build();
     BeanUtils.copyProperties(assignment, assignmentWithFile);
     assignmentWithFile.setFile(anotherFile);
-    assignmentWithFile.setBatch(Batch.builder().code("CODE").build());
+    Batch anotherBatch = Batch.builder().code("CODE").build();
+    assignmentWithFile.setBatch(anotherBatch);
+    when(batchService.getBatchByCode("CODE")).thenReturn(anotherBatch);
     when(resourceService.getFile("id")).thenReturn(anotherFile);
     when(resourceService.markFilesUsed(Collections.singletonList("id"), true)).thenReturn(true);
     when(assignmentRepository.findByIdAndDeletedFalse(assignmentWithFile.getId())).thenReturn(Optional.of(assignment));
@@ -250,6 +253,7 @@ public class AssignmentServiceImplTest {
     assertThat(actual.getFile()).isEqualTo(anotherFile);
     assertThat(actual).isEqualTo(assignmentWithFile);
     verify(resourceService).getFile("id");
+    verify(batchService).getBatchByCode("CODE");
     verify(resourceService).markFilesUsed(Collections.singletonList("id"), true);
     verify(resourceService).markFilesUsed(Collections.singletonList(FILE_ID), false);
     verify(roomService).deleteAllRoomsByAssignmentId(assignmentWithFile.getId());

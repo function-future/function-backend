@@ -109,6 +109,7 @@ public class StudentQuizServiceImplTest {
         .id(USER_ID)
         .name(USER_NAME)
         .role(Role.STUDENT)
+        .batch(batch)
         .build();
 
     batch = Batch
@@ -150,9 +151,9 @@ public class StudentQuizServiceImplTest {
 
     studentQuizPage = new PageImpl<>(Collections.singletonList(studentQuiz), pageable, 1);
 
-    when(studentQuizRepository.findAllByStudentId(USER_ID, pageable))
+    when(studentQuizRepository.findAllByStudentIdAndDeletedFalse(USER_ID, pageable))
         .thenReturn(studentQuizPage);
-    when(studentQuizRepository.findByStudentIdAndQuizId(USER_ID, QUIZ_ID))
+    when(studentQuizRepository.findByStudentIdAndQuizIdAndDeletedFalse(USER_ID, QUIZ_ID))
         .thenReturn(Optional.of(studentQuiz));
     when(studentQuizRepository.findByIdAndDeletedFalse(STUDENT_QUIZ_ID))
         .thenReturn(Optional.of(studentQuiz));
@@ -193,7 +194,7 @@ public class StudentQuizServiceImplTest {
     assertThat(actual.getContent().get(0).getId()).isEqualTo(STUDENT_QUIZ_ID);
     assertThat(actual.getContent().get(0).getTrials()).isEqualTo(QUIZ_TRIALS);
     verify(userService).getUser(USER_ID);
-    verify(studentQuizRepository).findAllByStudentId(USER_ID, pageable);
+    verify(studentQuizRepository).findAllByStudentIdAndDeletedFalse(USER_ID, pageable);
   }
 
   @Test
@@ -306,7 +307,7 @@ public class StudentQuizServiceImplTest {
     studentQuizService.deleteByBatchCodeAndQuiz(BATCH_CODE, QUIZ_ID);
     verify(userService).getStudentsByBatchCode(BATCH_CODE);
     verify(studentQuizDetailService).deleteByStudentQuiz(studentQuiz);
-    verify(studentQuizRepository).findByStudentIdAndQuizId(USER_ID, QUIZ_ID);
+    verify(studentQuizRepository).findByStudentIdAndQuizIdAndDeletedFalse(USER_ID, QUIZ_ID);
     verify(studentQuizRepository).save(studentQuiz);
   }
 }
