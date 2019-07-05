@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class SummaryResponse {
+public class SummaryWebResponse {
 
     private String type;
     private String title;

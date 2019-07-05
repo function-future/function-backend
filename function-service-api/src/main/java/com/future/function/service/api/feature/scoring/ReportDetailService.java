@@ -1,20 +1,20 @@
 package com.future.function.service.api.feature.scoring;
 
-import com.future.function.model.dto.scoring.SummaryDTO;
+import com.future.function.model.dto.scoring.StudentSummaryDTO;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.model.entity.feature.scoring.Report;
 import com.future.function.model.entity.feature.scoring.ReportDetail;
-import org.springframework.data.util.Pair;
-
 import java.util.List;
 
 public interface ReportDetailService {
 
-    List<ReportDetail> findAllByReportId(String reportId);
+  List<StudentSummaryDTO> findAllSummaryByReportId(String reportId, String userId);
+
+  List<ReportDetail> findAllDetailByReportId(String reportId);
 
     Report createReportDetailByReport(Report report, User student);
 
-    Pair<ReportDetail, List<SummaryDTO>> findByStudentId(String studentId, String userId);
+  ReportDetail findByStudentId(String studentId, String userId);
 
     Report giveScoreToEachStudentInDetail(String reportId, List<ReportDetail> detailList, String userId);
 

@@ -8,6 +8,10 @@ import com.future.function.model.entity.feature.scoring.ReportDetail;
 import com.future.function.repository.feature.scoring.ReportRepository;
 import com.future.function.service.api.feature.core.UserService;
 import com.future.function.service.api.feature.scoring.ReportDetailService;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Collections;
+import java.util.Optional;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,15 +25,12 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.Collections;
-import java.util.Optional;
-
 import static com.googlecode.catchexception.CatchException.catchException;
 import static com.googlecode.catchexception.CatchException.caughtException;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ReportServiceImplTest {
@@ -90,7 +91,7 @@ public class ReportServiceImplTest {
         when(reportRepository.findByIdAndDeletedFalse(REPORT_ID)).thenReturn(Optional.of(report));
         when(reportRepository.save(report)).thenReturn(report);
         when(userService.getUser(USER_ID)).thenReturn(student);
-        when(reportDetailService.findAllByReportId(REPORT_ID)).thenReturn(Collections.singletonList(reportDetail));
+        when(reportDetailService.findAllDetailByReportId(REPORT_ID)).thenReturn(Collections.singletonList(reportDetail));
         when(reportDetailService.createReportDetailByReport(report, student)).thenReturn(report);
     }
 
@@ -157,7 +158,7 @@ public class ReportServiceImplTest {
         assertThat(actual).isEqualTo(actual);
         verify(reportRepository).findByIdAndDeletedFalse(REPORT_ID);
         verify(reportRepository).save(report);
-        verify(reportDetailService).findAllByReportId(REPORT_ID);
+        verify(reportDetailService).findAllDetailByReportId(REPORT_ID);
     }
 
     @Test
@@ -166,7 +167,7 @@ public class ReportServiceImplTest {
         reportDetail.setUser(student);
         catchException(() -> reportService.updateReport(report));
         assertThat(caughtException().getClass()).isEqualTo(UnsupportedOperationException.class);
-        verify(reportDetailService).findAllByReportId(REPORT_ID);
+        verify(reportDetailService).findAllDetailByReportId(REPORT_ID);
     }
 
     @Test

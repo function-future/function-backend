@@ -1,11 +1,10 @@
 package com.future.function.web.model.response.feature.scoring;
 
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
 
 @Data
 @Builder
@@ -13,9 +12,9 @@ import java.util.List;
 @NoArgsConstructor
 public class ReportDetailWebResponse {
 
-    private String id;
     private String studentName;
     private String batchCode;
-    private List<SummaryResponse> scores;
+  private String university;
+  private List<SummaryWebResponse> scores;
 
 }

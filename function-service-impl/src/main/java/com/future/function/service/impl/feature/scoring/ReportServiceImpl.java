@@ -10,16 +10,15 @@ import com.future.function.service.api.feature.core.UserService;
 import com.future.function.service.api.feature.scoring.ReportDetailService;
 import com.future.function.service.api.feature.scoring.ReportService;
 import com.future.function.service.impl.helper.CopyHelper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
 
 @Service
 public class ReportServiceImpl implements ReportService {
@@ -87,7 +86,7 @@ public class ReportServiceImpl implements ReportService {
     }
 
     private Report checkStudentIdsChangedAndDeleteIfChanged(Report report) {
-        List<String> foundStudentIds = reportDetailService.findAllByReportId(report.getId()).stream()
+      List<String> foundStudentIds = reportDetailService.findAllDetailByReportId(report.getId()).stream()
                 .map(ReportDetail::getUser)
                 .map(User::getId)
                 .collect(Collectors.toList());

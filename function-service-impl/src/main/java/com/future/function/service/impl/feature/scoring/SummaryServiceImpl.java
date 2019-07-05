@@ -2,6 +2,8 @@ package com.future.function.service.impl.feature.scoring;
 
 import com.future.function.common.enumeration.core.Role;
 import com.future.function.common.exception.ForbiddenException;
+import com.future.function.common.exception.NotFoundException;
+import com.future.function.model.dto.scoring.StudentSummaryDTO;
 import com.future.function.model.dto.scoring.SummaryDTO;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.model.entity.feature.scoring.Room;
@@ -11,14 +13,12 @@ import com.future.function.service.api.feature.core.UserService;
 import com.future.function.service.api.feature.scoring.RoomService;
 import com.future.function.service.api.feature.scoring.StudentQuizService;
 import com.future.function.service.api.feature.scoring.SummaryService;
-import com.future.function.service.impl.helper.AuthorizationHelper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import sun.net.www.protocol.http.AuthenticationHeader;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.util.Pair;
+import org.springframework.stereotype.Service;
 
 @Service
 public class SummaryServiceImpl implements SummaryService {
@@ -33,14 +33,14 @@ public class SummaryServiceImpl implements SummaryService {
     private UserService userService;
 
     @Override
-    public List<SummaryDTO> findAllPointSummaryByStudentId(String studentId, String userId) {
+    public StudentSummaryDTO findAllPointSummaryByStudentId(String studentId, String userId) {
         return Optional.ofNullable(userId)
                 .map(userService::getUser)
                 .map(user -> checkEligibilityUser(user, studentId))
                 .map(userService::getUser)
-                .map(User::getId)
                 .map(this::getAllSummaryFromAssignmentAndQuiz)
-                .orElseGet(ArrayList::new);
+            .map(this::mapToStudentSummaryDTO)
+            .orElseThrow(() -> new NotFoundException("Student not found at #findAllPointSummaryByStudentId"));
     }
 
     private String checkEligibilityUser(User user, String studentId) {
@@ -50,11 +50,20 @@ public class SummaryServiceImpl implements SummaryService {
         return studentId;
     }
 
-    private List<SummaryDTO> getAllSummaryFromAssignmentAndQuiz(String userId) {
+    private StudentSummaryDTO mapToStudentSummaryDTO(Pair<User, List<SummaryDTO>> pair) {
+        return StudentSummaryDTO.builder()
+            .studentName(pair.getFirst().getName())
+            .batchCode(pair.getFirst().getBatch().getCode())
+            .university(pair.getFirst().getUniversity())
+            .scores(pair.getSecond())
+            .build();
+    }
+
+    private Pair<User, List<SummaryDTO>> getAllSummaryFromAssignmentAndQuiz(User user) {
         List<SummaryDTO> resultList = new ArrayList<>();
-        roomService.findAllByStudentId(userId).stream().map(this::mapRoomToSummaryDTO).forEach(resultList::add);
-        studentQuizService.findAllQuizByStudentId(userId).stream().map(this::mapQuizToSummaryDTO).forEach(resultList::add);
-        return resultList;
+        roomService.findAllByStudentId(user.getId()).stream().map(this::mapRoomToSummaryDTO).forEach(resultList::add);
+        studentQuizService.findAllQuizByStudentId(user.getId()).stream().map(this::mapQuizToSummaryDTO).forEach(resultList::add);
+        return Pair.of(user, resultList);
     }
 
 
