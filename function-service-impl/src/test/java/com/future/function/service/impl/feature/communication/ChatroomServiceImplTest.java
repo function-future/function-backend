@@ -186,7 +186,7 @@ public class ChatroomServiceImplTest {
     when(userService.getUser(USER_ID_1)).thenReturn(MEMBER_1);
     when(userService.getUser(USER_ID_2)).thenReturn(MEMBER_2);
     when(chatroomRepository.save(chatroom)).thenReturn(chatroom);
-    when(chatroomRepository.findByMembersContaining(Arrays.asList(MEMBER_1, MEMBER_2))).thenReturn(new ArrayList<>());
+    when(chatroomRepository.findAllByMembersContaining(Arrays.asList(MEMBER_1, MEMBER_2))).thenReturn(new ArrayList<>());
 
     chatroom.setType(ChatroomType.PRIVATE);
 
@@ -199,7 +199,7 @@ public class ChatroomServiceImplTest {
     verify(userService, times(2)).getUser(USER_ID_1);
     verify(userService, times(2)).getUser(USER_ID_2);
     verify(chatroomRepository).save(chatroom);
-    verify(chatroomRepository).findByMembersContaining(Arrays.asList(MEMBER_1, MEMBER_2));
+    verify(chatroomRepository).findAllByMembersContaining(Arrays.asList(MEMBER_1, MEMBER_2));
   }
 
   @Test

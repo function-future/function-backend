@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Author: PriagungSatyagama
@@ -72,15 +71,13 @@ public class ChatroomServiceImpl implements ChatroomService {
               .map(member -> userService.getUser(member.getId()))
               .collect(Collectors.toList());
 
-      List<Chatroom> filteredChatroom = chatroomRepository.findByMembersContaining(members).stream()
+      List<Chatroom> filteredChatrooms = chatroomRepository.findAllByMembersContaining(members).stream()
               .filter(room -> room.getType().equals(ChatroomType.PRIVATE))
-              .filter(room -> {
-                return memberIds.contains(room.getMembers().get(0).getId()) &&
-                        memberIds.contains(room.getMembers().get(1).getId());
-              }).collect(Collectors.toList());
+              .filter(room -> isMemberIdsInChatroom(memberIds, room))
+              .collect(Collectors.toList());
 
-      if (filteredChatroom.size() > 0) {
-        return filteredChatroom.get(0);
+      if (filteredChatrooms.size() > 0) {
+        return filteredChatrooms.get(0);
       }
     }
 
@@ -106,6 +103,11 @@ public class ChatroomServiceImpl implements ChatroomService {
   public Chatroom getPublicChatroom() {
     return chatroomRepository.findByType(ChatroomType.PUBLIC.name())
             .orElseThrow(() -> new NotFoundException("Chatroom not found"));
+  }
+
+  private Boolean isMemberIdsInChatroom(List<String> memberIds, Chatroom room) {
+    return memberIds.contains(room.getMembers().get(0).getId()) &&
+            memberIds.contains(room.getMembers().get(1).getId());
   }
 
   private Chatroom setChatroomName(Chatroom chatroom) {

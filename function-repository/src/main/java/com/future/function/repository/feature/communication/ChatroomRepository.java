@@ -42,5 +42,5 @@ public interface ChatroomRepository extends MongoRepository<Chatroom, String> {
 
   Optional<Chatroom> findByType(String type);
 
-  List<Chatroom> findByMembersContaining(List<User> members);
+  List<Chatroom> findAllByMembersContaining(List<User> members);
 }
