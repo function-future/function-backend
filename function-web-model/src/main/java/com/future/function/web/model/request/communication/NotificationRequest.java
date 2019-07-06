@@ -1,11 +1,10 @@
 package com.future.function.web.model.request.communication;
 
-import com.future.function.validation.annotation.communication.NotificationContent;
-import com.future.function.validation.annotation.communication.NotificationTitle;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.NotNull;
 
@@ -23,10 +22,10 @@ public class NotificationRequest {
   private String targetUser;
 
   @NotNull
-  @NotificationTitle
+  @Length(min = 1, max = 30)
   private String title;
 
-  @NotificationContent
+  @Length(max = 140)
   private String description;
 
 }

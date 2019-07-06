@@ -1,12 +1,12 @@
 package com.future.function.web.model.request.communication;
 
-import com.future.function.validation.annotation.communication.NotificationContent;
-import com.future.function.validation.annotation.communication.NotificationTitle;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;
+import org.hibernate.validator.constraints.Range;
 
 import java.util.List;
 
@@ -20,20 +20,23 @@ import java.util.List;
 @AllArgsConstructor
 public class ReminderRequest {
 
-  @NotificationTitle
+  @Length(min = 1, max = 30)
   private String title;
 
-  @NotificationContent
+  @Length(max = 140)
   private String description;
 
   private Boolean isRepeatedMonthly;
 
+  @Range(min = 1, max = 31)
   private Integer monthlyDate;
 
   private List<String> repeatDays;
 
+  @Range(min = 0, max = 23)
   private Integer hour;
 
+  @Range(min = 0, max = 59)
   private Integer minute;
 
   @NotEmpty
