@@ -4,6 +4,7 @@ import com.future.function.common.enumeration.communication.ChatroomType;
 import com.future.function.model.entity.feature.communication.chatting.Chatroom;
 import com.future.function.model.entity.feature.communication.chatting.Message;
 import com.future.function.repository.TestApplication;
+import com.future.function.repository.feature.communication.chatting.MessageRepository;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
