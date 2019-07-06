@@ -7,6 +7,7 @@ import com.future.function.model.entity.feature.core.User;
 import com.future.function.repository.feature.communication.MessageRepository;
 import com.future.function.service.api.feature.communication.ChatroomService;
 import com.future.function.service.api.feature.core.UserService;
+import org.bson.types.ObjectId;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -105,6 +106,40 @@ public class MessageServiceImplTest {
 
     verify(chatroomService).getChatroom(CHATROOM_ID);
     verify(messageRepository).findAllByChatroomOrderByCreatedAtDesc(CHATROOM, PAGEABLE);
+  }
+
+  @Test
+  public void testGivenChatroomAndMessageIdByGettingMessagesByChatroomAndMessageIdGreaterReturnPagedMessages() {
+    ObjectId objectId = new ObjectId();
+    when(chatroomService.getChatroom(CHATROOM_ID)).thenReturn(CHATROOM);
+    when(messageRepository.findAllByChatroomAndIdGreaterThanOrderByCreatedAtDesc(CHATROOM, objectId, PAGEABLE))
+            .thenReturn(new PageImpl<>(Arrays.asList(message2, message1), PAGEABLE, 2));
+
+    Page<Message> messagePage = messageService.getMessagesAfterPivot(CHATROOM_ID, objectId.toHexString(), PAGEABLE);
+
+    assertThat(messagePage.getTotalElements()).isEqualTo(2);
+    assertThat(messagePage.getContent().get(0).getId()).isEqualTo(MESSAGE_ID_2);
+    assertThat(messagePage.getContent().get(1).getId()).isEqualTo(MESSAGE_ID_1);
+
+    verify(chatroomService).getChatroom(CHATROOM_ID);
+    verify(messageRepository).findAllByChatroomAndIdGreaterThanOrderByCreatedAtDesc(CHATROOM, objectId, PAGEABLE);
+  }
+
+  @Test
+  public void testGivenChatroomAndMessageIdByGettingMessagesByChatroomAndMessageIdLessReturnPagedMessages() {
+    ObjectId objectId = new ObjectId();
+    when(chatroomService.getChatroom(CHATROOM_ID)).thenReturn(CHATROOM);
+    when(messageRepository.findAllByChatroomAndIdLessThanOrderByCreatedAtDesc(CHATROOM, objectId, PAGEABLE))
+            .thenReturn(new PageImpl<>(Arrays.asList(message2, message1), PAGEABLE, 2));
+
+    Page<Message> messagePage = messageService.getMessagesBeforePivot(CHATROOM_ID, objectId.toHexString(), PAGEABLE);
+
+    assertThat(messagePage.getTotalElements()).isEqualTo(2);
+    assertThat(messagePage.getContent().get(0).getId()).isEqualTo(MESSAGE_ID_2);
+    assertThat(messagePage.getContent().get(1).getId()).isEqualTo(MESSAGE_ID_1);
+
+    verify(chatroomService).getChatroom(CHATROOM_ID);
+    verify(messageRepository).findAllByChatroomAndIdLessThanOrderByCreatedAtDesc(CHATROOM, objectId, PAGEABLE);
   }
 
   @Test
