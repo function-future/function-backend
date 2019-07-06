@@ -123,15 +123,15 @@ public class ExceptionController {
    * @return {@link com.future.function.web.model.response.base.BaseResponse}
    * - Response showing 'exception' message.
    */
-  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-  @ExceptionHandler(Throwable.class)
-  public BaseResponse genericException(
-    Throwable e
-  ) {
-
-    log.error(e.getMessage(), e.getCause());
-
-    return ResponseHelper.toBaseResponse(HttpStatus.INTERNAL_SERVER_ERROR);
-  }
+//  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+//  @ExceptionHandler(Throwable.class)
+//  public BaseResponse genericException(
+//    Throwable e
+//  ) {
+//
+//    log.error(e.getMessage(), e.getCause());
+//
+//    return ResponseHelper.toBaseResponse(HttpStatus.INTERNAL_SERVER_ERROR);
+//  }
   
 }

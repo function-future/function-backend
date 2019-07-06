@@ -74,7 +74,7 @@ public class RoomResponseMapperTest {
         .password("password").phone("phone").pictureV2(fileV2).role(Role.STUDENT).build();
     userWebResponse = new UserWebResponse();
     BeanUtils.copyProperties(student, userWebResponse);
-    userWebResponse.setBatch(BATCH_CODE);
+//    userWebResponse.setBatch(BATCH_CODE);
     userWebResponse.setAvatar(FILE_URl);
     userWebResponse.setRole("STUDENT");
     room = Room.builder().assignment(assignment).student(student).point(0).build();
