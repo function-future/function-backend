@@ -17,7 +17,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReminderResponse {
+public class ReminderDetailResponse {
 
   private String id;
 
@@ -31,7 +31,8 @@ public class ReminderResponse {
 
   private List<String> repeatDays;
 
-  private Integer memberCount;
-
   private String time;
+
+  private List<ParticipantDetailResponse> members;
+
 }

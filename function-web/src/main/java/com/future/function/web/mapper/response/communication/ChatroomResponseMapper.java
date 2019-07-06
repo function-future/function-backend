@@ -1,17 +1,13 @@
 package com.future.function.web.mapper.response.communication;
 
 import com.future.function.common.enumeration.communication.ChatroomType;
-import com.future.function.common.enumeration.core.Role;
 import com.future.function.model.entity.feature.communication.chatting.Chatroom;
 import com.future.function.model.entity.feature.communication.chatting.Message;
-import com.future.function.model.entity.feature.core.Batch;
-import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.service.api.feature.communication.MessageService;
 import com.future.function.service.api.feature.communication.MessageStatusService;
 import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
-import com.future.function.web.mapper.response.core.BatchResponseMapper;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.feature.communication.chatting.ChatroomDetailResponse;
@@ -20,7 +16,6 @@ import com.future.function.web.model.response.feature.communication.chatting.Cha
 import com.future.function.web.model.response.feature.communication.chatting.ChatroomResponse;
 import com.future.function.web.model.response.feature.communication.chatting.LastMessageResponse;
 import com.future.function.web.model.response.feature.communication.chatting.MessageResponse;
-import com.future.function.web.model.response.feature.core.BatchWebResponse;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -31,6 +26,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static com.future.function.web.mapper.response.communication.ParticipantResponseMapper.toParticipantDetailResponse;
+
 /**
  * Author: priagung.satyagama
  * Created At: 9:23 AM 6/11/2019
@@ -38,39 +35,9 @@ import java.util.stream.Collectors;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ChatroomResponseMapper {
 
-    private static ParticipantDetailResponse toChatroomParticipantDetailResponse(User user) {
-        return ParticipantDetailResponse.builder()
-                .id(user.getId())
-                .avatar(getAvatarThumbnailUrl(user.getPictureV2()))
-                .batch(getBatch(user.getBatch()))
-                .name(user.getName())
-                .type(getRole(user))
-                .university(user.getUniversity())
-                .build();
-    }
-
-    private static String getRole(User user) {
-        return Optional.ofNullable(user.getRole())
-                .map(Role::name)
-                .orElse(null);
-    }
-
-    private static String getAvatarThumbnailUrl(FileV2 fileV2) {
-        return Optional.ofNullable(fileV2)
-                .map(FileV2::getThumbnailUrl)
-                .orElse(null);
-    }
-
-    private static BatchWebResponse getBatch(Batch batch) {
-        return Optional.ofNullable(batch)
-                .map(BatchResponseMapper::toBatchDataResponse)
-                .map(DataResponse::getData)
-                .orElse(null);
-    }
-
     private static ChatroomDetailResponse toChatroomDetailResponse(Chatroom chatroom) {
         List<ParticipantDetailResponse> participants = new ArrayList<>();
-        chatroom.getMembers().forEach(member -> participants.add(toChatroomParticipantDetailResponse(member)));
+        chatroom.getMembers().forEach(member -> participants.add(toParticipantDetailResponse(member)));
         return ChatroomDetailResponse.builder()
                 .id(chatroom.getId())
                 .name(chatroom.getTitle())
@@ -88,7 +55,7 @@ public class ChatroomResponseMapper {
         return ChatroomParticipantResponse.builder()
                 .id(user.getId())
                 .name(user.getName())
-                .avatar(getAvatarThumbnailUrl(user.getPictureV2()))
+                .avatar(ParticipantResponseMapper.getAvatarThumbnailUrl(user.getPictureV2()))
                 .build();
     }
 
