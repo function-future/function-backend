@@ -15,7 +15,7 @@ import com.future.function.web.mapper.response.core.BatchResponseMapper;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.feature.communication.chatting.ChatroomDetailResponse;
-import com.future.function.web.model.response.feature.communication.chatting.ChatroomParticipantDetailResponse;
+import com.future.function.web.model.response.feature.embedded.ParticipantDetailResponse;
 import com.future.function.web.model.response.feature.communication.chatting.ChatroomParticipantResponse;
 import com.future.function.web.model.response.feature.communication.chatting.ChatroomResponse;
 import com.future.function.web.model.response.feature.communication.chatting.LastMessageResponse;
@@ -38,8 +38,8 @@ import java.util.stream.Collectors;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ChatroomResponseMapper {
 
-    private static ChatroomParticipantDetailResponse toChatroomParticipantDetailResponse(User user) {
-        return ChatroomParticipantDetailResponse.builder()
+    private static ParticipantDetailResponse toChatroomParticipantDetailResponse(User user) {
+        return ParticipantDetailResponse.builder()
                 .id(user.getId())
                 .avatar(getAvatarThumbnailUrl(user.getPictureV2()))
                 .batch(getBatch(user.getBatch()))
@@ -69,7 +69,7 @@ public class ChatroomResponseMapper {
     }
 
     private static ChatroomDetailResponse toChatroomDetailResponse(Chatroom chatroom) {
-        List<ChatroomParticipantDetailResponse> participants = new ArrayList<>();
+        List<ParticipantDetailResponse> participants = new ArrayList<>();
         chatroom.getMembers().forEach(member -> participants.add(toChatroomParticipantDetailResponse(member)));
         return ChatroomDetailResponse.builder()
                 .id(chatroom.getId())
