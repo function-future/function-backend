@@ -1,6 +1,5 @@
 package com.future.function.service.impl.feature.scoring;
 
-import com.future.function.common.enumeration.core.FileOrigin;
 import com.future.function.common.enumeration.core.Role;
 import com.future.function.common.exception.ForbiddenException;
 import com.future.function.common.exception.NotFoundException;
@@ -57,12 +56,10 @@ public class RoomServiceImpl implements RoomService {
     }
 
   private Room checkStudentEligibility(User user, Room room) {
-    if (!user.getRole().equals(Role.STUDENT)) {
+      if (user.getRole().equals(Role.STUDENT) && !room.getStudent().getId().equals(user.getId())) {
+          throw new ForbiddenException("Failed at #checkStudentEligibility");
+      }
       return room;
-    } else if (room.getStudent().getId().equals(user.getId())) {
-      return room;
-    }
-    throw new ForbiddenException("User not allowed");
   }
 
     @Override
@@ -71,12 +68,19 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
-    public Page<Room> findAllByStudentId(String studentId, Pageable pageable) {
-        return Optional.ofNullable(studentId)
+    public Page<Room> findAllByStudentId(String studentId, Pageable pageable, String userId) {
+        return Optional.ofNullable(userId)
                 .map(userService::getUser)
-                .map(User::getId)
+                .map(user -> checkUserEligibilityToSeeStudentRoom(studentId, user))
                 .map(id -> roomRepository.findAllByStudentIdAndDeletedFalse(id, pageable))
                 .orElseGet(() -> PageHelper.empty(pageable));
+    }
+
+    private String checkUserEligibilityToSeeStudentRoom(String studentId, User user) {
+        if (user.getRole().equals(Role.STUDENT) && !user.getId().equals(studentId)) {
+            throw new ForbiddenException("Failed at #checkUserEligibilityToSeeStudentRoom");
+        }
+        return studentId;
     }
 
     @Override
@@ -138,7 +142,7 @@ public class RoomServiceImpl implements RoomService {
             return room;
           })
           .map(roomRepository::save)
-          .orElseThrow(() -> new ForbiddenException("User not allowed"));
+              .orElseThrow(() -> new ForbiddenException("Failed at #giveScoreToRoomByRoomId"));
     }
 
     @Override

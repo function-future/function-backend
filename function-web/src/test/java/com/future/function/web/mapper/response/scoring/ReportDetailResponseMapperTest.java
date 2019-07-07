@@ -3,15 +3,18 @@ package com.future.function.web.mapper.response.scoring;
 import com.future.function.model.dto.scoring.StudentSummaryDTO;
 import com.future.function.model.dto.scoring.SummaryDTO;
 import com.future.function.model.entity.feature.core.Batch;
+import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.model.entity.feature.scoring.ReportDetail;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.feature.scoring.ReportDetailWebResponse;
-import java.util.Collections;
-import java.util.List;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.http.HttpStatus;
+
+import java.util.Collections;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -24,9 +27,11 @@ public class ReportDetailResponseMapperTest {
   private static final String UNIVERSITY = "university";
     private static final String TITLE = "title";
     private static final String TYPE = "type";
+    private static final String FILE_URL = "file-url";
     private static final int POINT = 100;
 
     private ReportDetail reportDetail;
+    private FileV2 fileV2;
     private User student;
     private Batch batch;
     private SummaryDTO summaryDTO;
@@ -40,11 +45,13 @@ public class ReportDetailResponseMapperTest {
                 .point(POINT)
                 .build();
 
+        fileV2 = FileV2.builder().fileUrl(FILE_URL).build();
+
         batch = Batch.builder().code(BATCH_CODE).build();
-      student = User.builder().name(STUDENT_NAME).batch(batch).university(UNIVERSITY).build();
+        student = User.builder().name(STUDENT_NAME).batch(batch).university(UNIVERSITY).pictureV2(fileV2).build();
         reportDetail = ReportDetail.builder().id(REPORT_DETAIL_ID).user(student).point(0).build();
       studentSummaryDTO = StudentSummaryDTO.builder().studentName(STUDENT_NAME).batchCode(BATCH_CODE)
-          .university(UNIVERSITY).scores(Collections.singletonList(summaryDTO)).build();
+              .university(UNIVERSITY).avatar(FILE_URL).scores(Collections.singletonList(summaryDTO)).build();
     }
 
     @After
@@ -66,6 +73,18 @@ public class ReportDetailResponseMapperTest {
             Collections.singletonList(studentSummaryDTO));
         assertThat(actual.getData().get(0).getBatchCode()).isEqualTo(BATCH_CODE);
         assertThat(actual.getData().get(0).getStudentName()).isEqualTo(STUDENT_NAME);
+        assertThat(actual.getData().get(0).getUniversity()).isEqualTo(UNIVERSITY);
+        assertThat(actual.getData().get(0).getAvatar()).isEqualTo(FILE_URL);
         assertThat(actual.getData().get(0).getScores().get(0).getTitle()).isEqualTo(TITLE);
+    }
+
+    @Test
+    public void toDataListReportDetailWebResponseFromReportDetail() {
+        DataResponse<List<ReportDetailWebResponse>> actual = ReportDetailResponseMapper.toDataListReportDetailWebResponseFromReportDetail(
+                HttpStatus.CREATED, Collections.singletonList(reportDetail));
+        assertThat(actual.getData().get(0).getBatchCode()).isEqualTo(BATCH_CODE);
+        assertThat(actual.getData().get(0).getStudentName()).isEqualTo(STUDENT_NAME);
+        assertThat(actual.getData().get(0).getUniversity()).isEqualTo(UNIVERSITY);
+        assertThat(actual.getData().get(0).getAvatar()).isEqualTo(FILE_URL);
     }
 }

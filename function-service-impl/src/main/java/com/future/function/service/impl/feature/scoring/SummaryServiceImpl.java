@@ -13,24 +13,29 @@ import com.future.function.service.api.feature.core.UserService;
 import com.future.function.service.api.feature.scoring.RoomService;
 import com.future.function.service.api.feature.scoring.StudentQuizService;
 import com.future.function.service.api.feature.scoring.SummaryService;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 @Service
 public class SummaryServiceImpl implements SummaryService {
 
-    @Autowired
     private RoomService roomService;
 
-    @Autowired
     private StudentQuizService studentQuizService;
 
-    @Autowired
     private UserService userService;
+
+    @Autowired
+    public SummaryServiceImpl(RoomService roomService, StudentQuizService studentQuizService, UserService userService) {
+        this.roomService = roomService;
+        this.studentQuizService = studentQuizService;
+        this.userService = userService;
+    }
 
     @Override
     public StudentSummaryDTO findAllPointSummaryByStudentId(String studentId, String userId) {
@@ -55,6 +60,7 @@ public class SummaryServiceImpl implements SummaryService {
             .studentName(pair.getFirst().getName())
             .batchCode(pair.getFirst().getBatch().getCode())
             .university(pair.getFirst().getUniversity())
+                .avatar(pair.getFirst().getPictureV2().getFileUrl())
             .scores(pair.getSecond())
             .build();
     }

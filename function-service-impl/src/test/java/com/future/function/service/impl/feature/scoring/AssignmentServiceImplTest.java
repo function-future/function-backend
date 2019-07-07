@@ -9,11 +9,7 @@ import com.future.function.repository.feature.scoring.AssignmentRepository;
 import com.future.function.service.api.feature.core.BatchService;
 import com.future.function.service.api.feature.core.ResourceService;
 import com.future.function.service.api.feature.scoring.RoomService;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import com.future.function.service.impl.helper.PageHelper;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,16 +23,12 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+import java.util.*;
+
 import static com.googlecode.catchexception.CatchException.catchException;
 import static com.googlecode.catchexception.CatchException.caughtException;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.eq;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class AssignmentServiceImplTest {
@@ -122,6 +114,8 @@ public class AssignmentServiceImplTest {
     when(roomService.findById(ROOM_ID, USER_ID)).thenReturn(room);
     when(roomService.findAllRoomsByAssignmentId(any(String.class), eq(pageable))).thenReturn(roomPage);
     when(roomService.giveScoreToRoomByRoomId(ROOM_ID, USER_ID, 100)).thenReturn(room);
+      when(roomService.findAllByStudentId(USER_ID, pageable, USER_ID))
+              .thenReturn(PageHelper.toPage(Collections.singletonList(room), pageable));
   }
 
   @After
@@ -138,6 +132,15 @@ public class AssignmentServiceImplTest {
     verify(batchService).getBatchByCode(BATCH_CODE);
     verify(assignmentRepository).findAllByBatchAndDeletedFalse(batch, pageable);
   }
+
+    @Test
+    public void testFindAllRoomsWithStudentIdAndPageable() {
+        Page<Room> result = assignmentService.findAllRoomsByStudentId(USER_ID, pageable, USER_ID);
+        assertThat(result).isNotNull();
+        assertThat(result.getContent().size()).isEqualTo(1);
+        assertThat(result.getContent()).isEqualTo(Collections.singletonList(room));
+        verify(roomService).findAllByStudentId(USER_ID, pageable, USER_ID);
+    }
 
   @Test
   public void testFindByIdSuccess() {

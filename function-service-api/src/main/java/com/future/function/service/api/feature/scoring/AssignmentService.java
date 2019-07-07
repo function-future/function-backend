@@ -16,7 +16,7 @@ public interface AssignmentService {
 
   Page<Room> findAllRoomsByAssignmentId(String assignmentId, Pageable pageable);
 
-  Page<Room> findAllRoomsByStudentId(String studentId, Pageable pageable);
+    Page<Room> findAllRoomsByStudentId(String studentId, Pageable pageable, String userId);
 
   Room findRoomById(String id, String studentId);
 

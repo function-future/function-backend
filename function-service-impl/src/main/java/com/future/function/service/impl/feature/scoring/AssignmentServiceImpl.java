@@ -11,7 +11,6 @@ import com.future.function.service.api.feature.core.ResourceService;
 import com.future.function.service.api.feature.scoring.AssignmentService;
 import com.future.function.service.api.feature.scoring.RoomService;
 import com.future.function.service.impl.helper.CopyHelper;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -78,8 +77,8 @@ public class AssignmentServiceImpl implements AssignmentService {
   }
 
   @Override
-  public Page<Room> findAllRoomsByStudentId(String studentId, Pageable pageable) {
-    return roomService.findAllByStudentId(studentId, pageable);
+  public Page<Room> findAllRoomsByStudentId(String studentId, Pageable pageable, String userId) {
+      return roomService.findAllByStudentId(studentId, pageable, userId);
   }
 
   @Override

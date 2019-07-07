@@ -6,14 +6,15 @@ import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.feature.scoring.ReportWebResponse;
-import java.time.ZoneId;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+
+import java.time.ZoneId;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ReportResponseMapper {
@@ -37,6 +38,7 @@ public class ReportResponseMapper {
             .builder()
             .title(report.getTitle())
             .description(value.getDescription())
+                .batchCode(value.getBatch().getCode())
             .usedAt(getLongFormatOfDate(value))
             .studentCount(value.getStudentIds().size())
             .build())

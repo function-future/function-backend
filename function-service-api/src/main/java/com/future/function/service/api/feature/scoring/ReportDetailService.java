@@ -4,6 +4,7 @@ import com.future.function.model.dto.scoring.StudentSummaryDTO;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.model.entity.feature.scoring.Report;
 import com.future.function.model.entity.feature.scoring.ReportDetail;
+
 import java.util.List;
 
 public interface ReportDetailService {
@@ -16,7 +17,7 @@ public interface ReportDetailService {
 
   ReportDetail findByStudentId(String studentId, String userId);
 
-    Report giveScoreToEachStudentInDetail(String reportId, List<ReportDetail> detailList, String userId);
+    List<ReportDetail> giveScoreToEachStudentInDetail(String reportId, List<ReportDetail> detailList);
 
     void deleteAllByReportId(String reportId);
 

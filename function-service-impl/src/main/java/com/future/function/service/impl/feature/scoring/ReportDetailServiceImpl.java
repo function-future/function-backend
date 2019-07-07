@@ -12,12 +12,13 @@ import com.future.function.service.api.feature.core.UserService;
 import com.future.function.service.api.feature.scoring.ReportDetailService;
 import com.future.function.service.api.feature.scoring.SummaryService;
 import com.future.function.service.impl.helper.CopyHelper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 @Service
 public class ReportDetailServiceImpl implements ReportDetailService {
@@ -78,7 +79,7 @@ public class ReportDetailServiceImpl implements ReportDetailService {
                 .map(userService::getUser)
                 .map(user -> this.checkUserEligibility(studentId, user))
                 .flatMap(user -> reportDetailRepository.findByUserId(studentId))
-                .orElseThrow(() -> new NotFoundException("Report not found"));
+                .orElseThrow(() -> new NotFoundException("Failed at #findByStudentId"));
     }
 
     private User checkUserEligibility(String studentId, User user) {
@@ -90,23 +91,24 @@ public class ReportDetailServiceImpl implements ReportDetailService {
     }
 
     @Override
-    public Report giveScoreToEachStudentInDetail(String reportId, List<ReportDetail> detailList, String userId) {
+    public List<ReportDetail> giveScoreToEachStudentInDetail(String reportId, List<ReportDetail> detailList) {
         return detailList.stream()
-                .map(reportDetail -> findReportDetailAndValidateReportId(reportId, userId, reportDetail))
+                .map(reportDetail -> findReportDetailAndValidateReportId(reportId, reportDetail))
                 .map(reportDetailRepository::save)
-                .findFirst()
-                .map(ReportDetail::getReport)
-                .orElseThrow(() -> new UnsupportedOperationException("Failed at #giveScoreToEachStudentInDetail"));
+                .collect(Collectors.toList());
     }
 
-    private ReportDetail findReportDetailAndValidateReportId(String reportId, String userId, ReportDetail reportDetail) {
-        ReportDetail foundReportDetail = this.findByStudentId(reportDetail.getUser().getId(), userId);
-        if (foundReportDetail.getReport().getId().equals(reportId)) {
-            CopyHelper.copyProperties(reportDetail, foundReportDetail);
-            return foundReportDetail;
-        } else {
-            throw new UnsupportedOperationException("Report id not equal");
-        }
+    private ReportDetail findReportDetailAndValidateReportId(String reportId, ReportDetail reportDetail) {
+        return Optional.ofNullable(reportDetail)
+                .map(ReportDetail::getUser)
+                .map(User::getId)
+                .flatMap(reportDetailRepository::findByUserId)
+                .filter(detail -> detail.getReport().getId().equals(reportId))
+                .map(detail -> {
+                    CopyHelper.copyProperties(reportDetail, detail);
+                    return detail;
+                })
+                .orElseThrow(() -> new UnsupportedOperationException("Failed at #findReportDetailAndValidateReportId"));
     }
 
     @Override

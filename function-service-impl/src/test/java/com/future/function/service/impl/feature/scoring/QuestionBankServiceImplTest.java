@@ -3,9 +3,6 @@ package com.future.function.service.impl.feature.scoring;
 import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.scoring.QuestionBank;
 import com.future.function.repository.feature.scoring.QuestionBankRepository;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,12 +15,14 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
 import static com.googlecode.catchexception.CatchException.catchException;
 import static com.googlecode.catchexception.CatchException.caughtException;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class QuestionBankServiceImplTest {
@@ -85,6 +84,7 @@ public class QuestionBankServiceImplTest {
 
   @Test
   public void testFindByIdEmptyFail() {
+      when(questionBankRepository.findByIdAndDeletedFalse("")).thenReturn(Optional.empty());
     catchException(() -> questionBankService.findById(""));
 
     assertThat(caughtException().getClass()).isEqualTo(NotFoundException.class);

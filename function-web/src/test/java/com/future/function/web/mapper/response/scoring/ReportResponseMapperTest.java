@@ -1,13 +1,10 @@
 package com.future.function.web.mapper.response.scoring;
 
+import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.scoring.Report;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.feature.scoring.ReportWebResponse;
-import java.time.Instant;
-import java.time.ZoneId;
-import java.util.Collections;
-import java.util.List;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,16 +14,23 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 
+import java.time.Instant;
+import java.time.ZoneId;
+import java.util.Collections;
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ReportResponseMapperTest {
 
   private static final String NAME = "final-judge";
   private static final String DESCRIPTION = "final description";
+    private static final String BATCH_CODE = "batch-code";
   private static final long USED_AT = 1561607367;
   private static final String STUDENT_ID = "student-id";
 
   private Report report;
+    private Batch batch;
   private ReportWebResponse response;
   private Pageable pageable;
   private Page<Report> reportPage;
@@ -37,9 +41,12 @@ public class ReportResponseMapperTest {
 
     studentIds = Collections.singletonList(STUDENT_ID);
 
+      batch = Batch.builder().code(BATCH_CODE).build();
+
     report = Report
         .builder()
         .title(NAME)
+            .batch(batch)
         .description(DESCRIPTION)
         .usedAt(Instant.ofEpochSecond(USED_AT).atZone(ZoneId.systemDefault()).toLocalDate())
         .studentIds(studentIds)
@@ -59,6 +66,7 @@ public class ReportResponseMapperTest {
     DataResponse<ReportWebResponse> actual = ReportResponseMapper.toDataReportWebResponse(report);
     assertThat(actual.getData().getTitle()).isEqualTo(NAME);
     assertThat(actual.getData().getDescription()).isEqualTo(DESCRIPTION);
+      assertThat(actual.getData().getBatchCode()).isEqualTo(BATCH_CODE);
     assertThat(actual.getData().getStudentCount()).isEqualTo(1);
   }
 
@@ -67,6 +75,7 @@ public class ReportResponseMapperTest {
     DataResponse<ReportWebResponse> actual = ReportResponseMapper.toDataReportWebResponse(HttpStatus.CREATED, report);
     assertThat(actual.getData().getTitle()).isEqualTo(NAME);
     assertThat(actual.getData().getDescription()).isEqualTo(DESCRIPTION);
+      assertThat(actual.getData().getBatchCode()).isEqualTo(BATCH_CODE);
     assertThat(actual.getData().getStudentCount()).isEqualTo(1);
     assertThat(actual.getCode()).isEqualTo(201);
   }
@@ -76,6 +85,7 @@ public class ReportResponseMapperTest {
     PagingResponse<ReportWebResponse> actual = ReportResponseMapper.toPagingReportWebResponse(reportPage);
     assertThat(actual.getData().get(0).getTitle()).isEqualTo(NAME);
     assertThat(actual.getData().get(0).getDescription()).isEqualTo(DESCRIPTION);
+      assertThat(actual.getData().get(0).getBatchCode()).isEqualTo(BATCH_CODE);
     assertThat(actual.getData().get(0).getStudentCount()).isEqualTo(1);
     assertThat(actual.getPaging().getTotalRecords()).isEqualTo(1);
   }

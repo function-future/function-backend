@@ -36,7 +36,7 @@ public class PageHelperTest {
     DUMMY_DATA_LIST, PAGEABLE, DUMMY_DATA_LIST.size());
 
   private static final Paging PAGING = Paging.builder()
-    .page(PAGE - 1)
+          .page(PAGE)
     .size(SIZE)
     .totalRecords(DUMMY_DATA_LIST.size())
     .build();
@@ -53,7 +53,7 @@ public class PageHelperTest {
     Pageable pageable = PageHelper.toPageable(PAGE, SIZE);
 
     assertThat(pageable).isNotNull();
-    assertThat(pageable.getPageNumber()).isEqualTo(PAGE);
+      assertThat(pageable.getPageNumber()).isEqualTo(PAGE - 1);
     assertThat(pageable.getPageSize()).isEqualTo(SIZE);
     assertThat(pageable).isEqualTo(PAGEABLE);
   }

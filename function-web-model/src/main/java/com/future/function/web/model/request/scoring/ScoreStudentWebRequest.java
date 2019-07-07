@@ -7,26 +7,19 @@ import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.validation.constraints.Min;
-import java.util.List;
+import javax.validation.constraints.NotNull;
 
 @Data
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
-public class ReportWebRequest {
+@AllArgsConstructor
+public class ScoreStudentWebRequest {
 
     @NotBlank(message = "NotBlank")
-    private String name;
+    private String studentId;
 
-    @NotBlank(message = "NotBlank")
-    private String description;
-
-    @Min(value = 1, message = "Min")
-    private long usedAt;
-
-    @NotBlank(message = "NotBlank")
-    private String batchCode;
-
-    private List<String> students;
+    @NotNull(message = "NotNull")
+    @Min(message = "Min", value = 0)
+    private Integer score;
 
 }

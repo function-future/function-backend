@@ -5,17 +5,13 @@ import com.future.function.common.exception.ForbiddenException;
 import com.future.function.model.dto.scoring.StudentSummaryDTO;
 import com.future.function.model.dto.scoring.SummaryDTO;
 import com.future.function.model.entity.feature.core.Batch;
+import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.User;
-import com.future.function.model.entity.feature.scoring.Assignment;
-import com.future.function.model.entity.feature.scoring.Quiz;
-import com.future.function.model.entity.feature.scoring.Room;
-import com.future.function.model.entity.feature.scoring.StudentQuiz;
-import com.future.function.model.entity.feature.scoring.StudentQuizDetail;
+import com.future.function.model.entity.feature.scoring.*;
 import com.future.function.model.enums.scoring.ScoringType;
 import com.future.function.service.api.feature.core.UserService;
 import com.future.function.service.api.feature.scoring.RoomService;
 import com.future.function.service.api.feature.scoring.StudentQuizService;
-import java.util.Collections;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,13 +20,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.util.Collections;
+
 import static com.googlecode.catchexception.CatchException.catchException;
 import static com.googlecode.catchexception.CatchException.caughtException;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class SummaryServiceImplTest {
@@ -42,10 +37,12 @@ public class SummaryServiceImplTest {
     private static final String STUDENT_NAME = "studentName";
     private static final String BATCH_CODE = "batch-code";
     private static final String UNIVERSITY = "university";
+    private static final String FILE_URL = "file-url";
     private static final int POINT = 100;
 
     private User student;
     private Room room;
+    private FileV2 fileV2;
     private Batch batch;
     private SummaryDTO quizSummaryDTO;
     private SummaryDTO roomSummaryDTO;
@@ -65,8 +62,16 @@ public class SummaryServiceImplTest {
 
     @Before
     public void setUp() throws Exception {
+        fileV2 = FileV2.builder().fileUrl(FILE_URL).build();
         batch = Batch.builder().code(BATCH_CODE).build();
-        student = User.builder().id(STUDENT_ID).name(STUDENT_NAME).batch(batch).university(UNIVERSITY).role(Role.STUDENT).build();
+        student = User.builder()
+                .id(STUDENT_ID)
+                .name(STUDENT_NAME)
+                .batch(batch)
+                .university(UNIVERSITY)
+                .pictureV2(fileV2)
+                .role(Role.STUDENT)
+                .build();
         room = Room.builder().assignment(Assignment.builder().title(ASSIGNMENT_TITLE).build()).point(POINT).build();
         studentQuizDetail = StudentQuizDetail.builder()
             .point(POINT)
@@ -95,6 +100,7 @@ public class SummaryServiceImplTest {
         assertThat(actual.getStudentName()).isEqualTo(STUDENT_NAME);
         assertThat(actual.getBatchCode()).isEqualTo(BATCH_CODE);
         assertThat(actual.getUniversity()).isEqualTo(UNIVERSITY);
+        assertThat(actual.getAvatar()).isEqualTo(FILE_URL);
         assertThat(actual.getScores().get(0).getTitle()).isEqualTo(ASSIGNMENT_TITLE);
         assertThat(actual.getScores().get(0).getType()).isEqualTo(ScoringType.ASSIGNMENT.getType());
         assertThat(actual.getScores().get(1).getTitle()).isEqualTo(QUIZ_TITLE);
@@ -112,6 +118,7 @@ public class SummaryServiceImplTest {
         assertThat(actual.getStudentName()).isEqualTo(STUDENT_NAME);
         assertThat(actual.getBatchCode()).isEqualTo(BATCH_CODE);
         assertThat(actual.getUniversity()).isEqualTo(UNIVERSITY);
+        assertThat(actual.getAvatar()).isEqualTo(FILE_URL);
         assertThat(actual.getScores().get(0).getTitle()).isEqualTo(ASSIGNMENT_TITLE);
         assertThat(actual.getScores().get(0).getType()).isEqualTo(ScoringType.ASSIGNMENT.getType());
         assertThat(actual.getScores().get(1).getTitle()).isEqualTo(QUIZ_TITLE);

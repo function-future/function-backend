@@ -1,14 +1,16 @@
 package com.future.function.web.mapper.request.scoring;
 
 import com.future.function.common.exception.BadRequestException;
+import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.scoring.Report;
 import com.future.function.validation.RequestValidator;
 import com.future.function.web.model.request.scoring.ReportWebRequest;
+import org.springframework.stereotype.Component;
+
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Optional;
-import org.springframework.stereotype.Component;
 
 @Component
 public class ReportRequestMapper {
@@ -31,6 +33,7 @@ public class ReportRequestMapper {
         .map(value -> Report.builder()
             .title(value.getName())
             .description(value.getDescription())
+                .batch(Batch.builder().code(value.getBatchCode()).build())
             .usedAt(getLocalDate(value))
             .studentIds(value.getStudents())
             .build())

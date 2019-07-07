@@ -5,11 +5,11 @@ import com.future.function.model.entity.feature.scoring.Option;
 import com.future.function.repository.feature.scoring.OptionRepository;
 import com.future.function.service.api.feature.scoring.OptionService;
 import com.future.function.service.impl.helper.CopyHelper;
-import java.util.List;
-import java.util.Optional;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class OptionServiceImpl implements OptionService {

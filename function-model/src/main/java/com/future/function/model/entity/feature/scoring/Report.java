@@ -1,11 +1,10 @@
 package com.future.function.model.entity.feature.scoring;
 
 import com.future.function.model.entity.base.BaseEntity;
-import java.time.LocalDate;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.future.function.model.entity.feature.core.Batch;
+import com.future.function.model.util.constant.FieldName;
+import lombok.*;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -13,6 +12,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
+@EqualsAndHashCode(callSuper = false)
 @Data
 @Builder
 @AllArgsConstructor
@@ -23,14 +23,18 @@ public class Report extends BaseEntity {
     @Builder.Default
     private String id = UUID.randomUUID().toString();
 
-    @Field
+    @Field(FieldName.Report.TITLE)
     private String title;
 
-    @Field
+    @Field(FieldName.Report.DESCRIPTION)
     private String description;
 
-    @Field
+    @Field(FieldName.Report.USED_AT)
     private LocalDate usedAt;
+
+    @DBRef
+    @Field(FieldName.Report.BATCH)
+    private Batch batch;
 
     private List<String> studentIds;
 
