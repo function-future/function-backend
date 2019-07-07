@@ -17,7 +17,7 @@ public @interface QuestionnaireTitle {
    *
    * @return {@code String} - The name of this annotation.
    */
-  String message() default "ChatroomName";
+  String message() default "QuestionnaireTitle";
 
   Class<?>[] groups() default {};
 

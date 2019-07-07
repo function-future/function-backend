@@ -7,9 +7,9 @@ import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
-import com.future.function.web.model.response.feature.communication.questionnaire.BatchResponse;
 import com.future.function.web.model.response.feature.communication.questionnaire.MemberResponse;
 import com.future.function.web.model.response.feature.communication.questionnaire.UserSummaryResponse;
+import com.future.function.web.model.response.feature.core.BatchWebResponse;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -58,8 +58,8 @@ public class QuestionnaireResultsResponseMapper {
             .build();
   }
 
-  private static BatchResponse toBatchResponse(Batch batch) {
-    return BatchResponse.builder()
+  private static BatchWebResponse toBatchResponse(Batch batch) {
+    return BatchWebResponse.builder()
             .id(batch.getId())
             .name(batch.getName())
             .code(batch.getCode())

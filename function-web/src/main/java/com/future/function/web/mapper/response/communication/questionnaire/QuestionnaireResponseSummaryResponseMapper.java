@@ -6,11 +6,11 @@ import com.future.function.model.entity.feature.core.User;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.feature.communication.questionnaire.*;
+import com.future.function.web.model.response.feature.core.BatchWebResponse;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
 
-import javax.xml.ws.Response;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -52,8 +52,8 @@ public class QuestionnaireResponseSummaryResponseMapper {
             .build();
   }
 
-  private static BatchResponse toBatchResponse(Batch batch) {
-    return BatchResponse.builder()
+  private static BatchWebResponse toBatchResponse(Batch batch) {
+    return BatchWebResponse.builder()
       .id(batch.getId())
       .name(batch.getName())
       .code(batch.getCode())

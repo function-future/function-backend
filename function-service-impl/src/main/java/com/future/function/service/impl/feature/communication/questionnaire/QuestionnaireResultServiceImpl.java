@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class QuestionnaireResultServiceImpl implements QuestionnaireResultService {
@@ -20,12 +21,9 @@ public class QuestionnaireResultServiceImpl implements QuestionnaireResultServic
 
   private final UserQuestionnaireSummaryRepository userQuestionnaireSummaryRepository;
 
-  private final UserQuestionnaireSummaryRepositoryCustom userQuestionnaireSummaryRepositoryCustom;
-
   @Autowired
-  public QuestionnaireResultServiceImpl(UserQuestionnaireSummaryRepository userQuestionnaireSummaryRepository, UserQuestionnaireSummaryRepositoryCustom userQuestionnaireSummaryRepositoryCustom) {
+  public QuestionnaireResultServiceImpl(UserQuestionnaireSummaryRepository userQuestionnaireSummaryRepository) {
     this.userQuestionnaireSummaryRepository = userQuestionnaireSummaryRepository;
-    this.userQuestionnaireSummaryRepositoryCustom = userQuestionnaireSummaryRepositoryCustom;
   }
 
   @Override
@@ -35,16 +33,10 @@ public class QuestionnaireResultServiceImpl implements QuestionnaireResultServic
 
   @Override
   public List<UserQuestionnaireSummary> getAppraisalsQuestionnaireSummary(Batch batch, String search, Pageable pageable) {
-    List<UserQuestionnaireSummary> results = userQuestionnaireSummaryRepositoryCustom.findAllByUserName(search);
 
-    List<UserQuestionnaireSummary> ret = new ArrayList<>();
-
-    for (UserQuestionnaireSummary result : results) {
-      if(result.getBatch().getCode() == batch.getCode()) {
-        ret.add(result);
-      }
-    }
-
-    return ret;
+    return userQuestionnaireSummaryRepository.findAllByUserName(search)
+      .stream()
+      .filter(summary  -> summary.getBatch().getCode() == batch.getCode())
+      .collect(Collectors.toList());
   }
 }

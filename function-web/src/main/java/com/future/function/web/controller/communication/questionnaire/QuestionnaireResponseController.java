@@ -20,7 +20,7 @@ import javax.xml.crypto.Data;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "/api/communication/questionnaire-Response")
+@RequestMapping(value = "/api/communication/questionnaire-response")
 @WithAnyRole(roles = { Role.ADMIN })
 public class QuestionnaireResponseController {
 
