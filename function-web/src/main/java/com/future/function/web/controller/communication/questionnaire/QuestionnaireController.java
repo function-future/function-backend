@@ -238,7 +238,7 @@ public class QuestionnaireController {
   }
 
   @ResponseStatus(HttpStatus.OK)
-  @PostMapping(value = "/{questionnaireId}/appraiser",
+  @PostMapping(value = "/{questionnaireId}/appraisee",
           produces = MediaType.APPLICATION_JSON_VALUE,
           consumes = MediaType.APPLICATION_JSON_VALUE
   )
