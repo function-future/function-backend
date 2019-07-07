@@ -71,13 +71,13 @@ public class QuestionnaireResponseSummaryServiceImpl implements QuestionnaireRes
 
   @Override
   public List<QuestionResponse> getQuestionResponseByQuestionResponseSummaryId(String questionResponseSummaryId) {
-    QuestionResponseSummary questionResponseSummary = questionResponseSummaryRepository.findOne(questionResponseSummaryId);
 
-    return Optional.of(questionResponseSummary)
+    return Optional.of(questionResponseSummaryId)
+            .map(questionResponseSummaryRepository::findOne)
             .map(ignored ->
                     questionResponseRepository.findAllByQuestionQuestionnaireAndAppraiseeAndDeletedFalse(
-                            questionQuestionnaireRepository.findOne(questionResponseSummary.getQuestion().getId()),
-                            userService.getUser(questionResponseSummary.getId())
+                            questionQuestionnaireRepository.findOne(ignored.getQuestion().getId()),
+                            userService.getUser(ignored.getId())
                     )
             )
             .orElseGet(Collections::emptyList);
