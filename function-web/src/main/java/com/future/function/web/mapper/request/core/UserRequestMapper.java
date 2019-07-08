@@ -70,7 +70,7 @@ public class UserRequestMapper {
       .filter(avatarSingleList -> !avatarSingleList.isEmpty())
       .map(list -> list.get(0))
       .map(this::buildFileV2)
-      .orElseGet(FileV2::new);
+      .orElse(null);
   }
   
   private FileV2 buildFileV2(String fileId) {

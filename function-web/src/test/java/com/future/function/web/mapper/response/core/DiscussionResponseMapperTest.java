@@ -51,7 +51,7 @@ public class DiscussionResponseMapperTest {
       .build();
   
   private static final Paging PAGING = Paging.builder()
-    .page(0)
+    .page(1)
     .size(4)
     .totalRecords(1)
     .build();
