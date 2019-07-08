@@ -14,6 +14,10 @@ public interface MessageService {
 
   Page<Message> getMessages(String chatroomId, Pageable pageable);
 
+  Page<Message> getMessagesAfterPivot(String chatroomId, String messageId, Pageable pageable);
+
+  Page<Message> getMessagesBeforePivot(String chatroomId, String messageId, Pageable pageable);
+
   Message getLastMessage(String chatroomId);
 
   Message createMessage(Message message);

@@ -223,6 +223,44 @@ public class ChatroomControllerTest extends TestHelper {
     }
 
     @Test
+    public void testGivenCallToChatroomsApiByGettingMessagesBeforePivotReturnPaging() throws Exception {
+
+        String messageId = "messageId";
+
+        Page<Message> messagePage = new PageImpl<>(
+                Arrays.asList(MESSAGE, MESSAGE), PAGEABLE, 2);
+        when(messageService.getMessagesBeforePivot(CHATROOM_ID, messageId, PAGEABLE)).thenReturn(messagePage);
+
+        PagingResponse<MessageResponse> response = ChatroomResponseMapper.toMessagePagingResponse(messagePage);
+
+        mockMvc.perform(get("/api/communication/chatrooms/" + CHATROOM_ID + "/messages/_before")
+                .param("messageId", messageId).cookie(cookies))
+                .andExpect(status().isOk())
+                .andExpect(content().json(pagingResponseJacksonTester.write(response).getJson()));
+
+        verify(messageService).getMessagesBeforePivot(CHATROOM_ID, messageId, PAGEABLE);
+    }
+
+    @Test
+    public void testGivenCallToChatroomsApiByGettingMessagesAfterPivotReturnPaging() throws Exception {
+
+        String messageId = "messageId";
+
+        Page<Message> messagePage = new PageImpl<>(
+                Arrays.asList(MESSAGE, MESSAGE), PAGEABLE, 2);
+        when(messageService.getMessagesAfterPivot(CHATROOM_ID, messageId, PAGEABLE)).thenReturn(messagePage);
+
+        PagingResponse<MessageResponse> response = ChatroomResponseMapper.toMessagePagingResponse(messagePage);
+
+        mockMvc.perform(get("/api/communication/chatrooms/" + CHATROOM_ID + "/messages/_after")
+                .param("messageId", messageId).cookie(cookies))
+                .andExpect(status().isOk())
+                .andExpect(content().json(pagingResponseJacksonTester.write(response).getJson()));
+
+        verify(messageService).getMessagesAfterPivot(CHATROOM_ID, messageId, PAGEABLE);
+    }
+
+    @Test
     public void testGivenChatroomDataByCreatingChatroomReturnDataResponseChatroom() throws Exception {
         super.setCookie(Role.ADMIN);
 
