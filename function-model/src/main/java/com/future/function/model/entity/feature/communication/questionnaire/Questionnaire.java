@@ -1,10 +1,12 @@
 package com.future.function.model.entity.feature.communication.questionnaire;
 
 import com.future.function.model.entity.base.BaseEntity;
+import com.future.function.model.entity.feature.core.User;
 import com.future.function.model.util.constant.DocumentName;
 import com.future.function.model.util.constant.FieldName;
 import lombok.*;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -28,4 +30,10 @@ public class Questionnaire extends BaseEntity {
   @Field(FieldName.Questionnaire.START_DATE)
   private long startDate;
 
+  @Field(FieldName.Questionnaire.DUE_DATE)
+  private long dueDate;
+
+  @Field(FieldName.Questionnaire.AUTHOR)
+  @DBRef
+  private User author;
 }

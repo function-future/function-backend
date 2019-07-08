@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class BatchResponseMapper {
-  
+
   /**
    * Converts a batch data to {@code BatchWebResponse} object, wrapped in
    * {@code DataResponse}.
@@ -34,11 +34,11 @@ public class BatchResponseMapper {
   public static DataResponse<BatchWebResponse> toBatchDataResponse(
     Batch batch
   ) {
-    
+
     return ResponseHelper.toDataResponse(
       HttpStatus.OK, toBatchWebResponse(batch));
   }
-  
+
   /**
    * Converts a batch data to {@code BatchWebResponse} object, wrapped in
    * {@code DataResponse}.
@@ -53,20 +53,20 @@ public class BatchResponseMapper {
   public static DataResponse<BatchWebResponse> toBatchDataResponse(
     HttpStatus httpStatus, Batch batch
   ) {
-    
+
     return ResponseHelper.toDataResponse(
       httpStatus, toBatchWebResponse(batch));
   }
-  
+
   public static BatchWebResponse toBatchWebResponse(Batch batch) {
-    
+
     return BatchWebResponse.builder()
       .id(batch.getId())
       .name(batch.getName())
       .code(batch.getCode())
       .build();
   }
-  
+
   /**
    * Converts batches data to {@code BatchWebResponse} object, wrapped in
    * {@code PagingResponse}.
@@ -80,19 +80,19 @@ public class BatchResponseMapper {
   public static PagingResponse<BatchWebResponse> toBatchesPagingResponse(
     Page<Batch> data
   ) {
-    
+
     return ResponseHelper.toPagingResponse(
       HttpStatus.OK, toBatchWebResponseList(data), PageHelper.toPaging(data));
   }
-  
+
   private static List<BatchWebResponse> toBatchWebResponseList(
     Page<Batch> data
   ) {
-    
+
     return data.getContent()
       .stream()
       .map(BatchResponseMapper::toBatchWebResponse)
       .collect(Collectors.toList());
   }
-  
+
 }

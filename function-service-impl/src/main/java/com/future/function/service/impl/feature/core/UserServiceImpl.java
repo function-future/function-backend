@@ -25,27 +25,27 @@ import java.util.Optional;
  */
 @Service
 public class UserServiceImpl implements UserService {
-  
+
   private final BatchService batchService;
-  
+
   private final UserRepository userRepository;
-  
+
   private final ResourceService resourceService;
-  
+
   private final BCryptPasswordEncoder encoder;
-  
+
   @Autowired
   public UserServiceImpl(
     BatchService batchService, UserRepository userRepository,
     ResourceService resourceService, BCryptPasswordEncoder encoder
   ) {
-    
+
     this.batchService = batchService;
     this.userRepository = userRepository;
     this.resourceService = resourceService;
     this.encoder = encoder;
   }
-  
+
   /**
    * {@inheritDoc}
    *
@@ -55,12 +55,12 @@ public class UserServiceImpl implements UserService {
    */
   @Override
   public User getUser(String userId) {
-    
+
     return Optional.ofNullable(userId)
       .map(userRepository::findOne)
       .orElseThrow(() -> new NotFoundException("Get User Not Found"));
   }
-  
+
   /**
    * {@inheritDoc}
    *
@@ -71,13 +71,13 @@ public class UserServiceImpl implements UserService {
    */
   @Override
   public User getUserByEmailAndPassword(String email, String password) {
-    
+
     return Optional.ofNullable(email)
       .flatMap(userRepository::findByEmailAndDeletedFalse)
       .filter(user -> encoder.matches(password, user.getPassword()))
       .orElseThrow(() -> new UnauthorizedException("Invalid Email/Password"));
   }
-  
+
   /**
    * {@inheritDoc}
    *
@@ -88,10 +88,10 @@ public class UserServiceImpl implements UserService {
    */
   @Override
   public Page<User> getUsers(Role role, Pageable pageable) {
-    
+
     return userRepository.findAllByRoleAndDeletedFalse(role, pageable);
   }
-  
+
   /**
    * {@inheritDoc}
    *
@@ -101,12 +101,12 @@ public class UserServiceImpl implements UserService {
    */
   @Override
   public User createUser(User user) {
-    
+
     if (user.getBatch() != null) {
       user.setBatch(batchService.getBatchByCode(user.getBatch()
                                                   .getCode()));
     }
-    
+
     return Optional.of(user)
       .map(this::setDefaultEncryptedPassword)
       .map(this::setUserPicture)
@@ -114,7 +114,7 @@ public class UserServiceImpl implements UserService {
       .orElseThrow(
         () -> new UnsupportedOperationException("Failed Create User"));
   }
-  
+
   /**
    * {@inheritDoc}
    *
@@ -124,12 +124,12 @@ public class UserServiceImpl implements UserService {
    */
   @Override
   public User updateUser(User user) {
-    
+
     if (user.getBatch() != null) {
       user.setBatch(batchService.getBatchByCode(user.getBatch()
                                                   .getCode()));
     }
-    
+
     return Optional.of(user)
       .map(User::getId)
       .map(userRepository::findOne)
@@ -138,7 +138,7 @@ public class UserServiceImpl implements UserService {
       .map(foundUser -> this.copyPropertiesAndSaveUser(user, foundUser))
       .orElse(user);
   }
-  
+
   /**
    * {@inheritDoc}
    *
@@ -146,12 +146,12 @@ public class UserServiceImpl implements UserService {
    */
   @Override
   public void deleteUser(String userId) {
-    
+
     Optional.ofNullable(userId)
       .map(userRepository::findOne)
       .ifPresent(this::markDeleted);
   }
-  
+
   /**
    * {@inheritDoc}
    *
@@ -163,48 +163,48 @@ public class UserServiceImpl implements UserService {
   public List<User> getStudentsByBatchCode(
     String batchCode
   ) {
-    
+
     return Optional.ofNullable(batchCode)
       .map(batchService::getBatchByCode)
       .map(batch -> userRepository.findAllByRoleAndBatchAndDeletedFalse(Role.STUDENT, batch))
       .orElseGet(Collections::emptyList);
   }
-  
+
   @Override
   public User getUserByEmail(String email) {
-    
+
     return userRepository.findByEmailAndDeletedFalse(email)
       .orElseThrow(() -> new NotFoundException("Get User Not Found"));
   }
-  
+
   @Override
   @SuppressWarnings("squid:S2201")
   public void changeUserPassword(
     String email, String oldPassword, String newPassword
   ) {
-    
+
     userRepository.findByEmailAndDeletedFalse(email)
       .filter(user -> encoder.matches(user.getPassword(), oldPassword))
       .map(user -> this.setEncryptedPassword(user, newPassword))
       .map(userRepository::save)
       .orElseThrow(() -> new UnauthorizedException("Invalid Old Password"));
   }
-  
+
   private User setEncryptedPassword(User user, String password) {
-    
+
     user.setPassword(encoder.encode(password));
     return user;
   }
-  
+
   @Override
   public Page<User> getUsersByNameContainsIgnoreCase(String name, Pageable pageable) {
-    
+
     return userRepository.findAllByNameContainsIgnoreCaseAndDeletedFalse(name
       , pageable);
   }
-  
+
   private User setUserPicture(User user, User foundUser) {
-    
+
     return Optional.of(foundUser)
       .map(User::getPictureV2)
       .map(FileV2::getId)
@@ -212,48 +212,48 @@ public class UserServiceImpl implements UserService {
       .map(ignored -> foundUser)
       .orElse(foundUser);
   }
-  
+
   private User markAndSetUserPicture(User user, String fileId, boolean used) {
-    
+
     resourceService.markFilesUsed(Collections.singletonList(fileId), used);
     user.setPictureV2(resourceService.getFile(fileId));
     return user;
   }
-  
+
   private User copyPropertiesAndSaveUser(User user, User foundUser) {
-    
+
     CopyHelper.copyProperties(user, foundUser);
     return userRepository.save(foundUser);
   }
-  
+
   private void markDeleted(User user) {
-    
+
     user.setDeleted(true);
     deleteUserPicture(user);
     userRepository.save(user);
   }
-  
+
   private User deleteUserPicture(User user) {
-    
+
     return Optional.of(user)
       .map(User::getPictureV2)
       .map(FileV2::getId)
       .map(id -> this.markAndSetUserPicture(user, id, false))
       .orElse(user);
   }
-  
+
   private User setUserPicture(User user) {
-    
+
     return Optional.of(user)
       .map(User::getPictureV2)
       .map(FileV2::getId)
       .map(fileId -> this.markAndSetUserPicture(user, fileId, true))
       .orElse(user);
   }
-  
+
   private User setDefaultEncryptedPassword(User user) {
-    
+
     return this.setEncryptedPassword(user, user.getPassword());
   }
-  
+
 }

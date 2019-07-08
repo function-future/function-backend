@@ -156,7 +156,7 @@ public class ChatroomControllerTest extends TestHelper {
 
         String KEYWORD = "chat";
         MESSAGE.setCreatedAt(1L);
-    
+
         when(chatroomService.getChatroomsWithKeyword(KEYWORD, MEMBER_ID_1, PAGEABLE)).thenReturn(
                 new PageImpl<>(Arrays.asList(CHATROOM, CHATROOM), PAGEABLE, 2)
         );
