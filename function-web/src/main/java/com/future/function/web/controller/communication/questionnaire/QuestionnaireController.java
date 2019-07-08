@@ -16,6 +16,7 @@ import com.future.function.web.mapper.response.communication.questionnaire.Quest
 import com.future.function.web.mapper.response.communication.questionnaire.QuestionQuestionnaireResponseMapper;
 import com.future.function.web.mapper.response.communication.questionnaire.QuestionnaireResponseMapper;
 import com.future.function.web.model.request.communication.questionnaire.QuestionQuestionnaireRequest;
+import com.future.function.web.model.request.communication.questionnaire.QuestionnaireParticipantRequest;
 import com.future.function.web.model.request.communication.questionnaire.QuestionnaireRequest;
 import com.future.function.web.model.response.base.BaseResponse;
 import com.future.function.web.model.response.base.DataResponse;
@@ -204,10 +205,10 @@ public class QuestionnaireController {
           consumes = MediaType.APPLICATION_JSON_VALUE
   )
   public DataResponse<QuestionnaireParticipantResponse> addAppraiser(@PathVariable String questionnaireId,
-                                                                     @RequestBody QuestionnaireParticipant questionnaireParticipant
+                                                                     @RequestBody QuestionnaireParticipantRequest questionnaireParticipant
                                    ){
    return QuestionnaireParticipantResponseMapper.toDataResponseQuestionnaireParticipantResponse(
-           questionnaireService.addQuestionnaireAppraiserToQuestionnaire(questionnaireId, questionnaireParticipant.getId()),
+           questionnaireService.addQuestionnaireAppraiserToQuestionnaire(questionnaireId, questionnaireParticipant.getIdParticipant()),
            HttpStatus.OK
    );
   }
@@ -243,10 +244,10 @@ public class QuestionnaireController {
           consumes = MediaType.APPLICATION_JSON_VALUE
   )
   public DataResponse<QuestionnaireParticipantResponse> addAppraisee(@PathVariable String questionnaireId,
-                                                                     @RequestBody QuestionnaireParticipant questionnaireParticipant
+                                                                     @RequestBody QuestionnaireParticipantRequest questionnaireParticipant
   ){
     return QuestionnaireParticipantResponseMapper.toDataResponseQuestionnaireParticipantResponse(
-            questionnaireService.addQuestionnaireAppraiseeToQuestionnaire(questionnaireId, questionnaireParticipant.getId()),
+            questionnaireService.addQuestionnaireAppraiseeToQuestionnaire(questionnaireId, questionnaireParticipant.getIdParticipant()),
             HttpStatus.OK
     );
   }

@@ -50,6 +50,7 @@ public class QuestionnaireParticipantResponseMapper {
 
   private static QuestionnaireParticipantResponse toQuestionnaireParticipantResponse(QuestionnaireParticipant questionnaireParticipant){
     return QuestionnaireParticipantResponse.builder()
+            .id(questionnaireParticipant.getId())
             .questionnaireId(questionnaireParticipant.getQuestionnaire().getId())
             .memberId(questionnaireParticipant.getMember().getId())
             .participantType(questionnaireParticipant.getParticipantType().toString())

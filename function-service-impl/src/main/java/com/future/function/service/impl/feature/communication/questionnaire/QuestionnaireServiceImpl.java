@@ -166,7 +166,7 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
 
   @Override
   public QuestionnaireParticipant addQuestionnaireAppraiseeToQuestionnaire(String questionnaireId, String appraiseeId){
-    QuestionnaireParticipant questionnaireParticipant = new QuestionnaireParticipant().builder()
+    QuestionnaireParticipant questionnaireParticipant = QuestionnaireParticipant.builder()
           .participantType(ParticipantType.APPRAISEE)
           .member(userService.getUser(appraiseeId))
           .questionnaire(questionnaireRepository.findOne(questionnaireId))

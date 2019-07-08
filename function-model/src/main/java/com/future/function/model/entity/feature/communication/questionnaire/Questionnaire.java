@@ -6,6 +6,7 @@ import com.future.function.model.util.constant.DocumentName;
 import com.future.function.model.util.constant.FieldName;
 import lombok.*;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -33,5 +34,6 @@ public class Questionnaire extends BaseEntity {
   private long dueDate;
 
   @Field(FieldName.Questionnaire.AUTHOR)
+  @DBRef
   private User author;
 }
