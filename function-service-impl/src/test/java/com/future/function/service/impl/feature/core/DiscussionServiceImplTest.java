@@ -134,6 +134,7 @@ public class DiscussionServiceImplTest {
     when(sharedCourseService.getCourseByIdAndBatchCode(COURSE_ID,
                                                        BATCH_CODE
     )).thenReturn(new Course());
+
     when(batchService.getBatchByCode(BATCH_CODE)).thenReturn(BATCH);
 
     Page<Discussion> discussionPage = PageHelper.toPage(

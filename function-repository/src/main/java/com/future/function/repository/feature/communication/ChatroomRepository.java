@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -40,4 +41,6 @@ public interface ChatroomRepository extends MongoRepository<Chatroom, String> {
   Page<Chatroom> findAllByTitleContainingIgnoreCaseAndMembersOrderByUpdatedAtDesc(String titleKeyword, User member, Pageable pageable);
 
   Optional<Chatroom> findByType(String type);
+
+  List<Chatroom> findAllByMembersContaining(List<User> members);
 }
