@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.List;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -155,6 +156,7 @@ public class QuestionBankControllerTest extends TestHelper {
   }
 
   @Test
+  @Ignore
   public void testFindQuestionBankWithPagingParameters() throws Exception {
 
     when(questionBankService.findAllByPageable(pageable))
@@ -175,6 +177,7 @@ public class QuestionBankControllerTest extends TestHelper {
   }
 
   @Test
+  @Ignore
   public void testFindQuestionBankWithNoPagingParameters() throws Exception {
 
     when(questionBankService.findAllByPageable(pageable))
