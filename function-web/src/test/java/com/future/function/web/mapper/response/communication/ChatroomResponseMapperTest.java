@@ -139,7 +139,7 @@ public class ChatroomResponseMapperTest {
         );
 
         assertThat(data).isNotNull();
-        assertThat(data.getPaging().getPage()).isEqualTo(0);
+        assertThat(data.getPaging().getPage()).isEqualTo(1);
         assertThat(data.getPaging().getSize()).isEqualTo(1);
         assertThat(data.getData().get(0).getId()).isEqualTo(CHATROOM_ID);
 
@@ -155,7 +155,7 @@ public class ChatroomResponseMapperTest {
 
         assertThat(data).isNotNull();
         assertThat(data.getPaging().getSize()).isEqualTo(2);
-        assertThat(data.getPaging().getPage()).isEqualTo(0);
+        assertThat(data.getPaging().getPage()).isEqualTo(1);
         assertThat(data.getData().get(0).getId()).isEqualTo(MESSAGE_ID_1);
         assertThat(data.getData().get(1).getId()).isEqualTo(MESSAGE_ID_2);
     }
