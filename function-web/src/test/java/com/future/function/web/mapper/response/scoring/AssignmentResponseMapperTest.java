@@ -11,6 +11,7 @@ import com.future.function.web.model.response.feature.scoring.AssignmentWebRespo
 import org.assertj.core.api.Assertions;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -23,6 +24,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+@Ignore
 public class AssignmentResponseMapperTest {
 
   private static final String ASSIGNMENT_TITLE = "assignment-title";
