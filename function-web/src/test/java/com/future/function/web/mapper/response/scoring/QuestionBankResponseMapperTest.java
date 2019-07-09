@@ -63,7 +63,7 @@ public class QuestionBankResponseMapperTest {
 
     paging = Paging
         .builder()
-        .page(questionBankPage.getNumber())
+        .page(questionBankPage.getNumber() + 1)
         .size(questionBankPage.getSize())
         .totalRecords(questionBankPage.getTotalElements())
         .build();

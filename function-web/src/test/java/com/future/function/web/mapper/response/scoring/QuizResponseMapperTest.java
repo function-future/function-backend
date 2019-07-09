@@ -86,7 +86,7 @@ public class QuizResponseMapperTest {
         .builder()
         .totalRecords(SIZE)
         .size(SIZE)
-        .page(PAGE)
+        .page(PAGE + 1)
         .build();
 
     quizWebPagingResponse = PagingResponse

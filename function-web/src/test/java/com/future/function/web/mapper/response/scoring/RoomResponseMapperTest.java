@@ -10,12 +10,14 @@ import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.base.paging.Paging;
+import com.future.function.web.model.response.feature.core.BatchWebResponse;
 import com.future.function.web.model.response.feature.core.UserWebResponse;
 import com.future.function.web.model.response.feature.scoring.AssignmentWebResponse;
 import com.future.function.web.model.response.feature.scoring.RoomWebResponse;
+import java.util.Collections;
+import java.util.Date;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
@@ -24,12 +26,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 
-import java.util.Collections;
-import java.util.Date;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Ignore
 public class RoomResponseMapperTest {
   private static final String ASSIGNMENT_TITLE = "assignment-title";
   private static final String ASSIGNMENT_DESCRIPTION = "assignment-description";
@@ -48,6 +46,7 @@ public class RoomResponseMapperTest {
   private Page<Room> roomPage;
   private AssignmentWebResponse assignmentWebResponse;
   private RoomWebResponse roomWebResponse;
+  private BatchWebResponse batchWebResponse;
   private UserWebResponse userWebResponse;
   private DataResponse<RoomWebResponse> roomWebResponseDataResponse;
   private PagingResponse<RoomWebResponse> roomWebResponsePagingResponse;
@@ -73,11 +72,13 @@ public class RoomResponseMapperTest {
         .batchCode(BATCH_CODE)
         .file(FILE_URl)
         .build();
+    batchWebResponse = BatchWebResponse.builder()
+        .code(BATCH_CODE).build();
     student = User.builder().id(USER_ID).name("name").address("address").batch(batch).email("email")
         .password("password").phone("phone").pictureV2(fileV2).role(Role.STUDENT).build();
     userWebResponse = new UserWebResponse();
     BeanUtils.copyProperties(student, userWebResponse);
-//    userWebResponse.setBatch(BATCH_CODE);
+    userWebResponse.setBatch(batchWebResponse);
     userWebResponse.setAvatar(FILE_URl);
     userWebResponse.setRole("STUDENT");
     room = Room.builder().assignment(assignment).student(student).point(0).build();
