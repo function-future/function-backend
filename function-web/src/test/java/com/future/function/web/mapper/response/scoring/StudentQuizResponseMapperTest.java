@@ -20,7 +20,6 @@ import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Ignore
 public class StudentQuizResponseMapperTest {
 
   private static final String STUDENT_QUIZ_ID = "id";

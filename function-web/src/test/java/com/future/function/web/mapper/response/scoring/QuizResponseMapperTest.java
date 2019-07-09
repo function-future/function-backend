@@ -22,7 +22,6 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Ignore
 public class QuizResponseMapperTest {
 
   private static final String QUIZ_TITLE = "quiz-title";

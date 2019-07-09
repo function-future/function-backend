@@ -20,7 +20,6 @@ import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Ignore
 public class QuestionBankResponseMapperTest {
 
   private static final String QUESTION_BANK_ID = "questionbank-id";

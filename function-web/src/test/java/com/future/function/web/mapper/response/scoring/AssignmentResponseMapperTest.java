@@ -24,7 +24,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-@Ignore
 public class AssignmentResponseMapperTest {
 
   private static final String ASSIGNMENT_TITLE = "assignment-title";

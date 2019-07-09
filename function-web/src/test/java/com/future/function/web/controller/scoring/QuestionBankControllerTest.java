@@ -47,7 +47,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @Import(TestSecurityConfiguration.class)
 @WebMvcTest(QuestionBankController.class)
-@Ignore
 public class QuestionBankControllerTest extends TestHelper {
 
   private static final String QUESTION_BANK_ID = "questionbank-id";
