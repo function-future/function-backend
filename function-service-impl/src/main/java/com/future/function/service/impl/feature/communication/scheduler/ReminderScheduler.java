@@ -38,7 +38,6 @@ public class ReminderScheduler {
   @Scheduled(fixedDelayString = "#{@reminderProperties.schedulerPeriod}")
   public void createNotificationBasedOnReminder() {
     LocalDateTime timeNow = LocalDateTime.now();
-    System.out.println(timeNow.getSecond());
     reminderService.getAllReminder().forEach(reminder -> generateNotificationIfNecessary(reminder, timeNow));
   }
 
