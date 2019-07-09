@@ -24,7 +24,7 @@ public final class OptionResponseMapper {
 
   private static OptionWebResponse buildOptionWebResponse(Option option) {
     return OptionWebResponse.builder()
-        .optionId(option.getId())
+        .id(option.getId())
         .label(option.getLabel())
             .correct(option.isCorrect() ? option.isCorrect() : null)
         .build();
