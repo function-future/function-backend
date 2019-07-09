@@ -122,6 +122,7 @@ public class ReportServiceImplTest {
         verify(reportRepository).findAll(pageable);
         verify(userService).getUser(USER_ID);
         verify(batchService).getBatchByCode(BATCH_CODE);
+        verify(reportDetailService).findAllDetailByReportId(REPORT_ID);
     }
 
     @Test
@@ -133,6 +134,7 @@ public class ReportServiceImplTest {
         verify(reportRepository).findAllByBatchAndUsedAtEqualsAndDeletedFalse(batch, USED_AT, pageable);
         verify(userService).getUser(USER_ID);
         verify(batchService).getBatchByCode(BATCH_CODE);
+        verify(reportDetailService).findAllDetailByReportId(REPORT_ID);
     }
 
     @Test
@@ -140,6 +142,7 @@ public class ReportServiceImplTest {
         Report actual = reportService.findById(REPORT_ID);
         assertThat(actual).isEqualTo(report);
         verify(reportRepository).findByIdAndDeletedFalse(REPORT_ID);
+        verify(reportDetailService).findAllDetailByReportId(REPORT_ID);
     }
 
     @Test
@@ -156,6 +159,7 @@ public class ReportServiceImplTest {
         assertThat(actual).isEqualTo(report);
         verify(reportRepository).save(report);
         verify(reportDetailService).createReportDetailByReport(report, student);
+        verify(batchService).getBatchByCode(BATCH_CODE);
     }
 
     @Test
@@ -180,7 +184,7 @@ public class ReportServiceImplTest {
         assertThat(actual).isEqualTo(actual);
         verify(reportRepository).findByIdAndDeletedFalse(REPORT_ID);
         verify(reportRepository).save(report);
-        verify(reportDetailService).findAllDetailByReportId(REPORT_ID);
+        verify(reportDetailService, times(2)).findAllDetailByReportId(REPORT_ID);
     }
 
     @Test
@@ -195,7 +199,7 @@ public class ReportServiceImplTest {
         assertThat(actual).isEqualTo(actual);
         verify(reportRepository).findByIdAndDeletedFalse(REPORT_ID);
         verify(reportRepository).save(report);
-        verify(reportDetailService).findAllDetailByReportId(REPORT_ID);
+        verify(reportDetailService, times(2)).findAllDetailByReportId(REPORT_ID);
         verify(reportDetailService).createReportDetailByReport(report, anotherStudent);
         verify(reportDetailService).deleteAllByReportId(REPORT_ID);
     }

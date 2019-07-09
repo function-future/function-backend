@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ReportWebResponse {
 
+    private String id;
     private String title;
     private String description;
     private String batchCode;

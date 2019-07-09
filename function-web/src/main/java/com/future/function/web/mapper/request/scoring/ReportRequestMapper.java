@@ -5,6 +5,7 @@ import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.scoring.Report;
 import com.future.function.validation.RequestValidator;
 import com.future.function.web.model.request.scoring.ReportWebRequest;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
@@ -16,6 +17,11 @@ import java.util.Optional;
 public class ReportRequestMapper {
 
   private RequestValidator validator;
+
+  @Autowired
+  public ReportRequestMapper(RequestValidator validator) {
+    this.validator = validator;
+  }
 
   public Report toReport(ReportWebRequest request) {
     return toValidatedReport(request);

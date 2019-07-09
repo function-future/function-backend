@@ -23,6 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class ReportResponseMapperTest {
 
+  private static final String ID = "id";
   private static final String NAME = "final-judge";
   private static final String DESCRIPTION = "final description";
     private static final String BATCH_CODE = "batch-code";
@@ -45,6 +46,7 @@ public class ReportResponseMapperTest {
 
     report = Report
         .builder()
+            .id(ID)
         .title(NAME)
             .batch(batch)
         .description(DESCRIPTION)
@@ -64,6 +66,7 @@ public class ReportResponseMapperTest {
   @Test
   public void toDataReportWebResponse() {
     DataResponse<ReportWebResponse> actual = ReportResponseMapper.toDataReportWebResponse(report);
+    assertThat(actual.getData().getId()).isEqualTo(ID);
     assertThat(actual.getData().getTitle()).isEqualTo(NAME);
     assertThat(actual.getData().getDescription()).isEqualTo(DESCRIPTION);
       assertThat(actual.getData().getBatchCode()).isEqualTo(BATCH_CODE);
@@ -73,6 +76,7 @@ public class ReportResponseMapperTest {
   @Test
   public void toDataReportWebResponseCreated() {
     DataResponse<ReportWebResponse> actual = ReportResponseMapper.toDataReportWebResponse(HttpStatus.CREATED, report);
+    assertThat(actual.getData().getId()).isEqualTo(ID);
     assertThat(actual.getData().getTitle()).isEqualTo(NAME);
     assertThat(actual.getData().getDescription()).isEqualTo(DESCRIPTION);
       assertThat(actual.getData().getBatchCode()).isEqualTo(BATCH_CODE);

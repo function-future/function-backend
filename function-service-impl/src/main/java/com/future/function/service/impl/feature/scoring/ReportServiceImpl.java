@@ -48,27 +48,51 @@ public class ReportServiceImpl implements ReportService {
         Batch batch = batchService.getBatchByCode(batchCode);
         User user = userService.getUser(userId);
         if (user.getRole().equals(Role.ADMIN)) {
-            return reportRepository.findAll(pageable);
+            return mapReportPageToHaveStudentIds(reportRepository.findAll(pageable));
         } else {
-            return reportRepository.findAllByBatchAndUsedAtEqualsAndDeletedFalse(batch,
-                    LocalDate.now(ZoneId.systemDefault()), pageable);
+            return mapReportPageToHaveStudentIds(reportRepository.findAllByBatchAndUsedAtEqualsAndDeletedFalse(batch,
+                    LocalDate.now(ZoneId.systemDefault()), pageable));
         }
+    }
+
+    private Page<Report> mapReportPageToHaveStudentIds(Page<Report> reportPage) {
+        reportPage.getContent()
+                .forEach(this::findStudentIdsByReportId);
+        return reportPage;
     }
 
     @Override
     public Report findById(String id) {
         return Optional.ofNullable(id)
                 .flatMap(reportRepository::findByIdAndDeletedFalse)
+                .map(this::findStudentIdsByReportId)
                 .orElseThrow(() -> new NotFoundException("Report not found"));
+    }
+
+    private Report findStudentIdsByReportId(Report report) {
+        List<String> studentIds = reportDetailService.findAllDetailByReportId(report.getId())
+                .stream()
+                .map(ReportDetail::getUser)
+                .map(User::getId)
+                .collect(Collectors.toList());
+        report.setStudentIds(studentIds);
+        return report;
     }
 
     @Override
     public Report createReport(Report report) {
-        return Optional.ofNullable(report)
-                .map(Report::getStudentIds)
-                .filter(studentIds -> studentIds.size() <= 3)
-                .map(studentIds -> createReportDetailByReportAndStudentId(report, studentIds))
+        List<String> studentIds = report.getStudentIds();
+        return Optional.ofNullable(studentIds)
+                .filter(students -> students.size() <= 3)
+                .map(value -> report)
+                .map(value -> {
+                    Batch batch = batchService.getBatchByCode(value.getBatch().getCode());
+                    value.setBatch(batch);
+                    value.setStudentIds(null);
+                    return value;
+                })
                 .map(reportRepository::save)
+                .map(students -> createReportDetailByReportAndStudentId(report, studentIds))
                 .orElseThrow(() -> new UnsupportedOperationException("Failed to create report"));
     }
 
@@ -78,7 +102,7 @@ public class ReportServiceImpl implements ReportService {
                 .map(student -> reportDetailService.createReportDetailByReport(report, student))
                 .findFirst()
                 .map(value -> {
-                    value.setStudentIds(null);
+                    value.setStudentIds(studentIds);
                     return value;
                 })
                 .orElse(null);
@@ -86,16 +110,27 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public Report updateReport(Report report) {
+        List<String> studentIds = report.getStudentIds();
         return Optional.ofNullable(report)
                 .map(this::checkStudentIdsChangedAndDeleteIfChanged)
                 .map(Report::getId)
                 .map(this::findById)
                 .map(foundReport -> {
+                    Batch batch = foundReport.getBatch();
                     CopyHelper.copyProperties(report, foundReport);
+                    if (!batch.getCode().equals(report.getBatch().getCode())) {
+                        foundReport.setBatch(batchService.getBatchByCode(report.getBatch().getCode()));
+                    } else {
+                        foundReport.setBatch(batch);
+                    }
                     foundReport.setStudentIds(null);
                     return foundReport;
                 })
                 .map(reportRepository::save)
+                .map(value -> {
+                    value.setStudentIds(studentIds);
+                    return value;
+                })
                 .orElseThrow(() -> new UnsupportedOperationException("Failed to update report"));
     }
 

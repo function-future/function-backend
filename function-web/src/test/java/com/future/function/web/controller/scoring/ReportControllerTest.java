@@ -98,6 +98,7 @@ public class ReportControllerTest extends TestHelper {
                 .build();
 
         reportWebResponse = ReportWebResponse.builder()
+                .id(REPORT_ID)
                 .title(TITLE)
                 .description(DESCRIPTION)
                 .usedAt(usedAt.atStartOfDay().atZone(ZoneId.systemDefault()).toEpochSecond())
