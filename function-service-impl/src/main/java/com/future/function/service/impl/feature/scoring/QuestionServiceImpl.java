@@ -9,14 +9,14 @@ import com.future.function.service.api.feature.scoring.OptionService;
 import com.future.function.service.api.feature.scoring.QuestionBankService;
 import com.future.function.service.api.feature.scoring.QuestionService;
 import com.future.function.service.impl.helper.CopyHelper;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class QuestionServiceImpl implements QuestionService {

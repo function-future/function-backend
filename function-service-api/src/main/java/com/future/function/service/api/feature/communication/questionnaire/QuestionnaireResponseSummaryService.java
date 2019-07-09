@@ -3,7 +3,6 @@ package com.future.function.service.api.feature.communication.questionnaire;
 import com.future.function.model.entity.feature.communication.questionnaire.QuestionResponse;
 import com.future.function.model.entity.feature.communication.questionnaire.QuestionResponseSummary;
 import com.future.function.model.entity.feature.communication.questionnaire.QuestionnaireResponseSummary;
-import com.future.function.model.entity.feature.communication.questionnaire.UserQuestionnaireSummary;
 import com.future.function.model.entity.feature.core.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

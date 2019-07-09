@@ -9,10 +9,11 @@ import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.feature.scoring.StudentQuestionWebResponse;
 import com.future.function.web.model.response.feature.scoring.StudentQuizDetailWebResponse;
-import java.util.Collections;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

@@ -4,14 +4,12 @@ import com.future.function.common.enumeration.core.Role;
 import com.future.function.model.entity.feature.communication.questionnaire.UserQuestionnaireSummary;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.repository.feature.communication.questionnaire.UserQuestionnaireSummaryRepository;
-import com.future.function.repository.feature.communication.questionnaire.UserQuestionnaireSummaryRepositoryCustom;
 import com.future.function.service.api.feature.communication.questionnaire.QuestionnaireResultService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 

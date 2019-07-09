@@ -1,11 +1,21 @@
 package com.future.function.web.mapper.response.communication.questionnaire;
 
-import com.future.function.model.entity.feature.communication.questionnaire.*;
+import com.future.function.model.entity.feature.communication.questionnaire.QuestionQuestionnaire;
+import com.future.function.model.entity.feature.communication.questionnaire.QuestionResponse;
+import com.future.function.model.entity.feature.communication.questionnaire.QuestionResponseSummary;
+import com.future.function.model.entity.feature.communication.questionnaire.Questionnaire;
+import com.future.function.model.entity.feature.communication.questionnaire.QuestionnaireResponseSummary;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.model.response.base.DataResponse;
-import com.future.function.web.model.response.feature.communication.questionnaire.*;
+import com.future.function.web.model.response.feature.communication.questionnaire.AppraiseeResponse;
+import com.future.function.web.model.response.feature.communication.questionnaire.QuestionAnswerDetailResponse;
+import com.future.function.web.model.response.feature.communication.questionnaire.QuestionAnswerResponse;
+import com.future.function.web.model.response.feature.communication.questionnaire.QuestionQuestionnaireResponse;
+import com.future.function.web.model.response.feature.communication.questionnaire.QuestionQuestionnaireSummaryResponse;
+import com.future.function.web.model.response.feature.communication.questionnaire.QuestionnaireDetailResponse;
+import com.future.function.web.model.response.feature.communication.questionnaire.QuestionnaireSummaryDescriptionResponse;
 import com.future.function.web.model.response.feature.core.BatchWebResponse;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;

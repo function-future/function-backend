@@ -8,8 +8,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
 /**
  * Author: PriagungSatyagama
  * Created At: 13:10 01/06/2019

@@ -7,14 +7,16 @@ import com.future.function.model.entity.feature.scoring.StudentQuiz;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.feature.scoring.StudentQuizWebResponse;
-import java.util.Collections;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+
+import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -76,7 +78,7 @@ public class StudentQuizResponseMapperTest {
   @Test
   public void toPagingStudentQuizWebResponse() {
     PagingResponse<StudentQuizWebResponse> response = StudentQuizResponseMapper.toPagingStudentQuizWebResponse(studentQuizPage);
-    assertThat(response.getPaging().getPage()).isEqualTo(0);
+    assertThat(response.getPaging().getPage()).isEqualTo(1);
     assertThat(response.getPaging().getSize()).isEqualTo(10);
     assertThat(response.getPaging().getTotalRecords()).isEqualTo(1);
     assertThat(response.getData().get(0).getQuiz().getId()).isEqualTo(quiz.getId());

@@ -6,10 +6,9 @@ import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.base.paging.Paging;
 import com.future.function.web.model.response.feature.scoring.QuizWebResponse;
-import java.util.ArrayList;
-import java.util.List;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
@@ -17,6 +16,9 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -83,7 +85,7 @@ public class QuizResponseMapperTest {
         .builder()
         .totalRecords(SIZE)
         .size(SIZE)
-        .page(PAGE)
+        .page(PAGE + 1)
         .build();
 
     quizWebPagingResponse = PagingResponse

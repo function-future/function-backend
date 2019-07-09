@@ -8,9 +8,6 @@ import com.future.function.model.entity.feature.scoring.StudentQuestion;
 import com.future.function.model.entity.feature.scoring.StudentQuizDetail;
 import com.future.function.repository.feature.scoring.StudentQuestionRepository;
 import com.future.function.service.api.feature.scoring.QuestionService;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,6 +16,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.data.domain.Sort;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import static com.googlecode.catchexception.CatchException.catchException;
 import static com.googlecode.catchexception.CatchException.caughtException;

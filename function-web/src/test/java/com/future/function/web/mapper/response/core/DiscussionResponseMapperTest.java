@@ -2,11 +2,11 @@ package com.future.function.web.mapper.response.core;
 
 import com.future.function.model.entity.feature.core.Discussion;
 import com.future.function.model.entity.feature.core.User;
-import com.future.function.web.model.response.feature.embedded.AuthorWebResponse;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.base.paging.Paging;
 import com.future.function.web.model.response.feature.core.DiscussionWebResponse;
+import com.future.function.web.model.response.feature.embedded.AuthorWebResponse;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.data.domain.Page;
@@ -51,7 +51,7 @@ public class DiscussionResponseMapperTest {
       .build();
   
   private static final Paging PAGING = Paging.builder()
-    .page(0)
+    .page(1)
     .size(4)
     .totalRecords(1)
     .build();

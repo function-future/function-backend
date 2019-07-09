@@ -5,11 +5,12 @@ import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.scoring.Assignment;
 import com.future.function.validation.RequestValidator;
 import com.future.function.web.model.request.scoring.AssignmentWebRequest;
-import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Optional;
 
 /**
  * Bean class used to map AssignmentWebRequest from json string

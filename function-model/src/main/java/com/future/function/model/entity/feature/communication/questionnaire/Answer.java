@@ -1,6 +1,9 @@
 package com.future.function.model.entity.feature.communication.questionnaire;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Builder

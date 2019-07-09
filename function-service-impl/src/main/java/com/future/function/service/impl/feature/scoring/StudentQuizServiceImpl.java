@@ -9,24 +9,23 @@ import com.future.function.model.entity.feature.scoring.Quiz;
 import com.future.function.model.entity.feature.scoring.StudentQuestion;
 import com.future.function.model.entity.feature.scoring.StudentQuiz;
 import com.future.function.model.entity.feature.scoring.StudentQuizDetail;
-import com.future.function.model.util.constant.FieldName;
 import com.future.function.repository.feature.scoring.StudentQuizRepository;
 import com.future.function.service.api.feature.core.UserService;
 import com.future.function.service.api.feature.scoring.StudentQuizDetailService;
 import com.future.function.service.api.feature.scoring.StudentQuizService;
 import com.future.function.service.impl.helper.CopyHelper;
 import com.future.function.service.impl.helper.PageHelper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
 
 @Service
 public class StudentQuizServiceImpl implements StudentQuizService {
