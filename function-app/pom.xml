@@ -16,25 +16,25 @@
     <dependency>
       <groupId>com.future.function</groupId>
       <artifactId>function-data-migration</artifactId>
-      <version>${project.parent.version}</version>
+      <version>${project.version}</version>
     </dependency>
 
     <dependency>
       <groupId>com.future.function</groupId>
       <artifactId>function-repository</artifactId>
-      <version>${project.parent.version}</version>
+      <version>${project.version}</version>
     </dependency>
 
     <dependency>
       <groupId>com.future.function</groupId>
       <artifactId>function-service-impl</artifactId>
-      <version>${project.parent.version}</version>
+      <version>${project.version}</version>
     </dependency>
 
     <dependency>
       <groupId>com.future.function</groupId>
       <artifactId>function-web</artifactId>
-      <version>${project.parent.version}</version>
+      <version>${project.version}</version>
     </dependency>
 
     <dependency>

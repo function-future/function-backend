@@ -14,7 +14,7 @@
     <dependency>
       <groupId>com.future.function</groupId>
       <artifactId>function-common</artifactId>
-      <version>${project.parent.version}</version>
+      <version>${project.version}</version>
     </dependency>
 
     <dependency>

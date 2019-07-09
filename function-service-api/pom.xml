@@ -16,14 +16,14 @@
     <dependency>
       <groupId>com.future.function</groupId>
       <artifactId>function-model</artifactId>
-      <version>${project.parent.version}</version>
+      <version>${project.version}</version>
       <scope>compile</scope>
     </dependency>
 
     <dependency>
       <groupId>com.future.function</groupId>
       <artifactId>function-session</artifactId>
-      <version>${project.parent.version}</version>
+      <version>${project.version}</version>
     </dependency>
 
     <dependency>
