@@ -117,4 +117,14 @@ public class BatchResponseMapperTest {
     assertThat(pagingResponse).isEqualTo(BATCH_WEB_RESPONSE_PAGING_RESPONSE);
   }
   
+  @Test
+  public void testGivenBatchByMappingToBatchWebResponseReturnBatchWebResponseObject() {
+    
+    BatchWebResponse batchWebResponse =
+      BatchResponseMapper.toBatchWebResponse(BATCH_1);
+    
+    assertThat(batchWebResponse).isNotNull();
+    assertThat(batchWebResponse).isEqualTo(BATCH_WEB_RESPONSE_1);
+  }
+  
 }

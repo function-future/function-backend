@@ -13,6 +13,6 @@ public interface QuestionBankRepository extends MongoRepository<QuestionBank, St
 
   Optional<QuestionBank> findByIdAndDeletedFalse(String id);
 
-    Page<QuestionBank> findAllByDeletedFalse(Pageable pageable);
+  Page<QuestionBank> findAllByDeletedFalse(Pageable pageable);
 
 }

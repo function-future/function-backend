@@ -3,6 +3,7 @@ package com.future.function.repository.feature.core;
 import com.future.function.model.entity.feature.core.ActivityBlog;
 import com.future.function.model.util.constant.DocumentName;
 import com.future.function.model.util.constant.FieldName;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -49,8 +50,9 @@ public class ActivityBlogRepositoryImpl
     if (StringUtils.isEmpty(userId)) {
       criteria = this.buildTitleAndDescriptionCriteria(search);
     } else {
-      criteria = Criteria.where(FieldName.ActivityBlog.USER + "_id")
-        .is(userId)
+      criteria = Criteria.where(
+        FieldName.ActivityBlog.USER + ".$" + FieldName.BaseEntity.ID)
+        .is(new ObjectId(userId))
         .andOperator(this.buildTitleAndDescriptionCriteria(search));
     }
     

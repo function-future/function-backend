@@ -7,6 +7,7 @@ import com.future.function.model.entity.feature.core.User;
 import com.future.function.repository.feature.communication.MessageRepository;
 import com.future.function.service.api.feature.communication.ChatroomService;
 import com.future.function.service.api.feature.core.UserService;
+import org.bson.types.ObjectId;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -108,6 +109,40 @@ public class MessageServiceImplTest {
   }
 
   @Test
+  public void testGivenChatroomAndMessageIdByGettingMessagesByChatroomAndMessageIdGreaterReturnPagedMessages() {
+    ObjectId objectId = new ObjectId();
+    when(chatroomService.getChatroom(CHATROOM_ID)).thenReturn(CHATROOM);
+    when(messageRepository.findAllByChatroomAndIdGreaterThanOrderByCreatedAtDesc(CHATROOM, objectId, PAGEABLE))
+            .thenReturn(new PageImpl<>(Arrays.asList(message2, message1), PAGEABLE, 2));
+
+    Page<Message> messagePage = messageService.getMessagesAfterPivot(CHATROOM_ID, objectId.toHexString(), PAGEABLE);
+
+    assertThat(messagePage.getTotalElements()).isEqualTo(2);
+    assertThat(messagePage.getContent().get(0).getId()).isEqualTo(MESSAGE_ID_2);
+    assertThat(messagePage.getContent().get(1).getId()).isEqualTo(MESSAGE_ID_1);
+
+    verify(chatroomService).getChatroom(CHATROOM_ID);
+    verify(messageRepository).findAllByChatroomAndIdGreaterThanOrderByCreatedAtDesc(CHATROOM, objectId, PAGEABLE);
+  }
+
+  @Test
+  public void testGivenChatroomAndMessageIdByGettingMessagesByChatroomAndMessageIdLessReturnPagedMessages() {
+    ObjectId objectId = new ObjectId();
+    when(chatroomService.getChatroom(CHATROOM_ID)).thenReturn(CHATROOM);
+    when(messageRepository.findAllByChatroomAndIdLessThanOrderByCreatedAtDesc(CHATROOM, objectId, PAGEABLE))
+            .thenReturn(new PageImpl<>(Arrays.asList(message2, message1), PAGEABLE, 2));
+
+    Page<Message> messagePage = messageService.getMessagesBeforePivot(CHATROOM_ID, objectId.toHexString(), PAGEABLE);
+
+    assertThat(messagePage.getTotalElements()).isEqualTo(2);
+    assertThat(messagePage.getContent().get(0).getId()).isEqualTo(MESSAGE_ID_2);
+    assertThat(messagePage.getContent().get(1).getId()).isEqualTo(MESSAGE_ID_1);
+
+    verify(chatroomService).getChatroom(CHATROOM_ID);
+    verify(messageRepository).findAllByChatroomAndIdLessThanOrderByCreatedAtDesc(CHATROOM, objectId, PAGEABLE);
+  }
+
+  @Test
   public void testGivenMessageIdByGettingMessageByMessageIdReturnMessage() {
     when(messageRepository.findOne(MESSAGE_ID_1)).thenReturn(message1);
 
@@ -151,6 +186,7 @@ public class MessageServiceImplTest {
     when(messageRepository.save(message1)).thenReturn(message1);
     when(userService.getUser(USER_ID)).thenReturn(USER);
     when(chatroomService.getChatroom(CHATROOM_ID)).thenReturn(CHATROOM);
+    when(chatroomService.updateChatroom(CHATROOM)).thenReturn(CHATROOM);
 
     message1.setChatroom(CHATROOM);
     message1.setSender(USER);
@@ -164,6 +200,7 @@ public class MessageServiceImplTest {
     verify(messageRepository).save(message1);
     verify(userService).getUser(USER_ID);
     verify(chatroomService).getChatroom(CHATROOM_ID);
+    verify(chatroomService).updateChatroom(CHATROOM);
   }
 
 

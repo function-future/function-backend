@@ -66,9 +66,8 @@ public class UserResponseMapperTest {
       .name(NAME)
       .phone(PHONE)
       .address(ADDRESS)
-      .deleted(false)
       .avatar(PICTURE.getFileUrl())
-      .batch(BATCH.getCode())
+      .batch(BatchResponseMapper.toBatchWebResponse(BATCH))
       .university(UNIVERSITY)
       .build();
   
@@ -97,7 +96,6 @@ public class UserResponseMapperTest {
       .name(NAME)
       .phone(PHONE)
       .address(ADDRESS)
-      .deleted(false)
       .avatar(PICTURE.getFileUrl())
       .build();
   
@@ -119,7 +117,7 @@ public class UserResponseMapperTest {
     USERS, PAGEABLE, USERS.size());
   
   private static final Paging PAGING = Paging.builder()
-    .page(0)
+    .page(1)
     .size(2)
     .totalRecords(2)
     .build();

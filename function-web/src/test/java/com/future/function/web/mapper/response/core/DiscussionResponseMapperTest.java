@@ -6,6 +6,7 @@ import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.base.paging.Paging;
 import com.future.function.web.model.response.feature.core.DiscussionWebResponse;
+import com.future.function.web.model.response.feature.embedded.AuthorWebResponse;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.data.domain.Page;
@@ -21,8 +22,6 @@ public class DiscussionResponseMapperTest {
   private static final String ID = "id";
   
   private static final String COURSE_ID = "course-id";
-  
-  private static final String BATCH_CODE = "batch-code";
   
   private static final String DESCRIPTION = "description";
   
@@ -40,7 +39,7 @@ public class DiscussionResponseMapperTest {
   private static final DiscussionWebResponse DISCUSSION_WEB_RESPONSE =
     DiscussionWebResponse.builder()
       .id(ID)
-      .author(new DiscussionWebResponse.Author(USER_ID, NAME))
+            .author(new AuthorWebResponse(USER_ID, NAME))
       .comment(DESCRIPTION)
       .createdAt(CREATED_AT)
       .build();
@@ -52,7 +51,7 @@ public class DiscussionResponseMapperTest {
       .build();
   
   private static final Paging PAGING = Paging.builder()
-    .page(0)
+    .page(1)
     .size(4)
     .totalRecords(1)
     .build();
@@ -72,7 +71,6 @@ public class DiscussionResponseMapperTest {
     discussion = Discussion.builder()
       .id(ID)
       .courseId(COURSE_ID)
-      .batchCode(BATCH_CODE)
       .description(DESCRIPTION)
       .user(USER)
       .build();

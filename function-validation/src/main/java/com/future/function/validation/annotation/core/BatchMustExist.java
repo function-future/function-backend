@@ -38,6 +38,6 @@ public @interface BatchMustExist {
    *
    * @return {@code String} - The name of the field.
    */
-  String field() default "batchCodes";
+  String field() default "batch";
   
 }

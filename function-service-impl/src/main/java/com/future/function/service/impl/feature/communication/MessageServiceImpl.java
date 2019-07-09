@@ -3,18 +3,18 @@ package com.future.function.service.impl.feature.communication;
 import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.communication.chatting.Chatroom;
 import com.future.function.model.entity.feature.communication.chatting.Message;
-import com.future.function.model.entity.feature.communication.chatting.MessageStatus;
 import com.future.function.repository.feature.communication.MessageRepository;
 import com.future.function.service.api.feature.communication.ChatroomService;
 import com.future.function.service.api.feature.communication.MessageService;
-import com.future.function.service.api.feature.communication.MessageStatusService;
 import com.future.function.service.api.feature.core.UserService;
 import com.future.function.service.impl.helper.PageHelper;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.Optional;
 
 /**
@@ -46,9 +46,39 @@ public class MessageServiceImpl implements MessageService {
 
   @Override
   public Page<Message> getMessages(String chatroomId, Pageable pageable) {
+    if (chatroomId.equalsIgnoreCase("public")) {
+      Chatroom publicChatroom = chatroomService.getPublicChatroom();
+      chatroomId = publicChatroom.getId();
+    }
     return Optional.of(chatroomId)
             .map(chatroomService::getChatroom)
             .map(chatroom -> messageRepository.findAllByChatroomOrderByCreatedAtDesc(chatroom, pageable))
+            .orElse(PageHelper.empty(pageable));
+  }
+
+  @Override
+  public Page<Message> getMessagesAfterPivot(String chatroomId, String messageId, Pageable pageable) {
+    if (chatroomId.equalsIgnoreCase("public")) {
+      Chatroom publicChatroom = chatroomService.getPublicChatroom();
+      chatroomId = publicChatroom.getId();
+    }
+    return Optional.of(chatroomId)
+            .map(chatroomService::getChatroom)
+            .map(chatroom -> messageRepository
+                    .findAllByChatroomAndIdGreaterThanOrderByCreatedAtDesc(chatroom, new ObjectId(messageId), pageable))
+            .orElse(PageHelper.empty(pageable));
+  }
+
+  @Override
+  public Page<Message> getMessagesBeforePivot(String chatroomId, String messageId, Pageable pageable) {
+    if (chatroomId.equalsIgnoreCase("public")) {
+      Chatroom publicChatroom = chatroomService.getPublicChatroom();
+      chatroomId = publicChatroom.getId();
+    }
+    return Optional.of(chatroomId)
+            .map(chatroomService::getChatroom)
+            .map(chatroom -> messageRepository
+                    .findAllByChatroomAndIdLessThanOrderByCreatedAtDesc(chatroom, new ObjectId(messageId), pageable))
             .orElse(PageHelper.empty(pageable));
   }
 
@@ -75,7 +105,9 @@ public class MessageServiceImpl implements MessageService {
   }
 
   private Message setChatroom(Message message) {
-    message.setChatroom(chatroomService.getChatroom(message.getChatroom().getId()));
+    Chatroom chatroom = chatroomService.getChatroom(message.getChatroom().getId());
+    chatroom.setUpdatedAt(new Date().getTime());
+    message.setChatroom(chatroomService.updateChatroom(chatroom));
     return message;
   }
 

@@ -8,6 +8,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+import java.util.Optional;
+
 /**
  * Author: PriagungSatyagama
  * Created At: 8:26 01/06/2019
@@ -24,7 +27,7 @@ public interface ChatroomRepository extends MongoRepository<Chatroom, String> {
    *
    * @return {@code Page<Chatroom>} - Paged chatting list from database
    */
-  Page<Chatroom> findAllByTypeAndMembersOrderByCreatedAtDesc(ChatroomType type, User member, Pageable pageable);
+  Page<Chatroom> findAllByTypeAndMembersOrderByUpdatedAtDesc(ChatroomType type, User member, Pageable pageable);
 
   /**
    * Find all paged chatting by title keyword and member
@@ -35,6 +38,9 @@ public interface ChatroomRepository extends MongoRepository<Chatroom, String> {
    *
    * @return {@code Page<Chatroom} - Paged chatting list from database
    */
-  Page<Chatroom> findAllByTitleContainingIgnoreCaseAndMembersOrderByCreatedAtDesc(String titleKeyword, User member, Pageable pageable);
+  Page<Chatroom> findAllByTitleContainingIgnoreCaseAndMembersOrderByUpdatedAtDesc(String titleKeyword, User member, Pageable pageable);
 
+  Optional<Chatroom> findByType(String type);
+
+  List<Chatroom> findAllByMembersContaining(List<User> members);
 }

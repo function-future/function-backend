@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.validator.constraints.NotEmpty;
+import org.hibernate.validator.constraints.NotBlank;
 
 @Data
 @Builder
@@ -12,7 +12,10 @@ import org.hibernate.validator.constraints.NotEmpty;
 @AllArgsConstructor
 public class QuestionBankWebRequest {
 
-  @NotEmpty(message = "NotEmpty")
+  @NotBlank(message = "NotBlank")
+  private String title;
+
+  @NotBlank(message = "NotBlank")
   private String description;
 
 }

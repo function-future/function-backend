@@ -65,7 +65,7 @@ public class ChatroomControllerTest extends TestHelper {
 
     private final String MESSAGE_ID = "messageId";
 
-    private final String MEMBER_ID_1 = "5d01be122dee811d8c5f32e7";
+    private final String MEMBER_ID_1 = "admin-id";
 
     private final String MEMBER_ID_2 = "idUser2";
 
@@ -89,7 +89,7 @@ public class ChatroomControllerTest extends TestHelper {
             .name(CHATROOM_TITLE)
             .build();
 
-    private final Message MESSAGE = Message.builder()
+    private Message MESSAGE = Message.builder()
             .id(MESSAGE_ID)
             .chatroom(CHATROOM)
             .text("test")
@@ -155,6 +155,8 @@ public class ChatroomControllerTest extends TestHelper {
     public void testGivenCallToChatroomsWithKeywordApiByGettingChatroomsReturnPagingResponse() throws Exception {
 
         String KEYWORD = "chat";
+        MESSAGE.setCreatedAt(1L);
+
         when(chatroomService.getChatroomsWithKeyword(KEYWORD, MEMBER_ID_1, PAGEABLE)).thenReturn(
                 new PageImpl<>(Arrays.asList(CHATROOM, CHATROOM), PAGEABLE, 2)
         );
@@ -179,6 +181,8 @@ public class ChatroomControllerTest extends TestHelper {
 
     @Test
     public void testGivenCallToChatroomsApiByGettingChatroomsReturnPagingResponse() throws Exception {
+
+        MESSAGE.setCreatedAt(1L);
 
         when(chatroomService.getChatrooms("GROUP", MEMBER_ID_1, PAGEABLE)).thenReturn(
                 new PageImpl<>(Arrays.asList(CHATROOM, CHATROOM), PAGEABLE, 2)
@@ -216,6 +220,44 @@ public class ChatroomControllerTest extends TestHelper {
                 .andExpect(content().json(pagingResponseJacksonTester.write(response).getJson()));
 
         verify(messageService).getMessages(CHATROOM_ID, PAGEABLE);
+    }
+
+    @Test
+    public void testGivenCallToChatroomsApiByGettingMessagesBeforePivotReturnPaging() throws Exception {
+
+        String messageId = "messageId";
+
+        Page<Message> messagePage = new PageImpl<>(
+                Arrays.asList(MESSAGE, MESSAGE), PAGEABLE, 2);
+        when(messageService.getMessagesBeforePivot(CHATROOM_ID, messageId, PAGEABLE)).thenReturn(messagePage);
+
+        PagingResponse<MessageResponse> response = ChatroomResponseMapper.toMessagePagingResponse(messagePage);
+
+        mockMvc.perform(get("/api/communication/chatrooms/" + CHATROOM_ID + "/messages/_before")
+                .param("messageId", messageId).cookie(cookies))
+                .andExpect(status().isOk())
+                .andExpect(content().json(pagingResponseJacksonTester.write(response).getJson()));
+
+        verify(messageService).getMessagesBeforePivot(CHATROOM_ID, messageId, PAGEABLE);
+    }
+
+    @Test
+    public void testGivenCallToChatroomsApiByGettingMessagesAfterPivotReturnPaging() throws Exception {
+
+        String messageId = "messageId";
+
+        Page<Message> messagePage = new PageImpl<>(
+                Arrays.asList(MESSAGE, MESSAGE), PAGEABLE, 2);
+        when(messageService.getMessagesAfterPivot(CHATROOM_ID, messageId, PAGEABLE)).thenReturn(messagePage);
+
+        PagingResponse<MessageResponse> response = ChatroomResponseMapper.toMessagePagingResponse(messagePage);
+
+        mockMvc.perform(get("/api/communication/chatrooms/" + CHATROOM_ID + "/messages/_after")
+                .param("messageId", messageId).cookie(cookies))
+                .andExpect(status().isOk())
+                .andExpect(content().json(pagingResponseJacksonTester.write(response).getJson()));
+
+        verify(messageService).getMessagesAfterPivot(CHATROOM_ID, messageId, PAGEABLE);
     }
 
     @Test

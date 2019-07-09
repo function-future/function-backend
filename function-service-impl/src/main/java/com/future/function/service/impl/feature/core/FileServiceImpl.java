@@ -2,6 +2,7 @@ package com.future.function.service.impl.feature.core;
 
 import com.future.function.common.enumeration.core.FileOrigin;
 import com.future.function.common.enumeration.core.Role;
+import com.future.function.common.exception.ForbiddenException;
 import com.future.function.common.exception.NotFoundException;
 import com.future.function.common.properties.core.FileProperties;
 import com.future.function.model.entity.feature.core.FileV2;
@@ -26,24 +27,24 @@ import java.util.Set;
 
 @Service
 public class FileServiceImpl implements FileService {
-  
+
   private final FileRepositoryV2 fileRepositoryV2;
-  
+
   private final ResourceService resourceService;
-  
+
   private final FileProperties fileProperties;
-  
+
   @Autowired
   public FileServiceImpl(
     FileRepositoryV2 fileRepositoryV2, ResourceService resourceService,
     FileProperties fileProperties
   ) {
-    
+
     this.fileRepositoryV2 = fileRepositoryV2;
     this.resourceService = resourceService;
     this.fileProperties = fileProperties;
   }
-  
+
   /**
    * {@inheritDoc}
    *
@@ -54,12 +55,12 @@ public class FileServiceImpl implements FileService {
    */
   @Override
   public FileV2 getFileOrFolder(String fileFolderId, String parentId) {
-    
+
     return Optional.ofNullable(fileFolderId)
       .flatMap(id -> fileRepositoryV2.findByIdAndParentIdAndDeletedFalse(id, parentId))
       .orElseThrow(() -> new NotFoundException("Get File/Folder Not Found"));
   }
-  
+
   /**
    * {@inheritDoc}
    *
@@ -71,14 +72,14 @@ public class FileServiceImpl implements FileService {
    */
   @Override
   public Page<FileV2> getFilesAndFolders(String parentId, Pageable pageable) {
-    
+
     return Optional.ofNullable(parentId)
       .map(
         id -> fileRepositoryV2.findAllByParentIdAndAsResourceFalseAndDeletedFalseOrderByMarkFolderDesc(
           id, pageable))
       .orElseGet(() -> PageHelper.empty(pageable));
   }
-  
+
   /**
    * {@inheritDoc}
    *
@@ -90,34 +91,43 @@ public class FileServiceImpl implements FileService {
    */
   @Override
   public FileV2 createFileOrFolder(
-    String parentId, String objectName, String fileName, byte[] bytes
+    Session session, String parentId, String objectName, String fileName,
+    byte[] bytes
   ) {
-    
+
     return Optional.of(bytes)
       .filter(b -> b.length != 0)
       .map(b -> this.createAndSaveFile(parentId, objectName, fileName, b))
-      .orElseGet(() -> this.createAndSaveFolder(parentId, objectName));
+      .orElseGet(() -> this.createAndSaveFolder(session, parentId, objectName));
   }
-  
-  private FileV2 createAndSaveFolder(String parentId, String objectName) {
-    
-    return fileRepositoryV2.save(this.buildFolder(parentId, objectName));
+
+  private FileV2 createAndSaveFolder(
+    Session session, String parentId, String objectName
+  ) {
+
+    return Optional.of(session)
+      .filter(sess -> AuthorizationHelper.isRoleValidForEdit(sess.getRole(),
+                                                             Role.ADMIN
+      ))
+      .map(ignored -> fileRepositoryV2.save(this.buildFolder(parentId, objectName)))
+      .orElseThrow(
+        () -> new ForbiddenException("Invalid Role For Creating Folder"));
   }
-  
+
   private FileV2 createAndSaveFile(
     String parentId, String objectName, String fileName, byte[] bytes
   ) {
-    
+
     FileV2 file = resourceService.storeFile(null, parentId, objectName,
                                             fileName, bytes, FileOrigin.FILE
     );
     file.setUsed(true);
-    
+
     return fileRepositoryV2.save(file);
   }
-  
+
   private FileV2 buildFolder(String parentId, String objectName) {
-    
+
     return FileV2.builder()
       .name(objectName)
       .parentId(parentId)
@@ -125,7 +135,7 @@ public class FileServiceImpl implements FileService {
       .markFolder(true)
       .build();
   }
-  
+
   /**
    * {@inheritDoc}
    *
@@ -143,9 +153,9 @@ public class FileServiceImpl implements FileService {
     Session session, String fileOrFolderId, String parentId, String objectName,
     String fileName, byte[] bytes
   ) {
-    
+
     FileV2 fileV2 = this.getFileOrFolder(fileOrFolderId, parentId);
-    
+
     return Optional.of(fileV2)
       .filter(file -> !file.isMarkFolder())
       .map(file -> this.updateFile(file, session, fileOrFolderId, parentId,
@@ -153,9 +163,9 @@ public class FileServiceImpl implements FileService {
       ))
       .orElseGet(() -> this.updateFolder(session, fileV2, objectName));
   }
-  
+
   private FileV2 updateFolder(Session session, FileV2 fileV2, String name) {
-    
+
     fileV2.setName(name);
     return Optional.of(fileV2)
       .filter(
@@ -166,12 +176,12 @@ public class FileServiceImpl implements FileService {
       .map(fileRepositoryV2::save)
       .orElse(fileV2);
   }
-  
+
   private FileV2 updateFile(
     FileV2 fileV2, Session session, String fileOrFolderId, String parentId,
     String objectName, String fileName, byte[] bytes
   ) {
-    
+
     return Optional.of(fileV2)
       .filter(
         file -> AuthorizationHelper.isAuthorizedForEdit(session.getEmail(),
@@ -188,13 +198,13 @@ public class FileServiceImpl implements FileService {
       .map(this::copyPropertiesAndSaveFileV2)
       .orElse(fileV2);
   }
-  
+
   private FileV2 copyPropertiesAndSaveFileV2(Pair<FileV2, FileV2> pair) {
-    
+
     CopyHelper.copyProperties(pair.getFirst(), pair.getSecond());
     return fileRepositoryV2.save(pair.getSecond());
   }
-  
+
   /**
    * {@inheritDoc}
    *
@@ -206,7 +216,7 @@ public class FileServiceImpl implements FileService {
   public void deleteFileOrFolder(
     Session session, String parentId, String fileFolderId
   ) {
-    
+
     Optional.ofNullable(fileFolderId)
       .filter(id -> !id.equalsIgnoreCase(fileProperties.getRootId()))
       .flatMap(id -> fileRepositoryV2.findByIdAndParentIdAndDeletedFalse(id, parentId))
@@ -217,23 +227,23 @@ public class FileServiceImpl implements FileService {
         ))
       .ifPresent(file -> {
         List<String> fileIds = this.getListOfIdToBeMarked(file);
-        
+
         resourceService.markFilesUsed(fileIds, false);
-        
+
         // Prevents optimistic locking
         Iterable<FileV2> files = fileRepositoryV2.findAll(fileIds);
-        
+
         files.forEach(fileV2 -> fileV2.setDeleted(true));
         fileRepositoryV2.save(files);
       });
   }
-  
+
   private List<String> getListOfIdToBeMarked(FileV2 file) {
-    
+
     Set<String> fileIds = new HashSet<>();
-  
+
     String fileId = file.getId();
-  
+
     List<FileV2> filesWithFileAsParent = fileRepositoryV2.findAllByParentIdAndDeletedFalse(
       fileId);
     if (!filesWithFileAsParent.isEmpty()) {
@@ -244,13 +254,13 @@ public class FileServiceImpl implements FileService {
           collectedFileIds.addAll(retrievedFileIds);
           return collectedFileIds;
         });
-    
+
       fileIds.addAll(ids);
     }
-  
+
     fileIds.add(fileId);
-  
+
     return new ArrayList<>(fileIds);
   }
-  
+
 }

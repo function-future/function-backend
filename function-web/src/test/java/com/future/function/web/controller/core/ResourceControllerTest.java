@@ -41,63 +41,63 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import(TestSecurityConfiguration.class)
 @WebMvcTest(value = ResourceController.class)
 public class ResourceControllerTest extends TestHelper {
-  
+
   private static final byte[] BYTES = new byte[0];
-  
+
   private static final String NAME = "name";
-  
+
   private static final String ORIGINAL_NAME = NAME + ".txt";
-  
+
   private static final String ORIGIN = "ANNOUNCEMENT";
-  
+
   private static final String ID = "id";
-  
+
   private static final String FILE_URL = "file-url";
-  
+
   private static final FileV2 FILE_V2_NULL_THUMBNAIL = FileV2.builder()
     .id(ID)
     .name(NAME)
     .fileUrl(FILE_URL)
     .thumbnailUrl(null)
     .build();
-  
+
   private static final DataResponse<FileWebResponse>
     CREATED_DATA_RESPONSE_NULL_THUMBNAIL =
     ResourceResponseMapper.toResourceDataResponse(FILE_V2_NULL_THUMBNAIL);
-  
+
   @MockBean
   private ResourceService resourceService;
-  
+
   @MockBean
   private ResourceRequestMapper resourceRequestMapper;
-  
+
   @Override
   @Before
   public void setUp() {
-    
+
     super.setUp();
     super.setCookie(Role.MENTOR);
   }
-  
+
   @After
   public void tearDown() {
-    
+
     verifyNoMoreInteractions(resourceService, resourceRequestMapper);
   }
-  
+
   @Test
   public void testGivenApiCallByStoringFileReturnDataResponseObject()
     throws Exception {
-    
+
     Pair<String, byte[]> pair = Pair.of(NAME, BYTES);
-    
+
     when(resourceRequestMapper.toStringAndByteArrayPair(
       any(MultipartFile.class))).thenReturn(pair);
     when(resourceService.storeAndSaveFile(null, NAME, BYTES,
                                           FileOrigin.ANNOUNCEMENT
     )).thenReturn(FILE_V2_NULL_THUMBNAIL);
-    
-    mockMvc.perform(post("/api/resources").cookie(cookies)
+
+    mockMvc.perform(post("/api/core/resources").cookie(cookies)
                       .contentType(MediaType.MULTIPART_FORM_DATA)
                       .param("file", "")
                       .param("origin", ORIGIN))
@@ -105,17 +105,17 @@ public class ResourceControllerTest extends TestHelper {
       .andExpect(content().json(
         dataResponseJacksonTester.write(CREATED_DATA_RESPONSE_NULL_THUMBNAIL)
           .getJson()));
-    
+
     verify(resourceRequestMapper).toStringAndByteArrayPair(
       any(MultipartFile.class));
     verify(resourceService).storeAndSaveFile(
       null, NAME, BYTES, FileOrigin.ANNOUNCEMENT);
   }
-  
+
   @Test
   public void testGivenApiCallAndFileNameByGettingFileAsByteArrayReturnByteArray()
     throws Exception {
-    
+
     when(resourceRequestMapper.getMediaType(eq(ORIGINAL_NAME),
                                             any(HttpServletRequest.class)
     )).thenReturn(MediaType.TEXT_PLAIN);
@@ -123,21 +123,21 @@ public class ResourceControllerTest extends TestHelper {
       resourceService.getFileAsByteArray(ORIGINAL_NAME, FileOrigin.ANNOUNCEMENT,
                                          null
       )).thenReturn(BYTES);
-    
+
     mockMvc.perform(
-      get("/api/resources/" + ORIGIN + "/" + ORIGINAL_NAME).cookie(cookies))
+      get("/api/core/resources/" + ORIGIN + "/" + ORIGINAL_NAME).cookie(cookies))
       .andExpect(status().isOk())
       .andExpect(header().string(HttpHeaders.CONTENT_DISPOSITION,
                                  "attachment; filename=\"" + ORIGINAL_NAME +
                                  "\""
       ))
       .andExpect(content().bytes(BYTES));
-    
+
     verify(resourceRequestMapper).getMediaType(
       eq(ORIGINAL_NAME), any(HttpServletRequest.class));
     verify(resourceService).getFileAsByteArray(
       ORIGINAL_NAME, FileOrigin.ANNOUNCEMENT, null);
     verifyZeroInteractions(resourceRequestMapper);
   }
-  
+
 }

@@ -8,18 +8,18 @@ import java.util.List;
 
 public interface StudentQuizDetailService {
 
-    StudentQuizDetail findLatestByStudentQuizId(String studentQuizId);
+  StudentQuizDetail findLatestByStudentQuizId(String studentQuizId);
 
-    List<StudentQuestion> findAllQuestionsByStudentQuizId(String studentQuizId);
+  List<StudentQuestion> findAllQuestionsByStudentQuizId(String studentQuizId);
 
-    List<StudentQuestion> findAllUnansweredQuestionsByStudentQuizId(String studentQuizId);
+  List<StudentQuestion> findAllUnansweredQuestionsByStudentQuizId(String studentQuizId);
 
-    StudentQuizDetail answerStudentQuiz(String studentQuizId, List<StudentQuestion> answers);
+  StudentQuizDetail answerStudentQuiz(String studentQuizId, List<StudentQuestion> answers);
 
-    StudentQuizDetail createStudentQuizDetail(StudentQuiz studentQuiz, List<StudentQuestion> questions);
+  StudentQuizDetail createStudentQuizDetail(StudentQuiz studentQuiz, List<StudentQuestion> questions);
 
-    List<StudentQuestion> validateQuestionsAndCreateStudentQuestions(StudentQuizDetail studentQuizDetail,
-                                                                     List<StudentQuestion> questions);
+  List<StudentQuestion> validateQuestionsAndCreateStudentQuestions(StudentQuizDetail studentQuizDetail,
+      List<StudentQuestion> questions);
 
-    void deleteByStudentQuiz(StudentQuiz studentQuiz);
+  void deleteByStudentQuiz(StudentQuiz studentQuiz);
 }

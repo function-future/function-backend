@@ -19,13 +19,17 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
 import static com.googlecode.catchexception.CatchException.catchException;
 import static com.googlecode.catchexception.CatchException.caughtException;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 /**
  * Author: PriagungSatyagama
@@ -98,7 +102,7 @@ public class ChatroomServiceImplTest {
   public void testGivenTypeAndMemberByGettingChatroomByTypeAndMemberReturnPagedChatrooms() {
 
     when(userService.getUser(USER_ID_1)).thenReturn(MEMBER_1);
-    when(chatroomRepository.findAllByTypeAndMembersOrderByCreatedAtDesc(TYPE, MEMBER_1, PAGEABLE))
+    when(chatroomRepository.findAllByTypeAndMembersOrderByUpdatedAtDesc(TYPE, MEMBER_1, PAGEABLE))
             .thenReturn(new PageImpl<>(Collections.singletonList(chatroom), PAGEABLE, 1));
 
     Page<Chatroom> chatroomPage = chatroomService.getChatrooms(TYPE.name(), USER_ID_1, PAGEABLE);
@@ -112,13 +116,13 @@ public class ChatroomServiceImplTest {
     assertThat(chatroomPage.getContent().get(0).getMembers().contains(MEMBER_2)).isTrue();
 
     verify(userService).getUser(USER_ID_1);
-    verify(chatroomRepository).findAllByTypeAndMembersOrderByCreatedAtDesc(TYPE, MEMBER_1, PAGEABLE);
+    verify(chatroomRepository).findAllByTypeAndMembersOrderByUpdatedAtDesc(TYPE, MEMBER_1, PAGEABLE);
   }
 
   @Test
   public void testGivenKeywordAndMemberByGettingChatroomByKeywordAndMemberReturnPagedChatrooms() {
     when(userService.getUser(USER_ID_1)).thenReturn(MEMBER_1);
-    when(chatroomRepository.findAllByTitleContainingIgnoreCaseAndMembersOrderByCreatedAtDesc(KEYWORD, MEMBER_1, PAGEABLE))
+    when(chatroomRepository.findAllByTitleContainingIgnoreCaseAndMembersOrderByUpdatedAtDesc(KEYWORD, MEMBER_1, PAGEABLE))
             .thenReturn(new PageImpl<>(Collections.singletonList(chatroom), PAGEABLE, 1));
 
     Page<Chatroom> chatroomPage = chatroomService.getChatroomsWithKeyword(KEYWORD, USER_ID_1, PAGEABLE);
@@ -132,7 +136,7 @@ public class ChatroomServiceImplTest {
     assertThat(chatroomPage.getContent().get(0).getMembers().contains(MEMBER_2)).isTrue();
 
     verify(userService).getUser(USER_ID_1);
-    verify(chatroomRepository).findAllByTitleContainingIgnoreCaseAndMembersOrderByCreatedAtDesc(
+    verify(chatroomRepository).findAllByTitleContainingIgnoreCaseAndMembersOrderByUpdatedAtDesc(
             KEYWORD, MEMBER_1, PAGEABLE);
   }
 
@@ -178,6 +182,27 @@ public class ChatroomServiceImplTest {
     verify(userService).getUser(USER_ID_1);
     verify(userService).getUser(USER_ID_2);
     verify(chatroomRepository).save(chatroom);
+  }
+
+  @Test
+  public void testGivenChatroomByCreatingPrivateChatroomReturnExistingChatroom() {
+    when(userService.getUser(USER_ID_1)).thenReturn(MEMBER_1);
+    when(userService.getUser(USER_ID_2)).thenReturn(MEMBER_2);
+    when(chatroomRepository.save(chatroom)).thenReturn(chatroom);
+    when(chatroomRepository.findAllByMembersContaining(Arrays.asList(MEMBER_1, MEMBER_2))).thenReturn(new ArrayList<>());
+
+    chatroom.setType(ChatroomType.PRIVATE);
+
+    Chatroom chatroomResult = chatroomService.createChatroom(chatroom);
+
+    assertThat(chatroomResult).isNotNull();
+    assertThat(chatroomResult.getId()).isEqualTo(CHATROOM_ID);
+    assertThat(chatroomResult.getType()).isEqualTo(ChatroomType.PRIVATE);
+
+    verify(userService, times(2)).getUser(USER_ID_1);
+    verify(userService, times(2)).getUser(USER_ID_2);
+    verify(chatroomRepository).save(chatroom);
+    verify(chatroomRepository).findAllByMembersContaining(Arrays.asList(MEMBER_1, MEMBER_2));
   }
 
   @Test

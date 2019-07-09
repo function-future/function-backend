@@ -108,7 +108,8 @@ public class FileController {
     
     return FileResponseMapper.toFileDataResponse(
       HttpStatus.CREATED, fileService.createFileOrFolder(
-        parentId, request.getName(), pair.getFirst(), pair.getSecond()));
+        session, parentId, request.getName(), pair.getFirst(),
+        pair.getSecond()));
   }
   
   @ResponseStatus(HttpStatus.OK)

@@ -16,11 +16,12 @@ public interface QuizRepository extends MongoRepository<Quiz, String> {
 
   /**
    * Used to find existing quiz with its id and is not deleted in the database
+   *
    * @param id (String)
    * @return Optional<Quiz>
    */
   Optional<Quiz> findByIdAndDeletedFalse(String id);
 
-    Page<Quiz> findAllByDeletedFalse(Pageable pageable);
+  Page<Quiz> findAllByDeletedFalse(Pageable pageable);
 
 }

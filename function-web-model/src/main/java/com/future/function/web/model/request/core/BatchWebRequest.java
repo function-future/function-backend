@@ -6,8 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import javax.validation.constraints.NotNull;
+import org.hibernate.validator.constraints.NotBlank;
 
 /**
  * Model representation for batch web request.
@@ -22,7 +21,7 @@ public class BatchWebRequest {
   
   @NoSpace
   @UniqueBatchCode
-  @NotNull(message = "NotNull")
+  @NotBlank(message = "NotBlank")
   private String code;
   
 }
