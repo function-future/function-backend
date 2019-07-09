@@ -17,8 +17,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 
@@ -69,6 +67,7 @@ public class QuestionnaireParticipantRepositoryTest {
             .member(user1)
             .participantType(ParticipantType.fromString("APPRAISER"))
             .build();
+
     QuestionnaireParticipant questionnaireParticipant2 = QuestionnaireParticipant.builder()
             .id(ID_2)
             .questionnaire(questionnaire2)
@@ -76,6 +75,7 @@ public class QuestionnaireParticipantRepositoryTest {
             .participantType(ParticipantType.fromString("APPRAISER"))
             .build();
 
+    questionnaireParticipant2.setDeleted(true);
     userRepository.save(user1);
     questionnaireRepository.save(questionnaire1);
     questionnaireRepository.save(questionnaire2);
@@ -95,26 +95,32 @@ public class QuestionnaireParticipantRepositoryTest {
     testByGivenMemberAndParticipantTypeByFindingAllQuestionnaireParticipantReturnPagedQuestionnaireParticipant() {
       Page<QuestionnaireParticipant> questionnaireParticipants =
               questionnaireParticipantRepository
-                      .findAllByMemberAndParticipantType(user1, ParticipantType.fromString("APPRAISER"), PAGEABLE);
+                      .findAllByMemberAndParticipantTypeAndDeletedFalse(user1, ParticipantType.fromString("APPRAISER"), PAGEABLE);
 
-      assertThat(questionnaireParticipants.getTotalElements()).isEqualTo(2);
+      assertThat(questionnaireParticipants.getTotalElements()).isEqualTo(1);
       assertThat(questionnaireParticipants.getContent().get(0).getId()).isEqualTo(ID_1);
       assertThat(questionnaireParticipants.getContent().get(0).getMember().getId()).isEqualTo(ID_USER_1);
       assertThat(questionnaireParticipants.getContent().get(0).getQuestionnaire().getId()).isEqualTo(ID_QUESTIONNAIRE1);
-      assertThat(questionnaireParticipants.getContent().get(1).getId()).isEqualTo(ID_2);
-      assertThat(questionnaireParticipants.getContent().get(1).getMember().getId()).isEqualTo(ID_USER_1);
-      assertThat(questionnaireParticipants.getContent().get(1).getQuestionnaire().getId()).isEqualTo(ID_QUESTIONNAIRE2);
+//      assertThat(questionnaireParticipants.getContent().get(1).getId()).isEqualTo(ID_2);
+//      assertThat(questionnaireParticipants.getContent().get(1).getMember().getId()).isEqualTo(ID_USER_1);
+//      assertThat(questionnaireParticipants.getContent().get(1).getQuestionnaire().getId()).isEqualTo(ID_QUESTIONNAIRE2);
   }
 
   @Test
   public void testByGivenQuestionnaireByFindingAllQuestionnaireParticipantReturnListQuestionnaireParticipant() {
-    List<QuestionnaireParticipant> questionnaireParticipants =
-            questionnaireParticipantRepository.findAllByQuestionnaire(questionnaire1);
+    Page<QuestionnaireParticipant> questionnaireParticipants =
+            questionnaireParticipantRepository.findAllByQuestionnaireAndDeletedFalse(questionnaire1, PAGEABLE);
 
-    System.out.println(questionnaireParticipants.get(0).toString());
-    assertThat(questionnaireParticipants.size()).isEqualTo(1);
-    assertThat(questionnaireParticipants.get(0).getId()).isEqualTo(ID_1);
-    assertThat(questionnaireParticipants.get(0).getMember().getId()).isEqualTo(ID_USER_1);
-    assertThat(questionnaireParticipants.get(0).getQuestionnaire().getId()).isEqualTo(ID_QUESTIONNAIRE1);
+//    System.out.println(questionnaireParticipants.get(0)./toString());
+    assertThat(questionnaireParticipants.getTotalElements()).isEqualTo(1);
+    assertThat(questionnaireParticipants.getContent().get(0).getId()).isEqualTo(ID_1);
+    assertThat(questionnaireParticipants.getContent().get(0).getMember().getId()).isEqualTo(ID_USER_1);
+    assertThat(questionnaireParticipants.getContent().get(0).getQuestionnaire().getId()).isEqualTo(ID_QUESTIONNAIRE1);
+
+    questionnaireParticipants =
+      questionnaireParticipantRepository.findAllByQuestionnaireAndDeletedFalse(questionnaire2, PAGEABLE);
+
+    assertThat(questionnaireParticipants.getTotalElements()).isEqualTo(0);
+
   }
 }

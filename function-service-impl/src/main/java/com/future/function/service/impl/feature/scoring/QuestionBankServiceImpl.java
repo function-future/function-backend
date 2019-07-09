@@ -5,12 +5,12 @@ import com.future.function.model.entity.feature.scoring.QuestionBank;
 import com.future.function.repository.feature.scoring.QuestionBankRepository;
 import com.future.function.service.api.feature.scoring.QuestionBankService;
 import com.future.function.service.impl.helper.CopyHelper;
-import java.util.Optional;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 public class QuestionBankServiceImpl implements QuestionBankService {

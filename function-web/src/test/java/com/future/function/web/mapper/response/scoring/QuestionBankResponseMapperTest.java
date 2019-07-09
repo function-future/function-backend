@@ -6,9 +6,9 @@ import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.base.paging.Paging;
 import com.future.function.web.model.response.feature.scoring.QuestionBankWebResponse;
-import java.util.Collections;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -16,8 +16,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 
+import java.util.Collections;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Ignore
 public class QuestionBankResponseMapperTest {
 
   private static final String QUESTION_BANK_ID = "questionbank-id";

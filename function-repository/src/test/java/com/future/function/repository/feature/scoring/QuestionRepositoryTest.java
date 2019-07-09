@@ -2,9 +2,6 @@ package com.future.function.repository.feature.scoring;
 
 import com.future.function.model.entity.feature.scoring.Question;
 import com.future.function.model.entity.feature.scoring.QuestionBank;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,6 +13,10 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

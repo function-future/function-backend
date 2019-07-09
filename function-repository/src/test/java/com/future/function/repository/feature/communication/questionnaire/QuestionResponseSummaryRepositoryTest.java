@@ -28,11 +28,15 @@ public class QuestionResponseSummaryRepositoryTest {
 
   private static final String ID_2 = "id_2";
 
+  private static final String ID_3 = "id_3";
+
   private static final String ID_USER_1 = "id_user1";
 
   private static final String QUESTION_ID1 = "question_id1";
 
   private static final String QUESTION_ID2 = "question_id2";
+
+  private static final String QUESTION_ID3 = "question_id3";
 
   private static final String QUESTIONNAIRE_ID = "questionnaire_id";
 
@@ -47,6 +51,11 @@ public class QuestionResponseSummaryRepositoryTest {
   private QuestionQuestionnaire question2 = QuestionQuestionnaire.builder()
           .id(QUESTION_ID2)
           .build();
+
+  private QuestionQuestionnaire question3 = QuestionQuestionnaire.builder()
+          .id(QUESTION_ID3)
+          .build();
+
 
   private Questionnaire questionnaire = Questionnaire.builder()
           .id(QUESTIONNAIRE_ID)
@@ -87,12 +96,23 @@ public class QuestionResponseSummaryRepositoryTest {
             .questionnaire(questionnaire)
             .build();
 
+    QuestionResponseSummary qRS3 = QuestionResponseSummary.builder()
+            .id(ID_3)
+            .appraisee(appraisee)
+            .question(question3)
+            .questionnaire(questionnaire)
+            .build();
+
+    qRS3.setDeleted(true);
+
     userRepository.save(appraisee);
     questionQuestionnaireRepository.save(question1);
     questionQuestionnaireRepository.save(question2);
+    questionQuestionnaireRepository.save(question3);
     questionnaireRepository.save(questionnaire);
     questionResponseSummaryRepository.save(qRS1);
     questionResponseSummaryRepository.save(qRS2);
+    questionResponseSummaryRepository.save(qRS3);
   }
 
   @After
@@ -108,7 +128,7 @@ public class QuestionResponseSummaryRepositoryTest {
     testGivenQuestionnaireAndAppraiseeByFindingAllQuestionResponseSummaryReturnedListQuestionResponseSummary() {
       List<QuestionResponseSummary> questionResponseSummaries =
               questionResponseSummaryRepository
-                      .findAllByQuestionnaireAndAppraisee(questionnaire, appraisee);
+                      .findAllByQuestionnaireAndAppraiseeAndDeletedFalse(questionnaire, appraisee);
 
       assertThat(questionResponseSummaries.size()).isEqualTo(2);
       assertThat(questionResponseSummaries.get(0).getId()).isEqualTo(ID_1);
@@ -118,9 +138,16 @@ public class QuestionResponseSummaryRepositoryTest {
   @Test
   public void testGivenAppraiseeAndQuestionByFindingQuestionResponseSummaryReturnedQuestionResponseSummary() {
     Optional<QuestionResponseSummary> questionResponseSummary =
-            questionResponseSummaryRepository.findAllByAppraiseeAndQuestionQuestionnaire(appraisee,question1);
+            questionResponseSummaryRepository.findByAppraiseeAndQuestionQuestionnaireAndDeletedFalse(appraisee,question1);
 
     assertThat(questionResponseSummary.get().getId()).isEqualTo(ID_1);
     assertThat(questionResponseSummary.get().getScoreSummary().getId()).isEqualTo(ANSWER_ID);
+
+    Optional<QuestionResponseSummary> questionResponseSummary2 =
+      questionResponseSummaryRepository.findByAppraiseeAndQuestionQuestionnaireAndDeletedFalse(appraisee,question3);
+
+    System.out.println(questionResponseSummary.get());
+    assertThat(questionResponseSummary2.isPresent()).isEqualTo(false);
+
   }
 }

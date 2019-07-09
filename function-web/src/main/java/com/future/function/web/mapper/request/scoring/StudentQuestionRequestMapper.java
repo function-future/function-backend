@@ -3,10 +3,11 @@ package com.future.function.web.mapper.request.scoring;
 import com.future.function.model.entity.feature.scoring.StudentQuestion;
 import com.future.function.validation.RequestValidator;
 import com.future.function.web.model.request.scoring.StudentQuestionWebRequest;
-import java.util.List;
-import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class StudentQuestionRequestMapper {
