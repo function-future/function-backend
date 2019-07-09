@@ -48,7 +48,6 @@ public class RoomResponseMapperTest {
   private RoomWebResponse roomWebResponse;
   private BatchWebResponse batchWebResponse;
   private UserWebResponse userWebResponse;
-  private BatchWebResponse batchWebResponse;
   private DataResponse<RoomWebResponse> roomWebResponseDataResponse;
   private PagingResponse<RoomWebResponse> roomWebResponsePagingResponse;
 
