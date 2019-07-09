@@ -13,17 +13,17 @@ import java.util.Optional;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class AuthResponseMapper {
-  
+
   public static DataResponse<AuthWebResponse> toAuthDataResponse(User user) {
-    
+
     return ResponseHelper.toDataResponse(HttpStatus.OK,
                                          AuthResponseMapper.buildAuthWebResponse(
                                            user)
     );
   }
-  
+
   private static AuthWebResponse buildAuthWebResponse(User user) {
-    
+
     return AuthWebResponse.builder()
       .id(user.getId())
       .name(user.getName())
@@ -33,19 +33,19 @@ public final class AuthResponseMapper {
       .avatar(AuthResponseMapper.getThumbnailUrl(user.getPictureV2()))
       .build();
   }
-  
+
   private static String getThumbnailUrl(FileV2 file) {
-    
+
     return Optional.ofNullable(file)
       .map(FileV2::getThumbnailUrl)
       .orElseGet(() -> AuthResponseMapper.getFileUrl(file));
   }
-  
+
   private static String getFileUrl(FileV2 file) {
-    
+
     return Optional.ofNullable(file)
       .map(FileV2::getFileUrl)
       .orElse(null);
   }
-  
+
 }

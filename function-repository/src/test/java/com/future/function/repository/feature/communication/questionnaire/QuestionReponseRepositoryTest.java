@@ -25,6 +25,8 @@ public class QuestionReponseRepositoryTest {
 
   private static final String ID_2 ="id_2";
 
+  private static final String ID_3 ="id_3";
+
   private static final String QUESTION_ID = "question_id";
 
   private static final String ID_USER_1 = "id_user1";
@@ -60,10 +62,19 @@ public class QuestionReponseRepositoryTest {
             .appraisee(appraisee)
             .build();
 
+    QuestionResponse questionResponse3 = QuestionResponse.builder()
+            .id(ID_3)
+            .question(question)
+            .appraisee(appraisee)
+            .build();
+
+    questionResponse3.setDeleted(true);
+
     userRepository.save(appraisee);
     questionQuestionnaireRepository.save(question);
     questionResponseRepository.save(questionResponse1);
     questionResponseRepository.save(questionResponse2);
+    questionResponseRepository.save(questionResponse3);
 
   }
 
@@ -76,7 +87,7 @@ public class QuestionReponseRepositoryTest {
   @Test
   public void testGivenQuestionAndAppraiseeByFindingAllQuestionsReponseReturnedListQuestionsResponse() {
     List<QuestionResponse> questionResponses =
-            questionResponseRepository.findAllByQuestionQuestionnaireAndAppraisee(question, appraisee);
+            questionResponseRepository.findAllByQuestionQuestionnaireAndAppraiseeAndDeletedFalse(question, appraisee);
 
     System.out.println(questionResponses.get(0).toString());
 

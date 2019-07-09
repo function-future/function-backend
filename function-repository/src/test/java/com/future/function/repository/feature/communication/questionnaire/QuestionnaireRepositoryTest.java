@@ -9,10 +9,9 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.junit4.SpringRunner;
-
 
 import java.util.Optional;
 
@@ -54,6 +53,8 @@ public class QuestionnaireRepositoryTest {
             .build();
 
     questionnaireRepository.save(questionnaire1);
+
+    questionnaire2.setDeleted(true);
     questionnaireRepository.save(questionnaire2);
   }
 
@@ -64,11 +65,11 @@ public class QuestionnaireRepositoryTest {
 
   @Test
   public void testByFindingAllQuestionnaireReturnPagedQuestionnaire() {
-    Page<Questionnaire> questionnaires = questionnaireRepository.findAll(PAGEABLE);
+    Page<Questionnaire> questionnaires = questionnaireRepository.findAllByDeletedFalse(PAGEABLE);
 
-    assertThat(questionnaires.getTotalElements()).isEqualTo(2);
+    assertThat(questionnaires.getTotalElements()).isEqualTo(1);
     assertThat(questionnaires.getContent().get(0).getTitle()).isEqualTo(TITLE_1);
-    assertThat(questionnaires.getContent().get(1).getTitle()).isEqualTo(TITLE_2);
+//    assertThat(questionnaires.getContent().get(1).getTitle()).isEqualTo(TITLE_2);
   }
 
   @Test
@@ -82,10 +83,10 @@ public class QuestionnaireRepositoryTest {
 
   @Test
   public void testGivenTitleSoughtByFindingAllQuestionnaireReturnPagedQuestionnaire() {
-    Page<Questionnaire> questionnaires = questionnaireRepository.findAllByTitleIgnoreCaseContaining("bc", PAGEABLE);
+    Page<Questionnaire> questionnaires = questionnaireRepository.findAllByTitleIgnoreCaseContainingAndDeletedFalse("bc", PAGEABLE);
 
-    assertThat(questionnaires.getTotalElements()).isEqualTo(2);
+    assertThat(questionnaires.getTotalElements()).isEqualTo(1);
     assertThat(questionnaires.getContent().get(0).getTitle()).isEqualTo(TITLE_1);
-    assertThat(questionnaires.getContent().get(1).getTitle()).isEqualTo(TITLE_2);
+//    assertThat(questionnaires.getContent().get(1).getTitle()).isEqualTo(TITLE_2);
   }
 }

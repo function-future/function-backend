@@ -18,7 +18,7 @@ public interface QuestionnaireRepository extends MongoRepository<Questionnaire, 
    *
    * @return {@code Page<Questionnaire>} - paged qustionnaire list from database
    */
-  Page<Questionnaire> findAll (Pageable pageable);
+  Page<Questionnaire> findAllByDeletedFalse (Pageable pageable);
 
   /**
    * Find questionnaire by questionnaireId
@@ -39,6 +39,6 @@ public interface QuestionnaireRepository extends MongoRepository<Questionnaire, 
    * @return {@code Page<Questionnaire>} - paged questionnaire list from database
    */
 
-  Page<Questionnaire> findAllByTitleIgnoreCaseContaining(String titleName, Pageable pageable);
+  Page<Questionnaire> findAllByTitleIgnoreCaseContainingAndDeletedFalse(String titleName, Pageable pageable);
 
 }

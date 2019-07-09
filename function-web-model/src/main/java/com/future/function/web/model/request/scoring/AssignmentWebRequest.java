@@ -2,15 +2,16 @@ package com.future.function.web.model.request.scoring;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.future.function.validation.annotation.core.FileMustExist;
-import java.util.List;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.NotEmpty;
+
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import java.util.List;
 
 /**
  * Represent the assignment request in the web as AssignmentWebRequest

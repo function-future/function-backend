@@ -16,98 +16,98 @@ import java.util.List;
 
 @Configuration
 public class MvcConfiguration implements WebMvcConfigurer {
-  
+
   private final SessionResolver sessionResolver;
-  
+
   @Autowired
   public MvcConfiguration(SessionResolver sessionResolver) {
-    
+
     this.sessionResolver = sessionResolver;
   }
-  
+
   @Override
   public void configurePathMatch(PathMatchConfigurer configurer) {}
-  
+
   @Override
   public void configureContentNegotiation(
     ContentNegotiationConfigurer configurer
   ) {}
-  
+
   @Override
   public void configureAsyncSupport(AsyncSupportConfigurer configurer) {}
-  
+
   @Override
   public void configureDefaultServletHandling(
     DefaultServletHandlerConfigurer configurer
   ) {}
-  
+
   @Override
   public void addFormatters(FormatterRegistry registry) {}
-  
+
   @Override
   public void addInterceptors(InterceptorRegistry registry) {}
-  
+
   @Override
   public void addResourceHandlers(ResourceHandlerRegistry registry) {
-    
+
     registry.addResourceHandler("swagger-ui.html")
       .addResourceLocations("classpath:/META-INF/resources/");
     registry.addResourceHandler("/webjars/**")
       .addResourceLocations("classpath:/META-INF/resources/webjars/");
   }
-  
+
   @Override
   public void addCorsMappings(CorsRegistry registry) {}
-  
+
   @Override
   public void addViewControllers(ViewControllerRegistry registry) {}
-  
+
   @Override
   public void configureViewResolvers(ViewResolverRegistry registry) {}
-  
+
   @Override
   public void addArgumentResolvers(
     List<HandlerMethodArgumentResolver> argumentResolvers
   ) {
-    
+
     argumentResolvers.add(sessionResolver);
   }
-  
+
   @Override
   public void addReturnValueHandlers(
     List<HandlerMethodReturnValueHandler> returnValueHandlers
   ) {}
-  
+
   @Override
   public void configureMessageConverters(
     List<HttpMessageConverter<?>> converters
   ) {}
-  
+
   @Override
   public void extendMessageConverters(
     List<HttpMessageConverter<?>> converters
   ) {}
-  
+
   @Override
   public void configureHandlerExceptionResolvers(
     List<HandlerExceptionResolver> exceptionResolvers
   ) {}
-  
+
   @Override
   public void extendHandlerExceptionResolvers(
     List<HandlerExceptionResolver> exceptionResolvers
   ) {}
-  
+
   @Override
   public Validator getValidator() {
-    
+
     return null;
   }
-  
+
   @Override
   public MessageCodesResolver getMessageCodesResolver() {
-    
+
     return null;
   }
-  
+
 }

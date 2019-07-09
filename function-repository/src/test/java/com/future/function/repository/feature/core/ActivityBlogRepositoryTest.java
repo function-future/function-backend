@@ -3,6 +3,7 @@ package com.future.function.repository.feature.core;
 import com.future.function.model.entity.feature.core.ActivityBlog;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.repository.TestApplication;
+import org.bson.types.ObjectId;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,7 +22,7 @@ public class ActivityBlogRepositoryTest {
   
   private static final PageRequest PAGEABLE = new PageRequest(0, 5);
   
-  private static final String USER_ID = "user-id";
+  private static final String USER_ID = new ObjectId().toHexString();
   
   private static final User USER = User.builder()
     .id(USER_ID)
