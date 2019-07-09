@@ -23,20 +23,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class QuizResponseMapperTest {
 
-  private static String QUIZ_ID;
   private static final String QUIZ_TITLE = "quiz-title";
   private static final String QUIZ_DESCRIPTION = "quiz-description";
   private static final long DATE = 150000;
   private static final long QUIZ_TIME_LIMIT = 15000;
   private static final int QUIZ_QUESTION_COUNT = 2;
   private static final int QUIZ_TRIALS = 3;
-    private static final String BATCH_CODE = "3";
-
+  private static final String BATCH_CODE = "3";
   private static final int PAGE = 0;
   private static final int SIZE = 10;
-
+  private static String QUIZ_ID;
   private Quiz quiz;
-    private Batch batch;
+  private Batch batch;
   private Paging paging;
   private Pageable pageable;
   private List<Quiz> quizList;
@@ -49,52 +47,52 @@ public class QuizResponseMapperTest {
   @Before
   public void setUp() throws Exception {
 
-      batch = Batch
-              .builder()
-              .code(BATCH_CODE)
-              .build();
+    batch = Batch
+        .builder()
+        .code(BATCH_CODE)
+        .build();
 
     quiz = Quiz
-            .builder()
-            .title(QUIZ_TITLE)
-            .description(QUIZ_DESCRIPTION)
-            .startDate(DATE)
-            .endDate(DATE)
-            .timeLimit(QUIZ_TIME_LIMIT)
-            .questionCount(QUIZ_QUESTION_COUNT)
-            .trials(QUIZ_TRIALS)
-            .questionBanks(new ArrayList<>())
-            .batch(batch)
-            .build();
+        .builder()
+        .title(QUIZ_TITLE)
+        .description(QUIZ_DESCRIPTION)
+        .startDate(DATE)
+        .endDate(DATE)
+        .timeLimit(QUIZ_TIME_LIMIT)
+        .questionCount(QUIZ_QUESTION_COUNT)
+        .trials(QUIZ_TRIALS)
+        .questionBanks(new ArrayList<>())
+        .batch(batch)
+        .build();
 
     quizList = new ArrayList<>();
     quizList.add(quiz);
 
     quizWebResponse = new QuizWebResponse();
     BeanUtils.copyProperties(quiz, quizWebResponse);
-      quizWebResponse.setBatchCode(BATCH_CODE);
+    quizWebResponse.setBatchCode(BATCH_CODE);
 
     quizWebDataResponse = DataResponse
-            .<QuizWebResponse> builder()
-            .data(quizWebResponse)
-            .build();
+        .<QuizWebResponse>builder()
+        .data(quizWebResponse)
+        .build();
 
     quizWebResponseList = new ArrayList<>();
     quizWebResponseList.add(quizWebResponse);
 
     paging = Paging
-            .builder()
-            .totalRecords(SIZE)
-            .size(SIZE)
-            .page(PAGE)
-            .build();
+        .builder()
+        .totalRecords(SIZE)
+        .size(SIZE)
+        .page(PAGE)
+        .build();
 
     quizWebPagingResponse = PagingResponse
-            .<QuizWebResponse> builder()
-            .data(quizWebResponseList)
-            .paging(paging)
-            .code(HttpStatus.OK.value())
-            .build();
+        .<QuizWebResponse>builder()
+        .data(quizWebResponseList)
+        .paging(paging)
+        .code(HttpStatus.OK.value())
+        .build();
 
     pageable = new PageRequest(PAGE, SIZE);
 

@@ -9,8 +9,8 @@ import java.util.Optional;
 @Repository
 public interface StudentQuizDetailRepository extends MongoRepository<StudentQuizDetail, String> {
 
-    Optional<StudentQuizDetail> findByIdAndDeletedFalse(String id);
+  Optional<StudentQuizDetail> findByIdAndDeletedFalse(String id);
 
-    Optional<StudentQuizDetail> findFirstByStudentQuizId(String studentQuizId);
+  Optional<StudentQuizDetail> findFirstByStudentQuizIdAndDeletedFalse(String studentQuizId);
 
 }

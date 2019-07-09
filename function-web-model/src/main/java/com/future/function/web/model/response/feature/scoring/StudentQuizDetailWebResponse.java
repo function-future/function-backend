@@ -15,9 +15,9 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class StudentQuizDetailWebResponse {
 
-    private List<StudentQuestionWebResponse> questions;
+  private List<StudentQuestionWebResponse> questions;
 
-    private Integer point;
+  private Integer point;
 
 
 }

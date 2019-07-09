@@ -16,34 +16,34 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class QuestionResponseMapper {
+public final class QuestionResponseMapper {
 
-    public static DataResponse<QuestionWebResponse> toQuestionWebResponse(Question question) {
-        return ResponseHelper.toDataResponse(HttpStatus.OK, buildQuestionWebResponse(question, question.getOptions()));
-    }
+  public static DataResponse<QuestionWebResponse> toQuestionWebResponse(Question question) {
+    return ResponseHelper.toDataResponse(HttpStatus.OK, buildQuestionWebResponse(question, question.getOptions()));
+  }
 
-    public static DataResponse<QuestionWebResponse> toQuestionWebResponse(HttpStatus httpStatus, Question question) {
-        return ResponseHelper.toDataResponse(httpStatus, buildQuestionWebResponse(question, question.getOptions()));
-    }
+  public static DataResponse<QuestionWebResponse> toQuestionWebResponse(HttpStatus httpStatus, Question question) {
+    return ResponseHelper.toDataResponse(httpStatus, buildQuestionWebResponse(question, question.getOptions()));
+  }
 
-    private static QuestionWebResponse buildQuestionWebResponse(Question question, List<Option> options) {
-        return QuestionWebResponse.builder()
-                .id(question.getId())
-                .text(question.getText())
-                .options(OptionResponseMapper.toListOfOptionWebResponse(options))
-                .build();
-    }
+  private static QuestionWebResponse buildQuestionWebResponse(Question question, List<Option> options) {
+    return QuestionWebResponse.builder()
+        .id(question.getId())
+        .text(question.getText())
+        .options(OptionResponseMapper.toListOfOptionWebResponse(options))
+        .build();
+  }
 
-    public static PagingResponse<QuestionWebResponse> toQuestionPagingResponse(Page<Question> questionPage) {
-        List<QuestionWebResponse> responseList = getQuestionWebResponseList(questionPage.getContent());
-        return ResponseHelper.toPagingResponse(HttpStatus.OK, responseList, PageHelper.toPaging(questionPage));
-    }
+  public static PagingResponse<QuestionWebResponse> toQuestionPagingResponse(Page<Question> questionPage) {
+    List<QuestionWebResponse> responseList = getQuestionWebResponseList(questionPage.getContent());
+    return ResponseHelper.toPagingResponse(HttpStatus.OK, responseList, PageHelper.toPaging(questionPage));
+  }
 
-    private static List<QuestionWebResponse> getQuestionWebResponseList(List<Question> questionList) {
-        return questionList
-                .stream()
-                .map(question -> QuestionResponseMapper.buildQuestionWebResponse(question, question.getOptions()))
-                .collect(Collectors.toList());
-    }
+  private static List<QuestionWebResponse> getQuestionWebResponseList(List<Question> questionList) {
+    return questionList
+        .stream()
+        .map(question -> QuestionResponseMapper.buildQuestionWebResponse(question, question.getOptions()))
+        .collect(Collectors.toList());
+  }
 
 }

@@ -12,23 +12,23 @@ import java.util.List;
 
 public interface StudentQuizService {
 
-    Page<StudentQuiz> findAllByStudentId(String studentId, Pageable pageable);
+  Page<StudentQuiz> findAllByStudentId(String studentId, Pageable pageable, String userId);
 
-    StudentQuiz findById(String id);
+  StudentQuiz findById(String id, String userId);
 
-    List<StudentQuestion> findAllQuestionsByStudentQuizId(String studentQuizId);
+  List<StudentQuestion> findAllQuestionsByStudentQuizId(String studentQuizId, String userId);
 
-    List<StudentQuestion> findAllUnansweredQuestionByStudentQuizId(String studentQuizId);
+  List<StudentQuestion> findAllUnansweredQuestionByStudentQuizId(String studentQuizId, String userId);
 
-    StudentQuizDetail answerQuestionsByStudentQuizId(String studentQuizId, List<StudentQuestion> answers);
+  StudentQuizDetail answerQuestionsByStudentQuizId(String studentQuizId, String userId, List<StudentQuestion> answers);
 
-    StudentQuiz createStudentQuizAndSave(String userId, Quiz quiz);
+  StudentQuiz createStudentQuizAndSave(String userId, Quiz quiz);
 
-    Quiz createStudentQuizByBatchCode(String batchCode, Quiz quiz);
+  Quiz createStudentQuizByBatchCode(String batchCode, Quiz quiz);
 
-    Quiz copyQuizWithTargetBatch(Batch targetBatch, Quiz quiz);
+  Quiz copyQuizWithTargetBatch(Batch targetBatch, Quiz quiz);
 
-    void deleteById(String id);
+  void deleteById(String id);
 
-    void deleteByBatchCodeAndQuiz(String batchCode, String quizId);
+  void deleteByBatchCodeAndQuiz(String batchCode, String quizId);
 }

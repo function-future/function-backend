@@ -14,13 +14,13 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 public class CopyStudentQuizWebRequest {
 
-    @NotNull(message = "NotNull")
-    private int originBatch;
+  @NotNull(message = "NotNull")
+  private int originBatch;
 
-    @NotNull(message = "NotNull")
-    private int targetBatch;
+  @NotNull(message = "NotNull")
+  private int targetBatch;
 
-    @NotEmpty(message = "Not Empty")
-    private String quizId;
+  @NotEmpty(message = "Not Empty")
+  private String quizId;
 
 }

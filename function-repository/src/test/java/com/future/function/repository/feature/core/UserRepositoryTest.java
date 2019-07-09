@@ -23,41 +23,41 @@ import static org.assertj.core.api.Assertions.assertThat;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = TestApplication.class)
 public class UserRepositoryTest {
-  
+
   private static final String NAME_1 = "name-1";
-  
+
   private static final String NAME_2 = "name-2";
-  
+
   private static final String EMAIL_1 = "email-1";
-  
+
   private static final String EMAIL_2 = "email-2";
-  
+
   private static final String BATCH_CODE = "batch-code";
-  
+
   private static final String BATCH_ID = "batch-id";
-  
+
   private static final Batch BATCH = Batch.builder()
     .id(BATCH_ID)
     .code(BATCH_CODE)
     .build();
-  
+
   @Autowired
   private UserRepository userRepository;
-  
+
   private User user1;
-  
+
   private User user2;
-  
+
   @Before
   public void setUp() {
-    
+
     user1 = User.builder()
       .role(Role.ADMIN)
       .name(NAME_1)
       .email(EMAIL_1)
       .build();
     user1.setDeleted(false);
-    
+
     user2 = User.builder()
       .role(Role.STUDENT)
       .name(NAME_2)
@@ -65,75 +65,79 @@ public class UserRepositoryTest {
       .batch(BATCH)
       .build();
     user2.setDeleted(false);
-    
+
     userRepository.save(user1);
     userRepository.save(user2);
   }
-  
+
   @After
   public void tearDown() {
-    
+
     userRepository.deleteAll();
   }
-  
+
   @Test
   public void testGivenUserEmailByFindingUserByEmailReturnUserData() {
-    
+
     Optional<User> foundUser1 = userRepository.findByEmailAndDeletedFalse(
       EMAIL_1);
-    
+
     assertThat(foundUser1).isNotEqualTo(Optional.empty());
     assertThat(foundUser1.get()
                  .getRole()
                  .name()).isEqualTo(user1.getRole()
                                       .name());
-    
+
     Optional<User> foundUser2 = userRepository.findByEmailAndDeletedFalse(
       EMAIL_2);
-    
+
     assertThat(foundUser2).isNotEqualTo(Optional.empty());
     assertThat(foundUser2.get()
                  .getRole()
                  .name()).isEqualTo(user2.getRole()
                                       .name());
   }
-  
+
   @Test
   public void testGivenRoleAndPageableByFindingUsersByRoleAndPageableReturnPageOfUsers() {
-    
+
     Page<User> foundUsersPage1 = userRepository.findAllByRoleAndDeletedFalse(
       Role.ADMIN, new PageRequest(0, 5));
-    
+
     assertThat(foundUsersPage1).isNotNull();
     assertThat(foundUsersPage1.getContent()).isNotEmpty();
     assertThat(foundUsersPage1.getNumberOfElements()).isEqualTo(1);
-    
+
     Page<User> foundUsersPage2 = userRepository.findAllByRoleAndDeletedFalse(
       Role.JUDGE, new PageRequest(0, 5));
-    
+
     assertThat(foundUsersPage2).isNotNull();
     assertThat(foundUsersPage2.getContent()).isEmpty();
     assertThat(foundUsersPage2.getNumberOfElements()).isEqualTo(0);
   }
-  
+
   @Test
   public void testGivenRoleAndBatchByFindingUsersByRoleAndBatchReturnListOfUsers() {
-    
+
     List<User> foundUsers = userRepository.findAllByRoleAndBatchAndDeletedFalse(
       Role.STUDENT, BATCH);
-    
+
     assertThat(foundUsers).isNotEmpty();
     assertThat(foundUsers.size()).isEqualTo(1);
   }
-  
+
   @Test
   public void testGivenNameByFindingUsersByNameContainsIgnoreCaseReturnListOfUsers() {
-    
-    List<User> foundUsers =
-      userRepository.findAllByNameContainsIgnoreCaseAndDeletedFalse("E-1");
-    
-    assertThat(foundUsers).isNotEmpty();
-    assertThat(foundUsers).isEqualTo(Collections.singletonList(user1));
+
+    Page<User> foundUsers =
+      userRepository.findAllByNameContainsIgnoreCaseAndDeletedFalse("E-1",
+                                                                    new PageRequest(
+                                                                      0, 10)
+      );
+
+    assertThat(foundUsers.getContent()).isNotEmpty();
+    assertThat(foundUsers.getContent()).isEqualTo(
+      Collections.singletonList(user1));
   }
-  
+
 }

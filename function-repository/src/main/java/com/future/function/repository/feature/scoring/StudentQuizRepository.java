@@ -11,10 +11,10 @@ import java.util.Optional;
 @Repository
 public interface StudentQuizRepository extends MongoRepository<StudentQuiz, String> {
 
-    Optional<StudentQuiz> findByIdAndDeletedFalse(String id);
+  Optional<StudentQuiz> findByIdAndDeletedFalse(String id);
 
-    Optional<StudentQuiz> findByStudentIdAndQuizId(String studentId, String quizId);
+  Optional<StudentQuiz> findByStudentIdAndQuizIdAndDeletedFalse(String studentId, String quizId);
 
-    Page<StudentQuiz> findAllByStudentId(String studentId, Pageable pageable);
+  Page<StudentQuiz> findAllByStudentIdAndDeletedFalse(String studentId, Pageable pageable);
 
 }

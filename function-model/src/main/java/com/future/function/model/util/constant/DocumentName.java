@@ -67,5 +67,9 @@ public abstract class DocumentName {
   public static final String ACCESS = "accesses";
   
   public static final String MENU = "menus";
+
+    public static final String ROOM = "rooms";
+
+    public static final String COMMENT = "comments";
   
 }
