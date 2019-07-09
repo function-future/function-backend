@@ -4,6 +4,7 @@ import com.future.function.common.enumeration.communication.ChatroomType;
 import com.future.function.model.entity.feature.communication.chatting.Chatroom;
 import com.future.function.model.entity.feature.communication.chatting.Message;
 import com.future.function.repository.TestApplication;
+import org.bson.types.ObjectId;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,6 +15,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -93,6 +96,30 @@ public class MessageRepositoryTest {
 
     assertThat(message).isNotNull();
     assertThat(message.getText()).isEqualTo(TEXT_2);
+  }
+
+  @Test
+  public void testGivenChatroomAndMessageIdByFindingMessagesGreaterThanMessageIdReturnPagedMessage() {
+    List<Message> messageList = messageRepository.findAllByChatroomOrderByCreatedAtDesc(chatroom1, PAGEABLE).getContent();
+
+    Page<Message> messagePage = messageRepository.findAllByChatroomAndIdGreaterThanOrderByCreatedAtDesc(chatroom1,
+            new ObjectId(messageList.get(1).getId()), PAGEABLE);
+
+    assertThat(messagePage).isNotNull();
+    assertThat(messagePage.getContent().size()).isEqualTo(1);
+    assertThat(messagePage.getContent().get(0).getText()).isEqualTo(TEXT_2);
+  }
+
+  @Test
+  public void testGivenChatroomAndMessageIdByFindingMessagesLessThanMessageIdReturnPagedMessage() {
+    List<Message> messageList = messageRepository.findAllByChatroomOrderByCreatedAtDesc(chatroom1, PAGEABLE).getContent();
+
+    Page<Message> messagePage = messageRepository.findAllByChatroomAndIdLessThanOrderByCreatedAtDesc(chatroom1,
+            new ObjectId(messageList.get(0).getId()), PAGEABLE);
+
+    assertThat(messagePage).isNotNull();
+    assertThat(messagePage.getContent().size()).isEqualTo(1);
+    assertThat(messagePage.getContent().get(0).getText()).isEqualTo(TEXT_1);
   }
 
 }

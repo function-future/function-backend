@@ -8,16 +8,16 @@ import java.util.List;
 
 public interface QuestionService {
 
-    Page<Question> findAllByQuestionBankId(String questionBankId, Pageable pageable);
+  Page<Question> findAllByQuestionBankId(String questionBankId, Pageable pageable);
 
-    List<Question> findAllByMultipleQuestionBankId(List<String> questionBankIds);
+  List<Question> findAllByMultipleQuestionBankId(List<String> questionBankIds);
 
-    Question findById(String id);
+  Question findById(String id);
 
-    Question createQuestion(Question question, String questionBankId);
+  Question createQuestion(Question question, String questionBankId);
 
-    Question updateQuestion(Question question, String questionBankId);
+  Question updateQuestion(Question question, String questionBankId);
 
-    void deleteById(String id);
+  void deleteById(String id);
 
 }

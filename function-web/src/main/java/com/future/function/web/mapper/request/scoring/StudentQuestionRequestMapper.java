@@ -12,31 +12,31 @@ import java.util.stream.Collectors;
 @Component
 public class StudentQuestionRequestMapper {
 
-    @Autowired
-    private RequestValidator validator;
+  @Autowired
+  private RequestValidator validator;
 
-    @Autowired
-    private OptionRequestMapper optionRequestMapper;
+  @Autowired
+  private OptionRequestMapper optionRequestMapper;
 
-    public StudentQuestion toStudentQuestion(StudentQuestionWebRequest request) {
-        return toValidatedStudentQuestion(request);
-    }
+  public StudentQuestion toStudentQuestion(StudentQuestionWebRequest request) {
+    return toValidatedStudentQuestion(request);
+  }
 
-    private StudentQuestion toValidatedStudentQuestion(StudentQuestionWebRequest request) {
-        request = validator.validate(request);
+  private StudentQuestion toValidatedStudentQuestion(StudentQuestionWebRequest request) {
+    request = validator.validate(request);
 
-        return StudentQuestion
-                .builder()
-                .number(request.getNumber())
-                .option(optionRequestMapper.toOptionFromOptionId(request.getOptionId()))
-                .build();
-    }
+    return StudentQuestion
+        .builder()
+        .number(request.getNumber())
+        .option(optionRequestMapper.toOptionFromOptionId(request.getOptionId()))
+        .build();
+  }
 
-    public List<StudentQuestion> toStudentQuestionList(List<StudentQuestionWebRequest> requests) {
-        return requests
-                .stream()
-                .map(this::toStudentQuestion)
-                .collect(Collectors.toList());
-    }
+  public List<StudentQuestion> toStudentQuestionList(List<StudentQuestionWebRequest> requests) {
+    return requests
+        .stream()
+        .map(this::toStudentQuestion)
+        .collect(Collectors.toList());
+  }
 
 }

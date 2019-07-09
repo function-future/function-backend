@@ -14,10 +14,10 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 public class StudentQuestionWebRequest {
 
-    @NotNull(message = "NotNull")
-    private Integer number;
+  @NotNull(message = "NotNull")
+  private Integer number;
 
-    @NotBlank(message = "NotBlank")
-    private String optionId;
+  @NotBlank(message = "NotBlank")
+  private String optionId;
 
 }

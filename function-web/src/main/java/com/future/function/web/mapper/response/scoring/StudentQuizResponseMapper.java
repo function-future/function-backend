@@ -15,31 +15,31 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class StudentQuizResponseMapper {
+public final class StudentQuizResponseMapper {
 
-    public static DataResponse<StudentQuizWebResponse> toStudentQuizWebResponse(StudentQuiz studentQuiz) {
-        return ResponseHelper.toDataResponse(HttpStatus.OK, buildStudentQuizWebResponse(studentQuiz));
-    }
+  public static DataResponse<StudentQuizWebResponse> toStudentQuizWebResponse(StudentQuiz studentQuiz) {
+    return ResponseHelper.toDataResponse(HttpStatus.OK, buildStudentQuizWebResponse(studentQuiz));
+  }
 
-    private static StudentQuizWebResponse buildStudentQuizWebResponse(StudentQuiz studentQuiz) {
-        return StudentQuizWebResponse
-                .builder()
-                .id(studentQuiz.getId())
-                .quiz(QuizResponseMapper.toQuizWebDataResponse(studentQuiz.getQuiz()).getData())
-                .build();
-    }
+  private static StudentQuizWebResponse buildStudentQuizWebResponse(StudentQuiz studentQuiz) {
+    return StudentQuizWebResponse
+        .builder()
+        .id(studentQuiz.getId())
+        .quiz(QuizResponseMapper.toQuizWebDataResponse(studentQuiz.getQuiz()).getData())
+        .build();
+  }
 
-    public static PagingResponse<StudentQuizWebResponse> toPagingStudentQuizWebResponse(Page<StudentQuiz> studentQuizPage) {
-        return ResponseHelper.toPagingResponse(HttpStatus.OK,
-                buildListOfStudentQuizWebResponse(studentQuizPage),
-                PageHelper.toPaging(studentQuizPage));
-    }
+  public static PagingResponse<StudentQuizWebResponse> toPagingStudentQuizWebResponse(Page<StudentQuiz> studentQuizPage) {
+    return ResponseHelper.toPagingResponse(HttpStatus.OK,
+        buildListOfStudentQuizWebResponse(studentQuizPage),
+        PageHelper.toPaging(studentQuizPage));
+  }
 
-    private static List<StudentQuizWebResponse> buildListOfStudentQuizWebResponse(Page<StudentQuiz> studentQuizPage) {
-        return studentQuizPage.getContent()
-                .stream()
-                .map(StudentQuizResponseMapper::buildStudentQuizWebResponse)
-                .collect(Collectors.toList());
-    }
+  private static List<StudentQuizWebResponse> buildListOfStudentQuizWebResponse(Page<StudentQuiz> studentQuizPage) {
+    return studentQuizPage.getContent()
+        .stream()
+        .map(StudentQuizResponseMapper::buildStudentQuizWebResponse)
+        .collect(Collectors.toList());
+  }
 
 }
