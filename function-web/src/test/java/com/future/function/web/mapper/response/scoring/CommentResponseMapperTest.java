@@ -6,12 +6,13 @@ import com.future.function.model.entity.feature.scoring.Room;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.feature.embedded.AuthorWebResponse;
 import com.future.function.web.model.response.feature.scoring.CommentWebResponse;
-import java.util.Collections;
-import java.util.List;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
+
+import java.util.Collections;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

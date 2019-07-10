@@ -52,13 +52,13 @@ public interface FieldName {
 
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
   abstract class StickyNote {
-    
+
     public static final String TITLE = "title";
-    
+
     public static final String DESCRIPTION = "description";
-    
+
   }
-  
+
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
   abstract class Batch {
 
@@ -115,6 +115,10 @@ public interface FieldName {
 
     public static final String START_DATE = "startDate";
 
+    public static final String DUE_DATE = "dueDate";
+
+    public static final String AUTHOR = "author";
+
   }
 
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -151,6 +155,8 @@ public interface FieldName {
     public static final String APPRAISEE = "appraisee";
 
     public static final String SCORE_SUMMARY = "scoreSummary";
+
+    public static final String COUNTER = "counter";
   }
 
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -175,6 +181,8 @@ public interface FieldName {
     public static final String APPRAISEE = "appraisee";
 
     public static final String SCORE_SUMMARY = "scoreSummary";
+
+    public static final String COUNTER = "counter";
   }
 
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -194,7 +202,11 @@ public interface FieldName {
 
     public static final String BATCH = "batch";
 
+    public static final String ROLE = "role";
+
     public static final String SCORE_SUMMARY = "scoreSummary";
+
+    public static final String COUNTER = "counter";
 
   }
 
@@ -393,6 +405,7 @@ public interface FieldName {
     public static final String ROOM = "room";
 
   }
+
 
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
   abstract class ActivityBlog {

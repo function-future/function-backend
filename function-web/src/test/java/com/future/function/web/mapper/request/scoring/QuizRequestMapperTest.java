@@ -6,8 +6,6 @@ import com.future.function.model.entity.feature.scoring.Quiz;
 import com.future.function.validation.RequestValidator;
 import com.future.function.web.model.request.scoring.CopyQuizWebRequest;
 import com.future.function.web.model.request.scoring.QuizWebRequest;
-import java.util.Collections;
-import java.util.UUID;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,6 +14,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.beans.BeanUtils;
+
+import java.util.Collections;
+import java.util.UUID;
 
 import static com.googlecode.catchexception.CatchException.catchException;
 import static com.googlecode.catchexception.CatchException.caughtException;

@@ -121,6 +121,7 @@ public class SharedCourseControllerTest extends TestHelper {
   
   private static final SharedCourseWebRequest SHARED_COURSE_WEB_REQUEST =
     SharedCourseWebRequest.builder()
+      .targetBatch(BATCH_CODE)
       .originBatch(ORIGIN_BATCH_CODE)
       .courses(COURSE_IDS)
       .build();

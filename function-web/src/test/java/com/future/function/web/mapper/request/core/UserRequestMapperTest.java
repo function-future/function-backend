@@ -17,7 +17,9 @@ import org.mockito.runners.MockitoJUnitRunner;
 import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class UserRequestMapperTest {
@@ -97,7 +99,9 @@ public class UserRequestMapperTest {
     .password(PASSWORD)
     .phone(PHONE)
     .address(ADDRESS)
-    .pictureV2(new FileV2())
+    .pictureV2(FileV2.builder()
+                 .id(FILE_ID)
+                 .build())
     .build();
   
   private static final User VALID_ADMIN = User.builder()
@@ -107,7 +111,9 @@ public class UserRequestMapperTest {
     .password(PASSWORD)
     .phone(PHONE)
     .address(ADDRESS)
-    .pictureV2(new FileV2())
+    .pictureV2(FileV2.builder()
+                 .id(FILE_ID)
+                 .build())
     .build();
   
   private static final UserWebRequest VALID_ADMIN_WEB_REQUEST =
@@ -117,6 +123,7 @@ public class UserRequestMapperTest {
       .name(NAME)
       .phone(PHONE)
       .address(ADDRESS)
+      .avatar(Collections.singletonList(FILE_ID))
       .build();
   
   private static final User VALID_ADMIN_WITH_EMPTY_AVATAR = User.builder()
@@ -126,7 +133,7 @@ public class UserRequestMapperTest {
     .password(PASSWORD)
     .phone(PHONE)
     .address(ADDRESS)
-    .pictureV2(new FileV2())
+    .pictureV2(null)
     .build();
   
   private static final UserWebRequest

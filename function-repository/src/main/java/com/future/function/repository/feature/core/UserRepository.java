@@ -16,7 +16,7 @@ import java.util.Optional;
  */
 @Repository
 public interface UserRepository extends MongoRepository<User, String> {
-  
+
   /**
    * Finds specific user by email.
    *
@@ -26,7 +26,7 @@ public interface UserRepository extends MongoRepository<User, String> {
    * otherwise return {@link java.util.Optional#empty()}
    */
   Optional<User> findByEmailAndDeletedFalse(String email);
-  
+
   /**
    * Finds users by role and page data
    * ({@link org.springframework.data.domain.Pageable}).
@@ -37,7 +37,7 @@ public interface UserRepository extends MongoRepository<User, String> {
    * @return {@code Page<User>} - Page of users found in database.
    */
   Page<User> findAllByRoleAndDeletedFalse(Role role, Pageable pageable);
-  
+
   /**
    * Finds users by role and batch data.
    *
@@ -47,7 +47,7 @@ public interface UserRepository extends MongoRepository<User, String> {
    * @return {@code List<User>} - List of users (students) found in database.
    */
   List<User> findAllByRoleAndBatchAndDeletedFalse(Role role, Batch batch);
-  
+
   /**
    * Finds user by name containing search query and matches search query
    * case-insensitively.
@@ -58,5 +58,5 @@ public interface UserRepository extends MongoRepository<User, String> {
    */
   Page<User> findAllByNameContainsIgnoreCaseAndDeletedFalse(String name,
                                                             Pageable pageable);
-  
+
 }

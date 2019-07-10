@@ -11,19 +11,19 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @ChangeLog(order = "001")
 public class DataMigration_001 {
-  
+
   // Insert first admin on app database.
-  
+
   private static final BCryptPasswordEncoder ENCODER =
     new BCryptPasswordEncoder();
-  
+
   private static final String ADMIN_EMAIL = "admin@admin.com";
-  
+
   @ChangeSet(author = "jonathan",
              id = "adminMigration",
              order = "0001")
   public void insertAdmin(MongoTemplate mongoTemplate) {
-    
+
     BasicDBObject admin = new BasicDBObject();
     admin.append(FieldName.User.EMAIL, ADMIN_EMAIL);
     admin.append(FieldName.User.NAME, "Admin Istrator");
@@ -38,8 +38,8 @@ public class DataMigration_001 {
     admin.append(FieldName.BaseEntity.UPDATED_BY, ADMIN_EMAIL);
     admin.append(FieldName.BaseEntity.VERSION, 0);
     admin.append(FieldName.BaseEntity.DELETED, false);
-    
+
     mongoTemplate.insert(admin, DocumentName.USER);
   }
-  
+
 }

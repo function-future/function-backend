@@ -1,6 +1,5 @@
 package com.future.function.service.impl.feature.scoring;
 
-import com.future.function.common.exception.BadRequestException;
 import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.scoring.QuestionBank;
@@ -11,14 +10,15 @@ import com.future.function.service.api.feature.core.BatchService;
 import com.future.function.service.api.feature.scoring.QuestionBankService;
 import com.future.function.service.api.feature.scoring.QuizService;
 import com.future.function.service.api.feature.scoring.StudentQuizService;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Service class used to manipulate Quiz Entity

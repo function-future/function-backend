@@ -12,16 +12,16 @@ import org.junit.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class AuthResponseMapperTest {
-  
+
   @Before
   public void setUp() {}
-  
+
   @After
   public void tearDown() {}
-  
+
   @Test
   public void testGivenUserByMappingToDataResponseReturnDataResponseObject() {
-    
+
     User user = User.builder()
       .id("id")
       .role(Role.MENTOR)
@@ -33,7 +33,7 @@ public class AuthResponseMapperTest {
                    .fileUrl("file-url")
                    .build())
       .build();
-    
+
     AuthWebResponse authWebResponse = AuthWebResponse.builder()
       .id("id")
       .name("name")
@@ -41,17 +41,17 @@ public class AuthResponseMapperTest {
       .avatar("file-url")
       .role(Role.MENTOR.name())
       .build();
-    
+
     DataResponse<AuthWebResponse> expectedDataResponse =
       DataResponse.<AuthWebResponse>builder().code(200)
         .status("OK")
         .data(authWebResponse)
         .build();
-    
+
     DataResponse<AuthWebResponse> dataResponse =
       AuthResponseMapper.toAuthDataResponse(user);
-    
+
     assertThat(dataResponse).isEqualTo(expectedDataResponse);
   }
-  
+
 }

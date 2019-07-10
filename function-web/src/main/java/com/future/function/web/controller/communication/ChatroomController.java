@@ -54,7 +54,7 @@ public class ChatroomController {
     private ChatroomService chatroomService;
 
     private MessageService messageService;
-    
+
 
     private MessageStatusService messageStatusService;
 
