@@ -34,7 +34,7 @@ public class ExceptionController {
   @ExceptionHandler(BadRequestException.class)
   public ErrorResponse badRequestException(BadRequestException e) {
 
-    log.error(e.getMessage(), e.getCause(), e.getConstraintViolations());
+    log.error(e.getMessage(), e.getConstraintViolations(), e);
 
     return ResponseHelper.toErrorResponse(
       HttpStatus.BAD_REQUEST, e.getConstraintViolations());
@@ -53,7 +53,7 @@ public class ExceptionController {
   @ExceptionHandler(UnauthorizedException.class)
   public BaseResponse unauthorizedException(UnauthorizedException e) {
 
-    log.error(e.getMessage(), e.getCause());
+    log.error(e.getMessage(), e);
 
     return ResponseHelper.toBaseResponse(HttpStatus.UNAUTHORIZED);
   }
@@ -71,7 +71,7 @@ public class ExceptionController {
   @ExceptionHandler(ForbiddenException.class)
   public BaseResponse forbiddenException(ForbiddenException e) {
 
-    log.error(e.getMessage(), e.getCause());
+    log.error(e.getMessage(), e);
 
     return ResponseHelper.toBaseResponse(HttpStatus.FORBIDDEN);
   }
@@ -90,7 +90,7 @@ public class ExceptionController {
   @ExceptionHandler({ NotFoundException.class, NoHandlerFoundException.class })
   public BaseResponse notFoundException(Exception e) {
 
-    log.error(e.getMessage(), e.getCause());
+    log.error(e.getMessage(), e);
 
     return ResponseHelper.toBaseResponse(HttpStatus.NOT_FOUND);
   }
@@ -110,7 +110,7 @@ public class ExceptionController {
     UnsupportedOperationException e
   ) {
 
-    log.error(e.getMessage(), e.getCause());
+    log.error(e.getMessage(), e);
 
     return ResponseHelper.toBaseResponse(HttpStatus.BAD_REQUEST);
   }
@@ -129,7 +129,7 @@ public class ExceptionController {
     Throwable e
   ) {
 
-    log.error(e.getMessage(), e.getCause());
+    log.error(e.getMessage(), e);
 
     return ResponseHelper.toBaseResponse(HttpStatus.INTERNAL_SERVER_ERROR);
   }
