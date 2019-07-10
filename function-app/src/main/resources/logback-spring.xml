@@ -9,13 +9,15 @@
         </encoder>
     </appender>
 
-    <appender name="SAVE-TO-FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <appender name="FILE-DAILY" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <pattern>%d{dd-MM-yyyy HH:mm:ss.SSS} [%thread] %-5level %logger{36}.%M - %msg%n</pattern>
         </encoder>
 
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <fileNamePattern>${LOG_PATH}/Log_%d{dd-MM-yyyy}.log</fileNamePattern>
+            <maxHistory>40</maxHistory>
+            <totalSizeCap>2GB</totalSizeCap>
         </rollingPolicy>
     </appender>
 
@@ -31,11 +33,11 @@
 
     <springProfile name="no-mock">
         <root level="info">
-            <appender-ref ref="SAVE-TO-FILE"/>
+            <appender-ref ref="FILE-DAILY"/>
         </root>
 
-        <logger name="com.future.function" additivity="false" level="error">
-            <appender-ref ref="SAVE-TO-FILE"/>
+        <logger name="com.future.function" additivity="false" level="warn">
+            <appender-ref ref="FILE-DAILY"/>
         </logger>
     </springProfile>
 
