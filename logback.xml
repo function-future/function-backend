@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true">
+
+    <include resource="org/springframework/boot/logging/logback/defaults.xml" />
+    <include resource="org/springframework/boot/logging/logback/file-appender.xml" />
+
+    <root level="info">
+        <appender-ref ref="FILE"/>
+    </root>
+
+    <logger name="com.future.function" additivity="false" level="warn">
+        <appender-ref ref="FILE"/>
+    </logger>
+
+</configuration>
