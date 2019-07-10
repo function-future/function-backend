@@ -63,9 +63,10 @@ public class ReminderScheduler {
   }
 
   private Boolean isItNowToSendReminderWeekly(Reminder reminder, LocalDateTime timeNow, LocalDateTime lastReminderTime) {
-    return lastReminderTime.getDayOfWeek() != timeNow.getDayOfWeek() &&
-            reminder.getDays().contains(timeNow.getDayOfWeek()) &&
-            isItTimeToSendReminder(reminder, timeNow);
+    return isItTimeToSendReminder(reminder, timeNow) &&
+            ((lastReminderTime == null && reminder.getDays().contains(timeNow.getDayOfWeek())) ||
+                (lastReminderTime != null && lastReminderTime.getDayOfWeek() != timeNow.getDayOfWeek()) &&
+                    reminder.getDays().contains(timeNow.getDayOfWeek()));
   }
 
   private LocalDateTime millisToLocalDateTime(Long millis) {
