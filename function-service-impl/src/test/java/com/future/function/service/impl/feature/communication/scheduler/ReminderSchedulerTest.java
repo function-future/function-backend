@@ -26,13 +26,13 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class ReminderSchedulerTest {
 
-  public static final String USER_ID_1 = "userId1";
-  public static final String USER_ID_2 = "userId2";
-  public static final User USER_1 = User.builder().id(USER_ID_1).build();
-  public static final User USER_2 = User.builder().id(USER_ID_2).build();
-  public static final String REMINDER_ID_1 = "reminderId1";
-  public static final String REMINDER_ID_2 = "reminderId2";
-  public static final Reminder REMINDER_1 = Reminder.builder()
+  private static final String USER_ID_1 = "userId1";
+  private static final String USER_ID_2 = "userId2";
+  private static final User USER_1 = User.builder().id(USER_ID_1).build();
+  private static final User USER_2 = User.builder().id(USER_ID_2).build();
+  private static final String REMINDER_ID_1 = "reminderId1";
+  private static final String REMINDER_ID_2 = "reminderId2";
+  private static final Reminder REMINDER_1 = Reminder.builder()
           .id(REMINDER_ID_1)
           .isRepeatedMonthly(true)
           .hour(LocalDateTime.now().getHour())
@@ -40,7 +40,7 @@ public class ReminderSchedulerTest {
           .minute(LocalDateTime.now().getMinute())
           .members(Arrays.asList(USER_1, USER_2))
           .build();
-  public static final Reminder REMINDER_2 = Reminder.builder()
+  private static final Reminder REMINDER_2 = Reminder.builder()
           .id(REMINDER_ID_2)
           .isRepeatedMonthly(false)
           .hour(LocalDateTime.now().getHour())

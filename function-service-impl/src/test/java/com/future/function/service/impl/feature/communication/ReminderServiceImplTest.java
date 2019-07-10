@@ -31,13 +31,13 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class ReminderServiceImplTest {
 
-  public static final String REMINDER_ID_1 = "reminderId1";
-  public static final String REMINDER_ID_2 = "reminderId2";
-  public static final Reminder REMINDER_1 = Reminder.builder().id(REMINDER_ID_1).build();
-  public static final Reminder REMINDER_2 = Reminder.builder().id(REMINDER_ID_2).build();
-  public static final PageRequest PAGEABLE = new PageRequest(0, 10);
-  public static final String USER_ID = "userId";
-  public static final User USER = User.builder().id(USER_ID).build();
+  private static final String REMINDER_ID_1 = "reminderId1";
+  private static final String REMINDER_ID_2 = "reminderId2";
+  private static final Reminder REMINDER_1 = Reminder.builder().id(REMINDER_ID_1).build();
+  private static final Reminder REMINDER_2 = Reminder.builder().id(REMINDER_ID_2).build();
+  private static final PageRequest PAGEABLE = new PageRequest(0, 10);
+  private static final String USER_ID = "userId";
+  private static final User USER = User.builder().id(USER_ID).build();
 
   @Mock
   private ReminderRepository reminderRepository;
