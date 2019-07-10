@@ -19,7 +19,6 @@ import java.time.ZoneId;
  * Created At: 13:21 07/07/2019
  */
 @Component
-@Slf4j
 public class ReminderScheduler {
 
   private final ReminderProperties reminderProperties;
