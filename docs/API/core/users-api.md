@@ -141,7 +141,7 @@ specified new/existing user role's value is student; parameters page and role mu
                 "phone": "088888888888",
                 "address": "Jl. Address 1 Address 2",
                 "avatar": ["sample-id"],
-                "batchCode": "sample-id",
+                "batch": "sample-id",
                 "university": "Bina Nusantara University"
             }
         
@@ -277,7 +277,7 @@ request.
                 "phone": "088888888888",
                 "address": "Jl. Address 1 Address 2",
                 "avatar": ["sample-id"],
-                "batchCode": "sample-id",
+                "batch": "sample-id",
                 "university": "Bina Nusantara University"
             }
         

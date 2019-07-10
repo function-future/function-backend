@@ -104,6 +104,7 @@ public class SharedCourseController {
       SharedCourseWebRequest request
   ) {
     
+    request.setTargetBatch(batchCode);
     Pair<List<String>, String> courseIdsAndOriginBatchPair =
       sharedCourseRequestMapper.toCourseIdsAndOriginBatchCodePair(request);
     
