@@ -34,7 +34,7 @@ public class NotificationServiceImpl implements NotificationService {
 
   @Override
   public Page<Notification> getNotifications(Session session, Pageable pageable) {
-    return Optional.of(session.getId())
+    return Optional.of(session.getUserId())
             .map(userService::getUser)
             .map(user -> notificationRepository.findAllByMemberOrderByCreatedAtDesc(user, pageable))
             .orElse(PageHelper.empty(pageable));

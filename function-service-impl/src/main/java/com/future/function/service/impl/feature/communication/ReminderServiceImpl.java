@@ -63,6 +63,7 @@ public class ReminderServiceImpl implements ReminderService {
             .map(reminderRepository::findOne)
             .map(r -> this.setMembers(r, reminder.getMembers()))
             .map(r -> this.setReminderAttributes(reminder, r))
+            .map(reminderRepository::save)
             .orElse(reminder);
   }
 
