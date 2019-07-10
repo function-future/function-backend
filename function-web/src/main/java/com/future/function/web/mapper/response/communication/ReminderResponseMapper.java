@@ -24,7 +24,6 @@ import java.util.stream.Collectors;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ReminderResponseMapper {
 
-
   private static ReminderResponse toReminderResponse(Reminder reminder) {
     return ReminderResponse.builder()
             .id(reminder.getId())
