@@ -8,12 +8,14 @@ import com.future.function.session.model.Session;
 import com.future.function.web.TestHelper;
 import com.future.function.web.TestSecurityConfiguration;
 import com.future.function.web.mapper.helper.PageHelper;
+import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.mapper.request.communication.NotificationRequestMapper;
 import com.future.function.web.mapper.response.communication.NotificationResponseMapper;
 import com.future.function.web.model.request.communication.NotificationRequest;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.feature.communication.reminder.NotificationResponse;
+import com.future.function.web.model.response.feature.communication.reminder.NotificationTotalUnseenResponse;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,6 +26,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -33,8 +36,7 @@ import java.util.Collections;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -102,6 +104,33 @@ public class NotificationControllerTest extends TestHelper {
 
     verify(notificationService).createNotification(NOTIFICATION);
     verify(notificationRequestMapper).toNotification(request);
+  }
+
+  @Test
+  public void testGivenCallToGetTotalUnseenReturnDataResponse() throws Exception {
+    int total = 10;
+    when(notificationService.getTotalUnseenNotifications(any(Session.class))).thenReturn(total);
+
+    DataResponse<NotificationTotalUnseenResponse> response = NotificationResponseMapper
+            .toNotificationTotalUnseenResponse(total);
+
+    mockMvc.perform(get("/api/communication/notifications/_unseen_total").cookie(cookies))
+            .andExpect(status().isOk())
+            .andExpect(content().json(dataResponseJacksonTester.write(response).getJson()));
+
+    verify(notificationService).getTotalUnseenNotifications(any(Session.class));
+  }
+
+  @Test
+  public void testGivenCallToReadNotificationApiReturnBaseResponse() throws Exception {
+    doNothing().when(notificationService).updateSeenNotification(NOTIFICATION_ID);
+
+    mockMvc.perform(put("/api/communication/notifications/" + NOTIFICATION_ID + "/_read").cookie(cookies))
+            .andExpect(status().isOk())
+            .andExpect(content().json(baseResponseJacksonTester
+                    .write(ResponseHelper.toBaseResponse(HttpStatus.OK)).getJson()));
+
+    verify(notificationService).updateSeenNotification(NOTIFICATION_ID);
   }
 
 }

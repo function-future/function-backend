@@ -5,13 +5,17 @@ import com.future.function.service.api.feature.communication.NotificationService
 import com.future.function.session.annotation.WithAnyRole;
 import com.future.function.session.model.Session;
 import com.future.function.web.mapper.helper.PageHelper;
+import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.mapper.request.communication.NotificationRequestMapper;
 import com.future.function.web.mapper.response.communication.NotificationResponseMapper;
 import com.future.function.web.model.request.communication.NotificationRequest;
+import com.future.function.web.model.response.base.BaseResponse;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.feature.communication.reminder.NotificationResponse;
+import com.future.function.web.model.response.feature.communication.reminder.NotificationTotalUnseenResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -46,6 +50,15 @@ public class NotificationController {
             notificationService.getNotifications(session, PageHelper.toPageable(page, size)));
   }
 
+  @GetMapping(value = "/_unseen_total", produces = MediaType.APPLICATION_JSON_VALUE)
+  public DataResponse<NotificationTotalUnseenResponse> getTotalUnseen(
+          @WithAnyRole(roles = {Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT})
+          Session session
+  ) {
+    return NotificationResponseMapper.toNotificationTotalUnseenResponse(
+            notificationService.getTotalUnseenNotifications(session));
+  }
+
   @PostMapping(
           produces = MediaType.APPLICATION_JSON_VALUE,
           consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -54,6 +67,16 @@ public class NotificationController {
           @RequestBody NotificationRequest data) {
     return NotificationResponseMapper.toSingleNotificationResponse(
             notificationService.createNotification(notificationRequestMapper.toNotification(data)));
+  }
+
+  @PutMapping(value = "/{notificationId:.+}/_read", produces = MediaType.APPLICATION_JSON_VALUE)
+  public BaseResponse readNotification(
+          @WithAnyRole(roles = {Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT})
+          Session session,
+          @PathVariable String notificationId
+  ) {
+    notificationService.updateSeenNotification(notificationId);
+    return ResponseHelper.toBaseResponse(HttpStatus.OK);
   }
 
 }

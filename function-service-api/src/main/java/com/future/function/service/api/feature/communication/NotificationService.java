@@ -11,8 +11,12 @@ import org.springframework.data.domain.Pageable;
  */
 public interface NotificationService {
 
+  Integer getTotalUnseenNotifications(Session session);
+
   Page<Notification> getNotifications(Session session, Pageable pageable);
 
   Notification createNotification(Notification notification);
+
+  void updateSeenNotification(String notificationId);
 
 }

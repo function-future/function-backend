@@ -14,7 +14,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.not;
 
 /**
  * Author: PriagungSatyagama
@@ -38,12 +41,14 @@ public class NotificationRepositoryTest {
     Notification notification1 = Notification.builder()
             .id(NOTIFICATION_ID_1)
             .member(MEMBER)
+            .seen(false)
             .build();
     notification1.setCreatedAt(1L);
 
     Notification notification2 = Notification.builder()
             .id(NOTIFICATION_ID_2)
             .member(MEMBER)
+            .seen(true)
             .build();
     notification2.setCreatedAt(2L);
 
@@ -56,12 +61,20 @@ public class NotificationRepositoryTest {
   public void tearDown() {notificationRepository.deleteAll();}
 
   @Test
-  public void testGivenMemberByFindingAllMemberReturnPagedNotifications() {
+  public void testGivenMemberByFindingAllNotificationsReturnPagedNotifications() {
     Page<Notification> notifications = notificationRepository.findAllByMemberOrderByCreatedAtDesc(MEMBER, PAGEABLE);
 
     assertThat(notifications).isNotNull();
     assertThat(notifications.getContent().get(0).getId()).isEqualTo(NOTIFICATION_ID_2);
     assertThat(notifications.getContent().get(1).getId()).isEqualTo(NOTIFICATION_ID_1);
+  }
+
+  @Test
+  public void testGivenMemberByFindingAllUnseenNotificationReturnPagedNotifications() {
+    List<Notification> notifications = notificationRepository.findAllByMemberAndSeen(MEMBER, false);
+
+    assertThat(notifications.size()).isEqualTo(1);
+    assertThat(notifications.get(0).getId()).isEqualTo(NOTIFICATION_ID_1);
   }
 
 }

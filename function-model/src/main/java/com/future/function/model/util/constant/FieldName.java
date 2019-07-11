@@ -449,6 +449,8 @@ public interface FieldName {
 
     public static final String CONTENT = "content";
 
+    public static final String IS_SEEN = "isSeen";
+
   }
 
   @NoArgsConstructor(access = AccessLevel.PRIVATE)

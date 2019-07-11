@@ -6,6 +6,7 @@ import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.feature.communication.reminder.NotificationResponse;
+import com.future.function.web.model.response.feature.communication.reminder.NotificationTotalUnseenResponse;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -28,6 +29,11 @@ public class NotificationResponseMapper {
 
   public static DataResponse<NotificationResponse> toSingleNotificationResponse(Notification notification) {
     return ResponseHelper.toDataResponse(HttpStatus.OK, toNotificationResponse(notification));
+  }
+
+  public static DataResponse<NotificationTotalUnseenResponse> toNotificationTotalUnseenResponse(Integer total) {
+    return ResponseHelper.toDataResponse(HttpStatus.OK,
+            NotificationTotalUnseenResponse.builder().total(total).build());
   }
 
   private static List<NotificationResponse> toListNotificationResponse(Page<Notification> notifications) {

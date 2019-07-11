@@ -6,11 +6,13 @@ import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.feature.communication.reminder.NotificationResponse;
+import com.future.function.web.model.response.feature.communication.reminder.NotificationTotalUnseenResponse;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.http.HttpStatus;
 
 import java.util.Arrays;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -43,6 +45,14 @@ public class NotificationResponseMapperTest {
   public void testGivenNotificationByCallingToSingleNotificationReturnDataResponse() {
     DataResponse<NotificationResponse> response = NotificationResponseMapper.toSingleNotificationResponse(NOTIFICATION_1);
     assertThat(response.getData().getId()).isEqualTo(NOTIFICATION_ID_1);
+  }
+
+  @Test
+  public void testGivenIntegerByCallingToNotificationTotalUnseenResponseReturnDataResponse() {
+    int total = 1;
+    DataResponse<NotificationTotalUnseenResponse> response = NotificationResponseMapper.toNotificationTotalUnseenResponse(total);
+    assertThat(response.getData().getTotal()).isEqualTo(total);
+    assertThat(response.getCode()).isEqualTo(200);
   }
 
 }

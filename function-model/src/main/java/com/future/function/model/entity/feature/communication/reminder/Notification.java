@@ -31,6 +31,9 @@ public class Notification extends BaseEntity {
   @Field(FieldName.Notification.CONTENT)
   private String content;
 
+  @Field(FieldName.Notification.IS_SEEN)
+  private Boolean seen;
+
   @Field(FieldName.Notification.MEMBER)
   @DBRef(lazy = true)
   private User member;

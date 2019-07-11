@@ -7,6 +7,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 /**
  * Author: PriagungSatyagama
  * Created At: 14:43 06/07/2019
@@ -15,5 +17,7 @@ import org.springframework.stereotype.Repository;
 public interface NotificationRepository extends MongoRepository<Notification, String> {
 
   Page<Notification> findAllByMemberOrderByCreatedAtDesc(User member, Pageable pageable);
+
+  List<Notification> findAllByMemberAndSeen(User Member, Boolean seen);
 
 }

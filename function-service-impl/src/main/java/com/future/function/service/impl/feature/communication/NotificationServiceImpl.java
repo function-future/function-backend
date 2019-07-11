@@ -1,5 +1,6 @@
 package com.future.function.service.impl.feature.communication;
 
+import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.communication.reminder.Notification;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.repository.feature.communication.reminder.NotificationRepository;
@@ -12,8 +13,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Author: PriagungSatyagama
@@ -33,6 +36,14 @@ public class NotificationServiceImpl implements NotificationService {
   }
 
   @Override
+  public Integer getTotalUnseenNotifications(Session session) {
+    return Optional.of(session.getUserId())
+            .map(userService::getUser)
+            .map(user -> notificationRepository.findAllByMemberAndSeen(user, false))
+            .orElse(new ArrayList<>()).size();
+  }
+
+  @Override
   public Page<Notification> getNotifications(Session session, Pageable pageable) {
     return Optional.of(session.getUserId())
             .map(userService::getUser)
@@ -48,11 +59,33 @@ public class NotificationServiceImpl implements NotificationService {
             .orElseThrow(UnsupportedOperationException::new);
   }
 
+  @Override
+  public void updateSeenNotification(String notificationId) {
+    Notification notification = Optional.of(notificationId)
+            .map(notificationRepository::findOne)
+            .orElseThrow(() -> new NotFoundException("Notification not found"));
+    notificationRepository.findAllByMemberAndSeen(notification.getMember(), false).stream()
+            .filter(n -> n.getCreatedAt() <= notification.getCreatedAt())
+            .forEach(this::updateSingleNotificationSeenStatus);
+  }
+
+  private void updateSingleNotificationSeenStatus(Notification notification) {
+    Optional.of(notification.getId())
+            .map(notificationRepository::findOne)
+            .map(this::setSeenTrue)
+            .ifPresent(notificationRepository::save);
+  }
+
   private Notification setMember(Notification notification) {
     User member = Optional.of(notification.getMember().getId())
             .map(userService::getUser)
             .orElse(null);
     notification.setMember(member);
+    return notification;
+  }
+
+  private Notification setSeenTrue(Notification notification) {
+    notification.setSeen(true);
     return notification;
   }
 }
