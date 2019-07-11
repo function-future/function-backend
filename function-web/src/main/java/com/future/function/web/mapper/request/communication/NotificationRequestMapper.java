@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component;
  * Author: PriagungSatyagama
  * Created At: 21:14 06/07/2019
  */
-@Slf4j
 @Component
 public class NotificationRequestMapper {
 

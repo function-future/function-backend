@@ -79,7 +79,7 @@ public class NotificationServiceImpl implements NotificationService {
   private Notification setMember(Notification notification) {
     User member = Optional.of(notification.getMember().getId())
             .map(userService::getUser)
-            .orElse(null);
+            .orElseThrow(() -> new NotFoundException("User not found"));
     notification.setMember(member);
     return notification;
   }

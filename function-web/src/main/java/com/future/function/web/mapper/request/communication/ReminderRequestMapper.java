@@ -16,7 +16,6 @@ import java.util.stream.Collectors;
  * Author: PriagungSatyagama
  * Created At: 21:20 06/07/2019
  */
-@Slf4j
 @Component
 public class ReminderRequestMapper {
 

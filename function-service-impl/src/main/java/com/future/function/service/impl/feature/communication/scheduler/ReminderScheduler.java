@@ -5,7 +5,6 @@ import com.future.function.model.entity.feature.communication.reminder.Notificat
 import com.future.function.model.entity.feature.communication.reminder.Reminder;
 import com.future.function.service.api.feature.communication.NotificationService;
 import com.future.function.service.api.feature.communication.ReminderService;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -42,12 +41,20 @@ public class ReminderScheduler {
 
   private void generateNotificationIfNecessary(Reminder reminder, LocalDateTime timeNow) {
     LocalDateTime lastReminderTime = millisToLocalDateTime(reminder.getLastReminderSent());
-    if ((reminder.getIsRepeatedMonthly() &&
-            isItNowToSendReminderMonthly(reminder, timeNow, lastReminderTime)) ||
-        (!reminder.getIsRepeatedMonthly() &&
-            isItNowToSendReminderWeekly(reminder, timeNow, lastReminderTime))) {
+    if (monthlyCheck(reminder, timeNow, lastReminderTime) ||
+            weeklyCheck(reminder, timeNow, lastReminderTime)) {
       sendNotifications(reminder);
     }
+  }
+
+  private boolean weeklyCheck(Reminder reminder, LocalDateTime timeNow, LocalDateTime lastReminderTime) {
+    return !reminder.getIsRepeatedMonthly() &&
+        isItNowToSendReminderWeekly(reminder, timeNow, lastReminderTime);
+  }
+
+  private boolean monthlyCheck(Reminder reminder, LocalDateTime timeNow, LocalDateTime lastReminderTime) {
+    return reminder.getIsRepeatedMonthly() &&
+            isItNowToSendReminderMonthly(reminder, timeNow, lastReminderTime);
   }
 
   private Boolean isItTimeToSendReminder(Reminder reminder, LocalDateTime time) {
@@ -56,17 +63,33 @@ public class ReminderScheduler {
 
   private Boolean isItNowToSendReminderMonthly(Reminder reminder, LocalDateTime timeNow, LocalDateTime lastReminderTime) {
     return isItTimeToSendReminder(reminder, timeNow) &&
-            (lastReminderTime != null &&
-            timeNow.getMonth() != lastReminderTime.getMonth() &&
-            timeNow.getDayOfMonth() == reminder.getMonthlyDate()) ||
-            (lastReminderTime == null && timeNow.getDayOfMonth() == reminder.getMonthlyDate());
+            monthlyValid(reminder, timeNow, lastReminderTime) ||
+            monthlyFirstValid(reminder, timeNow, lastReminderTime);
+  }
+
+  private boolean monthlyFirstValid(Reminder reminder, LocalDateTime timeNow, LocalDateTime lastReminderTime) {
+    return lastReminderTime == null && timeNow.getDayOfMonth() == reminder.getMonthlyDate();
+  }
+
+  private boolean monthlyValid(Reminder reminder, LocalDateTime timeNow, LocalDateTime lastReminderTime) {
+    return lastReminderTime != null &&
+    timeNow.getMonth() != lastReminderTime.getMonth() &&
+    timeNow.getDayOfMonth() == reminder.getMonthlyDate();
   }
 
   private Boolean isItNowToSendReminderWeekly(Reminder reminder, LocalDateTime timeNow, LocalDateTime lastReminderTime) {
     return isItTimeToSendReminder(reminder, timeNow) &&
-            ((lastReminderTime == null && reminder.getDays().contains(timeNow.getDayOfWeek())) ||
-                (lastReminderTime != null && lastReminderTime.getDayOfWeek() != timeNow.getDayOfWeek()) &&
-                    reminder.getDays().contains(timeNow.getDayOfWeek()));
+            (weeklyFirstValid(reminder, timeNow, lastReminderTime) ||
+                    weeklyValid(reminder, timeNow, lastReminderTime));
+  }
+
+  private boolean weeklyValid(Reminder reminder, LocalDateTime timeNow, LocalDateTime lastReminderTime) {
+    return (lastReminderTime != null && lastReminderTime.getDayOfWeek() != timeNow.getDayOfWeek()) &&
+        reminder.getDays().contains(timeNow.getDayOfWeek());
+  }
+
+  private boolean weeklyFirstValid(Reminder reminder, LocalDateTime timeNow, LocalDateTime lastReminderTime) {
+    return lastReminderTime == null && reminder.getDays().contains(timeNow.getDayOfWeek());
   }
 
   private LocalDateTime millisToLocalDateTime(Long millis) {
