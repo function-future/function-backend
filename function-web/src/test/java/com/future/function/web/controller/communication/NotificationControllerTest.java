@@ -48,10 +48,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(NotificationController.class)
 public class NotificationControllerTest extends TestHelper {
 
-  public static final String NOTIFICATION_ID = "notificationId";
-  public static final String USER_ID = "userId";
-  public static final User USER = User.builder().id(USER_ID).build();
-  public static final Notification NOTIFICATION = Notification.builder().id(NOTIFICATION_ID).member(USER).build();
+  private static final String NOTIFICATION_ID = "notificationId";
+  private static final String USER_ID = "userId";
+  private static final User USER = User.builder().id(USER_ID).build();
+  private static final Notification NOTIFICATION = Notification.builder().id(NOTIFICATION_ID).member(USER).build();
 
   private JacksonTester<NotificationRequest> notificationRequestJacksonTester;
 
