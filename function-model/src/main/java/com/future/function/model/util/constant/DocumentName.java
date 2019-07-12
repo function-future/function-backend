@@ -68,8 +68,11 @@ public abstract class DocumentName {
   
   public static final String MENU = "menus";
 
-    public static final String ROOM = "rooms";
+  public static final String ROOM = "rooms";
 
-    public static final String COMMENT = "comments";
-  
+  public static final String COMMENT = "comments";
+
+  public static final String NOTIFICATION = "notifications";
+
+  public static final String REMINDER = "reminder";
 }
