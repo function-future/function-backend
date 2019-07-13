@@ -54,12 +54,12 @@ public class UniqueBatchCodeValidatorTest {
   public void testGivenNullIdAndNewCodeByValidatingUniqueBatchCodeReturnTrue() {
     
     when(batchData.getCode()).thenReturn(CODE);
-    when(batchRepository.findByCode(CODE)).thenReturn(Optional.empty());
+    when(batchRepository.findByCodeAndDeletedFalse(CODE)).thenReturn(Optional.empty());
     
     assertThat(validator.isValid(batchData, null)).isTrue();
     
     verify(batchData).getCode();
-    verify(batchRepository).findByCode(CODE);
+    verify(batchRepository).findByCodeAndDeletedFalse(CODE);
   }
   
   @Test
@@ -72,13 +72,13 @@ public class UniqueBatchCodeValidatorTest {
       .id(ID)
       .code(CODE)
       .build();
-    when(batchRepository.findByCode(CODE)).thenReturn(Optional.of(batch));
+    when(batchRepository.findByCodeAndDeletedFalse(CODE)).thenReturn(Optional.of(batch));
     
     assertThat(validator.isValid(batchData, null)).isTrue();
     
     verify(batchData).getId();
     verify(batchData).getCode();
-    verify(batchRepository).findByCode(CODE);
+    verify(batchRepository).findByCodeAndDeletedFalse(CODE);
   }
   
   @Test
@@ -91,13 +91,13 @@ public class UniqueBatchCodeValidatorTest {
       .id(ID)
       .code(CODE)
       .build();
-    when(batchRepository.findByCode(CODE)).thenReturn(Optional.of(batch));
+    when(batchRepository.findByCodeAndDeletedFalse(CODE)).thenReturn(Optional.of(batch));
     
     assertThat(validator.isValid(batchData, null)).isFalse();
     
     verify(batchData).getId();
     verify(batchData).getCode();
-    verify(batchRepository).findByCode(CODE);
+    verify(batchRepository).findByCodeAndDeletedFalse(CODE);
   }
   
 }

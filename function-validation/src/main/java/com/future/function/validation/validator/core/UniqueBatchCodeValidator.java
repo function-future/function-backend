@@ -23,7 +23,7 @@ public class UniqueBatchCodeValidator
   @Override
   public boolean isValid(BatchData data, ConstraintValidatorContext context) {
     
-    return batchRepository.findByCode(data.getCode())
+    return batchRepository.findByCodeAndDeletedFalse(data.getCode())
       .map(Batch::getId)
       .map(id -> id.equals(data.getId()))
       .orElse(true);

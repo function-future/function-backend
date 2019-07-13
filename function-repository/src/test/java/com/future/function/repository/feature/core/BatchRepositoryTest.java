@@ -58,7 +58,7 @@ public class BatchRepositoryTest {
   @Test
   public void testGivenMethodCallByFindingBatchesReturnBatchObject() {
     
-    Page<Batch> foundBatches = batchRepository.findAllByIdIsNotNull(PAGEABLE);
+    Page<Batch> foundBatches = batchRepository.findAllByDeletedFalse(PAGEABLE);
     
     assertThat(foundBatches.getContent()
                  .get(0)
@@ -72,7 +72,7 @@ public class BatchRepositoryTest {
   public void testGivenMethodCallByFindingFirstBatchReturnBatchObject() {
     
     Optional<Batch> foundBatch =
-      batchRepository.findFirstByIdIsNotNullOrderByUpdatedAtDesc();
+      batchRepository.findFirstByDeletedFalseOrderByUpdatedAtDesc();
     
     assertThat(foundBatch).isNotEqualTo(Optional.empty());
     assertThat(foundBatch.get()
@@ -82,7 +82,7 @@ public class BatchRepositoryTest {
   @Test
   public void testGivenBatchNumberByFindingBatchByNumberReturnBatchObject() {
     
-    Optional<Batch> foundBatch = batchRepository.findByCode(NUMBER_1);
+    Optional<Batch> foundBatch = batchRepository.findByCodeAndDeletedFalse(NUMBER_1);
     
     assertThat(foundBatch).isNotEqualTo(Optional.empty());
     assertThat(foundBatch.get()
