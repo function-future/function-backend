@@ -33,13 +33,15 @@ public class BatchRepositoryTest {
   
   private static final Pageable PAGEABLE = new PageRequest(0, 10, SORT);
   
+  private static final String ID_1 = "id-1";
+  
   @Autowired
   private BatchRepository batchRepository;
   
   @Before
   public void setUp() {
     
-    Batch firstBatch = new Batch("id-1", "name-1", NUMBER_1);
+    Batch firstBatch = new Batch(ID_1, "name-1", NUMBER_1);
     firstBatch.setCreatedAt(5L);
     firstBatch.setUpdatedAt(10L);
     Batch secondBatch = new Batch("id-2", "name-2", NUMBER_2);
@@ -82,10 +84,22 @@ public class BatchRepositoryTest {
   @Test
   public void testGivenBatchNumberByFindingBatchByNumberReturnBatchObject() {
     
-    Optional<Batch> foundBatch = batchRepository.findByCodeAndDeletedFalse(NUMBER_1);
+    Optional<Batch> foundBatch = batchRepository.findByCodeAndDeletedFalse(
+      NUMBER_1);
     
     assertThat(foundBatch).isNotEqualTo(Optional.empty());
     assertThat(foundBatch.get()
+                 .getCode()).isEqualTo(NUMBER_1);
+  }
+  
+  @Test
+  public void testGivenBatchIdAndPageableByFindingBatchesReturnPageOfBatch() {
+    
+    Page<Batch> foundBatches = batchRepository.findAllByIdAndDeletedFalse(
+      ID_1, PAGEABLE);
+    
+    assertThat(foundBatches.getContent()
+                 .get(0)
                  .getCode()).isEqualTo(NUMBER_1);
   }
   

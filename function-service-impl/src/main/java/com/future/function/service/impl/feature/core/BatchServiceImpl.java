@@ -1,16 +1,19 @@
 package com.future.function.service.impl.feature.core;
 
+import com.future.function.common.enumeration.core.Role;
 import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.repository.feature.core.BatchRepository;
 import com.future.function.service.api.feature.core.BatchService;
 import com.future.function.service.impl.helper.CopyHelper;
+import com.future.function.session.model.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * Service implementation class for batch logic operations implementation.
@@ -32,9 +35,21 @@ public class BatchServiceImpl implements BatchService {
    * @return {@code Batch} - Batches found in database.
    */
   @Override
-  public Page<Batch> getBatches(Pageable pageable) {
-    
-    return batchRepository.findAllByDeletedFalse(pageable);
+  public Page<Batch> getBatches(Session session, Pageable pageable) {
+  
+    return Optional.of(session)
+      .filter(this::hasNonStudentRole)
+      .map(ignored -> batchRepository.findAllByDeletedFalse(pageable))
+      .orElseGet(
+        () -> batchRepository.findAllByIdAndDeletedFalse(session.getBatchId(),
+                                                         pageable
+        ));
+  }
+  
+  private boolean hasNonStudentRole(Session session) {
+  
+    return Stream.of(Role.ADMIN, Role.JUDGE, Role.MENTOR)
+      .anyMatch(role -> role.equals(session.getRole()));
   }
   
   /**

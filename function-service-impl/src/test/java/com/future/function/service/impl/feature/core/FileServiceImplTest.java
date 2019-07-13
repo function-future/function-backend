@@ -52,7 +52,8 @@ public class FileServiceImplTest {
   private static final String NAME = "name";
 
   private static final Session SESSION = new Session("session-id", "user-id",
-                                                     EMAIL, Role.ADMIN
+                                                     "batch-id", EMAIL,
+                                                     Role.ADMIN
   );
 
   private FileV2 file = FileV2.builder()
@@ -278,7 +279,7 @@ public class FileServiceImplTest {
     when(fileRepository.save(any(FileV2.class))).thenReturn(savedFile);
 
     FileV2 createdFile = fileService.createFileOrFolder(
-      new Session("", "", EMAIL, Role.ADMIN), PARENT_ID, NAME, NAME,
+      new Session("", "", "", EMAIL, Role.ADMIN), PARENT_ID, NAME, NAME,
       NAME.getBytes()
     );
 
@@ -308,7 +309,7 @@ public class FileServiceImplTest {
     when(fileRepository.save(any(FileV2.class))).thenReturn(returnedFolder);
 
     FileV2 createdFolder = fileService.createFileOrFolder(
-      new Session("", "", EMAIL, Role.ADMIN), PARENT_ID, NAME, NAME,
+      new Session("", "", "", EMAIL, Role.ADMIN), PARENT_ID, NAME, NAME,
       new byte[] {}
     );
 
@@ -327,7 +328,7 @@ public class FileServiceImplTest {
   public void testGivenMethodCallAndEmptyByteArrayAndInvalidRoleByCreatingFolderReturnForbiddenException() {
 
     catchException(
-      () -> fileService.createFileOrFolder(new Session("", "", EMAIL, Role.MENTOR),
+      () -> fileService.createFileOrFolder(new Session("", "", "", EMAIL, Role.MENTOR),
                                            PARENT_ID, NAME, NAME, new byte[] {}
       ));
 

@@ -23,6 +23,14 @@ public interface BatchRepository extends MongoRepository<Batch, String> {
   Page<Batch> findAllByDeletedFalse(Pageable pageable);
   
   /**
+   * Finds batches in database based on {@code id} parameter.
+   *
+   * @return {@code Page<Batch>} - Batches found in database, if any exists;
+   * otherwise returns empty {@link Page}.
+   */
+  Page<Batch> findAllByIdAndDeletedFalse(String id, Pageable pageable);
+  
+  /**
    * Finds first (latest) batch in database based on {@code updatedAt} field.
    *
    * @return {@code Optional<Batch>} - Batch found in database, if any

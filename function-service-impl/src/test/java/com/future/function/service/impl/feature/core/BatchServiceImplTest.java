@@ -1,10 +1,12 @@
 package com.future.function.service.impl.feature.core;
 
+import com.future.function.common.enumeration.core.Role;
 import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.util.constant.FieldName;
 import com.future.function.repository.feature.core.BatchRepository;
 import com.future.function.service.impl.helper.PageHelper;
+import com.future.function.session.model.Session;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -12,6 +14,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -146,6 +149,20 @@ public class BatchServiceImplTest {
   }
   
   @Test
+  public void testGivenExistingDeletedBatchInDatabaseByFindingBatchByIdReturnNotFoundException() {
+    
+    batch.setDeleted(true);
+    when(batchRepository.findOne(ID_1)).thenReturn(batch);
+    
+    catchException(() -> batchService.getBatchById(ID_1));
+  
+    assertThat(caughtException().getClass()).isEqualTo(NotFoundException.class);
+    assertThat(caughtException().getMessage()).isEqualTo("Get Batch Not Found");
+    
+    verify(batchRepository).findOne(ID_1);
+  }
+  
+  @Test
   public void testGivenNonExistingBatchInDatabaseByFindingBatchByIdReturnNull() {
     
     when(batchRepository.findOne(ID_1)).thenReturn(null);
@@ -170,12 +187,33 @@ public class BatchServiceImplTest {
     
     when(batchRepository.findAllByDeletedFalse(PAGEABLE)).thenReturn(batchPage);
     
-    Page<Batch> foundBatchPage = batchService.getBatches(PAGEABLE);
+    Session sessionJudge = Session.builder()
+      .role(Role.JUDGE)
+      .build();
+    Page<Batch> foundBatchPageJudge = batchService.getBatches(sessionJudge,
+                                                         PAGEABLE
+    );
     
-    assertThat(foundBatchPage.getContent()).isNotEmpty();
-    assertThat(foundBatchPage).isEqualTo(batchPage);
+    assertThat(foundBatchPageJudge.getContent()).isNotEmpty();
+    assertThat(foundBatchPageJudge).isEqualTo(batchPage);
     
     verify(batchRepository).findAllByDeletedFalse(PAGEABLE);
+  
+    when(batchRepository.findAllByIdAndDeletedFalse(ID_1, PAGEABLE)).thenReturn(
+      batchPage);
+  
+    Session sessionStudent = Session.builder()
+      .batchId(ID_1)
+      .role(Role.STUDENT)
+      .build();
+    Page<Batch> foundBatchPageStudent = batchService.getBatches(sessionStudent,
+                                                                PAGEABLE
+    );
+  
+    assertThat(foundBatchPageStudent.getContent()).isNotEmpty();
+    assertThat(foundBatchPageStudent).isEqualTo(batchPage);
+  
+    verify(batchRepository).findAllByIdAndDeletedFalse(ID_1, PAGEABLE);
   }
   
   @Test
@@ -185,11 +223,29 @@ public class BatchServiceImplTest {
     
     when(batchRepository.findAllByDeletedFalse(PAGEABLE)).thenReturn(batchPage);
     
-    Page<Batch> foundBatchPage = batchService.getBatches(PAGEABLE);
+    Session sessionJudge = Session.builder()
+      .role(Role.JUDGE)
+      .build();
+    Page<Batch> foundBatchPageJudge = batchService.getBatches(
+      sessionJudge, PAGEABLE);
     
-    assertThat(foundBatchPage.getContent()).isEmpty();
+    assertThat(foundBatchPageJudge.getContent()).isEmpty();
     
     verify(batchRepository).findAllByDeletedFalse(PAGEABLE);
+  
+    when(batchRepository.findAllByIdAndDeletedFalse(ID_1, PAGEABLE)).thenReturn(
+      batchPage);
+  
+    Session sessionStudent = Session.builder()
+      .batchId(ID_1)
+      .role(Role.STUDENT)
+      .build();
+    Page<Batch> foundBatchPageStudent = batchService.getBatches(
+      sessionStudent, PAGEABLE);
+  
+    assertThat(foundBatchPageStudent.getContent()).isEmpty();
+  
+    verify(batchRepository).findAllByIdAndDeletedFalse(ID_1, PAGEABLE);
   }
   
   @Test
@@ -203,6 +259,19 @@ public class BatchServiceImplTest {
     
     verify(batchRepository).findOne(ID_1);
     verify(batchRepository).save(batch);
+  }
+  
+  @Test
+  public void testGivenBatchIdAndDeletedBatchByDeletingBatchReturnSuccessfulButNoDeletion() {
+    
+    batch.setDeleted(true);
+    when(batchRepository.findOne(ID_1)).thenReturn(batch);
+    
+    batchService.deleteBatch(ID_1);
+    
+    assertThat(batch.isDeleted()).isTrue();
+    
+    verify(batchRepository).findOne(ID_1);
   }
   
   @Test
@@ -222,6 +291,22 @@ public class BatchServiceImplTest {
     verify(batchRepository).findOne(ID_1);
     verify(batchRepository).save(batch);
     verify(batchRepository).findFirstByDeletedFalseOrderByUpdatedAtDesc();
+  }
+  
+  @Test
+  public void testGivenMethodCallToUpdateDeletedBatchByUpdatingBatchReturnRequestBatchObject() {
+    
+    Batch batch = new Batch();
+    BeanUtils.copyProperties(this.batch, batch);
+    batch.setDeleted(true);
+    when(batchRepository.findOne(ID_1)).thenReturn(batch);
+    
+    Batch updatedBatch = batchService.updateBatch(this.batch);
+    
+    assertThat(updatedBatch).isNotNull();
+    assertThat(updatedBatch).isEqualTo(this.batch);
+    
+    verify(batchRepository).findOne(ID_1);
   }
   
   @Test

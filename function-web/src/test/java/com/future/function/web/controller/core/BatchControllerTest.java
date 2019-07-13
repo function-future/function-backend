@@ -116,7 +116,7 @@ public class BatchControllerTest extends TestHelper {
   public void testGivenCallToBatchesApiByFindingBatchesFromBatchServiceReturnListOfBatchNumbers()
     throws Exception {
     
-    when(batchService.getBatches(PAGEABLE)).thenReturn(BATCH_PAGE);
+    when(batchService.getBatches(ADMIN_SESSION, PAGEABLE)).thenReturn(BATCH_PAGE);
     
     mockMvc.perform(get("/api/core/batches").cookie(cookies))
       .andExpect(status().isOk())
@@ -124,7 +124,7 @@ public class BatchControllerTest extends TestHelper {
         pagingResponseJacksonTester.write(BATCHES_DATA_RESPONSE)
           .getJson()));
     
-    verify(batchService).getBatches(PAGEABLE);
+    verify(batchService).getBatches(ADMIN_SESSION, PAGEABLE);
   }
   
   @Test
