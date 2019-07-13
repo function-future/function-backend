@@ -24,6 +24,33 @@ public class CopyHelperTest {
       .user(User.builder()
               .email("dummy-source-user-email")
               .build())
+      .anotherField("another-field")
+      .build();
+    dummySource.setCreatedAt(1L);
+    dummySource.setCreatedBy("dummy-source-user-email");
+    dummySource.setUpdatedAt(2L);
+    
+    Dummy expectedDummyTarget = Dummy.builder()
+      .anotherField("another-field")
+      .build();
+    expectedDummyTarget.setUpdatedAt(2L);
+    
+    Dummy dummyTarget = new Dummy();
+    
+    CopyHelper.copyProperties(dummySource, dummyTarget);
+    
+    assertThat(dummyTarget).isEqualTo(expectedDummyTarget);
+  }
+  
+  @Test
+  public void testGivenSourceAndTargetAndAdditionalIgnoredPropertiesByCopyingPropertiesReturnSuccessfulCopy() {
+    
+    Dummy dummySource = Dummy.builder()
+      .id("dummy-source-id")
+      .user(User.builder()
+              .email("dummy-source-user-email")
+              .build())
+      .anotherField("another-field")
       .build();
     dummySource.setCreatedAt(1L);
     dummySource.setCreatedBy("dummy-source-user-email");
@@ -35,7 +62,7 @@ public class CopyHelperTest {
     
     Dummy dummyTarget = new Dummy();
     
-    CopyHelper.copyProperties(dummySource, dummyTarget);
+    CopyHelper.copyProperties(dummySource, dummyTarget, "anotherField");
     
     assertThat(dummyTarget).isEqualTo(expectedDummyTarget);
   }
