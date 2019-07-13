@@ -108,6 +108,7 @@ public class BatchController {
       BatchWebRequest data
   ) {
     
+    data.setId(batchId);
     return BatchResponseMapper.toBatchDataResponse(
       batchService.updateBatch(batchRequestMapper.toBatch(batchId, data)));
   }

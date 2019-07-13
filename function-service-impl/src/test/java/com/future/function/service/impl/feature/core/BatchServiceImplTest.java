@@ -74,7 +74,7 @@ public class BatchServiceImplTest {
     
     when(batchRepository.save(batch)).thenReturn(batch);
     when(
-      batchRepository.findFirstByIdIsNotNullOrderByUpdatedAtDesc()).thenReturn(
+      batchRepository.findFirstByDeletedFalseOrderByUpdatedAtDesc()).thenReturn(
       Optional.of(batch));
     
     Batch createdBatch = batchService.createBatch(batch);
@@ -83,7 +83,7 @@ public class BatchServiceImplTest {
     assertThat(createdBatch).isEqualTo(batch);
     
     verify(batchRepository).save(batch);
-    verify(batchRepository).findFirstByIdIsNotNullOrderByUpdatedAtDesc();
+    verify(batchRepository).findFirstByDeletedFalseOrderByUpdatedAtDesc();
   }
   
   @Test
@@ -91,7 +91,7 @@ public class BatchServiceImplTest {
     
     when(batchRepository.save(batch)).thenReturn(batch);
     when(
-      batchRepository.findFirstByIdIsNotNullOrderByUpdatedAtDesc()).thenThrow(
+      batchRepository.findFirstByDeletedFalseOrderByUpdatedAtDesc()).thenThrow(
       new NotFoundException("Saved Batch Not Found"));
     
     catchException(() -> batchService.createBatch(batch));
@@ -101,13 +101,13 @@ public class BatchServiceImplTest {
       "Saved Batch Not Found");
     
     verify(batchRepository).save(batch);
-    verify(batchRepository).findFirstByIdIsNotNullOrderByUpdatedAtDesc();
+    verify(batchRepository).findFirstByDeletedFalseOrderByUpdatedAtDesc();
   }
   
   @Test
   public void testGivenExistingBatchInDatabaseByFindingBatchByCodeReturnBatchObject() {
     
-    when(batchRepository.findByCode(FIRST_BATCH_NUMBER)).thenReturn(
+    when(batchRepository.findByCodeAndDeletedFalse(FIRST_BATCH_NUMBER)).thenReturn(
       Optional.of(batch));
     
     Batch foundBatch = batchService.getBatchByCode(FIRST_BATCH_NUMBER);
@@ -115,13 +115,13 @@ public class BatchServiceImplTest {
     assertThat(foundBatch).isNotNull();
     assertThat(foundBatch).isEqualTo(batch);
     
-    verify(batchRepository).findByCode(FIRST_BATCH_NUMBER);
+    verify(batchRepository).findByCodeAndDeletedFalse(FIRST_BATCH_NUMBER);
   }
   
   @Test
   public void testGivenNonExistingBatchInDatabaseByFindingBatchByCodeReturnNull() {
     
-    when(batchRepository.findByCode(FIRST_BATCH_NUMBER)).thenReturn(
+    when(batchRepository.findByCodeAndDeletedFalse(FIRST_BATCH_NUMBER)).thenReturn(
       Optional.empty());
     
     catchException(() -> batchService.getBatchByCode(FIRST_BATCH_NUMBER));
@@ -129,7 +129,7 @@ public class BatchServiceImplTest {
     assertThat(caughtException().getClass()).isEqualTo(NotFoundException.class);
     assertThat(caughtException().getMessage()).isEqualTo("Get Batch Not Found");
     
-    verify(batchRepository).findByCode(FIRST_BATCH_NUMBER);
+    verify(batchRepository).findByCodeAndDeletedFalse(FIRST_BATCH_NUMBER);
   }
   
   @Test
@@ -168,14 +168,14 @@ public class BatchServiceImplTest {
     Page<Batch> batchPage = PageHelper.toPage(
       Arrays.asList(secondBatch, batch), PAGEABLE);
     
-    when(batchRepository.findAllByIdIsNotNull(PAGEABLE)).thenReturn(batchPage);
+    when(batchRepository.findAllByDeletedFalse(PAGEABLE)).thenReturn(batchPage);
     
     Page<Batch> foundBatchPage = batchService.getBatches(PAGEABLE);
     
     assertThat(foundBatchPage.getContent()).isNotEmpty();
     assertThat(foundBatchPage).isEqualTo(batchPage);
     
-    verify(batchRepository).findAllByIdIsNotNull(PAGEABLE);
+    verify(batchRepository).findAllByDeletedFalse(PAGEABLE);
   }
   
   @Test
@@ -183,13 +183,13 @@ public class BatchServiceImplTest {
     
     Page<Batch> batchPage = PageHelper.empty(PAGEABLE);
     
-    when(batchRepository.findAllByIdIsNotNull(PAGEABLE)).thenReturn(batchPage);
+    when(batchRepository.findAllByDeletedFalse(PAGEABLE)).thenReturn(batchPage);
     
     Page<Batch> foundBatchPage = batchService.getBatches(PAGEABLE);
     
     assertThat(foundBatchPage.getContent()).isEmpty();
     
-    verify(batchRepository).findAllByIdIsNotNull(PAGEABLE);
+    verify(batchRepository).findAllByDeletedFalse(PAGEABLE);
   }
   
   @Test
@@ -211,7 +211,7 @@ public class BatchServiceImplTest {
     when(batchRepository.findOne(ID_1)).thenReturn(batch);
     when(batchRepository.save(batch)).thenReturn(batch);
     when(
-      batchRepository.findFirstByIdIsNotNullOrderByUpdatedAtDesc()).thenReturn(
+      batchRepository.findFirstByDeletedFalseOrderByUpdatedAtDesc()).thenReturn(
       Optional.of(batch));
     
     Batch updatedBatch = batchService.updateBatch(batch);
@@ -221,7 +221,7 @@ public class BatchServiceImplTest {
     
     verify(batchRepository).findOne(ID_1);
     verify(batchRepository).save(batch);
-    verify(batchRepository).findFirstByIdIsNotNullOrderByUpdatedAtDesc();
+    verify(batchRepository).findFirstByDeletedFalseOrderByUpdatedAtDesc();
   }
   
   @Test

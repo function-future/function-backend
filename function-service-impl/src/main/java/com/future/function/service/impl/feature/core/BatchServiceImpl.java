@@ -34,7 +34,7 @@ public class BatchServiceImpl implements BatchService {
   @Override
   public Page<Batch> getBatches(Pageable pageable) {
     
-    return batchRepository.findAllByIdIsNotNull(pageable);
+    return batchRepository.findAllByDeletedFalse(pageable);
   }
   
   /**
@@ -47,7 +47,7 @@ public class BatchServiceImpl implements BatchService {
   @Override
   public Batch getBatchByCode(String code) {
     
-    return batchRepository.findByCode(code)
+    return batchRepository.findByCodeAndDeletedFalse(code)
       .orElseThrow(() -> new NotFoundException("Get Batch Not Found"));
   }
   
@@ -56,6 +56,7 @@ public class BatchServiceImpl implements BatchService {
     
     return Optional.ofNullable(batchId)
       .map(batchRepository::findOne)
+      .filter(foundBatch -> !foundBatch.isDeleted())
       .orElseThrow(() -> new NotFoundException("Get Batch Not Found"));
   }
   
@@ -69,7 +70,7 @@ public class BatchServiceImpl implements BatchService {
     
     batchRepository.save(batch);
     
-    return batchRepository.findFirstByIdIsNotNullOrderByUpdatedAtDesc()
+    return batchRepository.findFirstByDeletedFalseOrderByUpdatedAtDesc()
       .orElseThrow(() -> new NotFoundException("Saved Batch Not Found"));
   }
   
@@ -78,9 +79,10 @@ public class BatchServiceImpl implements BatchService {
     
     return Optional.of(batch)
       .map(b -> batchRepository.findOne(b.getId()))
+      .filter(foundBatch -> !foundBatch.isDeleted())
       .map(foundBatch -> copyPropertiesAndSaveBatch(batch, foundBatch))
       .flatMap(
-        ignored -> batchRepository.findFirstByIdIsNotNullOrderByUpdatedAtDesc())
+        ignored -> batchRepository.findFirstByDeletedFalseOrderByUpdatedAtDesc())
       .orElse(batch);
   }
   
@@ -95,6 +97,7 @@ public class BatchServiceImpl implements BatchService {
     
     Optional.ofNullable(batchId)
       .map(batchRepository::findOne)
+      .filter(foundBatch -> !foundBatch.isDeleted())
       .ifPresent(batch -> {
         batch.setDeleted(true);
         batchRepository.save(batch);

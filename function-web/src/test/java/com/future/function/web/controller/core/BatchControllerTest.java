@@ -71,11 +71,7 @@ public class BatchControllerTest extends TestHelper {
     .code(SECOND_BATCH_CODE)
     .build();
   
-  private static final BatchWebRequest BATCH_WEB_REQUEST =
-    BatchWebRequest.builder()
-      .name(FIRST_BATCH_NAME)
-      .code(FIRST_BATCH_CODE)
-      .build();
+  private BatchWebRequest batchWebRequest;
   
   private static final Pageable PAGEABLE = new PageRequest(0, 10);
   
@@ -135,20 +131,25 @@ public class BatchControllerTest extends TestHelper {
   public void testGivenCallToBatchesApiByCreatingBatchReturnNewBatchResponse()
     throws Exception {
     
-    when(batchRequestMapper.toBatch(BATCH_WEB_REQUEST)).thenReturn(FIRST_BATCH);
+    batchWebRequest = BatchWebRequest.builder()
+      .name(FIRST_BATCH_NAME)
+      .code(FIRST_BATCH_CODE)
+      .build();
+    
+    when(batchRequestMapper.toBatch(batchWebRequest)).thenReturn(FIRST_BATCH);
     when(batchService.createBatch(FIRST_BATCH)).thenReturn(FIRST_BATCH);
     
     mockMvc.perform(post("/api/core/batches").cookie(cookies)
                       .contentType(MediaType.APPLICATION_JSON)
                       .content(
-                        batchWebRequestJacksonTester.write(BATCH_WEB_REQUEST)
+                        batchWebRequestJacksonTester.write(batchWebRequest)
                           .getJson()))
       .andExpect(status().isCreated())
       .andExpect(content().json(
         dataResponseJacksonTester.write(CREATED_DATA_RESPONSE)
           .getJson()));
     
-    verify(batchRequestMapper).toBatch(BATCH_WEB_REQUEST);
+    verify(batchRequestMapper).toBatch(batchWebRequest);
     verify(batchService).createBatch(FIRST_BATCH);
   }
   
@@ -172,22 +173,28 @@ public class BatchControllerTest extends TestHelper {
   public void testGivenCallToBatchesApiByUpdatingBatchReturnDataResponseObject()
     throws Exception {
     
+    batchWebRequest = BatchWebRequest.builder()
+      .id(FIRST_BATCH_ID)
+      .name(FIRST_BATCH_NAME)
+      .code(FIRST_BATCH_CODE)
+      .build();
+    
     when(
-      batchRequestMapper.toBatch(FIRST_BATCH_ID, BATCH_WEB_REQUEST)).thenReturn(
+      batchRequestMapper.toBatch(FIRST_BATCH_ID, batchWebRequest)).thenReturn(
       FIRST_BATCH);
     when(batchService.updateBatch(FIRST_BATCH)).thenReturn(FIRST_BATCH);
     
     mockMvc.perform(put("/api/core/batches/" + FIRST_BATCH_ID).cookie(cookies)
                       .contentType(MediaType.APPLICATION_JSON)
                       .content(
-                        batchWebRequestJacksonTester.write(BATCH_WEB_REQUEST)
+                        batchWebRequestJacksonTester.write(batchWebRequest)
                           .getJson()))
       .andExpect(status().isOk())
       .andExpect(content().json(
         dataResponseJacksonTester.write(RETRIEVED_DATA_RESPONSE)
           .getJson()));
     
-    verify(batchRequestMapper).toBatch(FIRST_BATCH_ID, BATCH_WEB_REQUEST);
+    verify(batchRequestMapper).toBatch(FIRST_BATCH_ID, batchWebRequest);
     verify(batchService).updateBatch(FIRST_BATCH);
   }
   
