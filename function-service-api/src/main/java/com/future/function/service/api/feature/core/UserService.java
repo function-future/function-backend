@@ -11,7 +11,7 @@ import java.util.List;
  * Service interface class for user logic operations declaration.
  */
 public interface UserService {
-  
+
   /**
    * Retrieves a user from database given the users's userId. If not found,
    * then throw {@link com.future.function.common.exception.NotFoundException}
@@ -22,7 +22,7 @@ public interface UserService {
    * @return {@code User} - The user object found in database.
    */
   User getUser(String userId);
-  
+
   /**
    * Retrieves a user from database given the users's userId. If not found,
    * then throw
@@ -35,7 +35,7 @@ public interface UserService {
    * @return {@code User} - The user object found in database.
    */
   User getUserByEmailAndPassword(String email, String password);
-  
+
   /**
    * Retrieves users from database given role.
    *
@@ -45,7 +45,7 @@ public interface UserService {
    * @return {@code Page<User>} - Page of users found in database.
    */
   Page<User> getUsers(Role role, Pageable pageable);
-  
+
   /**
    * Creates user object and saves any other data related to the user.
    *
@@ -54,7 +54,7 @@ public interface UserService {
    * @return {@code User} - The user object of the saved data.
    */
   User createUser(User user);
-  
+
   /**
    * Updates user object and saves any other data related to the user. If not
    * found, then return the request object.
@@ -64,7 +64,7 @@ public interface UserService {
    * @return {@code User} - The user object of the saved data.
    */
   User updateUser(User user);
-  
+
   /**
    * Deletes user object from database. If not found, then throw
    * {@link com.future.function.common.exception.NotFoundException} exception.
@@ -72,7 +72,7 @@ public interface UserService {
    * @param userId Id of user to be deleted.
    */
   void deleteUser(String userId);
-  
+
   /**
    * Retrieves users from database given role.
    *
@@ -81,7 +81,7 @@ public interface UserService {
    * @return {@code List<User>} - List of users found in database.
    */
   List<User> getStudentsByBatchCode(String batchCode);
-  
+
   /**
    * Retrieves user from database with specified email.
    *
@@ -90,9 +90,9 @@ public interface UserService {
    * @return {@code User} - User found in database.
    */
   User getUserByEmail(String email);
-  
+
   void changeUserPassword(String email, String oldPassword, String newPassword);
-  
+
   /**
    * Retrieves users from database which contains and case-insensitively
    * matches given name.
@@ -101,6 +101,6 @@ public interface UserService {
    *
    * @return {@code List<User>} - List of users found in database.
    */
-  List<User> getUsersByNameContainsIgnoreCase(String name);
-  
+  Page<User> getUsersByNameContainsIgnoreCase(String name, Pageable pageable);
+
 }

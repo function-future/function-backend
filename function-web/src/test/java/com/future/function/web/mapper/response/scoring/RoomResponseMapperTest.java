@@ -46,6 +46,7 @@ public class RoomResponseMapperTest {
   private Page<Room> roomPage;
   private AssignmentWebResponse assignmentWebResponse;
   private RoomWebResponse roomWebResponse;
+  private BatchWebResponse batchWebResponse;
   private UserWebResponse userWebResponse;
   private BatchWebResponse batchWebResponse;
   private DataResponse<RoomWebResponse> roomWebResponseDataResponse;
@@ -72,6 +73,8 @@ public class RoomResponseMapperTest {
         .batchCode(BATCH_CODE)
         .file(FILE_URl)
         .build();
+    batchWebResponse = BatchWebResponse.builder()
+        .code(BATCH_CODE).build();
     student = User.builder().id(USER_ID).name("name").address("address").batch(batch).email("email")
         .password("password").phone("phone").pictureV2(fileV2).role(Role.STUDENT).build();
     batchWebResponse = new BatchWebResponse();

@@ -31,16 +31,16 @@ import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DiscussionServiceImplTest {
-  
+
   private static final String BATCH_ID = "batch-id";
-  
+
   private static final String BATCH_CODE = "batch-code";
-  
+
   private static final Batch BATCH = Batch.builder()
     .id(BATCH_ID)
     .code(BATCH_CODE)
     .build();
-  
+
   private static final String COURSE_ID = "course-id";
 
   private static final String ID = "id";
@@ -136,12 +136,12 @@ public class DiscussionServiceImplTest {
     )).thenReturn(new Course());
 
     when(batchService.getBatchByCode(BATCH_CODE)).thenReturn(BATCH);
-    
+
     Page<Discussion> discussionPage = PageHelper.toPage(
       Collections.singletonList(DISCUSSION), PAGEABLE);
     when(discussionRepository.findAllByCourseIdAndBatchIdOrderByCreatedAtDesc(
       COURSE_ID, BATCH_ID, PAGEABLE)).thenReturn(discussionPage);
-    
+
     Page<Discussion> discussions = discussionService.getDiscussions(
       EMAIL, COURSE_ID, BATCH_CODE, PAGEABLE);
 

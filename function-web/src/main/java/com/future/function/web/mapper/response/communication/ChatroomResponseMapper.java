@@ -75,6 +75,7 @@ public class ChatroomResponseMapper {
                 .id(chatroom.getId())
                 .name(chatroom.getTitle())
                 .members(participants)
+                .type(chatroom.getType().name())
                 .build();
     }
 

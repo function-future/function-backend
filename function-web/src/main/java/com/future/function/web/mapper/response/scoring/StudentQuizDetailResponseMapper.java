@@ -8,11 +8,12 @@ import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.feature.scoring.OptionWebResponse;
 import com.future.function.web.model.response.feature.scoring.StudentQuestionWebResponse;
 import com.future.function.web.model.response.feature.scoring.StudentQuizDetailWebResponse;
-import java.util.List;
-import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class StudentQuizDetailResponseMapper {

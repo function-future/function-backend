@@ -8,12 +8,13 @@ import com.future.function.repository.feature.scoring.StudentQuizDetailRepositor
 import com.future.function.service.api.feature.scoring.StudentQuestionService;
 import com.future.function.service.api.feature.scoring.StudentQuizDetailService;
 import com.future.function.service.impl.helper.CopyHelper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 @Service
 public class StudentQuizDetailServiceImpl implements StudentQuizDetailService {

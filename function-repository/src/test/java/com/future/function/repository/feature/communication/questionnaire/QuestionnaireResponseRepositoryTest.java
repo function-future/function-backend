@@ -84,6 +84,7 @@ public class QuestionnaireResponseRepositoryTest {
             .details(questionResponses)
             .build();
 
+    questionnaireResponse2.setDeleted(true);
     questionnaireResponseRepository.save(questionnaireResponse);
     questionnaireResponseRepository.save(questionnaireResponse2);
   }
@@ -98,12 +99,12 @@ public class QuestionnaireResponseRepositoryTest {
   @Test
   public void testGivenQuestionnaireAndAppraiseeByFindingAllQuestionnaireResponseReturnListQuestionnaireResponse() {
     List<QuestionnaireResponse> questionnaireResponses =
-            questionnaireResponseRepository.findAllByQuestionnaireAndAppraisee(questionnaire, appraisee);
+            questionnaireResponseRepository.findAllByQuestionnaireAndAppraiseeAndDeletedFalse(questionnaire, appraisee);
 
-    assertThat(questionnaireResponses.size()).isEqualTo(2);
+    assertThat(questionnaireResponses.size()).isEqualTo(1);
     assertThat(questionnaireResponses.get(0).getId()).isEqualTo(ID_1);
     assertThat(questionnaireResponses.get(0).getDetails().size()).isEqualTo(2);
-    assertThat(questionnaireResponses.get(1).getId()).isEqualTo(ID_2);
-    assertThat(questionnaireResponses.get(1).getDetails().size()).isEqualTo(2);
+//    assertThat(questionnaireResponses.get(1).getId()).isEqualTo(ID_2);
+//    assertThat(questionnaireResponses.get(1).getDetails().size()).isEqualTo(2);
   }
 }
