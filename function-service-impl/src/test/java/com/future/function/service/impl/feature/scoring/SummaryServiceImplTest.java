@@ -2,13 +2,13 @@ package com.future.function.service.impl.feature.scoring;
 
 import com.future.function.common.enumeration.core.Role;
 import com.future.function.common.exception.ForbiddenException;
-import com.future.function.model.dto.scoring.StudentSummaryDTO;
-import com.future.function.model.dto.scoring.SummaryDTO;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.model.entity.feature.scoring.*;
 import com.future.function.model.enums.scoring.ScoringType;
+import com.future.function.model.vo.scoring.StudentSummaryVO;
+import com.future.function.model.vo.scoring.SummaryVO;
 import com.future.function.service.api.feature.core.UserService;
 import com.future.function.service.api.feature.scoring.RoomService;
 import com.future.function.service.api.feature.scoring.StudentQuizService;
@@ -44,8 +44,8 @@ public class SummaryServiceImplTest {
     private Room room;
     private FileV2 fileV2;
     private Batch batch;
-    private SummaryDTO quizSummaryDTO;
-    private SummaryDTO roomSummaryDTO;
+    private SummaryVO quizSummaryVO;
+    private SummaryVO roomSummaryVO;
     private StudentQuizDetail studentQuizDetail;
 
     @InjectMocks
@@ -96,7 +96,7 @@ public class SummaryServiceImplTest {
 
     @Test
     public void findAllPointSummaryByStudentId() {
-        StudentSummaryDTO actual = summaryService.findAllPointSummaryByStudentId(STUDENT_ID, USER_ID);
+        StudentSummaryVO actual = summaryService.findAllPointSummaryByStudentId(STUDENT_ID, USER_ID);
         assertThat(actual.getStudentName()).isEqualTo(STUDENT_NAME);
         assertThat(actual.getBatchCode()).isEqualTo(BATCH_CODE);
         assertThat(actual.getUniversity()).isEqualTo(UNIVERSITY);
@@ -114,7 +114,7 @@ public class SummaryServiceImplTest {
     public void findAllPointSummaryByStudentIdAccessedByAdmin() {
         User anotherUser = User.builder().id("id").role(Role.ADMIN).build();
         when(userService.getUser("id")).thenReturn(anotherUser);
-        StudentSummaryDTO actual = summaryService.findAllPointSummaryByStudentId(STUDENT_ID, "id");
+        StudentSummaryVO actual = summaryService.findAllPointSummaryByStudentId(STUDENT_ID, "id");
         assertThat(actual.getStudentName()).isEqualTo(STUDENT_NAME);
         assertThat(actual.getBatchCode()).isEqualTo(BATCH_CODE);
         assertThat(actual.getUniversity()).isEqualTo(UNIVERSITY);

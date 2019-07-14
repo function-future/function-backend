@@ -27,8 +27,8 @@ public class SummaryController {
 
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   @WithAnyRole(roles = {Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT})
-  public DataResponse<ReportDetailWebResponse> findAllSummaryByStudentId(@PathVariable(value = "studentId") String studentId,
-      Session session) {
+  public DataResponse<ReportDetailWebResponse> findAllSummaryByStudentId(@PathVariable String studentId,
+                                                                         Session session) {
     return ReportDetailResponseMapper.toDataReportDetailWebResponse(
         summaryService.findAllPointSummaryByStudentId(studentId, session.getUserId()));
   }

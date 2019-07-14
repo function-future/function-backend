@@ -71,5 +71,9 @@ public abstract class DocumentName {
     public static final String ROOM = "rooms";
 
     public static final String COMMENT = "comments";
+
+    public static final String REPORT = "reports";
+
+    public static final String REPORT_DETAIL = "report-details";
   
 }

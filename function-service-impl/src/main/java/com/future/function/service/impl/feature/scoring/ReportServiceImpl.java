@@ -131,7 +131,7 @@ public class ReportServiceImpl implements ReportService {
                     value.setStudentIds(studentIds);
                     return value;
                 })
-                .orElseThrow(() -> new UnsupportedOperationException("Failed to update report"));
+                .orElse(report);
     }
 
     private Report checkStudentIdsChangedAndDeleteIfChanged(Report report) {

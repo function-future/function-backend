@@ -2,13 +2,13 @@ package com.future.function.service.impl.feature.scoring;
 
 import com.future.function.common.enumeration.core.Role;
 import com.future.function.common.exception.ForbiddenException;
-import com.future.function.model.dto.scoring.StudentSummaryDTO;
-import com.future.function.model.dto.scoring.SummaryDTO;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.model.entity.feature.scoring.Report;
 import com.future.function.model.entity.feature.scoring.ReportDetail;
+import com.future.function.model.vo.scoring.StudentSummaryVO;
+import com.future.function.model.vo.scoring.SummaryVO;
 import com.future.function.repository.feature.scoring.ReportDetailRepository;
 import com.future.function.service.api.feature.core.UserService;
 import com.future.function.service.api.feature.scoring.SummaryService;
@@ -50,8 +50,8 @@ public class ReportDetailServiceImplTest {
     private User student;
     private Batch batch;
     private FileV2 fileV2;
-    private SummaryDTO summaryDTO;
-    private StudentSummaryDTO studentSummaryDTO;
+    private SummaryVO summaryVO;
+    private StudentSummaryVO studentSummaryVO;
 
     @InjectMocks
     private ReportDetailServiceImpl reportDetailService;
@@ -68,14 +68,14 @@ public class ReportDetailServiceImplTest {
     @Before
     public void setUp() throws Exception {
 
-        summaryDTO = SummaryDTO.builder().title(QUIZ_TITLE).type(QUIZ_TYPE).point(POINT).build();
+        summaryVO = SummaryVO.builder().title(QUIZ_TITLE).type(QUIZ_TYPE).point(POINT).build();
 
-        studentSummaryDTO = StudentSummaryDTO.builder()
+        studentSummaryVO = StudentSummaryVO.builder()
                 .studentName(USER_NAME)
                 .university(UNIVERSITY)
                 .batchCode(BATCH_CODE)
                 .avatar(FILE_URL)
-                .scores(Collections.singletonList(summaryDTO))
+                .scores(Collections.singletonList(summaryVO))
                 .build();
 
 
@@ -110,7 +110,7 @@ public class ReportDetailServiceImplTest {
         when(reportDetailRepository.save(reportDetail)).thenReturn(reportDetail);
         when(reportDetailRepository.findByUserId(USER_ID)).thenReturn(Optional.of(reportDetail));
         when(summaryService.findAllPointSummaryByStudentId(USER_ID, USER_ID))
-                .thenReturn(studentSummaryDTO);
+                .thenReturn(studentSummaryVO);
         when(userService.getUser(USER_ID)).thenReturn(student);
     }
 
@@ -129,7 +129,7 @@ public class ReportDetailServiceImplTest {
 
     @Test
     public void findAllSummaryByReportId() {
-        List<StudentSummaryDTO> actual = reportDetailService.findAllSummaryByReportId(REPORT_ID, USER_ID);
+        List<StudentSummaryVO> actual = reportDetailService.findAllSummaryByReportId(REPORT_ID, USER_ID);
         assertThat(actual.size()).isEqualTo(1);
         assertThat(actual.get(0).getStudentName()).isEqualTo(USER_NAME);
         assertThat(actual.get(0).getUniversity()).isEqualTo(UNIVERSITY);

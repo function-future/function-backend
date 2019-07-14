@@ -3,10 +3,10 @@ package com.future.function.service.impl.feature.scoring;
 import com.future.function.common.enumeration.core.Role;
 import com.future.function.common.exception.ForbiddenException;
 import com.future.function.common.exception.NotFoundException;
-import com.future.function.model.dto.scoring.StudentSummaryDTO;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.model.entity.feature.scoring.Report;
 import com.future.function.model.entity.feature.scoring.ReportDetail;
+import com.future.function.model.vo.scoring.StudentSummaryVO;
 import com.future.function.repository.feature.scoring.ReportDetailRepository;
 import com.future.function.service.api.feature.core.UserService;
 import com.future.function.service.api.feature.scoring.ReportDetailService;
@@ -38,7 +38,7 @@ public class ReportDetailServiceImpl implements ReportDetailService {
     }
 
     @Override
-    public List<StudentSummaryDTO> findAllSummaryByReportId(String reportId, String userId) {
+    public List<StudentSummaryVO> findAllSummaryByReportId(String reportId, String userId) {
         return Optional.ofNullable(reportId)
             .map(reportDetailRepository::findAllByReportIdAndDeletedFalse)
             .map(list -> getStudentsSummaryPoints(userId, list))
@@ -52,7 +52,7 @@ public class ReportDetailServiceImpl implements ReportDetailService {
             .orElseGet(ArrayList::new);
     }
 
-    private List<StudentSummaryDTO> getStudentsSummaryPoints(String userId, List<ReportDetail> list) {
+    private List<StudentSummaryVO> getStudentsSummaryPoints(String userId, List<ReportDetail> list) {
         return list.stream()
             .map(ReportDetail::getUser)
             .map(User::getId)

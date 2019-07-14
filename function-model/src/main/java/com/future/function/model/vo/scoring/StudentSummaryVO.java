@@ -1,4 +1,4 @@
-package com.future.function.model.dto.scoring;
+package com.future.function.model.vo.scoring;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,12 +11,12 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class StudentSummaryDTO {
+public class StudentSummaryVO {
 
   private String studentName;
   private String batchCode;
   private String university;
     private String avatar;
-  private List<SummaryDTO> scores;
+    private List<SummaryVO> scores;
 
 }

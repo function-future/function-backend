@@ -1,11 +1,11 @@
 package com.future.function.web.mapper.response.scoring;
 
-import com.future.function.model.dto.scoring.StudentSummaryDTO;
-import com.future.function.model.dto.scoring.SummaryDTO;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.model.entity.feature.scoring.ReportDetail;
+import com.future.function.model.vo.scoring.StudentSummaryVO;
+import com.future.function.model.vo.scoring.SummaryVO;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.feature.scoring.ReportDetailWebResponse;
 import org.junit.After;
@@ -34,12 +34,12 @@ public class ReportDetailResponseMapperTest {
     private FileV2 fileV2;
     private User student;
     private Batch batch;
-    private SummaryDTO summaryDTO;
-  private StudentSummaryDTO studentSummaryDTO;
+    private SummaryVO summaryVO;
+    private StudentSummaryVO studentSummaryVO;
 
     @Before
     public void setUp() throws Exception {
-        summaryDTO = SummaryDTO.builder()
+        summaryVO = SummaryVO.builder()
                 .title(TITLE)
                 .type(TYPE)
                 .point(POINT)
@@ -50,8 +50,8 @@ public class ReportDetailResponseMapperTest {
         batch = Batch.builder().code(BATCH_CODE).build();
         student = User.builder().name(STUDENT_NAME).batch(batch).university(UNIVERSITY).pictureV2(fileV2).build();
         reportDetail = ReportDetail.builder().id(REPORT_DETAIL_ID).user(student).point(0).build();
-      studentSummaryDTO = StudentSummaryDTO.builder().studentName(STUDENT_NAME).batchCode(BATCH_CODE)
-              .university(UNIVERSITY).avatar(FILE_URL).scores(Collections.singletonList(summaryDTO)).build();
+        studentSummaryVO = StudentSummaryVO.builder().studentName(STUDENT_NAME).batchCode(BATCH_CODE)
+                .university(UNIVERSITY).avatar(FILE_URL).scores(Collections.singletonList(summaryVO)).build();
     }
 
     @After
@@ -61,7 +61,7 @@ public class ReportDetailResponseMapperTest {
     @Test
     public void toDataReportDetailWebResponse() {
         DataResponse<ReportDetailWebResponse> actual = ReportDetailResponseMapper.toDataReportDetailWebResponse(
-            studentSummaryDTO);
+                studentSummaryVO);
         assertThat(actual.getData().getBatchCode()).isEqualTo(BATCH_CODE);
         assertThat(actual.getData().getStudentName()).isEqualTo(STUDENT_NAME);
         assertThat(actual.getData().getScores().get(0).getTitle()).isEqualTo(TITLE);
@@ -70,7 +70,7 @@ public class ReportDetailResponseMapperTest {
     @Test
     public void toDataListReportDetailWebResponse() {
         DataResponse<List<ReportDetailWebResponse>> actual = ReportDetailResponseMapper.toDataListReportDetailWebResponse(
-            Collections.singletonList(studentSummaryDTO));
+                Collections.singletonList(studentSummaryVO));
         assertThat(actual.getData().get(0).getBatchCode()).isEqualTo(BATCH_CODE);
         assertThat(actual.getData().get(0).getStudentName()).isEqualTo(STUDENT_NAME);
         assertThat(actual.getData().get(0).getUniversity()).isEqualTo(UNIVERSITY);

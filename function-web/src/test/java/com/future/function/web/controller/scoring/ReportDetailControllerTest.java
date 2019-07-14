@@ -1,13 +1,13 @@
 package com.future.function.web.controller.scoring;
 
 import com.future.function.common.enumeration.core.Role;
-import com.future.function.model.dto.scoring.StudentSummaryDTO;
-import com.future.function.model.dto.scoring.SummaryDTO;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.model.entity.feature.scoring.Report;
 import com.future.function.model.entity.feature.scoring.ReportDetail;
+import com.future.function.model.vo.scoring.StudentSummaryVO;
+import com.future.function.model.vo.scoring.SummaryVO;
 import com.future.function.service.api.feature.scoring.ReportDetailService;
 import com.future.function.web.TestHelper;
 import com.future.function.web.TestSecurityConfiguration;
@@ -55,8 +55,8 @@ public class ReportDetailControllerTest extends TestHelper {
     private static final int POINT = 100;
 
     private ReportDetail reportDetail;
-    private StudentSummaryDTO studentSummaryDTO;
-    private SummaryDTO summaryDTO;
+    private StudentSummaryVO studentSummaryVO;
+    private SummaryVO summaryVO;
     private User student;
     private Batch batch;
     private FileV2 fileV2;
@@ -87,15 +87,15 @@ public class ReportDetailControllerTest extends TestHelper {
         report = Report.builder().id(REPORT_ID).build();
         fileV2 = FileV2.builder().fileUrl(AVATAR).build();
         batch = Batch.builder().code(BATCH_CODE).build();
-        summaryDTO = SummaryDTO.builder().title(TITLE).type(TYPE).point(POINT).build();
+        summaryVO = SummaryVO.builder().title(TITLE).type(TYPE).point(POINT).build();
         student = User.builder().pictureV2(fileV2).batch(batch).name(STUDENT_NAME).university(UNIVERSITY).build();
         reportDetail = ReportDetail.builder().user(student).point(POINT).report(report).build();
-        studentSummaryDTO = StudentSummaryDTO.builder()
+        studentSummaryVO = StudentSummaryVO.builder()
                 .studentName(STUDENT_NAME)
                 .university(UNIVERSITY)
                 .batchCode(BATCH_CODE)
                 .avatar(AVATAR)
-                .scores(Collections.singletonList(summaryDTO))
+                .scores(Collections.singletonList(summaryVO))
                 .build();
         scoreStudentWebRequest = ScoreStudentWebRequest.builder()
                 .studentId(STUDENT_ID)
@@ -131,7 +131,7 @@ public class ReportDetailControllerTest extends TestHelper {
         when(requestMapper.toReportDetailList(reportDetailScoreWebRequest, REPORT_ID))
                 .thenReturn(Collections.singletonList(reportDetail));
         when(reportDetailService.findAllSummaryByReportId(REPORT_ID, JUDGE_ID))
-                .thenReturn(Collections.singletonList(studentSummaryDTO));
+                .thenReturn(Collections.singletonList(studentSummaryVO));
         when(reportDetailService.giveScoreToEachStudentInDetail(REPORT_ID, Collections.singletonList(reportDetail)))
                 .thenReturn(Collections.singletonList(reportDetail));
     }

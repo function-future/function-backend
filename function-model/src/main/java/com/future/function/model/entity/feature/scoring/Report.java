@@ -2,6 +2,7 @@ package com.future.function.model.entity.feature.scoring;
 
 import com.future.function.model.entity.base.BaseEntity;
 import com.future.function.model.entity.feature.core.Batch;
+import com.future.function.model.util.constant.DocumentName;
 import com.future.function.model.util.constant.FieldName;
 import lombok.*;
 import org.springframework.data.mongodb.core.mapping.DBRef;
@@ -17,7 +18,7 @@ import java.util.UUID;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Document
+@Document(collection = DocumentName.REPORT)
 public class Report extends BaseEntity {
 
     @Builder.Default
@@ -32,7 +33,7 @@ public class Report extends BaseEntity {
     @Field(FieldName.Report.USED_AT)
     private LocalDate usedAt;
 
-    @DBRef
+    @DBRef(lazy = true)
     @Field(FieldName.Report.BATCH)
     private Batch batch;
 

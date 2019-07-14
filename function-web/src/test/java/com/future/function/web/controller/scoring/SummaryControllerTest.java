@@ -1,8 +1,8 @@
 package com.future.function.web.controller.scoring;
 
 import com.future.function.common.enumeration.core.Role;
-import com.future.function.model.dto.scoring.StudentSummaryDTO;
-import com.future.function.model.dto.scoring.SummaryDTO;
+import com.future.function.model.vo.scoring.StudentSummaryVO;
+import com.future.function.model.vo.scoring.SummaryVO;
 import com.future.function.service.api.feature.scoring.SummaryService;
 import com.future.function.web.TestHelper;
 import com.future.function.web.TestSecurityConfiguration;
@@ -10,7 +10,6 @@ import com.future.function.web.mapper.response.scoring.ReportDetailResponseMappe
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.feature.scoring.ReportDetailWebResponse;
 import com.future.function.web.model.response.feature.scoring.SummaryWebResponse;
-import java.util.Collections;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,9 +19,9 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
+import java.util.Collections;
+
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -40,8 +39,8 @@ public class SummaryControllerTest extends TestHelper {
   private static final String UNIVERSITY = "university";
   private static final int POINT = 100;
 
-  private SummaryDTO summaryDTO;
-  private StudentSummaryDTO studentSummaryDTO;
+    private SummaryVO summaryVO;
+    private StudentSummaryVO studentSummaryVO;
   private SummaryWebResponse summaryWebResponse;
   private ReportDetailWebResponse reportDetailWebResponse;
   private DataResponse<ReportDetailWebResponse> DATA_RESPONSE;
@@ -54,17 +53,17 @@ public class SummaryControllerTest extends TestHelper {
     super.setUp();
     super.setCookie(Role.ADMIN);
 
-    summaryDTO = SummaryDTO.builder()
+      summaryVO = SummaryVO.builder()
         .title(TITLE)
         .type(TYPE)
         .point(POINT)
         .build();
 
-    studentSummaryDTO = StudentSummaryDTO.builder()
+      studentSummaryVO = StudentSummaryVO.builder()
         .studentName(STUDENT_NAME)
         .batchCode(BATCH_CODE)
         .university(UNIVERSITY)
-        .scores(Collections.singletonList(summaryDTO))
+              .scores(Collections.singletonList(summaryVO))
         .build();
 
     summaryWebResponse = SummaryWebResponse.builder()
@@ -80,9 +79,9 @@ public class SummaryControllerTest extends TestHelper {
         .scores(Collections.singletonList(summaryWebResponse))
         .build();
 
-    DATA_RESPONSE = ReportDetailResponseMapper.toDataReportDetailWebResponse(studentSummaryDTO);
+      DATA_RESPONSE = ReportDetailResponseMapper.toDataReportDetailWebResponse(studentSummaryVO);
 
-    when(summaryService.findAllPointSummaryByStudentId(STUDENT_ID, ADMIN_ID)).thenReturn(studentSummaryDTO);
+      when(summaryService.findAllPointSummaryByStudentId(STUDENT_ID, ADMIN_ID)).thenReturn(studentSummaryVO);
   }
 
   @After

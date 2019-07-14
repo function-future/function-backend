@@ -1,5 +1,8 @@
 package com.future.function.model.enums.scoring;
 
+import lombok.Getter;
+
+@Getter
 public enum ScoringType {
 
     QUIZ("QUIZ"),
@@ -9,9 +12,5 @@ public enum ScoringType {
 
     ScoringType(String type) {
         this.type = type;
-    }
-
-    public String getType() {
-        return type;
     }
 }
