@@ -42,7 +42,7 @@ public class AuthServiceImplTest {
   private static final String PASSWORD = "password";
   
   private static final Session SESSION = new Session(
-    SESSION_ID, USER_ID, EMAIL, Role.MENTOR);
+    SESSION_ID, USER_ID, null, EMAIL, Role.MENTOR);
   
   private static final User USER = User.builder()
     .id("id")

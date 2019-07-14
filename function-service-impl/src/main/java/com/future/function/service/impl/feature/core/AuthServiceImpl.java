@@ -2,6 +2,7 @@ package com.future.function.service.impl.feature.core;
 
 import com.future.function.common.exception.UnauthorizedException;
 import com.future.function.common.properties.core.SessionProperties;
+import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.service.api.feature.core.AuthService;
 import com.future.function.service.api.feature.core.UserService;
@@ -51,6 +52,7 @@ public class AuthServiceImpl implements AuthService {
 
     Session session = Session.builder()
       .userId(user.getId())
+      .batchId(this.getBatchId(user))
       .email(user.getEmail())
       .role(user.getRole())
       .build();
@@ -66,6 +68,14 @@ public class AuthServiceImpl implements AuthService {
     return user;
   }
 
+  private String getBatchId(User user) {
+    
+    return Optional.of(user)
+    .map(User::getBatch)
+      .map(Batch::getId)
+    .orElse(null);
+  }
+  
   private void setAuthenticationOnSecurityContextHolder(
     Authentication authentication
   ) {
