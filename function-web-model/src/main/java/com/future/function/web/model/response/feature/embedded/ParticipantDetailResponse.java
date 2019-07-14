@@ -1,4 +1,4 @@
-package com.future.function.web.model.response.feature.communication.chatting;
+package com.future.function.web.model.response.feature.embedded;
 
 import com.future.function.web.model.response.feature.core.BatchWebResponse;
 import lombok.AllArgsConstructor;
@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ChatroomParticipantDetailResponse {
+public class ParticipantDetailResponse {
 
   private String id;
 
