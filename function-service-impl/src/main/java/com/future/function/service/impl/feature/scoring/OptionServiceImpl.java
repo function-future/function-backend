@@ -25,14 +25,14 @@ public class OptionServiceImpl implements OptionService {
   public List<Option> getOptionListByQuestionId(String questionId) {
     return Optional.ofNullable(questionId)
         .map(optionRepository::findAllByQuestionId)
-        .orElseThrow(() -> new NotFoundException("Question not found"));
+            .orElseThrow(() -> new NotFoundException("Failed at #getOptionListByQuestionId #OptionService"));
   }
 
   @Override
   public Option findById(String id) {
     return Optional.ofNullable(id)
         .flatMap(optionRepository::findByIdAndDeletedFalse)
-        .orElseThrow(() -> new NotFoundException("Option not found"));
+            .orElseThrow(() -> new NotFoundException("Failed at #findById #OptionService"));
   }
 
   @Override

@@ -45,12 +45,12 @@ public class SummaryServiceImpl implements SummaryService {
                 .map(userService::getUser)
                 .map(this::getAllSummaryFromAssignmentAndQuiz)
             .map(this::mapToStudentSummaryDTO)
-            .orElseThrow(() -> new NotFoundException("Student not found at #findAllPointSummaryByStudentId"));
+                .orElseThrow(() -> new NotFoundException("Failed at #findAllPointSummaryByStudentId #SummaryService"));
     }
 
     private String checkEligibilityUser(User user, String studentId) {
         if(user.getRole().equals(Role.STUDENT) && !user.getId().equals(studentId)) {
-            throw new ForbiddenException("User not allowed");
+            throw new ForbiddenException("Failed at #checkEligibilityUser #SummaryService");
         }
         return studentId;
     }

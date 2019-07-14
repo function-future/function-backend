@@ -40,7 +40,7 @@ public class ReportController {
           @RequestParam(defaultValue = "10") int size,
           Session session) {
     return ReportResponseMapper.toPagingReportWebResponse(reportService
-            .findAllReport(batchCode, session.getUserId(), PageHelper.toPageable(page, size)));
+            .findAllReport(batchCode, PageHelper.toPageable(page, size)));
   }
 
   @ResponseStatus(HttpStatus.OK)

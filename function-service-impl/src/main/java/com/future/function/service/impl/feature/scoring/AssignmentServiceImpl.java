@@ -68,7 +68,7 @@ public class AssignmentServiceImpl implements AssignmentService {
   public Assignment findById(String id) {
     return Optional.ofNullable(id)
             .flatMap(assignmentRepository::findByIdAndDeletedFalse)
-            .orElseThrow(() -> new NotFoundException("Assignment Not Found"));
+            .orElseThrow(() -> new NotFoundException("#Failed at #findById #AssignmentService"));
   }
 
   @Override

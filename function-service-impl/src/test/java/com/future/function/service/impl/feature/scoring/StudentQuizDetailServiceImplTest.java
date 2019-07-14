@@ -1,12 +1,6 @@
 package com.future.function.service.impl.feature.scoring;
 
-import com.future.function.model.entity.feature.scoring.Option;
-import com.future.function.model.entity.feature.scoring.Question;
-import com.future.function.model.entity.feature.scoring.QuestionBank;
-import com.future.function.model.entity.feature.scoring.Quiz;
-import com.future.function.model.entity.feature.scoring.StudentQuestion;
-import com.future.function.model.entity.feature.scoring.StudentQuiz;
-import com.future.function.model.entity.feature.scoring.StudentQuizDetail;
+import com.future.function.model.entity.feature.scoring.*;
 import com.future.function.repository.feature.scoring.StudentQuizDetailRepository;
 import com.future.function.service.api.feature.scoring.StudentQuestionService;
 import org.junit.After;
@@ -169,6 +163,7 @@ public class StudentQuizDetailServiceImplTest {
     assertThat(actual.getPoint()).isEqualTo(100);
     verify(studentQuizDetailRepository).findFirstByStudentQuizIdAndDeletedFalse(STUDENT_QUIZ_ID);
     verify(studentQuestionService).postAnswerForAllStudentQuestion(Collections.singletonList(studentQuestion));
+    verify(studentQuizDetailRepository).save(studentQuizDetail);
   }
 
   @Test

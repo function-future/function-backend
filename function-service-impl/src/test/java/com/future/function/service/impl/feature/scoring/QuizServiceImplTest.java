@@ -13,7 +13,6 @@ import com.future.function.service.api.feature.scoring.QuestionService;
 import com.future.function.service.api.feature.scoring.StudentQuizService;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -36,7 +35,6 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
-@Ignore
 public class QuizServiceImplTest {
 
   private static final String QUIZ_ID = UUID.randomUUID().toString();
@@ -54,7 +52,6 @@ public class QuizServiceImplTest {
 
   private static final String QUESTION_ID = "question-id";
   private static final String QUESTION_TEXT = "question-text";
-  private static final String NOT_FOUND_MSG = "Quiz Not Found";
   private int PAGE = 0;
   private int TOTAL = 10;
   private Quiz quiz;
@@ -152,7 +149,6 @@ public class QuizServiceImplTest {
     catchException(() -> quizService.findById(null));
 
     assertThat(caughtException().getClass()).isEqualTo(NotFoundException.class);
-    assertThat(caughtException().getMessage()).isEqualTo(NOT_FOUND_MSG);
   }
 
   @Test
@@ -160,7 +156,6 @@ public class QuizServiceImplTest {
     catchException(() -> quizService.findById(""));
 
     assertThat(caughtException().getClass()).isEqualTo(NotFoundException.class);
-    assertThat(caughtException().getMessage()).isEqualTo(NOT_FOUND_MSG);
   }
 
   @Test
@@ -227,7 +222,6 @@ public class QuizServiceImplTest {
   }
 
   @Test
-  @Ignore
   public void testUpdateQuizFindByIdNotFound() {
     quiz.setId("randomId");
       when(quizRepository.findByIdAndDeletedFalse("randomId")).thenReturn(Optional.empty());

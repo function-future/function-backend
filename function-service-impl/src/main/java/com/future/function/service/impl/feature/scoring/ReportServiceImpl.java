@@ -1,6 +1,5 @@
 package com.future.function.service.impl.feature.scoring;
 
-import com.future.function.common.enumeration.core.Role;
 import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.User;
@@ -17,8 +16,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -44,15 +41,9 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public Page<Report> findAllReport(String batchCode, String userId, Pageable pageable) {
+    public Page<Report> findAllReport(String batchCode, Pageable pageable) {
         Batch batch = batchService.getBatchByCode(batchCode);
-        User user = userService.getUser(userId);
-        if (user.getRole().equals(Role.ADMIN)) {
-            return mapReportPageToHaveStudentIds(reportRepository.findAll(pageable));
-        } else {
-            return mapReportPageToHaveStudentIds(reportRepository.findAllByBatchAndUsedAtEqualsAndDeletedFalse(batch,
-                    LocalDate.now(ZoneId.systemDefault()), pageable));
-        }
+        return mapReportPageToHaveStudentIds(reportRepository.findAllByBatchAndDeletedFalse(batch, pageable));
     }
 
     private Page<Report> mapReportPageToHaveStudentIds(Page<Report> reportPage) {
@@ -66,7 +57,7 @@ public class ReportServiceImpl implements ReportService {
         return Optional.ofNullable(id)
                 .flatMap(reportRepository::findByIdAndDeletedFalse)
                 .map(this::findStudentIdsByReportId)
-                .orElseThrow(() -> new NotFoundException("Report not found"));
+                .orElseThrow(() -> new NotFoundException("Failed at #findById #ReportService"));
     }
 
     private Report findStudentIdsByReportId(Report report) {
@@ -93,7 +84,7 @@ public class ReportServiceImpl implements ReportService {
                 })
                 .map(reportRepository::save)
                 .map(students -> createReportDetailByReportAndStudentId(report, studentIds))
-                .orElseThrow(() -> new UnsupportedOperationException("Failed to create report"));
+                .orElseThrow(() -> new UnsupportedOperationException("Failed at #createReport #ReportService"));
     }
 
     private Report createReportDetailByReportAndStudentId(Report report, List<String> studentIds) {
@@ -149,7 +140,7 @@ public class ReportServiceImpl implements ReportService {
 
     private List<String> validateList(List<String> list) {
         if (list.isEmpty() || list.size() > 3)
-            throw new UnsupportedOperationException("Update failed: student list empty");
+            throw new UnsupportedOperationException("Failed at #validateStudentList #ReportService");
         return list;
     }
 

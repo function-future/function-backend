@@ -6,7 +6,7 @@ import org.springframework.data.domain.Pageable;
 
 public interface ReportService {
 
-    Page<Report> findAllReport(String batchCode, String userId, Pageable pageable);
+    Page<Report> findAllReport(String batchCode, Pageable pageable);
 
     Report findById(String id);
 

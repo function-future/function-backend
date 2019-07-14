@@ -41,8 +41,6 @@ public class AssignmentServiceImplTest {
 
   private static final String ROOM_ID = "room-id";
 
-  private static final String ERROR_MSG_NOT_FOUND = "Assignment Not Found";
-
   private static final String FILE_PATH = "file-path";
   private static final String FILE_ID = "file-id";
 
@@ -154,7 +152,6 @@ public class AssignmentServiceImplTest {
   public void testFindByIdNull() {
     catchException(() -> assignmentService.findById(null));
     assertThat(caughtException().getClass()).isEqualTo(NotFoundException.class);
-    assertThat(caughtException().getMessage()).isEqualTo(ERROR_MSG_NOT_FOUND);
     verifyZeroInteractions(assignmentRepository);
   }
 

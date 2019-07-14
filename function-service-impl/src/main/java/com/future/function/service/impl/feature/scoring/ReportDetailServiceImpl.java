@@ -66,7 +66,7 @@ public class ReportDetailServiceImpl implements ReportDetailService {
                 .map(value -> buildReportDetail(report, student))
                 .map(reportDetailRepository::save)
                 .map(ReportDetail::getReport)
-                .orElseThrow(() -> new UnsupportedOperationException("Failed at #createReportDetailByReport"));
+                .orElseThrow(() -> new UnsupportedOperationException("Failed at #createReportDetailByReport #ReportDetailService"));
     }
 
     private ReportDetail buildReportDetail(Report report, User student) {
@@ -79,12 +79,12 @@ public class ReportDetailServiceImpl implements ReportDetailService {
                 .map(userService::getUser)
                 .map(user -> this.checkUserEligibility(studentId, user))
                 .flatMap(user -> reportDetailRepository.findByUserId(studentId))
-                .orElseThrow(() -> new NotFoundException("Failed at #findByStudentId"));
+                .orElseThrow(() -> new NotFoundException("Failed at #findByStudentId #ReportDetailService"));
     }
 
     private User checkUserEligibility(String studentId, User user) {
         if (user.getRole().equals(Role.STUDENT) && !user.getId().equals(studentId)) {
-            throw new ForbiddenException("User not allowed");
+            throw new ForbiddenException("Faileld at #checkUserEligibility #ReportDetailService");
         } else {
             return user;
         }
@@ -108,7 +108,7 @@ public class ReportDetailServiceImpl implements ReportDetailService {
                     CopyHelper.copyProperties(reportDetail, detail);
                     return detail;
                 })
-                .orElseThrow(() -> new UnsupportedOperationException("Failed at #findReportDetailAndValidateReportId"));
+                .orElseThrow(() -> new UnsupportedOperationException("Failed at #findReportDetailAndValidateReportId #ReportDetailService"));
     }
 
     @Override

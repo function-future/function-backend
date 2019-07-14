@@ -33,7 +33,7 @@ public class StudentQuizDetailServiceImpl implements StudentQuizDetailService {
   public StudentQuizDetail findLatestByStudentQuizId(String studentQuizId) {
     return Optional.ofNullable(studentQuizId)
         .flatMap(studentQuizDetailRepository::findFirstByStudentQuizIdAndDeletedFalse)
-        .orElseThrow(() -> new NotFoundException("Quiz not found"));
+            .orElseThrow(() -> new NotFoundException("Failed at #findLatestByStudentQuizId #StudentQuizDetailService"));
   }
 
   @Override
@@ -42,7 +42,7 @@ public class StudentQuizDetailServiceImpl implements StudentQuizDetailService {
         .map(this::findLatestByStudentQuizId)
         .map(StudentQuizDetail::getId)
         .map(studentQuestionService::findAllByStudentQuizDetailId)
-        .orElseThrow(() -> new UnsupportedOperationException("Student Quiz not found"));
+            .orElseThrow(() -> new NotFoundException("Failed at #findAllQuestionsByStudentQuizId #StudentQuizDetailService"));
   }
 
   @Override
@@ -57,7 +57,7 @@ public class StudentQuizDetailServiceImpl implements StudentQuizDetailService {
         .map(questionList -> studentQuestionService
             .createStudentQuestionsFromQuestionList(questionList,
                 this.createNewStudentQuizDetail(studentQuizId)))
-        .orElseThrow(() -> new UnsupportedOperationException("Student Quiz not found"));
+            .orElseThrow(() -> new NotFoundException("Failed at #findAllUnansweredQuestionsByStudentQuizId #StudentQuizDetailService"));
   }
 
   private StudentQuizDetail createNewStudentQuizDetail(String studentQuizId) {
@@ -69,20 +69,25 @@ public class StudentQuizDetailServiceImpl implements StudentQuizDetailService {
 
   @Override
   public StudentQuizDetail answerStudentQuiz(String studentQuizId, List<StudentQuestion> answers) {
-    StudentQuizDetail detail = Optional.ofNullable(studentQuizId)
-        .map(this::findLatestByStudentQuizId)
-        .orElseThrow(() -> new NotFoundException("Student quiz detail not found"));
+    StudentQuizDetail detail = this.findLatestByStudentQuizId(studentQuizId);
+    return Optional.ofNullable(detail)
+            .map(value -> mapAnswersToStudentQuizDetail(answers, value))
+            .map(studentQuestionService::postAnswerForAllStudentQuestion)
+            .map(point -> {
+              detail.setPoint(point);
+              return studentQuizDetailRepository.save(detail);
+            })
+            .orElseThrow(() -> new UnsupportedOperationException("Failed at #answerStudentQuiz #StudentQuizDetailService"));
+  }
 
+  private List<StudentQuestion> mapAnswersToStudentQuizDetail(List<StudentQuestion> answers, StudentQuizDetail detail) {
     answers = answers.stream()
-        .map(answer -> {
-          answer.setStudentQuizDetail(detail);
-          return answer;
-        })
-        .collect(Collectors.toList());
-
-    Integer point = studentQuestionService.postAnswerForAllStudentQuestion(answers);
-    detail.setPoint(point);
-    return detail;
+            .map(answer -> {
+              answer.setStudentQuizDetail(detail);
+              return answer;
+            })
+            .collect(Collectors.toList());
+    return answers;
   }
 
   @Override

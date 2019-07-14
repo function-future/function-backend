@@ -20,7 +20,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -73,7 +76,7 @@ public class StudentQuizServiceImpl implements StudentQuizService {
   private User isUserIdEqualStudentId(String studentId, User value) {
     if (value.getId().equals(studentId))
       return value;
-    throw new ForbiddenException("User not allowed");
+    throw new ForbiddenException("Failed at #isUserIdEqualsStudentId #StudentQuizService");
   }
 
   @Override
@@ -85,7 +88,7 @@ public class StudentQuizServiceImpl implements StudentQuizService {
           checkUserEligibilityAndReturnStudentId(user, studentQuiz.getStudent().getId());
           return studentQuiz;
         })
-        .orElseThrow(() -> new NotFoundException("Quiz not found"));
+            .orElseThrow(() -> new NotFoundException("Failed at #findById #StudentQuizService"));
   }
 
   @Override
@@ -119,22 +122,17 @@ public class StudentQuizServiceImpl implements StudentQuizService {
   @Override
   public StudentQuizDetail answerQuestionsByStudentQuizId(String studentQuizId, String userId, List<StudentQuestion> answers) {
     StudentQuiz studentQuiz = this.findById(studentQuizId, userId);
-    String studentId = Optional.ofNullable(studentQuiz)
-        .map(StudentQuiz::getStudent)
-        .map(User::getId)
-        .orElse("");
     return Optional.of(userId)
         .map(userService::getUser)
         .filter(user -> user.getRole().equals(Role.STUDENT))
-        .map(user -> this.checkUserEligibilityAndReturnStudentId(user, studentId))
+            .map(user -> this.checkUserEligibilityAndReturnStudentId(user, studentQuiz.getStudent().getId()))
         .map(id -> studentQuizDetailService.answerStudentQuiz(studentQuizId, answers))
-        .orElseThrow(() -> new UnsupportedOperationException("Answer Questions Failed"));
+            .orElseThrow(() -> new UnsupportedOperationException("Failed at #answerQuestionsByStudentQuizId #StudentQuizService"));
   }
 
   @Override
   public StudentQuiz createStudentQuizAndSave(String userId, Quiz quiz) {
     return Optional.ofNullable(quiz)
-        .filter(Objects::nonNull)
         .map(quizObj -> toStudentQuizWithUserAndQuiz(userId, quizObj))
         .map(studentQuizRepository::save)
         .orElseThrow(() -> new UnsupportedOperationException("Create quiz failed"));
@@ -149,7 +147,7 @@ public class StudentQuizServiceImpl implements StudentQuizService {
         .map(studentQuiz -> studentQuiz.get(0))
         .map(this::createStudentQuizDetailAndSave)
         .map(returnValue -> quiz)
-        .orElseThrow(() -> new UnsupportedOperationException("Create Student Quiz Failed"));
+            .orElseThrow(() -> new UnsupportedOperationException("Failed at#CreateStudentQuizByBatchCode #StudentQuizService"));
   }
 
   private StudentQuizDetail createStudentQuizDetailAndSave(StudentQuiz studentQuiz) {

@@ -5,7 +5,6 @@ import com.future.function.model.entity.feature.scoring.QuestionBank;
 import com.future.function.repository.feature.scoring.QuestionBankRepository;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -26,7 +25,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
-@Ignore
 public class QuestionBankServiceImplTest {
 
   private static final String QUESTIONBANK_ID = "random-id";
@@ -85,7 +83,6 @@ public class QuestionBankServiceImplTest {
   }
 
   @Test
-  @Ignore
   public void testFindByIdEmptyFail() {
       when(questionBankRepository.findByIdAndDeletedFalse("")).thenReturn(Optional.empty());
     catchException(() -> questionBankService.findById(""));

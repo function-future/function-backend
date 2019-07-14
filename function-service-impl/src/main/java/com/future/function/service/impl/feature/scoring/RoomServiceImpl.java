@@ -57,7 +57,7 @@ public class RoomServiceImpl implements RoomService {
 
   private Room checkStudentEligibility(User user, Room room) {
       if (user.getRole().equals(Role.STUDENT) && !room.getStudent().getId().equals(user.getId())) {
-          throw new ForbiddenException("Failed at #checkStudentEligibility");
+          throw new ForbiddenException("Failed at #checkStudentEligibility #RoomService");
       }
       return room;
   }
@@ -78,7 +78,7 @@ public class RoomServiceImpl implements RoomService {
 
     private String checkUserEligibilityToSeeStudentRoom(String studentId, User user) {
         if (user.getRole().equals(Role.STUDENT) && !user.getId().equals(studentId)) {
-            throw new ForbiddenException("Failed at #checkUserEligibilityToSeeStudentRoom");
+            throw new ForbiddenException("Failed at #checkUserEligibilityToSeeStudentRoom #RoomService");
         }
         return studentId;
     }
@@ -113,7 +113,7 @@ public class RoomServiceImpl implements RoomService {
             .map(userService::getStudentsByBatchCode)
             .map(list -> mapEveryStudentToRoom(assignment, list))
             .map(object -> assignment)
-            .orElseThrow(() -> new UnsupportedOperationException("Failed on #createRoomsByAssignment"));
+                .orElseThrow(() -> new UnsupportedOperationException("Failed on #createRoomsByAssignment #RoomService"));
     }
 
   private List<User> mapEveryStudentToRoom(Assignment assignment, List<User> list) {
@@ -142,7 +142,7 @@ public class RoomServiceImpl implements RoomService {
             return room;
           })
           .map(roomRepository::save)
-              .orElseThrow(() -> new ForbiddenException("Failed at #giveScoreToRoomByRoomId"));
+              .orElseThrow(() -> new ForbiddenException("Failed at #giveScoreToRoomByRoomId #RoomService"));
     }
 
     @Override

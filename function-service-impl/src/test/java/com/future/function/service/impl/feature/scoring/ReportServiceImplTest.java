@@ -98,7 +98,7 @@ public class ReportServiceImplTest {
         reportPage = new PageImpl<>(Collections.singletonList(report), pageable, 1);
 
         when(reportRepository.findAll(pageable)).thenReturn(reportPage);
-        when(reportRepository.findAllByBatchAndUsedAtEqualsAndDeletedFalse(batch, LocalDate.now(), pageable))
+        when(reportRepository.findAllByBatchAndDeletedFalse(batch, pageable))
                 .thenReturn(reportPage);
         when(reportRepository.findByIdAndDeletedFalse(REPORT_ID)).thenReturn(Optional.of(report));
         when(reportRepository.save(report)).thenReturn(report);
@@ -117,10 +117,9 @@ public class ReportServiceImplTest {
     public void findAllReport() {
         User admin = User.builder().id(USER_ID).role(Role.ADMIN).build();
         when(userService.getUser(USER_ID)).thenReturn(admin);
-        Page<Report> actual = reportService.findAllReport(BATCH_CODE, USER_ID, pageable);
+        Page<Report> actual = reportService.findAllReport(BATCH_CODE, pageable);
         assertThat(actual).isEqualTo(reportPage);
-        verify(reportRepository).findAll(pageable);
-        verify(userService).getUser(USER_ID);
+        verify(reportRepository).findAllByBatchAndDeletedFalse(batch, pageable);
         verify(batchService).getBatchByCode(BATCH_CODE);
         verify(reportDetailService).findAllDetailByReportId(REPORT_ID);
     }
@@ -129,10 +128,9 @@ public class ReportServiceImplTest {
     public void findAllReportJudge() {
         User judge = User.builder().id(USER_ID).role(Role.JUDGE).build();
         when(userService.getUser(USER_ID)).thenReturn(judge);
-        Page<Report> actual = reportService.findAllReport(BATCH_CODE, USER_ID, pageable);
+        Page<Report> actual = reportService.findAllReport(BATCH_CODE, pageable);
         assertThat(actual).isEqualTo(reportPage);
-        verify(reportRepository).findAllByBatchAndUsedAtEqualsAndDeletedFalse(batch, USED_AT, pageable);
-        verify(userService).getUser(USER_ID);
+        verify(reportRepository).findAllByBatchAndDeletedFalse(batch, pageable);
         verify(batchService).getBatchByCode(BATCH_CODE);
         verify(reportDetailService).findAllDetailByReportId(REPORT_ID);
     }

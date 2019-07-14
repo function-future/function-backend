@@ -110,7 +110,7 @@ public class ReportControllerTest extends TestHelper {
         CREATED_DATA_RESPONSE = ResponseHelper.toDataResponse(HttpStatus.CREATED, reportWebResponse);
         PAGING_RESPONSE = ResponseHelper.toPagingResponse(HttpStatus.OK,
                 Collections.singletonList(reportWebResponse), paging);
-        when(reportService.findAllReport(BATCH_CODE, ADMIN_ID, pageable))
+        when(reportService.findAllReport(BATCH_CODE, pageable))
                 .thenReturn(new PageImpl<>(Collections.singletonList(report), pageable, 1));
         when(reportService.createReport(report)).thenReturn(report);
         when(reportService.updateReport(report)).thenReturn(report);
@@ -135,7 +135,7 @@ public class ReportControllerTest extends TestHelper {
                 .andExpect(content().json(
                         pagingResponseJacksonTester.write(PAGING_RESPONSE)
                                 .getJson()));
-        verify(reportService).findAllReport(BATCH_CODE, ADMIN_ID, pageable);
+        verify(reportService).findAllReport(BATCH_CODE, pageable);
     }
 
     @Test
