@@ -1,5 +1,6 @@
 package com.future.function.validation.validator.core;
 
+import com.future.function.common.data.core.BatchData;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.repository.feature.core.BatchRepository;
 import com.future.function.validation.annotation.core.UniqueBatchCode;
@@ -21,8 +22,15 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class UniqueBatchCodeValidatorTest {
   
+  private static final String ID = "id";
+  
+  private static final String CODE = "code";
+  
   @Mock
   private UniqueBatchCode annotation;
+  
+  @Mock
+  private BatchData batchData;
   
   @Mock
   private BatchRepository batchRepository;
@@ -39,36 +47,57 @@ public class UniqueBatchCodeValidatorTest {
   @After
   public void tearDown() {
     
-    verifyNoMoreInteractions(annotation, batchRepository);
+    verifyNoMoreInteractions(annotation, batchData, batchRepository);
   }
   
   @Test
-  public void testGivenNullValueByValidatingUniqueBatchCodeReturnFalse() {
+  public void testGivenNullIdAndNewCodeByValidatingUniqueBatchCodeReturnTrue() {
     
-    assertThat(validator.isValid(null, null)).isFalse();
+    when(batchData.getCode()).thenReturn(CODE);
+    when(batchRepository.findByCodeAndDeletedFalse(CODE)).thenReturn(Optional.empty());
+    
+    assertThat(validator.isValid(batchData, null)).isTrue();
+    
+    verify(batchData).getCode();
+    verify(batchRepository).findByCodeAndDeletedFalse(CODE);
   }
   
   @Test
-  public void testGivenExistingCodeByValidatingUniqueBatchCodeReturnFalse() {
+  public void testGivenBatchIdAndExistingCodeByValidatingUniqueBatchCodeReturnTrue() {
     
-    String code = "code";
-    when(batchRepository.findByCode(code)).thenReturn(
-      Optional.of(new Batch("id", "name", code)));
+    when(batchData.getId()).thenReturn(ID);
+    when(batchData.getCode()).thenReturn(CODE);
     
-    assertThat(validator.isValid(code, null)).isFalse();
+    Batch batch = Batch.builder()
+      .id(ID)
+      .code(CODE)
+      .build();
+    when(batchRepository.findByCodeAndDeletedFalse(CODE)).thenReturn(Optional.of(batch));
     
-    verify(batchRepository).findByCode(code);
+    assertThat(validator.isValid(batchData, null)).isTrue();
+    
+    verify(batchData).getId();
+    verify(batchData).getCode();
+    verify(batchRepository).findByCodeAndDeletedFalse(CODE);
   }
   
   @Test
-  public void testGivenNonExistingCodeByValidatingUniqueBatchCodeReturnTrue() {
+  public void testGivenDifferentBatchIdAndExistingCodeByValidatingUniqueBatchCodeReturnTrue() {
     
-    String code = "code";
-    when(batchRepository.findByCode(code)).thenReturn(Optional.empty());
+    when(batchData.getId()).thenReturn(ID + "-1");
+    when(batchData.getCode()).thenReturn(CODE);
     
-    assertThat(validator.isValid(code, null)).isTrue();
+    Batch batch = Batch.builder()
+      .id(ID)
+      .code(CODE)
+      .build();
+    when(batchRepository.findByCodeAndDeletedFalse(CODE)).thenReturn(Optional.of(batch));
     
-    verify(batchRepository).findByCode(code);
+    assertThat(validator.isValid(batchData, null)).isFalse();
+    
+    verify(batchData).getId();
+    verify(batchData).getCode();
+    verify(batchRepository).findByCodeAndDeletedFalse(CODE);
   }
   
 }
