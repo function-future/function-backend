@@ -315,7 +315,7 @@ public interface FieldName {
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
   abstract class Question {
 
-    public static final String TEXT = "label";
+    public static final String LABEL = "label";
 
     public static final String QUESTION_BANK = "questionBank";
 

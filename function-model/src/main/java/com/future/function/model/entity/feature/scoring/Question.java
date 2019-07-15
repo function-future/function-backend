@@ -26,7 +26,7 @@ public class Question extends BaseEntity {
   @Builder.Default
   private String id = UUID.randomUUID().toString();
 
-  @Field(FieldName.Question.TEXT)
+  @Field(FieldName.Question.LABEL)
   private String label;
 
   @Field(FieldName.Question.QUESTION_BANK)
