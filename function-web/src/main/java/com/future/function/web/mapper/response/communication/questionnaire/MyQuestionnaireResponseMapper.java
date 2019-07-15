@@ -42,6 +42,7 @@ public class MyQuestionnaireResponseMapper {
             .name(questionnaireParticipant.getMember().getName())
             .avatar(questionnaireParticipant.getMember().getPictureV2().getThumbnailUrl())
             .batch(toBatchResponse(questionnaireParticipant.getMember().getBatch()))
+            .role(questionnaireParticipant.getMember().getRole().toString())
             .university(questionnaireParticipant.getMember().getUniversity())
             .build();
   }

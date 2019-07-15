@@ -70,7 +70,7 @@ public class MyQuestionnaireServiceImpl implements MyQuestionnaireService {
     List<QuestionnaireParticipant> participantsList  = new ArrayList<>();
 
     for (QuestionnaireParticipant participant : participants) {
-      if(participant.getMember().getId() != memberLogin.getId()) {
+      if(!participant.getMember().getId().equals(memberLogin.getId())) {
         participantsList.add(participant);
       }
     }
