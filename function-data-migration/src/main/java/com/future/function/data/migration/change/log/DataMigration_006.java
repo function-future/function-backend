@@ -417,26 +417,26 @@ public class DataMigration_006 {
     mongoTemplate.insert(adminAccessAdd, DocumentName.ACCESS);
     mongoTemplate.insert(adminAccessEdit, DocumentName.ACCESS);
   
-    Map<String, Object> judgeAndMentorComponents = new HashMap<>();
-    judgeAndMentorComponents.put("add", false);
-    judgeAndMentorComponents.put("delete", false);
-    judgeAndMentorComponents.put("edit", false);
-    judgeAndMentorComponents.put("read", true);
+    Map<String, Object> nonGuestComponents = new HashMap<>();
+    nonGuestComponents.put("add", false);
+    nonGuestComponents.put("delete", false);
+    nonGuestComponents.put("edit", false);
+    nonGuestComponents.put("read", true);
     
     Access judgeAccessGet = Access.builder()
       .urlRegex(urlRegexGet)
       .role(Role.JUDGE)
-      .components(judgeAndMentorComponents)
+      .components(nonGuestComponents)
       .build();
     Access judgeAccessAdd = Access.builder()
       .urlRegex(urlRegexAdd)
       .role(Role.JUDGE)
-      .components(judgeAndMentorComponents)
+      .components(nonGuestComponents)
       .build();
     Access judgeAccessEdit = Access.builder()
       .urlRegex(urlRegexEdit)
       .role(Role.JUDGE)
-      .components(judgeAndMentorComponents)
+      .components(nonGuestComponents)
       .build();
     
     mongoTemplate.insert(judgeAccessGet, DocumentName.ACCESS);
@@ -446,63 +446,63 @@ public class DataMigration_006 {
     Access mentorAccessGet = Access.builder()
       .urlRegex(urlRegexGet)
       .role(Role.MENTOR)
-      .components(judgeAndMentorComponents)
+      .components(nonGuestComponents)
       .build();
     Access mentorAccessAdd = Access.builder()
       .urlRegex(urlRegexAdd)
       .role(Role.MENTOR)
-      .components(judgeAndMentorComponents)
+      .components(nonGuestComponents)
       .build();
     Access mentorAccessEdit = Access.builder()
       .urlRegex(urlRegexEdit)
       .role(Role.MENTOR)
-      .components(judgeAndMentorComponents)
+      .components(nonGuestComponents)
       .build();
     
     mongoTemplate.insert(mentorAccessGet, DocumentName.ACCESS);
     mongoTemplate.insert(mentorAccessAdd, DocumentName.ACCESS);
     mongoTemplate.insert(mentorAccessEdit, DocumentName.ACCESS);
     
-    Map<String, Object> studentOrGuestComponents = new HashMap<>();
-    studentOrGuestComponents.put("add", false);
-    studentOrGuestComponents.put("delete", false);
-    studentOrGuestComponents.put("edit", false);
-    studentOrGuestComponents.put("read", false);
-    
     Access studentAccessGet = Access.builder()
       .urlRegex(urlRegexGet)
       .role(Role.STUDENT)
-      .components(studentOrGuestComponents)
+      .components(nonGuestComponents)
       .build();
     Access studentAccessAdd = Access.builder()
       .urlRegex(urlRegexAdd)
       .role(Role.STUDENT)
-      .components(studentOrGuestComponents)
+      .components(nonGuestComponents)
       .build();
     Access studentAccessEdit = Access.builder()
       .urlRegex(urlRegexEdit)
       .role(Role.STUDENT)
-      .components(studentOrGuestComponents)
+      .components(nonGuestComponents)
       .build();
     
     mongoTemplate.insert(studentAccessGet, DocumentName.ACCESS);
     mongoTemplate.insert(studentAccessAdd, DocumentName.ACCESS);
     mongoTemplate.insert(studentAccessEdit, DocumentName.ACCESS);
+  
+    Map<String, Object> guestComponents = new HashMap<>();
+    guestComponents.put("add", false);
+    guestComponents.put("delete", false);
+    guestComponents.put("edit", false);
+    guestComponents.put("read", false);
     
     Access guestAccessGet = Access.builder()
       .urlRegex(urlRegexGet)
       .role(Role.UNKNOWN)
-      .components(studentOrGuestComponents)
+      .components(guestComponents)
       .build();
     Access guestAccessAdd = Access.builder()
       .urlRegex(urlRegexAdd)
       .role(Role.UNKNOWN)
-      .components(studentOrGuestComponents)
+      .components(guestComponents)
       .build();
     Access guestAccessEdit = Access.builder()
       .urlRegex(urlRegexEdit)
       .role(Role.UNKNOWN)
-      .components(studentOrGuestComponents)
+      .components(guestComponents)
       .build();
     
     mongoTemplate.insert(guestAccessGet, DocumentName.ACCESS);
