@@ -7,7 +7,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.NotBlank;
-import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -33,9 +32,6 @@ public class AssignmentWebRequest {
 
   @NotNull(message = "NotNull")
   private Long deadline;
-
-  @NotEmpty(message = "NotEmpty")
-  private String batchCode;
 
   @FileMustExist
   @Size(max = 1, message = "Size")

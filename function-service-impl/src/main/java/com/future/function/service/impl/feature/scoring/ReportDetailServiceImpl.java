@@ -54,10 +54,15 @@ public class ReportDetailServiceImpl implements ReportDetailService {
 
     private List<StudentSummaryVO> getStudentsSummaryPoints(String userId, List<ReportDetail> list) {
         return list.stream()
-            .map(ReportDetail::getUser)
-            .map(User::getId)
-            .map(studentId -> summaryService.findAllPointSummaryByStudentId(studentId, userId))
+                .map(reportDetail -> getSummaryVOFromReportDetail(userId, reportDetail))
             .collect(Collectors.toList());
+    }
+
+    private StudentSummaryVO getSummaryVOFromReportDetail(String userId, ReportDetail reportDetail) {
+        String studentId = reportDetail.getUser().getId();
+        StudentSummaryVO summary = summaryService.findAllPointSummaryByStudentId(studentId, userId);
+        summary.setPoint(reportDetail.getPoint());
+        return summary;
     }
 
     @Override
@@ -78,7 +83,7 @@ public class ReportDetailServiceImpl implements ReportDetailService {
         return Optional.ofNullable(userId)
                 .map(userService::getUser)
                 .map(user -> this.checkUserEligibility(studentId, user))
-                .flatMap(user -> reportDetailRepository.findByUserId(studentId))
+                .flatMap(user -> reportDetailRepository.findByUserIdAndDeletedFalse(studentId))
                 .orElseThrow(() -> new NotFoundException("Failed at #findByStudentId #ReportDetailService"));
     }
 
@@ -102,7 +107,7 @@ public class ReportDetailServiceImpl implements ReportDetailService {
         return Optional.ofNullable(reportDetail)
                 .map(ReportDetail::getUser)
                 .map(User::getId)
-                .flatMap(reportDetailRepository::findByUserId)
+                .flatMap(reportDetailRepository::findByUserIdAndDeletedFalse)
                 .filter(detail -> detail.getReport().getId().equals(reportId))
                 .map(detail -> {
                     CopyHelper.copyProperties(reportDetail, detail);

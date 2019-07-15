@@ -26,11 +26,13 @@ public class ReportDetailResponseMapper {
 
     private static ReportDetailWebResponse buildReportDetailWebResponse(StudentSummaryVO summaryDTO) {
         return ReportDetailWebResponse.builder()
+                .studentId(summaryDTO.getStudentId())
             .studentName(summaryDTO.getStudentName())
             .batchCode(summaryDTO.getBatchCode())
             .university(summaryDTO.getUniversity())
                 .avatar(summaryDTO.getAvatar())
             .scores(ScoreSummaryResponseMapper.toDataListSummaryResponse(summaryDTO.getScores()).getData())
+                .point(summaryDTO.getPoint())
                 .build();
     }
 
@@ -42,6 +44,7 @@ public class ReportDetailResponseMapper {
 
     private static ReportDetailWebResponse buildReportDetailWebResponse(ReportDetail reportDetail) {
         return ReportDetailWebResponse.builder()
+                .studentId(reportDetail.getUser().getId())
                 .studentName(reportDetail.getUser().getName())
                 .batchCode(reportDetail.getUser().getBatch().getCode())
                 .university(reportDetail.getUser().getUniversity())

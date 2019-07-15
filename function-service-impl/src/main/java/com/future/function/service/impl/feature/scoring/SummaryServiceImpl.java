@@ -57,6 +57,7 @@ public class SummaryServiceImpl implements SummaryService {
 
     private StudentSummaryVO mapToStudentSummaryDTO(Pair<User, List<SummaryVO>> pair) {
         return StudentSummaryVO.builder()
+                .studentId(pair.getFirst().getId())
             .studentName(pair.getFirst().getName())
             .batchCode(pair.getFirst().getBatch().getCode())
             .university(pair.getFirst().getUniversity())

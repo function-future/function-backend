@@ -108,7 +108,7 @@ public class ReportDetailServiceImplTest {
         when(reportDetailRepository.findAllByReportIdAndDeletedFalse(REPORT_ID))
                 .thenReturn(Collections.singletonList(reportDetail));
         when(reportDetailRepository.save(reportDetail)).thenReturn(reportDetail);
-        when(reportDetailRepository.findByUserId(USER_ID)).thenReturn(Optional.of(reportDetail));
+        when(reportDetailRepository.findByUserIdAndDeletedFalse(USER_ID)).thenReturn(Optional.of(reportDetail));
         when(summaryService.findAllPointSummaryByStudentId(USER_ID, USER_ID))
                 .thenReturn(studentSummaryVO);
         when(userService.getUser(USER_ID)).thenReturn(student);
@@ -152,7 +152,7 @@ public class ReportDetailServiceImplTest {
     public void findByStudentId() {
         ReportDetail actual = reportDetailService.findByStudentId(USER_ID, USER_ID);
         assertThat(actual).isEqualTo(reportDetail);
-        verify(reportDetailRepository).findByUserId(USER_ID);
+        verify(reportDetailRepository).findByUserIdAndDeletedFalse(USER_ID);
         verify(userService).getUser(USER_ID);
     }
 
@@ -162,7 +162,7 @@ public class ReportDetailServiceImplTest {
         when(userService.getUser(id)).thenReturn(User.builder().id(id).role(Role.ADMIN).build());
         ReportDetail actual = reportDetailService.findByStudentId(USER_ID, id);
         assertThat(actual).isEqualTo(reportDetail);
-        verify(reportDetailRepository).findByUserId(USER_ID);
+        verify(reportDetailRepository).findByUserIdAndDeletedFalse(USER_ID);
         verify(userService).getUser(id);
     }
 
@@ -180,7 +180,7 @@ public class ReportDetailServiceImplTest {
         List<ReportDetail> actual = reportDetailService.giveScoreToEachStudentInDetail(REPORT_ID,
                 Collections.singletonList(reportDetail));
         assertThat(actual.get(0)).isEqualTo(reportDetail);
-        verify(reportDetailRepository).findByUserId(USER_ID);
+        verify(reportDetailRepository).findByUserIdAndDeletedFalse(USER_ID);
         verify(reportDetailRepository).save(reportDetail);
     }
 
@@ -189,7 +189,7 @@ public class ReportDetailServiceImplTest {
         catchException(() -> reportDetailService.giveScoreToEachStudentInDetail("id",
                 Collections.singletonList(reportDetail)));
         assertThat(caughtException().getClass()).isEqualTo(UnsupportedOperationException.class);
-        verify(reportDetailRepository).findByUserId(USER_ID);
+        verify(reportDetailRepository).findByUserIdAndDeletedFalse(USER_ID);
     }
 
     @Test

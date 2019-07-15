@@ -242,15 +242,15 @@ public class QuizServiceImplTest {
 
   @Test
   public void copyQuizWithTargetBatch() {
-    String targetBatch = "ABC";
-    Batch targetBatchObj = Batch.builder().code(targetBatch).build();
-    when(batchService.getBatchByCode(targetBatch)).thenReturn(targetBatchObj);
+      String batchId = "ABC";
+      Batch targetBatchObj = Batch.builder().id(batchId).build();
+      when(batchService.getBatchById(batchId)).thenReturn(targetBatchObj);
     when(studentQuizService.copyQuizWithTargetBatch(targetBatchObj, quiz)).thenReturn(quiz);
-    Quiz actual = quizService.copyQuizWithTargetBatch(targetBatch, quiz);
+      Quiz actual = quizService.copyQuizWithTargetBatch(batchId, quiz);
     assertThat(actual.getTitle()).isEqualTo(QUIZ_TITLE);
     verify(quizRepository).findByIdAndDeletedFalse(QUIZ_ID);
     verify(studentQuizService).copyQuizWithTargetBatch(targetBatchObj, quiz);
-    quiz.getBatch().setCode(targetBatch);
+      quiz.getBatch().setCode(batchId);
     verify(quizRepository).save(quiz);
   }
 }

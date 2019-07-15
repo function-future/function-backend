@@ -23,7 +23,7 @@ public class ReportDetail extends BaseEntity {
     private String id = UUID.randomUUID().toString();
 
     @Field(FieldName.ReportDetail.POINT)
-    private Integer point;
+    private int point;
 
     @DBRef(lazy = true)
     @Field(FieldName.ReportDetail.USER)
