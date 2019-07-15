@@ -255,5 +255,14 @@ public class UserServiceImpl implements UserService {
 
     return this.setEncryptedPassword(user, user.getPassword());
   }
+  
+  @Override
+  public User changeProfilePicture(User user) {
+    
+    return userRepository.findByEmailAndDeletedFalse(user.getEmail())
+      .map(this::setUserPicture)
+      .map(userRepository::save)
+      .orElse(user);
+  }
 
 }

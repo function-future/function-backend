@@ -92,6 +92,8 @@ public interface UserService {
   User getUserByEmail(String email);
 
   void changeUserPassword(String email, String oldPassword, String newPassword);
+  
+  User changeProfilePicture(User user);
 
   /**
    * Retrieves users from database which contains and case-insensitively
