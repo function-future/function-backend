@@ -10,7 +10,6 @@ import com.future.function.web.model.response.base.paging.Paging;
 import com.future.function.web.model.response.feature.core.UserWebResponse;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -23,7 +22,6 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Ignore
 public class UserResponseMapperTest {
   
   private static final String EMAIL = "email";

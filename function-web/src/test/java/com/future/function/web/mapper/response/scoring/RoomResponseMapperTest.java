@@ -14,8 +14,6 @@ import com.future.function.web.model.response.feature.core.BatchWebResponse;
 import com.future.function.web.model.response.feature.core.UserWebResponse;
 import com.future.function.web.model.response.feature.scoring.AssignmentWebResponse;
 import com.future.function.web.model.response.feature.scoring.RoomWebResponse;
-import java.util.Collections;
-import java.util.Date;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,6 +23,9 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+
+import java.util.Collections;
+import java.util.Date;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

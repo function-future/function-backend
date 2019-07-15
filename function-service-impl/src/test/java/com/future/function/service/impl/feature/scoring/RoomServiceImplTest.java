@@ -13,7 +13,6 @@ import com.future.function.service.api.feature.scoring.CommentService;
 import com.future.function.service.impl.helper.PageHelper;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -28,18 +27,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-
 import static com.googlecode.catchexception.CatchException.catchException;
 import static com.googlecode.catchexception.CatchException.caughtException;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
-@Ignore
 public class RoomServiceImplTest {
 
   private static final String ROOM_ID = "room-id";
@@ -221,7 +214,6 @@ public class RoomServiceImplTest {
   }
 
   @Test
-  @Ignore
   public void giveScoreToRoomByRoomIdByStudent() {
     room.setPoint(100);
     catchException(() -> roomService.giveScoreToRoomByRoomId(ROOM_ID, USER_ID, 100));

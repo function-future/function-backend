@@ -3,12 +3,12 @@ package com.future.function.service.impl.feature.scoring;
 import com.future.function.common.enumeration.core.Role;
 import com.future.function.common.exception.ForbiddenException;
 import com.future.function.common.exception.NotFoundException;
-import com.future.function.model.dto.scoring.StudentSummaryDTO;
-import com.future.function.model.dto.scoring.SummaryDTO;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.model.entity.feature.scoring.Room;
 import com.future.function.model.entity.feature.scoring.StudentQuizDetail;
 import com.future.function.model.enums.scoring.ScoringType;
+import com.future.function.model.vo.scoring.StudentSummaryVO;
+import com.future.function.model.vo.scoring.SummaryVO;
 import com.future.function.service.api.feature.core.UserService;
 import com.future.function.service.api.feature.scoring.RoomService;
 import com.future.function.service.api.feature.scoring.StudentQuizService;
@@ -38,25 +38,25 @@ public class SummaryServiceImpl implements SummaryService {
     }
 
     @Override
-    public StudentSummaryDTO findAllPointSummaryByStudentId(String studentId, String userId) {
+    public StudentSummaryVO findAllPointSummaryByStudentId(String studentId, String userId) {
         return Optional.ofNullable(userId)
                 .map(userService::getUser)
                 .map(user -> checkEligibilityUser(user, studentId))
                 .map(userService::getUser)
                 .map(this::getAllSummaryFromAssignmentAndQuiz)
             .map(this::mapToStudentSummaryDTO)
-            .orElseThrow(() -> new NotFoundException("Student not found at #findAllPointSummaryByStudentId"));
+                .orElseThrow(() -> new NotFoundException("Failed at #findAllPointSummaryByStudentId #SummaryService"));
     }
 
     private String checkEligibilityUser(User user, String studentId) {
         if(user.getRole().equals(Role.STUDENT) && !user.getId().equals(studentId)) {
-            throw new ForbiddenException("User not allowed");
+            throw new ForbiddenException("Failed at #checkEligibilityUser #SummaryService");
         }
         return studentId;
     }
 
-    private StudentSummaryDTO mapToStudentSummaryDTO(Pair<User, List<SummaryDTO>> pair) {
-        return StudentSummaryDTO.builder()
+    private StudentSummaryVO mapToStudentSummaryDTO(Pair<User, List<SummaryVO>> pair) {
+        return StudentSummaryVO.builder()
             .studentName(pair.getFirst().getName())
             .batchCode(pair.getFirst().getBatch().getCode())
             .university(pair.getFirst().getUniversity())
@@ -65,24 +65,24 @@ public class SummaryServiceImpl implements SummaryService {
             .build();
     }
 
-    private Pair<User, List<SummaryDTO>> getAllSummaryFromAssignmentAndQuiz(User user) {
-        List<SummaryDTO> resultList = new ArrayList<>();
+    private Pair<User, List<SummaryVO>> getAllSummaryFromAssignmentAndQuiz(User user) {
+        List<SummaryVO> resultList = new ArrayList<>();
         roomService.findAllByStudentId(user.getId()).stream().map(this::mapRoomToSummaryDTO).forEach(resultList::add);
         studentQuizService.findAllQuizByStudentId(user.getId()).stream().map(this::mapQuizToSummaryDTO).forEach(resultList::add);
         return Pair.of(user, resultList);
     }
 
 
-    private SummaryDTO mapRoomToSummaryDTO(Room room) {
-        return SummaryDTO.builder()
+    private SummaryVO mapRoomToSummaryDTO(Room room) {
+        return SummaryVO.builder()
                 .title(room.getAssignment().getTitle())
                 .point(room.getPoint())
                 .type(ScoringType.ASSIGNMENT.getType())
                 .build();
     }
 
-    private SummaryDTO mapQuizToSummaryDTO(StudentQuizDetail studentQuizDetail) {
-        return SummaryDTO.builder()
+    private SummaryVO mapQuizToSummaryDTO(StudentQuizDetail studentQuizDetail) {
+        return SummaryVO.builder()
                 .title(studentQuizDetail.getStudentQuiz().getQuiz().getTitle())
                 .point(studentQuizDetail.getPoint())
                 .type(ScoringType.QUIZ.getType())

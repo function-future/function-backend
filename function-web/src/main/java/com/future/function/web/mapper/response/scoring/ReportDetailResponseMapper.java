@@ -1,7 +1,7 @@
 package com.future.function.web.mapper.response.scoring;
 
-import com.future.function.model.dto.scoring.StudentSummaryDTO;
 import com.future.function.model.entity.feature.scoring.ReportDetail;
+import com.future.function.model.vo.scoring.StudentSummaryVO;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.feature.scoring.ReportDetailWebResponse;
@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ReportDetailResponseMapper {
 
-  public static DataResponse<ReportDetailWebResponse> toDataReportDetailWebResponse(StudentSummaryDTO summaryDTO) {
+    public static DataResponse<ReportDetailWebResponse> toDataReportDetailWebResponse(StudentSummaryVO summaryDTO) {
     return ResponseHelper.toDataResponse(HttpStatus.OK, buildReportDetailWebResponse(summaryDTO));
     }
 
@@ -24,7 +24,7 @@ public class ReportDetailResponseMapper {
         return ResponseHelper.toDataResponse(httpStatus, buildListFromReportDetailList(reportDetailList));
     }
 
-  private static ReportDetailWebResponse buildReportDetailWebResponse(StudentSummaryDTO summaryDTO) {
+    private static ReportDetailWebResponse buildReportDetailWebResponse(StudentSummaryVO summaryDTO) {
         return ReportDetailWebResponse.builder()
             .studentName(summaryDTO.getStudentName())
             .batchCode(summaryDTO.getBatchCode())
@@ -34,7 +34,7 @@ public class ReportDetailResponseMapper {
                 .build();
     }
 
-    private static List<ReportDetailWebResponse> buildListOfSummaryDTOs(List<StudentSummaryDTO> summaryDTOs) {
+    private static List<ReportDetailWebResponse> buildListOfSummaryDTOs(List<StudentSummaryVO> summaryDTOs) {
     return summaryDTOs.stream()
         .map(ReportDetailResponseMapper::buildReportDetailWebResponse)
                 .collect(Collectors.toList());
@@ -56,7 +56,7 @@ public class ReportDetailResponseMapper {
                 .collect(Collectors.toList());
     }
 
-  public static DataResponse<List<ReportDetailWebResponse>> toDataListReportDetailWebResponse(List<StudentSummaryDTO> summaryDTOs) {
+    public static DataResponse<List<ReportDetailWebResponse>> toDataListReportDetailWebResponse(List<StudentSummaryVO> summaryDTOs) {
       return ResponseHelper.toDataResponse(HttpStatus.OK, buildListOfSummaryDTOs(summaryDTOs));
     }
 

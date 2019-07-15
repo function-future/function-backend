@@ -33,7 +33,7 @@ public class ReportDetailController {
     @ResponseStatus(HttpStatus.OK)
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @WithAnyRole(roles = {Role.ADMIN, Role.JUDGE, Role.MENTOR})
-    public DataResponse<List<ReportDetailWebResponse>> findComparisonByReportId(@PathVariable("judgingId") String judgingId,
+    public DataResponse<List<ReportDetailWebResponse>> findComparisonByReportId(@PathVariable String judgingId,
                                                                                 Session session) {
         return ReportDetailResponseMapper.toDataListReportDetailWebResponse(
                 reportDetailService.findAllSummaryByReportId(judgingId, session.getUserId()));
@@ -42,7 +42,7 @@ public class ReportDetailController {
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @WithAnyRole(roles = Role.JUDGE)
-    public DataResponse<List<ReportDetailWebResponse>> giveFinalScoreToStudentsByReportId(@PathVariable("judgingId") String judgingId,
+    public DataResponse<List<ReportDetailWebResponse>> giveFinalScoreToStudentsByReportId(@PathVariable String judgingId,
                                                                                           @RequestBody ReportDetailScoreWebRequest request,
                                                                                           Session session) {
         return ReportDetailResponseMapper.toDataListReportDetailWebResponseFromReportDetail(

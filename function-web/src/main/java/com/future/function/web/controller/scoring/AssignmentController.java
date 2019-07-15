@@ -47,10 +47,10 @@ public class AssignmentController {
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   @WithAnyRole(roles = {Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT})
   public PagingResponse<AssignmentWebResponse> findAllAssignment(
-      @PathVariable(value = "batchCode") String batchCode,
-      @RequestParam(required = false, defaultValue = "1") int page,
-      @RequestParam(required = false, defaultValue = "10") int size,
-      Session session) {
+          @PathVariable String batchCode,
+          @RequestParam(defaultValue = "1") int page,
+          @RequestParam(defaultValue = "10") int size,
+          Session session) {
     return AssignmentResponseMapper
         .toAssignmentsPagingResponse(
             assignmentService.findAllByBatchCodeAndPageable(batchCode, PageHelper.toPageable(page, size)));

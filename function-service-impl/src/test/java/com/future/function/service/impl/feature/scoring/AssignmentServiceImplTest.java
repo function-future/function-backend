@@ -23,11 +23,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static com.googlecode.catchexception.CatchException.catchException;
 import static com.googlecode.catchexception.CatchException.caughtException;
@@ -44,8 +40,6 @@ public class AssignmentServiceImplTest {
   private static final String USER_ID = "userId";
 
   private static final String ROOM_ID = "room-id";
-
-  private static final String ERROR_MSG_NOT_FOUND = "Assignment Not Found";
 
   private static final String FILE_PATH = "file-path";
   private static final String FILE_ID = "file-id";
@@ -158,7 +152,6 @@ public class AssignmentServiceImplTest {
   public void testFindByIdNull() {
     catchException(() -> assignmentService.findById(null));
     assertThat(caughtException().getClass()).isEqualTo(NotFoundException.class);
-    assertThat(caughtException().getMessage()).isEqualTo(ERROR_MSG_NOT_FOUND);
     verifyZeroInteractions(assignmentRepository);
   }
 

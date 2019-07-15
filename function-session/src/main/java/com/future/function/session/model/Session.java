@@ -21,6 +21,8 @@ public class Session implements Serializable {
   
   private String userId;
   
+  private String batchId;
+  
   private String email;
   
   private Role role;

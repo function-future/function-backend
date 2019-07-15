@@ -1,9 +1,9 @@
 package com.future.function.service.api.feature.scoring;
 
-import com.future.function.model.dto.scoring.StudentSummaryDTO;
+import com.future.function.model.vo.scoring.StudentSummaryVO;
 
 public interface SummaryService {
 
-  StudentSummaryDTO findAllPointSummaryByStudentId(String studentId, String userId);
+    StudentSummaryVO findAllPointSummaryByStudentId(String studentId, String userId);
 
 }

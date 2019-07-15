@@ -36,11 +36,11 @@ public class ReportController {
   @WithAnyRole(roles = {Role.ADMIN, Role.MENTOR, Role.JUDGE})
   public PagingResponse<ReportWebResponse> findAllReportByUsedAtNow(
           @PathVariable("batchCode") String batchCode,
-          @RequestParam(defaultValue = "1", required = false) int page,
-          @RequestParam(defaultValue = "10", required = false) int size,
+          @RequestParam(defaultValue = "1") int page,
+          @RequestParam(defaultValue = "10") int size,
           Session session) {
     return ReportResponseMapper.toPagingReportWebResponse(reportService
-            .findAllReport(batchCode, session.getUserId(), PageHelper.toPageable(page, size)));
+            .findAllReport(batchCode, PageHelper.toPageable(page, size)));
   }
 
   @ResponseStatus(HttpStatus.OK)

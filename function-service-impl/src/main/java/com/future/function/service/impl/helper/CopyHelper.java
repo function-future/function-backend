@@ -3,6 +3,7 @@ package com.future.function.service.impl.helper;
 import com.future.function.model.util.constant.FieldName;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.BeanUtils;
 
 /**
@@ -28,6 +29,22 @@ public final class CopyHelper {
   public static <T> void copyProperties(T source, T target) {
     
     BeanUtils.copyProperties(source, target, IGNORED_PROPERTIES);
+  }
+  
+  /**
+   * Copies properties of object with type {@code T} to another object of
+   * type  {@code T}, with default ignored properties.
+   *
+   * @param source Object acting as source for data to be copied.
+   * @param target Object acting as target.
+   * @param <T>    Type of class of the specified data.
+   */
+  public static <T> void copyProperties(
+    T source, T target, String... ignoredProperties
+  ) {
+    
+    BeanUtils.copyProperties(
+      source, target, ArrayUtils.addAll(IGNORED_PROPERTIES, ignoredProperties));
   }
   
 }

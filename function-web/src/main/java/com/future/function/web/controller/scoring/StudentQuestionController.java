@@ -39,8 +39,9 @@ public class StudentQuestionController {
   @ResponseStatus(HttpStatus.OK)
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   @WithAnyRole(roles = Role.STUDENT)
-  public PagingResponse<StudentQuestionWebResponse> findStudentQuestionsByStudentQuizId(@PathVariable(value = "studentQuizId")
-      String studentQuizId, Session session) {
+  public PagingResponse<StudentQuestionWebResponse> findStudentQuestionsByStudentQuizId(
+          @PathVariable String studentQuizId,
+          Session session) {
     return StudentQuizDetailResponseMapper
         .toStudentQuestionWebResponses(
             studentQuizService
@@ -51,7 +52,7 @@ public class StudentQuestionController {
   @GetMapping(value = "/start", produces = MediaType.APPLICATION_JSON_VALUE)
   @WithAnyRole(roles = Role.STUDENT)
   public PagingResponse<StudentQuestionWebResponse> findUnansweredStudentQuestionsByStudentQuizId(
-      @PathVariable(value = "studentQuizId") String studentQuizId, Session session) {
+          @PathVariable String studentQuizId, Session session) {
     return StudentQuizDetailResponseMapper
         .toStudentQuestionWebResponses(
             studentQuizService
@@ -61,8 +62,8 @@ public class StudentQuestionController {
   @ResponseStatus(HttpStatus.CREATED)
   @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
   @WithAnyRole(roles = Role.STUDENT)
-  public DataResponse<StudentQuizDetailWebResponse> postAnswersForQuestions(@PathVariable(value = "studentQuizId") String studentQuizId,
-      @RequestBody List<StudentQuestionWebRequest> answerRequests, Session session) {
+  public DataResponse<StudentQuizDetailWebResponse> postAnswersForQuestions(@PathVariable String studentQuizId,
+                                                                            @RequestBody List<StudentQuestionWebRequest> answerRequests, Session session) {
     return StudentQuizDetailResponseMapper
         .toStudentQuizDetailWebResponse(
             studentQuizService

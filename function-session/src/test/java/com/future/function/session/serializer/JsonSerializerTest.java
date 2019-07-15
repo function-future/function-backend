@@ -31,11 +31,15 @@ public class JsonSerializerTest {
   
   private static final String USER_ID = "user-id";
   
+  private static final String BATCH_ID = "batch-id";
+  
   private static final String EMAIL = "email";
   
   private static final Role ROLE = Role.STUDENT;
   
-  private static final Session SESSION = new Session(ID, USER_ID, EMAIL, ROLE);
+  private static final Session SESSION = new Session(ID, USER_ID, BATCH_ID,
+                                                     EMAIL, ROLE
+  );
   
   private JacksonTester<Session> sessionJacksonTester;
   
@@ -67,7 +71,7 @@ public class JsonSerializerTest {
   public void testGivenSessionBySerializingSessionReturnByteOfSerializedSession()
     throws Exception {
     
-    Session session = new Session(ID, USER_ID, EMAIL, ROLE);
+    Session session = new Session(ID, USER_ID, BATCH_ID, EMAIL, ROLE);
     String sessionJson = sessionJacksonTester.write(session)
       .getJson();
     byte[] bytes = sessionJson.getBytes();
@@ -106,7 +110,7 @@ public class JsonSerializerTest {
   public void testGivenByteOfSerializedSessionByDeserializingSessionReturnSession()
     throws Exception {
     
-    Session session = new Session(ID, USER_ID, EMAIL, ROLE);
+    Session session = new Session(ID, USER_ID, BATCH_ID, EMAIL, ROLE);
     when(objectMapper.readValue(sessionBytes, Session.class)).thenReturn(
       session);
     

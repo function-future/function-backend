@@ -1,4 +1,4 @@
-package com.future.function.model.dto.scoring;
+package com.future.function.model.vo.scoring;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SummaryDTO {
+public class SummaryVO {
 
     private String title;
     private Integer point;

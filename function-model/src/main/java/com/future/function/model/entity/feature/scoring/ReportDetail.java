@@ -2,22 +2,21 @@ package com.future.function.model.entity.feature.scoring;
 
 import com.future.function.model.entity.base.BaseEntity;
 import com.future.function.model.entity.feature.core.User;
+import com.future.function.model.util.constant.DocumentName;
 import com.future.function.model.util.constant.FieldName;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.UUID;
 
+@EqualsAndHashCode(callSuper = false)
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Document
+@Document(collection = DocumentName.REPORT_DETAIL)
 public class ReportDetail extends BaseEntity {
 
     @Builder.Default
@@ -26,11 +25,11 @@ public class ReportDetail extends BaseEntity {
     @Field(FieldName.ReportDetail.POINT)
     private Integer point;
 
-    @DBRef
+    @DBRef(lazy = true)
     @Field(FieldName.ReportDetail.USER)
     private User user;
 
-    @DBRef
+    @DBRef(lazy = true)
     @Field(FieldName.ReportDetail.REPORT)
     private Report report;
 

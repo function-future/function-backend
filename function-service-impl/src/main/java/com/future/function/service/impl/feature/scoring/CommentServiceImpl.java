@@ -24,7 +24,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public List<Comment> findAllCommentsByRoomId(String roomId) {
         return Optional.ofNullable(roomId)
-                .map(commentRepository::findAllByRoomId)
+                .map(commentRepository::findAllByRoomIdOrderByCreatedAtAsc)
                 .orElseGet(ArrayList::new);
     }
 
