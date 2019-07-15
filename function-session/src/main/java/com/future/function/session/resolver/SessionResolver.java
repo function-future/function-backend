@@ -127,11 +127,16 @@ public class SessionResolver implements HandlerMethodArgumentResolver {
 
     return Optional.ofNullable(parameterAnnotation)
       .filter(WithAnyRole::noUnauthorized)
-      .map(ignored -> new Session())
+      .map(ignored -> this.buildSessionWithUnknownRole())
       .orElseThrow(
         () -> new UnauthorizedException("Invalid Session From Resolver"));
   }
-
+  
+  private Session buildSessionWithUnknownRole() {
+    
+    return Session.builder().role(Role.UNKNOWN).build();
+  }
+  
   private Optional<String> getCustomCookieValue(Cookie[] cookies) {
 
     return Stream.of(cookies)
