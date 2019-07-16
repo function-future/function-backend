@@ -9,7 +9,7 @@ import com.mongodb.client.model.Indexes;
 
 import static com.future.function.data.migration.constant.IndexName.*;
 
-
+@SuppressWarnings("squid:S00101")
 @ChangeLog(order = "004")
 public class DataMigration_004 {
   

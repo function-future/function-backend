@@ -5,7 +5,6 @@ import com.future.function.model.entity.feature.core.User;
 import com.future.function.validation.RequestValidator;
 import com.future.function.web.model.request.core.ChangePasswordWebRequest;
 import com.future.function.web.model.request.core.ChangeProfilePictureWebRequest;
-import com.future.function.web.model.request.core.UserWebRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Component;
