@@ -87,12 +87,12 @@ public class AssignmentServiceImpl implements AssignmentService {
   }
 
   @Override
-  public Assignment copyAssignment(String assignmentId, String targetBatchCode) {
+  public Assignment copyAssignment(String assignmentId, String batchId) {
     Assignment assignment = this.findById(assignmentId);
     Assignment newAssignment = Assignment.builder().build();
-    Batch targetBatchObj = batchService.getBatchByCode(targetBatchCode);
+      Batch targetBatch = batchService.getBatchById(batchId);
     CopyHelper.copyProperties(assignment, newAssignment);
-    newAssignment.setBatch(targetBatchObj);
+      newAssignment.setBatch(targetBatch);
     return this.createAssignment(newAssignment);
   }
 

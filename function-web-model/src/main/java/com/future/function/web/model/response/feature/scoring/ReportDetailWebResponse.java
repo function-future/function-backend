@@ -15,6 +15,7 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ReportDetailWebResponse {
 
+    private String studentId;
     private String studentName;
     private String batchCode;
   private String university;

@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.Min;
+import javax.validation.constraints.Size;
 import java.util.List;
 
 @Data
@@ -14,7 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 public class ReportDetailScoreWebRequest {
 
-    @Min(value = 1, message = "Min")
+    @Size(message = "Size", min = 1)
     private List<ScoreStudentWebRequest> scores;
 
 }

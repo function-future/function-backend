@@ -78,7 +78,7 @@ public class QuizController {
     return QuizResponseMapper
         .toQuizWebDataResponse(
             HttpStatus.CREATED,
-            quizService.copyQuizWithTargetBatch(request.getBatchCode(), quizService.findById(request.getQuizId())));
+                quizService.copyQuizWithTargetBatch(request.getBatchId(), quizService.findById(request.getQuizId())));
   }
 
   /**
@@ -90,9 +90,12 @@ public class QuizController {
   @ResponseStatus(value = HttpStatus.CREATED)
   @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
   @WithAnyRole(roles = Role.ADMIN)
-  public DataResponse<QuizWebResponse> createQuiz(@RequestBody QuizWebRequest quizWebRequest, Session session) {
+  public DataResponse<QuizWebResponse> createQuiz(@PathVariable("batchCode") String batchCode,
+                                                  @RequestBody QuizWebRequest quizWebRequest,
+                                                  Session session) {
     return QuizResponseMapper
-        .toQuizWebDataResponse(HttpStatus.CREATED, quizService.createQuiz(quizRequestMapper.toQuiz(quizWebRequest)));
+            .toQuizWebDataResponse(HttpStatus.CREATED, quizService.createQuiz(quizRequestMapper.toQuiz(quizWebRequest,
+                    batchCode)));
   }
 
   /**
@@ -105,9 +108,11 @@ public class QuizController {
   @ResponseStatus(value = HttpStatus.OK)
   @PutMapping(path = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
   @WithAnyRole(roles = Role.ADMIN)
-  public DataResponse<QuizWebResponse> updateQuiz(@PathVariable String id, @RequestBody QuizWebRequest request,
-      Session session) {
-    return QuizResponseMapper.toQuizWebDataResponse(quizService.updateQuiz(quizRequestMapper.toQuiz(id, request)));
+  public DataResponse<QuizWebResponse> updateQuiz(@PathVariable("batchCode") String batchCode,
+                                                  @PathVariable("id") String id, @RequestBody QuizWebRequest request,
+                                                  Session session) {
+    return QuizResponseMapper.toQuizWebDataResponse(quizService.updateQuiz(quizRequestMapper.toQuiz(id, request,
+            batchCode)));
   }
 
   /**

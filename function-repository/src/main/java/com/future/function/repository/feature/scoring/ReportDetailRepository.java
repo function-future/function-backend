@@ -12,6 +12,6 @@ public interface ReportDetailRepository extends MongoRepository<ReportDetail, St
 
     List<ReportDetail> findAllByReportIdAndDeletedFalse(String reportId);
 
-    Optional<ReportDetail> findByUserId(String studentId);
+    Optional<ReportDetail> findByUserIdAndDeletedFalse(String studentId);
 
 }

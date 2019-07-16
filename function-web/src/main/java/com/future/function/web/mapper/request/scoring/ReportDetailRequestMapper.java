@@ -17,16 +17,16 @@ import java.util.stream.Collectors;
 @Component
 public class ReportDetailRequestMapper {
 
-    private RequestValidator requestValidator;
+    private RequestValidator validator;
 
     @Autowired
-    public ReportDetailRequestMapper(RequestValidator requestValidator) {
-        this.requestValidator = requestValidator;
+    public ReportDetailRequestMapper(RequestValidator validator) {
+        this.validator = validator;
     }
 
     public List<ReportDetail> toReportDetailList(ReportDetailScoreWebRequest request, String reportId) {
         return Optional.ofNullable(request)
-                .map(requestValidator::validate)
+                .map(validator::validate)
                 .map(value -> toValidatedReportDetailList(value, reportId))
                 .orElseThrow(() -> new BadRequestException("Failed mapping at #toReportDetailList"));
     }

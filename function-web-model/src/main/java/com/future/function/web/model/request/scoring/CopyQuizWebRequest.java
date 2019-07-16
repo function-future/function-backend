@@ -13,7 +13,7 @@ import org.hibernate.validator.constraints.NotBlank;
 public class CopyQuizWebRequest {
 
   @NotBlank(message = "NotBlank")
-  private String batchCode;
+  private String batchId;
 
   @NotBlank(message = "NotBlank")
   private String quizId;
