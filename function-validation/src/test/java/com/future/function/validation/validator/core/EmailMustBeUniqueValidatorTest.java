@@ -52,7 +52,7 @@ public class EmailMustBeUniqueValidatorTest {
   }
   
   @Test
-  public void testGivenUniqueEmailByValidatingEmailIsUniqueInDatabaseReturnTrue() {
+  public void testGivenUniqueEmailWhenCreatingUserByValidatingEmailIsUniqueInDatabaseReturnTrue() {
 
     when(userData.getId()).thenReturn(null);
     when(userData.getEmail()).thenReturn(EMAIL);
@@ -60,6 +60,23 @@ public class EmailMustBeUniqueValidatorTest {
     when(userRepository.findByEmailAndDeletedFalse(EMAIL)).thenReturn(Optional.empty());
   
     assertThat(validator.isValid(userData, null)).isTrue();
+    
+    verify(userData).getId();
+    verify(userData).getEmail();
+    
+    verify(userRepository).findByEmailAndDeletedFalse(EMAIL);
+  }
+  
+  @Test
+  public void testGivenExistingEmailWhenCreatingUserByValidatingEmailIsUniqueInDatabaseReturnFalse() {
+
+    when(userData.getId()).thenReturn(null);
+    when(userData.getEmail()).thenReturn(EMAIL);
+  
+    when(userRepository.findByEmailAndDeletedFalse(EMAIL)).thenReturn(
+      Optional.of(new User()));
+  
+    assertThat(validator.isValid(userData, null)).isFalse();
     
     verify(userData).getId();
     verify(userData).getEmail();
@@ -85,7 +102,7 @@ public class EmailMustBeUniqueValidatorTest {
   }
   
   @Test
-  public void testGivenExistingEmailByValidatingEmailIsUniqueInDatabaseReturnFalse() {
+  public void testGivenExistingEmailWhenUpdateUserByValidatingEmailIsUniqueInDatabaseReturnFalse() {
     
     when(userData.getId()).thenReturn(ID);
     when(userData.getEmail()).thenReturn(EMAIL);
