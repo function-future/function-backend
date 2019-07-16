@@ -11,8 +11,8 @@ import com.mongodb.DBRef;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
-@ChangeLog(order = "005")
-public class DataMigration_005 {
+@ChangeLog(order = "007")
+public class DataMigration_007 {
 
   private static final String ADMIN_EMAIL = "admin@admin.com";
   private static final String QUESTION_BANK_TITLE = "Question Bank #1";
@@ -20,7 +20,7 @@ public class DataMigration_005 {
   private static final String QUESTION_LABEL = "Question #1";
   private static final String OPTION_lABEL_PREFIX = "Option #";
 
-  @ChangeSet(author = "oliver", order = "001", id = "questionBankMigration")
+  @ChangeSet(author = "oliver", order = "0001", id = "questionBankMigration")
   public void questionBankMigration(MongoTemplate mongoTemplate) {
     BasicDBObject questionBank = new BasicDBObject();
     questionBank.append(FieldName.QuestionBank.TITLE, QUESTION_BANK_TITLE);
@@ -34,7 +34,7 @@ public class DataMigration_005 {
     mongoTemplate.insert(questionBank, DocumentName.QUESTION_BANK);
   }
 
-  @ChangeSet(author = "oliver", order = "002", id = "questionMigration")
+  @ChangeSet(author = "oliver", order = "0002", id = "questionMigration")
   public void questionMigration(MongoTemplate mongoTemplate) {
     BasicDBObject question = new BasicDBObject();
     String questionBankId = mongoTemplate.findAll(QuestionBank.class).get(0).getId();
@@ -49,7 +49,7 @@ public class DataMigration_005 {
     mongoTemplate.insert(question, DocumentName.QUESTION);
   }
 
-  @ChangeSet(author = "oliver", order = "003", id = "optionMigration")
+  @ChangeSet(author = "oliver", order = "0003", id = "optionMigration")
   public void optionMigration(MongoTemplate mongoTemplate) {
     String questionId = mongoTemplate.findAll(Question.class).get(0).getId();
     for (int i = 0; i < 4; i++) {

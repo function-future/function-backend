@@ -88,6 +88,8 @@ public class AssignmentControllerTest extends TestHelper {
             .batch(Batch.builder().code(BATCH_CODE).build())
             .build();
 
+    assignment.setCreatedAt(ASSIGNMENT_DEADLINE);
+
     assignmentWebRequest = AssignmentWebRequest.builder()
         .deadline(ASSIGNMENT_DEADLINE)
         .description(ASSIGNMENT_DESCRIPTION)
