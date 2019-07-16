@@ -110,14 +110,18 @@ public class AuthControllerTest extends TestHelper {
     
     super.setCookie(Role.MENTOR);
     
-    when(authService.getLoginStatus(MENTOR_SESSION_ID)).thenReturn(USER);
+    when(authService.getLoginStatus(eq(MENTOR_SESSION_ID),
+                                    any(HttpServletResponse.class)
+    )).thenReturn(USER);
     
     mockMvc.perform(get("/api/core/auth").cookie(cookies))
       .andExpect(status().isOk())
       .andExpect(content().json(dataResponseJacksonTester.write(DATA_RESPONSE)
                                   .getJson()));
     
-    verify(authService).getLoginStatus(MENTOR_SESSION_ID);
+    verify(authService).getLoginStatus(eq(MENTOR_SESSION_ID),
+                                       any(HttpServletResponse.class)
+    );
   }
   
   @Test

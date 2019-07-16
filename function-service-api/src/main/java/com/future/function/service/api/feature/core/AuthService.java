@@ -10,6 +10,8 @@ public interface AuthService {
   
   void logout(String sessionId, HttpServletResponse response);
   
-  User getLoginStatus(String sessionId);
+  User getLoginStatus(
+    String sessionId, HttpServletResponse servletResponse
+  );
   
 }
