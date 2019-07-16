@@ -41,6 +41,8 @@ public class UserRequestMapper {
   
   private User toValidatedUser(String userId, UserWebRequest request) {
     
+    request.setId(userId);
+    
     validator.validate(request);
     
     User user = User.builder()
