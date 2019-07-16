@@ -29,38 +29,38 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/core/user")
 public class UserDetailController {
-  
+
   private final UserService userService;
-  
+
   private final MenuService menuService;
-  
+
   private final AccessService accessService;
-  
+
   private final UserDetailRequestMapper userDetailRequestMapper;
-  
+
   @Autowired
   public UserDetailController(
     UserService userService, MenuService menuService,
     AccessService accessService, UserDetailRequestMapper userDetailRequestMapper
   ) {
-    
+
     this.userService = userService;
     this.menuService = menuService;
     this.accessService = accessService;
     this.userDetailRequestMapper = userDetailRequestMapper;
   }
-  
+
   @ResponseStatus(HttpStatus.OK)
   @GetMapping("/profile")
   public DataResponse<UserWebResponse> getProfile(
     @WithAnyRole(roles = { Role.STUDENT, Role.MENTOR, Role.JUDGE, Role.ADMIN })
       Session session
   ) {
-    
+
     return UserResponseMapper.toUserDataResponse(
       userService.getUserByEmail(session.getEmail()));
   }
-  
+
   @ResponseStatus(HttpStatus.OK)
   @PostMapping("/password")
   public BaseResponse changePassword(
@@ -69,28 +69,28 @@ public class UserDetailController {
     @RequestBody
       ChangePasswordWebRequest request
   ) {
-    
+
     Pair<String, String> oldAndNewPasswordPair =
       userDetailRequestMapper.toOldAndNewPasswordPair(request);
-  
+
     userService.changeUserPassword(session.getEmail(),
                                    oldAndNewPasswordPair.getFirst(),
                                    oldAndNewPasswordPair.getSecond()
     );
-    
+
     return ResponseHelper.toBaseResponse(HttpStatus.OK);
   }
-  
+
   @ResponseStatus(HttpStatus.OK)
   @GetMapping("/menu-list")
   public Map<String, Object> getMenuList(
     @WithAnyRole(noUnauthorized = true)
       Session session
   ) {
-    
+
     return menuService.getSectionsByRole(session.getRole());
   }
-  
+
   @ResponseStatus(HttpStatus.OK)
   @GetMapping("/access-list")
   public Map<String, Object> getAccessList(
@@ -99,8 +99,8 @@ public class UserDetailController {
     @WithAnyRole(noUnauthorized = true)
       Session session
   ) {
-    
+
     return accessService.getComponentsByUrlAndRole(url, session.getRole());
   }
-  
+
 }

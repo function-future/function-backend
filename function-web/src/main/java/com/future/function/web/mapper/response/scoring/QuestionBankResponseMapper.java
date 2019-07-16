@@ -15,7 +15,7 @@ import org.springframework.http.HttpStatus;
 import java.util.stream.Collectors;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class QuestionBankResponseMapper {
+public final class QuestionBankResponseMapper {
 
   public static DataResponse<QuestionBankWebResponse> toQuestionBankWebResponse(QuestionBank questionBank) {
     return ResponseHelper.toDataResponse(HttpStatus.OK, buildQuestionBankWebResponse(questionBank));
@@ -33,16 +33,16 @@ public class QuestionBankResponseMapper {
 
   public static PagingResponse<QuestionBankWebResponse> toPagingQuestionBankWebResponse(Page<QuestionBank> questionBankPage) {
     return ResponseHelper
-            .toPagingResponse(
-                    HttpStatus.OK,
-                    questionBankPage
-                            .getContent()
-                            .stream()
-                            .map(QuestionBankResponseMapper::buildQuestionBankWebResponse)
-                            .collect(Collectors.toList()),
-                    PageHelper
-                            .toPaging(questionBankPage)
-            );
+        .toPagingResponse(
+            HttpStatus.OK,
+            questionBankPage
+                .getContent()
+                .stream()
+                .map(QuestionBankResponseMapper::buildQuestionBankWebResponse)
+                .collect(Collectors.toList()),
+            PageHelper
+                .toPaging(questionBankPage)
+        );
   }
 
 }

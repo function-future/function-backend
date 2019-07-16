@@ -11,11 +11,11 @@ import org.hibernate.validator.constraints.NotBlank;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ChangePasswordWebRequest {
-  
+
   @NotBlank(message = "NotBlank")
   private String oldPassword;
-  
+
   @NotBlank(message = "NotBlank")
   private String newPassword;
-  
+
 }

@@ -3,7 +3,11 @@ package com.future.function.model.entity.feature.scoring;
 import com.future.function.model.entity.base.BaseEntity;
 import com.future.function.model.util.constant.DocumentName;
 import com.future.function.model.util.constant.FieldName;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
@@ -18,13 +22,13 @@ import java.util.UUID;
 @Document(collection = DocumentName.STUDENT_QUIZ_DETAIL)
 public class StudentQuizDetail extends BaseEntity {
 
-    @Builder.Default
-    private String id = UUID.randomUUID().toString();
+  @Builder.Default
+  private String id = UUID.randomUUID().toString();
 
-    @DBRef
-    @Field(FieldName.StudentQuizDetail.STUDENT_QUIZ)
-    private StudentQuiz studentQuiz;
+  @DBRef(lazy = true)
+  @Field(FieldName.StudentQuizDetail.STUDENT_QUIZ)
+  private StudentQuiz studentQuiz;
 
-    @Field(FieldName.StudentQuizDetail.POINT)
-    private int point;
+  @Field(FieldName.StudentQuizDetail.POINT)
+  private int point;
 }

@@ -16,7 +16,7 @@ import java.lang.annotation.Target;
  */
 @Documented
 @Constraint(validatedBy = UniqueBatchCodeValidator.class)
-@Target({ ElementType.FIELD })
+@Target({ ElementType.TYPE, ElementType.TYPE_USE })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface UniqueBatchCode {
   
@@ -31,5 +31,7 @@ public @interface UniqueBatchCode {
   Class<?>[] groups() default {};
   
   Class<? extends Payload>[] payload() default {};
+  
+  String field() default "code";
   
 }

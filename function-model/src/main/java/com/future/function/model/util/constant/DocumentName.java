@@ -17,15 +17,15 @@ public abstract class DocumentName {
 
   public static final String COURSE = "courses";
 
-  public static final String SHARED_COURSE = "shared-courses";
+  public static final String SHARED_COURSE = "shared_courses";
 
   public static final String ANNOUNCEMENT = "announcements";
 
-  public static final String STICKY_NOTE = "sticky-notes";
+  public static final String STICKY_NOTE = "sticky_notes";
   
   public static final String DISCUSSION = "discussions";
   
-  public static final String ACTIVITY_BLOG = "activity-blogs";
+  public static final String ACTIVITY_BLOG = "activity_blogs";
 
   public static final String QUESTIONNAIRE = "questionnaires";
 
@@ -67,5 +67,12 @@ public abstract class DocumentName {
   public static final String ACCESS = "accesses";
   
   public static final String MENU = "menus";
-  
+
+  public static final String ROOM = "rooms";
+
+  public static final String COMMENT = "comments";
+
+  public static final String NOTIFICATION = "notifications";
+
+  public static final String REMINDER = "reminder";
 }

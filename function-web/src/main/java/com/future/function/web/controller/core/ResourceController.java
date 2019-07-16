@@ -29,19 +29,19 @@ import javax.servlet.http.HttpServletRequest;
 @RequestMapping("/api/core/resources")
 @WithAnyRole(roles = { Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT })
 public class ResourceController {
-  
+
   private final ResourceService resourceService;
-  
+
   private final ResourceRequestMapper resourceRequestMapper;
-  
+
   public ResourceController(
     ResourceService resourceService, ResourceRequestMapper resourceRequestMapper
   ) {
-    
+
     this.resourceService = resourceService;
     this.resourceRequestMapper = resourceRequestMapper;
   }
-  
+
   @ResponseStatus(HttpStatus.CREATED)
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
                produces = MediaType.APPLICATION_JSON_VALUE)
@@ -52,16 +52,16 @@ public class ResourceController {
     @RequestParam
       String origin
   ) {
-    
+
     Pair<String, byte[]> pair = resourceRequestMapper.toStringAndByteArrayPair(
       file);
-    
+
     return ResourceResponseMapper.toResourceDataResponse(
       resourceService.storeAndSaveFile(null, pair.getFirst(), pair.getSecond(),
                                        FileOrigin.toFileOrigin(origin)
       ));
   }
-  
+
   @ResponseStatus(HttpStatus.OK)
   @GetMapping(value = "/{origin}/{fileName:.+}")
   public ResponseEntity getFileAsByteArray(
@@ -73,7 +73,7 @@ public class ResourceController {
     @RequestParam(required = false)
       Long version
   ) {
-    
+
     return ResponseEntity.ok()
       .contentType(resourceRequestMapper.getMediaType(fileName, servletRequest))
       .header(HttpHeaders.CONTENT_DISPOSITION,
@@ -84,5 +84,5 @@ public class ResourceController {
                                                version
       ));
   }
-  
+
 }

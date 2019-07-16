@@ -4,7 +4,7 @@ import com.future.function.common.enumeration.communication.ChatroomType;
 import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.communication.chatting.Chatroom;
 import com.future.function.model.entity.feature.core.User;
-import com.future.function.repository.feature.communication.ChatroomRepository;
+import com.future.function.repository.feature.communication.chatting.ChatroomRepository;
 import com.future.function.service.api.feature.core.UserService;
 import org.junit.After;
 import org.junit.Before;
@@ -26,7 +26,10 @@ import java.util.Collections;
 import static com.googlecode.catchexception.CatchException.catchException;
 import static com.googlecode.catchexception.CatchException.caughtException;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 /**
  * Author: PriagungSatyagama

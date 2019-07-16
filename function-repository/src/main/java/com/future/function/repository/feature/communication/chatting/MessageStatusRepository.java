@@ -1,4 +1,4 @@
-package com.future.function.repository.feature.communication;
+package com.future.function.repository.feature.communication.chatting;
 
 import com.future.function.model.entity.feature.communication.chatting.Chatroom;
 import com.future.function.model.entity.feature.communication.chatting.MessageStatus;

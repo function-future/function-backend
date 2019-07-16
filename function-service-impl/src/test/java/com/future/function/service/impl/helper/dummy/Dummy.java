@@ -19,4 +19,6 @@ public class Dummy extends BaseEntity {
   
   private User user;
   
+  private String anotherField;
+  
 }

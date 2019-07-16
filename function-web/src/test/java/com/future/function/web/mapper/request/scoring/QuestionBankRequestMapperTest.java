@@ -15,7 +15,9 @@ import org.mockito.runners.MockitoJUnitRunner;
 import static com.googlecode.catchexception.CatchException.catchException;
 import static com.googlecode.catchexception.CatchException.caughtException;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class QuestionBankRequestMapperTest {
@@ -35,18 +37,18 @@ public class QuestionBankRequestMapperTest {
   @Before
   public void setUp() throws Exception {
     webRequest = QuestionBankWebRequest
-            .builder()
-            .description(QUESTION_BANK_DESCRIPTION)
-            .build();
+        .builder()
+        .description(QUESTION_BANK_DESCRIPTION)
+        .build();
 
     questionBank = QuestionBank
-            .builder()
-            .id(QUESTION_BANK_ID)
-            .description(QUESTION_BANK_DESCRIPTION)
-            .build();
+        .builder()
+        .id(QUESTION_BANK_ID)
+        .description(QUESTION_BANK_DESCRIPTION)
+        .build();
 
     when(validator.validate(webRequest))
-            .thenReturn(webRequest);
+        .thenReturn(webRequest);
   }
 
   @After
@@ -58,7 +60,7 @@ public class QuestionBankRequestMapperTest {
   public void testToQuestionBank() {
     questionBank.setId(null);
     QuestionBank actual = requestMapper.toQuestionBank(webRequest);
-      assertThat(actual.getDescription()).isEqualTo(questionBank.getDescription());
+    assertThat(actual.getDescription()).isEqualTo(questionBank.getDescription());
     verify(validator).validate(webRequest);
   }
 

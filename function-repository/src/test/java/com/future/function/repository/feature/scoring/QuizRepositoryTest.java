@@ -44,16 +44,16 @@ public class QuizRepositoryTest {
   @Before
   public void setUp() throws Exception {
     quiz = Quiz
-            .builder()
-            .id(QUIZ_ID)
-            .title(QUIZ_TITLE)
-            .description(QUIZ_DESCRIPTION)
-            .startDate(DATE)
-            .endDate(DATE)
-            .timeLimit(TIME_LIMIT)
-            .trials(TRIALS)
-            .questionCount(QUESTION_COUNT)
-            .build();
+        .builder()
+        .id(QUIZ_ID)
+        .title(QUIZ_TITLE)
+        .description(QUIZ_DESCRIPTION)
+        .startDate(DATE)
+        .endDate(DATE)
+        .timeLimit(TIME_LIMIT)
+        .trials(TRIALS)
+        .questionCount(QUESTION_COUNT)
+        .build();
 
     quizList = Collections.singletonList(quiz);
 
@@ -91,7 +91,6 @@ public class QuizRepositoryTest {
 
   @Test
   public void testFindAllQuizPageWithPageableFilterAndSearch() {
-    //TODO change find all to findAll with filter and search
     Page<Quiz> actual = quizRepository.findAll(pageable);
     assertThat(actual.getContent()).isEqualTo(quizList);
   }

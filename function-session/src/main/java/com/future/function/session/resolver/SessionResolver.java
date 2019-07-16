@@ -26,128 +26,133 @@ import java.util.stream.Stream;
 
 @Component
 public class SessionResolver implements HandlerMethodArgumentResolver {
-  
+
   private final ValueOperations<String, Session> valueOperations;
-  
+
   private final SessionProperties sessionProperties;
-  
+
   @Autowired
   public SessionResolver(
     RedisTemplate<String, Session> redisTemplate,
     SessionProperties sessionProperties
   ) {
-    
+
     this.valueOperations = redisTemplate.opsForValue();
     this.sessionProperties = sessionProperties;
   }
-  
+
   @Override
   public boolean supportsParameter(MethodParameter parameter) {
-    
+
     return this.isClassAnnotated(parameter) || this.isMethodAnnotated(
       parameter) || this.isParameterAnnotated(parameter);
   }
-  
+
   private boolean isMethodAnnotated(MethodParameter parameter) {
-    
+
     return Objects.nonNull(parameter.getMethodAnnotation(WithAnyRole.class));
   }
-  
+
   private boolean isClassAnnotated(MethodParameter parameter) {
-    
+
     return Objects.nonNull(parameter.getContainingClass()
                              .getAnnotation(WithAnyRole.class));
   }
-  
+
   private boolean isParameterAnnotated(MethodParameter parameter) {
-    
+
     return Objects.nonNull(parameter.getParameterAnnotation(WithAnyRole.class));
   }
-  
+
   @Override
   public Object resolveArgument(
     MethodParameter parameter, ModelAndViewContainer mavContainer,
     NativeWebRequest webRequest, WebDataBinderFactory binderFactory
   ) throws Exception {
-    
+
     WithAnyRole parameterAnnotation = this.getParameterAnnotation(parameter);
-    
+
     return Optional.ofNullable(webRequest)
       .map(this::getCookies)
       .map(cookies -> this.getSession(cookies, parameterAnnotation))
       .filter(session -> this.isUserOfValidRole(session, parameterAnnotation))
       .orElseThrow(() -> new ForbiddenException("Invalid Role"));
   }
-  
+
   private boolean isUserOfValidRole(
     Session session, WithAnyRole parameterAnnotation
   ) {
-    
+
     if (Objects.isNull(parameterAnnotation)) {
       return false;
     }
-    
+
     if (parameterAnnotation.noUnauthorized()) {
       return true;
     }
-    
+
     Role[] roles = parameterAnnotation.roles();
-    
+
     if (roles.length == 0) {
       return true;
     }
-    
+
     return Stream.of(roles)
       .anyMatch(role -> role.equals(session.getRole()));
   }
-  
+
   private Session getSession(
     Cookie[] cookies, WithAnyRole parameterAnnotation
   ) {
-    
+
     return this.getCustomCookieValue(cookies)
       .map(valueOperations::get)
       .map(this::reSetSecurityContextHolderAuthentication)
       .orElseGet(() -> this.returnEmptySessionOrException(parameterAnnotation));
   }
-  
+
   private Session reSetSecurityContextHolderAuthentication(Session session) {
-  
+
     UsernamePasswordAuthenticationToken authentication =
       new UsernamePasswordAuthenticationToken(session.getEmail(), "");
     SecurityContextHolder.getContext()
       .setAuthentication(authentication);
-    
+
     return session;
   }
-  
+
   private Session returnEmptySessionOrException(
     WithAnyRole parameterAnnotation
   ) {
-    
+
     return Optional.ofNullable(parameterAnnotation)
       .filter(WithAnyRole::noUnauthorized)
-      .map(ignored -> new Session())
+      .map(ignored -> this.buildSessionWithUnknownRole())
       .orElseThrow(
         () -> new UnauthorizedException("Invalid Session From Resolver"));
   }
   
-  private Optional<String> getCustomCookieValue(Cookie[] cookies) {
+  private Session buildSessionWithUnknownRole() {
     
+    return Session.builder().role(Role.UNKNOWN).build();
+  }
+  
+  private Optional<String> getCustomCookieValue(Cookie[] cookies) {
+
     return Stream.of(cookies)
       .filter(this::isCookieNameMatch)
       .map(Cookie::getValue)
       .findFirst();
   }
-  
+
   private boolean isCookieNameMatch(Cookie cookie) {
-    
+
     return sessionProperties.getCookieName()
       .equals(cookie.getName());
   }
-  
+
   private WithAnyRole getParameterAnnotation(MethodParameter parameter) {
-    
+
     if (this.isClassAnnotated(parameter)) {
       return parameter.getContainingClass()
         .getAnnotation(WithAnyRole.class);
@@ -159,14 +164,14 @@ public class SessionResolver implements HandlerMethodArgumentResolver {
       return null;
     }
   }
-  
+
   private Cookie[] getCookies(NativeWebRequest webRequest) {
-    
+
     return Optional.ofNullable(webRequest)
       .map(NativeWebRequest::getNativeRequest)
       .map(HttpServletRequest.class::cast)
       .map(HttpServletRequest::getCookies)
       .orElseGet(() -> new Cookie[0]);
   }
-  
+
 }

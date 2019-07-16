@@ -75,6 +75,7 @@ public class QuestionnaireResponseSummaryRepositoryTest {
                     .appraisee(appraisee)
                     .build();
 
+    questionnaireResponseSummary2.setDeleted(true);
     questionnaireResponseSummaryRepository.save(questionnaireResponseSummary);
     questionnaireResponseSummaryRepository.save(questionnaireResponseSummary2);
   }
@@ -89,13 +90,13 @@ public class QuestionnaireResponseSummaryRepositoryTest {
   @Test
   public void testGivenAppraiseeByFindingAllQuesitonnaireResponseSummaryReturnPagedQuestionnaireResponseSummary() {
     Page<QuestionnaireResponseSummary> questionnaireResponseSummaries =
-            questionnaireResponseSummaryRepository.findAllByAppraisee(appraisee, PAGEABLE);
+            questionnaireResponseSummaryRepository.findAllByAppraiseeAndDeletedFalse(appraisee, PAGEABLE);
 
-    assertThat(questionnaireResponseSummaries.getTotalElements()).isEqualTo(2);
+    assertThat(questionnaireResponseSummaries.getTotalElements()).isEqualTo(1);
     assertThat(questionnaireResponseSummaries.getContent().get(0).getId()).isEqualTo(ID_1);
     assertThat(questionnaireResponseSummaries.getContent().get(0).getQuestionnaire().getId()).isEqualTo(QUESTIONNAIRE_ID);
-    assertThat(questionnaireResponseSummaries.getContent().get(1).getId()).isEqualTo(ID_2);
-    assertThat(questionnaireResponseSummaries.getContent().get(1).getQuestionnaire().getId()).isEqualTo(QUESTIONNAIRE_ID2);
+//    assertThat(questionnaireResponseSummaries.getContent().get(1).getId()).isEqualTo(ID_2);
+//    assertThat(questionnaireResponseSummaries.getContent().get(1).getQuestionnaire().getId()).isEqualTo(QUESTIONNAIRE_ID2);
 
   }
 }

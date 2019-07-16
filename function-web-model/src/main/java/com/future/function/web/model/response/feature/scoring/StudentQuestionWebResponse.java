@@ -13,8 +13,8 @@ import java.util.List;
 @AllArgsConstructor
 public class StudentQuestionWebResponse {
 
-    private int number;
-    private String text;
-    private List<OptionWebResponse> options;
+  private int number;
+  private String text;
+  private List<OptionWebResponse> options;
 
 }

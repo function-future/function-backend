@@ -3,6 +3,7 @@ package com.future.function.web.configuration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.future.function.session.model.Session;
 import com.future.function.session.serializer.JsonSerializer;
+import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
@@ -13,9 +14,17 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 public class RedisConfiguration {
   
   @Bean
-  public JedisConnectionFactory jedisConnectionFactory() {
+  public JedisConnectionFactory jedisConnectionFactory(
+    RedisProperties redisProperties
+  ) {
     
-    return new JedisConnectionFactory();
+    JedisConnectionFactory connectionFactory = new JedisConnectionFactory();
+    
+    connectionFactory.setHostName(redisProperties.getHost());
+    connectionFactory.setPort(redisProperties.getPort());
+    connectionFactory.setPassword(redisProperties.getPassword());
+    
+    return connectionFactory;
   }
   
   @Bean

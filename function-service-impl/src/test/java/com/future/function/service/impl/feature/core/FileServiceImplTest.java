@@ -38,110 +38,111 @@ import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class FileServiceImplTest {
-  
+
   private static final String ID = "id";
-  
+
   private static final String PARENT_ID = "parent-id";
-  
+
   private static final String EMAIL = "email";
-  
+
   private static final Pageable PAGEABLE = new PageRequest(0, 5);
-  
+
   private static final String ROOT = "root";
-  
+
   private static final String NAME = "name";
-  
+
   private static final Session SESSION = new Session("session-id", "user-id",
-                                                     EMAIL, Role.ADMIN
+                                                     "batch-id", EMAIL,
+                                                     Role.ADMIN
   );
-  
+
   private FileV2 file = FileV2.builder()
     .id(ID)
     .parentId(PARENT_ID)
     .markFolder(false)
     .build();
-  
+
   private Page<FileV2> page;
-  
+
   @Mock
   private FileRepositoryV2 fileRepository;
-  
+
   @Mock
   private ResourceService resourceService;
-  
+
   @Mock
   private FileProperties fileProperties;
-  
+
   @InjectMocks
   private FileServiceImpl fileService;
-  
+
   @Before
   public void setUp() {
-    
+
     file.setCreatedBy(EMAIL);
   }
-  
+
   @After
   public void tearDown() {
-    
+
     verifyNoMoreInteractions(fileRepository, resourceService, fileProperties);
   }
-  
+
   @Test
   public void testGivenFileOrFolderIdAndParentIdByGettingFileOrFolderReturnFileOrFolder() {
-    
+
     when(fileRepository.findByIdAndParentIdAndDeletedFalse(ID,
                                                            PARENT_ID
     )).thenReturn(Optional.of(file));
-    
+
     FileV2 file = fileService.getFileOrFolder(ID, PARENT_ID);
-    
+
     assertThat(file).isNotNull();
     assertThat(file).isEqualTo(this.file);
-    
+
     verify(fileRepository).findByIdAndParentIdAndDeletedFalse(ID, PARENT_ID);
     verifyZeroInteractions(resourceService, fileProperties);
   }
-  
+
   @Test
   public void testGivenInvalidFileOrFolderIdAndParentIdByGettingFileOrFolderReturnNotFoundException() {
-    
+
     when(fileRepository.findByIdAndParentIdAndDeletedFalse(ID,
                                                            PARENT_ID
     )).thenReturn(Optional.empty());
-    
+
     catchException(() -> fileService.getFileOrFolder(ID, PARENT_ID));
-    
+
     assertThat(caughtException().getClass()).isEqualTo(NotFoundException.class);
     assertThat(caughtException().getMessage()).isEqualTo(
       "Get File/Folder Not Found");
-    
+
     verify(fileRepository).findByIdAndParentIdAndDeletedFalse(ID, PARENT_ID);
     verifyZeroInteractions(resourceService, fileProperties);
   }
-  
+
   @Test
   public void testGivenParentIdAndPageableByGettingFilesOrFoldersReturnPageOfFile() {
-    
+
     page = new PageImpl<>(Collections.singletonList(file), PAGEABLE, 1);
-    
+
     when(
       fileRepository.findAllByParentIdAndAsResourceFalseAndDeletedFalseOrderByMarkFolderDesc(
         PARENT_ID, PAGEABLE)).thenReturn(page);
-    
+
     Page<FileV2> page = fileService.getFilesAndFolders(PARENT_ID, PAGEABLE);
-    
+
     assertThat(page).isNotNull();
     assertThat(page).isEqualTo(this.page);
-    
+
     verify(
       fileRepository).findAllByParentIdAndAsResourceFalseAndDeletedFalseOrderByMarkFolderDesc(
       PARENT_ID, PAGEABLE);
   }
-  
+
   @Test
   public void testGivenEmailAndParentIdAndFileOrFolderIdByDeletingFileOrFolderReturnSuccessfulDeletion() {
-    
+
     when(fileProperties.getRootId()).thenReturn(ROOT);
     when(fileRepository.findByIdAndParentIdAndDeletedFalse(ID,
                                                            PARENT_ID
@@ -153,16 +154,16 @@ public class FileServiceImplTest {
     )).thenReturn(true);
     when(fileRepository.findAll(Collections.singletonList(ID))).thenReturn(
       Collections.singletonList(file));
-    
+
     FileV2 markedDeletedFile = new FileV2();
     BeanUtils.copyProperties(file, markedDeletedFile);
     markedDeletedFile.setDeleted(true);
     when(fileRepository.save(
       Collections.singletonList(markedDeletedFile))).thenReturn(
       Collections.singletonList(markedDeletedFile));
-    
+
     fileService.deleteFileOrFolder(SESSION, PARENT_ID, ID);
-    
+
     verify(fileProperties).getRootId();
     verify(fileRepository).findByIdAndParentIdAndDeletedFalse(ID, PARENT_ID);
     verify(fileRepository).findAllByParentIdAndDeletedFalse(ID);
@@ -170,10 +171,10 @@ public class FileServiceImplTest {
     verify(fileRepository).findAll(Collections.singletonList(ID));
     verify(fileRepository).save(Collections.singletonList(markedDeletedFile));
   }
-  
+
   @Test
   public void testGivenEmailAndParentIdAndFileOrFolderIdAndNestedFileOrFolderByDeletingFileOrFolderReturnSuccessfulDeletion() {
-    
+
     FileV2 folder1 = FileV2.builder()
       .id("folder-1")
       .parentId(ROOT)
@@ -196,15 +197,15 @@ public class FileServiceImplTest {
       .id("file-3")
       .parentId(folder2.getId())
       .build();
-    
+
     when(fileProperties.getRootId()).thenReturn(ROOT);
-    
+
     when(fileRepository.findByIdAndParentIdAndDeletedFalse(folder1.getId(),
                                                            folder1.getParentId()
     )).thenReturn(Optional.of(folder1));
     when(fileRepository.findAllByParentIdAndDeletedFalse(
       folder1.getId())).thenReturn(Arrays.asList(file1, folder2));
-    
+
     when(fileRepository.findAllByParentIdAndDeletedFalse(
       file1.getId())).thenReturn(Collections.emptyList());
     when(fileRepository.findAllByParentIdAndDeletedFalse(
@@ -213,27 +214,27 @@ public class FileServiceImplTest {
       file2.getId())).thenReturn(Collections.emptyList());
     when(fileRepository.findAllByParentIdAndDeletedFalse(
       file3.getId())).thenReturn(Collections.emptyList());
-    
+
     List<String> fileIds = Arrays.asList(folder2.getId(), folder1.getId(),
                                          file1.getId(), file2.getId(),
                                          file3.getId()
     );
     when(resourceService.markFilesUsed(fileIds, false)).thenReturn(true);
-    
+
     List<FileV2> fileV2s = Arrays.asList(folder2, folder1, file1, file2, file3);
     when(fileRepository.findAll(fileIds)).thenReturn(fileV2s);
-    
+
     folder2.setDeleted(true);
     folder1.setDeleted(true);
     file1.setDeleted(true);
     file2.setDeleted(true);
     file3.setDeleted(true);
     when(fileRepository.save(fileV2s)).thenReturn(fileV2s);
-    
+
     fileService.deleteFileOrFolder(SESSION, ROOT, folder1.getId());
-    
+
     verify(fileProperties).getRootId();
-    
+
     verify(fileRepository).findByIdAndParentIdAndDeletedFalse(
       folder1.getId(), folder1.getParentId());
     verify(fileRepository).findAllByParentIdAndDeletedFalse(folder1.getId());
@@ -241,27 +242,27 @@ public class FileServiceImplTest {
     verify(fileRepository).findAllByParentIdAndDeletedFalse(folder2.getId());
     verify(fileRepository).findAllByParentIdAndDeletedFalse(file2.getId());
     verify(fileRepository).findAllByParentIdAndDeletedFalse(file3.getId());
-    
+
     verify(resourceService).markFilesUsed(fileIds, false);
-    
+
     verify(fileRepository).findAll(fileIds);
     verify(fileRepository).save(fileV2s);
   }
-  
+
   @Test
   public void testGivenInvalidEmailAndParentIdAndFileOrFolderIdByDeletingFileOrFolderReturnFailedDeletion() {
-    
+
     when(fileProperties.getRootId()).thenReturn(ROOT);
-    
+
     fileService.deleteFileOrFolder(SESSION, PARENT_ID, ROOT);
-    
+
     verify(fileProperties).getRootId();
     verifyZeroInteractions(fileRepository, resourceService);
   }
-  
+
   @Test
   public void testGivenMethodCallAndNonEmptyByteArrayByCreatingFileReturnNewFile() {
-    
+
     FileV2 returnedFile = FileV2.builder()
       .parentId(PARENT_ID)
       .name(NAME)
@@ -269,79 +270,79 @@ public class FileServiceImplTest {
     when(resourceService.storeFile(null, PARENT_ID, NAME, NAME, NAME.getBytes(),
                                    FileOrigin.FILE
     )).thenReturn(returnedFile);
-    
+
     FileV2 savedFile = FileV2.builder()
       .parentId(PARENT_ID)
       .name(NAME)
       .used(true)
       .build();
     when(fileRepository.save(any(FileV2.class))).thenReturn(savedFile);
-    
+
     FileV2 createdFile = fileService.createFileOrFolder(
-      new Session("", "", EMAIL, Role.ADMIN), PARENT_ID, NAME, NAME,
+      new Session("", "", "", EMAIL, Role.ADMIN), PARENT_ID, NAME, NAME,
       NAME.getBytes()
     );
-    
+
     assertThat(createdFile).isNotNull();
     assertThat(createdFile.getId()).isNotBlank();
     assertThat(createdFile.getName()).isEqualTo(NAME);
     assertThat(createdFile.getParentId()).isEqualTo(PARENT_ID);
     assertThat(createdFile.isUsed()).isTrue();
     assertThat(createdFile.isMarkFolder()).isFalse();
-    
+
     verify(resourceService).storeFile(
       null, PARENT_ID, NAME, NAME, NAME.getBytes(), FileOrigin.FILE);
     verify(fileRepository).save(any(FileV2.class));
     verifyZeroInteractions(fileProperties);
   }
-  
+
   @Test
   public void testGivenMethodCallAndEmptyByteArrayByCreatingFolderReturnNewFolder() {
-    
+
     FileV2 returnedFolder = FileV2.builder()
       .name(NAME)
       .parentId(PARENT_ID)
       .used(true)
       .markFolder(true)
       .build();
-    
+
     when(fileRepository.save(any(FileV2.class))).thenReturn(returnedFolder);
-    
+
     FileV2 createdFolder = fileService.createFileOrFolder(
-      new Session("", "", EMAIL, Role.ADMIN), PARENT_ID, NAME, NAME,
+      new Session("", "", "", EMAIL, Role.ADMIN), PARENT_ID, NAME, NAME,
       new byte[] {}
     );
-    
+
     assertThat(createdFolder).isNotNull();
     assertThat(createdFolder.getId()).isNotBlank();
     assertThat(createdFolder.getName()).isEqualTo(NAME);
     assertThat(createdFolder.getParentId()).isEqualTo(PARENT_ID);
     assertThat(createdFolder.isUsed()).isTrue();
     assertThat(createdFolder.isMarkFolder()).isTrue();
-    
+
     verify(fileRepository).save(any(FileV2.class));
     verifyZeroInteractions(resourceService, fileProperties);
   }
-  
+
   @Test
   public void testGivenMethodCallAndEmptyByteArrayAndInvalidRoleByCreatingFolderReturnForbiddenException() {
-  
+
     catchException(
-      () -> fileService.createFileOrFolder(new Session("", "", EMAIL, Role.MENTOR),
+      () -> fileService.createFileOrFolder(new Session("", "", "", EMAIL, Role.MENTOR),
                                            PARENT_ID, NAME, NAME, new byte[] {}
       ));
-  
+
     assertThat(caughtException().getClass()).isEqualTo(
       ForbiddenException.class);
     assertThat(caughtException().getMessage()).isEqualTo(
       "Invalid Role For Creating Folder");
-  
+
     verifyZeroInteractions(fileRepository, resourceService, fileProperties);
   }
-  
+
   @Test
   public void testGivenMethodCallAndNonEmptyByteArrayByUpdatingFileOrFolderReturnUpdatedFile() {
-    
+
     when(fileRepository.findByIdAndParentIdAndDeletedFalse(ID,
                                                            PARENT_ID
     )).thenReturn(Optional.of(file));
@@ -350,13 +351,13 @@ public class FileServiceImplTest {
     )).thenReturn(file);
     when(fileRepository.findOne(ID)).thenReturn(file);
     when(fileRepository.save(file)).thenReturn(file);
-    
+
     FileV2 updatedFile = fileService.updateFileOrFolder(
       SESSION, ID, PARENT_ID, NAME, NAME, NAME.getBytes());
-    
+
     assertThat(updatedFile).isNotNull();
     assertThat(updatedFile).isEqualTo(file);
-    
+
     verify(fileRepository).findByIdAndParentIdAndDeletedFalse(ID, PARENT_ID);
     verify(resourceService).storeFile(
       ID, PARENT_ID, NAME, NAME, NAME.getBytes(), FileOrigin.FILE);
@@ -364,32 +365,32 @@ public class FileServiceImplTest {
     verify(fileRepository).save(file);
     verifyZeroInteractions(fileProperties);
   }
-  
+
   @Test
   public void testGivenMethodCallAndEmptyByteArrayByUpdatingFileOrFolderReturnUpdatedFolder() {
-    
+
     FileV2 folder = FileV2.builder()
       .name(NAME)
       .parentId(PARENT_ID)
       .used(true)
       .markFolder(true)
       .build();
-    
+
     when(fileRepository.findByIdAndParentIdAndDeletedFalse(folder.getId(),
                                                            PARENT_ID
     )).thenReturn(Optional.of(folder));
     when(fileRepository.save(folder)).thenReturn(folder);
-    
+
     FileV2 updatedFolder = fileService.updateFileOrFolder(
       SESSION, folder.getId(), PARENT_ID, NAME, NAME, new byte[] {});
-    
+
     assertThat(updatedFolder).isNotNull();
     assertThat(updatedFolder).isEqualTo(folder);
-    
+
     verify(fileRepository).findByIdAndParentIdAndDeletedFalse(
       folder.getId(), PARENT_ID);
     verify(fileRepository).save(folder);
     verifyZeroInteractions(resourceService, fileProperties);
   }
-  
+
 }
