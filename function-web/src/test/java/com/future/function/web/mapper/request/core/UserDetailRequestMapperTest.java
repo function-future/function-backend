@@ -96,4 +96,26 @@ public class UserDetailRequestMapperTest {
     verify(validator).validate(CHANGE_PROFILE_PICTURE_WEB_REQUEST);
   }
   
+  @Test
+  public void testGivenChangeProfilePictureWebRequestAndEmptyAvatarAndEmailByGettingUserFromRequestReturnUser() {
+  
+    ChangeProfilePictureWebRequest emptyAvatarRequest =
+      new ChangeProfilePictureWebRequest(Collections.emptyList());
+    when(validator.validate(emptyAvatarRequest)).thenReturn(
+      emptyAvatarRequest);
+  
+    User expectedUser = User.builder()
+      .email(EMAIL)
+      .pictureV2(null)
+      .build();
+  
+    User user = userDetailRequestMapper.toUser(
+      emptyAvatarRequest, EMAIL);
+  
+    assertThat(user).isNotNull();
+    assertThat(user).isEqualTo(expectedUser);
+    
+    verify(validator).validate(emptyAvatarRequest);
+  }
+  
 }
