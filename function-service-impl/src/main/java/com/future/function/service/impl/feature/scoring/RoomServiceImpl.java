@@ -18,6 +18,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -55,27 +56,46 @@ public class RoomServiceImpl implements RoomService {
     }
 
   private Room checkStudentEligibility(User user, Room room) {
-    if (!user.getRole().equals(Role.STUDENT)) {
+      if (user.getRole().equals(Role.STUDENT) && !room.getStudent().getId().equals(user.getId())) {
+          throw new ForbiddenException("Failed at #checkStudentEligibility #RoomService");
+      }
       return room;
-    } else if (room.getStudent().getId().equals(user.getId())) {
-      return room;
-    }
-    throw new ForbiddenException("User not allowed");
   }
 
     @Override
-    public List<Comment> findAllCommentsByRoomId(String roomId) {
-        return commentService.findAllCommentsByRoomId(roomId);
+    public Page<Comment> findAllCommentsByRoomId(String roomId, Pageable pageable) {
+        return commentService.findAllCommentsByRoomId(roomId, pageable);
+    }
+
+    @Override
+    public Page<Room> findAllByStudentId(String studentId, Pageable pageable, String userId) {
+        return Optional.ofNullable(userId)
+                .map(userService::getUser)
+                .map(user -> checkUserEligibilityToSeeStudentRoom(studentId, user))
+                .map(id -> roomRepository.findAllByStudentIdAndDeletedFalse(id, pageable))
+                .orElseGet(() -> PageHelper.empty(pageable));
+    }
+
+    private String checkUserEligibilityToSeeStudentRoom(String studentId, User user) {
+        if (user.getRole().equals(Role.STUDENT) && !user.getId().equals(studentId)) {
+            throw new ForbiddenException("Failed at #checkUserEligibilityToSeeStudentRoom #RoomService");
+        }
+        return studentId;
+    }
+
+    @Override
+    public List<Room> findAllByStudentId(String studentId) {
+        return Optional.ofNullable(studentId)
+                .map(roomRepository::findAllByStudentIdAndDeletedFalse)
+                .orElseGet(ArrayList::new);
     }
 
     @Override
     public Comment createComment(Comment comment, String userId) {
-      Room room = this.findById(comment.getRoom().getId(), comment.getAuthor().getId());
-        User author = userService.getUser(comment.getAuthor().getId());
+      Room room = this.findById(comment.getRoom().getId(), userId);
+      User author = userService.getUser(userId);
         return Optional.of(comment)
                 .filter(value -> room.getAssignment().getDeadline() > new Date().getTime())
-            .filter(value -> author.getId().equals(userId))
-            .map(value -> checkStudentEligibility(author, room))
                 .map(value -> {
                   comment.setRoom(room);
                   comment.setAuthor(author);
@@ -93,7 +113,7 @@ public class RoomServiceImpl implements RoomService {
             .map(userService::getStudentsByBatchCode)
             .map(list -> mapEveryStudentToRoom(assignment, list))
             .map(object -> assignment)
-            .orElseThrow(() -> new UnsupportedOperationException("Failed on #createRoomsByAssignment"));
+                .orElseThrow(() -> new UnsupportedOperationException("Failed on #createRoomsByAssignment #RoomService"));
     }
 
   private List<User> mapEveryStudentToRoom(Assignment assignment, List<User> list) {
@@ -122,7 +142,7 @@ public class RoomServiceImpl implements RoomService {
             return room;
           })
           .map(roomRepository::save)
-          .orElseGet(() -> this.findById(roomId, userId));
+              .orElseThrow(() -> new ForbiddenException("Failed at #giveScoreToRoomByRoomId #RoomService"));
     }
 
     @Override

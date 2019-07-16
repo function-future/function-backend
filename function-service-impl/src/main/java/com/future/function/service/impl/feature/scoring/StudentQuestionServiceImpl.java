@@ -1,11 +1,7 @@
 package com.future.function.service.impl.feature.scoring;
 
 import com.future.function.common.exception.NotFoundException;
-import com.future.function.model.entity.feature.scoring.Option;
-import com.future.function.model.entity.feature.scoring.Question;
-import com.future.function.model.entity.feature.scoring.QuestionBank;
-import com.future.function.model.entity.feature.scoring.StudentQuestion;
-import com.future.function.model.entity.feature.scoring.StudentQuizDetail;
+import com.future.function.model.entity.feature.scoring.*;
 import com.future.function.repository.feature.scoring.StudentQuestionRepository;
 import com.future.function.service.api.feature.scoring.QuestionService;
 import com.future.function.service.api.feature.scoring.StudentQuestionService;
@@ -62,6 +58,7 @@ public class StudentQuestionServiceImpl implements StudentQuestionService {
     return IntStream.range(0, questionList.size())
         .mapToObj(i -> Pair.of(i, questionList.get(i)))
         .map(pair -> mapStudentQuizDetail(studentQuizDetail, pair))
+        .map(studentQuestionRepository::save)
         .collect(Collectors.toList());
   }
 
@@ -80,7 +77,7 @@ public class StudentQuestionServiceImpl implements StudentQuestionService {
         .stream()
         .filter(Option::isCorrect)
         .findFirst()
-        .orElseThrow(() -> new NotFoundException("No Correct Option"));
+            .orElseThrow(() -> new NotFoundException("Failed at #FindCorrectOption #StudentQuestionService"));
   }
 
   private List<Question> getListOfQuestions(boolean random, int questionCount, List<Question> questionList) {
@@ -125,7 +122,7 @@ public class StudentQuestionServiceImpl implements StudentQuestionService {
     answers
         .forEach(answer -> {
           if (!answer.getStudentQuizDetail().getId().equals(studentQuizDetailId))
-            throw new UnsupportedOperationException("Student quiz detail id not equals");
+            throw new UnsupportedOperationException("Failed at #validateAnswersHaveSameQuizDetailId #StudentQuestionService");
         });
     return studentQuizDetailId;
   }

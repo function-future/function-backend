@@ -14,6 +14,7 @@ import com.future.function.web.mapper.response.scoring.CommentResponseMapper;
 import com.future.function.web.model.request.scoring.CommentWebRequest;
 import com.future.function.web.model.response.base.BaseResponse;
 import com.future.function.web.model.response.base.DataResponse;
+import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.feature.scoring.CommentWebResponse;
 import org.junit.After;
 import org.junit.Before;
@@ -23,6 +24,10 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -30,9 +35,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.util.Collections;
 import java.util.List;
 
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -54,7 +57,9 @@ public class CommentControllerTest extends TestHelper {
 
   private Comment comment;
   private Room room;
+  private Page<Comment> commentPage;
   private User user;
+  private Pageable pageable;
   private List<Comment> commentList;
   private CommentWebRequest commentWebRequest;
 
@@ -64,9 +69,7 @@ public class CommentControllerTest extends TestHelper {
 
   private DataResponse<CommentWebResponse> CREATED_DATA_RESPONSE;
 
-  private DataResponse<List<CommentWebResponse>> LIST_DATA_RESPONSE;
-
-  private JacksonTester<DataResponse<List<CommentWebResponse>>> pagingResponseJacksonTester;
+  private PagingResponse<CommentWebResponse> PAGING_RESPONSE;
 
   private JacksonTester<CommentWebRequest> roomPointWebRequestJacksonTester;
 
@@ -95,9 +98,13 @@ public class CommentControllerTest extends TestHelper {
         .point(0)
         .build();
 
+    pageable = new PageRequest(0, 10);
+
     comment = Comment.builder().author(user).text(COMMENT).id(COMMENT_ID).room(room).build();
 
-    commentWebRequest = CommentWebRequest.builder().userId(USER_ID).comment(COMMENT).build();
+    commentPage = new PageImpl<>(Collections.singletonList(comment), pageable, 1);
+
+      commentWebRequest = CommentWebRequest.builder().comment(COMMENT).build();
 
     DATA_RESPONSE = CommentResponseMapper
         .toDataCommentWebResponse(HttpStatus.OK, this.comment);
@@ -105,13 +112,13 @@ public class CommentControllerTest extends TestHelper {
     CREATED_DATA_RESPONSE = CommentResponseMapper
         .toDataCommentWebResponse(HttpStatus.CREATED, this.comment);
 
-    LIST_DATA_RESPONSE = CommentResponseMapper
-        .toDataListCommentWebResponse(Collections.singletonList(this.comment));
+    PAGING_RESPONSE = CommentResponseMapper
+        .toPagingCommentWebResponse(commentPage);
 
     BASE_RESPONSE = ResponseHelper.toBaseResponse(HttpStatus.OK);
 
-    when(roomService.findAllCommentsByRoomId(ROOM_ID))
-        .thenReturn(Collections.singletonList(comment));
+    when(roomService.findAllCommentsByRoomId(ROOM_ID, pageable))
+        .thenReturn(commentPage);
     when(roomService.createComment(comment, STUDENT_ID))
         .thenReturn(comment);
     when(commentRequestMapper.toCommentFromRequestWithRoomId(commentWebRequest, ROOM_ID))
@@ -130,8 +137,8 @@ public class CommentControllerTest extends TestHelper {
             "/comments").cookie(cookies))
         .andExpect(status().isOk())
         .andExpect(content().json(
-            pagingResponseJacksonTester.write(LIST_DATA_RESPONSE).getJson()));
-    verify(roomService).findAllCommentsByRoomId(ROOM_ID);
+            pagingResponseJacksonTester.write(PAGING_RESPONSE).getJson()));
+    verify(roomService).findAllCommentsByRoomId(ROOM_ID, pageable);
   }
 
   @Test

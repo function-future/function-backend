@@ -23,7 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class StudentQuizRepositoryTest {
 
   private static final String QUIZ_ID = "quiz-id";
-  private static final String QUIZ_TEXT = "quiz-text";
+  private static final String QUIZ_TEXT = "quiz-label";
 
   private static final String USER_ID = "student-id";
   private static final String USER_NAME = "user-name";

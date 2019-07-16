@@ -1,6 +1,5 @@
 package com.future.function.web.mapper.request.scoring;
 
-import com.future.function.common.exception.BadRequestException;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.scoring.QuestionBank;
 import com.future.function.model.entity.feature.scoring.Quiz;
@@ -13,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -37,15 +35,10 @@ public class QuizRequestMapper {
    * @param request (QuizWebRequest)
    * @return Quiz object
    */
-  public Quiz toQuiz(String id, QuizWebRequest request) {
-    Quiz quiz = Optional.ofNullable(id)
-        .filter(val -> !val.isEmpty())
-        .map(val -> Quiz
-            .builder()
-            .id(val)
-            .build())
-        .orElseThrow(() -> new BadRequestException("Bad Request"));
-    return toValidatedQuiz(request, quiz);
+  public Quiz toQuiz(String id, QuizWebRequest request, String batchCode) {
+      Quiz quiz = toValidatedQuiz(request, batchCode);
+      quiz.setId(id);
+      return quiz;
   }
 
   public CopyQuizWebRequest validateCopyQuizWebRequest(CopyQuizWebRequest request) {
@@ -58,28 +51,24 @@ public class QuizRequestMapper {
    * @param request (QuizWebRequest)
    * @return Quiz object
    */
-  public Quiz toQuiz(QuizWebRequest request) {
-    return toValidatedQuiz(request, new Quiz());
+  public Quiz toQuiz(QuizWebRequest request, String batchCode) {
+      return toValidatedQuiz(request, batchCode);
   }
 
   /**
    * Private method used to validate web request and map to quiz entity object
    *
    * @param request (QuizWebRequest)
-   * @param quiz    (Quiz)
    * @return Quiz object
    */
-  private Quiz toValidatedQuiz(QuizWebRequest request, Quiz quiz) {
-    return Optional.ofNullable(request)
-        .map(validator::validate)
-        .map(val -> {
-          BeanUtils.copyProperties(val, quiz);
-          Batch batch = Batch.builder().code(val.getBatchCode()).build();
-          quiz.setBatch(batch);
-          quiz.setQuestionBanks(buildQuestionBanks(val.getQuestionBanks()));
-          return quiz;
-        })
-        .orElseThrow(() -> new BadRequestException("Bad Request"));
+  private Quiz toValidatedQuiz(QuizWebRequest request, String batchCode) {
+      request = validator.validate(request);
+      Quiz quiz = new Quiz();
+      BeanUtils.copyProperties(request, quiz);
+      Batch batch = Batch.builder().code(batchCode).build();
+      quiz.setBatch(batch);
+      quiz.setQuestionBanks(buildQuestionBanks(request.getQuestionBanks()));
+      return quiz;
   }
 
   private List<QuestionBank> buildQuestionBanks(List<String> questionBankIds) {

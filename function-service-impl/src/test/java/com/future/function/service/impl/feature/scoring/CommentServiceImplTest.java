@@ -4,6 +4,7 @@ import com.future.function.model.entity.feature.core.User;
 import com.future.function.model.entity.feature.scoring.Comment;
 import com.future.function.model.entity.feature.scoring.Room;
 import com.future.function.repository.feature.scoring.CommentRepository;
+import com.future.function.service.impl.helper.PageHelper;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -13,12 +14,12 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.Collections;
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CommentServiceImplTest {
@@ -31,6 +32,7 @@ public class CommentServiceImplTest {
   private Room room;
   private User author;
   private Comment comment;
+  private Pageable pageable;
 
   @InjectMocks
   private CommentServiceImpl commentService;
@@ -44,7 +46,12 @@ public class CommentServiceImplTest {
     room = Room.builder().student(author).id(ROOM_ID).build();
     comment = Comment.builder().author(author).room(room).build();
 
-    when(commentRepository.findAllByRoomId(ROOM_ID)).thenReturn(Collections.singletonList(comment));
+    pageable = new PageRequest(0, 10);
+
+    when(commentRepository.findAllByRoomIdOrderByCreatedAtDesc(ROOM_ID))
+            .thenReturn(Collections.singletonList(comment));
+    when(commentRepository.findAllByRoomIdOrderByCreatedAtDesc(ROOM_ID, pageable))
+        .thenReturn(PageHelper.toPage(Collections.singletonList(comment), pageable));
     when(commentRepository.save(comment)).thenReturn(comment);
   }
 
@@ -55,10 +62,11 @@ public class CommentServiceImplTest {
 
   @Test
   public void findAllCommentsByRoomId() {
-    List<Comment> actual = commentService.findAllCommentsByRoomId(ROOM_ID);
-    assertThat(actual.size()).isEqualTo(1);
-    assertThat(actual.get(0)).isEqualTo(comment);
-    verify(commentRepository).findAllByRoomId(ROOM_ID);
+    Page<Comment> actual = commentService.findAllCommentsByRoomId(ROOM_ID, pageable);
+    assertThat(actual.getSize()).isEqualTo(10);
+    assertThat(actual.getTotalElements()).isEqualTo(1);
+    assertThat(actual.getContent().get(0)).isEqualTo(comment);
+    verify(commentRepository).findAllByRoomIdOrderByCreatedAtDesc(ROOM_ID, pageable);
   }
 
   @Test
@@ -72,7 +80,7 @@ public class CommentServiceImplTest {
   @Test
   public void deleteAllCommentByRoomId() {
     commentService.deleteAllCommentByRoomId(ROOM_ID);
-    verify(commentRepository).findAllByRoomId(ROOM_ID);
+    verify(commentRepository).findAllByRoomIdOrderByCreatedAtDesc(ROOM_ID);
     comment.setDeleted(true);
     verify(commentRepository).save(comment);
   }

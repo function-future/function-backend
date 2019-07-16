@@ -1,12 +1,15 @@
 package com.future.function.web.mapper.response.scoring;
 
 import com.future.function.model.entity.feature.scoring.Comment;
+import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.model.response.base.DataResponse;
+import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.feature.embedded.AuthorWebResponse;
 import com.future.function.web.model.response.feature.scoring.CommentWebResponse;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 
 import java.util.List;
@@ -15,8 +18,9 @@ import java.util.stream.Collectors;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class CommentResponseMapper {
 
-  public static DataResponse<List<CommentWebResponse>> toDataListCommentWebResponse(List<Comment> commentList) {
-    return ResponseHelper.toDataResponse(HttpStatus.OK, CommentResponseMapper.toListCommentWebResponse(commentList));
+  public static PagingResponse<CommentWebResponse> toPagingCommentWebResponse(Page<Comment> commentPage) {
+    return ResponseHelper.toPagingResponse(HttpStatus.OK, CommentResponseMapper.toListCommentWebResponse(commentPage.getContent()),
+        PageHelper.toPaging(commentPage));
   }
 
   private static List<CommentWebResponse> toListCommentWebResponse(List<Comment> commentList) {

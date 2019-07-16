@@ -315,7 +315,7 @@ public interface FieldName {
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
   abstract class Question {
 
-    public static final String TEXT = "text";
+    public static final String LABEL = "label";
 
     public static final String QUESTION_BANK = "questionBank";
 
@@ -324,7 +324,7 @@ public interface FieldName {
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
   abstract class Option {
 
-    public static final String LABEL = "text";
+    public static final String LABEL = "label";
 
     public static final String CORRECT = "correct";
 
@@ -406,6 +406,30 @@ public interface FieldName {
 
   }
 
+
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  abstract class Report {
+
+    public static final String TITLE = "title";
+
+    public static final String DESCRIPTION = "description";
+
+    public static final String USED_AT = "usedAt";
+
+    public static final String BATCH = "batch";
+
+  }
+
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  abstract class ReportDetail {
+
+    public static final String REPORT = "report";
+
+    public static final String USER = "user";
+
+    public static final String POINT = "point";
+
+  }
 
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
   abstract class ActivityBlog {

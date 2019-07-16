@@ -14,7 +14,11 @@ public interface RoomService {
 
   Room findById(String id, String userId);
 
-  List<Comment> findAllCommentsByRoomId(String roomId);
+  Page<Comment> findAllCommentsByRoomId(String roomId, Pageable pageable);
+
+    Page<Room> findAllByStudentId(String studentId, Pageable pageable, String userId);
+
+    List<Room> findAllByStudentId(String studentId);
 
   Comment createComment(Comment comment, String userId);
 

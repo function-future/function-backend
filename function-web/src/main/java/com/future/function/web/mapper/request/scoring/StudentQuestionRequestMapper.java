@@ -12,11 +12,15 @@ import java.util.stream.Collectors;
 @Component
 public class StudentQuestionRequestMapper {
 
-  @Autowired
   private RequestValidator validator;
 
-  @Autowired
   private OptionRequestMapper optionRequestMapper;
+
+  @Autowired
+  public StudentQuestionRequestMapper(RequestValidator validator, OptionRequestMapper optionRequestMapper) {
+    this.validator = validator;
+    this.optionRequestMapper = optionRequestMapper;
+  }
 
   public StudentQuestion toStudentQuestion(StudentQuestionWebRequest request) {
     return toValidatedStudentQuestion(request);
