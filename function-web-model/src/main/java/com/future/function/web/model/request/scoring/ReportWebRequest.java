@@ -24,9 +24,6 @@ public class ReportWebRequest {
     @Min(value = 1, message = "Min")
     private long usedAt;
 
-    @NotBlank(message = "NotBlank")
-    private String batchCode;
-
     private List<String> students;
 
 }

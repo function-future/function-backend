@@ -192,7 +192,7 @@ public class UserDetailControllerTest extends TestHelper {
       .andExpect(content().json(mapJacksonTester.write(defaultMenuList)
                                   .getJson()));
 
-    verify(menuService).getSectionsByRole(null);
+    verify(menuService).getSectionsByRole(Role.UNKNOWN);
     verifyZeroInteractions(userService, accessService, userDetailRequestMapper);
   }
 
@@ -231,7 +231,7 @@ public class UserDetailControllerTest extends TestHelper {
       .andExpect(content().json(mapJacksonTester.write(defaultAccessList)
                                   .getJson()));
 
-    verify(accessService).getComponentsByUrlAndRole(url, null);
+    verify(accessService).getComponentsByUrlAndRole(url, Role.UNKNOWN);
     verifyZeroInteractions(userService, menuService, userDetailRequestMapper);
   }
 
@@ -248,7 +248,7 @@ public class UserDetailControllerTest extends TestHelper {
       .andExpect(content().json(mapJacksonTester.write(defaultAccessList)
                                   .getJson()));
 
-    verify(accessService).getComponentsByUrlAndRole("", null);
+    verify(accessService).getComponentsByUrlAndRole("", Role.UNKNOWN);
     verifyZeroInteractions(userService, menuService, userDetailRequestMapper);
   }
 

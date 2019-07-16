@@ -53,18 +53,18 @@ public class ReportController {
   @ResponseStatus(HttpStatus.CREATED)
   @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
   @WithAnyRole(roles = Role.ADMIN)
-  public DataResponse<ReportWebResponse> createFinalJudging(@RequestBody ReportWebRequest request, Session session) {
+  public DataResponse<ReportWebResponse> createFinalJudging(@PathVariable String batchCode,
+      @RequestBody ReportWebRequest request, Session session) {
     return ReportResponseMapper.toDataReportWebResponse(HttpStatus.CREATED,
-        reportService.createReport(requestMapper.toReport(request)));
+        reportService.createReport(requestMapper.toReport(request, batchCode)));
   }
 
   @ResponseStatus(HttpStatus.OK)
   @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
   @WithAnyRole(roles = Role.ADMIN)
-  public DataResponse<ReportWebResponse> updateFinalJudging(@PathVariable String id,
-                                                            @RequestBody ReportWebRequest request,
-                                                            Session session) {
-    return ReportResponseMapper.toDataReportWebResponse(reportService.updateReport(requestMapper.toReport(request, id)));
+  public DataResponse<ReportWebResponse> updateFinalJudging(@PathVariable String batchCode, @PathVariable String id,
+                                                            @RequestBody ReportWebRequest request, Session session) {
+    return ReportResponseMapper.toDataReportWebResponse(reportService.updateReport(requestMapper.toReport(request, id, batchCode)));
   }
 
   @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)

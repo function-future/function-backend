@@ -93,7 +93,6 @@ public class ReportControllerTest extends TestHelper {
                 .name(TITLE)
                 .description(DESCRIPTION)
                 .usedAt(usedAt.atStartOfDay().atZone(ZoneId.systemDefault()).toEpochSecond())
-                .batchCode(BATCH_CODE)
                 .students(Collections.singletonList(STUDENT_ID))
                 .build();
 
@@ -115,8 +114,8 @@ public class ReportControllerTest extends TestHelper {
         when(reportService.createReport(report)).thenReturn(report);
         when(reportService.updateReport(report)).thenReturn(report);
         when(reportService.findById(REPORT_ID)).thenReturn(report);
-        when(requestMapper.toReport(reportWebRequest)).thenReturn(report);
-        when(requestMapper.toReport(reportWebRequest, REPORT_ID)).thenReturn(report);
+        when(requestMapper.toReport(reportWebRequest, BATCH_CODE)).thenReturn(report);
+        when(requestMapper.toReport(reportWebRequest, REPORT_ID, BATCH_CODE)).thenReturn(report);
     }
 
     @After
@@ -161,7 +160,7 @@ public class ReportControllerTest extends TestHelper {
                 .andExpect(content().json(
                         dataResponseJacksonTester.write(CREATED_DATA_RESPONSE)
                                 .getJson()));
-        verify(requestMapper).toReport(reportWebRequest);
+        verify(requestMapper).toReport(reportWebRequest, BATCH_CODE);
         verify(reportService).createReport(report);
     }
 
@@ -176,7 +175,7 @@ public class ReportControllerTest extends TestHelper {
                 .andExpect(content().json(
                         dataResponseJacksonTester.write(DATA_RESPONSE)
                                 .getJson()));
-        verify(requestMapper).toReport(reportWebRequest, REPORT_ID);
+        verify(requestMapper).toReport(reportWebRequest, REPORT_ID, BATCH_CODE);
         verify(reportService).updateReport(report);
     }
 

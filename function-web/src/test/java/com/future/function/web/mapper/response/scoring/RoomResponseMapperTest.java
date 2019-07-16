@@ -65,6 +65,7 @@ public class RoomResponseMapperTest {
         .batch(batch)
         .file(fileV2)
         .build();
+    assignment.setCreatedAt(ASSIGNMENT_DEADLINE);
     assignmentWebResponse = AssignmentWebResponse
         .builder()
         .title(ASSIGNMENT_TITLE)
@@ -73,6 +74,7 @@ public class RoomResponseMapperTest {
         .batchCode(BATCH_CODE)
         .file(FILE_URl)
         .build();
+    assignmentWebResponse.setUploadedDate(ASSIGNMENT_DEADLINE);
     batchWebResponse = BatchWebResponse.builder()
         .code(BATCH_CODE).build();
     student = User.builder().id(USER_ID).name("name").address("address").batch(batch).email("email")

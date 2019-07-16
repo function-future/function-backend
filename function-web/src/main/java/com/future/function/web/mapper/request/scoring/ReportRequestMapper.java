@@ -23,23 +23,23 @@ public class ReportRequestMapper {
     this.validator = validator;
   }
 
-  public Report toReport(ReportWebRequest request) {
-    return toValidatedReport(request);
+  public Report toReport(ReportWebRequest request, String batchCode) {
+    return toValidatedReport(request, batchCode);
   }
 
-  public Report toReport(ReportWebRequest request, String id) {
-    Report report = toValidatedReport(request);
+  public Report toReport(ReportWebRequest request, String id, String batchCode) {
+    Report report = toValidatedReport(request, batchCode);
     report.setId(id);
     return report;
   }
 
-  private Report toValidatedReport(ReportWebRequest request) {
+  private Report toValidatedReport(ReportWebRequest request, String batchCode) {
     return Optional.ofNullable(request)
         .map(validator::validate)
         .map(value -> Report.builder()
             .title(value.getName())
             .description(value.getDescription())
-                .batch(Batch.builder().code(value.getBatchCode()).build())
+            .batch(Batch.builder().code(batchCode).build())
             .usedAt(getLocalDate(value))
             .studentIds(value.getStudents())
             .build())

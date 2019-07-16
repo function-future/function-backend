@@ -109,11 +109,7 @@ public class ReportServiceImpl implements ReportService {
                 .map(foundReport -> {
                     Batch batch = foundReport.getBatch();
                     CopyHelper.copyProperties(report, foundReport);
-                    if (!batch.getCode().equals(report.getBatch().getCode())) {
-                        foundReport.setBatch(batchService.getBatchByCode(report.getBatch().getCode()));
-                    } else {
-                        foundReport.setBatch(batch);
-                    }
+                    foundReport.setBatch(batch);
                     foundReport.setStudentIds(null);
                     return foundReport;
                 })

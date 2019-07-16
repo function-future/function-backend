@@ -47,7 +47,6 @@ public class ReportRequestMapperTest {
         .builder()
         .name(NAME)
         .description(DESCRIPTION)
-            .batchCode(BATCH_CODE)
         .usedAt(USED_AT)
         .students(studentIds)
         .build();
@@ -62,7 +61,7 @@ public class ReportRequestMapperTest {
 
   @Test
   public void toReport() {
-    Report actual = requestMapper.toReport(request);
+    Report actual = requestMapper.toReport(request, BATCH_CODE);
     assertThat(actual.getTitle()).isEqualTo(NAME);
     assertThat(actual.getDescription()).isEqualTo(DESCRIPTION);
       assertThat(actual.getBatch().getCode()).isEqualTo(BATCH_CODE);
@@ -73,13 +72,13 @@ public class ReportRequestMapperTest {
   @Test
   public void toReportWithNullValue() {
     request = null;
-    catchException(() -> requestMapper.toReport(request));
+    catchException(() -> requestMapper.toReport(request, BATCH_CODE));
     assertThat(caughtException().getClass()).isEqualTo(BadRequestException.class);
   }
 
   @Test
   public void toReportWithId() {
-    Report actual = requestMapper.toReport(request, "requestId");
+    Report actual = requestMapper.toReport(request, "requestId", BATCH_CODE);
     assertThat(actual.getId()).isEqualTo("requestId");
       assertThat(actual.getBatch().getCode()).isEqualTo(BATCH_CODE);
     verify(requestValidator).validate(request);

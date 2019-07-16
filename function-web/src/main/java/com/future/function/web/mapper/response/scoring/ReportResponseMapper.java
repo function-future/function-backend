@@ -36,10 +36,10 @@ public class ReportResponseMapper {
     return Optional.ofNullable(report)
         .map(value -> ReportWebResponse
             .builder()
-                .id(value.getId())
-                .title(value.getTitle())
+            .id(value.getId())
+            .title(value.getTitle())
             .description(value.getDescription())
-                .batchCode(value.getBatch().getCode())
+            .batchCode(value.getBatch().getCode())
             .usedAt(getLongFormatOfDate(value))
             .studentCount(value.getStudentIds().size())
             .build())
