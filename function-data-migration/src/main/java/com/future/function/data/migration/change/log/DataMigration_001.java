@@ -9,6 +9,7 @@ import com.mongodb.BasicDBObject;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+@SuppressWarnings("squid:S00101")
 @ChangeLog(order = "001")
 public class DataMigration_001 {
 

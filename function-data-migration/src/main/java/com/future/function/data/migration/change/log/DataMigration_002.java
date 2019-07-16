@@ -7,6 +7,7 @@ import com.github.mongobee.changeset.ChangeSet;
 import com.mongodb.BasicDBObject;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
+@SuppressWarnings("squid:S00101")
 @ChangeLog(order = "002")
 public class DataMigration_002 {
   

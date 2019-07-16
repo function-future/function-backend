@@ -629,5 +629,63 @@ public class UserServiceImplTest {
       namePart, PAGEABLE);
     verifyZeroInteractions(resourceService, encoder);
   }
+  
+  @Test
+  public void testGivenUserObjectByChangingProfilePictureReturnUpdatedUser() {
+    
+    FileV2 picture = FileV2.builder()
+      .id(PICTURE_ID)
+      .build();
+    User user = User.builder()
+      .email(EMAIL_STUDENT)
+      .pictureV2(picture)
+      .build();
+    
+    when(userRepository.findByEmailAndDeletedFalse(EMAIL_STUDENT)).thenReturn(
+      Optional.of(userStudent));
+    
+    when(resourceService.markFilesUsed(Collections.singletonList(PICTURE_ID),
+                                       true
+    )).thenReturn(true);
+    
+    when(resourceService.getFile(PICTURE_ID)).thenReturn(picture);
+    
+    User savedUser = new User();
+    BeanUtils.copyProperties(userStudent, savedUser);
+    savedUser.setPictureV2(picture);
+    when(userRepository.save(savedUser)).thenReturn(savedUser);
+    
+    User updatedUser = userService.changeProfilePicture(user);
+    
+    assertThat(updatedUser).isEqualTo(savedUser);
+    
+    verify(userRepository).findByEmailAndDeletedFalse(EMAIL_STUDENT);
+    verify(resourceService).markFilesUsed(
+      Collections.singletonList(PICTURE_ID), true);
+    verify(resourceService).getFile(PICTURE_ID);
+    verify(userRepository).save(savedUser);
+  }
+  
+  @Test
+  public void testGivenUserWithNonExistingEmailByChangingProfilePictureReturnRequestUserObject() {
+  
+    FileV2 picture = FileV2.builder()
+      .id(PICTURE_ID)
+      .build();
+    User user = User.builder()
+      .email(EMAIL_STUDENT)
+      .pictureV2(picture)
+      .build();
+  
+    when(userRepository.findByEmailAndDeletedFalse(EMAIL_STUDENT)).thenReturn(
+      Optional.empty());
+    
+    User updatedUser = userService.changeProfilePicture(user);
+    
+    assertThat(updatedUser).isEqualTo(user);
+    
+    verify(userRepository).findByEmailAndDeletedFalse(EMAIL_STUDENT);
+    verifyZeroInteractions(resourceService);
+  }
 
 }
