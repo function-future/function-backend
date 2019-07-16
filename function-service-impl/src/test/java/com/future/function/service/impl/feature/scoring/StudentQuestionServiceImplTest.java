@@ -24,8 +24,10 @@ import java.util.List;
 import static com.googlecode.catchexception.CatchException.catchException;
 import static com.googlecode.catchexception.CatchException.caughtException;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -102,6 +104,7 @@ public class StudentQuestionServiceImplTest {
     when(studentQuestionRepository.findAllByStudentQuizDetailIdAndDeletedFalseOrderByNumberAsc(STUDENT_QUIZ_DETAIL_ID))
         .thenReturn(Collections.singletonList(studentQuestion));
     when(studentQuestionRepository.save(studentQuestion)).thenReturn(studentQuestion);
+    when(studentQuestionRepository.save(any(StudentQuestion.class))).thenReturn(studentQuestion);
     when(questionService.findAllByMultipleQuestionBankId(Collections.singletonList(QUESTION_BANK_ID)))
         .thenReturn(Collections.singletonList(question));
   }
@@ -151,6 +154,7 @@ public class StudentQuestionServiceImplTest {
     assertThat(actual.size()).isEqualTo(1);
     assertThat(actual.get(0).getNumber()).isEqualTo(1);
     assertThat(actual.get(0).getQuestion().getLabel()).isEqualTo(QUESTION_TEXT);
+    verify(studentQuestionRepository).save(any(StudentQuestion.class));
   }
 
   @Test

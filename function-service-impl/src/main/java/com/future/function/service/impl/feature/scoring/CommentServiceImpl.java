@@ -4,11 +4,12 @@ import com.future.function.model.entity.feature.scoring.Comment;
 import com.future.function.model.entity.feature.scoring.Room;
 import com.future.function.repository.feature.scoring.CommentRepository;
 import com.future.function.service.api.feature.scoring.CommentService;
+import com.future.function.service.impl.helper.PageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -22,10 +23,10 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public List<Comment> findAllCommentsByRoomId(String roomId) {
+    public Page<Comment> findAllCommentsByRoomId(String roomId, Pageable pageable) {
         return Optional.ofNullable(roomId)
-                .map(commentRepository::findAllByRoomIdOrderByCreatedAtAsc)
-                .orElseGet(ArrayList::new);
+                .map(id -> commentRepository.findAllByRoomIdOrderByCreatedAtDesc(id, pageable))
+                .orElseGet(() -> PageHelper.empty(pageable));
     }
 
     @Override
@@ -36,7 +37,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public void deleteAllCommentByRoomId(String roomId) {
-        this.findAllCommentsByRoomId(roomId)
+        commentRepository.findAllByRoomIdOrderByCreatedAtDesc(roomId)
                 .stream()
                 .forEach(comment -> {
                     comment.setDeleted(true);

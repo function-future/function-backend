@@ -39,18 +39,6 @@ public class StudentQuestionController {
   @ResponseStatus(HttpStatus.OK)
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   @WithAnyRole(roles = Role.STUDENT)
-  public PagingResponse<StudentQuestionWebResponse> findStudentQuestionsByStudentQuizId(
-          @PathVariable String studentQuizId,
-          Session session) {
-    return StudentQuizDetailResponseMapper
-        .toStudentQuestionWebResponses(
-            studentQuizService
-                .findAllQuestionsByStudentQuizId(studentQuizId, session.getUserId()));
-  }
-
-  @ResponseStatus(HttpStatus.OK)
-  @GetMapping(value = "/start", produces = MediaType.APPLICATION_JSON_VALUE)
-  @WithAnyRole(roles = Role.STUDENT)
   public PagingResponse<StudentQuestionWebResponse> findUnansweredStudentQuestionsByStudentQuizId(
           @PathVariable String studentQuizId, Session session) {
     return StudentQuizDetailResponseMapper

@@ -63,8 +63,8 @@ public class RoomServiceImpl implements RoomService {
   }
 
     @Override
-    public List<Comment> findAllCommentsByRoomId(String roomId) {
-        return commentService.findAllCommentsByRoomId(roomId);
+    public Page<Comment> findAllCommentsByRoomId(String roomId, Pageable pageable) {
+        return commentService.findAllCommentsByRoomId(roomId, pageable);
     }
 
     @Override

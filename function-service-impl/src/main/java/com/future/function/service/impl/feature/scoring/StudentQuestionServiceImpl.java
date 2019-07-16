@@ -58,6 +58,7 @@ public class StudentQuestionServiceImpl implements StudentQuestionService {
     return IntStream.range(0, questionList.size())
         .mapToObj(i -> Pair.of(i, questionList.get(i)))
         .map(pair -> mapStudentQuizDetail(studentQuizDetail, pair))
+        .map(studentQuestionRepository::save)
         .collect(Collectors.toList());
   }
 

@@ -82,7 +82,8 @@ public class RoomServiceImplTest {
     when(roomRepository.save(any(Room.class))).thenReturn(room);
       when(roomRepository.findAllByStudentIdAndDeletedFalse(USER_ID)).thenReturn(Collections.singletonList(room));
       when(roomRepository.findAllByStudentIdAndDeletedFalse(USER_ID, pageable)).thenReturn(roomPage);
-    when(commentService.findAllCommentsByRoomId(ROOM_ID)).thenReturn(Collections.singletonList(comment));
+    when(commentService.findAllCommentsByRoomId(ROOM_ID, pageable)).thenReturn(PageHelper
+        .toPage(Collections.singletonList(comment), pageable));
     when(commentService.createCommentByRoom(room, comment)).thenReturn(comment);
   }
 
@@ -155,10 +156,11 @@ public class RoomServiceImplTest {
 
   @Test
   public void findAllCommentsByRoomId() {
-    List<Comment> actual = roomService.findAllCommentsByRoomId(ROOM_ID);
-    assertThat(actual.size()).isEqualTo(1);
-    assertThat(actual.get(0)).isEqualTo(comment);
-    verify(commentService).findAllCommentsByRoomId(ROOM_ID);
+    Page<Comment> actual = roomService.findAllCommentsByRoomId(ROOM_ID, pageable);
+    assertThat(actual.getTotalElements()).isEqualTo(1);
+    assertThat(actual.getSize()).isEqualTo(10);
+    assertThat(actual.getContent().get(0)).isEqualTo(comment);
+    verify(commentService).findAllCommentsByRoomId(ROOM_ID, pageable);
   }
 
   @Test
