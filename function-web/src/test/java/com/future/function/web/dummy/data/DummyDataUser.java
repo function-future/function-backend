@@ -18,6 +18,8 @@ import javax.validation.constraints.Min;
 @OnlyStudentCanHaveBatchAndUniversity
 public class DummyDataUser implements UserData {
   
+  private String id;
+  
   @Min(value = 10,
        message = "Min")
   private int number;
