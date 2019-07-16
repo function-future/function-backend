@@ -12,6 +12,7 @@ import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.mapper.request.core.UserDetailRequestMapper;
 import com.future.function.web.mapper.response.core.UserResponseMapper;
 import com.future.function.web.model.request.core.ChangePasswordWebRequest;
+import com.future.function.web.model.request.core.ChangeProfilePictureWebRequest;
 import com.future.function.web.model.response.base.BaseResponse;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.feature.core.UserWebResponse;
@@ -37,6 +38,7 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -45,6 +47,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(value = UserDetailController.class)
 public class UserDetailControllerTest extends TestHelper {
 
+  private static final String AVATAR_ID = "avatar-id";
+  
   private static final User USER = User.builder()
     .id("id")
     .role(Role.MENTOR)
@@ -53,6 +57,7 @@ public class UserDetailControllerTest extends TestHelper {
     .phone("phone")
     .address("address")
     .pictureV2(FileV2.builder()
+                 .id(AVATAR_ID)
                  .fileUrl("file-url")
                  .build())
     .build();
@@ -63,6 +68,10 @@ public class UserDetailControllerTest extends TestHelper {
 
   private static final ChangePasswordWebRequest CHANGE_PASSWORD_WEB_REQUEST =
     new ChangePasswordWebRequest(OLD_PASSWORD, NEW_PASSWORD);
+  
+  private static final ChangeProfilePictureWebRequest
+    CHANGE_PROFILE_PICTURE_WEB_REQUEST = new ChangeProfilePictureWebRequest(
+    Collections.singletonList(AVATAR_ID));
 
   private static final DataResponse<UserWebResponse> DATA_RESPONSE =
     UserResponseMapper.toUserDataResponse(USER);
@@ -75,6 +84,9 @@ public class UserDetailControllerTest extends TestHelper {
 
   private JacksonTester<ChangePasswordWebRequest>
     changePasswordWebRequestJacksonTester;
+
+  private JacksonTester<ChangeProfilePictureWebRequest>
+    changeProfilePictureWebRequestJacksonTester;
 
   private JacksonTester<Map<String, Object>> mapJacksonTester;
 
@@ -102,6 +114,35 @@ public class UserDetailControllerTest extends TestHelper {
 
     verifyNoMoreInteractions(
       userService, menuService, accessService, userDetailRequestMapper);
+  }
+  
+  @Test
+  public void testGivenApiCallByChangingProfilePictureReturnDataResponse()
+    throws Exception {
+    
+    super.setCookie(Role.MENTOR);
+  
+    when(userDetailRequestMapper.toUser(CHANGE_PROFILE_PICTURE_WEB_REQUEST,
+                                        MENTOR_EMAIL
+    )).thenReturn(USER);
+  
+    when(userService.changeProfilePicture(USER)).thenReturn(USER);
+  
+    mockMvc.perform(put("/api/core/user/profile/picture").cookie(cookies)
+                      .contentType(MediaType.APPLICATION_JSON)
+                      .content(
+                        changeProfilePictureWebRequestJacksonTester.write(
+                          CHANGE_PROFILE_PICTURE_WEB_REQUEST)
+                          .getJson()))
+      .andExpect(status().isOk())
+      .andExpect(content().json(dataResponseJacksonTester.write(DATA_RESPONSE)
+                                  .getJson()));
+  
+    verify(userDetailRequestMapper).toUser(CHANGE_PROFILE_PICTURE_WEB_REQUEST,
+                                           MENTOR_EMAIL);
+    verify(userService).changeProfilePicture(USER);
+    
+    verifyZeroInteractions(menuService, accessService);
   }
 
   @Test

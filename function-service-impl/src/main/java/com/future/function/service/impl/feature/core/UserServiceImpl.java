@@ -205,10 +205,10 @@ public class UserServiceImpl implements UserService {
 
   private User setUserPicture(User user, User foundUser) {
 
-    return Optional.of(foundUser)
+    return Optional.of(user)
       .map(User::getPictureV2)
       .map(FileV2::getId)
-      .map(fileId -> this.markAndSetUserPicture(user, fileId, true))
+      .map(fileId -> this.markAndSetUserPicture(foundUser, fileId, true))
       .map(ignored -> foundUser)
       .orElse(foundUser);
   }
@@ -254,6 +254,15 @@ public class UserServiceImpl implements UserService {
   private User setDefaultEncryptedPassword(User user) {
 
     return this.setEncryptedPassword(user, user.getPassword());
+  }
+  
+  @Override
+  public User changeProfilePicture(User user) {
+    
+    return userRepository.findByEmailAndDeletedFalse(user.getEmail())
+      .map(foundUser -> this.setUserPicture(user, foundUser))
+      .map(userRepository::save)
+      .orElse(user);
   }
 
 }
