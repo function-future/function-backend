@@ -119,7 +119,7 @@ public class QuizServiceImplTest {
 
     quizPage = new PageImpl<>(quizList, pageable, TOTAL);
 
-    when(quizRepository.findAllByDeletedFalse(pageable)).thenReturn(quizPage);
+    when(quizRepository.findAllByBatchAndDeletedFalse(batch, pageable)).thenReturn(quizPage);
     when(quizRepository.findByIdAndDeletedFalse(QUIZ_ID)).thenReturn(Optional.of(quiz));
     when(quizRepository.save(quiz)).thenReturn(quiz);
     when(studentQuizService.createStudentQuizByBatchCode(BATCH_CODE, quiz))
@@ -165,7 +165,7 @@ public class QuizServiceImplTest {
     assertThat(actual.getTotalElements()).isEqualTo(TOTAL);
     assertThat(actual).isEqualTo(quizPage);
 
-    verify(quizRepository).findAllByDeletedFalse(pageable);
+    verify(quizRepository).findAllByBatchAndDeletedFalse(batch, pageable);
   }
 
   @Test
@@ -176,7 +176,7 @@ public class QuizServiceImplTest {
     assertThat(actual.getTotalElements()).isEqualTo(TOTAL);
     assertThat(actual).isEqualTo(quizPage);
 
-    verify(quizRepository).findAllByDeletedFalse(pageable);
+    verify(quizRepository).findAllByBatchAndDeletedFalse(batch, pageable);
   }
 
   @Test

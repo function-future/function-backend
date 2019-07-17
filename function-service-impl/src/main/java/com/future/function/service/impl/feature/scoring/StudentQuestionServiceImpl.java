@@ -128,7 +128,7 @@ public class StudentQuestionServiceImpl implements StudentQuestionService {
   }
 
   private int getTotalPoint(List<StudentQuestion> questions, Long correctQuestions) {
-    return (Integer.valueOf(String.valueOf(correctQuestions)) / questions.size()) * 100;
+    return (int) ((correctQuestions.floatValue() / questions.size()) * 100);
   }
 
   @Override

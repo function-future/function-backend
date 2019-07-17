@@ -66,7 +66,8 @@ public class QuizServiceImpl implements QuizService {
    */
   @Override
   public Page<Quiz> findAllByBatchCodeAndPageable(String batchCode, Pageable pageable) {
-    return quizRepository.findAllByDeletedFalse(pageable);
+    Batch batch = batchService.getBatchByCode(batchCode);
+    return quizRepository.findAllByBatchAndDeletedFalse(batch, pageable);
   }
 
   @Override

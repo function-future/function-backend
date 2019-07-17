@@ -32,7 +32,7 @@ public class StudentQuizDetailServiceImpl implements StudentQuizDetailService {
   @Override
   public StudentQuizDetail findLatestByStudentQuizId(String studentQuizId) {
     return Optional.ofNullable(studentQuizId)
-        .flatMap(studentQuizDetailRepository::findTopByStudentQuiz_IdAndDeletedFalseOrderByCreatedAtDesc)
+        .flatMap(studentQuizDetailRepository::findTopByStudentQuizIdAndDeletedFalseOrderByCreatedAtDesc)
             .orElseThrow(() -> new NotFoundException("Failed at #findLatestByStudentQuizId #StudentQuizDetailService"));
   }
 

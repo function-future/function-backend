@@ -144,10 +144,15 @@ public class StudentQuizServiceImpl implements StudentQuizService {
         .map(userService::getStudentsByBatchCode)
         .filter(userList -> !userList.isEmpty())
         .map(userList -> createStudentQuizFromUserList(quiz, userList))
-        .map(studentQuiz -> studentQuiz.get(0))
-        .map(this::createStudentQuizDetailAndSave)
-        .map(returnValue -> quiz)
-            .orElseThrow(() -> new UnsupportedOperationException("Failed at#CreateStudentQuizByBatchCode #StudentQuizService"));
+        .map(studentQuizList -> {
+          this.createStudentQuizzes(studentQuizList);
+          return quiz;
+        })
+        .orElseThrow(() -> new UnsupportedOperationException("Failed at#CreateStudentQuizByBatchCode #StudentQuizService"));
+  }
+
+  private void createStudentQuizzes(List<StudentQuiz> studentQuizzes) {
+    studentQuizzes.forEach(this::createStudentQuizDetailAndSave);
   }
 
   private StudentQuizDetail createStudentQuizDetailAndSave(StudentQuiz studentQuiz) {
@@ -187,17 +192,24 @@ public class StudentQuizServiceImpl implements StudentQuizService {
   public void deleteByBatchCodeAndQuiz(String batchCode, String quizId) {
     List<User> userList = userService.getStudentsByBatchCode(batchCode);
     userList.stream()
-        .map(User::getId)
-        .map(id -> studentQuizRepository.findByStudentIdAndQuizIdAndDeletedFalse(id, quizId))
-        .filter(Optional::isPresent)
-        .map(Optional::get)
+        .map(user -> this.findByStudentIdAndQuizIdAndDeletedFalse(user, quizId))
         .forEach(this::checkAndDeleteStudentQuiz);
   }
 
+  private StudentQuiz findByStudentIdAndQuizIdAndDeletedFalse(User user, String quizId) {
+    return Optional.ofNullable(user)
+        .map(User::getId)
+        .flatMap(userId -> studentQuizRepository.findByStudentIdAndQuizIdAndDeletedFalse(userId, quizId))
+        .orElse(null);
+  }
+
   private void checkAndDeleteStudentQuiz(StudentQuiz studentQuiz) {
-    studentQuiz.setDeleted(true);
-    studentQuizRepository.save(studentQuiz);
-    studentQuizDetailService.deleteByStudentQuiz(studentQuiz);
+    Optional.ofNullable(studentQuiz)
+        .ifPresent(value -> {
+          studentQuizDetailService.deleteByStudentQuiz(value);
+          value.setDeleted(true);
+          studentQuizRepository.save(value);
+        });
   }
 
   private List<StudentQuiz> createStudentQuizFromUserList(Quiz quiz, List<User> userList) {

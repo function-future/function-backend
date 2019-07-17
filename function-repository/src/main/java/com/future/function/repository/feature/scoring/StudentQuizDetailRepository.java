@@ -11,6 +11,6 @@ public interface StudentQuizDetailRepository extends MongoRepository<StudentQuiz
 
   Optional<StudentQuizDetail> findByIdAndDeletedFalse(String id);
 
-  Optional<StudentQuizDetail> findTopByStudentQuiz_IdAndDeletedFalseOrderByCreatedAtDesc(String studentQuizId);
+  Optional<StudentQuizDetail> findTopByStudentQuizIdAndDeletedFalseOrderByCreatedAtDesc(String studentQuizId);
 
 }
