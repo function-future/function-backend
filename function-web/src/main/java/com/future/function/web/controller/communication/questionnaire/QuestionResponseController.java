@@ -12,7 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping(value = "/api/communication/question-Response")
+@RequestMapping(value = "/api/communication/question-response")
 @WithAnyRole(roles = { Role.ADMIN })
 public class QuestionResponseController {
 

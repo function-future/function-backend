@@ -46,7 +46,7 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
 
   @Override
   public Page<Questionnaire> getAllQuestionnaires(Pageable pageable) {
-    return questionnaireRepository.findAll(pageable);
+    return questionnaireRepository.findAllByDeletedFalse(pageable);
   }
 
   @Override
@@ -186,7 +186,12 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
 
 
   private Questionnaire copyProperties(Questionnaire questionnaire, Questionnaire targetQuestionnaire) {
-    BeanUtils.copyProperties(questionnaire,targetQuestionnaire);
+    targetQuestionnaire.setStartDate(questionnaire.getStartDate());
+    targetQuestionnaire.setDueDate(questionnaire.getDueDate());
+    targetQuestionnaire.setTitle(questionnaire.getTitle());
+    targetQuestionnaire.setDescription(questionnaire.getDescription());
+    targetQuestionnaire.setAuthor(questionnaire.getAuthor());
+//    BeanUtils.copyProperties(questionnaire,targetQuestionnaire);
     return targetQuestionnaire;
   }
 

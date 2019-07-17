@@ -110,7 +110,7 @@ public class QuestionnaireController {
   )
   public DataResponse<QuestionnaireDetailResponse> updateQuestionnaire(
     @PathVariable String questionnaireId,
-    QuestionnaireRequest questionnaireRequest
+    @RequestBody  QuestionnaireRequest questionnaireRequest
   ) {
     return QuestionnaireResponseMapper.toDataResponseQuestionnaireDetailResponse(
       questionnaireService.updateQuestionnaire(
@@ -135,7 +135,7 @@ public class QuestionnaireController {
   }
 
   @ResponseStatus(HttpStatus.CREATED)
-  @PostMapping(value = "/{questionnaireId]/questions",
+  @PostMapping(value = "/{questionnaireId}/questions",
               consumes = MediaType.APPLICATION_JSON_VALUE,
               produces = MediaType.APPLICATION_JSON_VALUE
               )
@@ -154,14 +154,14 @@ public class QuestionnaireController {
   }
 
   @ResponseStatus(HttpStatus.OK)
-  @PutMapping(value = "/{questionnaireId}/questions/{questionId]",
+  @PutMapping(value = "/{questionnaireId}/questions/{questionId}",
           consumes = MediaType.APPLICATION_JSON_VALUE,
           produces = MediaType.APPLICATION_JSON_VALUE
   )
   public DataResponse updateQuestionQuestionnaire(
           @PathVariable String questionnaireId,
           @PathVariable String questionId,
-          QuestionQuestionnaireRequest questionQuestionnaireRequest
+          @RequestBody QuestionQuestionnaireRequest questionQuestionnaireRequest
   ) {
     return QuestionQuestionnaireResponseMapper.toDataResponseQuestionQuestionnaireResponse(
             questionnaireService.updateQuestionQuestionnaire(

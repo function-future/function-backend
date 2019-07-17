@@ -28,6 +28,7 @@ public class QuestionnaireRequestMapper {
     validator.validate(questionnaireRequest);
 
     Questionnaire newQuestionnaire = Questionnaire.builder()
+      .id(questionnaireId)
       .title(questionnaireRequest.getTitle())
       .description(questionnaireRequest.getDesc())
       .startDate(questionnaireRequest.getStartDate())
