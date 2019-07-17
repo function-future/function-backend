@@ -1,9 +1,7 @@
 package com.future.function.web.controller.core;
 
 import com.future.function.common.enumeration.core.Role;
-import com.future.function.service.api.feature.core.AccessService;
-import com.future.function.service.api.feature.core.MenuService;
-import com.future.function.service.api.feature.core.UserService;
+import com.future.function.service.api.feature.core.UserDetailService;
 import com.future.function.session.annotation.WithAnyRole;
 import com.future.function.session.model.Session;
 import com.future.function.web.mapper.helper.ResponseHelper;
@@ -32,23 +30,17 @@ import java.util.Map;
 @RequestMapping("/api/core/user")
 public class UserDetailController {
 
-  private final UserService userService;
-
-  private final MenuService menuService;
-
-  private final AccessService accessService;
+  private final UserDetailService userDetailService;
 
   private final UserDetailRequestMapper userDetailRequestMapper;
 
   @Autowired
   public UserDetailController(
-    UserService userService, MenuService menuService,
-    AccessService accessService, UserDetailRequestMapper userDetailRequestMapper
+    UserDetailService userDetailService,
+    UserDetailRequestMapper userDetailRequestMapper
   ) {
 
-    this.userService = userService;
-    this.menuService = menuService;
-    this.accessService = accessService;
+    this.userDetailService = userDetailService;
     this.userDetailRequestMapper = userDetailRequestMapper;
   }
   
@@ -62,7 +54,7 @@ public class UserDetailController {
   ) {
   
     return UserResponseMapper.toUserDataResponse(
-      userService.changeProfilePicture(
+      userDetailService.changeProfilePicture(
         userDetailRequestMapper.toUser(request, session.getEmail())));
   }
 
@@ -74,7 +66,7 @@ public class UserDetailController {
   ) {
 
     return UserResponseMapper.toUserDataResponse(
-      userService.getUserByEmail(session.getEmail()));
+      userDetailService.getUserByEmail(session.getEmail()));
   }
 
   @ResponseStatus(HttpStatus.OK)
@@ -89,9 +81,9 @@ public class UserDetailController {
     Pair<String, String> oldAndNewPasswordPair =
       userDetailRequestMapper.toOldAndNewPasswordPair(request);
 
-    userService.changeUserPassword(session.getEmail(),
-                                   oldAndNewPasswordPair.getFirst(),
-                                   oldAndNewPasswordPair.getSecond()
+    userDetailService.changeUserPassword(session.getEmail(),
+                                         oldAndNewPasswordPair.getFirst(),
+                                         oldAndNewPasswordPair.getSecond()
     );
 
     return ResponseHelper.toBaseResponse(HttpStatus.OK);
@@ -104,7 +96,7 @@ public class UserDetailController {
       Session session
   ) {
 
-    return menuService.getSectionsByRole(session.getRole());
+    return userDetailService.getSectionsByRole(session.getRole());
   }
 
   @ResponseStatus(HttpStatus.OK)
@@ -116,7 +108,7 @@ public class UserDetailController {
       Session session
   ) {
 
-    return accessService.getComponentsByUrlAndRole(url, session.getRole());
+    return userDetailService.getComponentsByUrlAndRole(url, session.getRole());
   }
 
 }
