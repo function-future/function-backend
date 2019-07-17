@@ -3,11 +3,13 @@ package com.future.function.service.impl.feature.core;
 import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.Course;
+import com.future.function.model.entity.feature.core.Discussion;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.SharedCourse;
 import com.future.function.repository.feature.core.SharedCourseRepository;
 import com.future.function.service.api.feature.core.BatchService;
 import com.future.function.service.api.feature.core.CourseService;
+import com.future.function.service.api.feature.core.DiscussionService;
 import com.future.function.service.api.feature.core.ResourceService;
 import com.future.function.service.api.feature.core.SharedCourseService;
 import com.future.function.service.impl.helper.CopyHelper;
@@ -35,16 +37,20 @@ public class SharedCourseServiceImpl implements SharedCourseService {
   
   private final CourseService courseService;
   
+  private final DiscussionService discussionService;
+  
   @Autowired
   public SharedCourseServiceImpl(
     SharedCourseRepository sharedCourseRepository, BatchService batchService,
-    ResourceService resourceService, CourseService courseService
+    ResourceService resourceService, CourseService courseService,
+    DiscussionService discussionService
   ) {
     
     this.sharedCourseRepository = sharedCourseRepository;
     this.batchService = batchService;
     this.resourceService = resourceService;
     this.courseService = courseService;
+    this.discussionService = discussionService;
   }
   
   @Override
@@ -98,15 +104,28 @@ public class SharedCourseServiceImpl implements SharedCourseService {
       .flatMap(
         batch -> sharedCourseRepository.findByCourseIdAndBatch(courseId, batch))
       .ifPresent(sharedCourse -> {
-        Optional.of(sharedCourse)
-          .map(SharedCourse::getCourse)
-          .map(Course::getFile)
-          .map(FileV2::getId)
-          .map(Collections::singletonList)
-          .ifPresent(fileIds -> resourceService.markFilesUsed(fileIds, false));
-        
+        this.markCourseFilesUnused(sharedCourse);
+        this.deleteDiscussionsForSharedCourse(sharedCourse);
         sharedCourseRepository.delete(sharedCourse);
       });
+  }
+  
+  private void deleteDiscussionsForSharedCourse(SharedCourse sharedCourse) {
+    
+    discussionService.deleteDiscussion(
+      sharedCourse.getCourse()
+        .getId(), sharedCourse.getBatch()
+        .getCode());
+  }
+  
+  private void markCourseFilesUnused(SharedCourse sharedCourse) {
+    
+    Optional.of(sharedCourse)
+      .map(SharedCourse::getCourse)
+      .map(Course::getFile)
+      .map(FileV2::getId)
+      .map(Collections::singletonList)
+      .ifPresent(fileIds -> resourceService.markFilesUsed(fileIds, false));
   }
   
   @Override
@@ -177,6 +196,26 @@ public class SharedCourseServiceImpl implements SharedCourseService {
       ))
       .map(SharedCourse::getCourse)
       .orElse(course);
+  }
+  
+  @Override
+  public Page<Discussion> getDiscussions(
+    String email, String courseId, String batchCode, Pageable pageable
+  ) {
+  
+    this.getCourseByIdAndBatchCode(courseId, batchCode);
+    
+    return discussionService.getDiscussions(
+      email, courseId, batchCode, pageable);
+  }
+  
+  @Override
+  public Discussion createDiscussion(Discussion discussion) {
+  
+    this.getCourseByIdAndBatchCode(
+      discussion.getCourseId(), discussion.getBatchCode());
+    
+    return discussionService.createDiscussion(discussion);
   }
   
   private SharedCourse copyPropertiesAndSaveSharedCourse(

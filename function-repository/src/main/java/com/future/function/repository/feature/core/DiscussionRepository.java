@@ -17,4 +17,6 @@ public interface DiscussionRepository
     String courseId, String batchCode, Pageable pageable
   );
   
+  void deleteAllByCourseIdAndBatchCode(String courseId, String batchCode);
+  
 }

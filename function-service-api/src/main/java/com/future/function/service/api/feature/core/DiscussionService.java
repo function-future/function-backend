@@ -29,8 +29,8 @@ public interface DiscussionService {
    *
    * @return {@code Discussion} - The discussion object of the saved data.
    */
-  Discussion createDiscussion(
-    Discussion discussion
-  );
+  Discussion createDiscussion(Discussion discussion);
+  
+  void deleteDiscussion(String courseId, String batchCode);
   
 }
