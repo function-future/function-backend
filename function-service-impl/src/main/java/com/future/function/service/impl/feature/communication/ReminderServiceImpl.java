@@ -38,8 +38,8 @@ public class ReminderServiceImpl implements ReminderService {
   }
 
   @Override
-  public Page<Reminder> getAllPagedReminder(Pageable pageable) {
-    return reminderRepository.findAll(pageable);
+  public Page<Reminder> getAllPagedReminder(Pageable pageable, String keyword) {
+    return reminderRepository.findAllByTitleContainingIgnoreCaseOrderByUpdatedAtDesc(keyword, pageable);
   }
 
   @Override

@@ -42,10 +42,11 @@ public class ReminderController {
   public PagingResponse<ReminderResponse> getReminders(
           Session session,
           @RequestParam(required = false, defaultValue = "1") int page,
-          @RequestParam(required = false, defaultValue = "10") int size
+          @RequestParam(required = false, defaultValue = "10") int size,
+          @RequestParam(required = false, defaultValue = "") String keyword
   ) {
     return ReminderResponseMapper.toPagingReminderResponse(reminderService
-            .getAllPagedReminder(PageHelper.toPageable(page, size)));
+            .getAllPagedReminder(PageHelper.toPageable(page, size), keyword));
   }
 
   @GetMapping(

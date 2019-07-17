@@ -88,12 +88,12 @@ public class ReminderControllerTest extends TestHelper {
 
     @Test
     public void testGivenCallToGetRemindersReturnPagingResponse() throws Exception {
-        when(reminderService.getAllPagedReminder(PAGEABLE)).thenReturn(REMINDER_PAGE);
+        when(reminderService.getAllPagedReminder(PAGEABLE, "")).thenReturn(REMINDER_PAGE);
         PagingResponse<ReminderResponse> response = ReminderResponseMapper.toPagingReminderResponse(REMINDER_PAGE);
         mockMvc.perform(get("/api/communication/reminders").cookie(cookies))
                 .andExpect(status().isOk())
                 .andExpect(content().json(pagingResponseJacksonTester.write(response).getJson()));
-        verify(reminderService).getAllPagedReminder(PAGEABLE);
+        verify(reminderService).getAllPagedReminder(PAGEABLE, "");
     }
 
     @Test
