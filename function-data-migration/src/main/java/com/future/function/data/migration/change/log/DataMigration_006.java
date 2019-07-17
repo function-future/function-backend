@@ -588,7 +588,7 @@ public class DataMigration_006 {
     Access adminAccess = Access.builder()
             .role(Role.ADMIN)
             .urlRegex(urlRegex)
-            .components(nonAdminComponent)
+            .components(adminComponent)
             .build();
 
     Access judgeAccess = Access.builder()
@@ -605,13 +605,13 @@ public class DataMigration_006 {
 
     Access studentAccess = Access.builder()
             .role(Role.STUDENT)
-            .components(adminComponent)
+            .components(nonAdminComponent)
             .urlRegex(urlRegex)
             .build();
 
     Access guestAccess = Access.builder()
             .role(Role.UNKNOWN)
-            .components(adminComponent)
+            .components(nonAdminComponent)
             .urlRegex(urlRegex)
             .build();
 
