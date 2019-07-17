@@ -566,5 +566,60 @@ public class DataMigration_006 {
     mongoTemplate.insert(studentAccess, DocumentName.ACCESS);
     mongoTemplate.insert(guestAccess, DocumentName.ACCESS);
   }
+
+  @ChangeSet(author = "priagung",
+          id = "reminderAccessListMigration",
+          order = "0009")
+  public void insertReminderAccessList(MongoTemplate mongoTemplate) {
+    String urlRegex = "^\\/reminders(\\/.*)?$";
+
+    Map<String, Object> nonAdminComponent = new HashMap<>();
+    nonAdminComponent.put("add", false);
+    nonAdminComponent.put("delete", false);
+    nonAdminComponent.put("edit", false);
+    nonAdminComponent.put("read", false);
+
+    Map<String, Object> adminComponent = new HashMap<>();
+    adminComponent.put("add", true);
+    adminComponent.put("delete", true);
+    adminComponent.put("edit", true);
+    adminComponent.put("read", true);
+
+    Access adminAccess = Access.builder()
+            .role(Role.ADMIN)
+            .urlRegex(urlRegex)
+            .components(nonAdminComponent)
+            .build();
+
+    Access judgeAccess = Access.builder()
+            .role(Role.JUDGE)
+            .components(nonAdminComponent)
+            .urlRegex(urlRegex)
+            .build();
+
+    Access mentorAccess = Access.builder()
+            .role(Role.MENTOR)
+            .components(nonAdminComponent)
+            .urlRegex(urlRegex)
+            .build();
+
+    Access studentAccess = Access.builder()
+            .role(Role.STUDENT)
+            .components(adminComponent)
+            .urlRegex(urlRegex)
+            .build();
+
+    Access guestAccess = Access.builder()
+            .role(Role.UNKNOWN)
+            .components(adminComponent)
+            .urlRegex(urlRegex)
+            .build();
+
+    mongoTemplate.insert(adminAccess, DocumentName.ACCESS);
+    mongoTemplate.insert(judgeAccess, DocumentName.ACCESS);
+    mongoTemplate.insert(mentorAccess, DocumentName.ACCESS);
+    mongoTemplate.insert(studentAccess, DocumentName.ACCESS);
+    mongoTemplate.insert(guestAccess, DocumentName.ACCESS);
+  }
   
 }

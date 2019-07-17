@@ -31,6 +31,7 @@ public class DataMigration_005 {
     adminSections.put("comparisons", true);
     adminSections.put("points", false);
     adminSections.put("chatrooms", true);
+    adminSections.put("reminders", true);
     
     Menu adminMenu = Menu.builder()
       .role(Role.ADMIN)
@@ -49,6 +50,7 @@ public class DataMigration_005 {
     judgeSections.put("comparisons", true);
     judgeSections.put("points", false);
     judgeSections.put("chatrooms", true);
+    judgeSections.put("reminders", false);
 
     Menu judgeMenu = Menu.builder()
       .role(Role.JUDGE)
@@ -67,6 +69,7 @@ public class DataMigration_005 {
     mentorSections.put("comparisons", true);
     mentorSections.put("points", false);
     mentorSections.put("chatrooms", true);
+    mentorSections.put("reminders", false);
 
     Menu mentorMenu = Menu.builder()
       .role(Role.MENTOR)
@@ -85,6 +88,7 @@ public class DataMigration_005 {
     studentSections.put("comparisons", false);
     studentSections.put("points", true);
     studentSections.put("chatrooms", true);
+    studentSections.put("reminders", false);
 
     Menu studentMenu = Menu.builder()
       .role(Role.STUDENT)
@@ -102,7 +106,8 @@ public class DataMigration_005 {
     guestSections.put("assignments", false);
     guestSections.put("comparisons", false);
     guestSections.put("points", false);
-    
+    guestSections.put("reminders", false);
+
     Menu guestMenu = Menu.builder()
       .role(Role.UNKNOWN)
       .sections(guestSections)
