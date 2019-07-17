@@ -1,7 +1,6 @@
 package com.future.function.service.impl.feature.scoring;
 
 import com.future.function.common.enumeration.core.Role;
-import com.future.function.common.exception.ForbiddenException;
 import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.User;
@@ -13,6 +12,7 @@ import com.future.function.repository.feature.scoring.StudentQuizRepository;
 import com.future.function.service.api.feature.core.UserService;
 import com.future.function.service.api.feature.scoring.StudentQuizDetailService;
 import com.future.function.service.api.feature.scoring.StudentQuizService;
+import com.future.function.service.impl.helper.AuthorizationHelper;
 import com.future.function.service.impl.helper.CopyHelper;
 import com.future.function.service.impl.helper.PageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +23,6 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -45,8 +44,8 @@ public class StudentQuizServiceImpl implements StudentQuizService {
   public Page<StudentQuiz> findAllByStudentId(String studentId, Pageable pageable, String userId) {
     return Optional.of(userId)
         .map(userService::getUser)
-        .map(user -> checkUserEligibilityAndReturnStudentId(user, studentId))
-        .map(id -> studentQuizRepository.findAllByStudentIdAndDeletedFalse(studentId, pageable))
+            .filter(user -> AuthorizationHelper.isUserAuthorizedForAccess(user, studentId, Role.values()))
+            .map(ignored -> studentQuizRepository.findAllByStudentIdAndDeletedFalse(studentId, pageable))
         .orElseGet(() -> PageHelper.empty(pageable));
   }
 
@@ -65,57 +64,48 @@ public class StudentQuizServiceImpl implements StudentQuizService {
             .collect(Collectors.toList());
   }
 
-  private String checkUserEligibilityAndReturnStudentId(User user, String studentId) {
-    return Optional.of(user)
-        .filter(value -> value.getRole().equals(Role.STUDENT))
-        .map(value -> isUserIdEqualStudentId(studentId, value))
-        .map(User::getId)
-        .orElse(studentId);
-  }
-
-  private User isUserIdEqualStudentId(String studentId, User value) {
-    if (value.getId().equals(studentId))
-      return value;
-    throw new ForbiddenException("Failed at #isUserIdEqualsStudentId #StudentQuizService");
-  }
-
   @Override
   public StudentQuiz findById(String id, String userId) {
     User user = userService.getUser(userId);
     return Optional.ofNullable(id)
         .flatMap(studentQuizRepository::findByIdAndDeletedFalse)
-        .map(studentQuiz -> {
-          checkUserEligibilityAndReturnStudentId(user, studentQuiz.getStudent().getId());
-          return studentQuiz;
-        })
+            .filter(studentQuiz -> AuthorizationHelper.isUserAuthorizedForAccess(user, studentQuiz.getStudent().getId(), Role.values()))
             .orElseThrow(() -> new NotFoundException("Failed at #findById #StudentQuizService"));
   }
 
   @Override
   public List<StudentQuestion> findAllQuestionsByStudentQuizId(String studentQuizId, String userId) {
+    User currentUser = userService.getUser(userId);
     return Optional.of(studentQuizId)
         .flatMap(studentQuizRepository::findByIdAndDeletedFalse)
         .map(StudentQuiz::getStudent)
-        .map(user -> checkUserEligibilityAndReturnStudentId(user, userId))
-        .map(id -> studentQuizDetailService.findAllQuestionsByStudentQuizId(studentQuizId))
+            .map(User::getId)
+            .filter(studentId -> AuthorizationHelper.isUserAuthorizedForAccess(currentUser, studentId, Role.STUDENT))
+            .map(ignored -> studentQuizId)
+            .map(studentQuizDetailService::findAllQuestionsByStudentQuizId)
         .orElseGet(ArrayList::new);
   }
 
   @Override
   public List<StudentQuestion> findAllUnansweredQuestionByStudentQuizId(String studentQuizId, String userId) {
-    StudentQuiz studentQuiz = findAndUpdateTrials(studentQuizId, userId);
-    return Optional.of(studentQuiz)
-        .filter(value -> value.getTrials() > 0)
-        .map(val -> studentQuizDetailService.findAllUnansweredQuestionsByStudentQuizId(val.getId()))
+    return Optional.ofNullable(studentQuizId)
+            .map(id -> this.updateStudentQuizTrialsAndReturnId(id, userId))
+            .map(studentQuizDetailService::findAllUnansweredQuestionsByStudentQuizId)
         .orElseGet(ArrayList::new);
   }
 
-  private StudentQuiz findAndUpdateTrials(String studentQuizId, String userId) {
-    StudentQuiz studentQuiz = this.findById(studentQuizId, userId);
-    if(studentQuiz.getTrials() > 0) {
-      studentQuiz.setTrials(studentQuiz.getTrials() - 1);
-      return studentQuizRepository.save(studentQuiz);
-    }
+  private String updateStudentQuizTrialsAndReturnId(String studentQuizId, String userId) {
+    return Optional.ofNullable(studentQuizId)
+            .map(id -> this.findById(id, userId))
+            .filter(studentQuiz -> studentQuiz.getTrials() > 0)
+            .map(this::reduceStudentQuizTrials)
+            .map(studentQuizRepository::save)
+            .map(StudentQuiz::getId)
+            .orElse(null);
+  }
+
+  private StudentQuiz reduceStudentQuizTrials(StudentQuiz studentQuiz) {
+    studentQuiz.setTrials(studentQuiz.getTrials() - 1);
     return studentQuiz;
   }
 
@@ -124,9 +114,9 @@ public class StudentQuizServiceImpl implements StudentQuizService {
     StudentQuiz studentQuiz = this.findById(studentQuizId, userId);
     return Optional.of(userId)
         .map(userService::getUser)
-        .filter(user -> user.getRole().equals(Role.STUDENT))
-            .map(user -> this.checkUserEligibilityAndReturnStudentId(user, studentQuiz.getStudent().getId()))
-        .map(id -> studentQuizDetailService.answerStudentQuiz(studentQuizId, answers))
+            .filter(user -> AuthorizationHelper.isUserAuthorizedForAccess(user, studentQuiz.getStudent().getId(), Role.STUDENT))
+            .map(ignored -> studentQuizId)
+            .map(id -> studentQuizDetailService.answerStudentQuiz(id, answers))
             .orElseThrow(() -> new UnsupportedOperationException("Failed at #answerQuestionsByStudentQuizId #StudentQuizService"));
   }
 
@@ -155,26 +145,27 @@ public class StudentQuizServiceImpl implements StudentQuizService {
     studentQuizzes.forEach(this::createStudentQuizDetailAndSave);
   }
 
-  private StudentQuizDetail createStudentQuizDetailAndSave(StudentQuiz studentQuiz) {
-    return studentQuizDetailService.createStudentQuizDetail(studentQuiz, null);
+  private void createStudentQuizDetailAndSave(StudentQuiz studentQuiz) {
+    studentQuizDetailService.createStudentQuizDetail(studentQuiz, null);
   }
 
   @Override
   public Quiz copyQuizWithTargetBatch(Batch targetBatch, Quiz quiz) {
     return Optional.ofNullable(quiz)
         .map(this::createNewQuiz)
-        .map(newQuiz -> {
-          newQuiz.setBatch(targetBatch);
-          return newQuiz;
-        })
-        .map(newQuiz -> this.createStudentQuizByBatchCode(targetBatch.getCode(), newQuiz))
-        .orElseThrow(() -> new UnsupportedOperationException("Copy Quiz Failed"));
+            .map(newQuiz -> setQuizTargetBatch(targetBatch, newQuiz))
+            .map(newQuiz -> this.createStudentQuizByBatchCode(targetBatch.getCode(), newQuiz))
+            .orElseThrow(() -> new UnsupportedOperationException("Failed at #copyQuizWithTargetBatch #StudentQuizService"));
+  }
+
+  private Quiz setQuizTargetBatch(Batch targetBatch, Quiz newQuiz) {
+    newQuiz.setBatch(targetBatch);
+    return newQuiz;
   }
 
   private Quiz createNewQuiz(Quiz quiz) {
     Quiz newQuiz = Quiz.builder().build();
     CopyHelper.copyProperties(quiz, newQuiz);
-    newQuiz.setId(UUID.randomUUID().toString());
     return newQuiz;
   }
 
@@ -189,11 +180,11 @@ public class StudentQuizServiceImpl implements StudentQuizService {
   }
 
   @Override
-  public void deleteByBatchCodeAndQuiz(String batchCode, String quizId) {
-    List<User> userList = userService.getStudentsByBatchCode(batchCode);
-    userList.stream()
-        .map(user -> this.findByStudentIdAndQuizIdAndDeletedFalse(user, quizId))
-        .forEach(this::checkAndDeleteStudentQuiz);
+  public void deleteByBatchCodeAndQuiz(Quiz quiz) {
+    userService.getStudentsByBatchCode(quiz.getBatch().getCode())
+            .stream()
+            .map(user -> this.findByStudentIdAndQuizIdAndDeletedFalse(user, quiz.getId()))
+            .forEach(this::checkAndDeleteStudentQuiz);
   }
 
   private StudentQuiz findByStudentIdAndQuizIdAndDeletedFalse(User user, String quizId) {

@@ -27,7 +27,6 @@ import org.springframework.web.bind.annotation.*;
 public class QuizController {
 
   private QuizService quizService;
-
   private QuizRequestMapper quizRequestMapper;
 
   @Autowired
@@ -78,7 +77,8 @@ public class QuizController {
     return QuizResponseMapper
         .toQuizWebDataResponse(
             HttpStatus.CREATED,
-                quizService.copyQuizWithTargetBatch(request.getBatchId(), quizService.findById(request.getQuizId())));
+                quizService.copyQuizWithTargetBatchId(request.getBatchId(),
+                        quizService.findById(request.getQuizId())));
   }
 
   /**

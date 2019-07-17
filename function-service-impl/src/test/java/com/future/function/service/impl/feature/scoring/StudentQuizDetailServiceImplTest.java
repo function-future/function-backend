@@ -111,11 +111,11 @@ public class StudentQuizDetailServiceImplTest {
     when(studentQuestionService.createStudentQuestionsByStudentQuizDetail(studentQuizDetail,
         Collections.singletonList(studentQuestion))).thenReturn(Collections.singletonList(studentQuestion));
     when(studentQuestionService
-        .findAllQuestionsFromMultipleQuestionBank(true, Collections.singletonList(questionBank), QUESTION_COUNT))
+            .findAllRandomQuestionsFromMultipleQuestionBank(Collections.singletonList(questionBank), QUESTION_COUNT))
         .thenReturn(Collections.singletonList(question));
     when(studentQuestionService.createStudentQuestionsFromQuestionList(Collections.singletonList(question), studentQuizDetail))
         .thenReturn(Collections.singletonList(studentQuestion));
-    when(studentQuestionService.postAnswerForAllStudentQuestion(Collections.singletonList(studentQuestion)))
+      when(studentQuestionService.postAnswerForAllStudentQuestion(Collections.singletonList(studentQuestion), STUDENT_QUIZ_DETAIL_ID))
         .thenReturn(100);
     when(studentQuestionService.findAllByStudentQuizDetailId(STUDENT_QUIZ_DETAIL_ID))
         .thenReturn(Collections.singletonList(studentQuestion));
@@ -150,8 +150,8 @@ public class StudentQuizDetailServiceImplTest {
     assertThat(actual.get(0).getQuestion().getLabel()).isEqualTo(QUESTION_TEXT);
     verify(studentQuizDetailRepository, times(2)).findTopByStudentQuizIdAndDeletedFalseOrderByCreatedAtDesc(STUDENT_QUIZ_ID);
     verify(studentQuizDetailRepository).save(any(StudentQuizDetail.class));
-    verify(studentQuestionService).findAllQuestionsFromMultipleQuestionBank(true,
-        Collections.singletonList(questionBank), studentQuiz.getQuiz().getQuestionCount());
+      verify(studentQuestionService).findAllRandomQuestionsFromMultipleQuestionBank(Collections.singletonList(questionBank),
+              studentQuiz.getQuiz().getQuestionCount());
     verify(studentQuestionService)
         .createStudentQuestionsFromQuestionList(Collections.singletonList(question), studentQuizDetail);
   }
@@ -162,7 +162,7 @@ public class StudentQuizDetailServiceImplTest {
         .answerStudentQuiz(STUDENT_QUIZ_ID, Collections.singletonList(studentQuestion));
     assertThat(actual.getPoint()).isEqualTo(100);
     verify(studentQuizDetailRepository).findTopByStudentQuizIdAndDeletedFalseOrderByCreatedAtDesc(STUDENT_QUIZ_ID);
-    verify(studentQuestionService).postAnswerForAllStudentQuestion(Collections.singletonList(studentQuestion));
+      verify(studentQuestionService).postAnswerForAllStudentQuestion(Collections.singletonList(studentQuestion), STUDENT_QUIZ_DETAIL_ID);
     verify(studentQuizDetailRepository).save(studentQuizDetail);
   }
 
@@ -181,24 +181,6 @@ public class StudentQuizDetailServiceImplTest {
     StudentQuizDetail actual = studentQuizDetailService.createStudentQuizDetail(studentQuiz, null);
     assertThat(actual.getStudentQuiz().getId()).isEqualTo(STUDENT_QUIZ_ID);
     verify(studentQuizDetailRepository).save(any(StudentQuizDetail.class));
-  }
-
-  @Test
-  public void validateQuestionsAndCreateStudentQuestions() {
-    List<StudentQuestion> actual = studentQuizDetailService.validateQuestionsAndCreateStudentQuestions(studentQuizDetail,
-        Collections.singletonList(studentQuestion));
-    assertThat(actual.size()).isEqualTo(1);
-    assertThat(actual.get(0).getOption().getLabel()).isEqualTo(OPTION_LABEL);
-    assertThat(actual.get(0).getQuestion().getLabel()).isEqualTo(QUESTION_TEXT);
-    verify(studentQuestionService).createStudentQuestionsByStudentQuizDetail(studentQuizDetail,
-        Collections.singletonList(studentQuestion));
-  }
-
-  @Test
-  public void validateQuestionsAndCreateStudentQuestionsEmptyQuestionList() {
-    List<StudentQuestion> actual = studentQuizDetailService.validateQuestionsAndCreateStudentQuestions(studentQuizDetail,
-        Collections.emptyList());
-    assertThat(actual.size()).isEqualTo(0);
   }
 
   @Test

@@ -18,8 +18,5 @@ public interface StudentQuizDetailService {
 
   StudentQuizDetail createStudentQuizDetail(StudentQuiz studentQuiz, List<StudentQuestion> questions);
 
-  List<StudentQuestion> validateQuestionsAndCreateStudentQuestions(StudentQuizDetail studentQuizDetail,
-      List<StudentQuestion> questions);
-
   void deleteByStudentQuiz(StudentQuiz studentQuiz);
 }

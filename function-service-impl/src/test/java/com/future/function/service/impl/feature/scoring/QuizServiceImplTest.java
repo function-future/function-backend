@@ -153,9 +153,10 @@ public class QuizServiceImplTest {
 
   @Test
   public void testFindQuizByIdAndDeletedFalseBlank() {
+      when(quizRepository.findByIdAndDeletedFalse("")).thenReturn(Optional.empty());
     catchException(() -> quizService.findById(""));
-
     assertThat(caughtException().getClass()).isEqualTo(NotFoundException.class);
+      verify(quizRepository).findByIdAndDeletedFalse("");
   }
 
   @Test
@@ -208,20 +209,6 @@ public class QuizServiceImplTest {
   }
 
   @Test
-  public void testUpdateQuizSuccessChangeBatch() {
-    Batch anotherBatch = Batch.builder().code("abc").build();
-    Quiz request = Quiz.builder().id(QUIZ_ID).batch(anotherBatch).build();
-    quiz.setId(QUIZ_ID);
-    Quiz actual = quizService.updateQuiz(request);
-    assertThat(actual).isEqualTo(quiz);
-
-    verify(quizRepository).findByIdAndDeletedFalse(QUIZ_ID);
-    verify(quizRepository).save(quiz);
-    verify(studentQuizService).deleteByBatchCodeAndQuiz(batch.getCode(), QUIZ_ID);
-    verify(studentQuizService).createStudentQuizByBatchCode("abc", quiz);
-  }
-
-  @Test
   public void testUpdateQuizFindByIdNotFound() {
     quiz.setId("randomId");
       when(quizRepository.findByIdAndDeletedFalse("randomId")).thenReturn(Optional.empty());
@@ -237,7 +224,7 @@ public class QuizServiceImplTest {
     quiz.setDeleted(true);
     verify(quizRepository).findByIdAndDeletedFalse(QUIZ_ID);
     verify(quizRepository).save(quiz);
-    verify(studentQuizService).deleteByBatchCodeAndQuiz(BATCH_CODE, QUIZ_ID);
+      verify(studentQuizService).deleteByBatchCodeAndQuiz(quiz);
   }
 
   @Test
@@ -246,7 +233,7 @@ public class QuizServiceImplTest {
       Batch targetBatchObj = Batch.builder().id(batchId).build();
       when(batchService.getBatchById(batchId)).thenReturn(targetBatchObj);
     when(studentQuizService.copyQuizWithTargetBatch(targetBatchObj, quiz)).thenReturn(quiz);
-      Quiz actual = quizService.copyQuizWithTargetBatch(batchId, quiz);
+      Quiz actual = quizService.copyQuizWithTargetBatchId(batchId, quiz);
     assertThat(actual.getTitle()).isEqualTo(QUIZ_TITLE);
     verify(quizRepository).findByIdAndDeletedFalse(QUIZ_ID);
     verify(studentQuizService).copyQuizWithTargetBatch(targetBatchObj, quiz);
