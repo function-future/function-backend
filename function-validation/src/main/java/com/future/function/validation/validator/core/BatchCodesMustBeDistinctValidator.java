@@ -21,6 +21,14 @@ public class BatchCodesMustBeDistinctValidator
     
     String originBatch = data.getOriginBatch();
     String targetBatch = data.getTargetBatch();
+  
+    return (originBatch == null) || this.isOriginNotEqualWithTargetBatch(
+      originBatch, targetBatch);
+  }
+  
+  private boolean isOriginNotEqualWithTargetBatch(
+    String originBatch, String targetBatch
+  ) {
     
     return originBatch != null && targetBatch != null &&
            !originBatch.equalsIgnoreCase(targetBatch);

@@ -35,7 +35,7 @@ public class PhoneValidator implements ConstraintValidator<Phone, String> {
   @Override
   public boolean isValid(String value, ConstraintValidatorContext context) {
 
-    return (value == null) || (value.matches("^(\\+62|0)[0-9]{10,12}$"));
+    return (value == null) || (value.matches("^(\\+62|0)[0-9]{9,12}$"));
   }
 
 }
