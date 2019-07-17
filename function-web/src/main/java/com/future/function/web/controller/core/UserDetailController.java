@@ -10,6 +10,7 @@ import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.mapper.request.core.UserDetailRequestMapper;
 import com.future.function.web.mapper.response.core.UserResponseMapper;
 import com.future.function.web.model.request.core.ChangePasswordWebRequest;
+import com.future.function.web.model.request.core.ChangeProfilePictureWebRequest;
 import com.future.function.web.model.response.base.BaseResponse;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.feature.core.UserWebResponse;
@@ -18,6 +19,7 @@ import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -48,6 +50,20 @@ public class UserDetailController {
     this.menuService = menuService;
     this.accessService = accessService;
     this.userDetailRequestMapper = userDetailRequestMapper;
+  }
+  
+  @ResponseStatus(HttpStatus.OK)
+  @PutMapping("/profile/picture")
+  public DataResponse<UserWebResponse> changeProfilePicture(
+    @WithAnyRole(roles = { Role.STUDENT, Role.MENTOR, Role.JUDGE, Role.ADMIN })
+      Session session,
+    @RequestBody
+      ChangeProfilePictureWebRequest request
+  ) {
+  
+    return UserResponseMapper.toUserDataResponse(
+      userService.changeProfilePicture(
+        userDetailRequestMapper.toUser(request, session.getEmail())));
   }
 
   @ResponseStatus(HttpStatus.OK)

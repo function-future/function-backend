@@ -44,7 +44,7 @@ public class QuestionRepositoryTest {
     questionBank = QuestionBank.builder().id(QUESTION_BANK_ID).build();
 
     question = Question.builder()
-        .text(QUESTION_TEXT)
+        .label(QUESTION_TEXT)
         .questionBank(questionBank)
         .build();
     question.setQuestionBank(questionBank);
@@ -74,13 +74,13 @@ public class QuestionRepositoryTest {
     Page<Question> actual = repository.findAllByQuestionBankIdAndDeletedFalse(QUESTION_BANK_ID, pageable);
     assertThat(actual.getTotalElements()).isEqualTo(1);
     question.setQuestionBank(null);
-    assertThat(actual.getContent().get(0).getText()).isEqualTo(question.getText());
+    assertThat(actual.getContent().get(0).getLabel()).isEqualTo(question.getLabel());
   }
 
   @Test
   public void findAllByQuestionBankIdListTest() {
     List<Question> actual = repository.findAllByQuestionBankIdAndDeletedFalse(QUESTION_BANK_ID);
     assertThat(actual.size()).isEqualTo(1);
-    assertThat(actual.get(0).getText()).isEqualTo(question.getText());
+    assertThat(actual.get(0).getLabel()).isEqualTo(question.getLabel());
   }
 }

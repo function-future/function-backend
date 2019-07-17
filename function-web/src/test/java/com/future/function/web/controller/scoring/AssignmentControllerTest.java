@@ -32,20 +32,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -98,8 +88,9 @@ public class AssignmentControllerTest extends TestHelper {
             .batch(Batch.builder().code(BATCH_CODE).build())
             .build();
 
+    assignment.setCreatedAt(ASSIGNMENT_DEADLINE);
+
     assignmentWebRequest = AssignmentWebRequest.builder()
-        .batchCode(BATCH_CODE)
         .deadline(ASSIGNMENT_DEADLINE)
         .description(ASSIGNMENT_DESCRIPTION)
         .title(ASSIGNMENT_TITLE)
@@ -108,7 +99,7 @@ public class AssignmentControllerTest extends TestHelper {
 
     copyAssignmentWebRequest = CopyAssignmentWebRequest
         .builder()
-        .targetBatch("BATCH-3")
+            .batchId("BATCH-3")
         .assignmentId(ASSIGNMENT_ID)
         .build();
 
@@ -141,9 +132,9 @@ public class AssignmentControllerTest extends TestHelper {
             .thenReturn(assignment);
     when(assignmentService.findById(ASSIGNMENT_ID))
             .thenReturn(assignment);
-    when(assignmentRequestMapper.toAssignment(assignmentWebRequest))
+      when(assignmentRequestMapper.toAssignment(assignmentWebRequest, BATCH_CODE))
             .thenReturn(assignment);
-    when(assignmentRequestMapper.toAssignmentWithId(ASSIGNMENT_ID, assignmentWebRequest))
+      when(assignmentRequestMapper.toAssignmentWithId(ASSIGNMENT_ID, assignmentWebRequest, BATCH_CODE))
             .thenReturn(assignment);
   }
 
@@ -212,7 +203,7 @@ public class AssignmentControllerTest extends TestHelper {
     //TODO return json with file attribute not blank
 
     verify(assignmentService).createAssignment(assignment);
-    verify(assignmentRequestMapper).toAssignment(assignmentWebRequest);
+      verify(assignmentRequestMapper).toAssignment(assignmentWebRequest, BATCH_CODE);
   }
 
   @Test
@@ -228,7 +219,7 @@ public class AssignmentControllerTest extends TestHelper {
                             .getJson()));
 
     verify(assignmentService).updateAssignment(assignment);
-    verify(assignmentRequestMapper).toAssignmentWithId(ASSIGNMENT_ID, assignmentWebRequest);
+      verify(assignmentRequestMapper).toAssignmentWithId(ASSIGNMENT_ID, assignmentWebRequest, BATCH_CODE);
   }
 
   @Test

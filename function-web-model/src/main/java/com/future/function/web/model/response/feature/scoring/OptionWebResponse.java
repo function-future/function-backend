@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class OptionWebResponse {
 
-  private String optionId;
+  private String id;
 
   private String label;
 

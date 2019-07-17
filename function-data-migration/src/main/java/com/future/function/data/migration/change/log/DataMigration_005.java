@@ -10,6 +10,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import java.util.HashMap;
 import java.util.Map;
 
+@SuppressWarnings(value = { "squid:S00101", "squid:S1192" })
 @ChangeLog(order = "005")
 public class DataMigration_005 {
   

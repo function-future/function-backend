@@ -13,7 +13,6 @@ import com.mongodb.DBRef;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.springframework.data.mongodb.core.query.Criteria.where;
@@ -23,6 +22,7 @@ import static org.springframework.data.mongodb.core.query.Query.query;
  * Author: priagung.satyagama
  * Created At: 10:13 AM 6/17/2019
  */
+@SuppressWarnings("squid:S00101")
 @ChangeLog(order = "003")
 public class DataMigration_003 {
 

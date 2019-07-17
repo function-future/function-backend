@@ -44,7 +44,7 @@ public class QuestionRequestMapper {
   private Question toValidatedQuestion(QuestionWebRequest request) {
     request = validator.validate(request);
     return Question.builder()
-        .text(request.getText())
+        .label(request.getLabel())
         .options(getAndMapOptionWebRequest(request))
         .build();
   }

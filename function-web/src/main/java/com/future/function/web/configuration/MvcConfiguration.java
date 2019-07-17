@@ -14,6 +14,7 @@ import org.springframework.web.servlet.config.annotation.*;
 
 import java.util.List;
 
+@SuppressWarnings("squid:S1186")
 @Configuration
 public class MvcConfiguration implements WebMvcConfigurer {
 

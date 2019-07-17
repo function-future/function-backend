@@ -3,12 +3,17 @@ package com.future.function.web.mapper.response.scoring;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.model.entity.feature.scoring.Comment;
 import com.future.function.model.entity.feature.scoring.Room;
+import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.model.response.base.DataResponse;
+import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.feature.embedded.AuthorWebResponse;
 import com.future.function.web.model.response.feature.scoring.CommentWebResponse;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 
 import java.util.Collections;
@@ -26,11 +31,13 @@ public class CommentResponseMapperTest {
   private Room room;
   private User author;
   private Comment comment;
+  private Pageable pageable;
   private AuthorWebResponse authorWebResponse;
   private CommentWebResponse commentWebResponse;
 
   @Before
   public void setUp() throws Exception {
+    pageable = new PageRequest(0, 10);
     room = Room.builder().id(ROOM_ID).build();
     author = User.builder().id(USER_ID).name("name").build();
     authorWebResponse = AuthorWebResponse.builder().id(USER_ID).name("name").build();
@@ -44,8 +51,8 @@ public class CommentResponseMapperTest {
 
   @Test
   public void toListCommentWebResponse() {
-    DataResponse<List<CommentWebResponse>> actual = CommentResponseMapper
-        .toDataListCommentWebResponse(Collections.singletonList(comment));
+    PagingResponse<CommentWebResponse> actual = CommentResponseMapper
+        .toPagingCommentWebResponse(new PageImpl<>(Collections.singletonList(comment), pageable, 1));
     assertThat(actual.getData()).isEqualTo(Collections.singletonList(commentWebResponse));
   }
 

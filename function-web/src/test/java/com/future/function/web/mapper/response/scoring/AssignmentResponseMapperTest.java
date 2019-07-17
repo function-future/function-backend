@@ -59,12 +59,15 @@ public class AssignmentResponseMapperTest {
         .file(fileV2)
         .build();
 
+    assignment.setCreatedAt(ASSIGNMENT_DEADLINE);
+
     assignmentWebResponse = AssignmentWebResponse
         .builder()
         .title(ASSIGNMENT_TITLE)
         .description(ASSIGNMENT_DESCRIPTION)
         .deadline(ASSIGNMENT_DEADLINE)
         .batchCode(BATCH_CODE)
+        .uploadedDate(ASSIGNMENT_DEADLINE)
         .file(FILE_URl)
         .build();
 

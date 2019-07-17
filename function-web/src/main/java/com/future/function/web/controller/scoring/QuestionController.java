@@ -37,9 +37,9 @@ public class QuestionController {
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   @WithAnyRole(roles = Role.ADMIN)
   public PagingResponse<QuestionWebResponse> getAllQuestionForQuestionBank(@PathVariable String questionBankId,
-      @RequestParam(required = false, defaultValue = "1") int page,
-      @RequestParam(required = false, defaultValue = "10") int size,
-      Session session) {
+                                                                           @RequestParam(defaultValue = "1") int page,
+                                                                           @RequestParam(defaultValue = "10") int size,
+                                                                           Session session) {
     return QuestionResponseMapper
         .toQuestionPagingResponse(
             questionService.findAllByQuestionBankId(questionBankId, PageHelper.toPageable(page, size)));

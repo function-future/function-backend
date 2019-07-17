@@ -68,7 +68,7 @@ public class AssignmentServiceImpl implements AssignmentService {
   public Assignment findById(String id) {
     return Optional.ofNullable(id)
             .flatMap(assignmentRepository::findByIdAndDeletedFalse)
-            .orElseThrow(() -> new NotFoundException("Assignment Not Found"));
+            .orElseThrow(() -> new NotFoundException("#Failed at #findById #AssignmentService"));
   }
 
   @Override
@@ -77,17 +77,22 @@ public class AssignmentServiceImpl implements AssignmentService {
   }
 
   @Override
+  public Page<Room> findAllRoomsByStudentId(String studentId, Pageable pageable, String userId) {
+      return roomService.findAllByStudentId(studentId, pageable, userId);
+  }
+
+  @Override
   public Room findRoomById(String id, String userId) {
     return roomService.findById(id, userId);
   }
 
   @Override
-  public Assignment copyAssignment(String assignmentId, String targetBatchCode) {
+  public Assignment copyAssignment(String assignmentId, String batchId) {
     Assignment assignment = this.findById(assignmentId);
     Assignment newAssignment = Assignment.builder().build();
-    Batch targetBatchObj = batchService.getBatchByCode(targetBatchCode);
+      Batch targetBatch = batchService.getBatchById(batchId);
     CopyHelper.copyProperties(assignment, newAssignment);
-    newAssignment.setBatch(targetBatchObj);
+      newAssignment.setBatch(targetBatch);
     return this.createAssignment(newAssignment);
   }
 
@@ -140,6 +145,8 @@ public class AssignmentServiceImpl implements AssignmentService {
     }
     CopyHelper.copyProperties(request, oldAssignment);
     oldAssignment = storeAssignmentFile(oldAssignment);
+    Batch batch = batchService.getBatchByCode(request.getBatch().getCode());
+    oldAssignment.setBatch(batch);
     oldAssignment = assignmentRepository.save(oldAssignment);
     if (isBatchChanged) {
       roomService.deleteAllRoomsByAssignmentId(oldAssignment.getId());
@@ -153,7 +160,11 @@ public class AssignmentServiceImpl implements AssignmentService {
   }
 
   private boolean isFilesChanged(Assignment request, Assignment oldAssignment) {
-    return !request.getFile().getId().equals(oldAssignment.getFile().getId());
+    return Optional.ofNullable(request)
+        .map(Assignment::getFile)
+        .map(FileV2::getId)
+        .map(id -> !id.equals(oldAssignment.getFile().getId()))
+        .orElse(false);
   }
 
   @Override

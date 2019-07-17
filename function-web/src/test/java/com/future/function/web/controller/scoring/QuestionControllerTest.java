@@ -22,6 +22,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
@@ -35,13 +36,8 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Collections;
 
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -55,18 +51,6 @@ public class QuestionControllerTest extends TestHelper {
   private static final String OPTION_ID = "option-id";
   private static final String OPTION_LABEL = "option-label";
   private static final String QUESTION_BANK_ID = "question-bank-id";
-
-  private static final String QUESTION_CREATE_REQUEST_JSON =
-      "{\n" + "\"text\": \"" + QUESTION_TEXT + "\",\n" + "    " +
-          "\"options\": [\n" +
-          "{\"label\": \"" + OPTION_LABEL + "\",\n" + "\"correct\" : " + true + "}]}";
-
-  private static final String QUESTION_UPDATE_REQUEST_JSON =
-      "{\n" + "\"text\": \"" + QUESTION_TEXT + "\",\n" + "    " +
-          "\"options\": [\n" +
-          "{\"id\": \"" + OPTION_ID + "\",\n" +
-          "\"label\": \"" + OPTION_LABEL + "\",\n" +
-          "\"correct\": " + true + "}]}";
 
   private Question question;
   private Option option;
@@ -84,6 +68,7 @@ public class QuestionControllerTest extends TestHelper {
   private DataResponse<QuestionWebResponse> DATA_RESPONSE;
   private DataResponse<QuestionWebResponse> CREATED_DATA_RESPONSE;
   private PagingResponse<QuestionWebResponse> PAGING_RESPONSE;
+    private JacksonTester<QuestionWebRequest> webRequestJacksonTester;
   private BaseResponse BASE_RESPONSE;
 
   @Autowired
@@ -109,7 +94,7 @@ public class QuestionControllerTest extends TestHelper {
 
     question = Question
         .builder()
-        .text(QUESTION_TEXT)
+            .label(QUESTION_TEXT)
         .options(Collections.singletonList(option))
         .build();
 
@@ -121,7 +106,7 @@ public class QuestionControllerTest extends TestHelper {
 
     questionWebRequest = QuestionWebRequest
         .builder()
-        .text(QUESTION_TEXT)
+            .label(QUESTION_TEXT)
         .options(Collections.singletonList(optionWebRequest))
         .build();
 
@@ -133,7 +118,7 @@ public class QuestionControllerTest extends TestHelper {
 
     questionWebResponse = QuestionWebResponse
         .builder()
-        .text(QUESTION_TEXT)
+            .label(QUESTION_TEXT)
         .options(Collections.singletonList(optionWebResponse))
         .build();
 
@@ -204,7 +189,7 @@ public class QuestionControllerTest extends TestHelper {
         post("/api/scoring/question-banks/" + QUESTION_BANK_ID + "/questions")
             .cookie(cookies)
             .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .content(QUESTION_CREATE_REQUEST_JSON)
+                .content(webRequestJacksonTester.write(questionWebRequest).getJson())
     )
         .andExpect(status().isCreated())
         .andExpect(content().json(
@@ -228,7 +213,7 @@ public class QuestionControllerTest extends TestHelper {
         put("/api/scoring/question-banks/" + QUESTION_BANK_ID + "/questions/" + QUESTION_ID)
             .cookie(cookies)
             .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .content(QUESTION_UPDATE_REQUEST_JSON)
+                .content(webRequestJacksonTester.write(questionWebRequest).getJson())
     )
         .andExpect(status().isOk())
         .andExpect(content().json(

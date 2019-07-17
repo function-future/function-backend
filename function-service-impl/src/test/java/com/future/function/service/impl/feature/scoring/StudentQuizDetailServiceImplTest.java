@@ -1,12 +1,6 @@
 package com.future.function.service.impl.feature.scoring;
 
-import com.future.function.model.entity.feature.scoring.Option;
-import com.future.function.model.entity.feature.scoring.Question;
-import com.future.function.model.entity.feature.scoring.QuestionBank;
-import com.future.function.model.entity.feature.scoring.Quiz;
-import com.future.function.model.entity.feature.scoring.StudentQuestion;
-import com.future.function.model.entity.feature.scoring.StudentQuiz;
-import com.future.function.model.entity.feature.scoring.StudentQuizDetail;
+import com.future.function.model.entity.feature.scoring.*;
 import com.future.function.repository.feature.scoring.StudentQuizDetailRepository;
 import com.future.function.service.api.feature.scoring.StudentQuestionService;
 import org.junit.After;
@@ -68,7 +62,7 @@ public class StudentQuizDetailServiceImplTest {
     question = Question
         .builder()
         .id(QUESTION_ID)
-        .text(QUESTION_TEXT)
+        .label(QUESTION_TEXT)
         .questionBank(questionBank)
         .build();
 
@@ -108,7 +102,7 @@ public class StudentQuizDetailServiceImplTest {
         .option(option)
         .build();
 
-    when(studentQuizDetailRepository.findFirstByStudentQuizIdAndDeletedFalse(STUDENT_QUIZ_ID))
+    when(studentQuizDetailRepository.findTopByStudentQuiz_IdAndDeletedFalseOrderByCreatedAtDesc(STUDENT_QUIZ_ID))
         .thenReturn(Optional.of(studentQuizDetail));
     when(studentQuizDetailRepository.findByIdAndDeletedFalse(STUDENT_QUIZ_DETAIL_ID))
         .thenReturn(Optional.of(studentQuizDetail));
@@ -137,7 +131,7 @@ public class StudentQuizDetailServiceImplTest {
     StudentQuizDetail actual = studentQuizDetailService.findLatestByStudentQuizId(STUDENT_QUIZ_ID);
     assertThat(actual.getId()).isEqualTo(STUDENT_QUIZ_DETAIL_ID);
     assertThat(actual.getStudentQuiz().getId()).isEqualTo(STUDENT_QUIZ_ID);
-    verify(studentQuizDetailRepository).findFirstByStudentQuizIdAndDeletedFalse(STUDENT_QUIZ_ID);
+    verify(studentQuizDetailRepository).findTopByStudentQuiz_IdAndDeletedFalseOrderByCreatedAtDesc(STUDENT_QUIZ_ID);
   }
 
   @Test
@@ -145,7 +139,7 @@ public class StudentQuizDetailServiceImplTest {
     List<StudentQuestion> actual = studentQuizDetailService.findAllQuestionsByStudentQuizId(STUDENT_QUIZ_ID);
     assertThat(actual.size()).isEqualTo(1);
     assertThat(actual.get(0).getId()).isEqualTo(STUDENT_QUESTION_ID);
-    verify(studentQuizDetailRepository).findFirstByStudentQuizIdAndDeletedFalse(STUDENT_QUIZ_ID);
+    verify(studentQuizDetailRepository).findTopByStudentQuiz_IdAndDeletedFalseOrderByCreatedAtDesc(STUDENT_QUIZ_ID);
     verify(studentQuestionService).findAllByStudentQuizDetailId(STUDENT_QUIZ_DETAIL_ID);
   }
 
@@ -153,8 +147,8 @@ public class StudentQuizDetailServiceImplTest {
   public void findAllUnansweredQuestionsByStudentQuizId() {
     List<StudentQuestion> actual = studentQuizDetailService.findAllUnansweredQuestionsByStudentQuizId(STUDENT_QUIZ_ID);
     assertThat(actual.get(0).getNumber()).isEqualTo(1);
-    assertThat(actual.get(0).getQuestion().getText()).isEqualTo(QUESTION_TEXT);
-    verify(studentQuizDetailRepository, times(2)).findFirstByStudentQuizIdAndDeletedFalse(STUDENT_QUIZ_ID);
+    assertThat(actual.get(0).getQuestion().getLabel()).isEqualTo(QUESTION_TEXT);
+    verify(studentQuizDetailRepository, times(2)).findTopByStudentQuiz_IdAndDeletedFalseOrderByCreatedAtDesc(STUDENT_QUIZ_ID);
     verify(studentQuizDetailRepository).save(any(StudentQuizDetail.class));
     verify(studentQuestionService).findAllQuestionsFromMultipleQuestionBank(true,
         Collections.singletonList(questionBank), studentQuiz.getQuiz().getQuestionCount());
@@ -167,8 +161,9 @@ public class StudentQuizDetailServiceImplTest {
     StudentQuizDetail actual = studentQuizDetailService
         .answerStudentQuiz(STUDENT_QUIZ_ID, Collections.singletonList(studentQuestion));
     assertThat(actual.getPoint()).isEqualTo(100);
-    verify(studentQuizDetailRepository).findFirstByStudentQuizIdAndDeletedFalse(STUDENT_QUIZ_ID);
+    verify(studentQuizDetailRepository).findTopByStudentQuiz_IdAndDeletedFalseOrderByCreatedAtDesc(STUDENT_QUIZ_ID);
     verify(studentQuestionService).postAnswerForAllStudentQuestion(Collections.singletonList(studentQuestion));
+    verify(studentQuizDetailRepository).save(studentQuizDetail);
   }
 
   @Test
@@ -194,7 +189,7 @@ public class StudentQuizDetailServiceImplTest {
         Collections.singletonList(studentQuestion));
     assertThat(actual.size()).isEqualTo(1);
     assertThat(actual.get(0).getOption().getLabel()).isEqualTo(OPTION_LABEL);
-    assertThat(actual.get(0).getQuestion().getText()).isEqualTo(QUESTION_TEXT);
+    assertThat(actual.get(0).getQuestion().getLabel()).isEqualTo(QUESTION_TEXT);
     verify(studentQuestionService).createStudentQuestionsByStudentQuizDetail(studentQuizDetail,
         Collections.singletonList(studentQuestion));
   }
@@ -210,7 +205,7 @@ public class StudentQuizDetailServiceImplTest {
   public void deleteByStudentQuiz() {
     studentQuizDetailService.deleteByStudentQuiz(studentQuiz);
     studentQuizDetail.setDeleted(true);
-    verify(studentQuizDetailRepository).findFirstByStudentQuizIdAndDeletedFalse(STUDENT_QUIZ_ID);
+    verify(studentQuizDetailRepository).findTopByStudentQuiz_IdAndDeletedFalseOrderByCreatedAtDesc(STUDENT_QUIZ_ID);
     verify(studentQuizDetailRepository).save(studentQuizDetail);
     verify(studentQuestionService).deleteAllByStudentQuizDetailId(STUDENT_QUIZ_DETAIL_ID);
   }

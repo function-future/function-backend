@@ -1,6 +1,5 @@
 package com.future.function.web.mapper.request.scoring;
 
-import com.future.function.model.entity.feature.core.User;
 import com.future.function.model.entity.feature.scoring.Comment;
 import com.future.function.model.entity.feature.scoring.Room;
 import com.future.function.validation.RequestValidator;
@@ -27,7 +26,6 @@ public class CommentRequestMapper {
         return Comment
                 .builder()
                 .room(Room.builder().id(roomId).build())
-                .author(User.builder().id(request.getUserId()).build())
                 .text(request.getComment())
                 .build();
     }

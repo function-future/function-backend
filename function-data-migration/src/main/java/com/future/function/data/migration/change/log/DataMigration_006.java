@@ -2,7 +2,6 @@ package com.future.function.data.migration.change.log;
 
 import com.future.function.common.enumeration.core.Role;
 import com.future.function.model.entity.feature.core.Access;
-import com.future.function.model.entity.feature.core.Menu;
 import com.future.function.model.util.constant.DocumentName;
 import com.github.mongobee.changeset.ChangeLog;
 import com.github.mongobee.changeset.ChangeSet;
@@ -11,6 +10,9 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import java.util.HashMap;
 import java.util.Map;
 
+@SuppressWarnings(value = {
+  "squid:S00101", "squid:S1192", "common-java:DuplicatedBlocks"
+})
 @ChangeLog(order = "006")
 public class DataMigration_006 {
   

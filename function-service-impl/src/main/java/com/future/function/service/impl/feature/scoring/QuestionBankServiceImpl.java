@@ -31,7 +31,7 @@ public class QuestionBankServiceImpl implements QuestionBankService {
   public QuestionBank findById(String id) {
     return Optional.ofNullable(id)
         .flatMap(questionBankRepository::findByIdAndDeletedFalse)
-        .orElseThrow(() -> new NotFoundException("Question Bank Not Found"));
+            .orElseThrow(() -> new NotFoundException("#Failed at #findById #QuestionBankService"));
   }
 
   @Override

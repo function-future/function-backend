@@ -26,13 +26,15 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@EmailMustBeUnique
 @OnlyStudentCanHaveBatchAndUniversity
 public class UserWebRequest implements UserData {
+  
+  private String id;
   
   @NotNull(message = "NotNull")
   private String role;
   
-  @EmailMustBeUnique
   @Email(message = "Email")
   @NotBlank(message = "NotBlank")
   private String email;

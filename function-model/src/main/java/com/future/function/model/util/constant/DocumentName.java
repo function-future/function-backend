@@ -42,6 +42,7 @@ public abstract class DocumentName {
   public static final String QUESTIONNAIRE_PARTICIPANT = "questionnaire-participants";
 
   public static final String USER_QUESTIONNAIRE_SUMMARY = "user-questionnaire-summary";
+
   public static final String ASSIGNMENT = "assignments";
 
   public static final String QUESTION_BANK = "question-banks";
@@ -75,4 +76,9 @@ public abstract class DocumentName {
   public static final String NOTIFICATION = "notifications";
 
   public static final String REMINDER = "reminder";
+
+  public static final String REPORT = "reports";
+
+  public static final String REPORT_DETAIL = "report-details";
+
 }

@@ -142,19 +142,6 @@ public class StudentQuestionControllerTest extends TestHelper {
   }
 
   @Test
-  public void findStudentQuestionsByStudentQuizIdTest() throws Exception {
-    mockMvc.perform(
-        get("/api/scoring/students/studentId/quizzes/" + STUDENT_QUIZ_ID + "/questions")
-            .cookie(cookies))
-        .andExpect(status().isOk())
-        .andExpect(content().json(
-            pagingResponseJacksonTester.write(
-                pagingResponse).getJson()
-        ));
-    verify(studentQuizService).findAllQuestionsByStudentQuizId(STUDENT_QUIZ_ID, STUDENT_ID);
-  }
-
-  @Test
   public void findStudentQuestionsByStudentQuizIdAccessedByAdminTest() throws Exception {
     super.setCookie(Role.ADMIN);
     mockMvc.perform(
@@ -166,7 +153,7 @@ public class StudentQuestionControllerTest extends TestHelper {
   @Test
   public void findUnansweredQuestionsByStudentQuizIdTest() throws Exception {
     mockMvc.perform(
-        get("/api/scoring/students/studentId/quizzes/" + STUDENT_QUIZ_ID + "/questions/start")
+        get("/api/scoring/students/studentId/quizzes/" + STUDENT_QUIZ_ID + "/questions")
             .cookie(cookies))
         .andExpect(status().isOk())
         .andExpect(content().json(
