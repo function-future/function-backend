@@ -75,7 +75,7 @@ public abstract class DocumentName {
 
   public static final String NOTIFICATION = "notifications";
 
-  public static final String REMINDER = "reminder";
+  public static final String REMINDER = "reminders";
 
   public static final String REPORT = "reports";
 
