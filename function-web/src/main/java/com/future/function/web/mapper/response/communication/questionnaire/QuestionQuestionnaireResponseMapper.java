@@ -31,7 +31,7 @@ public class QuestionQuestionnaireResponseMapper {
       return new QuestionQuestionnaireResponse().builder()
             .id(questionQuestionnaire.getId())
             .questionnaireId(questionQuestionnaire.getQuestionnaire().getId())
-            .desc(questionQuestionnaire.getDescription())
+            .description(questionQuestionnaire.getDescription())
             .build();
   }
 

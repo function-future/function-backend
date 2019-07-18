@@ -20,6 +20,7 @@ import com.future.function.web.model.request.communication.questionnaire.Questio
 import com.future.function.web.model.response.base.BaseResponse;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
+import com.future.function.web.model.response.feature.communication.questionnaire.QuestionQuestionnaireResponse;
 import com.future.function.web.model.response.feature.communication.questionnaire.QuestionnaireParticipantDescriptionResponse;
 import com.future.function.web.model.response.feature.communication.questionnaire.QuestionnaireDetailResponse;
 import com.future.function.web.model.response.feature.communication.questionnaire.QuestionnaireParticipantResponse;
@@ -27,6 +28,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping(value = "/api/communication/questionnaires")
@@ -99,8 +102,6 @@ public class QuestionnaireController {
   @ResponseStatus(HttpStatus.OK)
   @GetMapping(value="/{questionnaireId}", produces = MediaType.APPLICATION_JSON_VALUE)
   public DataResponse<QuestionnaireDetailResponse> getQuestionnaire(@PathVariable String questionnaireId){
-    System.out.println("so weird");
-    System.out.println(questionnaireId);
     return QuestionnaireResponseMapper.toDataResponseQuestionnaireDetailResponse(questionnaireService.getQuestionnaire(questionnaireId), HttpStatus.OK);
   }
 
@@ -128,8 +129,7 @@ public class QuestionnaireController {
 
   @ResponseStatus(HttpStatus.OK)
   @GetMapping(value = "/{questionnaireId}/questions", produces = MediaType.APPLICATION_JSON_VALUE)
-  public DataResponse getQuestionsQuestionnaire(@PathVariable String questionnaireId){
-    System.out.println("so weird");
+  public DataResponse<List<QuestionQuestionnaireResponse>> getQuestionsQuestionnaire(@PathVariable String questionnaireId){
     return QuestionQuestionnaireResponseMapper.toDataResponseListQuestionQuestionnaireResponse(
             questionnaireService.getQuestionsByIdQuestionnaire(questionnaireId),
             HttpStatus.OK);

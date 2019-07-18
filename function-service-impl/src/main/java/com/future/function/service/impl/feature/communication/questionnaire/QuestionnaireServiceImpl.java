@@ -208,7 +208,8 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
   }
 
   private QuestionQuestionnaire copyProperties (QuestionQuestionnaire questionQuestionnaire, QuestionQuestionnaire targetQuestionQuestionnaire) {
-    BeanUtils.copyProperties(questionQuestionnaire, targetQuestionQuestionnaire);
+//    BeanUtils.copyProperties(questionQuestionnaire, targetQuestionQuestionnaire);
+    targetQuestionQuestionnaire.setDescription(questionQuestionnaire.getDescription());
     return targetQuestionQuestionnaire;
   }
 
