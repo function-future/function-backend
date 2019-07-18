@@ -5,6 +5,7 @@ import com.future.function.model.entity.feature.scoring.QuestionBank;
 import com.future.function.repository.feature.scoring.QuestionBankRepository;
 import com.future.function.service.api.feature.scoring.QuestionBankService;
 import com.future.function.service.impl.helper.CopyHelper;
+import com.future.function.service.impl.helper.PageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,19 +25,23 @@ public class QuestionBankServiceImpl implements QuestionBankService {
 
   @Override
   public Page<QuestionBank> findAllByPageable(Pageable pageable) {
-    return questionBankRepository.findAllByDeletedFalse(pageable);
+    return Optional.ofNullable(pageable)
+        .map(questionBankRepository::findAllByDeletedFalse)
+        .orElseGet(() -> PageHelper.empty(pageable));
   }
 
   @Override
   public QuestionBank findById(String id) {
     return Optional.ofNullable(id)
         .flatMap(questionBankRepository::findByIdAndDeletedFalse)
-            .orElseThrow(() -> new NotFoundException("#Failed at #findById #QuestionBankService"));
+        .orElseThrow(() -> new NotFoundException("#Failed at #findById #QuestionBankService"));
   }
 
   @Override
   public QuestionBank createQuestionBank(QuestionBank questionBank) {
-    return questionBankRepository.save(questionBank);
+    return Optional.ofNullable(questionBank)
+        .map(questionBankRepository::save)
+        .orElseThrow(() -> new UnsupportedOperationException("Failed at #createQuestionBank #QuestionBankService"));
   }
 
   @Override
@@ -45,21 +50,24 @@ public class QuestionBankServiceImpl implements QuestionBankService {
         .map(QuestionBank::getId)
         .flatMap(questionBankRepository::findByIdAndDeletedFalse)
         .map(foundQuestionBank -> mergeFoundAndNewQuestionBankThenSave(foundQuestionBank, questionBank))
+        .map(questionBankRepository::save)
         .orElse(questionBank);
   }
 
   private QuestionBank mergeFoundAndNewQuestionBankThenSave(QuestionBank foundQuestionBank, QuestionBank questionBank) {
     CopyHelper.copyProperties(questionBank, foundQuestionBank);
-    return questionBankRepository.save(foundQuestionBank);
+    return foundQuestionBank;
   }
 
   @Override
   public void deleteById(String id) {
     Optional.ofNullable(id)
         .flatMap(questionBankRepository::findByIdAndDeletedFalse)
-        .ifPresent(val -> {
-          val.setDeleted(true);
-          questionBankRepository.save(val);
-        });
+        .ifPresent(this::setDeletedAndSaveQuestionBank);
+  }
+
+  private void setDeletedAndSaveQuestionBank(QuestionBank questionBank) {
+    questionBank.setDeleted(true);
+    questionBankRepository.save(questionBank);
   }
 }

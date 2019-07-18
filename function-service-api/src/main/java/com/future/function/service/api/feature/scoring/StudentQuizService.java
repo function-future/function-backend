@@ -32,5 +32,5 @@ public interface StudentQuizService {
 
   void deleteById(String id);
 
-    void deleteByBatchCodeAndQuiz(Quiz quiz);
+  void deleteByBatchCodeAndQuiz(Quiz quiz);
 }
