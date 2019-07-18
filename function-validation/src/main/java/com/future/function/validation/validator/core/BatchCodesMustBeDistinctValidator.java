@@ -30,8 +30,7 @@ public class BatchCodesMustBeDistinctValidator
     String originBatch, String targetBatch
   ) {
     
-    return originBatch != null && targetBatch != null &&
-           !originBatch.equalsIgnoreCase(targetBatch);
+    return targetBatch != null && !originBatch.equalsIgnoreCase(targetBatch);
   }
   
 }
