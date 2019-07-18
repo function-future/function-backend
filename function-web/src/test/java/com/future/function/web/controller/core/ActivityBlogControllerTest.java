@@ -23,6 +23,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -71,28 +72,17 @@ public class ActivityBlogControllerTest extends TestHelper {
     .email(EMAIL)
     .build();
   
-  private static final ActivityBlog ACTIVITY_BLOG = ActivityBlog.builder()
-    .id(ID)
-    .title(TITLE)
-    .description(DESCRIPTION)
-    .user(USER)
-    .build();
+  private static final long UPDATED_AT = 1L;
   
-  private static final PageImpl<ActivityBlog> ACTIVITY_BLOG_PAGE =
-    new PageImpl<>(Collections.singletonList(ACTIVITY_BLOG), PAGEABLE, 1);
+  private ActivityBlog activityBlog;
   
-  private static final DataResponse<ActivityBlogWebResponse>
-    RETRIEVED_DATA_RESPONSE =
-    ActivityBlogResponseMapper.toActivityBlogDataResponse(ACTIVITY_BLOG);
+  private Page<ActivityBlog> activityBlogPage;
   
-  private static final DataResponse<ActivityBlogWebResponse>
-    CREATED_DATA_RESPONSE =
-    ActivityBlogResponseMapper.toActivityBlogDataResponse(HttpStatus.CREATED,
-                                                          ACTIVITY_BLOG
-    );
+  private DataResponse<ActivityBlogWebResponse> retrievedDataResponse;
   
-  private static final PagingResponse<ActivityBlogWebResponse> PAGING_RESPONSE =
-    ActivityBlogResponseMapper.toActivityBlogPagingResponse(ACTIVITY_BLOG_PAGE);
+  private DataResponse<ActivityBlogWebResponse> createdDataResponse;
+  
+  private PagingResponse<ActivityBlogWebResponse> pagingResponse;
   
   private static final BaseResponse OK_BASE_RESPONSE =
     ResponseHelper.toBaseResponse(HttpStatus.OK);
@@ -117,6 +107,26 @@ public class ActivityBlogControllerTest extends TestHelper {
   @Before
   public void setUp() {
     
+    activityBlog = ActivityBlog.builder()
+      .id(ID)
+      .title(TITLE)
+      .description(DESCRIPTION)
+      .user(USER)
+      .build();
+    activityBlog.setUpdatedAt(UPDATED_AT);
+  
+    activityBlogPage =
+      new PageImpl<>(Collections.singletonList(activityBlog), PAGEABLE, 1);
+    
+    retrievedDataResponse =
+      ActivityBlogResponseMapper.toActivityBlogDataResponse(activityBlog);
+  
+    createdDataResponse = ActivityBlogResponseMapper.toActivityBlogDataResponse(
+      HttpStatus.CREATED, activityBlog);
+  
+    pagingResponse =
+      ActivityBlogResponseMapper.toActivityBlogPagingResponse(activityBlogPage);
+    
     super.setUp();
   }
   
@@ -131,12 +141,12 @@ public class ActivityBlogControllerTest extends TestHelper {
     throws Exception {
     
     when(activityBlogService.getActivityBlogs("", "", PAGEABLE)).thenReturn(
-      ACTIVITY_BLOG_PAGE);
+      activityBlogPage);
     
     mockMvc.perform(get("/api/core/activity-blogs"))
       .andExpect(status().isOk())
       .andExpect(content().json(
-        pagingResponseJacksonTester.write(PAGING_RESPONSE)
+        pagingResponseJacksonTester.write(pagingResponse)
           .getJson()));
     
     verify(activityBlogService).getActivityBlogs("", "", PAGEABLE);
@@ -147,12 +157,12 @@ public class ActivityBlogControllerTest extends TestHelper {
   public void testGivenApiCallAndActivityBlogIdByGettingActivityBlogReturnDataResponse()
     throws Exception {
     
-    when(activityBlogService.getActivityBlog(ID)).thenReturn(ACTIVITY_BLOG);
+    when(activityBlogService.getActivityBlog(ID)).thenReturn(activityBlog);
     
     mockMvc.perform(get("/api/core/activity-blogs/" + ID))
       .andExpect(status().isOk())
       .andExpect(content().json(
-        dataResponseJacksonTester.write(RETRIEVED_DATA_RESPONSE)
+        dataResponseJacksonTester.write(retrievedDataResponse)
           .getJson()));
     
     verify(activityBlogService).getActivityBlog(ID);
@@ -168,9 +178,9 @@ public class ActivityBlogControllerTest extends TestHelper {
     
     when(activityBlogRequestMapper.toActivityBlog(STUDENT_EMAIL,
                                                   REQUEST
-    )).thenReturn(ACTIVITY_BLOG);
-    when(activityBlogService.createActivityBlog(ACTIVITY_BLOG)).thenReturn(
-      ACTIVITY_BLOG);
+    )).thenReturn(activityBlog);
+    when(activityBlogService.createActivityBlog(activityBlog)).thenReturn(
+      activityBlog);
     
     mockMvc.perform(post("/api/core/activity-blogs").cookie(cookies)
                       .contentType(MediaType.APPLICATION_JSON)
@@ -179,11 +189,11 @@ public class ActivityBlogControllerTest extends TestHelper {
                           .getJson()))
       .andExpect(status().isCreated())
       .andExpect(content().json(
-        dataResponseJacksonTester.write(CREATED_DATA_RESPONSE)
+        dataResponseJacksonTester.write(createdDataResponse)
           .getJson()));
     
     verify(activityBlogRequestMapper).toActivityBlog(STUDENT_EMAIL, REQUEST);
-    verify(activityBlogService).createActivityBlog(ACTIVITY_BLOG);
+    verify(activityBlogService).createActivityBlog(activityBlog);
   }
   
   @Test
@@ -194,9 +204,9 @@ public class ActivityBlogControllerTest extends TestHelper {
     
     when(activityBlogRequestMapper.toActivityBlog(STUDENT_EMAIL, ID,
                                                   REQUEST
-    )).thenReturn(ACTIVITY_BLOG);
-    when(activityBlogService.updateActivityBlog(ACTIVITY_BLOG)).thenReturn(
-      ACTIVITY_BLOG);
+    )).thenReturn(activityBlog);
+    when(activityBlogService.updateActivityBlog(activityBlog)).thenReturn(
+      activityBlog);
     
     mockMvc.perform(put("/api/core/activity-blogs/" + ID).cookie(cookies)
                       .contentType(MediaType.APPLICATION_JSON)
@@ -205,12 +215,12 @@ public class ActivityBlogControllerTest extends TestHelper {
                           .getJson()))
       .andExpect(status().isOk())
       .andExpect(content().json(
-        dataResponseJacksonTester.write(RETRIEVED_DATA_RESPONSE)
+        dataResponseJacksonTester.write(retrievedDataResponse)
           .getJson()));
     
     verify(activityBlogRequestMapper).toActivityBlog(
       STUDENT_EMAIL, ID, REQUEST);
-    verify(activityBlogService).updateActivityBlog(ACTIVITY_BLOG);
+    verify(activityBlogService).updateActivityBlog(activityBlog);
   }
   
   @Test
