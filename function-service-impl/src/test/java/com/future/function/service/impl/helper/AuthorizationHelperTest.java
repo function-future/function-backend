@@ -3,6 +3,7 @@ package com.future.function.service.impl.helper;
 import com.future.function.common.enumeration.core.Role;
 import com.future.function.common.exception.ForbiddenException;
 import com.future.function.model.entity.base.BaseEntity;
+import com.future.function.model.entity.feature.core.User;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -75,6 +76,28 @@ public class AuthorizationHelperTest {
     assertThat(caughtException().getClass()).isEqualTo(
       ForbiddenException.class);
     assertThat(caughtException().getMessage()).isEqualTo("Invalid User Role");
+  }
+
+  @Test
+  public void testGivenUserAndObjectIdAndRoleAndAllowedRolesReturnTrue() {
+    User user = User.builder().id("id").role(Role.STUDENT).build();
+    assertThat(AuthorizationHelper.isUserAuthorizedForAccess(user, "id", AuthorizationHelper.getScoringAllowedRoles()))
+        .isTrue();
+  }
+
+  @Test
+  public void testGivenUserAndObjectIdNotEqualAndRoleAndAllowedRolesThrowForbiddenException() {
+    User user = User.builder().id("id").role(Role.STUDENT).build();
+    catchException(() -> AuthorizationHelper.isUserAuthorizedForAccess(user, "abc",  AuthorizationHelper
+        .getScoringAllowedRoles()));
+    assertThat(caughtException().getClass()).isEqualTo(ForbiddenException.class);
+  }
+
+  @Test
+  public void testGivenUserAndObjectIdAndRoleAndAllowedRolesNotContainThrowForbiddenException() {
+    User user = User.builder().id("id").role(Role.STUDENT).build();
+    catchException(() -> AuthorizationHelper.isUserAuthorizedForAccess(user, "judgeId", Role.JUDGE));
+    assertThat(caughtException().getClass()).isEqualTo(ForbiddenException.class);
   }
 
   @Test

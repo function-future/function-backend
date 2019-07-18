@@ -51,7 +51,8 @@ public class RoomServiceImpl implements RoomService {
       User user = userService.getUser(userId);
         return Optional.ofNullable(id)
                 .flatMap(roomRepository::findByIdAndDeletedFalse)
-                .filter(room -> AuthorizationHelper.isUserAuthorizedForAccess(user, room.getStudent().getId(), Role.values()))
+                .filter(room -> AuthorizationHelper.isUserAuthorizedForAccess(user, room.getStudent().getId(),
+                    AuthorizationHelper.getScoringAllowedRoles()))
                 .orElseThrow(() -> new NotFoundException("Room not found"));
     }
 
@@ -64,7 +65,8 @@ public class RoomServiceImpl implements RoomService {
     public Page<Room> findAllByStudentId(String studentId, Pageable pageable, String userId) {
         return Optional.ofNullable(userId)
                 .map(userService::getUser)
-                .filter(user -> AuthorizationHelper.isUserAuthorizedForAccess(user, studentId, Role.values()))
+                .filter(user -> AuthorizationHelper.isUserAuthorizedForAccess(user, studentId,
+                    AuthorizationHelper.getScoringAllowedRoles()))
                 .map(ignored -> studentId)
                 .map(id -> roomRepository.findAllByStudentIdAndDeletedFalse(id, pageable))
                 .orElseGet(() -> PageHelper.empty(pageable));

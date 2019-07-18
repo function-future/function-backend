@@ -5,12 +5,15 @@ import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.model.entity.feature.scoring.Report;
 import com.future.function.model.entity.feature.scoring.ReportDetail;
+import com.future.function.model.util.constant.FieldName;
+import com.future.function.model.vo.scoring.StudentSummaryVO;
 import com.future.function.repository.feature.scoring.ReportRepository;
 import com.future.function.service.api.feature.core.BatchService;
 import com.future.function.service.api.feature.core.UserService;
 import com.future.function.service.api.feature.scoring.ReportDetailService;
 import com.future.function.service.api.feature.scoring.ReportService;
 import com.future.function.service.impl.helper.CopyHelper;
+import com.future.function.service.impl.helper.PageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,11 +27,8 @@ import java.util.stream.Collectors;
 public class ReportServiceImpl implements ReportService {
 
     private ReportRepository reportRepository;
-
     private ReportDetailService reportDetailService;
-
     private UserService userService;
-
     private BatchService batchService;
 
     @Autowired
@@ -42,8 +42,11 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public Page<Report> findAllReport(String batchCode, Pageable pageable) {
-        Batch batch = batchService.getBatchByCode(batchCode);
-        return mapReportPageToHaveStudentIds(reportRepository.findAllByBatchAndDeletedFalse(batch, pageable));
+      return Optional.ofNullable(batchCode)
+          .map(batchService::getBatchByCode)
+          .map(batch -> reportRepository.findAllByBatchAndDeletedFalse(batch, pageable))
+          .map(this::mapReportPageToHaveStudentIds)
+          .orElseGet(() -> PageHelper.empty(pageable));
     }
 
     private Page<Report> mapReportPageToHaveStudentIds(Page<Report> reportPage) {
@@ -74,28 +77,36 @@ public class ReportServiceImpl implements ReportService {
     public Report createReport(Report report) {
         List<String> studentIds = report.getStudentIds();
         return Optional.ofNullable(studentIds)
-                .filter(students -> students.size() <= 3)
+                .filter(this::validateStudentCount)
                 .map(value -> report)
-                .map(value -> {
-                    Batch batch = batchService.getBatchByCode(value.getBatch().getCode());
-                    value.setBatch(batch);
-                    value.setStudentIds(null);
-                    return value;
-                })
+                .map(this::setBatch)
+                .map(currentReport -> this.setStudentIds(currentReport, null))
                 .map(reportRepository::save)
                 .map(students -> createReportDetailByReportAndStudentId(report, studentIds))
                 .orElseThrow(() -> new UnsupportedOperationException("Failed at #createReport #ReportService"));
     }
 
-    private Report createReportDetailByReportAndStudentId(Report report, List<String> studentIds) {
+  private Report setBatch(Report value) {
+    Batch batch = batchService.getBatchByCode(value.getBatch().getCode());
+    value.setBatch(batch);
+    return value;
+  }
+
+  private Report setStudentIds(Report report, List<String> studentIds) {
+      report.setStudentIds(studentIds);
+      return report;
+  }
+
+  private boolean validateStudentCount(List<String> students) {
+    return students.size() <= 3;
+  }
+
+  private Report createReportDetailByReportAndStudentId(Report report, List<String> studentIds) {
         return studentIds.stream()
                 .map(userService::getUser)
                 .map(student -> reportDetailService.createReportDetailByReport(report, student))
                 .findFirst()
-                .map(value -> {
-                    value.setStudentIds(studentIds);
-                    return value;
-                })
+                .map(currentReport -> this.setStudentIds(currentReport, studentIds))
                 .orElse(null);
     }
 
@@ -106,19 +117,16 @@ public class ReportServiceImpl implements ReportService {
                 .map(this::checkStudentIdsChangedAndDeleteIfChanged)
                 .map(Report::getId)
                 .map(this::findById)
-                .map(foundReport -> {
-                    Batch batch = foundReport.getBatch();
-                    CopyHelper.copyProperties(report, foundReport);
-                    foundReport.setBatch(batch);
-                    foundReport.setStudentIds(null);
-                    return foundReport;
-                })
+                .map(foundReport -> this.copyReportRequestAttributesIgnoreBatchField(report, foundReport))
+                .map(foundReport -> this.setStudentIds(foundReport, null))
                 .map(reportRepository::save)
-                .map(value -> {
-                    value.setStudentIds(studentIds);
-                    return value;
-                })
+                .map(foundReport -> this.setStudentIds(foundReport, studentIds))
                 .orElse(report);
+    }
+
+    private Report copyReportRequestAttributesIgnoreBatchField(Report request, Report report) {
+      CopyHelper.copyProperties(request, report, FieldName.Report.BATCH);
+      return report;
     }
 
     private Report checkStudentIdsChangedAndDeleteIfChanged(Report report) {
@@ -142,22 +150,38 @@ public class ReportServiceImpl implements ReportService {
 
     private Report deleteAllDetailByReportId(Report report) {
         return Optional.ofNullable(report)
-                .map(Report::getId)
-                .map(reportId -> {
-                    reportDetailService.deleteAllByReportId(reportId);
-                    return this.createReportDetailByReportAndStudentId(report, report.getStudentIds());
-                })
+                .map(this::deleteExistingDetailAndCreateNew)
                 .orElse(report);
     }
 
-    @Override
+  private Report deleteExistingDetailAndCreateNew(Report currentReport) {
+    reportDetailService.deleteAllByReportId(currentReport.getId());
+    return this.createReportDetailByReportAndStudentId(currentReport, currentReport.getStudentIds());
+  }
+
+  @Override
     public void deleteById(String id) {
         Optional.ofNullable(id)
                 .flatMap(reportRepository::findByIdAndDeletedFalse)
-                .ifPresent(report -> {
-                    reportDetailService.deleteAllByReportId(report.getId());
-                    report.setDeleted(true);
-                    reportRepository.save(report);
-                });
+                .ifPresent(this::setDetailsAsDeletedAndSave);
     }
+
+  @Override
+  public List<StudentSummaryVO> findAllSummaryByReportId(String reportId, String userId) {
+    return reportDetailService.findAllSummaryByReportId(reportId, userId);
+  }
+
+  @Override
+  public List<ReportDetail> giveScoreToReportStudents(String reportId, List<ReportDetail> reportDetailList) {
+    return Optional.ofNullable(reportId)
+        .flatMap(reportRepository::findByIdAndDeletedFalse)
+        .map(report -> reportDetailService.giveScoreToEachStudentInDetail(report, reportDetailList))
+        .orElseThrow(() -> new UnsupportedOperationException("Failed at #giveScoreToReportStudents"));
+  }
+
+  private void setDetailsAsDeletedAndSave(Report report) {
+    reportDetailService.deleteAllByReportId(report.getId());
+    report.setDeleted(true);
+    reportRepository.save(report);
+  }
 }

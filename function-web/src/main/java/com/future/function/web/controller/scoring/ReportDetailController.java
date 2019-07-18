@@ -2,6 +2,7 @@ package com.future.function.web.controller.scoring;
 
 import com.future.function.common.enumeration.core.Role;
 import com.future.function.service.api.feature.scoring.ReportDetailService;
+import com.future.function.service.api.feature.scoring.ReportService;
 import com.future.function.session.annotation.WithAnyRole;
 import com.future.function.session.model.Session;
 import com.future.function.web.mapper.request.scoring.ReportDetailRequestMapper;
@@ -20,13 +21,13 @@ import java.util.List;
 @RequestMapping("/api/scoring/batches/{batchCode}/final-judgings/{judgingId}/comparison")
 public class ReportDetailController {
 
-    private ReportDetailService reportDetailService;
+    private ReportService reportService;
 
     private ReportDetailRequestMapper requestMapper;
 
     @Autowired
-    public ReportDetailController(ReportDetailService reportDetailService, ReportDetailRequestMapper requestMapper) {
-        this.reportDetailService = reportDetailService;
+    public ReportDetailController(ReportService reportService, ReportDetailRequestMapper requestMapper) {
+        this.reportService = reportService;
         this.requestMapper = requestMapper;
     }
 
@@ -36,7 +37,7 @@ public class ReportDetailController {
     public DataResponse<List<ReportDetailWebResponse>> findComparisonByReportId(@PathVariable String judgingId,
                                                                                 Session session) {
         return ReportDetailResponseMapper.toDataListReportDetailWebResponse(
-                reportDetailService.findAllSummaryByReportId(judgingId, session.getUserId()));
+            reportService.findAllSummaryByReportId(judgingId, session.getUserId()));
     }
 
     @ResponseStatus(HttpStatus.CREATED)
@@ -47,7 +48,7 @@ public class ReportDetailController {
                                                                                           Session session) {
         return ReportDetailResponseMapper.toDataListReportDetailWebResponseFromReportDetail(
                 HttpStatus.CREATED,
-                reportDetailService.giveScoreToEachStudentInDetail(
+            reportService.giveScoreToReportStudents(
                         judgingId,
                         requestMapper.toReportDetailList(request, judgingId)));
     }

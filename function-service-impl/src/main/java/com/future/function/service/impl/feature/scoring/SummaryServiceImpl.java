@@ -13,6 +13,9 @@ import com.future.function.service.api.feature.core.UserService;
 import com.future.function.service.api.feature.scoring.RoomService;
 import com.future.function.service.api.feature.scoring.StudentQuizService;
 import com.future.function.service.api.feature.scoring.SummaryService;
+import com.future.function.service.impl.helper.AuthorizationHelper;
+import java.lang.reflect.Array;
+import java.util.Collections;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
@@ -25,9 +28,7 @@ import java.util.Optional;
 public class SummaryServiceImpl implements SummaryService {
 
     private RoomService roomService;
-
     private StudentQuizService studentQuizService;
-
     private UserService userService;
 
     @Autowired
@@ -41,38 +42,43 @@ public class SummaryServiceImpl implements SummaryService {
     public StudentSummaryVO findAllPointSummaryByStudentId(String studentId, String userId) {
         return Optional.ofNullable(userId)
                 .map(userService::getUser)
-                .map(user -> checkEligibilityUser(user, studentId))
+                .filter(user -> AuthorizationHelper.isUserAuthorizedForAccess(user, studentId,
+                    AuthorizationHelper.getScoringAllowedRoles()))
+                .map(ignored -> studentId)
                 .map(userService::getUser)
                 .map(this::getAllSummaryFromAssignmentAndQuiz)
-            .map(this::mapToStudentSummaryDTO)
+                .map(this::mapToStudentSummaryDTO)
                 .orElseThrow(() -> new NotFoundException("Failed at #findAllPointSummaryByStudentId #SummaryService"));
-    }
-
-    private String checkEligibilityUser(User user, String studentId) {
-        if(user.getRole().equals(Role.STUDENT) && !user.getId().equals(studentId)) {
-            throw new ForbiddenException("Failed at #checkEligibilityUser #SummaryService");
-        }
-        return studentId;
     }
 
     private StudentSummaryVO mapToStudentSummaryDTO(Pair<User, List<SummaryVO>> pair) {
         return StudentSummaryVO.builder()
                 .studentId(pair.getFirst().getId())
-            .studentName(pair.getFirst().getName())
-            .batchCode(pair.getFirst().getBatch().getCode())
-            .university(pair.getFirst().getUniversity())
+                .studentName(pair.getFirst().getName())
+                .batchCode(pair.getFirst().getBatch().getCode())
+                .university(pair.getFirst().getUniversity())
                 .avatar(pair.getFirst().getPictureV2().getFileUrl())
-            .scores(pair.getSecond())
-            .build();
+                .scores(pair.getSecond())
+                .build();
     }
 
     private Pair<User, List<SummaryVO>> getAllSummaryFromAssignmentAndQuiz(User user) {
-        List<SummaryVO> resultList = new ArrayList<>();
-        roomService.findAllByStudentId(user.getId()).stream().map(this::mapRoomToSummaryDTO).forEach(resultList::add);
-        studentQuizService.findAllQuizByStudentId(user.getId()).stream().map(this::mapQuizToSummaryDTO).forEach(resultList::add);
-        return Pair.of(user, resultList);
+        return Optional.ofNullable(new ArrayList<SummaryVO>())
+            .map(summaryList -> getStudentRooms(user, summaryList))
+            .map(summaryList -> getStudentQuizzes(user, summaryList))
+            .map(summaryList -> Pair.of(user, summaryList))
+            .orElseGet(() -> Pair.of(user, new ArrayList<>()));
     }
 
+    private List<SummaryVO> getStudentQuizzes(User user, List<SummaryVO> resultList) {
+        studentQuizService.findAllQuizByStudentId(user.getId()).stream().map(this::mapQuizToSummaryDTO).forEach(resultList::add);
+        return resultList;
+    }
+
+    private List<SummaryVO> getStudentRooms(User user, List<SummaryVO> resultList) {
+        roomService.findAllByStudentId(user.getId()).stream().map(this::mapRoomToSummaryDTO).forEach(resultList::add);
+        return resultList;
+    }
 
     private SummaryVO mapRoomToSummaryDTO(Room room) {
         return SummaryVO.builder()

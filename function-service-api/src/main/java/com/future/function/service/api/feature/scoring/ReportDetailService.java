@@ -9,15 +9,15 @@ import java.util.List;
 
 public interface ReportDetailService {
 
-  List<StudentSummaryVO> findAllSummaryByReportId(String reportId, String userId);
+    List<StudentSummaryVO> findAllSummaryByReportId(String reportId, String userId);
 
-  List<ReportDetail> findAllDetailByReportId(String reportId);
+    List<ReportDetail> findAllDetailByReportId(String reportId);
 
     Report createReportDetailByReport(Report report, User student);
 
-  ReportDetail findByStudentId(String studentId, String userId);
+    ReportDetail findByStudentId(String studentId, String userId);
 
-    List<ReportDetail> giveScoreToEachStudentInDetail(String reportId, List<ReportDetail> detailList);
+    List<ReportDetail> giveScoreToEachStudentInDetail(Report report, List<ReportDetail> detailList);
 
     void deleteAllByReportId(String reportId);
 

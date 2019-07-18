@@ -177,19 +177,11 @@ public class ReportDetailServiceImplTest {
 
     @Test
     public void giveScoreToEachStudentInDetail() {
-        List<ReportDetail> actual = reportDetailService.giveScoreToEachStudentInDetail(REPORT_ID,
+        List<ReportDetail> actual = reportDetailService.giveScoreToEachStudentInDetail(report,
                 Collections.singletonList(reportDetail));
         assertThat(actual.get(0)).isEqualTo(reportDetail);
         verify(reportDetailRepository).findByUserIdAndDeletedFalse(USER_ID);
         verify(reportDetailRepository).save(reportDetail);
-    }
-
-    @Test
-    public void giveScoreToEachStudentInDetailReportIdNotEqual() {
-        catchException(() -> reportDetailService.giveScoreToEachStudentInDetail("id",
-                Collections.singletonList(reportDetail)));
-        assertThat(caughtException().getClass()).isEqualTo(UnsupportedOperationException.class);
-        verify(reportDetailRepository).findByUserIdAndDeletedFalse(USER_ID);
     }
 
     @Test
