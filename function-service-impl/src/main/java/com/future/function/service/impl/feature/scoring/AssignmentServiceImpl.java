@@ -157,16 +157,19 @@ public class AssignmentServiceImpl implements AssignmentService {
             .map(Assignment::getId)
             .map(this::findById)
             .map(foundAssignment -> isFilesChanged(request, foundAssignment))
-            .map(foundAssignment -> {
-              if (Objects.isNull(request.getFile())) {
-                CopyHelper.copyProperties(request, foundAssignment, FieldName.Assignment.FILE, FieldName.Assignment.BATCH);
-              }
-              CopyHelper.copyProperties(request, foundAssignment, FieldName.Assignment.BATCH);
-              return foundAssignment;
-            })
+            .map(foundAssignment -> copyAssignmentRequestAttributesBasedOnFileExistence(request, foundAssignment))
             .map(this::storeAssignmentFile)
             .map(assignmentRepository::save)
             .orElse(request);
+  }
+
+  private Assignment copyAssignmentRequestAttributesBasedOnFileExistence(Assignment request, Assignment foundAssignment) {
+    if (Objects.isNull(request.getFile())) {
+      CopyHelper.copyProperties(request, foundAssignment, FieldName.Assignment.FILE, FieldName.Assignment.BATCH);
+    } else {
+      CopyHelper.copyProperties(request, foundAssignment, FieldName.Assignment.BATCH);
+    }
+    return foundAssignment;
   }
 
   private Assignment isFilesChanged(Assignment request, Assignment foundAssignment) {
