@@ -57,16 +57,7 @@ public class ReminderResponseMapper {
   }
 
   private static String timeToString(Integer hour, Integer minute) {
-    String result = "";
-    if (hour < 10) {
-      result += "0";
-    }
-    result += hour.toString() + ":";
-    if (minute < 10) {
-      result += "0";
-    }
-    result += minute.toString();
-    return result;
+    return String.format("%02d:%02d", hour, minute);
   }
 
   private static List<ReminderResponse> toListReminderResponse(Page<Reminder> reminders) {

@@ -41,9 +41,9 @@ public class ReminderController {
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   public PagingResponse<ReminderResponse> getReminders(
           Session session,
-          @RequestParam(required = false, defaultValue = "1") int page,
-          @RequestParam(required = false, defaultValue = "10") int size,
-          @RequestParam(required = false, defaultValue = "") String search
+          @RequestParam(defaultValue = "1") int page,
+          @RequestParam(defaultValue = "10") int size,
+          @RequestParam(defaultValue = "") String search
   ) {
     return ReminderResponseMapper.toPagingReminderResponse(reminderService
             .getAllPagedReminder(PageHelper.toPageable(page, size), search));
