@@ -4,12 +4,10 @@ import com.future.function.common.enumeration.core.Role;
 import com.future.function.common.exception.ForbiddenException;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.Discussion;
-import com.future.function.model.entity.feature.core.SharedCourse;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.repository.feature.core.DiscussionRepository;
 import com.future.function.service.api.feature.core.BatchService;
 import com.future.function.service.api.feature.core.DiscussionService;
-import com.future.function.service.api.feature.core.SharedCourseService;
 import com.future.function.service.api.feature.core.UserService;
 import com.future.function.service.impl.helper.PageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -127,9 +125,12 @@ public class DiscussionServiceImpl implements DiscussionService {
   }
   
   @Override
-  public void deleteDiscussion(String courseId, String batchCode) {
+  public void deleteDiscussions(String courseId, String batchCode) {
     
-    discussionRepository.deleteAllByCourseIdAndBatchCode(courseId, batchCode);
+    discussionRepository.deleteAllByCourseIdAndBatchId(courseId,
+                                                       this.getBatchId(
+                                                         batchCode)
+    );
   }
   
 }

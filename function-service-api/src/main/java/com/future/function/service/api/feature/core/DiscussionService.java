@@ -31,6 +31,6 @@ public interface DiscussionService {
    */
   Discussion createDiscussion(Discussion discussion);
   
-  void deleteDiscussion(String courseId, String batchCode);
+  void deleteDiscussions(String courseId, String batchCode);
   
 }

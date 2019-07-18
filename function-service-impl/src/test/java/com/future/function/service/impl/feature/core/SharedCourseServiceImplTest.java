@@ -3,11 +3,13 @@ package com.future.function.service.impl.feature.core;
 import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.Course;
+import com.future.function.model.entity.feature.core.Discussion;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.SharedCourse;
 import com.future.function.repository.feature.core.SharedCourseRepository;
 import com.future.function.service.api.feature.core.BatchService;
 import com.future.function.service.api.feature.core.CourseService;
+import com.future.function.service.api.feature.core.DiscussionService;
 import com.future.function.service.api.feature.core.ResourceService;
 import com.future.function.service.impl.helper.PageHelper;
 import org.junit.After;
@@ -18,6 +20,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
@@ -76,6 +79,8 @@ public class SharedCourseServiceImplTest {
     .batch(BATCH)
     .build();
   
+  private static final String EMAIL = "email";
+  
   private static final Pageable PAGEABLE = new PageRequest(0, 5);
   
   private static final List<SharedCourse> SHARED_COURSE_LIST =
@@ -83,6 +88,11 @@ public class SharedCourseServiceImplTest {
   
   private static final Page<SharedCourse> SHARED_COURSE_PAGE =
     PageHelper.toPage(SHARED_COURSE_LIST, PAGEABLE);
+  
+  private static final Discussion DISCUSSION = Discussion.builder()
+    .courseId(COURSE_ID)
+    .batchCode(BATCH_CODE)
+    .build();
   
   @Mock
   private SharedCourseRepository sharedCourseRepository;
@@ -96,6 +106,9 @@ public class SharedCourseServiceImplTest {
   @Mock
   private CourseService courseService;
   
+  @Mock
+  private DiscussionService discussionService;
+  
   @InjectMocks
   private SharedCourseServiceImpl sharedCourseService;
   
@@ -108,7 +121,9 @@ public class SharedCourseServiceImplTest {
   public void tearDown() {
     
     verifyNoMoreInteractions(
-      sharedCourseRepository, batchService, resourceService, courseService);
+      sharedCourseRepository, batchService, resourceService, courseService,
+      discussionService
+    );
   }
   
   @Test
@@ -127,7 +142,7 @@ public class SharedCourseServiceImplTest {
     
     verify(batchService).getBatchByCode(BATCH_CODE);
     verify(sharedCourseRepository).findByCourseIdAndBatch(COURSE_ID, BATCH);
-    verifyZeroInteractions(resourceService, courseService);
+    verifyZeroInteractions(resourceService, courseService, discussionService);
   }
   
   @Test
@@ -149,7 +164,7 @@ public class SharedCourseServiceImplTest {
     
     verify(batchService).getBatchByCode(BATCH_CODE);
     verify(sharedCourseRepository).findByCourseIdAndBatch(COURSE_ID, BATCH);
-    verifyZeroInteractions(resourceService, courseService);
+    verifyZeroInteractions(resourceService, courseService, discussionService);
   }
   
   @Test
@@ -170,7 +185,7 @@ public class SharedCourseServiceImplTest {
     
     verify(batchService).getBatchByCode(BATCH_CODE);
     verify(sharedCourseRepository).findAllByBatch(BATCH, PAGEABLE);
-    verifyZeroInteractions(resourceService, courseService);
+    verifyZeroInteractions(resourceService, courseService, discussionService);
   }
   
   @Test
@@ -191,7 +206,7 @@ public class SharedCourseServiceImplTest {
     
     verify(batchService).getBatchByCode(BATCH_CODE);
     verify(sharedCourseRepository).findAllByBatch(BATCH, PAGEABLE);
-    verifyZeroInteractions(resourceService, courseService);
+    verifyZeroInteractions(resourceService, courseService, discussionService);
   }
   
   @Test
@@ -207,6 +222,7 @@ public class SharedCourseServiceImplTest {
     verify(batchService).getBatchByCode(BATCH_CODE);
     verify(sharedCourseRepository).findByCourseIdAndBatch(COURSE_ID, BATCH);
     verify(resourceService).markFilesUsed(FILE_IDS, false);
+    verify(discussionService).deleteDiscussions(COURSE_ID, BATCH_CODE);
     verify(sharedCourseRepository).delete(SHARED_COURSE);
     verifyZeroInteractions(courseService);
   }
@@ -250,7 +266,7 @@ public class SharedCourseServiceImplTest {
     verify(resourceService).markFilesUsed(FILE_IDS, true);
     verify(resourceService).getFile(FILE_ID);
     verify(sharedCourseRepository).save(SHARED_COURSE);
-    verifyZeroInteractions(courseService);
+    verifyZeroInteractions(courseService, discussionService);
   }
   
   @Test
@@ -269,7 +285,7 @@ public class SharedCourseServiceImplTest {
     
     verify(batchService).getBatchByCode(BATCH_CODE);
     verify(sharedCourseRepository).findByCourseIdAndBatch(COURSE_ID, BATCH);
-    verifyZeroInteractions(resourceService, courseService);
+    verifyZeroInteractions(resourceService, courseService, discussionService);
   }
   
   @Test
@@ -295,6 +311,7 @@ public class SharedCourseServiceImplTest {
     verify(sharedCourseRepository).findAllByBatch(originBatch);
     verify(batchService).getBatchByCode(BATCH_CODE);
     verify(sharedCourseRepository).save(SHARED_COURSE);
+    verifyZeroInteractions(discussionService);
   }
   
   @Test
@@ -313,7 +330,7 @@ public class SharedCourseServiceImplTest {
     verify(courseService).getCourse(COURSE_ID);
     verify(batchService).getBatchByCode(BATCH_CODE);
     verify(sharedCourseRepository).save(SHARED_COURSE);
-    verifyZeroInteractions(resourceService);
+    verifyZeroInteractions(resourceService, discussionService);
   }
   
   @Test
@@ -332,7 +349,68 @@ public class SharedCourseServiceImplTest {
     verify(courseService).getCourse(COURSE_ID);
     verify(batchService).getBatchByCode(BATCH_CODE);
     verify(sharedCourseRepository).save(SHARED_COURSE);
-    verifyZeroInteractions(resourceService);
+    verifyZeroInteractions(resourceService, discussionService);
+  }
+  
+  @Test
+  public void testGivenEmailAndCourseIdAndBatchCodeByGettingDiscussionsForSharedCourseReturnPageOfDiscussion() {
+  
+    when(batchService.getBatchByCode(BATCH_CODE)).thenReturn(BATCH);
+    when(sharedCourseRepository.findByCourseIdAndBatch(COURSE_ID,
+                                                       BATCH
+    )).thenReturn(Optional.of(SHARED_COURSE));
+    when(discussionService.getDiscussions(EMAIL, COURSE_ID, BATCH_CODE,
+                                          PAGEABLE
+    )).thenReturn(
+      PageHelper.toPage(Collections.singletonList(DISCUSSION), PAGEABLE));
+  
+    Page<Discussion> expectedDiscussions = new PageImpl<>(
+      Collections.singletonList(DISCUSSION), PAGEABLE, 1);
+  
+    Page<Discussion> discussions = sharedCourseService.getDiscussions(EMAIL,
+                                                                      COURSE_ID,
+                                                                      BATCH_CODE,
+                                                                      PAGEABLE
+    );
+    
+    assertThat(discussions).isNotNull();
+    assertThat(discussions).isEqualTo(expectedDiscussions);
+    
+    verify(batchService).getBatchByCode(BATCH_CODE);
+    verify(sharedCourseRepository).findByCourseIdAndBatch(COURSE_ID, BATCH);
+    verify(discussionService).getDiscussions(EMAIL, COURSE_ID, BATCH_CODE,
+                                             PAGEABLE
+    );
+    
+    verifyZeroInteractions(courseService, resourceService);
+  }
+  
+  @Test
+  public void testGivenDiscussionByCreatingDiscussionReturnCreatedDiscussion() {
+  
+    when(batchService.getBatchByCode(BATCH_CODE)).thenReturn(BATCH);
+    when(sharedCourseRepository.findByCourseIdAndBatch(COURSE_ID,
+                                                       BATCH
+    )).thenReturn(Optional.of(SHARED_COURSE));
+    
+    Discussion discussionRequest = Discussion.builder()
+      .courseId(COURSE_ID)
+      .batchCode(BATCH_CODE)
+      .build();
+    when(discussionService.createDiscussion(discussionRequest)).thenReturn(
+      DISCUSSION);
+    
+    Discussion discussion =
+      sharedCourseService.createDiscussion(discussionRequest);
+    
+    assertThat(discussion).isNotNull();
+    assertThat(discussion).isEqualTo(DISCUSSION);
+  
+    verify(batchService).getBatchByCode(BATCH_CODE);
+    verify(sharedCourseRepository).findByCourseIdAndBatch(COURSE_ID, BATCH);
+    verify(discussionService).createDiscussion(discussionRequest);
+  
+    verifyZeroInteractions(courseService, resourceService);
   }
   
 }

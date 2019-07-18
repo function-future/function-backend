@@ -112,7 +112,7 @@ public class SharedCourseServiceImpl implements SharedCourseService {
   
   private void deleteDiscussionsForSharedCourse(SharedCourse sharedCourse) {
     
-    discussionService.deleteDiscussion(
+    discussionService.deleteDiscussions(
       sharedCourse.getCourse()
         .getId(), sharedCourse.getBatch()
         .getCode());
@@ -203,7 +203,9 @@ public class SharedCourseServiceImpl implements SharedCourseService {
     String email, String courseId, String batchCode, Pageable pageable
   ) {
   
-    this.getCourseByIdAndBatchCode(courseId, batchCode);
+    Optional.of(email)
+      .ifPresent(
+        ignored -> this.getCourseByIdAndBatchCode(courseId, batchCode));
     
     return discussionService.getDiscussions(
       email, courseId, batchCode, pageable);
@@ -212,8 +214,9 @@ public class SharedCourseServiceImpl implements SharedCourseService {
   @Override
   public Discussion createDiscussion(Discussion discussion) {
   
-    this.getCourseByIdAndBatchCode(
-      discussion.getCourseId(), discussion.getBatchCode());
+    Optional.of(discussion)
+      .ifPresent(
+        d -> this.getCourseByIdAndBatchCode(d.getCourseId(), d.getBatchCode()));
     
     return discussionService.createDiscussion(discussion);
   }

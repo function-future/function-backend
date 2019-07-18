@@ -3,7 +3,6 @@ package com.future.function.service.impl.feature.core;
 import com.future.function.common.enumeration.core.Role;
 import com.future.function.common.exception.ForbiddenException;
 import com.future.function.model.entity.feature.core.Batch;
-import com.future.function.model.entity.feature.core.Course;
 import com.future.function.model.entity.feature.core.Discussion;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.repository.feature.core.DiscussionRepository;
@@ -184,7 +183,6 @@ public class DiscussionServiceImplTest {
     verify(batchService).getBatchByCode(BATCH_CODE);
   }
 
-  // TODO Fix test
   @Test
   public void testGivenDiscussionWithInvalidCourseIdAndBatchCodeByCreatingDiscussionReturnUnsupportedOperationException() {
 
@@ -219,6 +217,17 @@ public class DiscussionServiceImplTest {
 
     verify(userService).getUserByEmail(EMAIL);
     verifyZeroInteractions(discussionRepository);
+  }
+  
+  @Test
+  public void testGivenCourseIdAndBatchCodeByDeletingDiscussionsReturnSuccessfulDeletion() {
+    
+    when(batchService.getBatchByCode(BATCH_CODE)).thenReturn(BATCH);
+  
+    discussionService.deleteDiscussions(COURSE_ID, BATCH_CODE);
+    
+    verify(batchService).getBatchByCode(BATCH_CODE);
+    verify(discussionRepository).deleteAllByCourseIdAndBatchId(COURSE_ID, BATCH_ID);
   }
 
 }
