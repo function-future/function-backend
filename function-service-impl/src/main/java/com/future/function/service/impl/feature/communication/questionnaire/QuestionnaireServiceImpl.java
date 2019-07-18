@@ -59,7 +59,7 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
   public Questionnaire getQuestionnaire(String questionnaireId) {
     return Optional.of(questionnaireId)
             .map(this.questionnaireRepository::findOne)
-            .orElseThrow(() -> new NotFoundException("Questionnaire not Found"));
+            .orElseThrow(() -> new NotFoundException("Questionnaire not Found with"));
   }
   @Override
   public Questionnaire createQuestionnaire(Questionnaire questionnaire, User author) {

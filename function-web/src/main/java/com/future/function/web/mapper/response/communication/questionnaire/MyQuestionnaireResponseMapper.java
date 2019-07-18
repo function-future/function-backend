@@ -49,6 +49,7 @@ public class MyQuestionnaireResponseMapper {
 
   private static BatchWebResponse toBatchResponse(Batch batch) {
     return BatchWebResponse.builder()
+
             .id(batch.getId())
             .name(batch.getName())
             .code(batch.getCode())

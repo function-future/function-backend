@@ -3,7 +3,6 @@ package com.future.function.web.controller.communication.questionnaire;
 
 import com.future.function.common.enumeration.core.Role;
 import com.future.function.model.entity.feature.communication.questionnaire.Questionnaire;
-import com.future.function.model.entity.feature.communication.questionnaire.QuestionnaireParticipant;
 import com.future.function.service.api.feature.communication.questionnaire.QuestionnaireService;
 import com.future.function.service.api.feature.core.UserService;
 import com.future.function.session.annotation.WithAnyRole;
@@ -100,6 +99,8 @@ public class QuestionnaireController {
   @ResponseStatus(HttpStatus.OK)
   @GetMapping(value="/{questionnaireId}", produces = MediaType.APPLICATION_JSON_VALUE)
   public DataResponse<QuestionnaireDetailResponse> getQuestionnaire(@PathVariable String questionnaireId){
+    System.out.println("so weird");
+    System.out.println(questionnaireId);
     return QuestionnaireResponseMapper.toDataResponseQuestionnaireDetailResponse(questionnaireService.getQuestionnaire(questionnaireId), HttpStatus.OK);
   }
 
@@ -126,12 +127,12 @@ public class QuestionnaireController {
   }
 
   @ResponseStatus(HttpStatus.OK)
-  @GetMapping(value = "/{questionnaireId}/questions")
-  public DataResponse getQuestionsQuestionnaire(@PathVariable String questionnarieId){
+  @GetMapping(value = "/{questionnaireId}/questions", produces = MediaType.APPLICATION_JSON_VALUE)
+  public DataResponse getQuestionsQuestionnaire(@PathVariable String questionnaireId){
+    System.out.println("so weird");
     return QuestionQuestionnaireResponseMapper.toDataResponseListQuestionQuestionnaireResponse(
-            questionnaireService.getQuestionsByIdQuestionnaire(questionnarieId),
-            HttpStatus.OK
-    );
+            questionnaireService.getQuestionsByIdQuestionnaire(questionnaireId),
+            HttpStatus.OK);
   }
 
   @ResponseStatus(HttpStatus.CREATED)
