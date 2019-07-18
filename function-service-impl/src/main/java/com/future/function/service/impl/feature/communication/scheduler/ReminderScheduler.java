@@ -38,7 +38,7 @@ public class ReminderScheduler {
 
   @Scheduled(fixedDelayString = "#{@reminderProperties.schedulerPeriod}")
   public void createNotificationBasedOnReminder() {
-    LocalDateTime timeNow = LocalDateTime.now();
+    LocalDateTime timeNow = Instant.now().atZone(ZoneId.of("Asia/Jakarta")).toLocalDateTime();
     reminderService.getAllReminder().forEach(reminder -> generateNotificationIfNecessary(reminder, timeNow));
   }
 
@@ -100,7 +100,7 @@ public class ReminderScheduler {
       return null;
     }
     Instant instant = Instant.ofEpochMilli(millis);
-    return instant.atZone(ZoneId.systemDefault()).toLocalDateTime();
+    return instant.atZone(ZoneId.of("Asia/Jakarta")).toLocalDateTime();
   }
 
   private void sendNotifications(Reminder reminder) {
