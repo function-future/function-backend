@@ -14,7 +14,7 @@ public interface ReminderService {
 
   List<Reminder> getAllReminder();
 
-  Page<Reminder> getAllPagedReminder(Pageable pageable);
+  Page<Reminder> getAllPagedReminder(Pageable pageable, String keyword);
 
   Reminder getReminder(String reminderId);
 
