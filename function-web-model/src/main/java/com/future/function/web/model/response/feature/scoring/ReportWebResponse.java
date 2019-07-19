@@ -15,7 +15,6 @@ public class ReportWebResponse {
     private String title;
     private String description;
     private String batchCode;
-    private long usedAt;
     private int studentCount;
 
 }

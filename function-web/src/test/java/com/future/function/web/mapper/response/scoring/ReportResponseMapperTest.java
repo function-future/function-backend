@@ -27,7 +27,6 @@ public class ReportResponseMapperTest {
   private static final String NAME = "final-judge";
   private static final String DESCRIPTION = "final description";
     private static final String BATCH_CODE = "batch-code";
-  private static final long USED_AT = 1561607367;
   private static final String STUDENT_ID = "student-id";
 
   private Report report;
@@ -50,7 +49,6 @@ public class ReportResponseMapperTest {
         .title(NAME)
             .batch(batch)
         .description(DESCRIPTION)
-        .usedAt(Instant.ofEpochSecond(USED_AT).atZone(ZoneId.systemDefault()).toLocalDate())
         .studentIds(studentIds)
         .build();
 

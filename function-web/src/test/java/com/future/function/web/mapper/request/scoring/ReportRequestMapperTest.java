@@ -26,7 +26,6 @@ public class ReportRequestMapperTest {
   private static final String NAME = "final-judge";
   private static final String DESCRIPTION = "final description";
     private static final String BATCH_CODE = "batch-code";
-  private static final long USED_AT = 1561607367;
   private static final String STUDENT_ID = "student-id";
 
   private ReportWebRequest request;
@@ -47,7 +46,6 @@ public class ReportRequestMapperTest {
         .builder()
         .name(NAME)
         .description(DESCRIPTION)
-        .usedAt(USED_AT)
         .students(studentIds)
         .build();
 

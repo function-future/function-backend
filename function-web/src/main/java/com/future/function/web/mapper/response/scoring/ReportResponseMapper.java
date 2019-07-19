@@ -40,14 +40,9 @@ public class ReportResponseMapper {
             .title(value.getTitle())
             .description(value.getDescription())
             .batchCode(value.getBatch().getCode())
-            .usedAt(getLongFormatOfDate(value))
             .studentCount(value.getStudentIds().size())
             .build())
         .orElseThrow(() -> new UnsupportedOperationException("Response Mapping failed"));
-  }
-
-  private static long getLongFormatOfDate(Report value) {
-    return value.getUsedAt().atStartOfDay().atZone(ZoneId.systemDefault()).toEpochSecond();
   }
 
   private static List<ReportWebResponse> buildReportWebResponseList(Page<Report> reportPage) {

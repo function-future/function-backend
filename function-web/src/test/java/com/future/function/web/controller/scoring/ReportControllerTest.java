@@ -85,14 +85,12 @@ public class ReportControllerTest extends TestHelper {
                 .title(TITLE)
                 .description(DESCRIPTION)
                 .batch(batch)
-                .usedAt(usedAt)
                 .studentIds(Collections.singletonList(STUDENT_ID))
                 .build();
 
         reportWebRequest = ReportWebRequest.builder()
                 .name(TITLE)
                 .description(DESCRIPTION)
-                .usedAt(usedAt.atStartOfDay().atZone(ZoneId.systemDefault()).toEpochSecond())
                 .students(Collections.singletonList(STUDENT_ID))
                 .build();
 
@@ -100,7 +98,6 @@ public class ReportControllerTest extends TestHelper {
                 .id(REPORT_ID)
                 .title(TITLE)
                 .description(DESCRIPTION)
-                .usedAt(usedAt.atStartOfDay().atZone(ZoneId.systemDefault()).toEpochSecond())
                 .batchCode(BATCH_CODE)
                 .studentCount(1)
                 .build();

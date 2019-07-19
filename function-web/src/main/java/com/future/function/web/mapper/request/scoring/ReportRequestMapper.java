@@ -40,14 +40,8 @@ public class ReportRequestMapper {
             .title(value.getName())
             .description(value.getDescription())
             .batch(Batch.builder().code(batchCode).build())
-            .usedAt(getLocalDate(value))
             .studentIds(value.getStudents())
             .build())
         .orElseThrow(() -> new BadRequestException("Bad Request"));
   }
-
-  private LocalDate getLocalDate(ReportWebRequest value) {
-    return Instant.ofEpochSecond(value.getUsedAt()).atZone(ZoneId.systemDefault()).toLocalDate();
-  }
-
 }
