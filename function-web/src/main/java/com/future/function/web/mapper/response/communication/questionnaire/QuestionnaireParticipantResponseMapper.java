@@ -33,7 +33,8 @@ public class QuestionnaireParticipantResponseMapper {
 
   private static QuestionnaireParticipantDescriptionResponse toParticipantDescriptionResposne(QuestionnaireParticipant questionnaireParticipant) {
     return QuestionnaireParticipantDescriptionResponse.builder()
-            .id(questionnaireParticipant.getId())
+            .id(questionnaireParticipant.getMember().getId())
+            .participantId(questionnaireParticipant.getId())
             .name(questionnaireParticipant.getMember().getName())
             .university(questionnaireParticipant.getMember().getUniversity())
             .role(questionnaireParticipant.getMember().getRole().toString())

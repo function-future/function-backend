@@ -13,6 +13,8 @@ public class QuestionnaireParticipantDescriptionResponse {
 
   private String id;
 
+  private String participantId;
+
   private String name;
 
   private String university;
