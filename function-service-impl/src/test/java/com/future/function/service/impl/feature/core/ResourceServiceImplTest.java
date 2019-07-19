@@ -84,7 +84,6 @@ public class ResourceServiceImplTest {
     fileProperties = Mockito.mock(FileProperties.class);
     
     when(fileProperties.getImageExtensions()).thenReturn(IMAGE_EXTENSIONS);
-    when(fileProperties.getUrlPrefix()).thenReturn("");
     when(fileProperties.getStoragePath()).thenReturn("");
     when(fileProperties.getThumbnailSuffix()).thenReturn(THUMBNAIL_SUFFIX);
   }
@@ -96,7 +95,6 @@ public class ResourceServiceImplTest {
     
     verify(
       fileProperties, times(numberOfTestMethodInClass)).getImageExtensions();
-    verify(fileProperties, times(numberOfTestMethodInClass)).getUrlPrefix();
     verify(fileProperties, times(numberOfTestMethodInClass)).getStoragePath();
     verify(
       fileProperties, times(numberOfTestMethodInClass)).getThumbnailSuffix();
