@@ -87,7 +87,7 @@ public class MyQuestionnaireController {
   }
 
   @ResponseStatus(HttpStatus.OK)
-  @GetMapping(value = "/{questionnaireId}/appraisees/{appraiseesId}", produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping(value = "/{questionnaireId}/appraisees/{appraiseeId}", produces = MediaType.APPLICATION_JSON_VALUE)
   public DataResponse<AppraisalDataResponse> getQuestionnaireData(
      @PathVariable String questionnaireId,
      @PathVariable String appraiseeId
@@ -99,7 +99,7 @@ public class MyQuestionnaireController {
   }
 
   @ResponseStatus(HttpStatus.OK)
-  @GetMapping(value = "/{questionnaireId}/appraisees/{appraiseesId}/questions", produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping(value = "/{questionnaireId}/appraisees/{appraiseeId}/questions", produces = MediaType.APPLICATION_JSON_VALUE)
   public DataResponse<List<QuestionQuestionnaireResponse>> getQuestion(
           @PathVariable String questionnaireId,
           @PathVariable String appraiseeId
@@ -112,7 +112,7 @@ public class MyQuestionnaireController {
   }
 
   @ResponseStatus(HttpStatus.CREATED)
-  @PostMapping(value = "/{questionnaireId}/appraisees/{appraiseesId}/questions",
+  @PostMapping(value = "/{questionnaireId}/appraisees/{appraiseeId}/questions",
                 consumes = MediaType.APPLICATION_JSON_VALUE,
                 produces = MediaType.APPLICATION_JSON_VALUE
   )

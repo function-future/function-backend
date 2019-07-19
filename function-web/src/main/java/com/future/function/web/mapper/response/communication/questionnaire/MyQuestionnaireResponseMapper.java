@@ -1,5 +1,6 @@
 package com.future.function.web.mapper.response.communication.questionnaire;
 
+import com.future.function.common.enumeration.core.Role;
 import com.future.function.model.entity.feature.communication.questionnaire.QuestionQuestionnaire;
 import com.future.function.model.entity.feature.communication.questionnaire.Questionnaire;
 import com.future.function.model.entity.feature.communication.questionnaire.QuestionnaireParticipant;
@@ -43,19 +44,26 @@ public class MyQuestionnaireResponseMapper {
             .id(questionnaireParticipant.getMember().getId())
             .name(questionnaireParticipant.getMember().getName())
             .avatar(questionnaireParticipant.getMember().getPictureV2().getThumbnailUrl())
-            .batch(toBatchResponse(questionnaireParticipant.getMember().getBatch()))
+            .batch(toBatchResponse(questionnaireParticipant.getMember().getBatch(), questionnaireParticipant.getMember().getRole()))
             .role(questionnaireParticipant.getMember().getRole().toString())
             .university(questionnaireParticipant.getMember().getUniversity())
             .build();
   }
 
-  private static BatchWebResponse toBatchResponse(Batch batch) {
+  private static BatchWebResponse toBatchResponse(Batch batch, Role role) {
+    if (role.toString().equals("STUDENT")) {
+      return BatchWebResponse.builder()
+              .id(batch.getId())
+              .name(batch.getName())
+              .code(batch.getCode())
+              .build();
+    }
     return BatchWebResponse.builder()
-
-            .id(batch.getId())
-            .name(batch.getName())
-            .code(batch.getCode())
+            .id("No-Batch")
+            .name("No-Batch")
+            .code("No-Batch")
             .build();
+
   }
 
   public static DataResponse<AppraisalDataResponse> toDataResponseQuestionnaireSummaryDescriptionResponse(Questionnaire questionnaire, User user) {
@@ -87,7 +95,8 @@ public class MyQuestionnaireResponseMapper {
             .id(appraisee.getId())
             .name(appraisee.getName())
             .avatar(appraisee.getPictureV2().getThumbnailUrl())
-            .batch(toBatchResponse(appraisee.getBatch()))
+            .role(appraisee.getRole().toString())
+            .batch(toBatchResponse(appraisee.getBatch(), appraisee.getRole()))
             .university(appraisee.getUniversity())
             .build();
   }

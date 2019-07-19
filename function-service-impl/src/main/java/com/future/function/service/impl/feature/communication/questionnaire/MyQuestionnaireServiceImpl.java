@@ -150,11 +150,11 @@ public class MyQuestionnaireServiceImpl implements MyQuestionnaireService {
   }
 
   public void updateQuestionResponseSummary(Questionnaire questionnaire, QuestionResponse questionResponse){
-    QuestionResponseSummary questionResponseSummary =
+    QuestionResponseSummary questionResponseSummary = QuestionResponseSummary
             questionResponseSummaryRepository
                     .findByAppraiseeAndQuestionQuestionnaireAndDeletedFalse(questionResponse.getAppraisee(), questionResponse.getQuestion()).get();
 
-    if(questionResponseSummary == null) {
+    if(!Optional.of(questionResponseSummary).isPresent() ) {
       Answer tempAnswerSummary =
         Answer.builder()
         .average(questionResponse.getScore())
