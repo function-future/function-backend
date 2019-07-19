@@ -33,43 +33,40 @@ public class ReportController {
 
   @ResponseStatus(HttpStatus.OK)
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-  @WithAnyRole(roles = {Role.ADMIN, Role.MENTOR, Role.JUDGE})
   public PagingResponse<ReportWebResponse> findAllReportByUsedAtNow(
           @PathVariable("batchCode") String batchCode,
           @RequestParam(defaultValue = "1") int page,
           @RequestParam(defaultValue = "10") int size,
-          Session session) {
+          @WithAnyRole(roles = {Role.ADMIN, Role.MENTOR, Role.JUDGE}) Session session) {
     return ReportResponseMapper.toPagingReportWebResponse(reportService
             .findAllReport(batchCode, PageHelper.toPageable(page, size)));
   }
 
   @ResponseStatus(HttpStatus.OK)
   @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-  @WithAnyRole(roles = {Role.ADMIN, Role.JUDGE, Role.MENTOR})
-  public DataResponse<ReportWebResponse> findOne(@PathVariable String id, Session session) {
+  public DataResponse<ReportWebResponse> findOne(@PathVariable String id,
+      @WithAnyRole(roles = {Role.ADMIN, Role.JUDGE, Role.MENTOR}) Session session) {
     return ReportResponseMapper.toDataReportWebResponse(reportService.findById(id));
   }
 
   @ResponseStatus(HttpStatus.CREATED)
   @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-  @WithAnyRole(roles = Role.ADMIN)
   public DataResponse<ReportWebResponse> createFinalJudging(@PathVariable String batchCode,
-      @RequestBody ReportWebRequest request, Session session) {
+      @RequestBody ReportWebRequest request, @WithAnyRole(roles = Role.ADMIN) Session session) {
     return ReportResponseMapper.toDataReportWebResponse(HttpStatus.CREATED,
         reportService.createReport(requestMapper.toReport(request, batchCode)));
   }
 
   @ResponseStatus(HttpStatus.OK)
   @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-  @WithAnyRole(roles = Role.ADMIN)
   public DataResponse<ReportWebResponse> updateFinalJudging(@PathVariable String batchCode, @PathVariable String id,
-                                                            @RequestBody ReportWebRequest request, Session session) {
+                                                            @RequestBody ReportWebRequest request,
+                                                            @WithAnyRole(roles = Role.ADMIN) Session session) {
     return ReportResponseMapper.toDataReportWebResponse(reportService.updateReport(requestMapper.toReport(request, id, batchCode)));
   }
 
   @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-  @WithAnyRole(roles = Role.ADMIN)
-  public BaseResponse deleteById(@PathVariable String id, Session session) {
+  public BaseResponse deleteById(@PathVariable String id, @WithAnyRole(roles = Role.ADMIN) Session session) {
     reportService.deleteById(id);
     return ResponseHelper.toBaseResponse(HttpStatus.OK);
   }
