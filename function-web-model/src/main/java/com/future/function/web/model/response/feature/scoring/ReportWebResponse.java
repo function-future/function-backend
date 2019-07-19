@@ -12,9 +12,10 @@ import lombok.NoArgsConstructor;
 public class ReportWebResponse {
 
     private String id;
-    private String title;
+    private String name;
     private String description;
     private String batchCode;
     private int studentCount;
+    private long uploadedDate;
 
 }

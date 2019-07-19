@@ -37,12 +37,13 @@ public class ReportResponseMapper {
         .map(value -> ReportWebResponse
             .builder()
             .id(value.getId())
-            .title(value.getTitle())
+            .name(value.getTitle())
             .description(value.getDescription())
             .batchCode(value.getBatch().getCode())
             .studentCount(value.getStudentIds().size())
+            .uploadedDate(value.getCreatedAt())
             .build())
-        .orElseThrow(() -> new UnsupportedOperationException("Response Mapping failed"));
+        .orElseThrow(() -> new UnsupportedOperationException("Failed at #buildReportWebResponse #ReportResponseMapper"));
   }
 
   private static List<ReportWebResponse> buildReportWebResponseList(Page<Report> reportPage) {

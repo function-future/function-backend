@@ -65,7 +65,7 @@ public class ReportResponseMapperTest {
   public void toDataReportWebResponse() {
     DataResponse<ReportWebResponse> actual = ReportResponseMapper.toDataReportWebResponse(report);
     assertThat(actual.getData().getId()).isEqualTo(ID);
-    assertThat(actual.getData().getTitle()).isEqualTo(NAME);
+    assertThat(actual.getData().getName()).isEqualTo(NAME);
     assertThat(actual.getData().getDescription()).isEqualTo(DESCRIPTION);
       assertThat(actual.getData().getBatchCode()).isEqualTo(BATCH_CODE);
     assertThat(actual.getData().getStudentCount()).isEqualTo(1);
@@ -75,7 +75,7 @@ public class ReportResponseMapperTest {
   public void toDataReportWebResponseCreated() {
     DataResponse<ReportWebResponse> actual = ReportResponseMapper.toDataReportWebResponse(HttpStatus.CREATED, report);
     assertThat(actual.getData().getId()).isEqualTo(ID);
-    assertThat(actual.getData().getTitle()).isEqualTo(NAME);
+    assertThat(actual.getData().getName()).isEqualTo(NAME);
     assertThat(actual.getData().getDescription()).isEqualTo(DESCRIPTION);
       assertThat(actual.getData().getBatchCode()).isEqualTo(BATCH_CODE);
     assertThat(actual.getData().getStudentCount()).isEqualTo(1);
@@ -85,7 +85,7 @@ public class ReportResponseMapperTest {
   @Test
   public void toPagingReportWebResponse() {
     PagingResponse<ReportWebResponse> actual = ReportResponseMapper.toPagingReportWebResponse(reportPage);
-    assertThat(actual.getData().get(0).getTitle()).isEqualTo(NAME);
+    assertThat(actual.getData().get(0).getName()).isEqualTo(NAME);
     assertThat(actual.getData().get(0).getDescription()).isEqualTo(DESCRIPTION);
       assertThat(actual.getData().get(0).getBatchCode()).isEqualTo(BATCH_CODE);
     assertThat(actual.getData().get(0).getStudentCount()).isEqualTo(1);

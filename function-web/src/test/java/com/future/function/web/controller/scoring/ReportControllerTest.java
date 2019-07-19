@@ -96,7 +96,7 @@ public class ReportControllerTest extends TestHelper {
 
         reportWebResponse = ReportWebResponse.builder()
                 .id(REPORT_ID)
-                .title(TITLE)
+                .name(TITLE)
                 .description(DESCRIPTION)
                 .batchCode(BATCH_CODE)
                 .studentCount(1)
