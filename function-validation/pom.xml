@@ -42,7 +42,6 @@
       <groupId>eu.codearte.catch-exception</groupId>
       <artifactId>catch-exception</artifactId>
       <scope>test</scope>
-      <optional>true</optional>
     </dependency>
 
     <dependency>
