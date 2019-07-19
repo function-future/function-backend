@@ -12,11 +12,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class OptionWebResponse {
 
-    private String optionId;
+  private String id;
 
-    private String label;
+  private String label;
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Boolean correct;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private Boolean correct;
 
 }

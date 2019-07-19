@@ -21,4 +21,6 @@ public class QuestionnaireParticipantDescriptionResponse {
 
   private String batch;
 
+  private String avatar;
+
 }

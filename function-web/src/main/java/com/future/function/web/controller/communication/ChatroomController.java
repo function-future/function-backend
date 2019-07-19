@@ -113,12 +113,32 @@ public class ChatroomController {
             @RequestParam(required = false, defaultValue = "1") int page,
             @RequestParam(required = false, defaultValue = "10") int size
     ) {
-        if (chatroomId.equalsIgnoreCase("public")) {
-            Chatroom publicChatroom = chatroomService.getPublicChatroom();
-            chatroomId = publicChatroom.getId();
-        }
         return ChatroomResponseMapper.toMessagePagingResponse(
                 messageService.getMessages(chatroomId, PageHelper.toPageable(page, size)));
+    }
+
+    @GetMapping(value = "/{chatroomId:.+}/messages/_after", produces = MediaType.APPLICATION_JSON_VALUE)
+    public PagingResponse<MessageResponse> getMessagesAfterPivot(
+            Session session,
+            @PathVariable String chatroomId,
+            @RequestParam(required = false, defaultValue = "1") int page,
+            @RequestParam(required = false, defaultValue = "10") int size,
+            @RequestParam(required = true) String messageId
+    ) {
+        return ChatroomResponseMapper.toMessagePagingResponse(
+                messageService.getMessagesAfterPivot(chatroomId, messageId, PageHelper.toPageable(page, size)));
+    }
+
+    @GetMapping(value = "/{chatroomId:.+}/messages/_before", produces = MediaType.APPLICATION_JSON_VALUE)
+    public PagingResponse<MessageResponse> getMessagesBeforePivot(
+            Session session,
+            @PathVariable String chatroomId,
+            @RequestParam(required = false, defaultValue = "1") int page,
+            @RequestParam(required = false, defaultValue = "10") int size,
+            @RequestParam(required = true) String messageId
+    ) {
+        return ChatroomResponseMapper.toMessagePagingResponse(
+                messageService.getMessagesBeforePivot(chatroomId, messageId, PageHelper.toPageable(page, size)));
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE,

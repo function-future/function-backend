@@ -8,6 +8,8 @@ package com.future.function.common.data.core;
  */
 public interface UserData {
   
+  String getId();
+  
   /**
    * Method to get role of a user web request object, which should be an enum's
    * {@code String} value.
@@ -34,5 +36,7 @@ public interface UserData {
    * @return {@code String} - {@code String} value of university.
    */
   String getUniversity();
+  
+  String getEmail();
   
 }

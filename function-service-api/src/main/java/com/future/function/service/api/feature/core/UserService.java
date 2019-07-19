@@ -92,6 +92,8 @@ public interface UserService {
   User getUserByEmail(String email);
 
   void changeUserPassword(String email, String oldPassword, String newPassword);
+  
+  User changeProfilePicture(User user);
 
   /**
    * Retrieves users from database which contains and case-insensitively
@@ -101,6 +103,6 @@ public interface UserService {
    *
    * @return {@code List<User>} - List of users found in database.
    */
-  List<User> getUsersByNameContainsIgnoreCase(String name);
+  Page<User> getUsersByNameContainsIgnoreCase(String name, Pageable pageable);
 
 }

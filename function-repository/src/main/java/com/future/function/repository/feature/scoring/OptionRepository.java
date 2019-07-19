@@ -10,7 +10,7 @@ import java.util.Optional;
 @Repository
 public interface OptionRepository extends MongoRepository<Option, String> {
 
-    Optional<Option> findByIdAndDeletedFalse(String id);
+  Optional<Option> findByIdAndDeletedFalse(String id);
 
-    List<Option> findAllByQuestionId(String questionId);
+  List<Option> findAllByQuestionId(String questionId);
 }

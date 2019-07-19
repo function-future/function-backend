@@ -12,10 +12,10 @@ import org.hibernate.validator.constraints.NotBlank;
 @AllArgsConstructor
 public class CopyQuizWebRequest {
 
-    @NotBlank(message = "NotBlank")
-    private String batchCode;
+  @NotBlank(message = "NotBlank")
+  private String batchId;
 
-    @NotBlank(message = "NotBlank")
-    private String quizId;
+  @NotBlank(message = "NotBlank")
+  private String quizId;
 
 }

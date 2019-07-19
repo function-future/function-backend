@@ -18,8 +18,7 @@ import java.util.stream.Collectors;
  * Static class to map Assignment into a proper DataResponse / PagingResponse of AssignmentWebResponse
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class AssignmentResponseMapper {
-
+public final class AssignmentResponseMapper {
 
   /**
    * used to convert assignment into a proper DataResponse of AssignmentWebResponse
@@ -51,6 +50,9 @@ public class AssignmentResponseMapper {
   private static AssignmentWebResponse buildAssignmentWebResponse(Assignment assignment) {
     AssignmentWebResponse response = new AssignmentWebResponse();
     BeanUtils.copyProperties(assignment, response);
+    response.setBatchCode(assignment.getBatch().getCode());
+    response.setFile(assignment.getFile().getFileUrl());
+    response.setUploadedDate(assignment.getCreatedAt());
     return response;
   }
 
@@ -62,13 +64,13 @@ public class AssignmentResponseMapper {
    */
   public static PagingResponse<AssignmentWebResponse> toAssignmentsPagingResponse(Page<Assignment> data) {
     return ResponseHelper.toPagingResponse(
-            HttpStatus.OK,
-            data
-              .getContent()
-              .stream()
-              .map(AssignmentResponseMapper::buildAssignmentWebResponse)
-              .collect(Collectors.toList()),
-            PageHelper.toPaging(data));
+        HttpStatus.OK,
+        data
+            .getContent()
+            .stream()
+            .map(AssignmentResponseMapper::buildAssignmentWebResponse)
+            .collect(Collectors.toList()),
+        PageHelper.toPaging(data));
   }
 
 }

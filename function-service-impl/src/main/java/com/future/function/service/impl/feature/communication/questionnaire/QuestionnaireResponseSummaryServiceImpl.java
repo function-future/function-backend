@@ -5,7 +5,11 @@ import com.future.function.model.entity.feature.communication.questionnaire.Ques
 import com.future.function.model.entity.feature.communication.questionnaire.Questionnaire;
 import com.future.function.model.entity.feature.communication.questionnaire.QuestionnaireResponseSummary;
 import com.future.function.model.entity.feature.core.User;
-import com.future.function.repository.feature.communication.questionnaire.*;
+import com.future.function.repository.feature.communication.questionnaire.QuestionQuestionnaireRepository;
+import com.future.function.repository.feature.communication.questionnaire.QuestionResponseRepository;
+import com.future.function.repository.feature.communication.questionnaire.QuestionResponseSummaryRepository;
+import com.future.function.repository.feature.communication.questionnaire.QuestionnaireRepository;
+import com.future.function.repository.feature.communication.questionnaire.QuestionnaireResponseSummaryRepository;
 import com.future.function.service.api.feature.communication.questionnaire.QuestionnaireResponseSummaryService;
 import com.future.function.service.api.feature.core.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +20,6 @@ import org.springframework.stereotype.Service;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class QuestionnaireResponseSummaryServiceImpl implements QuestionnaireResponseSummaryService {

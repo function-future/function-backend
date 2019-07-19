@@ -1,6 +1,9 @@
 package com.future.function.web.controller.scoring;
 
+import com.future.function.common.enumeration.core.Role;
 import com.future.function.service.api.feature.scoring.StudentQuizService;
+import com.future.function.session.annotation.WithAnyRole;
+import com.future.function.session.model.Session;
 import com.future.function.web.mapper.request.scoring.StudentQuestionRequestMapper;
 import com.future.function.web.mapper.response.scoring.StudentQuizDetailResponseMapper;
 import com.future.function.web.model.request.scoring.StudentQuestionWebRequest;
@@ -15,47 +18,47 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import java.util.List;
+
 
 @RestController
 @RequestMapping(path = "/api/scoring/students/{studentId}/quizzes/{studentQuizId}/questions")
 public class StudentQuestionController {
 
-    @Autowired
-    private StudentQuizService studentQuizService;
+  private StudentQuizService studentQuizService;
 
-    @Autowired
-    private StudentQuestionRequestMapper studentQuestionRequestMapper;
+  private StudentQuestionRequestMapper studentQuestionRequestMapper;
 
-    @ResponseStatus(HttpStatus.OK)
-    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public PagingResponse<StudentQuestionWebResponse> findStudentQuestionsByStudentQuizId(@PathVariable(value = "studentQuizId")
-                                                                                                   String studentQuizId) {
-        return StudentQuizDetailResponseMapper
-                .toStudentQuestionWebResponses(
-                        studentQuizService
-                                .findAllQuestionsByStudentQuizId(studentQuizId));
-    }
+  @Autowired
+  public StudentQuestionController(StudentQuizService studentQuizService,
+                                   StudentQuestionRequestMapper studentQuestionRequestMapper) {
+    this.studentQuizService = studentQuizService;
+    this.studentQuestionRequestMapper = studentQuestionRequestMapper;
+  }
 
-    @ResponseStatus(HttpStatus.OK)
-    @GetMapping(value = "/start", produces = MediaType.APPLICATION_JSON_VALUE)
-    public PagingResponse<StudentQuestionWebResponse> findUnansweredStudentQuestionsByStudentQuizId(
-            @PathVariable(value = "studentQuizId") String studentQuizId) {
-        return StudentQuizDetailResponseMapper
-                .toStudentQuestionWebResponses(
-                        studentQuizService
-                                .findAllUnansweredQuestionByStudentQuizId(studentQuizId));
-    }
+  @ResponseStatus(HttpStatus.OK)
+  @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+  @WithAnyRole(roles = Role.STUDENT)
+  public PagingResponse<StudentQuestionWebResponse> findUnansweredStudentQuestionsByStudentQuizId(
+          @PathVariable String studentQuizId, Session session) {
+    return StudentQuizDetailResponseMapper
+        .toStudentQuestionWebResponses(
+            studentQuizService
+                .findAllUnansweredQuestionByStudentQuizId(studentQuizId, session.getUserId()));
+  }
 
-    @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public DataResponse<StudentQuizDetailWebResponse> postAnswersForQuestions(@PathVariable(value = "studentQuizId") String studentQuizId,
-                                                                              @RequestBody List<StudentQuestionWebRequest> answerRequests) {
-        return StudentQuizDetailResponseMapper
-                .toStudentQuizDetailWebResponse(
-                        studentQuizService
-                                .answerQuestionsByStudentQuizId(
-                                        studentQuizId,
-                                        studentQuestionRequestMapper
-                                                .toStudentQuestionList(answerRequests)));
-    }
+  @ResponseStatus(HttpStatus.CREATED)
+  @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+  @WithAnyRole(roles = Role.STUDENT)
+  public DataResponse<StudentQuizDetailWebResponse> postAnswersForQuestions(@PathVariable String studentQuizId,
+                                                                            @RequestBody List<StudentQuestionWebRequest> answerRequests, Session session) {
+    return StudentQuizDetailResponseMapper
+        .toStudentQuizDetailWebResponse(
+            studentQuizService
+                .answerQuestionsByStudentQuizId(
+                    studentQuizId,
+                    session.getUserId(),
+                    studentQuestionRequestMapper
+                        .toStudentQuestionList(answerRequests)));
+  }
 }

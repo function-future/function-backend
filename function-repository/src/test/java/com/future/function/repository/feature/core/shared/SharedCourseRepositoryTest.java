@@ -81,7 +81,7 @@ public class SharedCourseRepositoryTest {
   
   private Batch getBatch(String code) {
     
-    return batchRepository.findByCode(code)
+    return batchRepository.findByCodeAndDeletedFalse(code)
       .get();
   }
   

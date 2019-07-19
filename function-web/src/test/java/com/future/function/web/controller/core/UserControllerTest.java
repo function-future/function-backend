@@ -31,6 +31,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.BDDMockito.given;
@@ -249,6 +250,42 @@ public class UserControllerTest extends TestHelper {
     
     verify(userService).updateUser(student);
     verify(userRequestMapper).toUser(STUDENT_EMAIL, STUDENT_WEB_REQUEST);
+  }
+  
+  @Test
+  public void testGivenNameByGettingUsersByNameReturnDataResponseUsers()
+    throws Exception {
+    
+    super.setCookie(Role.ADMIN);
+    
+    User student = User.builder()
+      .role(Role.STUDENT)
+      .email(STUDENT_EMAIL)
+      .name(NAME)
+      .phone(PHONE)
+      .address(ADDRESS)
+      .batch(Batch.builder()
+               .code(NUMBER)
+               .build())
+      .university(UNIVERSITY)
+      .build();
+    
+    List<User> users = Collections.singletonList(student);
+    given(userService.getUsersByNameContainsIgnoreCase(NAME, PAGEABLE)).willReturn(new PageImpl<>(users, PAGEABLE
+      , users.size()));
+    
+    PagingResponse<UserWebResponse> pagingResponse =
+      UserResponseMapper.toUsersPagingResponse(new PageImpl<>(users, PAGEABLE
+        , users.size()));
+    
+    mockMvc.perform(get("/api/core/users/search").cookie(cookies)
+                      .param("name", NAME))
+      .andExpect(status().isOk())
+      .andExpect(content().json(pagingResponseJacksonTester.write(pagingResponse)
+                                  .getJson()));
+    
+    verify(userService).getUsersByNameContainsIgnoreCase(NAME, PAGEABLE);
+    verifyZeroInteractions(userRequestMapper);
   }
   
 }

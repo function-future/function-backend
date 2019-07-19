@@ -53,7 +53,7 @@ public class BatchMustExistValidator
   
   private boolean isBatchWithBatchCodeExist(String batchCode) {
     
-    return !batchRepository.findByCode(batchCode)
+    return !batchRepository.findByCodeAndDeletedFalse(batchCode)
       .equals(Optional.empty());
   }
   

@@ -1,10 +1,11 @@
 package com.future.function.web.controller.scoring;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.future.function.common.enumeration.core.Role;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.scoring.QuestionBank;
 import com.future.function.model.entity.feature.scoring.Quiz;
 import com.future.function.service.api.feature.scoring.QuizService;
+import com.future.function.web.TestHelper;
 import com.future.function.web.TestSecurityConfiguration;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.mapper.request.scoring.QuizRequestMapper;
@@ -15,12 +16,10 @@ import com.future.function.web.model.response.base.BaseResponse;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.feature.scoring.QuizWebResponse;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -32,7 +31,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -46,240 +44,239 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @Import(TestSecurityConfiguration.class)
 @WebMvcTest(QuizController.class)
-public class QuizControllerTest {
+public class QuizControllerTest extends TestHelper {
 
-    private static final String QUIZ_ID = "quiz-id";
-    private static final String QUIZ_TITLE = "assignment-title";
-    private static final String QUIZ_DESCRIPTION = "assignment-description";
-    private static final long QUIZ_DATE = 150000;
-    private static final long QUIZ_TIME_LIMIT = 150000;
-    private static final int QUIZ_TRIALS = 3;
-    private static final String QUIZ_QUESTION_BANK_ID = "question-bank-id";
-    private static final int QUIZ_QUESTION_COUNT = 3;
-    private static final String QUIZ_BATCH_CODE = "3";
+  private static final String QUIZ_ID = "quiz-id";
+    private static final String QUIZ_TITLE = "quiz-title";
+    private static final String QUIZ_DESCRIPTION = "quiz-description";
+  private static final long QUIZ_DATE = 150000;
+  private static final long QUIZ_TIME_LIMIT = 150000;
+  private static final int QUIZ_TRIALS = 3;
+  private static final String QUIZ_QUESTION_BANK_ID = "question-bank-id";
+  private static final int QUIZ_QUESTION_COUNT = 3;
+  private static final String QUIZ_BATCH_CODE = "3";
+    private static final String QUIZ_BATCH_ID = "batchId";
 
-    private Pageable pageable;
-    private Quiz quiz;
-    private Batch batch;
-    private QuizWebRequest quizWebRequest;
-    private CopyQuizWebRequest copyQuizWebRequest;
-    private List<Quiz> quizList;
-    private Page<Quiz> quizPage;
-    private QuestionBank questionBank;
-    private List<String> QUESTION_BANK_IDS;
+  private Pageable pageable;
+  private Quiz quiz;
+  private Batch batch;
+  private QuizWebRequest quizWebRequest;
+  private CopyQuizWebRequest copyQuizWebRequest;
+  private List<Quiz> quizList;
+  private Page<Quiz> quizPage;
+  private QuestionBank questionBank;
+  private List<String> QUESTION_BANK_IDS;
 
-    private DataResponse<QuizWebResponse> DATA_RESPONSE;
-    private DataResponse<QuizWebResponse> CREATED_DATA_RESPONSE;
+  private DataResponse<QuizWebResponse> DATA_RESPONSE;
+  private DataResponse<QuizWebResponse> CREATED_DATA_RESPONSE;
 
-    private PagingResponse<QuizWebResponse> PAGING_RESPONSE;
+  private PagingResponse<QuizWebResponse> PAGING_RESPONSE;
 
-    private BaseResponse BASE_RESPONSE;
+  private BaseResponse BASE_RESPONSE;
 
-    private JacksonTester<DataResponse<QuizWebResponse>> dataResponseJacksonTester;
+  private JacksonTester<QuizWebRequest> webRequestJacksonTester;
 
-    private JacksonTester<PagingResponse<QuizWebResponse>> pagingResponseJacksonTester;
+  private JacksonTester<CopyQuizWebRequest> copyQuizWebRequestJacksonTester;
 
-    private JacksonTester<BaseResponse> baseResponseJacksonTester;
+  @MockBean
+  private QuizService quizService;
 
-    private JacksonTester<QuizWebRequest> webRequestJacksonTester;
+  @MockBean
+  private QuizRequestMapper requestMapper;
 
-    private JacksonTester<CopyQuizWebRequest> copyQuizWebRequestJacksonTester;
+  @Before
+  public void setUp() {
+    super.setUp();
+    super.setCookie(Role.ADMIN);
 
-    @Autowired
-    private MockMvc mockMvc;
+    questionBank = QuestionBank
+        .builder()
+        .id(QUIZ_QUESTION_BANK_ID)
+        .build();
 
-    @MockBean
-    private QuizService quizService;
+    batch = Batch
+        .builder()
+        .code(QUIZ_BATCH_CODE)
+        .build();
 
-    @MockBean
-    private QuizRequestMapper requestMapper;
+    QUESTION_BANK_IDS = new ArrayList<>();
+    QUESTION_BANK_IDS.add(QUIZ_QUESTION_BANK_ID);
 
-    @Before
-    public void setUp() throws Exception {
-        JacksonTester.initFields(this, ObjectMapper::new);
+    quiz = Quiz
+        .builder()
+        .id(QUIZ_ID)
+        .title(QUIZ_TITLE)
+        .description(QUIZ_DESCRIPTION)
+        .startDate(QUIZ_DATE)
+        .endDate(QUIZ_DATE)
+        .timeLimit(QUIZ_TIME_LIMIT)
+        .questionCount(QUIZ_QUESTION_COUNT)
+        .trials(QUIZ_TRIALS)
+        .questionBanks(Collections.singletonList(questionBank))
+        .batch(batch)
+        .build();
 
-        questionBank = QuestionBank
-                .builder()
-                .id(QUIZ_QUESTION_BANK_ID)
-                .build();
+    quizWebRequest = QuizWebRequest
+        .builder()
+        .title(QUIZ_TITLE)
+        .description(QUIZ_DESCRIPTION)
+        .startDate(QUIZ_DATE)
+        .endDate(QUIZ_DATE)
+        .timeLimit(QUIZ_TIME_LIMIT)
+        .questionCount(QUIZ_QUESTION_COUNT)
+        .trials(QUIZ_TRIALS)
+        .questionBanks(QUESTION_BANK_IDS)
+        .build();
 
-        batch = Batch
-                .builder()
-                .code(QUIZ_BATCH_CODE)
-                .build();
+    copyQuizWebRequest = CopyQuizWebRequest
+        .builder()
+        .quizId(QUIZ_ID)
+            .batchId(QUIZ_BATCH_ID)
+        .build();
 
-        QUESTION_BANK_IDS = new ArrayList<>();
-        QUESTION_BANK_IDS.add(QUIZ_QUESTION_BANK_ID);
+    quizList = new ArrayList<>();
+    quizList.add(quiz);
 
-        quiz = Quiz
-                .builder()
-                .id(QUIZ_ID)
-                .title(QUIZ_TITLE)
-                .description(QUIZ_DESCRIPTION)
-                .startDate(QUIZ_DATE)
-                .endDate(QUIZ_DATE)
-                .timeLimit(QUIZ_TIME_LIMIT)
-                .questionCount(QUIZ_QUESTION_COUNT)
-                .trials(QUIZ_TRIALS)
-                .questionBanks(Collections.singletonList(questionBank))
-                .batch(batch)
-                .build();
+    pageable = new PageRequest(0, 10);
 
-        quizWebRequest = QuizWebRequest
-                .builder()
-                .title(QUIZ_TITLE)
-                .description(QUIZ_DESCRIPTION)
-                .startDate(QUIZ_DATE)
-                .endDate(QUIZ_DATE)
-                .timeLimit(QUIZ_TIME_LIMIT)
-                .questionCount(QUIZ_QUESTION_COUNT)
-                .trials(QUIZ_TRIALS)
-                .batchCode(QUIZ_BATCH_CODE)
-                .questionBanks(QUESTION_BANK_IDS)
-                .build();
+    quizPage = new PageImpl<>(quizList, pageable, 10);
 
-        copyQuizWebRequest = CopyQuizWebRequest
-                .builder()
-                .quizId(QUIZ_ID)
-                .batchCode(QUIZ_BATCH_CODE)
-                .build();
+    DATA_RESPONSE = QuizResponseMapper
+        .toQuizWebDataResponse(this.quiz);
 
-        quizList = new ArrayList<>();
-        quizList.add(quiz);
+    CREATED_DATA_RESPONSE = QuizResponseMapper
+        .toQuizWebDataResponse(HttpStatus.CREATED, this.quiz);
 
-        pageable = new PageRequest(0, 10);
+    PAGING_RESPONSE = QuizResponseMapper
+        .toQuizWebPagingResponse(quizPage);
 
-        quizPage = new PageImpl<>(quizList, pageable, 10);
+    BASE_RESPONSE = ResponseHelper.toBaseResponse(HttpStatus.OK);
 
-        DATA_RESPONSE = QuizResponseMapper
-                .toQuizWebDataResponse(this.quiz);
+    when(quizService.findById(QUIZ_ID)).thenReturn(quiz);
+    when(quizService.createQuiz(quiz)).thenReturn(quiz);
+    when(quizService.updateQuiz(quiz)).thenReturn(quiz);
+    when(quizService.findAllByBatchCodeAndPageable(QUIZ_BATCH_CODE, pageable))
+        .thenReturn(quizPage);
+      when(quizService.copyQuizWithTargetBatch(QUIZ_BATCH_ID, quiz)).thenReturn(quiz);
+      when(requestMapper.toQuiz(quizWebRequest, QUIZ_BATCH_CODE)).thenReturn(quiz);
+      when(requestMapper.toQuiz(QUIZ_ID, quizWebRequest, QUIZ_BATCH_CODE)).thenReturn(quiz);
+    when(requestMapper.validateCopyQuizWebRequest(copyQuizWebRequest)).thenReturn(copyQuizWebRequest);
+  }
 
-        CREATED_DATA_RESPONSE = QuizResponseMapper
-                .toQuizWebDataResponse(HttpStatus.CREATED, this.quiz);
+  @After
+  public void tearDown() throws Exception {
+    verifyNoMoreInteractions(quizService, requestMapper);
+  }
 
-        PAGING_RESPONSE = QuizResponseMapper
-                .toQuizWebPagingResponse(quizPage);
+  @Test
+  public void testFindQuizById() throws Exception {
+    mockMvc.perform(
+        get("/api/scoring/batches/" + QUIZ_BATCH_CODE + "/quizzes/" + QUIZ_ID)
+            .cookie(cookies))
+        .andExpect(status().isOk())
+        .andExpect(content().json(
+            dataResponseJacksonTester.write(DATA_RESPONSE)
+                .getJson()
+        ));
 
-        BASE_RESPONSE = ResponseHelper.toBaseResponse(HttpStatus.OK);
+    verify(quizService).findById(QUIZ_ID);
+  }
 
-        when(quizService.findById(QUIZ_ID)).thenReturn(quiz);
-        when(quizService.createQuiz(quiz)).thenReturn(quiz);
-        when(quizService.updateQuiz(quiz)).thenReturn(quiz);
-        when(quizService.findAllByPageableAndFilterAndSearch(pageable, "", ""))
-                .thenReturn(quizPage);
-        when(quizService.copyQuizWithTargetBatch(QUIZ_BATCH_CODE, quiz)).thenReturn(quiz);
-        when(requestMapper.toQuiz(quizWebRequest)).thenReturn(quiz);
-        when(requestMapper.toQuiz(QUIZ_ID, quizWebRequest)).thenReturn(quiz);
-        when(requestMapper.validateCopyQuizWebRequest(copyQuizWebRequest)).thenReturn(copyQuizWebRequest);
-    }
+  @Test
+  public void testDeleteQuizById() throws Exception {
+    mockMvc.perform(
+        delete("/api/scoring/batches/" + QUIZ_BATCH_CODE + "/quizzes/" + QUIZ_ID)
+            .cookie(cookies))
+        .andExpect(status().isOk())
+        .andExpect(content().json(
+            baseResponseJacksonTester.write(BASE_RESPONSE)
+                .getJson()
+        ));
 
-    @After
-    public void tearDown() throws Exception {
-        verifyNoMoreInteractions(quizService, requestMapper);
-    }
+    verify(quizService).deleteById(QUIZ_ID);
+  }
 
-    @Test
-    public void testFindQuizById() throws Exception {
-        mockMvc.perform(
-                get("/api/scoring/quizzes/" + QUIZ_ID))
-                .andExpect(status().isOk())
-                .andExpect(content().json(
-                        dataResponseJacksonTester.write(DATA_RESPONSE)
-                                .getJson()
-                ));
+  @Test
+  public void testFindAllQuizByPagingParameters() throws Exception {
+    mockMvc.perform(
+        get("/api/scoring/batches/" + QUIZ_BATCH_CODE + "/quizzes")
+            .cookie(cookies)
+            .param("page", "1")
+            .param("size", "10"))
+        .andExpect(status().isOk())
+        .andExpect(content().json(
+            pagingResponseJacksonTester.write(PAGING_RESPONSE)
+                .getJson()
+        ));
 
-        verify(quizService).findById(QUIZ_ID);
-    }
+    verify(quizService).findAllByBatchCodeAndPageable(QUIZ_BATCH_CODE, pageable);
+  }
 
-    @Test
-    public void testDeleteQuizById() throws Exception {
-        mockMvc.perform(
-                delete("/api/scoring/quizzes/" + QUIZ_ID))
-                .andExpect(status().isOk())
-                .andExpect(content().json(
-                        baseResponseJacksonTester.write(BASE_RESPONSE)
-                                .getJson()
-                ));
+  @Test
+  public void testFindAllQuizWithoutPagingParameters() throws Exception {
+    mockMvc.perform(
+        get("/api/scoring/batches/" + QUIZ_BATCH_CODE + "/quizzes")
+            .cookie(cookies))
+        .andExpect(status().isOk())
+        .andExpect(content().json(
+            pagingResponseJacksonTester.write(PAGING_RESPONSE)
+                .getJson()
+        ));
 
-        verify(quizService).deleteById(QUIZ_ID);
-    }
+    verify(quizService).findAllByBatchCodeAndPageable(QUIZ_BATCH_CODE, pageable);
+  }
 
-    @Test
-    public void testFindAllQuizByPagingParameters() throws Exception {
-        mockMvc.perform(
-                get("/api/scoring/quizzes")
-                        .param("page", "1")
-                        .param("size", "10"))
-                .andExpect(status().isOk())
-                .andExpect(content().json(
-                        pagingResponseJacksonTester.write(PAGING_RESPONSE)
-                                .getJson()
-                ));
+  @Test
+  public void testCreateQuizPassQuizWebRequest() throws Exception {
+    mockMvc.perform(
+        post("/api/scoring/batches/" + QUIZ_BATCH_CODE + "/quizzes")
+            .cookie(cookies)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .content(webRequestJacksonTester.write(
+                quizWebRequest).getJson()))
+        .andExpect(status().isCreated())
+        .andExpect(content().json(
+            dataResponseJacksonTester.write(CREATED_DATA_RESPONSE)
+                .getJson()
+        ));
 
-        verify(quizService).findAllByPageableAndFilterAndSearch(pageable, "", "");
-    }
+    verify(quizService).createQuiz(quiz);
+      verify(requestMapper).toQuiz(quizWebRequest, QUIZ_BATCH_CODE);
+  }
 
-    @Test
-    public void testFindAllQuizWithoutPagingParameters() throws Exception {
-        mockMvc.perform(
-                get("/api/scoring/quizzes"))
-                .andExpect(status().isOk())
-                .andExpect(content().json(
-                        pagingResponseJacksonTester.write(PAGING_RESPONSE)
-                                .getJson()
-                ));
+  @Test
+  public void testCopyQuizWithTargetBatch() throws Exception {
+    mockMvc.perform(
+        post("/api/scoring/batches/" + QUIZ_BATCH_CODE + "/quizzes/copy")
+            .cookie(cookies)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .content(copyQuizWebRequestJacksonTester.write(
+                copyQuizWebRequest).getJson()))
+        .andExpect(status().isCreated())
+        .andExpect(content().json(
+            dataResponseJacksonTester.write(CREATED_DATA_RESPONSE)
+                .getJson()
+        ));
+    verify(quizService).findById(QUIZ_ID);
+      verify(quizService).copyQuizWithTargetBatch(QUIZ_BATCH_ID, quiz);
+    verify(requestMapper).validateCopyQuizWebRequest(copyQuizWebRequest);
+  }
 
-        verify(quizService).findAllByPageableAndFilterAndSearch(pageable, "", "");
-    }
+  @Test
+  public void testUpdateQuizPassQuizWebRequestAndId() throws Exception {
+    mockMvc.perform(
+        put("/api/scoring/batches/" + QUIZ_BATCH_CODE + "/quizzes/" + QUIZ_ID)
+            .cookie(cookies)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .content(webRequestJacksonTester.write(
+                quizWebRequest).getJson()))
+        .andExpect(status().isOk())
+        .andExpect(content().json(
+            dataResponseJacksonTester.write(DATA_RESPONSE)
+                .getJson()
+        ));
 
-    @Test
-    public void testCreateQuizPassQuizWebRequest() throws Exception {
-        mockMvc.perform(
-                post("/api/scoring/quizzes")
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(webRequestJacksonTester.write(
-                                quizWebRequest).getJson()))
-                .andExpect(status().isCreated())
-                .andExpect(content().json(
-                        dataResponseJacksonTester.write(CREATED_DATA_RESPONSE)
-                                .getJson()
-                ));
-
-        verify(quizService).createQuiz(quiz);
-        verify(requestMapper).toQuiz(quizWebRequest);
-    }
-
-    @Test
-    public void testCopyQuizWithTargetBatch() throws Exception {
-        mockMvc.perform(
-                post("/api/scoring/quizzes/copy")
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(copyQuizWebRequestJacksonTester.write(
-                                copyQuizWebRequest).getJson()))
-                .andExpect(status().isCreated())
-                .andExpect(content().json(
-                        dataResponseJacksonTester.write(CREATED_DATA_RESPONSE)
-                                .getJson()
-                ));
-        verify(quizService).findById(QUIZ_ID);
-        verify(quizService).copyQuizWithTargetBatch(QUIZ_BATCH_CODE, quiz);
-        verify(requestMapper).validateCopyQuizWebRequest(copyQuizWebRequest);
-    }
-
-    @Test
-    public void testUpdateQuizPassQuizWebRequestAndId() throws Exception {
-        mockMvc.perform(
-                put("/api/scoring/quizzes/" + QUIZ_ID)
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(webRequestJacksonTester.write(
-                                quizWebRequest).getJson()))
-                .andExpect(status().isOk())
-                .andExpect(content().json(
-                        dataResponseJacksonTester.write(DATA_RESPONSE)
-                                .getJson()
-                ));
-
-        verify(quizService).updateQuiz(quiz);
-        verify(requestMapper).toQuiz(QUIZ_ID, quizWebRequest);
-    }
+    verify(quizService).updateQuiz(quiz);
+      verify(requestMapper).toQuiz(QUIZ_ID, quizWebRequest, QUIZ_BATCH_CODE);
+  }
 }

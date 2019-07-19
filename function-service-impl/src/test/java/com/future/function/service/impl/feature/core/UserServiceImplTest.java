@@ -1,7 +1,6 @@
 package com.future.function.service.impl.feature.core;
 
 import com.future.function.common.enumeration.core.Role;
-import com.future.function.common.exception.ForbiddenException;
 import com.future.function.common.exception.NotFoundException;
 import com.future.function.common.exception.UnauthorizedException;
 import com.future.function.model.entity.feature.core.Batch;
@@ -20,6 +19,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -614,19 +614,78 @@ public class UserServiceImplTest {
   public void testGivenNameByGettingUsersByNameContainsIgnoreCaseReturnListOfUsers() {
 
     String namePart = "AM";
+    List<User> users = Arrays.asList(userStudent, userMentor);
     when(userRepository.findAllByNameContainsIgnoreCaseAndDeletedFalse(
-      namePart)).thenReturn(Arrays.asList(userStudent, userMentor));
+      namePart, PAGEABLE)).thenReturn(new PageImpl<>(
+      users, PAGEABLE, users.size()));
 
-    List<User> retrievedUsers = userService.getUsersByNameContainsIgnoreCase(
-      namePart);
+    Page<User> retrievedUsers = userService.getUsersByNameContainsIgnoreCase(
+      namePart, PAGEABLE);
 
-    assertThat(retrievedUsers).isNotEmpty();
-    assertThat(retrievedUsers).isEqualTo(
-      Arrays.asList(userStudent, userMentor));
+    assertThat(retrievedUsers.getContent()).isNotEmpty();
+    assertThat(retrievedUsers.getContent()).isEqualTo(users);
 
     verify(userRepository).findAllByNameContainsIgnoreCaseAndDeletedFalse(
-      namePart);
+      namePart, PAGEABLE);
     verifyZeroInteractions(resourceService, encoder);
+  }
+  
+  @Test
+  public void testGivenUserObjectByChangingProfilePictureReturnUpdatedUser() {
+    
+    FileV2 picture = FileV2.builder()
+      .id(PICTURE_ID)
+      .build();
+    User user = User.builder()
+      .email(EMAIL_STUDENT)
+      .pictureV2(picture)
+      .build();
+    
+    when(userRepository.findByEmailAndDeletedFalse(EMAIL_STUDENT)).thenReturn(
+      Optional.of(userStudent));
+    
+    when(resourceService.markFilesUsed(Collections.singletonList(PICTURE_ID),
+                                       true
+    )).thenReturn(true);
+    
+    when(resourceService.getFile(PICTURE_ID)).thenReturn(picture);
+    
+    User savedUser = new User();
+    BeanUtils.copyProperties(userStudent, savedUser);
+    savedUser.setPictureV2(picture);
+    when(userRepository.save(savedUser)).thenReturn(savedUser);
+    
+    User updatedUser = userService.changeProfilePicture(user);
+    
+    assertThat(updatedUser).isEqualTo(savedUser);
+    
+    verify(userRepository).findByEmailAndDeletedFalse(EMAIL_STUDENT);
+    verify(resourceService).markFilesUsed(
+      Collections.singletonList(PICTURE_ID), true);
+    verify(resourceService).getFile(PICTURE_ID);
+    verify(userRepository).save(savedUser);
+  }
+  
+  @Test
+  public void testGivenUserWithNonExistingEmailByChangingProfilePictureReturnRequestUserObject() {
+  
+    FileV2 picture = FileV2.builder()
+      .id(PICTURE_ID)
+      .build();
+    User user = User.builder()
+      .email(EMAIL_STUDENT)
+      .pictureV2(picture)
+      .build();
+  
+    when(userRepository.findByEmailAndDeletedFalse(EMAIL_STUDENT)).thenReturn(
+      Optional.empty());
+    
+    User updatedUser = userService.changeProfilePicture(user);
+    
+    assertThat(updatedUser).isEqualTo(user);
+    
+    verify(userRepository).findByEmailAndDeletedFalse(EMAIL_STUDENT);
+    verifyZeroInteractions(resourceService);
   }
 
 }

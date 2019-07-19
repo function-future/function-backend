@@ -12,31 +12,35 @@ import java.util.stream.Collectors;
 @Component
 public class StudentQuestionRequestMapper {
 
-    @Autowired
-    private RequestValidator validator;
+  private RequestValidator validator;
 
-    @Autowired
-    private OptionRequestMapper optionRequestMapper;
+  private OptionRequestMapper optionRequestMapper;
 
-    public StudentQuestion toStudentQuestion(StudentQuestionWebRequest request) {
-        return toValidatedStudentQuestion(request);
-    }
+  @Autowired
+  public StudentQuestionRequestMapper(RequestValidator validator, OptionRequestMapper optionRequestMapper) {
+    this.validator = validator;
+    this.optionRequestMapper = optionRequestMapper;
+  }
 
-    private StudentQuestion toValidatedStudentQuestion(StudentQuestionWebRequest request) {
-        request = validator.validate(request);
+  public StudentQuestion toStudentQuestion(StudentQuestionWebRequest request) {
+    return toValidatedStudentQuestion(request);
+  }
 
-        return StudentQuestion
-                .builder()
-                .number(request.getNumber())
-                .option(optionRequestMapper.toOptionFromOptionId(request.getOptionId()))
-                .build();
-    }
+  private StudentQuestion toValidatedStudentQuestion(StudentQuestionWebRequest request) {
+    request = validator.validate(request);
 
-    public List<StudentQuestion> toStudentQuestionList(List<StudentQuestionWebRequest> requests) {
-        return requests
-                .stream()
-                .map(this::toStudentQuestion)
-                .collect(Collectors.toList());
-    }
+    return StudentQuestion
+        .builder()
+        .number(request.getNumber())
+        .option(optionRequestMapper.toOptionFromOptionId(request.getOptionId()))
+        .build();
+  }
+
+  public List<StudentQuestion> toStudentQuestionList(List<StudentQuestionWebRequest> requests) {
+    return requests
+        .stream()
+        .map(this::toStudentQuestion)
+        .collect(Collectors.toList());
+  }
 
 }

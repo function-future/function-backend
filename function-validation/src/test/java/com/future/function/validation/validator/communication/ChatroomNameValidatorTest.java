@@ -17,7 +17,7 @@ public class ChatroomNameValidatorTest {
 
     private static final String VALID_NAME = "Chatroom Name 123";
 
-    private static final String INVALID_NAME = "Chatroom Name 123 *;";
+    private static final String INVALID_NAME = "Chatroom Name 123 name name name name name";
 
     @Mock
     private ChatroomName annotation;

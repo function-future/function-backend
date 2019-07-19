@@ -71,6 +71,7 @@ public final class ActivityBlogResponseMapper {
       .description(activityBlog.getDescription())
       .files(EmbeddedFileWebResponseMapper.toEmbeddedFileWebResponses(
         activityBlog.getFiles()))
+      .updatedAt(activityBlog.getUpdatedAt())
       .author(
         AuthorWebResponseMapper.buildAuthorWebResponse(activityBlog.getUser()))
       .build();

@@ -23,10 +23,11 @@ import java.util.stream.Collectors;
  * Static class used to map quiz entity object to web response object
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class QuizResponseMapper {
+public final class QuizResponseMapper {
 
   /**
    * Used to map quiz entity object into DataResponse of QuizWebResponse
+   *
    * @param quiz (Quiz)
    * @return DataResponse<QuizWebResponse>
    */
@@ -36,8 +37,9 @@ public class QuizResponseMapper {
 
   /**
    * Used to map quiz entity object with http status into DataResponse of QuizWebResponse
+   *
    * @param httpStatus (HttpStatus)
-   * @param quiz (Quiz)
+   * @param quiz       (Quiz)
    * @return DataResponse<QuizWebResponse>
    */
   public static DataResponse<QuizWebResponse> toQuizWebDataResponse(HttpStatus httpStatus, Quiz quiz) {
@@ -46,33 +48,35 @@ public class QuizResponseMapper {
 
   /**
    * Used to create new QuizWebResponse and map its attribute from quiz parameter
+   *
    * @param quiz (Quiz)
    * @return QuizWebResponse object
    */
   private static QuizWebResponse buildQuizWebResponse(Quiz quiz) {
     return Optional.ofNullable(quiz)
-            .map(val -> {
-              QuizWebResponse response = new QuizWebResponse();
-              BeanUtils.copyProperties(val, response);
-              response.setQuestionBanks(getQuestionBankIds(quiz));
-              response.setBatchCode(quiz.getBatch().getCode());
-              return response;
-            })
-            .orElseThrow(() -> new BadRequestException("Bad Request"));
+        .map(val -> {
+          QuizWebResponse response = new QuizWebResponse();
+          BeanUtils.copyProperties(val, response);
+          response.setQuestionBanks(getQuestionBankIds(quiz));
+          response.setBatchCode(quiz.getBatch().getCode());
+          return response;
+        })
+        .orElseThrow(() -> new BadRequestException("Bad Request"));
   }
 
   private static List<String> getQuestionBankIds(Quiz quiz) {
     if (quiz.getQuestionBanks() != null)
       return quiz
-              .getQuestionBanks()
-              .stream()
-              .map(QuestionBank::getId)
-              .collect(Collectors.toList());
+          .getQuestionBanks()
+          .stream()
+          .map(QuestionBank::getId)
+          .collect(Collectors.toList());
     return new ArrayList<>();
   }
 
   /**
    * Used to map Page of Quiz entity object into PagingResponse of QuizWebResponse
+   *
    * @param quizPage (Page<Quiz>)
    * @return PagingResponse<QuizWebResponse>
    */
@@ -82,15 +86,16 @@ public class QuizResponseMapper {
 
   /**
    * Used to map Page of Quiz entity object into List of QuizWebResponse
+   *
    * @param quizPage (Page<Quiz>)
    * @return List<QuizWebResponse>
    */
   private static List<QuizWebResponse> toQuizWebResponseList(Page<Quiz> quizPage) {
     return quizPage
-            .getContent()
-            .stream()
-            .map(QuizResponseMapper::buildQuizWebResponse)
-            .collect(Collectors.toList());
+        .getContent()
+        .stream()
+        .map(QuizResponseMapper::buildQuizWebResponse)
+        .collect(Collectors.toList());
   }
 
 }

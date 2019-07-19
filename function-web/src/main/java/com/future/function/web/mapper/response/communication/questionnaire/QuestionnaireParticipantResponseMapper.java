@@ -38,6 +38,7 @@ public class QuestionnaireParticipantResponseMapper {
             .university(questionnaireParticipant.getMember().getUniversity())
             .role(questionnaireParticipant.getMember().getRole().toString())
             .batch(questionnaireParticipant.getMember().getBatch().getCode())
+            .avatar(questionnaireParticipant.getMember().getPictureV2().getThumbnailUrl())
             .build();
   }
 

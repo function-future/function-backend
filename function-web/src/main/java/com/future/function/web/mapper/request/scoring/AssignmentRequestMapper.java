@@ -1,8 +1,9 @@
 package com.future.function.web.mapper.request.scoring;
 
+import com.future.function.model.entity.feature.core.Batch;
+import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.scoring.Assignment;
 import com.future.function.validation.RequestValidator;
-import com.future.function.web.mapper.request.WebRequestMapper;
 import com.future.function.web.model.request.scoring.AssignmentWebRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -18,38 +19,34 @@ import java.util.Optional;
 @Component
 public class AssignmentRequestMapper {
 
-  private WebRequestMapper requestMapper;
-
-    private RequestValidator validator;
+  private RequestValidator validator;
 
   @Autowired
-  public AssignmentRequestMapper(WebRequestMapper requestMapper, RequestValidator validator) {
-    this.requestMapper = requestMapper;
+  public AssignmentRequestMapper(RequestValidator validator) {
     this.validator = validator;
   }
 
   /**
    * used to convert json in string format into a proper Assignment Object
    *
-   * @param data (JSON)
+   * @param request (AssignmentWebRequest)
    * @return Assignment Object
    */
-  public Assignment toAssignment(String data) {
-    AssignmentWebRequest request = toAssignmentWebRequest(data);
-    return toValidatedAssignment(request);
+  public Assignment toAssignment(AssignmentWebRequest request, String batchCode) {
+      return toValidatedAssignment(request, batchCode);
   }
 
   /**
    * Used to convert json in string format and assignment id into a proper Assignment Object
    *
    * @param assignmentId (String)
-   * @param data         (JSON)
+   * @param request      (AssignmentWebRequest)
    * @return Assignment Object
    */
-  public Assignment toAssignmentWithId(String assignmentId, String data) {
-    AssignmentWebRequest request = toAssignmentWebRequest(data);
-    request.setId(assignmentId);
-    return toValidatedAssignment(request);
+  public Assignment toAssignmentWithId(String assignmentId, AssignmentWebRequest request, String batchCode) {
+      Assignment assignment = toValidatedAssignment(request, batchCode);
+    assignment.setId(assignmentId);
+    return assignment;
   }
 
   /**
@@ -58,24 +55,25 @@ public class AssignmentRequestMapper {
    * @param request (AssignmentWebRequest)
    * @return valid Assignment Object
    */
-  private Assignment toValidatedAssignment(AssignmentWebRequest request) {
-    return Optional.of(request)
-            .map(validator::validate)
-            .map(val -> {
-              Assignment assignment = new Assignment();
-              BeanUtils.copyProperties(val, assignment);
-              return assignment;
-            })
-            .orElse(new Assignment());
+  private Assignment toValidatedAssignment(AssignmentWebRequest request, String batchCode) {
+      request = validator.validate(request);
+      Assignment assignment = Assignment.builder().build();
+      BeanUtils.copyProperties(request, assignment);
+      assignment.setBatch(Batch.builder().code(batchCode).build());
+      assignment.setFile(toFileV2(request));
+      return assignment;
   }
 
-  /**
-   * used to convert json in string format to AssignmentWebRequest object with the help of Web Request Mapper bean
-   *
-   * @param data (JSON)
-   * @return AssignmentWebRequest object
-   */
-  private AssignmentWebRequest toAssignmentWebRequest(String data) {
-      return requestMapper.toWebRequestObject(data, AssignmentWebRequest.class);
+  private FileV2 toFileV2(AssignmentWebRequest request) {
+    return Optional.ofNullable(request)
+        .map(AssignmentWebRequest::getFiles)
+        .filter(files -> !files.isEmpty())
+        .map(files -> files.get(0))
+        .map(this::buildFileV2)
+        .orElseGet(FileV2::new);
+  }
+
+  private FileV2 buildFileV2(String file) {
+    return FileV2.builder().id(file).build();
   }
 }

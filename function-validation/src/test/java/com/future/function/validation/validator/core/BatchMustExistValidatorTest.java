@@ -48,25 +48,25 @@ public class BatchMustExistValidatorTest {
   @Test
   public void testGivenExistingBatchCodeOfExistingBatchByCheckingExistingBatchInDatabaseReturnTrue() {
     
-    when(batchRepository.findByCode(BATCH_CODE)).thenReturn(Optional.of(
+    when(batchRepository.findByCodeAndDeletedFalse(BATCH_CODE)).thenReturn(Optional.of(
       Batch.builder()
         .code(BATCH_CODE)
         .build()));
     
     assertThat(validator.isValid(BATCH_CODE, null)).isTrue();
     
-    verify(batchRepository).findByCode(BATCH_CODE);
+    verify(batchRepository).findByCodeAndDeletedFalse(BATCH_CODE);
     verifyZeroInteractions(annotation);
   }
   
   @Test
   public void testGivenNonExistingBatchCodeByCheckingExistingBatchInDatabaseReturnFalse() {
     
-    when(batchRepository.findByCode(BATCH_CODE)).thenReturn(Optional.empty());
+    when(batchRepository.findByCodeAndDeletedFalse(BATCH_CODE)).thenReturn(Optional.empty());
     
     assertThat(validator.isValid(BATCH_CODE, null)).isFalse();
     
-    verify(batchRepository).findByCode(BATCH_CODE);
+    verify(batchRepository).findByCodeAndDeletedFalse(BATCH_CODE);
     verifyZeroInteractions(annotation);
   }
   

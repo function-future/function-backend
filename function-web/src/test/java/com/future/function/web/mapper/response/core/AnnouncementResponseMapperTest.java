@@ -31,7 +31,7 @@ public class AnnouncementResponseMapperTest {
   private static final Pageable PAGEABLE = new PageRequest(0, 4);
   
   private static final Paging PAGING = Paging.builder()
-    .page(0)
+    .page(1)
     .size(4)
     .totalRecords(1)
     .build();

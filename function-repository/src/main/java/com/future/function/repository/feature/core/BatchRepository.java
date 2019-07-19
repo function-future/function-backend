@@ -20,7 +20,15 @@ public interface BatchRepository extends MongoRepository<Batch, String> {
    * @return {@code List<Batch>} - Batches found in database, if any exists;
    * otherwise returns empty {@link java.util.List}.
    */
-  Page<Batch> findAllByIdIsNotNull(Pageable pageable);
+  Page<Batch> findAllByDeletedFalse(Pageable pageable);
+  
+  /**
+   * Finds batches in database based on {@code id} parameter.
+   *
+   * @return {@code Page<Batch>} - Batches found in database, if any exists;
+   * otherwise returns empty {@link Page}.
+   */
+  Page<Batch> findAllByIdAndDeletedFalse(String id, Pageable pageable);
   
   /**
    * Finds first (latest) batch in database based on {@code updatedAt} field.
@@ -28,7 +36,7 @@ public interface BatchRepository extends MongoRepository<Batch, String> {
    * @return {@code Optional<Batch>} - Batch found in database, if any
    * exists; otherwise returns {@link java.util.Optional#empty()}.
    */
-  Optional<Batch> findFirstByIdIsNotNullOrderByUpdatedAtDesc();
+  Optional<Batch> findFirstByDeletedFalseOrderByUpdatedAtDesc();
   
   /**
    * Finds a specific batch, given parameter code.
@@ -38,6 +46,6 @@ public interface BatchRepository extends MongoRepository<Batch, String> {
    * @return {@code Optional<Batch>} - Batch found in database, if any exists;
    * otherwise returns {@link java.util.Optional#empty()}.
    */
-  Optional<Batch> findByCode(String code);
+  Optional<Batch> findByCodeAndDeletedFalse(String code);
   
 }

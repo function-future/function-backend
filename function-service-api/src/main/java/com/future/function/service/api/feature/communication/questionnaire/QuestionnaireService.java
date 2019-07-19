@@ -4,7 +4,6 @@ import com.future.function.model.entity.feature.communication.questionnaire.Ques
 import com.future.function.model.entity.feature.communication.questionnaire.Questionnaire;
 import com.future.function.model.entity.feature.communication.questionnaire.QuestionnaireParticipant;
 import com.future.function.model.entity.feature.core.User;
-import com.future.function.model.entity.feature.scoring.Question;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

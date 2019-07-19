@@ -1,15 +1,14 @@
 package com.future.function.web.controller.core;
 
 import com.future.function.common.enumeration.core.Role;
-import com.future.function.service.api.feature.core.AccessService;
-import com.future.function.service.api.feature.core.MenuService;
-import com.future.function.service.api.feature.core.UserService;
+import com.future.function.service.api.feature.core.UserDetailService;
 import com.future.function.session.annotation.WithAnyRole;
 import com.future.function.session.model.Session;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.mapper.request.core.UserDetailRequestMapper;
 import com.future.function.web.mapper.response.core.UserResponseMapper;
 import com.future.function.web.model.request.core.ChangePasswordWebRequest;
+import com.future.function.web.model.request.core.ChangeProfilePictureWebRequest;
 import com.future.function.web.model.response.base.BaseResponse;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.feature.core.UserWebResponse;
@@ -18,6 +17,7 @@ import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -30,24 +30,32 @@ import java.util.Map;
 @RequestMapping("/api/core/user")
 public class UserDetailController {
 
-  private final UserService userService;
-
-  private final MenuService menuService;
-
-  private final AccessService accessService;
+  private final UserDetailService userDetailService;
 
   private final UserDetailRequestMapper userDetailRequestMapper;
 
   @Autowired
   public UserDetailController(
-    UserService userService, MenuService menuService,
-    AccessService accessService, UserDetailRequestMapper userDetailRequestMapper
+    UserDetailService userDetailService,
+    UserDetailRequestMapper userDetailRequestMapper
   ) {
 
-    this.userService = userService;
-    this.menuService = menuService;
-    this.accessService = accessService;
+    this.userDetailService = userDetailService;
     this.userDetailRequestMapper = userDetailRequestMapper;
+  }
+  
+  @ResponseStatus(HttpStatus.OK)
+  @PutMapping("/profile/picture")
+  public DataResponse<UserWebResponse> changeProfilePicture(
+    @WithAnyRole(roles = { Role.STUDENT, Role.MENTOR, Role.JUDGE, Role.ADMIN })
+      Session session,
+    @RequestBody
+      ChangeProfilePictureWebRequest request
+  ) {
+  
+    return UserResponseMapper.toUserDataResponse(
+      userDetailService.changeProfilePicture(
+        userDetailRequestMapper.toUser(request, session.getEmail())));
   }
 
   @ResponseStatus(HttpStatus.OK)
@@ -58,7 +66,7 @@ public class UserDetailController {
   ) {
 
     return UserResponseMapper.toUserDataResponse(
-      userService.getUserByEmail(session.getEmail()));
+      userDetailService.getUserByEmail(session.getEmail()));
   }
 
   @ResponseStatus(HttpStatus.OK)
@@ -73,9 +81,9 @@ public class UserDetailController {
     Pair<String, String> oldAndNewPasswordPair =
       userDetailRequestMapper.toOldAndNewPasswordPair(request);
 
-    userService.changeUserPassword(session.getEmail(),
-                                   oldAndNewPasswordPair.getFirst(),
-                                   oldAndNewPasswordPair.getSecond()
+    userDetailService.changeUserPassword(session.getEmail(),
+                                         oldAndNewPasswordPair.getFirst(),
+                                         oldAndNewPasswordPair.getSecond()
     );
 
     return ResponseHelper.toBaseResponse(HttpStatus.OK);
@@ -88,7 +96,7 @@ public class UserDetailController {
       Session session
   ) {
 
-    return menuService.getSectionsByRole(session.getRole());
+    return userDetailService.getSectionsByRole(session.getRole());
   }
 
   @ResponseStatus(HttpStatus.OK)
@@ -100,7 +108,7 @@ public class UserDetailController {
       Session session
   ) {
 
-    return accessService.getComponentsByUrlAndRole(url, session.getRole());
+    return userDetailService.getComponentsByUrlAndRole(url, session.getRole());
   }
 
 }

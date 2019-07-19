@@ -14,8 +14,8 @@ import java.util.List;
 @AllArgsConstructor
 public class QuestionWebResponse {
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private String id;
-    private String text;
-    private List<OptionWebResponse> options;
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private String id;
+  private String label;
+  private List<OptionWebResponse> options;
 }

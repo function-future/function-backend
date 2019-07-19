@@ -19,6 +19,12 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class BatchRequestMapperTest {
   
+  private static final String NAME = "name";
+  
+  private static final String CODE = "code";
+  
+  private static final String ID = "id";
+  
   @Mock
   private RequestValidator validator;
   
@@ -38,14 +44,15 @@ public class BatchRequestMapperTest {
   public void testGivenBatchWebRequestByParsingToBatchReturnBatchObject() {
     
     BatchWebRequest request = BatchWebRequest.builder()
-      .name("name")
-      .code("code")
+      .id(ID)
+      .name(NAME)
+      .code(CODE)
       .build();
     when(validator.validate(request)).thenReturn(request);
     
     Batch batch = Batch.builder()
-      .name("name")
-      .code("code")
+      .name(NAME)
+      .code(CODE)
       .build();
     
     Batch parsedBatch = batchRequestMapper.toBatch(request);
@@ -59,19 +66,19 @@ public class BatchRequestMapperTest {
   public void testGivenIdAndBatchWebRequestByParsingToBatchReturnBatchObject() {
     
     BatchWebRequest request = BatchWebRequest.builder()
-      .name("name")
-      .code("code")
+      .id(ID)
+      .name(NAME)
+      .code(CODE)
       .build();
     when(validator.validate(request)).thenReturn(request);
-    
-    String id = "id";
+  
     Batch batch = Batch.builder()
-      .id(id)
-      .name("name")
-      .code("code")
+      .id(ID)
+      .name(NAME)
+      .code(CODE)
       .build();
     
-    Batch parsedBatch = batchRequestMapper.toBatch(id, request);
+    Batch parsedBatch = batchRequestMapper.toBatch(ID, request);
     
     assertThat(parsedBatch).isEqualTo(batch);
     

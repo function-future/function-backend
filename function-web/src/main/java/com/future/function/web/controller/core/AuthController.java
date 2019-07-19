@@ -50,11 +50,11 @@ public class AuthController {
   @GetMapping
   public DataResponse<AuthWebResponse> getLoginStatus(
     @WithAnyRole
-      Session session
+      Session session, HttpServletResponse servletResponse
   ) {
     
     return AuthResponseMapper.toAuthDataResponse(
-      authService.getLoginStatus(session.getId()));
+      authService.getLoginStatus(session.getId(), servletResponse));
   }
   
   @ResponseStatus(HttpStatus.OK)

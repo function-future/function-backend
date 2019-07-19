@@ -12,23 +12,25 @@ import java.util.List;
 
 public interface StudentQuizService {
 
-    Page<StudentQuiz> findAllByStudentId(String studentId, Pageable pageable);
+  Page<StudentQuiz> findAllByStudentId(String studentId, Pageable pageable, String userId);
 
-    StudentQuiz findById(String id);
+    List<StudentQuizDetail> findAllQuizByStudentId(String studentId);
 
-    List<StudentQuestion> findAllQuestionsByStudentQuizId(String studentQuizId);
+  StudentQuiz findById(String id, String userId);
 
-    List<StudentQuestion> findAllUnansweredQuestionByStudentQuizId(String studentQuizId);
+  List<StudentQuestion> findAllQuestionsByStudentQuizId(String studentQuizId, String userId);
 
-    StudentQuizDetail answerQuestionsByStudentQuizId(String studentQuizId, List<StudentQuestion> answers);
+  List<StudentQuestion> findAllUnansweredQuestionByStudentQuizId(String studentQuizId, String userId);
 
-    StudentQuiz createStudentQuizAndSave(String userId, Quiz quiz);
+  StudentQuizDetail answerQuestionsByStudentQuizId(String studentQuizId, String userId, List<StudentQuestion> answers);
 
-    Quiz createStudentQuizByBatchCode(String batchCode, Quiz quiz);
+  StudentQuiz createStudentQuizAndSave(String userId, Quiz quiz);
 
-    Quiz copyQuizWithTargetBatch(Batch targetBatch, Quiz quiz);
+  Quiz createStudentQuizByBatchCode(String batchCode, Quiz quiz);
 
-    void deleteById(String id);
+  Quiz copyQuizWithTargetBatch(Batch targetBatch, Quiz quiz);
 
-    void deleteByBatchCodeAndQuiz(String batchCode, String quizId);
+  void deleteById(String id);
+
+  void deleteByBatchCodeAndQuiz(String batchCode, String quizId);
 }
