@@ -23,22 +23,26 @@
       <groupId>com.future.function</groupId>
       <artifactId>function-repository</artifactId>
       <version>${project.version}</version>
+      <optional>true</optional>
     </dependency>
 
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
+      <optional>true</optional>
     </dependency>
 
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
+      <optional>true</optional>
     </dependency>
 
     <dependency>
       <groupId>eu.codearte.catch-exception</groupId>
       <artifactId>catch-exception</artifactId>
       <scope>test</scope>
+      <optional>true</optional>
     </dependency>
 
     <dependency>
