@@ -6,8 +6,10 @@ import com.future.function.common.exception.ForbiddenException;
 import com.future.function.common.exception.NotFoundException;
 import com.future.function.common.properties.core.FileProperties;
 import com.future.function.model.entity.feature.core.FileV2;
+import com.future.function.model.entity.feature.core.User;
 import com.future.function.repository.feature.core.FileRepositoryV2;
 import com.future.function.service.api.feature.core.ResourceService;
+import com.future.function.service.api.feature.core.UserService;
 import com.future.function.session.model.Session;
 import org.junit.After;
 import org.junit.Before;
@@ -72,6 +74,9 @@ public class FileServiceImplTest {
 
   @Mock
   private FileProperties fileProperties;
+  
+  @Mock
+  private UserService userService;
 
   @InjectMocks
   private FileServiceImpl fileService;
@@ -85,7 +90,9 @@ public class FileServiceImplTest {
   @After
   public void tearDown() {
 
-    verifyNoMoreInteractions(fileRepository, resourceService, fileProperties);
+    verifyNoMoreInteractions(fileRepository, resourceService, fileProperties,
+                             userService
+    );
   }
 
   @Test
@@ -101,7 +108,7 @@ public class FileServiceImplTest {
     assertThat(file).isEqualTo(this.file);
 
     verify(fileRepository).findByIdAndParentIdAndDeletedFalse(ID, PARENT_ID);
-    verifyZeroInteractions(resourceService, fileProperties);
+    verifyZeroInteractions(resourceService, fileProperties, userService);
   }
 
   @Test
@@ -118,7 +125,7 @@ public class FileServiceImplTest {
       "Get File/Folder Not Found");
 
     verify(fileRepository).findByIdAndParentIdAndDeletedFalse(ID, PARENT_ID);
-    verifyZeroInteractions(resourceService, fileProperties);
+    verifyZeroInteractions(resourceService, fileProperties, userService);
   }
 
   @Test
@@ -138,6 +145,7 @@ public class FileServiceImplTest {
     verify(
       fileRepository).findAllByParentIdAndAsResourceFalseAndDeletedFalseOrderByMarkFolderDesc(
       PARENT_ID, PAGEABLE);
+    verifyZeroInteractions(resourceService, fileProperties, userService);
   }
 
   @Test
@@ -170,6 +178,7 @@ public class FileServiceImplTest {
     verify(resourceService).markFilesUsed(Collections.singletonList(ID), false);
     verify(fileRepository).findAll(Collections.singletonList(ID));
     verify(fileRepository).save(Collections.singletonList(markedDeletedFile));
+    verifyZeroInteractions(userService);
   }
 
   @Test
@@ -247,6 +256,8 @@ public class FileServiceImplTest {
 
     verify(fileRepository).findAll(fileIds);
     verify(fileRepository).save(fileV2s);
+    
+    verifyZeroInteractions(userService);
   }
 
   @Test
@@ -257,7 +268,7 @@ public class FileServiceImplTest {
     fileService.deleteFileOrFolder(SESSION, PARENT_ID, ROOT);
 
     verify(fileProperties).getRootId();
-    verifyZeroInteractions(fileRepository, resourceService);
+    verifyZeroInteractions(fileRepository, resourceService, userService);
   }
 
   @Test
@@ -270,16 +281,20 @@ public class FileServiceImplTest {
     when(resourceService.storeFile(null, PARENT_ID, NAME, NAME, NAME.getBytes(),
                                    FileOrigin.FILE
     )).thenReturn(returnedFile);
+  
+    String userId = "user-id";
+    when(userService.getUser(userId)).thenReturn(new User());
 
     FileV2 savedFile = FileV2.builder()
       .parentId(PARENT_ID)
       .name(NAME)
       .used(true)
+      .user(new User())
       .build();
     when(fileRepository.save(any(FileV2.class))).thenReturn(savedFile);
 
     FileV2 createdFile = fileService.createFileOrFolder(
-      new Session("", "", "", EMAIL, Role.ADMIN), PARENT_ID, NAME, NAME,
+      new Session("", userId, "", EMAIL, Role.ADMIN), PARENT_ID, NAME, NAME,
       NAME.getBytes()
     );
 
@@ -289,27 +304,33 @@ public class FileServiceImplTest {
     assertThat(createdFile.getParentId()).isEqualTo(PARENT_ID);
     assertThat(createdFile.isUsed()).isTrue();
     assertThat(createdFile.isMarkFolder()).isFalse();
+    assertThat(createdFile.getUser()).isNotNull();
 
     verify(resourceService).storeFile(
       null, PARENT_ID, NAME, NAME, NAME.getBytes(), FileOrigin.FILE);
+    verify(userService).getUser(userId);
     verify(fileRepository).save(any(FileV2.class));
     verifyZeroInteractions(fileProperties);
   }
 
   @Test
   public void testGivenMethodCallAndEmptyByteArrayByCreatingFolderReturnNewFolder() {
+  
+    String userId = "";
+    when(userService.getUser(userId)).thenReturn(new User());
 
     FileV2 returnedFolder = FileV2.builder()
       .name(NAME)
       .parentId(PARENT_ID)
       .used(true)
       .markFolder(true)
+      .user(new User())
       .build();
 
     when(fileRepository.save(any(FileV2.class))).thenReturn(returnedFolder);
 
     FileV2 createdFolder = fileService.createFileOrFolder(
-      new Session("", "", "", EMAIL, Role.ADMIN), PARENT_ID, NAME, NAME,
+      new Session("", userId, "", EMAIL, Role.ADMIN), PARENT_ID, NAME, NAME,
       new byte[] {}
     );
 
@@ -319,7 +340,9 @@ public class FileServiceImplTest {
     assertThat(createdFolder.getParentId()).isEqualTo(PARENT_ID);
     assertThat(createdFolder.isUsed()).isTrue();
     assertThat(createdFolder.isMarkFolder()).isTrue();
+    assertThat(createdFolder.getUser()).isNotNull();
 
+    verify(userService).getUser(userId);
     verify(fileRepository).save(any(FileV2.class));
     verifyZeroInteractions(resourceService, fileProperties);
   }
@@ -337,7 +360,8 @@ public class FileServiceImplTest {
     assertThat(caughtException().getMessage()).isEqualTo(
       "Invalid Role For Creating Folder");
 
-    verifyZeroInteractions(fileRepository, resourceService, fileProperties);
+    verifyZeroInteractions(
+      fileRepository, resourceService, fileProperties, userService);
   }
 
   @Test
@@ -363,7 +387,7 @@ public class FileServiceImplTest {
       ID, PARENT_ID, NAME, NAME, NAME.getBytes(), FileOrigin.FILE);
     verify(fileRepository).findOne(ID);
     verify(fileRepository).save(file);
-    verifyZeroInteractions(fileProperties);
+    verifyZeroInteractions(fileProperties, userService);
   }
 
   @Test
@@ -390,7 +414,7 @@ public class FileServiceImplTest {
     verify(fileRepository).findByIdAndParentIdAndDeletedFalse(
       folder.getId(), PARENT_ID);
     verify(fileRepository).save(folder);
-    verifyZeroInteractions(resourceService, fileProperties);
+    verifyZeroInteractions(resourceService, fileProperties, userService);
   }
 
 }

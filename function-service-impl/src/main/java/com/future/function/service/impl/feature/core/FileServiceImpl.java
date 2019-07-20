@@ -9,6 +9,7 @@ import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.repository.feature.core.FileRepositoryV2;
 import com.future.function.service.api.feature.core.FileService;
 import com.future.function.service.api.feature.core.ResourceService;
+import com.future.function.service.api.feature.core.UserService;
 import com.future.function.service.impl.helper.AuthorizationHelper;
 import com.future.function.service.impl.helper.CopyHelper;
 import com.future.function.service.impl.helper.PageHelper;
@@ -33,16 +34,19 @@ public class FileServiceImpl implements FileService {
   private final ResourceService resourceService;
 
   private final FileProperties fileProperties;
+  
+  private final UserService userService;
 
   @Autowired
   public FileServiceImpl(
     FileRepositoryV2 fileRepositoryV2, ResourceService resourceService,
-    FileProperties fileProperties
+    FileProperties fileProperties, UserService userService
   ) {
 
     this.fileRepositoryV2 = fileRepositoryV2;
     this.resourceService = resourceService;
     this.fileProperties = fileProperties;
+    this.userService = userService;
   }
 
   /**
@@ -60,7 +64,7 @@ public class FileServiceImpl implements FileService {
       .flatMap(id -> fileRepositoryV2.findByIdAndParentIdAndDeletedFalse(id, parentId))
       .orElseThrow(() -> new NotFoundException("Get File/Folder Not Found"));
   }
-
+  
   /**
    * {@inheritDoc}
    *
@@ -97,7 +101,8 @@ public class FileServiceImpl implements FileService {
 
     return Optional.of(bytes)
       .filter(b -> b.length != 0)
-      .map(b -> this.createAndSaveFile(parentId, objectName, fileName, b))
+      .map(
+        b -> this.createAndSaveFile(session, parentId, objectName, fileName, b))
       .orElseGet(() -> this.createAndSaveFolder(session, parentId, objectName));
   }
 
@@ -109,30 +114,35 @@ public class FileServiceImpl implements FileService {
       .filter(sess -> AuthorizationHelper.isRoleValidForEdit(sess.getRole(),
                                                              Role.ADMIN
       ))
-      .map(ignored -> fileRepositoryV2.save(this.buildFolder(parentId, objectName)))
+      .map(sess -> fileRepositoryV2.save(
+        this.buildFolder(parentId, objectName, sess.getUserId())))
       .orElseThrow(
         () -> new ForbiddenException("Invalid Role For Creating Folder"));
   }
 
   private FileV2 createAndSaveFile(
-    String parentId, String objectName, String fileName, byte[] bytes
+    Session session, String parentId, String objectName, String fileName, byte[] bytes
   ) {
 
     FileV2 file = resourceService.storeFile(null, parentId, objectName,
                                             fileName, bytes, FileOrigin.FILE
     );
     file.setUsed(true);
+    file.setUser(userService.getUser(session.getUserId()));
 
     return fileRepositoryV2.save(file);
   }
 
-  private FileV2 buildFolder(String parentId, String objectName) {
+  private FileV2 buildFolder(
+    String parentId, String objectName, String userId
+  ) {
 
     return FileV2.builder()
       .name(objectName)
       .parentId(parentId)
       .used(true)
       .markFolder(true)
+      .user(userService.getUser(userId))
       .build();
   }
 
