@@ -44,7 +44,8 @@ public class StudentQuizServiceImpl implements StudentQuizService {
   public Page<StudentQuiz> findAllByStudentId(String studentId, Pageable pageable, String userId) {
     return Optional.of(userId)
         .map(userService::getUser)
-            .filter(user -> AuthorizationHelper.isUserAuthorizedForAccess(user, studentId, Role.values()))
+            .filter(user -> AuthorizationHelper.isUserAuthorizedForAccess(user, studentId,
+                AuthorizationHelper.getScoringAllowedRoles()))
             .map(ignored -> studentQuizRepository.findAllByStudentIdAndDeletedFalse(studentId, pageable))
         .orElseGet(() -> PageHelper.empty(pageable));
   }
@@ -69,7 +70,8 @@ public class StudentQuizServiceImpl implements StudentQuizService {
     User user = userService.getUser(userId);
     return Optional.ofNullable(id)
         .flatMap(studentQuizRepository::findByIdAndDeletedFalse)
-            .filter(studentQuiz -> AuthorizationHelper.isUserAuthorizedForAccess(user, studentQuiz.getStudent().getId(), Role.values()))
+            .filter(studentQuiz -> AuthorizationHelper.isUserAuthorizedForAccess(user, studentQuiz.getStudent().getId(),
+                AuthorizationHelper.getScoringAllowedRoles()))
             .orElseThrow(() -> new NotFoundException("Failed at #findById #StudentQuizService"));
   }
 

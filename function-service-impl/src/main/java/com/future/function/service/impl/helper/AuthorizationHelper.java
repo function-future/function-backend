@@ -66,13 +66,11 @@ public final class AuthorizationHelper {
   }
 
   public static boolean isUserAuthorizedForAccess(User currentUser, String id, Role... allowedRoles) {
-    //TODO need unit test
     return Optional.ofNullable(currentUser)
             .filter(user -> Role.STUDENT.equals(user.getRole()))
             .map(user -> user.getId().equals(id))
             .map(returnValue -> {
-              if (!returnValue)
-                throw new ForbiddenException("User not Allowed");
+              if (!returnValue) throw new ForbiddenException("User not Allowed");
               return true;
             })
             .orElseGet(() -> isRoleValidForEdit(currentUser.getRole(), Arrays.asList(allowedRoles)));
@@ -97,6 +95,10 @@ public final class AuthorizationHelper {
       .filter(allowedRoles::contains)
       .map(ignored -> true)
       .orElseThrow(() -> new ForbiddenException("Invalid User Role"));
+  }
+
+  public static Role[] getScoringAllowedRoles() {
+    return Arrays.asList(Role.ADMIN, Role.JUDGE, Role.MENTOR).toArray(new Role[0]);
   }
 
 }

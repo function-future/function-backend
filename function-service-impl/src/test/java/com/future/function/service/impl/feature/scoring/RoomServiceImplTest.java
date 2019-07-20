@@ -84,7 +84,7 @@ public class RoomServiceImplTest {
       when(roomRepository.findAllByStudentIdAndDeletedFalse(USER_ID, pageable)).thenReturn(roomPage);
     when(commentService.findAllCommentsByRoomId(ROOM_ID, pageable)).thenReturn(PageHelper
         .toPage(Collections.singletonList(comment), pageable));
-    when(commentService.createCommentByRoom(room, comment)).thenReturn(comment);
+    when(commentService.createComment(comment)).thenReturn(comment);
   }
 
   @After
@@ -170,7 +170,7 @@ public class RoomServiceImplTest {
     assertThat(actual.getAuthor()).isEqualTo(student);
     verify(roomRepository).findByIdAndDeletedFalse(ROOM_ID);
     verify(userService, times(2)).getUser(USER_ID);
-    verify(commentService).createCommentByRoom(room, comment);
+    verify(commentService).createComment(comment);
   }
 
   @Test
@@ -190,7 +190,7 @@ public class RoomServiceImplTest {
     catchException(() -> roomService.createComment(comment, USER_ID));
     assertThat(caughtException().getClass()).isEqualTo(UnsupportedOperationException.class);
     verify(roomRepository).findByIdAndDeletedFalse(ROOM_ID);
-    verify(userService, times(2)).getUser(USER_ID);
+    verify(userService).getUser(USER_ID);
   }
 
   @Test
@@ -220,7 +220,8 @@ public class RoomServiceImplTest {
     room.setPoint(100);
     catchException(() -> roomService.giveScoreToRoomByRoomId(ROOM_ID, USER_ID, 100));
     assertThat(caughtException().getClass()).isEqualTo(ForbiddenException.class);
-    verify(userService).getUser(USER_ID);
+    verify(userService, times(2)).getUser(USER_ID);
+    verify(roomRepository).findByIdAndDeletedFalse(ROOM_ID);
   }
 
   @Test

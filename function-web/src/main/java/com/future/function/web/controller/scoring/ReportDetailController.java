@@ -2,6 +2,7 @@ package com.future.function.web.controller.scoring;
 
 import com.future.function.common.enumeration.core.Role;
 import com.future.function.service.api.feature.scoring.ReportDetailService;
+import com.future.function.service.api.feature.scoring.ReportService;
 import com.future.function.session.annotation.WithAnyRole;
 import com.future.function.session.model.Session;
 import com.future.function.web.mapper.request.scoring.ReportDetailRequestMapper;
@@ -20,34 +21,32 @@ import java.util.List;
 @RequestMapping("/api/scoring/batches/{batchCode}/final-judgings/{judgingId}/comparison")
 public class ReportDetailController {
 
-    private ReportDetailService reportDetailService;
+    private ReportService reportService;
 
     private ReportDetailRequestMapper requestMapper;
 
     @Autowired
-    public ReportDetailController(ReportDetailService reportDetailService, ReportDetailRequestMapper requestMapper) {
-        this.reportDetailService = reportDetailService;
+    public ReportDetailController(ReportService reportService, ReportDetailRequestMapper requestMapper) {
+        this.reportService = reportService;
         this.requestMapper = requestMapper;
     }
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    @WithAnyRole(roles = {Role.ADMIN, Role.JUDGE, Role.MENTOR})
     public DataResponse<List<ReportDetailWebResponse>> findComparisonByReportId(@PathVariable String judgingId,
-                                                                                Session session) {
+        @WithAnyRole(roles = {Role.ADMIN, Role.JUDGE, Role.MENTOR}) Session session) {
         return ReportDetailResponseMapper.toDataListReportDetailWebResponse(
-                reportDetailService.findAllSummaryByReportId(judgingId, session.getUserId()));
+            reportService.findAllSummaryByReportId(judgingId, session.getUserId()));
     }
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    @WithAnyRole(roles = Role.JUDGE)
     public DataResponse<List<ReportDetailWebResponse>> giveFinalScoreToStudentsByReportId(@PathVariable String judgingId,
                                                                                           @RequestBody ReportDetailScoreWebRequest request,
-                                                                                          Session session) {
+                                                                                          @WithAnyRole(roles = Role.JUDGE) Session session) {
         return ReportDetailResponseMapper.toDataListReportDetailWebResponseFromReportDetail(
                 HttpStatus.CREATED,
-                reportDetailService.giveScoreToEachStudentInDetail(
+            reportService.giveScoreToReportStudents(
                         judgingId,
                         requestMapper.toReportDetailList(request, judgingId)));
     }

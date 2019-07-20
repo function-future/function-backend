@@ -9,6 +9,7 @@ import com.future.function.service.api.feature.scoring.OptionService;
 import com.future.function.service.api.feature.scoring.QuestionBankService;
 import com.future.function.service.api.feature.scoring.QuestionService;
 import com.future.function.service.impl.helper.CopyHelper;
+import com.future.function.service.impl.helper.PageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -37,27 +38,28 @@ public class QuestionServiceImpl implements QuestionService {
   public Page<Question> findAllByQuestionBankId(String questionBankId, Pageable pageable) {
     return Optional.ofNullable(questionBankId)
         .map(id -> questionRepository.findAllByQuestionBankIdAndDeletedFalse(id, pageable))
-        .map(this::findListFromQuestionPage)
-        .orElseThrow(() -> new NotFoundException("Question Bank is not found"));
+        .map(this::setOptionsInQuestionPage)
+        .orElseGet(() -> PageHelper.empty(pageable));
   }
 
   @Override
   public List<Question> findAllByMultipleQuestionBankId(List<String> questionBankIds) {
-    List<Question> questionList = new ArrayList<>();
     return Optional.ofNullable(questionBankIds)
-        .filter(list -> !list.isEmpty())
-        .map(list -> {
-          list
-              .stream()
-              .map(questionRepository::findAllByQuestionBankIdAndDeletedFalse)
-              .forEach(questionList::addAll);
-          return questionList;
-        })
+        .map(this::findQuestionsFromQuestionBanks)
         .map(this::setOptionsForQuestions)
-        .orElse(questionList);
+        .orElseGet(ArrayList::new);
   }
 
-  private Page<Question> findListFromQuestionPage(Page<Question> page) {
+  private List<Question> findQuestionsFromQuestionBanks(List<String> list) {
+    List<Question> questionList = new ArrayList<>();
+    list
+        .stream()
+        .map(questionRepository::findAllByQuestionBankIdAndDeletedFalse)
+        .forEach(questionList::addAll);
+    return questionList;
+  }
+
+  private Page<Question> setOptionsInQuestionPage(Page<Question> page) {
     page.getContent()
         .forEach(this::searchOptionsForQuestion);
     return page;
@@ -70,11 +72,7 @@ public class QuestionServiceImpl implements QuestionService {
   }
 
   private Question searchOptionsForQuestion(Question question) {
-    question.setOptions(
-        optionService
-            .getOptionListByQuestionId(question.getId()
-            )
-    );
+    question.setOptions(optionService.getOptionListByQuestionId(question.getId()));
     return question;
   }
 
@@ -83,22 +81,34 @@ public class QuestionServiceImpl implements QuestionService {
     return Optional.ofNullable(id)
         .flatMap(questionRepository::findByIdAndDeletedFalse)
         .map(this::searchOptionsForQuestion)
-        .orElseThrow(() -> new NotFoundException("Question not found"));
+        .orElseThrow(() -> new NotFoundException("Failed at #findById #QuestionService"));
   }
 
   @Override
   public Question createQuestion(Question question, String questionBankId) {
-    question.setQuestionBank(getQuestionBank(questionBankId));
     List<Option> options = question.getOptions();
-    saveOptionList(question, options, true);
-    question.setOptions(null);
-    question = questionRepository.save(question);
-    question.setOptions(options);
-    return question;
+    return Optional.ofNullable(questionBankId)
+        .map(questionBankService::findById)
+        .map(questionBank -> setQuestionBank(question, questionBank))
+        .map(currentQuestion -> saveOptionsAndSetNullOptionsForQuestion(options, currentQuestion, true))
+        .map(questionRepository::save)
+        .map(currentQuestion -> setOptionForCurrentQuestion(currentQuestion, options))
+        .orElseThrow(() -> new UnsupportedOperationException("Failed at #createQuestion #QuestionService"));
   }
 
-  private QuestionBank getQuestionBank(String questionBankId) {
-    return questionBankService.findById(questionBankId);
+  private Question saveOptionsAndSetNullOptionsForQuestion(List<Option> optionList, Question currentQuestion, boolean createOption) {
+    saveOptionList(currentQuestion, optionList, createOption);
+    return setOptionForCurrentQuestion(currentQuestion, null);
+  }
+
+  private Question setOptionForCurrentQuestion(Question currentQuestion, List<Option> o) {
+    currentQuestion.setOptions(o);
+    return currentQuestion;
+  }
+
+  private Question setQuestionBank(Question question, QuestionBank questionBank) {
+    question.setQuestionBank(questionBank);
+    return question;
   }
 
   private void saveOptionList(Question question, List<Option> options, boolean isCreate) {
@@ -113,21 +123,21 @@ public class QuestionServiceImpl implements QuestionService {
 
   @Override
   public Question updateQuestion(Question question, String questionBankId) {
-    question.setQuestionBank(getQuestionBank(questionBankId));
     List<Option> options = question.getOptions();
-    saveOptionList(question, options, false);
-    return Optional.of(question)
+    return Optional.ofNullable(questionBankId)
+        .map(questionBankService::findById)
+        .map(questionBank -> setQuestionBank(question, questionBank))
+        .map(currentQuestion -> saveOptionsAndSetNullOptionsForQuestion(options, currentQuestion, false))
         .map(Question::getId)
         .flatMap(questionRepository::findByIdAndDeletedFalse)
-        .map(foundQuestion -> convertAndSaveQuestion(question, options, foundQuestion))
+        .map(foundQuestion -> copyPropertiesOfQuestionRequest(question, foundQuestion))
+        .map(questionRepository::save)
+        .map(currentQuestion -> setOptionForCurrentQuestion(currentQuestion, options))
         .orElse(question);
   }
 
-  private Question convertAndSaveQuestion(Question question, List<Option> options, Question foundQuestion) {
+  private Question copyPropertiesOfQuestionRequest(Question question, Question foundQuestion) {
     CopyHelper.copyProperties(question, foundQuestion);
-    foundQuestion.setOptions(null);
-    foundQuestion = questionRepository.save(foundQuestion);
-    foundQuestion.setOptions(options);
     return foundQuestion;
   }
 
@@ -135,11 +145,13 @@ public class QuestionServiceImpl implements QuestionService {
   public void deleteById(String id) {
     Optional.of(id)
         .flatMap(questionRepository::findByIdAndDeletedFalse)
-        .ifPresent(question -> {
-          deleteAllOptionRelatedToQuestion(question);
-          question.setDeleted(true);
-          questionRepository.save(question);
-        });
+        .ifPresent(this::setDeletedAndSaveQuestion);
+  }
+
+  private void setDeletedAndSaveQuestion(Question question) {
+    deleteAllOptionRelatedToQuestion(question);
+    question.setDeleted(true);
+    questionRepository.save(question);
   }
 
   private void deleteAllOptionRelatedToQuestion(Question question) {

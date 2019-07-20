@@ -121,8 +121,9 @@ public class QuizServiceImpl implements QuizService {
   public Quiz updateQuiz(Quiz request) {
     return Optional.ofNullable(request)
         .map(Quiz::getId)
-            .flatMap(quizRepository::findByIdAndDeletedFalse)
-            .map(quiz -> copyRequestedQuizAttributes(request, quiz))
+        .flatMap(quizRepository::findByIdAndDeletedFalse)
+        .map(quiz -> copyRequestedQuizAttributes(request, quiz))
+        .map(this::setBatchAndQuestionBank)
         .map(quizRepository::save)
         .orElse(request);
   }

@@ -45,12 +45,11 @@ public class AssignmentController {
    */
   @ResponseStatus(value = HttpStatus.OK)
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-  @WithAnyRole(roles = {Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT})
   public PagingResponse<AssignmentWebResponse> findAllAssignment(
           @PathVariable String batchCode,
           @RequestParam(defaultValue = "1") int page,
           @RequestParam(defaultValue = "10") int size,
-          Session session) {
+          @WithAnyRole(roles = {Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT}) Session session) {
     return AssignmentResponseMapper
         .toAssignmentsPagingResponse(
             assignmentService.findAllByBatchCodeAndPageable(batchCode, PageHelper.toPageable(page, size)));
@@ -64,8 +63,8 @@ public class AssignmentController {
    */
   @ResponseStatus(value = HttpStatus.OK)
   @GetMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-  @WithAnyRole(roles = {Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT})
-  public DataResponse<AssignmentWebResponse> findAssignmentById(@PathVariable String id, Session session) {
+  public DataResponse<AssignmentWebResponse> findAssignmentById(@PathVariable String id,
+      @WithAnyRole(roles = {Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT})Session session) {
     return AssignmentResponseMapper.toAssignmentDataResponse(assignmentService.findById(id));
   }
 
@@ -78,9 +77,9 @@ public class AssignmentController {
    */
   @ResponseStatus(value = HttpStatus.CREATED)
   @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-  @WithAnyRole(roles = Role.ADMIN)
   public DataResponse<AssignmentWebResponse> createAssignment(@PathVariable String batchCode,
-                                                              @RequestBody AssignmentWebRequest data, Session session) {
+                                                              @RequestBody AssignmentWebRequest data,
+                                                              @WithAnyRole(roles = Role.ADMIN) Session session) {
     return AssignmentResponseMapper
         .toAssignmentDataResponse(HttpStatus.CREATED, assignmentService
                 .createAssignment(assignmentRequestMapper.toAssignment(data, batchCode)));
@@ -88,9 +87,8 @@ public class AssignmentController {
 
   @ResponseStatus(value = HttpStatus.CREATED)
   @PostMapping(path = "/copy", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-  @WithAnyRole(roles = Role.ADMIN)
   public DataResponse<AssignmentWebResponse> copyAssignment(@RequestBody CopyAssignmentWebRequest request,
-      Session session) {
+    @WithAnyRole(roles = Role.ADMIN) Session session) {
     return AssignmentResponseMapper
         .toAssignmentDataResponse(HttpStatus.CREATED, assignmentService
                 .copyAssignment(request.getAssignmentId(), request.getBatchId()));
@@ -104,9 +102,9 @@ public class AssignmentController {
    */
   @ResponseStatus(value = HttpStatus.OK)
   @PutMapping(path = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-  @WithAnyRole(roles = Role.ADMIN)
   public DataResponse<AssignmentWebResponse> updateAssignment(@PathVariable String batchCode, @PathVariable String id,
-                                                              @RequestBody AssignmentWebRequest data, Session session) {
+                                                              @RequestBody AssignmentWebRequest data,
+                                                              @WithAnyRole(roles = Role.ADMIN) Session session) {
     return AssignmentResponseMapper.toAssignmentDataResponse(assignmentService
             .updateAssignment(assignmentRequestMapper.toAssignmentWithId(id, data, batchCode)));
   }
@@ -119,8 +117,7 @@ public class AssignmentController {
    */
   @ResponseStatus(value = HttpStatus.OK)
   @DeleteMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-  @WithAnyRole(roles = Role.ADMIN)
-  public BaseResponse deleteAssignmentById(@PathVariable String id, Session session) {
+  public BaseResponse deleteAssignmentById(@PathVariable String id, @WithAnyRole(roles = Role.ADMIN) Session session) {
     assignmentService.deleteById(id);
     return ResponseHelper.toBaseResponse(HttpStatus.OK);
   }

@@ -241,7 +241,6 @@ public class AssignmentServiceImplTest {
   }
 
   @Test
-  @Ignore
   public void testUpdateAssignmentNoFileOnRequestSuccess() {
     //TODO bug when the request file is nulls
     Assignment assignmentWithNoFile = new Assignment();
