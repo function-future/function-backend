@@ -90,6 +90,8 @@ public interface FieldName {
     public static final String AS_RESOURCE = "asResource";
 
     public static final String VERSIONS = "versions";
+    
+    public static final String USER = "user";
 
   }
 

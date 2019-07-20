@@ -66,4 +66,7 @@ public class FileV2 extends BaseEntity {
   @Builder.Default
   private Map<Long, Version> versions = new LinkedHashMap<>();
   
+  @Field(FieldName.File.USER)
+  private User user;
+  
 }
