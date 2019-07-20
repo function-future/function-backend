@@ -1,8 +1,10 @@
 package com.future.function.web.mapper.response.core;
 
 import com.future.function.model.entity.feature.core.FileV2;
+import com.future.function.model.entity.feature.core.User;
 import com.future.function.model.entity.feature.core.embedded.Version;
 import com.future.function.web.mapper.helper.PageHelper;
+import com.future.function.web.mapper.response.core.embedded.AuthorWebResponseMapper;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.feature.core.FileWebResponse;
@@ -37,6 +39,11 @@ public class FileResponseMapperTest {
   private static final Map<Long, Version> VERSIONS = Collections.singletonMap(
     1L, new Version(0L, FILE_PATH, FILE_URL));
   
+  private static final User USER = User.builder()
+          .id("user-id")
+          .name("name")
+          .build();
+  
   private static final FileV2 FILE = FileV2.builder()
     .id(FILE_ID)
     .name(NAME)
@@ -47,6 +54,7 @@ public class FileResponseMapperTest {
     .markFolder(false)
     .versions(VERSIONS)
     .parentId(PARENT_ID)
+    .user(USER)
     .build();
   
   private static final FileV2 FOLDER = FileV2.builder()
@@ -74,6 +82,7 @@ public class FileResponseMapperTest {
       .parentId(PARENT_ID)
       .versions(
         Collections.singletonMap(1L, new VersionWebResponse(0L, FILE_URL)))
+      .author(AuthorWebResponseMapper.buildAuthorWebResponse(USER))
       .build();
   
   private static final PageRequest PAGEABLE = new PageRequest(0, 5);

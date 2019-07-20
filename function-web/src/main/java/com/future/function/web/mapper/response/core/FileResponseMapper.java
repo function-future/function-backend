@@ -5,10 +5,12 @@ import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.embedded.Version;
 import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
+import com.future.function.web.mapper.response.core.embedded.AuthorWebResponseMapper;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.feature.core.FileWebResponse;
 import com.future.function.web.model.response.feature.core.embedded.VersionWebResponse;
+import com.future.function.web.model.response.feature.embedded.AuthorWebResponse;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -72,7 +74,15 @@ public final class FileResponseMapper {
       .versions(
         FileResponseMapper.toFileWebResponseVersions(file.getVersions()))
       .file(FileResponseMapper.getFileUrl(file))
+      .author(toAuthorWebResponse(file))
       .build();
+  }
+  
+  private static AuthorWebResponse toAuthorWebResponse(FileV2 file) {
+    
+    return Optional.ofNullable(file.getUser())
+      .map(AuthorWebResponseMapper::buildAuthorWebResponse)
+      .orElse(null);
   }
   
   private static Map<Long, VersionWebResponse> toFileWebResponseVersions(
@@ -114,6 +124,7 @@ public final class FileResponseMapper {
       .versions(
         FileResponseMapper.toFileWebResponseVersions(file.getVersions()))
       .file(FileResponseMapper.getThumbnailUrl(file))
+      .author(toAuthorWebResponse(file))
       .build();
   }
   

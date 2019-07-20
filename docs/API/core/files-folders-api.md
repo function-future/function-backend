@@ -27,13 +27,21 @@ returned; if none found, return empty list.
                     "id": "id",
                     "type": "FOLDER",
                     "name": "Name 1",
-                    "parentId": "parent-id"
+                    "parentId": "parent-id",
+                    "author": {
+                        "id": "sample-id",
+                        "name": "name"
+                    }
                 },
                 {
                     "id": "id",
                     "type": "FOLDER",
                     "name": "Name 2",
-                    "parentId": "parent-id"
+                    "parentId": "parent-id",
+                    "author": {
+                        "id": "smaple-id",
+                        "name": "name"
+                    }
                 },
                 {
                     "id": "id",
@@ -50,7 +58,11 @@ returned; if none found, return empty list.
                             "url": "https://www.google.com/images/branding/googlelogo/2x/googlelogo_light_color_272x92dp.png"
                         }
                     },
-                    "parentId": "parent-id"
+                    "parentId": "parent-id"",
+                    "author": {
+                       "id": "smaple-id",
+                       "name": "name"
+                    }
                 }
             ]
         }
@@ -97,7 +109,11 @@ response is returned.
                         "url": "https://www.google.com/images/branding/googlelogo/2x/googlelogo_light_color_272x92dp.png"
                     }
                 },
-                "parentId": "parent-id"
+                "parentId": "parent-id"",
+                "author": {
+                    "id": "smaple-id",
+                    "name": "name"
+                }
             }
         }
 
@@ -164,7 +180,11 @@ otherwise 401 response is returned; if available; otherwise 404 response is retu
                         "url": "https://www.google.com/images/branding/googlelogo/2x/googlelogo_light_color_272x92dp.png"
                     }
                 },
-                "parentId": "parent-id"
+                "parentId": "parent-id"",
+                "author": {
+                    "id": "smaple-id",
+                    "name": "name"
+                }
             }
         }
 
@@ -221,7 +241,11 @@ response is returned; if available; otherwise 404 response is returned. Paramete
                         "url": "https://www.google.com/images/branding/googlelogo/2x/googlelogo_light_color_272x92dp.png"
                     }
                 },
-                "parentId": "parent-id"
+                "parentId": "parent-id"",
+                "author": {
+                    "id": "smaple-id",
+                    "name": "name"
+                }
             }
         }
 
