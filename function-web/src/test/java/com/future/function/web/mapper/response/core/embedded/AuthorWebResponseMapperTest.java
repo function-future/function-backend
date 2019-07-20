@@ -1,7 +1,7 @@
 package com.future.function.web.mapper.response.core.embedded;
 
 import com.future.function.model.entity.feature.core.User;
-import com.future.function.web.model.response.feature.core.embedded.AuthorWebResponse;
+import com.future.function.web.model.response.feature.embedded.AuthorWebResponse;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
