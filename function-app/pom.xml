@@ -36,6 +36,13 @@
 
     <dependency>
       <groupId>com.future.function</groupId>
+      <artifactId>function-service-api</artifactId>
+      <version>${project.version}</version>
+      <optional>true</optional>
+    </dependency>
+
+    <dependency>
+      <groupId>com.future.function</groupId>
       <artifactId>function-service-impl</artifactId>
       <version>${project.version}</version>
       <optional>true</optional>
@@ -69,6 +76,12 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-security</artifactId>
+      <optional>true</optional>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
       <optional>true</optional>
     </dependency>
 
