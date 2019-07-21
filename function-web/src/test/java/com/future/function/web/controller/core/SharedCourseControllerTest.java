@@ -2,19 +2,25 @@ package com.future.function.web.controller.core;
 
 import com.future.function.common.enumeration.core.Role;
 import com.future.function.model.entity.feature.core.Course;
+import com.future.function.model.entity.feature.core.Discussion;
 import com.future.function.model.entity.feature.core.FileV2;
+import com.future.function.model.entity.feature.core.User;
 import com.future.function.service.api.feature.core.SharedCourseService;
 import com.future.function.web.TestHelper;
 import com.future.function.web.TestSecurityConfiguration;
 import com.future.function.web.mapper.helper.ResponseHelper;
+import com.future.function.web.mapper.request.core.DiscussionRequestMapper;
 import com.future.function.web.mapper.request.core.SharedCourseRequestMapper;
 import com.future.function.web.mapper.response.core.CourseResponseMapper;
+import com.future.function.web.mapper.response.core.DiscussionResponseMapper;
 import com.future.function.web.model.request.core.CourseWebRequest;
+import com.future.function.web.model.request.core.DiscussionWebRequest;
 import com.future.function.web.model.request.core.SharedCourseWebRequest;
 import com.future.function.web.model.response.base.BaseResponse;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.feature.core.CourseWebResponse;
+import com.future.function.web.model.response.feature.core.DiscussionWebResponse;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -126,10 +132,38 @@ public class SharedCourseControllerTest extends TestHelper {
       .courses(COURSE_IDS)
       .build();
   
+  private static final String ID = "id";
+  
+  private static final String COMMENT = "text";
+  
+  private static final String USER_ID = "user-id";
+  
+  private static final String NAME = "name";
+  
+  private static final DiscussionWebRequest DISCUSSION_WEB_REQUEST =
+    DiscussionWebRequest.builder()
+      .comment(COMMENT)
+      .build();
+  
+  private static final long CREATED_AT = 1L;
+  
+  private Discussion discussionFromRequest;
+  
+  private Discussion discussion;
+  
+  private Page<Discussion> discussions;
+  
+  private DataResponse<DiscussionWebResponse> discussionWebResponseDataResponse;
+  
+  private PagingResponse<DiscussionWebResponse>
+    discussionWebResponsePagingResponse;
+  
   private JacksonTester<CourseWebRequest> courseWebRequestJacksonTester;
   
   private JacksonTester<SharedCourseWebRequest>
     sharedCourseWebRequestJacksonTester;
+  
+  private JacksonTester<DiscussionWebRequest> discussionWebRequestJacksonTester;
   
   @MockBean
   private SharedCourseService sharedCourseService;
@@ -137,12 +171,50 @@ public class SharedCourseControllerTest extends TestHelper {
   @MockBean
   private SharedCourseRequestMapper sharedCourseRequestMapper;
   
+  @MockBean
+  private DiscussionRequestMapper discussionRequestMapper;
+  
   @Override
   @Before
   public void setUp() {
     
+    discussionFromRequest = Discussion.builder()
+      .id(ID)
+      .courseId(COURSE_ID)
+      .batchCode(BATCH_CODE)
+      .description(COMMENT)
+      .user(this.buildUser(null, null))
+      .build();
+    
+    discussion = Discussion.builder()
+      .id(ID)
+      .courseId(COURSE_ID)
+      .batchCode(BATCH_CODE)
+      .description(COMMENT)
+      .user(this.buildUser(USER_ID, NAME))
+      .build();
+    discussion.setCreatedAt(CREATED_AT);
+    
+    discussions = new PageImpl<>(
+      Collections.singletonList(discussion), PAGEABLE, 1);
+    
+    discussionWebResponseDataResponse =
+      DiscussionResponseMapper.toDiscussionDataResponse(discussion);
+    
+    discussionWebResponsePagingResponse =
+      DiscussionResponseMapper.toDiscussionPagingResponse(discussions);
+    
     super.setUp();
     super.setCookie(Role.JUDGE);
+  }
+  
+  private User buildUser(String id, String name) {
+    
+    return User.builder()
+      .id(id)
+      .email(JUDGE_EMAIL)
+      .name(name)
+      .build();
   }
   
   @After
@@ -267,6 +339,56 @@ public class SharedCourseControllerTest extends TestHelper {
                                                      ORIGIN_BATCH_CODE,
                                                      BATCH_CODE
     );
+  }
+  
+  @Test
+  public void testGivenApiCallByGettingDiscussionsReturnPagingResponseObject()
+    throws Exception {
+    
+    when(sharedCourseService.getDiscussions(JUDGE_EMAIL, COURSE_ID, BATCH_CODE,
+                                            PAGEABLE
+    )).thenReturn(discussions);
+    
+    mockMvc.perform(get(
+      "/api/core/batches/" + BATCH_CODE + "/courses/" + COURSE_ID +
+      "/discussions").param("size", "5")
+                      .cookie(cookies))
+      .andExpect(status().isOk())
+      .andExpect(content().json(
+        pagingResponseJacksonTester.write(discussionWebResponsePagingResponse)
+          .getJson()));
+    
+    verify(sharedCourseService).getDiscussions(
+      JUDGE_EMAIL, COURSE_ID, BATCH_CODE, PAGEABLE);
+  }
+  
+  @Test
+  public void testGivenApiCallByCreatingDiscussionReturnDataResponseObject()
+    throws Exception {
+    
+    when(
+      discussionRequestMapper.toDiscussion(DISCUSSION_WEB_REQUEST, JUDGE_EMAIL,
+                                           COURSE_ID, BATCH_CODE
+      )).thenReturn(discussionFromRequest);
+    when(
+      sharedCourseService.createDiscussion(discussionFromRequest)).thenReturn(
+      discussion);
+    
+    mockMvc.perform(post(
+      "/api/core/batches/" + BATCH_CODE + "/courses/" + COURSE_ID +
+      "/discussions").cookie(cookies)
+                      .contentType(MediaType.APPLICATION_JSON)
+                      .content(discussionWebRequestJacksonTester.write(
+                        DISCUSSION_WEB_REQUEST)
+                                 .getJson()))
+      .andExpect(status().isCreated())
+      .andExpect(content().json(
+        dataResponseJacksonTester.write(discussionWebResponseDataResponse)
+          .getJson()));
+    
+    verify(discussionRequestMapper).toDiscussion(
+      DISCUSSION_WEB_REQUEST, JUDGE_EMAIL, COURSE_ID, BATCH_CODE);
+    verify(sharedCourseService).createDiscussion(discussionFromRequest);
   }
   
 }

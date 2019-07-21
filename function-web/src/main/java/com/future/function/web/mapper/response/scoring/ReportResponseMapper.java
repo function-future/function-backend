@@ -42,6 +42,7 @@ public class ReportResponseMapper {
             .batchCode(value.getBatch().getCode())
             .studentCount(value.getStudentIds().size())
             .uploadedDate(value.getCreatedAt())
+            .studentIds(value.getStudentIds())
             .build())
         .orElseThrow(() -> new UnsupportedOperationException("Failed at #buildReportWebResponse #ReportResponseMapper"));
   }

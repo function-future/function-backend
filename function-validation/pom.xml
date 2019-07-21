@@ -16,23 +16,26 @@
     <dependency>
       <groupId>com.future.function</groupId>
       <artifactId>function-common</artifactId>
-      <version>${project.parent.version}</version>
+      <version>${project.version}</version>
     </dependency>
 
     <dependency>
       <groupId>com.future.function</groupId>
       <artifactId>function-repository</artifactId>
-      <version>${project.parent.version}</version>
+      <version>${project.version}</version>
+      <optional>true</optional>
     </dependency>
 
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
+      <optional>true</optional>
     </dependency>
 
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
+      <optional>true</optional>
     </dependency>
 
     <dependency>

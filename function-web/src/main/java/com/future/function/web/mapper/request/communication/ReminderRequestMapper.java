@@ -39,7 +39,7 @@ public class ReminderRequestMapper {
                     .collect(Collectors.toList()) : null)
             .monthlyDate(request.getMonthlyDate())
             .hour(request.getHour())
-            .minute(request.getHour())
+            .minute(request.getMinute())
             .members(request.getMembers().stream()
                     .map(member -> User.builder().id(member).build())
                     .collect(Collectors.toList()))

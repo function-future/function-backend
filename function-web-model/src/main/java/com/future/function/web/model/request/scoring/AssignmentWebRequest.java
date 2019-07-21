@@ -22,8 +22,6 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AssignmentWebRequest {
 
-  private String id;
-
   @NotBlank(message = "NotBlank")
   private String title;
 

@@ -70,22 +70,29 @@ public class BatchCodesMustBeDistinctValidatorTest {
   }
   
   @Test
-  public void testGivenNullValueForEitherOriginBatchOrTargetBatchByValidatingBatchCodesMustBeDistinctReturnFalse() {
+  public void testGivenNullValueForOriginBatchByValidatingBatchCodesMustBeDistinctReturnTrue() {
   
     when(sharedCourseData.getOriginBatch()).thenReturn(null);
     when(sharedCourseData.getTargetBatch()).thenReturn(TARGET_BATCH);
   
-    assertThat(validator.isValid(sharedCourseData, null)).isFalse();
+    assertThat(validator.isValid(sharedCourseData, null)).isTrue();
+  
+    verify(sharedCourseData).getOriginBatch();
+    verify(sharedCourseData).getTargetBatch();
   
     verifyZeroInteractions(annotation);
+  }
+  
+  @Test
+  public void testGivenNullValueForTargetBatchByValidatingBatchCodesMustBeDistinctReturnFalse() {
   
     when(sharedCourseData.getOriginBatch()).thenReturn(ORIGIN_BATCH);
     when(sharedCourseData.getTargetBatch()).thenReturn(null);
   
     assertThat(validator.isValid(sharedCourseData, null)).isFalse();
   
-    verify(sharedCourseData, times(2)).getOriginBatch();
-    verify(sharedCourseData, times(2)).getTargetBatch();
+    verify(sharedCourseData).getOriginBatch();
+    verify(sharedCourseData).getTargetBatch();
   
     verifyZeroInteractions(annotation);
   }

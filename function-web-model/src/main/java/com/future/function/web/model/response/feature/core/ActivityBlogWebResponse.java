@@ -26,6 +26,8 @@ public class ActivityBlogWebResponse {
   
   private List<EmbeddedFileWebResponse> files;
   
+  private long updatedAt;
+  
   private AuthorWebResponse author;
   
 }

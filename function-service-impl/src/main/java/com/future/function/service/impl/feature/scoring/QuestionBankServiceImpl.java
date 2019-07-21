@@ -5,7 +5,6 @@ import com.future.function.model.entity.feature.scoring.QuestionBank;
 import com.future.function.repository.feature.scoring.QuestionBankRepository;
 import com.future.function.service.api.feature.scoring.QuestionBankService;
 import com.future.function.service.impl.helper.CopyHelper;
-import com.future.function.service.impl.helper.PageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,9 +24,7 @@ public class QuestionBankServiceImpl implements QuestionBankService {
 
   @Override
   public Page<QuestionBank> findAllByPageable(Pageable pageable) {
-    return Optional.ofNullable(pageable)
-        .map(questionBankRepository::findAllByDeletedFalse)
-        .orElseGet(() -> PageHelper.empty(pageable));
+      return questionBankRepository.findAllByDeletedFalse(pageable);
   }
 
   @Override

@@ -7,6 +7,9 @@ import com.future.function.service.api.feature.communication.NotificationService
 import com.future.function.service.api.feature.communication.ReminderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
@@ -35,7 +38,7 @@ public class ReminderScheduler {
 
   @Scheduled(fixedDelayString = "#{@reminderProperties.schedulerPeriod}")
   public void createNotificationBasedOnReminder() {
-    LocalDateTime timeNow = LocalDateTime.now();
+    LocalDateTime timeNow = Instant.now().atZone(ZoneId.of("Asia/Jakarta")).toLocalDateTime();
     reminderService.getAllReminder().forEach(reminder -> generateNotificationIfNecessary(reminder, timeNow));
   }
 
@@ -97,17 +100,17 @@ public class ReminderScheduler {
       return null;
     }
     Instant instant = Instant.ofEpochMilli(millis);
-    return instant.atZone(ZoneId.systemDefault()).toLocalDateTime();
+    return instant.atZone(ZoneId.of("Asia/Jakarta")).toLocalDateTime();
   }
 
   private void sendNotifications(Reminder reminder) {
-    reminder.getMembers().forEach(member -> {
-      notificationService.createNotification(Notification.builder()
-              .content(reminder.getContent())
-              .title(reminder.getTitle())
-              .member(member)
-              .build());
-    });
+    Authentication auth = new UsernamePasswordAuthenticationToken("system", "system");
+    SecurityContextHolder.getContext().setAuthentication(auth);
+    reminder.getMembers().forEach(member -> notificationService.createNotification(Notification.builder()
+            .content(reminder.getContent())
+            .title(reminder.getTitle())
+            .member(member)
+            .build()));
     reminder.setLastReminderSent(Instant.now().toEpochMilli());
     reminderService.updateReminder(reminder);
   }

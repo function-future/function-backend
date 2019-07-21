@@ -24,11 +24,10 @@ public class StudentRoomController {
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    @WithAnyRole(roles = {Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT})
     public PagingResponse<RoomWebResponse> findAllRoomsByStudentId(@PathVariable String studentId,
                                                                    @RequestParam(defaultValue = "1") int page,
                                                                    @RequestParam(defaultValue = "10") int size,
-                                                                   Session session) {
+        @WithAnyRole(roles = {Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT}) Session session) {
         return RoomResponseMapper.toPagingRoomWebResponse(
                 assignmentService.findAllRoomsByStudentId(studentId, PageHelper.toPageable(page, size), session.getUserId()));
     }

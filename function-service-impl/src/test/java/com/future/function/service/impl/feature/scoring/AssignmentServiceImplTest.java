@@ -13,7 +13,6 @@ import com.future.function.service.impl.helper.CopyHelper;
 import com.future.function.service.impl.helper.PageHelper;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -242,7 +241,6 @@ public class AssignmentServiceImplTest {
 
   @Test
   public void testUpdateAssignmentNoFileOnRequestSuccess() {
-    //TODO bug when the request file is nulls
     Assignment assignmentWithNoFile = new Assignment();
     CopyHelper.copyProperties(assignment, assignmentWithNoFile);
     assignmentWithNoFile.setId(ASSIGNMENT_ID);

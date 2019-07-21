@@ -49,7 +49,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(value = FileController.class)
 public class FileControllerTest extends TestHelper {
   
-  public static final PageRequest PAGEABLE = new PageRequest(0, 10);
+  private static final PageRequest PAGEABLE = new PageRequest(0, 10);
   
   private static final String PARENT_ID = "parent-id";
   
