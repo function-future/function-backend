@@ -14,9 +14,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 
-import java.time.Instant;
-import java.time.ZoneId;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -28,6 +27,7 @@ public class ReportResponseMapperTest {
   private static final String DESCRIPTION = "final description";
     private static final String BATCH_CODE = "batch-code";
   private static final String STUDENT_ID = "student-id";
+  private static final Long CREATED_AT = new Date().getTime();
 
   private Report report;
     private Batch batch;
@@ -51,6 +51,8 @@ public class ReportResponseMapperTest {
         .description(DESCRIPTION)
         .studentIds(studentIds)
         .build();
+
+    report.setCreatedAt(CREATED_AT);
 
     pageable = new PageRequest(0, 10);
 
