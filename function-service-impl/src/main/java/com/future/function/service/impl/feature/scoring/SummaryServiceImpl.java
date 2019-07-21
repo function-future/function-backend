@@ -1,7 +1,5 @@
 package com.future.function.service.impl.feature.scoring;
 
-import com.future.function.common.enumeration.core.Role;
-import com.future.function.common.exception.ForbiddenException;
 import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.model.entity.feature.scoring.Room;
@@ -14,8 +12,6 @@ import com.future.function.service.api.feature.scoring.RoomService;
 import com.future.function.service.api.feature.scoring.StudentQuizService;
 import com.future.function.service.api.feature.scoring.SummaryService;
 import com.future.function.service.impl.helper.AuthorizationHelper;
-import java.lang.reflect.Array;
-import java.util.Collections;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
@@ -63,7 +59,7 @@ public class SummaryServiceImpl implements SummaryService {
     }
 
     private Pair<User, List<SummaryVO>> getAllSummaryFromAssignmentAndQuiz(User user) {
-        return Optional.ofNullable(new ArrayList<SummaryVO>())
+        return Optional.of(new ArrayList<SummaryVO>())
             .map(summaryList -> getStudentRooms(user, summaryList))
             .map(summaryList -> getStudentQuizzes(user, summaryList))
             .map(summaryList -> Pair.of(user, summaryList))
