@@ -22,7 +22,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -114,8 +116,12 @@ public class FileServiceImpl implements FileService {
       .filter(sess -> AuthorizationHelper.isRoleValidForEdit(sess.getRole(),
                                                              Role.ADMIN
       ))
-      .map(sess -> fileRepositoryV2.save(
-        this.buildFolder(parentId, objectName, sess.getUserId())))
+      .map(sess -> this.buildFolder(parentId, objectName, sess.getUserId()))
+      .map(file -> {
+        file.setPaths(this.getPathsForFileOrFolder(file));
+        return file;
+      })
+      .map(fileRepositoryV2::save)
       .orElseThrow(
         () -> new ForbiddenException("Invalid Role For Creating Folder"));
   }
@@ -129,8 +135,28 @@ public class FileServiceImpl implements FileService {
     );
     file.setUsed(true);
     file.setUser(userService.getUser(session.getUserId()));
+    file.setPaths(this.getPathsForFileOrFolder(file));
 
     return fileRepositoryV2.save(file);
+  }
+  
+  private List<String> getPathsForFileOrFolder(FileV2 fileOrFolder) {
+  
+    if (Objects.isNull(fileOrFolder)) {
+      return new LinkedList<>();
+    }
+  
+    String parentId = Optional.ofNullable(fileOrFolder.getParentId())
+      .orElse("");
+    FileV2 parentOfFileOrFolder = fileRepositoryV2.findByIdAndDeletedFalse(
+      parentId)
+      .orElse(null);
+  
+    List<String> pathsForFileOrFolder = this.getPathsForFileOrFolder(
+      parentOfFileOrFolder);
+    pathsForFileOrFolder.add(parentId);
+  
+    return pathsForFileOrFolder;
   }
 
   private FileV2 buildFolder(

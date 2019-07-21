@@ -291,6 +291,10 @@ public class FileServiceImplTest {
       .used(true)
       .user(new User())
       .build();
+  
+    when(fileRepository.findByIdAndDeletedFalse(PARENT_ID)).thenReturn(
+      Optional.empty());
+    
     when(fileRepository.save(any(FileV2.class))).thenReturn(savedFile);
 
     FileV2 createdFile = fileService.createFileOrFolder(
@@ -309,6 +313,7 @@ public class FileServiceImplTest {
     verify(resourceService).storeFile(
       null, PARENT_ID, NAME, NAME, NAME.getBytes(), FileOrigin.FILE);
     verify(userService).getUser(userId);
+    verify(fileRepository).findByIdAndDeletedFalse(PARENT_ID);
     verify(fileRepository).save(any(FileV2.class));
     verifyZeroInteractions(fileProperties);
   }
@@ -326,6 +331,9 @@ public class FileServiceImplTest {
       .markFolder(true)
       .user(new User())
       .build();
+  
+    when(fileRepository.findByIdAndDeletedFalse(PARENT_ID)).thenReturn(
+      Optional.empty());
 
     when(fileRepository.save(any(FileV2.class))).thenReturn(returnedFolder);
 
@@ -343,6 +351,7 @@ public class FileServiceImplTest {
     assertThat(createdFolder.getUser()).isNotNull();
 
     verify(userService).getUser(userId);
+    verify(fileRepository).findByIdAndDeletedFalse(PARENT_ID);
     verify(fileRepository).save(any(FileV2.class));
     verifyZeroInteractions(resourceService, fileProperties);
   }
