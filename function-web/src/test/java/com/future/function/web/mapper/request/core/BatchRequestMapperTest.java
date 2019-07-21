@@ -19,17 +19,17 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class BatchRequestMapperTest {
   
-  public static final String NAME = "name";
+  private static final String NAME = "name";
   
-  public static final String CODE = "code";
+  private static final String CODE = "code";
+  
+  private static final String ID = "id";
   
   @Mock
   private RequestValidator validator;
   
   @InjectMocks
   private BatchRequestMapper batchRequestMapper;
-  
-  public static final String ID = "id";
   
   @Before
   public void setUp() {}

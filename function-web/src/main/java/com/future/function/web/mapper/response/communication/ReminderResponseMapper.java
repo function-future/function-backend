@@ -35,7 +35,7 @@ public class ReminderResponseMapper {
                     .map(DayOfWeek::name)
                     .collect(Collectors.toList()) : null)
             .memberCount(reminder.getMembers().size())
-            .time(reminder.getHour().toString() + ":" + reminder.getMinute().toString())
+            .time(timeToString(reminder.getHour(), reminder.getMinute()))
             .build();
   }
 
@@ -49,11 +49,15 @@ public class ReminderResponseMapper {
             .repeatDays(reminder.getDays() != null ? reminder.getDays().stream()
                     .map(DayOfWeek::name)
                     .collect(Collectors.toList()) : null)
-            .time(reminder.getHour().toString() + ":" + reminder.getMinute().toString())
+            .time(timeToString(reminder.getHour(), reminder.getMinute()))
             .members(reminder.getMembers().stream()
                     .map(ParticipantResponseMapper::toParticipantDetailResponse)
                     .collect(Collectors.toList()))
             .build();
+  }
+
+  private static String timeToString(Integer hour, Integer minute) {
+    return String.format("%02d:%02d", hour, minute);
   }
 
   private static List<ReminderResponse> toListReminderResponse(Page<Reminder> reminders) {

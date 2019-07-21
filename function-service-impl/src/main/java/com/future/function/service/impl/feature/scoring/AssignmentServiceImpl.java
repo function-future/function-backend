@@ -156,7 +156,7 @@ public class AssignmentServiceImpl implements AssignmentService {
     return Optional.ofNullable(request)
             .map(Assignment::getId)
             .map(this::findById)
-            .map(foundAssignment -> isFilesChanged(request, foundAssignment))
+            .map(foundAssignment -> setAssignmentFile(request, foundAssignment))
             .map(foundAssignment -> copyAssignmentRequestAttributesBasedOnFileExistence(request, foundAssignment))
             .map(this::storeAssignmentFile)
             .map(assignmentRepository::save)
@@ -172,7 +172,7 @@ public class AssignmentServiceImpl implements AssignmentService {
     return foundAssignment;
   }
 
-  private Assignment isFilesChanged(Assignment request, Assignment foundAssignment) {
+    private Assignment setAssignmentFile(Assignment request, Assignment foundAssignment) {
     return Optional.ofNullable(request)
         .map(Assignment::getFile)
         .map(FileV2::getId)

@@ -58,10 +58,8 @@ public class AuthServiceImpl implements AuthService {
       .build();
 
     valueOperations.set(session.getId(), session);
-    redisTemplate.expire(
-      session.getId(), sessionProperties.getExpireTime(), TimeUnit.SECONDS);
 
-    this.setCookie(response, session.getId(), sessionProperties.getMaxAge());
+    this.setRedisExpirationAndCookie(response, session);
 
     this.setAuthenticationOnSecurityContextHolder(this.toAuthentication(user));
 
@@ -122,14 +120,30 @@ public class AuthServiceImpl implements AuthService {
   }
 
   @Override
-  public User getLoginStatus(String sessionId) {
+  public User getLoginStatus(
+    String sessionId, HttpServletResponse response
+  ) {
 
     return Optional.ofNullable(sessionId)
       .map(valueOperations::get)
+      .map(session -> {
+        this.setRedisExpirationAndCookie(response, session);
+        return session;
+      })
       .map(Session::getEmail)
       .map(userService::getUserByEmail)
       .orElseThrow(
         () -> new UnauthorizedException("Invalid Session From Service"));
   }
 
+  private void setRedisExpirationAndCookie(
+    HttpServletResponse response, Session session
+  ) {
+    
+    redisTemplate.expire(
+      session.getId(), sessionProperties.getExpireTime(), TimeUnit.SECONDS);
+    
+    this.setCookie(response, session.getId(), sessionProperties.getMaxAge());
+  }
+  
 }

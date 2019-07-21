@@ -90,7 +90,6 @@ public class AssignmentRequestMapperTest {
   @Test
   public void testToAssignmentFromStringDataJsonAndStringIdSuccess() {
     assignment.setId(ASSIGNMENT_ID);
-    assignmentWebRequest.setId(ASSIGNMENT_ID);
     Assignment actual = assignmentRequestMapper.toAssignmentWithId(ASSIGNMENT_ID, assignmentWebRequest,
             ASSIGNMENT_BATCH);
     assertThat(actual.getDescription()).isEqualTo(assignment.getDescription());

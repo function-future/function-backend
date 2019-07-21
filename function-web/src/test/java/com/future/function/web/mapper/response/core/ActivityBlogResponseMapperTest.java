@@ -40,18 +40,14 @@ public class ActivityBlogResponseMapperTest {
   
   private static final String NAME = "name";
   
+  private static final long UPDATED_AT = 10L;
+  
   private static final User USER = User.builder()
     .id(USER_ID)
     .name(NAME)
     .build();
   
-  private static final ActivityBlog ACTIVITY_BLOG = ActivityBlog.builder()
-    .id(ID)
-    .title(TITLE)
-    .description(DESCRIPTION)
-    .files(Collections.singletonList(FILE_V2))
-    .user(USER)
-    .build();
+  private ActivityBlog activityBlog;
   
   private static final ActivityBlogWebResponse ACTIVITY_BLOG_WEB_RESPONSE =
     ActivityBlogWebResponse.builder()
@@ -60,11 +56,22 @@ public class ActivityBlogResponseMapperTest {
       .description(DESCRIPTION)
       .files(EmbeddedFileWebResponseMapper.toEmbeddedFileWebResponses(
         Collections.singletonList(FILE_V2)))
+      .updatedAt(UPDATED_AT)
       .author(AuthorWebResponseMapper.buildAuthorWebResponse(USER))
       .build();
   
   @Before
-  public void setUp() {}
+  public void setUp() {
+  
+    activityBlog = ActivityBlog.builder()
+      .id(ID)
+      .title(TITLE)
+      .description(DESCRIPTION)
+      .files(Collections.singletonList(FILE_V2))
+      .user(USER)
+      .build();
+    activityBlog.setUpdatedAt(UPDATED_AT);
+  }
   
   @After
   public void tearDown() {}
@@ -74,7 +81,7 @@ public class ActivityBlogResponseMapperTest {
     
     Pageable pageable = new PageRequest(0, 5);
     Page<ActivityBlog> activityBlogs = new PageImpl<>(
-      Collections.singletonList(ACTIVITY_BLOG), pageable, 1);
+      Collections.singletonList(activityBlog), pageable, 1);
     
     PagingResponse<ActivityBlogWebResponse> expectedPagingResponse =
       PagingResponse.<ActivityBlogWebResponse>builder().
@@ -102,7 +109,7 @@ public class ActivityBlogResponseMapperTest {
     
     DataResponse<ActivityBlogWebResponse> createdDataResponse =
       ActivityBlogResponseMapper.toActivityBlogDataResponse(
-        HttpStatus.CREATED, ACTIVITY_BLOG);
+        HttpStatus.CREATED, activityBlog);
     
     assertThat(createdDataResponse).isNotNull();
     assertThat(createdDataResponse).isEqualTo(expectedCreatedDataResponse);
@@ -114,7 +121,7 @@ public class ActivityBlogResponseMapperTest {
         .build();
     
     DataResponse<ActivityBlogWebResponse> retrievedDataResponse =
-      ActivityBlogResponseMapper.toActivityBlogDataResponse(ACTIVITY_BLOG);
+      ActivityBlogResponseMapper.toActivityBlogDataResponse(activityBlog);
     
     assertThat(retrievedDataResponse).isNotNull();
     assertThat(retrievedDataResponse).isEqualTo(expectedRetrievedDataResponse);

@@ -42,38 +42,4 @@ public class DataMigration_003 {
         chatroom.append("deleted", false);
         mongoTemplate.insert(chatroom, DocumentName.CHATROOM);
     }
-
-    @ChangeSet(author = "priagung",
-            id = "messageMigration",
-            order = "0002")
-    public void insertMessage(MongoTemplate mongoTemplate) {
-        User sender = mongoTemplate.findOne(query(where(FieldName.User.EMAIL).is("admin@admin.com")), User.class);
-        Chatroom chatroom = mongoTemplate
-                .findOne(query(where(FieldName.Chatroom.TYPE).is(ChatroomType.PUBLIC)), Chatroom.class);
-        BasicDBObject message = new BasicDBObject();
-        message.append(FieldName.Message.SENDER, new DBRef(DocumentName.USER, new ObjectId(sender.getId())));
-        message.append(FieldName.Message.TEXT, "Lorem ipsum dolor sit amet");
-        message.append(FieldName.Message.CHATROOM, new DBRef(DocumentName.CHATROOM, new ObjectId(chatroom.getId())));
-        message.append(
-                FieldName.BaseEntity.CREATED_AT, System.currentTimeMillis());
-        message.append(
-                FieldName.BaseEntity.UPDATED_AT, System.currentTimeMillis());
-        mongoTemplate.insert(message, DocumentName.MESSAGE);
-    }
-
-    @ChangeSet(author = "priagung", id = "messageStatusMigration", order = "0003")
-    public void insertMessageStatus(MongoTemplate mongoTemplate) {
-        Message message = mongoTemplate.findAll(Message.class).get(0);
-        List<User> users = mongoTemplate.findAll(User.class);
-        Chatroom chatroom = mongoTemplate.findOne(query(where(FieldName.Chatroom.TYPE)
-                .is(ChatroomType.PUBLIC)), Chatroom.class);
-        users.forEach(user -> {
-            BasicDBObject messageStatus = new BasicDBObject();
-            messageStatus.append(FieldName.MessageStatus.IS_SEEN, user.getEmail().equals("admin@admin.com"));
-            messageStatus.append(FieldName.MessageStatus.MEMBER, new DBRef(DocumentName.USER, new ObjectId(user.getId())));
-            messageStatus.append(FieldName.MessageStatus.MESSAGE, new DBRef(DocumentName.MESSAGE, new ObjectId(message.getId())));
-            messageStatus.append(FieldName.MessageStatus.CHATROOM, new DBRef(DocumentName.CHATROOM, new ObjectId(chatroom.getId())));
-            mongoTemplate.insert(messageStatus, DocumentName.MESSAGE_STATUS);
-        });
-    }
 }

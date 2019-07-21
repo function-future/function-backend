@@ -33,8 +33,8 @@ public class ReminderServiceImplTest {
 
   private static final String REMINDER_ID_1 = "reminderId1";
   private static final String REMINDER_ID_2 = "reminderId2";
-  private static final Reminder REMINDER_1 = Reminder.builder().id(REMINDER_ID_1).build();
-  private static final Reminder REMINDER_2 = Reminder.builder().id(REMINDER_ID_2).build();
+  private static final Reminder REMINDER_1 = Reminder.builder().title("test").id(REMINDER_ID_1).build();
+  private static final Reminder REMINDER_2 = Reminder.builder().title("test123").id(REMINDER_ID_2).build();
   private static final PageRequest PAGEABLE = new PageRequest(0, 10);
   private static final String USER_ID = "userId";
   private static final User USER = User.builder().id(USER_ID).build();
@@ -87,15 +87,15 @@ public class ReminderServiceImplTest {
 
   @Test
   public void testGivenMethodCallByGettingAllReminderReturnPageReminder() {
-    when(reminderRepository.findAll(PAGEABLE))
+    when(reminderRepository.findAllByTitleContainingIgnoreCaseOrderByUpdatedAtDesc("", PAGEABLE))
             .thenReturn(PageHelper.toPage(Arrays.asList(REMINDER_1, REMINDER_2), PAGEABLE));
 
-    Page<Reminder> reminders = reminderService.getAllPagedReminder(PAGEABLE);
+    Page<Reminder> reminders = reminderService.getAllPagedReminder(PAGEABLE, "");
 
     assertThat(reminders.getTotalElements()).isEqualTo(2);
     assertThat(reminders.getContent().get(0).getId()).isEqualTo(REMINDER_ID_1);
     assertThat(reminders.getContent().get(1).getId()).isEqualTo(REMINDER_ID_2);
-    verify(reminderRepository).findAll(PAGEABLE);
+    verify(reminderRepository).findAllByTitleContainingIgnoreCaseOrderByUpdatedAtDesc("", PAGEABLE);
   }
 
   @Test

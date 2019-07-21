@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -12,10 +14,11 @@ import lombok.NoArgsConstructor;
 public class ReportWebResponse {
 
     private String id;
-    private String title;
+    private String name;
     private String description;
     private String batchCode;
-    private long usedAt;
     private int studentCount;
+    private long uploadedDate;
+    private List<String> studentIds;
 
 }

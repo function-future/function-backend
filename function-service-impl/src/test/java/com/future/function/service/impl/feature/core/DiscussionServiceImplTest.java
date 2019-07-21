@@ -3,12 +3,10 @@ package com.future.function.service.impl.feature.core;
 import com.future.function.common.enumeration.core.Role;
 import com.future.function.common.exception.ForbiddenException;
 import com.future.function.model.entity.feature.core.Batch;
-import com.future.function.model.entity.feature.core.Course;
 import com.future.function.model.entity.feature.core.Discussion;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.repository.feature.core.DiscussionRepository;
 import com.future.function.service.api.feature.core.BatchService;
-import com.future.function.service.api.feature.core.SharedCourseService;
 import com.future.function.service.api.feature.core.UserService;
 import com.future.function.service.impl.helper.PageHelper;
 import org.junit.After;
@@ -97,9 +95,6 @@ public class DiscussionServiceImplTest {
   private UserService userService;
 
   @Mock
-  private SharedCourseService sharedCourseService;
-
-  @Mock
   private BatchService batchService;
 
   @InjectMocks
@@ -124,16 +119,13 @@ public class DiscussionServiceImplTest {
   public void tearDown() {
 
     verifyNoMoreInteractions(
-      discussionRepository, userService, sharedCourseService, batchService);
+      discussionRepository, userService, batchService);
   }
 
   @Test
   public void testGivenCourseIdAndBatchCodeAndPageableByGettingDiscussionsReturnPageOfDiscussion() {
 
     when(userService.getUserByEmail(EMAIL)).thenReturn(VALID_USER_MENTOR);
-    when(sharedCourseService.getCourseByIdAndBatchCode(COURSE_ID,
-                                                       BATCH_CODE
-    )).thenReturn(new Course());
 
     when(batchService.getBatchByCode(BATCH_CODE)).thenReturn(BATCH);
 
@@ -149,34 +141,10 @@ public class DiscussionServiceImplTest {
     assertThat(discussions).isEqualTo(discussionPage);
 
     verify(userService).getUserByEmail(EMAIL);
-    verify(sharedCourseService).getCourseByIdAndBatchCode(
-      COURSE_ID, BATCH_CODE);
     verify(
       discussionRepository).findAllByCourseIdAndBatchIdOrderByCreatedAtDesc(
       COURSE_ID, BATCH_ID, PAGEABLE);
     verify(batchService).getBatchByCode(BATCH_CODE);
-  }
-
-  @Test
-  public void testGivenInvalidCourseIdAndBatchCodeAndPageableByGettingDiscussionsReturnEmptyPageOfDiscussion() {
-
-    when(userService.getUserByEmail(EMAIL)).thenReturn(VALID_USER_STUDENT);
-    when(sharedCourseService.getCourseByIdAndBatchCode(COURSE_ID,
-                                                       BATCH_CODE
-    )).thenReturn(null);
-
-    Page<Discussion> discussionPage = PageHelper.empty(PAGEABLE);
-
-    Page<Discussion> discussions = discussionService.getDiscussions(
-      EMAIL, COURSE_ID, BATCH_CODE, PAGEABLE);
-
-    assertThat(discussions).isNotNull();
-    assertThat(discussions).isEqualTo(discussionPage);
-
-    verify(userService).getUserByEmail(EMAIL);
-    verify(sharedCourseService).getCourseByIdAndBatchCode(
-      COURSE_ID, BATCH_CODE);
-    verifyZeroInteractions(discussionRepository, batchService);
   }
 
   @Test
@@ -194,17 +162,13 @@ public class DiscussionServiceImplTest {
     assertThat(caughtException().getMessage()).isEqualTo("Invalid Batch");
 
     verify(userService).getUserByEmail(EMAIL);
-    verifyZeroInteractions(
-      discussionRepository, sharedCourseService, batchService);
+    verifyZeroInteractions(discussionRepository, batchService);
   }
 
   @Test
   public void testGivenDiscussionByCreatingDiscussionReturnCreatedDiscussionObject() {
 
     when(userService.getUserByEmail(EMAIL)).thenReturn(VALID_USER_MENTOR);
-    when(sharedCourseService.getCourseByIdAndBatchCode(COURSE_ID,
-                                                       BATCH_CODE
-    )).thenReturn(new Course());
     when(batchService.getBatchByCode(BATCH_CODE)).thenReturn(BATCH);
     when(discussionRepository.save(DISCUSSION)).thenReturn(DISCUSSION);
 
@@ -215,9 +179,6 @@ public class DiscussionServiceImplTest {
     assertThat(discussion).isEqualTo(DISCUSSION);
 
     verify(userService, times(2)).getUserByEmail(EMAIL);
-    verify(sharedCourseService).getCourseByIdAndBatchCode(COURSE_ID,
-                                                          BATCH_CODE
-    );
     verify(discussionRepository).save(DISCUSSION);
     verify(batchService).getBatchByCode(BATCH_CODE);
   }
@@ -225,11 +186,9 @@ public class DiscussionServiceImplTest {
   @Test
   public void testGivenDiscussionWithInvalidCourseIdAndBatchCodeByCreatingDiscussionReturnUnsupportedOperationException() {
 
-    when(userService.getUserByEmail(EMAIL)).thenReturn(VALID_USER_STUDENT);
-
-    when(sharedCourseService.getCourseByIdAndBatchCode(COURSE_ID,
-                                                       BATCH_CODE
-    )).thenReturn(null);
+    when(userService.getUserByEmail(EMAIL)).thenReturn(VALID_USER_MENTOR);
+    when(batchService.getBatchByCode(BATCH_CODE)).thenReturn(BATCH);
+    when(discussionRepository.save(DISCUSSION)).thenReturn(null);
 
     catchException(
       () -> discussionService.createDiscussion(discussionFromRequest));
@@ -239,11 +198,9 @@ public class DiscussionServiceImplTest {
     assertThat(caughtException().getMessage()).isEqualTo(
       "Create Discussion Failed");
 
-    verify(userService).getUserByEmail(EMAIL);
-    verify(sharedCourseService).getCourseByIdAndBatchCode(COURSE_ID,
-                                                          BATCH_CODE
-    );
-    verifyZeroInteractions(discussionRepository, batchService);
+    verify(userService, times(2)).getUserByEmail(EMAIL);
+    verify(discussionRepository).save(DISCUSSION);
+    verify(batchService).getBatchByCode(BATCH_CODE);
   }
 
   @Test
@@ -259,7 +216,18 @@ public class DiscussionServiceImplTest {
     assertThat(caughtException().getMessage()).isEqualTo("Invalid Batch");
 
     verify(userService).getUserByEmail(EMAIL);
-    verifyZeroInteractions(discussionRepository, sharedCourseService);
+    verifyZeroInteractions(discussionRepository);
+  }
+  
+  @Test
+  public void testGivenCourseIdAndBatchCodeByDeletingDiscussionsReturnSuccessfulDeletion() {
+    
+    when(batchService.getBatchByCode(BATCH_CODE)).thenReturn(BATCH);
+  
+    discussionService.deleteDiscussions(COURSE_ID, BATCH_CODE);
+    
+    verify(batchService).getBatchByCode(BATCH_CODE);
+    verify(discussionRepository).deleteAllByCourseIdAndBatchId(COURSE_ID, BATCH_ID);
   }
 
 }

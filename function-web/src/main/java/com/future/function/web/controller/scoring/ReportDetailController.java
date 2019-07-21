@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/scoring/batches/{batchCode}/final-judgings/{judgingId}/comparison")
+@RequestMapping("/api/scoring/batches/{batchCode}/final-judgings/{judgingId}/comparisons")
 public class ReportDetailController {
 
     private ReportService reportService;
@@ -33,19 +33,17 @@ public class ReportDetailController {
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    @WithAnyRole(roles = {Role.ADMIN, Role.JUDGE, Role.MENTOR})
     public DataResponse<List<ReportDetailWebResponse>> findComparisonByReportId(@PathVariable String judgingId,
-                                                                                Session session) {
+        @WithAnyRole(roles = {Role.ADMIN, Role.JUDGE, Role.MENTOR}) Session session) {
         return ReportDetailResponseMapper.toDataListReportDetailWebResponse(
             reportService.findAllSummaryByReportId(judgingId, session.getUserId()));
     }
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    @WithAnyRole(roles = Role.JUDGE)
     public DataResponse<List<ReportDetailWebResponse>> giveFinalScoreToStudentsByReportId(@PathVariable String judgingId,
                                                                                           @RequestBody ReportDetailScoreWebRequest request,
-                                                                                          Session session) {
+                                                                                          @WithAnyRole(roles = Role.JUDGE) Session session) {
         return ReportDetailResponseMapper.toDataListReportDetailWebResponseFromReportDetail(
                 HttpStatus.CREATED,
             reportService.giveScoreToReportStudents(

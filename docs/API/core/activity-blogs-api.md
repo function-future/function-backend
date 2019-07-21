@@ -31,6 +31,7 @@ Accessible for all users. Get activity blogs from all user, if none found, retur
                             }
                         }
                     ],
+                    "updatedAt": 1555980050616,
                     "author": {
                         "id": "sample-id",
                         "name": "Student 1"
@@ -49,6 +50,7 @@ Accessible for all users. Get activity blogs from all user, if none found, retur
                             }
                         }
                     ],
+                    "updatedAt": 1555980050616,
                     "author": {
                         "id": "sample-id",
                         "name": "Student 1"
@@ -67,6 +69,7 @@ Accessible for all users. Get activity blogs from all user, if none found, retur
                             }
                         }
                     ],
+                    "updatedAt": 1555980050616,
                     "author": {
                         "id": "sample-id",
                         "name": "Student 1"
@@ -85,6 +88,7 @@ Accessible for all users. Get activity blogs from all user, if none found, retur
                             }
                         }
                     ],
+                    "updatedAt": 1555980050616,
                     "author": {
                         "id": "sample-id",
                         "name": "Student 1"
@@ -103,6 +107,7 @@ Accessible for all users. Get activity blogs from all user, if none found, retur
                             }
                         }
                     ],
+                    "updatedAt": 1555980050616,
                     "author": {
                         "id": "sample-id",
                         "name": "Student 1"
@@ -147,6 +152,7 @@ Accessible for all users. Get activity blogs from a user based on passed email p
                             }
                         }
                     ],
+                    "updatedAt": 1555980050616,
                     "author": {
                         "id": "sample-id",
                         "name": "Student 1"
@@ -165,6 +171,7 @@ Accessible for all users. Get activity blogs from a user based on passed email p
                             }
                         }
                     ],
+                    "updatedAt": 1555980050616,
                     "author": {
                         "id": "sample-id",
                         "name": "Student 1"
@@ -183,6 +190,7 @@ Accessible for all users. Get activity blogs from a user based on passed email p
                             }
                         }
                     ],
+                    "updatedAt": 1555980050616,
                     "author": {
                         "id": "sample-id",
                         "name": "Student 1"
@@ -201,6 +209,7 @@ Accessible for all users. Get activity blogs from a user based on passed email p
                             }
                         }
                     ],
+                    "updatedAt": 1555980050616,
                     "author": {
                         "id": "sample-id",
                         "name": "Student 1"
@@ -219,6 +228,7 @@ Accessible for all users. Get activity blogs from a user based on passed email p
                             }
                         }
                     ],
+                    "updatedAt": 1555980050616,
                     "author": {
                         "id": "sample-id",
                         "name": "Student 1"
@@ -269,6 +279,7 @@ present in request.
                         }
                     }
                 ],
+                "updatedAt": 1555980050616,
                 "author": {
                     "id": "sample-id",
                     "name": "Student 1"
@@ -322,6 +333,7 @@ Accessible for all users. Get detail of activity blog specified by parameter act
                         }
                     }
                 ],
+                "updatedAt": 1555980050616,
                 "author": {
                     "id": "sample-id",
                     "name": "Student 1"
@@ -372,6 +384,7 @@ Accessible for all users except guest. Update activity blog by a user, if valid 
                         }
                     }
                 ],
+                "updatedAt": 1555980050616,
                 "author": {
                     "id": "sample-id",
                     "name": "Student 1"
