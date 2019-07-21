@@ -14,11 +14,11 @@ import java.util.List;
 public class ReportWebResponse {
 
     private String id;
-    private String title;
+    private String name;
     private String description;
     private String batchCode;
-    private List<String> studentIds;
-    private long usedAt;
     private int studentCount;
+    private long uploadedDate;
+    private List<String> studentIds;
 
 }

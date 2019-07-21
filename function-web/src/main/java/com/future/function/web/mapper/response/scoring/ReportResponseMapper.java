@@ -37,18 +37,14 @@ public class ReportResponseMapper {
         .map(value -> ReportWebResponse
             .builder()
             .id(value.getId())
-            .title(value.getTitle())
+            .name(value.getTitle())
             .description(value.getDescription())
             .batchCode(value.getBatch().getCode())
-            .usedAt(getLongFormatOfDate(value))
             .studentCount(value.getStudentIds().size())
-                .studentIds(value.getStudentIds())
+            .uploadedDate(value.getCreatedAt())
+            .studentIds(value.getStudentIds())
             .build())
-        .orElseThrow(() -> new UnsupportedOperationException("Response Mapping failed"));
-  }
-
-  private static long getLongFormatOfDate(Report value) {
-    return value.getUsedAt().atStartOfDay().atZone(ZoneId.systemDefault()).toEpochSecond();
+        .orElseThrow(() -> new UnsupportedOperationException("Failed at #buildReportWebResponse #ReportResponseMapper"));
   }
 
   private static List<ReportWebResponse> buildReportWebResponseList(Page<Report> reportPage) {

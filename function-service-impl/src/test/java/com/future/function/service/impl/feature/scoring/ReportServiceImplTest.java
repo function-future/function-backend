@@ -48,7 +48,6 @@ public class ReportServiceImplTest {
     private static final String DESCRIPTION = "description";
     private static final String BATCH_CODE = "batch-code";
     private static final Integer POINT = 100;
-    private static final LocalDate USED_AT = LocalDate.now(ZoneId.systemDefault());
 
     private Report report;
     private Pageable pageable;
@@ -84,7 +83,6 @@ public class ReportServiceImplTest {
                 .title(TITLE)
                 .description(DESCRIPTION)
                 .batch(batch)
-                .usedAt(USED_AT)
                 .build();
 
         student = User.builder()

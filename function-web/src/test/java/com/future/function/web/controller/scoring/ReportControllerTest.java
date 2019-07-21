@@ -29,8 +29,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.Collections;
+import java.util.Date;
 
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -47,6 +47,7 @@ public class ReportControllerTest extends TestHelper {
     private static final String TITLE = "title";
     private static final String DESCRIPTION = "description";
     private static final String BATCH_CODE = "batch-code";
+    private static final Long CREATED_AT = new Date().getTime();
 
     private LocalDate usedAt;
     private ReportWebResponse reportWebResponse;
@@ -85,25 +86,27 @@ public class ReportControllerTest extends TestHelper {
                 .title(TITLE)
                 .description(DESCRIPTION)
                 .batch(batch)
-                .usedAt(usedAt)
                 .studentIds(Collections.singletonList(STUDENT_ID))
                 .build();
+
+        report.setCreatedAt(CREATED_AT);
 
         reportWebRequest = ReportWebRequest.builder()
                 .name(TITLE)
                 .description(DESCRIPTION)
-                .usedAt(usedAt.atStartOfDay().atZone(ZoneId.systemDefault()).toEpochSecond())
                 .students(Collections.singletonList(STUDENT_ID))
                 .build();
 
         reportWebResponse = ReportWebResponse.builder()
                 .id(REPORT_ID)
-                .title(TITLE)
+                .name(TITLE)
                 .description(DESCRIPTION)
-                .usedAt(usedAt.atStartOfDay().atZone(ZoneId.systemDefault()).toEpochSecond())
                 .batchCode(BATCH_CODE)
                 .studentCount(1)
+                .studentIds(Collections.singletonList(STUDENT_ID))
                 .build();
+
+        reportWebResponse.setUploadedDate(CREATED_AT);
 
         DATA_RESPONSE = ResponseHelper.toDataResponse(HttpStatus.OK, reportWebResponse);
         CREATED_DATA_RESPONSE = ResponseHelper.toDataResponse(HttpStatus.CREATED, reportWebResponse);
