@@ -31,7 +31,6 @@
       <groupId>com.future.function</groupId>
       <artifactId>function-web-model</artifactId>
       <version>${project.version}</version>
-      <optional>true</optional>
     </dependency>
 
     <dependency>
