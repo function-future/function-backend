@@ -22,49 +22,56 @@ returned; if none found, return empty list.
         {
             "code": 200,
             "status": "OK",
-            "data": [
-                {
-                    "id": "id",
-                    "type": "FOLDER",
-                    "name": "Name 1",
-                    "parentId": "parent-id",
-                    "author": {
-                        "id": "sample-id",
-                        "name": "name"
-                    }
-                },
-                {
-                    "id": "id",
-                    "type": "FOLDER",
-                    "name": "Name 2",
-                    "parentId": "parent-id",
-                    "author": {
-                        "id": "smaple-id",
-                        "name": "name"
-                    }
-                },
-                {
-                    "id": "id",
-                    "type": "FILE",
-                    "name": "Name",
-                    "file": "https://www.google.com/images/branding/googlelogo/2x/googlelogo_light_color_272x92dp.png",
-                    "versions": {
-                        "2": {
-                            "timestamp": 1555980050616,
-                            "url": "https://www.google.com/images/branding/googlelogo/2x/googlelogo_light_color_272x92dp.png"
-                        },
-                        "1": {
-                            "timestamp": 1555980050616,
-                            "url": "https://www.google.com/images/branding/googlelogo/2x/googlelogo_light_color_272x92dp.png"
+            "data": {
+                "paths": [
+                    "root",
+                    "id-1",
+                    "parent-id"
+                ],
+                "content": [
+                    {
+                        "id": "id",
+                        "type": "FOLDER",
+                        "name": "Name 1",
+                        "parentId": "parent-id",
+                        "author": {
+                            "id": "sample-id",
+                            "name": "name"
                         }
                     },
-                    "parentId": "parent-id"",
-                    "author": {
-                       "id": "smaple-id",
-                       "name": "name"
+                    {
+                        "id": "id",
+                        "type": "FOLDER",
+                        "name": "Name 2",
+                        "parentId": "parent-id",
+                        "author": {
+                            "id": "sample-id",
+                            "name": "name"
+                        }
+                    },
+                    {
+                        "id": "id",
+                        "type": "FILE",
+                        "name": "Name",
+                        "file": "https://www.google.com/images/branding/googlelogo/2x/googlelogo_light_color_272x92dp.png",
+                        "versions": {
+                            "2": {
+                                "timestamp": 1555980050616,
+                                "url": "https://www.google.com/images/branding/googlelogo/2x/googlelogo_light_color_272x92dp.png"
+                            },
+                            "1": {
+                                "timestamp": 1555980050616,
+                                "url": "https://www.google.com/images/branding/googlelogo/2x/googlelogo_light_color_272x92dp.png"
+                            }
+                        },
+                        "parentId": "parent-id",
+                        "author": {
+                            "id": "sample-id",
+                            "name": "name"
+                        }
                     }
-                }
-            ]
+                ]
+            }
         }
 
 + Response 401 (application/json)
@@ -99,20 +106,23 @@ response is returned.
             "code": 201,
             "status": "CREATED",
             "data": {
-                "id": "id",
-                "type": "FILE",
-                "name": "File Name",
-                "file": "https://www.google.com/images/branding/googlelogo/2x/googlelogo_light_color_272x92dp.png",
-                "versions": {
-                    "1": {
-                        "timestamp": 1555980050616,
-                        "url": "https://www.google.com/images/branding/googlelogo/2x/googlelogo_light_color_272x92dp.png"
+                "paths": ["root", "parent-id"],
+                "content": {
+                    "id": "id",
+                    "type": "FILE",
+                    "name": "File Name",
+                    "file": "https://www.google.com/images/branding/googlelogo/2x/googlelogo_light_color_272x92dp.png",
+                    "versions": {
+                        "1": {
+                            "timestamp": 1555980050616,
+                            "url": "https://www.google.com/images/branding/googlelogo/2x/googlelogo_light_color_272x92dp.png"
+                        }
+                    },
+                    "parentId": "parent-id",
+                    "author": {
+                      "id": "sample-id",
+                      "name": "name"
                     }
-                },
-                "parentId": "parent-id"",
-                "author": {
-                    "id": "smaple-id",
-                    "name": "name"
                 }
             }
         }
@@ -166,24 +176,23 @@ otherwise 401 response is returned; if available; otherwise 404 response is retu
             "code": 200,
             "status": "OK",
             "data": {
-                "id": "id",
-                "type": "FILE",
-                "name": "File Name",
-                "file": "https://www.google.com/images/branding/googlelogo/2x/googlelogo_light_color_272x92dp.png",
-                "versions": {
-                    "2": {
-                        "timestamp": 1555980050616,
-                        "url": "https://www.google.com/images/branding/googlelogo/2x/googlelogo_light_color_272x92dp.png"
+                "paths": ["root", "parent-id"],
+                "content": {
+                    "id": "id",
+                    "type": "FILE",
+                    "name": "File Name",
+                    "file": "https://www.google.com/images/branding/googlelogo/2x/googlelogo_light_color_272x92dp.png",
+                    "versions": {
+                        "1": {
+                            "timestamp": 1555980050616,
+                            "url": "https://www.google.com/images/branding/googlelogo/2x/googlelogo_light_color_272x92dp.png"
+                        }
                     },
-                    "1": {
-                        "timestamp": 1555980050616,
-                        "url": "https://www.google.com/images/branding/googlelogo/2x/googlelogo_light_color_272x92dp.png"
+                    "parentId": "parent-id",
+                    "author": {
+                      "id": "sample-id",
+                      "name": "name"
                     }
-                },
-                "parentId": "parent-id"",
-                "author": {
-                    "id": "smaple-id",
-                    "name": "name"
                 }
             }
         }
@@ -227,24 +236,23 @@ response is returned; if available; otherwise 404 response is returned. Paramete
             "code": 200,
             "status": "OK",
             "data": {
-                "id": "id",
-                "type": "FILE",
-                "name": "File Name",
-                "file": "https://www.google.com/images/branding/googlelogo/2x/googlelogo_light_color_272x92dp.png",
-                "versions": {
-                    "2": {
-                        "timestamp": 1555980050616,
-                        "url": "https://www.google.com/images/branding/googlelogo/2x/googlelogo_light_color_272x92dp.png"
+                "paths": ["root", "parent-id"],
+                "content": {
+                    "id": "id",
+                    "type": "FILE",
+                    "name": "File Name",
+                    "file": "https://www.google.com/images/branding/googlelogo/2x/googlelogo_light_color_272x92dp.png",
+                    "versions": {
+                        "1": {
+                            "timestamp": 1555980050616,
+                            "url": "https://www.google.com/images/branding/googlelogo/2x/googlelogo_light_color_272x92dp.png"
+                        }
                     },
-                    "1": {
-                        "timestamp": 1555980050616,
-                        "url": "https://www.google.com/images/branding/googlelogo/2x/googlelogo_light_color_272x92dp.png"
+                    "parentId": "parent-id",
+                    "author": {
+                      "id": "sample-id",
+                      "name": "name"
                     }
-                },
-                "parentId": "parent-id"",
-                "author": {
-                    "id": "smaple-id",
-                    "name": "name"
                 }
             }
         }
