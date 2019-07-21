@@ -42,6 +42,7 @@ public class ReportResponseMapper {
             .batchCode(value.getBatch().getCode())
             .usedAt(getLongFormatOfDate(value))
             .studentCount(value.getStudentIds().size())
+                .studentIds(value.getStudentIds())
             .build())
         .orElseThrow(() -> new UnsupportedOperationException("Response Mapping failed"));
   }

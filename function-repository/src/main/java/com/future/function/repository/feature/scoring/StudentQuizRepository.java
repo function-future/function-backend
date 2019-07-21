@@ -18,8 +18,6 @@ public interface StudentQuizRepository extends MongoRepository<StudentQuiz, Stri
 
   Page<StudentQuiz> findAllByStudentIdAndDeletedFalse(String studentId, Pageable pageable);
 
-  Optional<StudentQuiz> findByStudentIdAndQuizId(String studentId, String quizId);
-
   Page<StudentQuiz> findAllByStudentId(String studentId, Pageable pageable);
 
     List<StudentQuiz> findAllByStudentIdAndDeletedFalse(String studentId);
