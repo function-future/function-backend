@@ -1,6 +1,7 @@
-package com.future.function.web.model.response.feature.core.embedded;
+package com.future.function.web.model.response.feature.core;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.future.function.web.model.response.feature.core.embedded.VersionWebResponse;
 import com.future.function.web.model.response.feature.embedded.AuthorWebResponse;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

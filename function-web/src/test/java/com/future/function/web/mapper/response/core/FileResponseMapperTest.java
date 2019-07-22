@@ -8,7 +8,7 @@ import com.future.function.web.mapper.response.core.embedded.AuthorWebResponseMa
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.feature.core.DataPageResponse;
 import com.future.function.web.model.response.feature.core.FileWebResponse;
-import com.future.function.web.model.response.feature.core.embedded.FileContentWebResponse;
+import com.future.function.web.model.response.feature.core.FileContentWebResponse;
 import com.future.function.web.model.response.feature.core.embedded.VersionWebResponse;
 import org.junit.After;
 import org.junit.Before;

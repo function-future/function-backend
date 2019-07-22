@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.model.response.base.DataResponse;
-import com.future.function.web.model.response.feature.core.ResourceWebResponse;
+import com.future.function.web.model.response.feature.core.FileContentWebResponse;
 import com.future.function.web.model.util.constant.FieldName;
 import org.junit.After;
 import org.junit.Before;
@@ -42,16 +42,16 @@ public class ResourceResponseMapperTest {
     .thumbnailUrl(null)
     .build();
   
-  private static final DataResponse<ResourceWebResponse>
+  private static final DataResponse<FileContentWebResponse>
     CREATED_DATA_RESPONSE_NULL_THUMBNAIL = ResponseHelper.toDataResponse(
-    HttpStatus.CREATED, ResourceWebResponse.builder()
+    HttpStatus.CREATED, FileContentWebResponse.builder()
       .id(ID)
       .name(NAME)
       .file(Collections.singletonMap(FieldName.FULL, FILE_URL))
       .build());
   
-  private DataResponse<ResourceWebResponse> createdDataResponse =
-    ResponseHelper.toDataResponse(HttpStatus.CREATED, ResourceWebResponse.builder()
+  private DataResponse<FileContentWebResponse> createdDataResponse =
+    ResponseHelper.toDataResponse(HttpStatus.CREATED, FileContentWebResponse.builder()
       .id(ID)
       .name(NAME)
       .file(Collections.singletonMap(FieldName.FULL, FILE_URL))

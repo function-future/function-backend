@@ -9,7 +9,7 @@ import com.future.function.web.TestSecurityConfiguration;
 import com.future.function.web.mapper.request.core.ResourceRequestMapper;
 import com.future.function.web.mapper.response.core.ResourceResponseMapper;
 import com.future.function.web.model.response.base.DataResponse;
-import com.future.function.web.model.response.feature.core.ResourceWebResponse;
+import com.future.function.web.model.response.feature.core.FileContentWebResponse;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -61,7 +61,7 @@ public class ResourceControllerTest extends TestHelper {
     .thumbnailUrl(null)
     .build();
 
-  private static final DataResponse<ResourceWebResponse>
+  private static final DataResponse<FileContentWebResponse>
     CREATED_DATA_RESPONSE_NULL_THUMBNAIL =
     ResourceResponseMapper.toResourceDataResponse(FILE_V2_NULL_THUMBNAIL);
 

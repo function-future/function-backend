@@ -14,7 +14,7 @@ import com.future.function.web.model.response.base.BaseResponse;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.feature.core.DataPageResponse;
 import com.future.function.web.model.response.feature.core.FileWebResponse;
-import com.future.function.web.model.response.feature.core.embedded.FileContentWebResponse;
+import com.future.function.web.model.response.feature.core.FileContentWebResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
