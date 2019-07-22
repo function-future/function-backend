@@ -61,7 +61,20 @@ public class ReportDetailServiceImpl implements ReportDetailService {
             .map(User::getId)
             .map(studentId -> summaryService.findAllPointSummaryByStudentId(studentId, userId))
             .map(summary -> setSummaryPoint(reportDetail, summary))
-            .orElseGet(StudentSummaryVO::new);
+            .orElseGet(() -> createEmptyStudentSummary(reportDetail));
+    }
+
+    private StudentSummaryVO createEmptyStudentSummary(ReportDetail reportDetail) {
+        User user = userService.getUser(reportDetail.getUser().getId());
+        return StudentSummaryVO.builder()
+            .studentId(user.getId())
+            .studentName(user.getName())
+            .university(user.getUniversity())
+            .avatar(user.getPictureV2().getFilePath())
+            .batchCode(reportDetail.getReport().getBatch().getCode())
+            .scores(new ArrayList<>())
+            .point(reportDetail.getPoint())
+            .build();
     }
 
     private StudentSummaryVO setSummaryPoint(ReportDetail reportDetail, StudentSummaryVO summary) {
@@ -72,7 +85,7 @@ public class ReportDetailServiceImpl implements ReportDetailService {
     @Override
     public Report createReportDetailByReport(Report report, User student) {
         return Optional.ofNullable(report)
-                .map(value -> buildReportDetail(report, student))
+                .map(value -> buildReportDetail(value, student))
                 .map(reportDetailRepository::save)
                 .map(ReportDetail::getReport)
                 .orElseThrow(() -> new UnsupportedOperationException("Failed at #createReportDetailByReport #ReportDetailService"));

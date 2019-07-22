@@ -52,7 +52,7 @@ public class QuizServiceImpl implements QuizService {
   @Override
   public Quiz findById(String id) {
     return Optional.ofNullable(id)
-        .flatMap(quizRepository::findByIdAndDeletedFalse)
+            .flatMap(quizRepository::findByIdAndDeletedFalse)
             .orElseThrow(() -> new NotFoundException("Failed at #findById #QuizService"));
   }
 
@@ -92,8 +92,8 @@ public class QuizServiceImpl implements QuizService {
   public Quiz createQuiz(Quiz request) {
     return Optional.ofNullable(request)
             .map(this::setBatchAndQuestionBank)
-        .map(quizRepository::save)
-        .map(quiz -> studentQuizService.createStudentQuizByBatchCode(quiz.getBatch().getCode(), quiz))
+            .map(quizRepository::save)
+            .map(quiz -> studentQuizService.createStudentQuizByBatchCode(quiz.getBatch().getCode(), quiz))
             .orElseThrow(() -> new UnsupportedOperationException("Failed on #createQuiz #QuizService"));
   }
 

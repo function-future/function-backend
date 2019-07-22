@@ -75,14 +75,11 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public Report createReport(Report report) {
-        List<String> studentIds = report.getStudentIds();
-        return Optional.ofNullable(studentIds)
-                .filter(this::validateStudentCount)
-                .map(value -> report)
+        return Optional.ofNullable(report)
                 .map(this::setBatch)
                 .map(currentReport -> this.setStudentIds(currentReport, null))
                 .map(reportRepository::save)
-                .map(students -> createReportDetailByReportAndStudentId(report, studentIds))
+                .map(currentReport -> createReportDetailByReportAndStudentId(currentReport, report.getStudentIds()))
                 .orElseThrow(() -> new UnsupportedOperationException("Failed at #createReport #ReportService"));
     }
 
@@ -97,22 +94,23 @@ public class ReportServiceImpl implements ReportService {
       return report;
   }
 
-  private boolean validateStudentCount(List<String> students) {
-    return students.size() <= 3;
-  }
-
   private Report createReportDetailByReportAndStudentId(Report report, List<String> studentIds) {
-        return studentIds.stream()
-                .map(userService::getUser)
-                .map(student -> reportDetailService.createReportDetailByReport(report, student))
-                .findFirst()
+        return Optional.ofNullable(report)
+                .map(currentReport -> createDetailsFromStudentIds(report, studentIds))
                 .map(currentReport -> this.setStudentIds(currentReport, studentIds))
                 .orElse(null);
     }
 
-    @Override
+  private Report createDetailsFromStudentIds(Report report, List<String> studentIds) {
+    return studentIds.stream()
+            .map(userService::getUser)
+            .map(student -> reportDetailService.createReportDetailByReport(report, student))
+            .collect(Collectors.toList())
+            .get(0);
+  }
+
+  @Override
     public Report updateReport(Report report) {
-        List<String> studentIds = report.getStudentIds();
         return Optional.ofNullable(report)
                 .map(this::checkStudentIdsChangedAndDeleteIfChanged)
                 .map(Report::getId)
@@ -120,7 +118,7 @@ public class ReportServiceImpl implements ReportService {
                 .map(foundReport -> this.copyReportRequestAttributesIgnoreBatchField(report, foundReport))
                 .map(foundReport -> this.setStudentIds(foundReport, null))
                 .map(reportRepository::save)
-                .map(foundReport -> this.setStudentIds(foundReport, studentIds))
+                .map(foundReport -> this.setStudentIds(foundReport, report.getStudentIds()))
                 .orElse(report);
     }
 
@@ -130,22 +128,17 @@ public class ReportServiceImpl implements ReportService {
     }
 
     private Report checkStudentIdsChangedAndDeleteIfChanged(Report report) {
-      List<String> foundStudentIds = reportDetailService.findAllDetailByReportId(report.getId()).stream()
-                .map(ReportDetail::getUser)
-                .map(User::getId)
-                .collect(Collectors.toList());
         return Optional.ofNullable(report)
-                .map(Report::getStudentIds)
-                .map(this::validateList)
-                .filter(foundStudentIds::containsAll)
-                .map(value -> report)
-                .orElseGet(() -> deleteAllDetailByReportId(report));
+                .filter(this::isStudentListChangedFromRepository)
+                .orElseGet(() -> this.deleteAllDetailByReportId(report));
     }
 
-    private List<String> validateList(List<String> list) {
-        if (list.isEmpty() || list.size() > 3)
-            throw new UnsupportedOperationException("Failed at #validateStudentList #ReportService");
-        return list;
+    private boolean isStudentListChangedFromRepository(Report report) {
+      return reportDetailService.findAllDetailByReportId(report.getId()).stream()
+          .map(ReportDetail::getUser)
+          .map(User::getId)
+          .collect(Collectors.toList())
+          .containsAll(report.getStudentIds());
     }
 
     private Report deleteAllDetailByReportId(Report report) {

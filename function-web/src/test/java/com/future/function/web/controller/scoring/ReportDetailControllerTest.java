@@ -144,7 +144,7 @@ public class ReportDetailControllerTest extends TestHelper {
     @Test
     public void findComparisonByReportId() throws Exception {
         mockMvc.perform(
-                get("/api/scoring/batches/" + BATCH_CODE + "/final-judgings/" + REPORT_ID + "/comparisons")
+                get("/api/scoring/batches/" + BATCH_CODE + "/judgings/" + REPORT_ID + "/comparisons")
                         .cookie(cookies))
                 .andExpect(status().isOk())
                 .andExpect(content().json(
@@ -156,7 +156,7 @@ public class ReportDetailControllerTest extends TestHelper {
     @Test
     public void giveFinalScoreToStudentsByReportId() throws Exception {
         mockMvc.perform(
-                post("/api/scoring/batches/" + BATCH_CODE + "/final-judgings/" + REPORT_ID + "/comparisons")
+                post("/api/scoring/batches/" + BATCH_CODE + "/judgings/" + REPORT_ID + "/comparisons")
                         .cookie(cookies)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(webRequestJacksonTester.write(reportDetailScoreWebRequest).getJson()))

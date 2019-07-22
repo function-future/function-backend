@@ -129,7 +129,7 @@ public class ReportControllerTest extends TestHelper {
     @Test
     public void findAllReportByUsedAtNow() throws Exception {
         mockMvc.perform(
-                get("/api/scoring/batches/" + BATCH_CODE + "/final-judgings")
+                get("/api/scoring/batches/" + BATCH_CODE + "/judgings")
                         .cookie(cookies)
                         .param("page", "1")
                         .param("size", "10"))
@@ -143,7 +143,7 @@ public class ReportControllerTest extends TestHelper {
     @Test
     public void findOne() throws Exception {
         mockMvc.perform(
-                get("/api/scoring/batches/" + BATCH_CODE + "/final-judgings/" + REPORT_ID)
+                get("/api/scoring/batches/" + BATCH_CODE + "/judgings/" + REPORT_ID)
                         .cookie(cookies))
                 .andExpect(status().isOk())
                 .andExpect(content().json(
@@ -155,7 +155,7 @@ public class ReportControllerTest extends TestHelper {
     @Test
     public void createFinalJudging() throws Exception {
         mockMvc.perform(
-                post("/api/scoring/batches/" + BATCH_CODE + "/final-judgings")
+                post("/api/scoring/batches/" + BATCH_CODE + "/judgings")
                         .cookie(cookies)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(webRequestJacksonTester.write(reportWebRequest).getJson()))
@@ -170,7 +170,7 @@ public class ReportControllerTest extends TestHelper {
     @Test
     public void updateFinalJudging() throws Exception {
         mockMvc.perform(
-                put("/api/scoring/batches/" + BATCH_CODE + "/final-judgings/" + REPORT_ID)
+                put("/api/scoring/batches/" + BATCH_CODE + "/judgings/" + REPORT_ID)
                         .cookie(cookies)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(webRequestJacksonTester.write(reportWebRequest).getJson()))
@@ -185,7 +185,7 @@ public class ReportControllerTest extends TestHelper {
     @Test
     public void deleteById() throws Exception {
         mockMvc.perform(
-                delete("/api/scoring/batches/" + BATCH_CODE + "/final-judgings/" + REPORT_ID)
+                delete("/api/scoring/batches/" + BATCH_CODE + "/judgings/" + REPORT_ID)
                         .cookie(cookies))
                 .andExpect(status().isOk())
                 .andExpect(content().json(
