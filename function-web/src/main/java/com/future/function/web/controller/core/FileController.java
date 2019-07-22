@@ -12,8 +12,9 @@ import com.future.function.web.mapper.response.core.FileResponseMapper;
 import com.future.function.web.model.request.core.FileWebRequest;
 import com.future.function.web.model.response.base.BaseResponse;
 import com.future.function.web.model.response.base.DataResponse;
-import com.future.function.web.model.response.base.PagingResponse;
+import com.future.function.web.model.response.feature.core.DataPageResponse;
 import com.future.function.web.model.response.feature.core.FileWebResponse;
+import com.future.function.web.model.response.feature.core.embedded.FileContentWebResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
@@ -28,6 +29,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/core/files")
@@ -54,7 +57,7 @@ public class FileController {
   
   @ResponseStatus(HttpStatus.OK)
   @GetMapping(value = "/{parentId}")
-  public PagingResponse<FileWebResponse> getFilesAndFolders(
+  public DataPageResponse<FileWebResponse<List<FileContentWebResponse>>> getFilesAndFolders(
     Session session,
     @PathVariable
       String parentId,
@@ -62,10 +65,9 @@ public class FileController {
       int page,
     @RequestParam(defaultValue = "10")
       int size
-  
   ) {
     
-    return FileResponseMapper.toFilePagingResponse(
+    return FileResponseMapper.toMultipleFileDataResponse(
       fileService.getFilesAndFolders(parentId,
                                      PageHelper.toPageable(page, size)
       ));
@@ -73,16 +75,15 @@ public class FileController {
   
   @ResponseStatus(HttpStatus.OK)
   @GetMapping(value = "/{parentId}/{fileOrFolderId}")
-  public DataResponse<FileWebResponse> getFileOrFolder(
+  public DataResponse<FileWebResponse<FileContentWebResponse>> getFileOrFolder(
     Session session,
     @PathVariable
       String parentId,
     @PathVariable
       String fileOrFolderId
-  
   ) {
     
-    return FileResponseMapper.toFileDataResponse(
+    return FileResponseMapper.toSingleFileDataResponse(
       fileService.getFileOrFolder(fileOrFolderId, parentId));
   }
   
@@ -90,7 +91,7 @@ public class FileController {
   @PostMapping(value = "/{parentId}",
                consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
                produces = MediaType.APPLICATION_JSON_VALUE)
-  public DataResponse<FileWebResponse> createFileOrFolder(
+  public DataResponse<FileWebResponse<FileContentWebResponse>> createFileOrFolder(
     Session session,
     @PathVariable
       String parentId,
@@ -106,7 +107,7 @@ public class FileController {
     FileWebRequest request = fileRequestMapper.toFileWebRequest(
       data, pair.getSecond());
     
-    return FileResponseMapper.toFileDataResponse(
+    return FileResponseMapper.toSingleFileDataResponse(
       HttpStatus.CREATED, fileService.createFileOrFolder(
         session, parentId, request.getName(), pair.getFirst(),
         pair.getSecond()));
@@ -116,7 +117,7 @@ public class FileController {
   @PutMapping(value = "/{parentId}/{fileOrFolderId}",
               consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
               produces = MediaType.APPLICATION_JSON_VALUE)
-  public DataResponse<FileWebResponse> updateFileOrFolder(
+  public DataResponse<FileWebResponse<FileContentWebResponse>> updateFileOrFolder(
     Session session,
     @PathVariable
       String parentId,
@@ -134,7 +135,7 @@ public class FileController {
     FileWebRequest request = fileRequestMapper.toFileWebRequest(
       data, pair.getSecond());
     
-    return FileResponseMapper.toFileDataResponse(
+    return FileResponseMapper.toSingleFileDataResponse(
       fileService.updateFileOrFolder(session, fileOrFolderId, parentId,
                                      request.getName(), pair.getFirst(),
                                      pair.getSecond()

@@ -23,6 +23,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.util.Pair;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -63,8 +64,6 @@ public class FileServiceImplTest {
     .parentId(PARENT_ID)
     .markFolder(false)
     .build();
-
-  private Page<FileV2> page;
 
   @Mock
   private FileRepositoryV2 fileRepository;
@@ -131,20 +130,34 @@ public class FileServiceImplTest {
   @Test
   public void testGivenParentIdAndPageableByGettingFilesOrFoldersReturnPageOfFile() {
 
-    page = new PageImpl<>(Collections.singletonList(file), PAGEABLE, 1);
+    Page<FileV2> returnedPage = new PageImpl<>(
+      Collections.singletonList(file), PAGEABLE, 1);
 
     when(
       fileRepository.findAllByParentIdAndAsResourceFalseAndDeletedFalseOrderByMarkFolderDesc(
-        PARENT_ID, PAGEABLE)).thenReturn(page);
+        PARENT_ID, PAGEABLE)).thenReturn(returnedPage);
+    when(fileRepository.findByIdAndDeletedFalse(PARENT_ID)).thenReturn(
+      Optional.empty());
+  
+    Pair<List<String>, Page<FileV2>> pathsAndFilesOrFolders =
+      fileService.getFilesAndFolders(PARENT_ID, PAGEABLE);
 
-    Page<FileV2> page = fileService.getFilesAndFolders(PARENT_ID, PAGEABLE);
+    List<String> paths = pathsAndFilesOrFolders.getFirst();
+    
+    assertThat(paths).isNotNull();
+    assertThat(paths).isEqualTo(Collections.singletonList(PARENT_ID));
+    
+    Page<FileV2> page = pathsAndFilesOrFolders
+      .getSecond();
 
     assertThat(page).isNotNull();
-    assertThat(page).isEqualTo(this.page);
+    assertThat(page).isEqualTo(
+      new PageImpl<>(Collections.singletonList(file), PAGEABLE, 1));
 
     verify(
       fileRepository).findAllByParentIdAndAsResourceFalseAndDeletedFalseOrderByMarkFolderDesc(
       PARENT_ID, PAGEABLE);
+    verify(fileRepository).findByIdAndDeletedFalse(PARENT_ID);
     verifyZeroInteractions(resourceService, fileProperties, userService);
   }
 

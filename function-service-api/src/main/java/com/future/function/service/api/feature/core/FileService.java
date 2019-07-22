@@ -4,6 +4,9 @@ import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.session.model.Session;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.util.Pair;
+
+import java.util.List;
 
 /**
  * Service interface class for file/folder logic operations declaration.
@@ -28,10 +31,12 @@ public interface FileService {
    * @param parentId Id of parent of files/folders to be retrieved.
    * @param pageable Pageable object for paging data.
    *
-   * @return {@code Page<FileV2>} - Page of files/folders found in
-   * database.
+   * @return {@code Pair<List<String>, Page<FileV2>>} - Pair of
+   * paths and files/folders found in database.
    */
-  Page<FileV2> getFilesAndFolders(String parentId, Pageable pageable);
+  Pair<List<String>, Page<FileV2>> getFilesAndFolders(
+    String parentId, Pageable pageable
+  );
   
   /**
    * Creates file/folder object and saves any other data related to the

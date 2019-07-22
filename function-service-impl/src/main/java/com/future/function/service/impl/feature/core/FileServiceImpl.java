@@ -77,13 +77,16 @@ public class FileServiceImpl implements FileService {
    * database.
    */
   @Override
-  public Page<FileV2> getFilesAndFolders(String parentId, Pageable pageable) {
+  public Pair<List<String>, Page<FileV2>> getFilesAndFolders(String parentId, Pageable pageable) {
+  
+    List<String> paths = this.getPathsForFileOrFolder(parentId);
 
     return Optional.ofNullable(parentId)
       .map(
         id -> fileRepositoryV2.findAllByParentIdAndAsResourceFalseAndDeletedFalseOrderByMarkFolderDesc(
           id, pageable))
-      .orElseGet(() -> PageHelper.empty(pageable));
+      .map(data -> Pair.of(paths, data))
+      .orElseGet(() -> Pair.of(paths, PageHelper.empty(pageable)));
   }
 
   /**
@@ -148,14 +151,20 @@ public class FileServiceImpl implements FileService {
   
     String parentId = Optional.ofNullable(fileOrFolder.getParentId())
       .orElse("");
+  
+    return this.getPathsForFileOrFolder(parentId);
+  }
+  
+  private List<String> getPathsForFileOrFolder(String parentId) {
+    
     FileV2 parentOfFileOrFolder = fileRepositoryV2.findByIdAndDeletedFalse(
       parentId)
       .orElse(null);
-  
+    
     List<String> pathsForFileOrFolder = this.getPathsForFileOrFolder(
       parentOfFileOrFolder);
     pathsForFileOrFolder.add(parentId);
-  
+    
     return pathsForFileOrFolder;
   }
 
