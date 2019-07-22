@@ -61,8 +61,8 @@ public class QuestionnaireResponseSummaryServiceImpl implements QuestionnaireRes
 
   @Override
   public List<QuestionResponseSummary> getQuestionsDetailsFromQuestionnaireResponseSummaryIdAndAppraisee(String questionnaireResponseSummaryId, User appraisee) {
-    Questionnaire questionnaire = questionnaireRepository.findOne(questionnaireResponseSummaryId);
-    return questionResponseSummaryRepository.findAllByQuestionnaireAndAppraiseeAndDeletedFalse(questionnaire, appraisee);
+    QuestionnaireResponseSummary questionnaireResponseSummary = questionnaireResponseSummaryRepository.findOne(questionnaireResponseSummaryId);
+    return questionResponseSummaryRepository.findAllByQuestionnaireAndAppraiseeAndDeletedFalse(questionnaireResponseSummary.getQuestionnaire(), appraisee);
   }
 
   @Override
@@ -80,7 +80,7 @@ public class QuestionnaireResponseSummaryServiceImpl implements QuestionnaireRes
             .map(ignored ->
                     questionResponseRepository.findAllByQuestionQuestionnaireAndAppraiseeAndDeletedFalse(
                             questionQuestionnaireRepository.findOne(ignored.getQuestion().getId()),
-                            userService.getUser(ignored.getId())
+                            userService.getUser(ignored.getAppraisee().getId())
                     )
             )
             .orElseGet(Collections::emptyList);

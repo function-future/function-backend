@@ -102,23 +102,12 @@ public class QuestionnaireResponseSummaryResponseMapper {
   }
 
 
-  public static DataResponse<QuestionAnswerDetailResponse> toDataResponseQuestionAnswerDetailResponse(QuestionnaireResponseSummary questionnaireResponseSummary, QuestionResponseSummary questionResponseSummary, List<QuestionResponse> questionResponseByQuestionResponseSummary) {
+  public static DataResponse<List<QuestionAnswerResponse>> toDataResponseQuestionAnswerDetailResponse(List<QuestionResponse> questionResponseByQuestionResponseSummary) {
     return ResponseHelper.toDataResponse(
             HttpStatus.OK,
-            toQuestionAnswerDetailResponse(
-                    questionnaireResponseSummary,
-                    questionResponseSummary,
+            toQuestionAnswerReponseList(
                     questionResponseByQuestionResponseSummary)
     );
-  }
-
-  private static QuestionAnswerDetailResponse toQuestionAnswerDetailResponse(QuestionnaireResponseSummary questionnaireResponseSummary, QuestionResponseSummary questionResponseSummary, List<QuestionResponse> questionResponseByQuestionResponseSummary) {
-
-    return QuestionAnswerDetailResponse.builder()
-            .questionnaireSummary(toQuestionnaireSummaryDescriptionResponse(questionnaireResponseSummary))
-            .questionSummary(toQuestionQuestionnaireSummaryResponse(questionResponseSummary))
-            .QuestionResponse(toQuestionAnswerReponseList(questionResponseByQuestionResponseSummary))
-            .build();
   }
 
   private static List<QuestionAnswerResponse> toQuestionAnswerReponseList(List<QuestionResponse> data) {

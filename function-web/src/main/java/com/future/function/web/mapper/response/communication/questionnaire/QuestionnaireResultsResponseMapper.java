@@ -26,10 +26,16 @@ public class QuestionnaireResultsResponseMapper {
     return ResponseHelper.toPagingResponse(HttpStatus.OK, toUserSummaryResponseList(data), PageHelper.toPaging(data));
   }
 
-  public static DataResponse<List<UserSummaryResponse>> toDataResponseUserSummaryResponse(
+  public static DataResponse<List<UserSummaryResponse>> toListDataResponseUserSummaryResponse(
     Page<UserQuestionnaireSummary> data
   ) {
     return ResponseHelper.toDataResponse(HttpStatus.OK, toUserSummaryResponseList(data));
+  }
+
+  public static DataResponse<UserSummaryResponse> toDataResponseUserSummaryResponse(
+          UserQuestionnaireSummary data
+  ) {
+    return ResponseHelper.toDataResponse(HttpStatus.OK, toUserSummaryResponse(data));
   }
 
   private static List<UserSummaryResponse> toUserSummaryResponseList(Page<UserQuestionnaireSummary> data) {

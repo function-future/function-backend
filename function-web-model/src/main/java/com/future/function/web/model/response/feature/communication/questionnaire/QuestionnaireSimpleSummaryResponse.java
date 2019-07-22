@@ -15,11 +15,13 @@ public class QuestionnaireSimpleSummaryResponse {
 
   String title;
 
-  String desc;
+  String description;
 
   String status;
 
-  Long duedate;
+  long startDate;
+
+  long dueDate;
 
   float score;
 }

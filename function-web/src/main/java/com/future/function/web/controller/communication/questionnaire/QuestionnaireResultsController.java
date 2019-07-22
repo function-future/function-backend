@@ -13,11 +13,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.websocket.server.PathParam;
 import java.util.List;
 
 @RestController
@@ -41,15 +43,27 @@ public class QuestionnaireResultsController {
   @ResponseStatus(HttpStatus.OK)
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   public DataResponse<List<UserSummaryResponse>> getUserSummary(
-    @RequestParam String batchId,
+    @RequestParam String batchCode,
     @RequestParam(required = false, defaultValue = "1") int page,
     @RequestParam(required = false, defaultValue = "10") int size
   ) {
-      return QuestionnaireResultsResponseMapper.toDataResponseUserSummaryResponse(
+      return QuestionnaireResultsResponseMapper.toListDataResponseUserSummaryResponse(
         questionnaireResultService.getAppraisalsQuestionnaireSummaryByBatch(
-          batchService.getBatchById(batchId),
+          batchService.getBatchByCode(batchCode),
           PageHelper.toPageable(page, size)
         )
       );
+  }
+
+  @ResponseStatus(HttpStatus.OK)
+  @GetMapping(value="/{batchCode}/user-summary-response/{userSummaryId}",
+          produces = MediaType.APPLICATION_JSON_VALUE)
+  public DataResponse<UserSummaryResponse> getUserSummaryById(
+          @PathVariable String batchCode,
+          @PathVariable String userSummaryId
+  ) {
+    return QuestionnaireResultsResponseMapper.toDataResponseUserSummaryResponse(
+            questionnaireResultService.getAppraisalsQuestionnaireSummaryById(userSummaryId)
+    );
   }
 }

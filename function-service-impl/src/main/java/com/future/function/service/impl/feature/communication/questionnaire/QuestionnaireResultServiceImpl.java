@@ -37,4 +37,9 @@ public class QuestionnaireResultServiceImpl implements QuestionnaireResultServic
       .filter(summary  -> summary.getBatch().getCode() == batch.getCode())
       .collect(Collectors.toList());
   }
+
+  @Override
+  public UserQuestionnaireSummary getAppraisalsQuestionnaireSummaryById(String id) {
+    return userQuestionnaireSummaryRepository.findOne(id);
+  }
 }

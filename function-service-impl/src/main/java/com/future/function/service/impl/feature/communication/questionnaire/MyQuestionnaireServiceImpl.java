@@ -149,7 +149,8 @@ public class MyQuestionnaireServiceImpl implements MyQuestionnaireService {
       .build();
 
     questionnaireResponseRepository.save(questionnaireResponse);
-    QuestionnaireResponseSummary questionnaireResponseSummary = updateQuestionnaireResponseSummary(questionnaireResponse);
+
+    this.updateQuestionnaireResponseSummary(questionnaireResponse);
 
     this.updateUserQuestionnaireSummary(questionnaireResponse);
 
@@ -199,7 +200,7 @@ public class MyQuestionnaireServiceImpl implements MyQuestionnaireService {
 
   }
 
-  public QuestionnaireResponseSummary updateQuestionnaireResponseSummary(QuestionnaireResponse questionnaireResponse) {
+  public void updateQuestionnaireResponseSummary(QuestionnaireResponse questionnaireResponse) {
     Optional<QuestionnaireResponseSummary> temp = questionnaireResponseSummaryRepository
       .findByAppraiseeAndQuestionnaireAndDeletedFalse(
         questionnaireResponse.getAppraisee(),
@@ -207,7 +208,6 @@ public class MyQuestionnaireServiceImpl implements MyQuestionnaireService {
       );
 
     QuestionnaireResponseSummary questionnaireResponseSummary = QuestionnaireResponseSummary.builder().build();
-
     if( temp.isPresent()) {
       questionnaireResponseSummary = temp.get();
       Answer tempAnswerSummary = Answer.builder().build();
@@ -234,7 +234,7 @@ public class MyQuestionnaireServiceImpl implements MyQuestionnaireService {
         .build();
     }
 
-    return questionnaireResponseSummaryRepository.save(questionnaireResponseSummary);
+    questionnaireResponseSummaryRepository.save(questionnaireResponseSummary);
   }
 
   public void updateUserQuestionnaireSummary(QuestionnaireResponse questionnaireResponse) {
