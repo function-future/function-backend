@@ -24,9 +24,18 @@ returned; if none found, return empty list.
             "status": "OK",
             "data": {
                 "paths": [
-                    "root",
-                    "id-1",
-                    "parent-id"
+                    {
+                        "id": "root",
+                        "name": "root"
+                    },
+                    {
+                        "id": "id-1",
+                        "name": "Id 1"
+                    },
+                    {
+                        "id": "parent-id",
+                        "name": "Parent Id"
+                    }
                 ],
                 "content": [
                     {
@@ -106,7 +115,20 @@ response is returned.
             "code": 201,
             "status": "CREATED",
             "data": {
-                "paths": ["root", "parent-id"],
+                "paths": [
+                    {
+                        "id": "root",
+                        "name": "root"
+                    },
+                    {
+                        "id": "id-1",
+                        "name": "Id 1"
+                    },
+                    {
+                        "id": "parent-id",
+                        "name": "Parent Id"
+                    }
+                ],
                 "content": {
                     "id": "id",
                     "type": "FILE",
@@ -176,7 +198,20 @@ otherwise 401 response is returned; if available; otherwise 404 response is retu
             "code": 200,
             "status": "OK",
             "data": {
-                "paths": ["root", "parent-id"],
+                "paths": [
+                    {
+                        "id": "root",
+                        "name": "root"
+                    },
+                    {
+                        "id": "id-1",
+                        "name": "Id 1"
+                    },
+                    {
+                        "id": "parent-id",
+                        "name": "Parent Id"
+                    }
+                ],
                 "content": {
                     "id": "id",
                     "type": "FILE",
@@ -236,7 +271,20 @@ response is returned; if available; otherwise 404 response is returned. Paramete
             "code": 200,
             "status": "OK",
             "data": {
-                "paths": ["root", "parent-id"],
+                "paths": [
+                    {
+                        "id": "root",
+                        "name": "root"
+                    },
+                    {
+                        "id": "id-1",
+                        "name": "Id 1"
+                    },
+                    {
+                        "id": "parent-id",
+                        "name": "Parent Id"
+                    }
+                ],
                 "content": {
                     "id": "id",
                     "type": "FILE",
