@@ -7,8 +7,9 @@ import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.response.core.embedded.AuthorWebResponseMapper;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.feature.core.DataPageResponse;
-import com.future.function.web.model.response.feature.core.FileWebResponse;
 import com.future.function.web.model.response.feature.core.FileContentWebResponse;
+import com.future.function.web.model.response.feature.core.FileWebResponse;
+import com.future.function.web.model.response.feature.core.embedded.PathWebResponse;
 import com.future.function.web.model.response.feature.core.embedded.VersionWebResponse;
 import org.junit.After;
 import org.junit.Before;
@@ -49,8 +50,19 @@ public class FileResponseMapperTest {
     .name("name")
     .build();
   
-  private static final List<String> PATHS = Collections.singletonList(
-    PARENT_ID);
+  private static final PathWebResponse PATH_WEB_RESPONSE =
+    PathWebResponse.builder()
+      .id(PARENT_ID)
+      .name("")
+      .build();
+  
+  private static final List<PathWebResponse> PATH_WEB_RESPONSES =
+    Collections.singletonList(PATH_WEB_RESPONSE);
+  
+  private static final List<FileV2> PATHS = Collections.singletonList(
+    FileV2.builder()
+      .id(PARENT_ID)
+      .build());
   
   private static final FileV2 FILE = FileV2.builder()
     .id(FILE_ID)
@@ -90,8 +102,7 @@ public class FileResponseMapperTest {
   
   private static final FileWebResponse<FileContentWebResponse>
     FOLDER_WEB_RESPONSE =
-    FileWebResponse.<FileContentWebResponse>builder().paths(
-      Collections.singletonList(PARENT_ID))
+    FileWebResponse.<FileContentWebResponse>builder().paths(PATH_WEB_RESPONSES)
       .content(FOLDER_CONTENT_WEB_RESPONSE)
       .build();
   
@@ -116,7 +127,8 @@ public class FileResponseMapperTest {
   
   private static final FileWebResponse<List<FileContentWebResponse>>
     FILE_DATA_RESPONSE =
-    FileWebResponse.<List<FileContentWebResponse>>builder().paths(PATHS)
+    FileWebResponse.<List<FileContentWebResponse>>builder().paths(
+      PATH_WEB_RESPONSES)
       .content(Collections.singletonList(FILE_CONTENT_WEB_RESPONSE))
       .build();
   

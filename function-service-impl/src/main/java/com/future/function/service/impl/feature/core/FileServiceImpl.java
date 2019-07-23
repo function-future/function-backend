@@ -77,9 +77,10 @@ public class FileServiceImpl implements FileService {
    * database.
    */
   @Override
-  public Pair<List<String>, Page<FileV2>> getFilesAndFolders(String parentId, Pageable pageable) {
+  public Pair<List<FileV2>, Page<FileV2>> getFilesAndFolders(String parentId,
+                                                        Pageable pageable) {
   
-    List<String> paths = this.getPathsForFileOrFolder(parentId);
+    List<FileV2> paths = this.getPathsForFileOrFolder(parentId);
 
     return Optional.ofNullable(parentId)
       .map(
@@ -143,27 +144,29 @@ public class FileServiceImpl implements FileService {
     return fileRepositoryV2.save(file);
   }
   
-  private List<String> getPathsForFileOrFolder(FileV2 fileOrFolder) {
+  private List<FileV2> getPathsForFileOrFolder(FileV2 fileOrFolder) {
   
     if (Objects.isNull(fileOrFolder)) {
       return new LinkedList<>();
     }
   
     String parentId = Optional.ofNullable(fileOrFolder.getParentId())
-      .orElse("");
+      .orElse(null);
   
     return this.getPathsForFileOrFolder(parentId);
   }
   
-  private List<String> getPathsForFileOrFolder(String parentId) {
+  private List<FileV2> getPathsForFileOrFolder(String parentId) {
     
-    FileV2 parentOfFileOrFolder = fileRepositoryV2.findByIdAndDeletedFalse(
-      parentId)
+    FileV2 parentOfFileOrFolder = Optional.ofNullable(parentId)
+      .flatMap(fileRepositoryV2::findByIdAndDeletedFalse)
       .orElse(null);
     
-    List<String> pathsForFileOrFolder = this.getPathsForFileOrFolder(
+    List<FileV2> pathsForFileOrFolder = this.getPathsForFileOrFolder(
       parentOfFileOrFolder);
-    pathsForFileOrFolder.add(parentId);
+    
+    Optional.ofNullable(parentOfFileOrFolder)
+      .ifPresent(pathsForFileOrFolder::add);
     
     return pathsForFileOrFolder;
   }

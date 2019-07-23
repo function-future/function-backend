@@ -31,10 +31,10 @@ public interface FileService {
    * @param parentId Id of parent of files/folders to be retrieved.
    * @param pageable Pageable object for paging data.
    *
-   * @return {@code Pair<List<String>, Page<FileV2>>} - Pair of
+   * @return {@code Pair<List<FileV2>, Page<FileV2>>} - Pair of
    * paths and files/folders found in database.
    */
-  Pair<List<String>, Page<FileV2>> getFilesAndFolders(
+  Pair<List<FileV2>, Page<FileV2>> getFilesAndFolders(
     String parentId, Pageable pageable
   );
   

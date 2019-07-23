@@ -1,5 +1,6 @@
 package com.future.function.web.model.response.feature.core;
 
+import com.future.function.web.model.response.feature.core.embedded.PathWebResponse;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,7 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 public class FileWebResponse<T> {
   
-  private List<String> paths;
+  private List<PathWebResponse> paths;
   
   private T content;
   

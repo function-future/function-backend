@@ -13,8 +13,9 @@ import com.future.function.web.model.request.core.FileWebRequest;
 import com.future.function.web.model.response.base.BaseResponse;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.feature.core.DataPageResponse;
-import com.future.function.web.model.response.feature.core.FileWebResponse;
 import com.future.function.web.model.response.feature.core.FileContentWebResponse;
+import com.future.function.web.model.response.feature.core.FileWebResponse;
+import com.future.function.web.model.response.feature.core.embedded.PathWebResponse;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -58,8 +59,16 @@ public class FileControllerTest extends TestHelper {
   
   private static final String ID = "id";
   
-  private static final List<String> PATHS =
-    Collections.singletonList(PARENT_ID);
+  private static final PathWebResponse PATH_WEB_RESPONSE =
+    PathWebResponse.builder()
+      .id(PARENT_ID)
+      .name(null)
+      .build();
+  
+  private static final List<FileV2> PATHS = Collections.singletonList(
+    FileV2.builder()
+      .id(PARENT_ID)
+      .build());
   
   private static final FileV2 FILE = FileV2.builder()
     .id(ID)
@@ -71,14 +80,15 @@ public class FileControllerTest extends TestHelper {
     Collections.singletonList(FILE), PAGEABLE, 1);
   
   private static final DataPageResponse<FileWebResponse<List<FileContentWebResponse>>>
-    DATA_PAGE_RESPONSE =
-    FileResponseMapper.toMultipleFileDataResponse(Pair.of(PATHS, PAGE));
+    DATA_PAGE_RESPONSE = FileResponseMapper.toMultipleFileDataResponse(
+    Pair.of(PATHS, PAGE));
   
-  private static final DataResponse<FileWebResponse<FileContentWebResponse>> RETRIEVED_DATA_RESPONSE =
-    FileResponseMapper.toSingleFileDataResponse(FILE);
+  private static final DataResponse<FileWebResponse<FileContentWebResponse>>
+    RETRIEVED_DATA_RESPONSE = FileResponseMapper.toSingleFileDataResponse(FILE);
   
-  private static final DataResponse<FileWebResponse<FileContentWebResponse>> CREATED_DATA_RESPONSE =
-    FileResponseMapper.toSingleFileDataResponse(HttpStatus.CREATED, FILE);
+  private static final DataResponse<FileWebResponse<FileContentWebResponse>>
+    CREATED_DATA_RESPONSE = FileResponseMapper.toSingleFileDataResponse(
+    HttpStatus.CREATED, FILE);
   
   private static final BaseResponse OK_BASE_RESPONSE =
     ResponseHelper.toBaseResponse(HttpStatus.OK);
@@ -163,7 +173,7 @@ public class FileControllerTest extends TestHelper {
     when(
       fileService.createFileOrFolder(ADMIN_SESSION, PARENT_ID, "NAME", "NAME",
                                      ID.getBytes()
-    )).thenReturn(FILE);
+      )).thenReturn(FILE);
     
     mockMvc.perform(post("/api/core/files/" + PARENT_ID).cookie(cookies)
                       .contentType(MediaType.MULTIPART_FORM_DATA)

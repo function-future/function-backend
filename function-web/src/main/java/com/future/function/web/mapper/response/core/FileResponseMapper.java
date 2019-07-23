@@ -8,8 +8,9 @@ import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.mapper.response.core.embedded.AuthorWebResponseMapper;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.feature.core.DataPageResponse;
-import com.future.function.web.model.response.feature.core.FileWebResponse;
 import com.future.function.web.model.response.feature.core.FileContentWebResponse;
+import com.future.function.web.model.response.feature.core.FileWebResponse;
+import com.future.function.web.model.response.feature.core.embedded.PathWebResponse;
 import com.future.function.web.model.response.feature.core.embedded.VersionWebResponse;
 import com.future.function.web.model.response.feature.embedded.AuthorWebResponse;
 import lombok.AccessLevel;
@@ -51,7 +52,7 @@ public final class FileResponseMapper {
   ) {
     
     return FileWebResponse.<FileContentWebResponse>builder().paths(
-      file.getPaths())
+      FileResponseMapper.toPathWebResponses(file.getPaths()))
       .content(buildNormalFileContentWebResponse(file))
       .build();
   }
@@ -87,7 +88,7 @@ public final class FileResponseMapper {
     
     List<Long> versionKeys = new ArrayList<>(fileVersions.keySet());
     Collections.reverse(versionKeys);
-  
+    
     versionKeys.forEach(key -> versions.put(key,
                                             FileResponseMapper.toVersionWebResponse(
                                               fileVersions.get(key))
@@ -106,6 +107,55 @@ public final class FileResponseMapper {
     return Optional.of(file)
       .map(FileV2::getFileUrl)
       .orElse(null);
+  }
+  
+  private static List<PathWebResponse> toPathWebResponses(List<FileV2> paths) {
+    
+    return paths.stream()
+      .map(FileResponseMapper::buildPathWebResponse)
+      .collect(Collectors.toList());
+  }
+  
+  private static PathWebResponse buildPathWebResponse(FileV2 file) {
+    
+    return PathWebResponse.builder()
+      .id(file.getId())
+      .name(file.getName())
+      .build();
+  }
+  
+  public static DataPageResponse<FileWebResponse<List<FileContentWebResponse>>> toMultipleFileDataResponse(
+    Pair<List<FileV2>, Page<FileV2>> data
+  ) {
+    
+    return DataPageResponse.<FileWebResponse<List<FileContentWebResponse>>>builder().code(
+      HttpStatus.OK.value())
+      .status(HttpStatus.OK.name())
+      .data(FileResponseMapper.buildFileWebResponse(data.getFirst(),
+                                                    data.getSecond()
+      ))
+      .paging(PageHelper.toPaging(data.getSecond()))
+      .build();
+  }
+  
+  private static FileWebResponse<List<FileContentWebResponse>> buildFileWebResponse(
+    List<FileV2> paths, Page<FileV2> data
+  ) {
+    
+    return FileWebResponse.<List<FileContentWebResponse>>builder().paths(
+      FileResponseMapper.toPathWebResponses(paths))
+      .content(FileResponseMapper.toFileContentWebResponses(data))
+      .build();
+  }
+  
+  private static List<FileContentWebResponse> toFileContentWebResponses(
+    Page<FileV2> data
+  ) {
+    
+    return data.getContent()
+      .stream()
+      .map(FileResponseMapper::buildThumbnailFileContentWebResponse)
+      .collect(Collectors.toList());
   }
   
   private static FileContentWebResponse buildThumbnailFileContentWebResponse(
@@ -129,39 +179,6 @@ public final class FileResponseMapper {
     return Optional.of(file)
       .map(FileV2::getThumbnailUrl)
       .orElseGet(() -> FileResponseMapper.getFileUrl(file));
-  }
-  
-  public static DataPageResponse<FileWebResponse<List<FileContentWebResponse>>> toMultipleFileDataResponse(
-    Pair<List<String>, Page<FileV2>> data
-  ) {
-    
-    return DataPageResponse.<FileWebResponse<List<FileContentWebResponse>>>builder().code(
-      HttpStatus.OK.value())
-      .status(HttpStatus.OK.name())
-      .data(FileResponseMapper.buildFileWebResponse(data.getFirst(),
-                                                    data.getSecond()
-      ))
-      .paging(PageHelper.toPaging(data.getSecond()))
-      .build();
-  }
-  
-  private static FileWebResponse<List<FileContentWebResponse>> buildFileWebResponse(
-    List<String> paths, Page<FileV2> data
-  ) {
-    
-    return FileWebResponse.<List<FileContentWebResponse>>builder().paths(paths)
-      .content(FileResponseMapper.toFileContentWebResponses(data))
-      .build();
-  }
-  
-  private static List<FileContentWebResponse> toFileContentWebResponses(
-    Page<FileV2> data
-  ) {
-    
-    return data.getContent()
-      .stream()
-      .map(FileResponseMapper::buildThumbnailFileContentWebResponse)
-      .collect(Collectors.toList());
   }
   
 }

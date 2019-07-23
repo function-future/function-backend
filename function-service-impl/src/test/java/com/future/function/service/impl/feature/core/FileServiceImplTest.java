@@ -136,16 +136,20 @@ public class FileServiceImplTest {
     when(
       fileRepository.findAllByParentIdAndAsResourceFalseAndDeletedFalseOrderByMarkFolderDesc(
         PARENT_ID, PAGEABLE)).thenReturn(returnedPage);
+    
+    FileV2 parentObject = FileV2.builder()
+      .id(PARENT_ID)
+      .build();
     when(fileRepository.findByIdAndDeletedFalse(PARENT_ID)).thenReturn(
-      Optional.empty());
+      Optional.of(parentObject));
   
-    Pair<List<String>, Page<FileV2>> pathsAndFilesOrFolders =
+    Pair<List<FileV2>, Page<FileV2>> pathsAndFilesOrFolders =
       fileService.getFilesAndFolders(PARENT_ID, PAGEABLE);
 
-    List<String> paths = pathsAndFilesOrFolders.getFirst();
+    List<FileV2> paths = pathsAndFilesOrFolders.getFirst();
     
     assertThat(paths).isNotNull();
-    assertThat(paths).isEqualTo(Collections.singletonList(PARENT_ID));
+    assertThat(paths).isEqualTo(Collections.singletonList(parentObject));
     
     Page<FileV2> page = pathsAndFilesOrFolders
       .getSecond();
