@@ -20,6 +20,7 @@ import com.future.function.repository.feature.communication.questionnaire.Questi
 import com.future.function.repository.feature.communication.questionnaire.QuestionnaireResponseSummaryRepository;
 import com.future.function.repository.feature.communication.questionnaire.UserQuestionnaireSummaryRepository;
 import com.future.function.service.api.feature.communication.questionnaire.MyQuestionnaireService;
+import com.future.function.service.api.feature.core.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -51,7 +52,7 @@ public class MyQuestionnaireServiceImpl implements MyQuestionnaireService {
   private final QuestionResponseSummaryRepository questionResponseSummaryRepository;
 
   @Autowired
-  public MyQuestionnaireServiceImpl(QuestionnaireRepository questionnaireRepository, QuestionnaireParticipantRepository questionnaireParticipantRepository, QuestionQuestionnaireRepository questionQuestionnaireRepository, QuestionResponseRepository questionResponseRepository, QuestionnaireResponseRepository questionnaireResponseRepository, QuestionnaireResponseSummaryRepository questionnaireResponseSummaryRepository, UserQuestionnaireSummaryRepository userQuestionnaireSummaryRepository, QuestionResponseSummaryRepository questionResponseSummaryRepository) {
+  public MyQuestionnaireServiceImpl(QuestionnaireRepository questionnaireRepository, QuestionnaireParticipantRepository questionnaireParticipantRepository, QuestionQuestionnaireRepository questionQuestionnaireRepository, QuestionResponseRepository questionResponseRepository, QuestionnaireResponseRepository questionnaireResponseRepository, QuestionnaireResponseSummaryRepository questionnaireResponseSummaryRepository, UserQuestionnaireSummaryRepository userQuestionnaireSummaryRepository, QuestionResponseSummaryRepository questionResponseSummaryRepository, UserService userService) {
     this.questionnaireRepository = questionnaireRepository;
     this.questionnaireParticipantRepository = questionnaireParticipantRepository;
     this.questionQuestionnaireRepository = questionQuestionnaireRepository;
@@ -65,7 +66,7 @@ public class MyQuestionnaireServiceImpl implements MyQuestionnaireService {
   @Override
   public Page<Questionnaire> getQuestionnairesByMemberLoginAsAppraiser(User memberLogin, Pageable pageable) {
     Page<QuestionnaireParticipant> results = questionnaireParticipantRepository
-            .findAllByMemberAndParticipantTypeAndDeletedFalse(memberLogin, ParticipantType.APPRAISER, pageable);
+            .findAllByMemberAndParticipantTypeAndDeletedFalseOrderByCreatedAtDesc(memberLogin, ParticipantType.APPRAISER, pageable);
     List<Questionnaire> questionnaires = new ArrayList<>();
     for(QuestionnaireParticipant result : results){
         questionnaires.add(result.getQuestionnaire());
@@ -86,7 +87,10 @@ public class MyQuestionnaireServiceImpl implements MyQuestionnaireService {
 
     for (QuestionnaireParticipant participant : participants) {
       if(!participant.getMember().getId().equals(memberLogin.getId())) {
-        participantsList.add(participant);
+        if(! questionnaireResponseRepository
+              .findByQuestionnaireAndAppraiseeAndAppraiserAndDeletedFalse(questionnaire, participant.getMember(), memberLogin).isPresent() ){
+          participantsList.add(participant);
+        }
       }
     }
 

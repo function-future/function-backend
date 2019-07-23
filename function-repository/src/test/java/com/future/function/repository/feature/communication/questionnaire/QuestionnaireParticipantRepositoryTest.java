@@ -95,7 +95,7 @@ public class QuestionnaireParticipantRepositoryTest {
     testByGivenMemberAndParticipantTypeByFindingAllQuestionnaireParticipantReturnPagedQuestionnaireParticipant() {
       Page<QuestionnaireParticipant> questionnaireParticipants =
               questionnaireParticipantRepository
-                      .findAllByMemberAndParticipantTypeAndDeletedFalse(user1, ParticipantType.fromString("APPRAISER"), PAGEABLE);
+                      .findAllByMemberAndParticipantTypeAndDeletedFalseOrderByCreatedAtDesc(user1, ParticipantType.fromString("APPRAISER"), PAGEABLE);
 
       assertThat(questionnaireParticipants.getTotalElements()).isEqualTo(1);
       assertThat(questionnaireParticipants.getContent().get(0).getId()).isEqualTo(ID_1);

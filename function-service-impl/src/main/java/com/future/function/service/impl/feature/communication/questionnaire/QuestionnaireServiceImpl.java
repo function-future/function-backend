@@ -11,7 +11,6 @@ import com.future.function.repository.feature.communication.questionnaire.Questi
 import com.future.function.repository.feature.communication.questionnaire.QuestionnaireRepository;
 import com.future.function.service.api.feature.communication.questionnaire.QuestionnaireService;
 import com.future.function.service.api.feature.core.UserService;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -46,12 +45,12 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
 
   @Override
   public Page<Questionnaire> getAllQuestionnaires(Pageable pageable) {
-    return questionnaireRepository.findAllByDeletedFalse(pageable);
+    return questionnaireRepository.findAllByDeletedFalseOrderByCreatedAtDesc(pageable);
   }
 
   @Override
   public Page<Questionnaire> getQuestionnairesWithKeyword(String keyword, Pageable pageable) {
-    return questionnaireRepository.findAllByTitleIgnoreCaseContainingAndDeletedFalse(keyword, pageable);
+    return questionnaireRepository.findAllByTitleIgnoreCaseContainingAndDeletedFalseOrderByCreatedAtDesc(keyword, pageable);
   }
 
 
@@ -89,7 +88,13 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
   public void deleteQuestionnaire(String questionnaireId) {
     Optional.ofNullable(questionnaireId)
       .map(questionnaireRepository::findOne)
-      .ifPresent(this::softDeleteHelperQuestionnaire);
+      .map(this::softDeleteHelperQuestionnaire)
+      .map(questionnaireParticipantRepository::findAllByQuestionnaireAndDeletedFalse)
+      .ifPresent(questionnaireParticipants -> questionnaireParticipants.forEach(
+        questionnaireParticipant -> {
+          this.softDeletedHelperQuestionnaireParticipant(questionnaireParticipant);
+        }
+      ));
   }
 
   @Override
@@ -195,9 +200,9 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
     return targetQuestionnaire;
   }
 
-  private void softDeleteHelperQuestionnaire(Questionnaire questionnaire){
+  private Questionnaire softDeleteHelperQuestionnaire(Questionnaire questionnaire){
     questionnaire.setDeleted(true);
-    questionnaireRepository.save(questionnaire);
+    return questionnaireRepository.save(questionnaire);
   }
 
   private QuestionQuestionnaire setQuestionnaire (QuestionQuestionnaire questionQuestionnaire, QuestionQuestionnaire targetQuestionQuestionnaire) {

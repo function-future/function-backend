@@ -125,6 +125,7 @@ public class QuestionnaireController {
   @DeleteMapping(value ="/{questionnaireId}")
   public BaseResponse deleteQuestionnaire(@PathVariable String questionnaireId){
     questionnaireService.deleteQuestionnaire(questionnaireId);
+
     return ResponseHelper.toBaseResponse(HttpStatus.OK);
   }
 

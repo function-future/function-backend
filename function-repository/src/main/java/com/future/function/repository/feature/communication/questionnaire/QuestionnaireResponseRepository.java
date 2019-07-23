@@ -7,6 +7,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface QuestionnaireResponseRepository extends MongoRepository<QuestionnaireResponse,String> {
@@ -19,4 +20,6 @@ public interface QuestionnaireResponseRepository extends MongoRepository<Questio
    * @return {@code List<QuestionnaireResponse>} - questionnaire response from database
    */
   List<QuestionnaireResponse> findAllByQuestionnaireAndAppraiseeAndDeletedFalse(Questionnaire questionnaire, User appraisee);
+
+  Optional<QuestionnaireResponse> findByQuestionnaireAndAppraiseeAndAppraiserAndDeletedFalse(Questionnaire questionnaire, User appraisee, User appraiser);
 }
