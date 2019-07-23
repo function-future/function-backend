@@ -1,4 +1,4 @@
-package com.future.function.service.impl.helper;
+package com.future.function.web.mapper.helper;
 
 import com.future.function.common.properties.core.FileProperties;
 import org.junit.After;
