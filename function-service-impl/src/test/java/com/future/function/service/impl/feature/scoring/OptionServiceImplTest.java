@@ -75,9 +75,8 @@ public class OptionServiceImplTest {
 
   @Test
   public void getOptionListByQuestionIdNull() {
-    catchException(() -> optionService.getOptionListByQuestionId(null));
-
-    assertThat(caughtException().getClass()).isEqualTo(NotFoundException.class);
+    List<Option> actual = optionService.getOptionListByQuestionId(null);
+    assertThat(actual.size()).isEqualTo(0);
   }
 
   @Test

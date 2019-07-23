@@ -5,6 +5,7 @@ import com.future.function.model.entity.feature.communication.chatting.Message;
 import com.future.function.model.entity.feature.communication.chatting.MessageStatus;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.repository.TestApplication;
+import com.future.function.repository.feature.communication.chatting.MessageStatusRepository;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

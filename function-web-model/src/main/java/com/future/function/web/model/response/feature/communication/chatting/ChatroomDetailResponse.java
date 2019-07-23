@@ -1,5 +1,6 @@
 package com.future.function.web.model.response.feature.communication.chatting;
 
+import com.future.function.web.model.response.feature.embedded.ParticipantDetailResponse;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,7 +22,7 @@ public class ChatroomDetailResponse {
 
   private String name;
 
-  private List<ChatroomParticipantDetailResponse> members;
+  private List<ParticipantDetailResponse> members;
 
   private String type;
 

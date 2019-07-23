@@ -5,12 +5,14 @@ import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.scoring.Assignment;
 import com.future.function.model.entity.feature.scoring.Room;
+import com.future.function.model.util.constant.FieldName;
 import com.future.function.repository.feature.scoring.AssignmentRepository;
 import com.future.function.service.api.feature.core.BatchService;
 import com.future.function.service.api.feature.core.ResourceService;
 import com.future.function.service.api.feature.scoring.AssignmentService;
 import com.future.function.service.api.feature.scoring.RoomService;
 import com.future.function.service.impl.helper.CopyHelper;
+import com.future.function.service.impl.helper.PageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,11 +31,8 @@ import java.util.Optional;
 public class AssignmentServiceImpl implements AssignmentService {
 
   private AssignmentRepository assignmentRepository;
-
   private RoomService roomService;
-
   private ResourceService resourceService;
-
   private BatchService batchService;
 
   @Autowired
@@ -53,8 +52,10 @@ public class AssignmentServiceImpl implements AssignmentService {
    */
   @Override
   public Page<Assignment> findAllByBatchCodeAndPageable(String batchCode, Pageable pageable) {
-    Batch batch = batchService.getBatchByCode(batchCode);
-    return assignmentRepository.findAllByBatchAndDeletedFalse(batch, pageable);
+    return Optional.ofNullable(batchCode)
+            .map(batchService::getBatchByCode)
+            .map(batch -> assignmentRepository.findAllByBatchAndDeletedFalse(batch, pageable))
+            .orElseGet(() -> PageHelper.empty(pageable));
   }
 
   /**
@@ -68,7 +69,7 @@ public class AssignmentServiceImpl implements AssignmentService {
   public Assignment findById(String id) {
     return Optional.ofNullable(id)
             .flatMap(assignmentRepository::findByIdAndDeletedFalse)
-            .orElseThrow(() -> new NotFoundException("Assignment Not Found"));
+            .orElseThrow(() -> new NotFoundException("#Failed at #findById #AssignmentService"));
   }
 
   @Override
@@ -77,18 +78,30 @@ public class AssignmentServiceImpl implements AssignmentService {
   }
 
   @Override
+  public Page<Room> findAllRoomsByStudentId(String studentId, Pageable pageable, String userId) {
+      return roomService.findAllByStudentId(studentId, pageable, userId);
+  }
+
+  @Override
   public Room findRoomById(String id, String userId) {
     return roomService.findById(id, userId);
   }
 
   @Override
-  public Assignment copyAssignment(String assignmentId, String targetBatchCode) {
-    Assignment assignment = this.findById(assignmentId);
+  public Assignment copyAssignment(String assignmentId, String batchId) {
+    Batch targetBatch = batchService.getBatchById(batchId);
+    return Optional.ofNullable(assignmentId)
+            .map(this::findById)
+            .map(assignment -> initializeNewAssignment(targetBatch, assignment))
+            .map(this::createAssignment)
+            .orElseThrow(() -> new UnsupportedOperationException("Failed at #copyAssignment #AssignmentService"));
+  }
+
+  private Assignment initializeNewAssignment(Batch targetBatch, Assignment assignment) {
     Assignment newAssignment = Assignment.builder().build();
-    Batch targetBatchObj = batchService.getBatchByCode(targetBatchCode);
     CopyHelper.copyProperties(assignment, newAssignment);
-    newAssignment.setBatch(targetBatchObj);
-    return this.createAssignment(newAssignment);
+    newAssignment.setBatch(targetBatch);
+    return newAssignment;
   }
 
   /**
@@ -99,11 +112,18 @@ public class AssignmentServiceImpl implements AssignmentService {
    */
   @Override
   public Assignment createAssignment(Assignment assignment) {
-    assignment = storeAssignmentFile(assignment);
-    Batch batch = batchService.getBatchByCode(assignment.getBatch().getCode());
-    assignment.setBatch(batch);
-    assignment = assignmentRepository.save(assignment);
-    return roomService.createRoomsByAssignment(assignment);
+    return Optional.ofNullable(assignment)
+            .map(this::storeAssignmentFile)
+            .map(this::findAndSetAssignmentBatch)
+            .map(assignmentRepository::save)
+            .map(roomService::createRoomsByAssignment)
+            .orElseThrow(() -> new UnsupportedOperationException("Failed at #createAssignment #AssignmentService"));
+  }
+
+  private Assignment findAndSetAssignmentBatch(Assignment value) {
+    Batch batch = batchService.getBatchByCode(value.getBatch().getCode());
+    value.setBatch(batch);
+    return value;
   }
 
   /**
@@ -133,27 +153,35 @@ public class AssignmentServiceImpl implements AssignmentService {
    */
   @Override
   public Assignment updateAssignment(Assignment request) {
-    Assignment oldAssignment = this.findById(request.getId());
-    boolean isBatchChanged = isBatchChanged(request, oldAssignment);
-    if (isFilesChanged(request, oldAssignment)) {
-      resourceService.markFilesUsed(Collections.singletonList(oldAssignment.getFile().getId()), false);
-    }
-    CopyHelper.copyProperties(request, oldAssignment);
-    oldAssignment = storeAssignmentFile(oldAssignment);
-    oldAssignment = assignmentRepository.save(oldAssignment);
-    if (isBatchChanged) {
-      roomService.deleteAllRoomsByAssignmentId(oldAssignment.getId());
-      roomService.createRoomsByAssignment(oldAssignment);
-    }
-    return oldAssignment;
+    return Optional.ofNullable(request)
+            .map(Assignment::getId)
+            .map(this::findById)
+            .map(foundAssignment -> setAssignmentFile(request, foundAssignment))
+            .map(foundAssignment -> copyAssignmentRequestAttributesBasedOnFileExistence(request, foundAssignment))
+            .map(this::storeAssignmentFile)
+            .map(assignmentRepository::save)
+            .orElse(request);
   }
 
-  private boolean isBatchChanged(Assignment request, Assignment oldAssignment) {
-    return !request.getBatch().getCode().equals(oldAssignment.getBatch().getCode());
+  private Assignment copyAssignmentRequestAttributesBasedOnFileExistence(Assignment request, Assignment foundAssignment) {
+    if (Objects.isNull(request.getFile())) {
+      CopyHelper.copyProperties(request, foundAssignment, FieldName.Assignment.FILE, FieldName.Assignment.BATCH);
+    } else {
+      CopyHelper.copyProperties(request, foundAssignment, FieldName.Assignment.BATCH);
+    }
+    return foundAssignment;
   }
 
-  private boolean isFilesChanged(Assignment request, Assignment oldAssignment) {
-    return !request.getFile().getId().equals(oldAssignment.getFile().getId());
+    private Assignment setAssignmentFile(Assignment request, Assignment foundAssignment) {
+    return Optional.ofNullable(request)
+        .map(Assignment::getFile)
+        .map(FileV2::getId)
+            .filter(id -> !id.equals(foundAssignment.getFile().getId()))
+            .map(fileId -> {
+              resourceService.markFilesUsed(Collections.singletonList(foundAssignment.getFile().getId()), false);
+              return foundAssignment;
+            })
+            .orElse(foundAssignment);
   }
 
   @Override
@@ -177,11 +205,15 @@ public class AssignmentServiceImpl implements AssignmentService {
             .map(this::findById)
             .ifPresent(assignment -> {
               roomService.deleteAllRoomsByAssignmentId(assignment.getId());
-              if (Objects.nonNull(assignment.getFile()) && !StringUtils.isEmpty(assignment.getFile().getId())) {
-                resourceService.markFilesUsed(Collections.singletonList(assignment.getFile().getId()), false);
-              }
+              markAllFilesAsNotUsed(assignment);
               assignment.setDeleted(true);
               assignmentRepository.save(assignment);
             });
+  }
+
+  private void markAllFilesAsNotUsed(Assignment assignment) {
+    if (Objects.nonNull(assignment.getFile()) && !StringUtils.isEmpty(assignment.getFile().getId())) {
+      resourceService.markFilesUsed(Collections.singletonList(assignment.getFile().getId()), false);
+    }
   }
 }

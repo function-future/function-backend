@@ -91,6 +91,8 @@ public class RoomControllerTest extends TestHelper {
         .batch(Batch.builder().code(BATCH_CODE).build())
         .build();
 
+    assignment.setCreatedAt(ASSIGNMENT_DEADLINE);
+
     user = User.builder().id(USER_ID)
         .name(USER_NAME)
         .address("address")

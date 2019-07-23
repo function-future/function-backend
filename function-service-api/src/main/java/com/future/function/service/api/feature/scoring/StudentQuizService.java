@@ -14,6 +14,8 @@ public interface StudentQuizService {
 
   Page<StudentQuiz> findAllByStudentId(String studentId, Pageable pageable, String userId);
 
+    List<StudentQuizDetail> findAllQuizByStudentId(String studentId);
+
   StudentQuiz findById(String id, String userId);
 
   List<StudentQuestion> findAllQuestionsByStudentQuizId(String studentQuizId, String userId);
@@ -30,5 +32,5 @@ public interface StudentQuizService {
 
   void deleteById(String id);
 
-  void deleteByBatchCodeAndQuiz(String batchCode, String quizId);
+  void deleteByBatchCodeAndQuiz(Quiz quiz);
 }

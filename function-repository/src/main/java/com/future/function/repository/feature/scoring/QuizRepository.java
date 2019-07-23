@@ -1,5 +1,6 @@
 package com.future.function.repository.feature.scoring;
 
+import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.scoring.Quiz;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,6 +23,6 @@ public interface QuizRepository extends MongoRepository<Quiz, String> {
    */
   Optional<Quiz> findByIdAndDeletedFalse(String id);
 
-  Page<Quiz> findAllByDeletedFalse(Pageable pageable);
+  Page<Quiz> findAllByBatchAndDeletedFalse(Batch batch, Pageable pageable);
 
 }

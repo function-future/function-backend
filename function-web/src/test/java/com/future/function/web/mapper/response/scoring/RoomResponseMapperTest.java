@@ -14,8 +14,6 @@ import com.future.function.web.model.response.feature.core.BatchWebResponse;
 import com.future.function.web.model.response.feature.core.UserWebResponse;
 import com.future.function.web.model.response.feature.scoring.AssignmentWebResponse;
 import com.future.function.web.model.response.feature.scoring.RoomWebResponse;
-import java.util.Collections;
-import java.util.Date;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,6 +23,9 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+
+import java.util.Collections;
+import java.util.Date;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -64,6 +65,7 @@ public class RoomResponseMapperTest {
         .batch(batch)
         .file(fileV2)
         .build();
+    assignment.setCreatedAt(ASSIGNMENT_DEADLINE);
     assignmentWebResponse = AssignmentWebResponse
         .builder()
         .title(ASSIGNMENT_TITLE)
@@ -72,10 +74,13 @@ public class RoomResponseMapperTest {
         .batchCode(BATCH_CODE)
         .file(FILE_URl)
         .build();
+    assignmentWebResponse.setUploadedDate(ASSIGNMENT_DEADLINE);
     batchWebResponse = BatchWebResponse.builder()
         .code(BATCH_CODE).build();
     student = User.builder().id(USER_ID).name("name").address("address").batch(batch).email("email")
         .password("password").phone("phone").pictureV2(fileV2).role(Role.STUDENT).build();
+    batchWebResponse = new BatchWebResponse();
+    BeanUtils.copyProperties(batch, batchWebResponse);
     userWebResponse = new UserWebResponse();
     BeanUtils.copyProperties(student, userWebResponse);
     userWebResponse.setBatch(batchWebResponse);

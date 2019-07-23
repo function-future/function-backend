@@ -1,16 +1,19 @@
 package com.future.function.service.impl.feature.core;
 
+import com.future.function.common.enumeration.core.Role;
 import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.repository.feature.core.BatchRepository;
 import com.future.function.service.api.feature.core.BatchService;
 import com.future.function.service.impl.helper.CopyHelper;
+import com.future.function.session.model.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * Service implementation class for batch logic operations implementation.
@@ -32,9 +35,21 @@ public class BatchServiceImpl implements BatchService {
    * @return {@code Batch} - Batches found in database.
    */
   @Override
-  public Page<Batch> getBatches(Pageable pageable) {
-    
-    return batchRepository.findAllByIdIsNotNull(pageable);
+  public Page<Batch> getBatches(Session session, Pageable pageable) {
+  
+    return Optional.of(session)
+      .filter(this::hasNonStudentRole)
+      .map(ignored -> batchRepository.findAllByDeletedFalse(pageable))
+      .orElseGet(
+        () -> batchRepository.findAllByIdAndDeletedFalse(session.getBatchId(),
+                                                         pageable
+        ));
+  }
+  
+  private boolean hasNonStudentRole(Session session) {
+  
+    return Stream.of(Role.ADMIN, Role.JUDGE, Role.MENTOR)
+      .anyMatch(role -> role.equals(session.getRole()));
   }
   
   /**
@@ -47,7 +62,7 @@ public class BatchServiceImpl implements BatchService {
   @Override
   public Batch getBatchByCode(String code) {
     
-    return batchRepository.findByCode(code)
+    return batchRepository.findByCodeAndDeletedFalse(code)
       .orElseThrow(() -> new NotFoundException("Get Batch Not Found"));
   }
   
@@ -56,6 +71,7 @@ public class BatchServiceImpl implements BatchService {
     
     return Optional.ofNullable(batchId)
       .map(batchRepository::findOne)
+      .filter(foundBatch -> !foundBatch.isDeleted())
       .orElseThrow(() -> new NotFoundException("Get Batch Not Found"));
   }
   
@@ -69,7 +85,7 @@ public class BatchServiceImpl implements BatchService {
     
     batchRepository.save(batch);
     
-    return batchRepository.findFirstByIdIsNotNullOrderByUpdatedAtDesc()
+    return batchRepository.findFirstByDeletedFalseOrderByUpdatedAtDesc()
       .orElseThrow(() -> new NotFoundException("Saved Batch Not Found"));
   }
   
@@ -78,9 +94,10 @@ public class BatchServiceImpl implements BatchService {
     
     return Optional.of(batch)
       .map(b -> batchRepository.findOne(b.getId()))
+      .filter(foundBatch -> !foundBatch.isDeleted())
       .map(foundBatch -> copyPropertiesAndSaveBatch(batch, foundBatch))
       .flatMap(
-        ignored -> batchRepository.findFirstByIdIsNotNullOrderByUpdatedAtDesc())
+        ignored -> batchRepository.findFirstByDeletedFalseOrderByUpdatedAtDesc())
       .orElse(batch);
   }
   
@@ -95,6 +112,7 @@ public class BatchServiceImpl implements BatchService {
     
     Optional.ofNullable(batchId)
       .map(batchRepository::findOne)
+      .filter(foundBatch -> !foundBatch.isDeleted())
       .ifPresent(batch -> {
         batch.setDeleted(true);
         batchRepository.save(batch);

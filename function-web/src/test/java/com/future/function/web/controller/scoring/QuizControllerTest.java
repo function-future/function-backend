@@ -20,7 +20,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -32,19 +31,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -54,14 +47,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class QuizControllerTest extends TestHelper {
 
   private static final String QUIZ_ID = "quiz-id";
-  private static final String QUIZ_TITLE = "assignment-title";
-  private static final String QUIZ_DESCRIPTION = "assignment-description";
+    private static final String QUIZ_TITLE = "quiz-title";
+    private static final String QUIZ_DESCRIPTION = "quiz-description";
   private static final long QUIZ_DATE = 150000;
   private static final long QUIZ_TIME_LIMIT = 150000;
   private static final int QUIZ_TRIALS = 3;
   private static final String QUIZ_QUESTION_BANK_ID = "question-bank-id";
   private static final int QUIZ_QUESTION_COUNT = 3;
   private static final String QUIZ_BATCH_CODE = "3";
+    private static final String QUIZ_BATCH_ID = "batchId";
 
   private Pageable pageable;
   private Quiz quiz;
@@ -83,9 +77,6 @@ public class QuizControllerTest extends TestHelper {
   private JacksonTester<QuizWebRequest> webRequestJacksonTester;
 
   private JacksonTester<CopyQuizWebRequest> copyQuizWebRequestJacksonTester;
-
-  @Autowired
-  private MockMvc mockMvc;
 
   @MockBean
   private QuizService quizService;
@@ -134,14 +125,13 @@ public class QuizControllerTest extends TestHelper {
         .timeLimit(QUIZ_TIME_LIMIT)
         .questionCount(QUIZ_QUESTION_COUNT)
         .trials(QUIZ_TRIALS)
-        .batchCode(QUIZ_BATCH_CODE)
         .questionBanks(QUESTION_BANK_IDS)
         .build();
 
     copyQuizWebRequest = CopyQuizWebRequest
         .builder()
         .quizId(QUIZ_ID)
-        .batchCode(QUIZ_BATCH_CODE)
+            .batchId(QUIZ_BATCH_ID)
         .build();
 
     quizList = new ArrayList<>();
@@ -167,9 +157,9 @@ public class QuizControllerTest extends TestHelper {
     when(quizService.updateQuiz(quiz)).thenReturn(quiz);
     when(quizService.findAllByBatchCodeAndPageable(QUIZ_BATCH_CODE, pageable))
         .thenReturn(quizPage);
-    when(quizService.copyQuizWithTargetBatch(QUIZ_BATCH_CODE, quiz)).thenReturn(quiz);
-    when(requestMapper.toQuiz(quizWebRequest)).thenReturn(quiz);
-    when(requestMapper.toQuiz(QUIZ_ID, quizWebRequest)).thenReturn(quiz);
+      when(quizService.copyQuizWithTargetBatchId(QUIZ_BATCH_ID, quiz)).thenReturn(quiz);
+      when(requestMapper.toQuiz(quizWebRequest, QUIZ_BATCH_CODE)).thenReturn(quiz);
+      when(requestMapper.toQuiz(QUIZ_ID, quizWebRequest, QUIZ_BATCH_CODE)).thenReturn(quiz);
     when(requestMapper.validateCopyQuizWebRequest(copyQuizWebRequest)).thenReturn(copyQuizWebRequest);
   }
 
@@ -251,7 +241,7 @@ public class QuizControllerTest extends TestHelper {
         ));
 
     verify(quizService).createQuiz(quiz);
-    verify(requestMapper).toQuiz(quizWebRequest);
+      verify(requestMapper).toQuiz(quizWebRequest, QUIZ_BATCH_CODE);
   }
 
   @Test
@@ -268,7 +258,7 @@ public class QuizControllerTest extends TestHelper {
                 .getJson()
         ));
     verify(quizService).findById(QUIZ_ID);
-    verify(quizService).copyQuizWithTargetBatch(QUIZ_BATCH_CODE, quiz);
+      verify(quizService).copyQuizWithTargetBatchId(QUIZ_BATCH_ID, quiz);
     verify(requestMapper).validateCopyQuizWebRequest(copyQuizWebRequest);
   }
 
@@ -287,6 +277,6 @@ public class QuizControllerTest extends TestHelper {
         ));
 
     verify(quizService).updateQuiz(quiz);
-    verify(requestMapper).toQuiz(QUIZ_ID, quizWebRequest);
+      verify(requestMapper).toQuiz(QUIZ_ID, quizWebRequest, QUIZ_BATCH_CODE);
   }
 }

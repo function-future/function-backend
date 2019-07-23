@@ -9,6 +9,8 @@ import com.future.function.repository.feature.scoring.AssignmentRepository;
 import com.future.function.service.api.feature.core.BatchService;
 import com.future.function.service.api.feature.core.ResourceService;
 import com.future.function.service.api.feature.scoring.RoomService;
+import com.future.function.service.impl.helper.CopyHelper;
+import com.future.function.service.impl.helper.PageHelper;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,11 +24,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static com.googlecode.catchexception.CatchException.catchException;
 import static com.googlecode.catchexception.CatchException.caughtException;
@@ -36,15 +34,15 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class AssignmentServiceImplTest {
 
+  private static final String ASSIGNMENT_ID = "assignment-id";
   private static final String ASSIGNMENT_TITLE = "assignment-title";
   private static final String ASSIGNMENT_DESCRIPTION = "assignment-description";
   private static final long ASSIGNMENT_DEADLINE = new Date().getTime();
   private static final String BATCH_CODE = "batchCode";
+    private static final String BATCH_ID = "batchId";
   private static final String USER_ID = "userId";
 
   private static final String ROOM_ID = "room-id";
-
-  private static final String ERROR_MSG_NOT_FOUND = "Assignment Not Found";
 
   private static final String FILE_PATH = "file-path";
   private static final String FILE_ID = "file-id";
@@ -76,7 +74,7 @@ public class AssignmentServiceImplTest {
   @Before
   public void setUp() throws Exception {
 
-    batch = Batch.builder().code(BATCH_CODE).build();
+      batch = Batch.builder().code(BATCH_CODE).id(BATCH_ID).build();
 
     file = FileV2
         .builder()
@@ -86,6 +84,7 @@ public class AssignmentServiceImplTest {
 
     assignment = Assignment
         .builder()
+            .id(ASSIGNMENT_ID)
         .title(ASSIGNMENT_TITLE)
         .description(ASSIGNMENT_DESCRIPTION)
         .deadline(ASSIGNMENT_DEADLINE)
@@ -103,13 +102,14 @@ public class AssignmentServiceImplTest {
     assignmentPage = new PageImpl<>(assignmentList, pageable, 1);
     roomPage = new PageImpl<>(Collections.singletonList(room), pageable, 1);
 
-    when(assignmentRepository.findByIdAndDeletedFalse(assignment.getId()))
+    when(assignmentRepository.findByIdAndDeletedFalse(ASSIGNMENT_ID))
         .thenReturn(Optional.of(assignment));
     when(assignmentRepository.findAllByBatchAndDeletedFalse(batch, pageable))
         .thenReturn(assignmentPage);
     when(assignmentRepository.save(assignment))
         .thenReturn(assignment);
     when(batchService.getBatchByCode(BATCH_CODE)).thenReturn(batch);
+      when(batchService.getBatchById(BATCH_ID)).thenReturn(batch);
     when(resourceService.getFile(FILE_ID)).thenReturn(file);
     when(resourceService.markFilesUsed(Collections.singletonList(FILE_ID), true)).thenReturn(true);
     when(resourceService.markFilesUsed(Collections.singletonList(FILE_ID), false)).thenReturn(true);
@@ -117,6 +117,8 @@ public class AssignmentServiceImplTest {
     when(roomService.findById(ROOM_ID, USER_ID)).thenReturn(room);
     when(roomService.findAllRoomsByAssignmentId(any(String.class), eq(pageable))).thenReturn(roomPage);
     when(roomService.giveScoreToRoomByRoomId(ROOM_ID, USER_ID, 100)).thenReturn(room);
+      when(roomService.findAllByStudentId(USER_ID, pageable, USER_ID))
+              .thenReturn(PageHelper.toPage(Collections.singletonList(room), pageable));
   }
 
   @After
@@ -134,6 +136,15 @@ public class AssignmentServiceImplTest {
     verify(assignmentRepository).findAllByBatchAndDeletedFalse(batch, pageable);
   }
 
+    @Test
+    public void testFindAllRoomsWithStudentIdAndPageable() {
+        Page<Room> result = assignmentService.findAllRoomsByStudentId(USER_ID, pageable, USER_ID);
+        assertThat(result).isNotNull();
+        assertThat(result.getContent().size()).isEqualTo(1);
+        assertThat(result.getContent()).isEqualTo(Collections.singletonList(room));
+        verify(roomService).findAllByStudentId(USER_ID, pageable, USER_ID);
+    }
+
   @Test
   public void testFindByIdSuccess() {
     Assignment result = assignmentService.findById(assignment.getId());
@@ -146,7 +157,6 @@ public class AssignmentServiceImplTest {
   public void testFindByIdNull() {
     catchException(() -> assignmentService.findById(null));
     assertThat(caughtException().getClass()).isEqualTo(NotFoundException.class);
-    assertThat(caughtException().getMessage()).isEqualTo(ERROR_MSG_NOT_FOUND);
     verifyZeroInteractions(assignmentRepository);
   }
 
@@ -230,12 +240,43 @@ public class AssignmentServiceImplTest {
   }
 
   @Test
+  public void testUpdateAssignmentNoFileOnRequestSuccess() {
+    Assignment assignmentWithNoFile = new Assignment();
+    CopyHelper.copyProperties(assignment, assignmentWithNoFile);
+    assignmentWithNoFile.setId(ASSIGNMENT_ID);
+    assignmentWithNoFile.setFile(null);
+    when(assignmentRepository.save(assignmentWithNoFile))
+            .thenReturn(assignmentWithNoFile);
+    Assignment actual = assignmentService.updateAssignment(assignmentWithNoFile);
+    assertThat(actual.getFile()).isEqualTo(file);
+    assertThat(actual).isEqualTo(assignment);
+    verify(resourceService).getFile(FILE_ID);
+    verify(resourceService).markFilesUsed(Collections.singletonList(FILE_ID), true);
+    verify(assignmentRepository).save(assignment);
+    verify(assignmentRepository).findByIdAndDeletedFalse(assignmentWithNoFile.getId());
+  }
+
+  @Test
+  public void testUpdateAssignmentNoFileOnDBAndRequestSuccess() {
+    Assignment assignmentWithNoFile = new Assignment();
+    CopyHelper.copyProperties(assignment, assignmentWithNoFile);
+    assignmentWithNoFile.setId(ASSIGNMENT_ID);
+    assignment.setFile(null);
+    assignmentWithNoFile.setFile(null);
+    when(assignmentRepository.save(assignmentWithNoFile))
+            .thenReturn(assignmentWithNoFile);
+    Assignment actual = assignmentService.updateAssignment(assignmentWithNoFile);
+    assertThat(actual).isEqualTo(assignment);
+    verify(assignmentRepository).save(assignment);
+    verify(assignmentRepository).findByIdAndDeletedFalse(assignmentWithNoFile.getId());
+  }
+
+  @Test
   public void testUpdateAssignmentDifferentBatchAndFileSuccess() {
     Assignment assignmentWithFile = new Assignment();
     FileV2 anotherFile = FileV2.builder().id("id").build();
     BeanUtils.copyProperties(assignment, assignmentWithFile);
     assignmentWithFile.setFile(anotherFile);
-    assignmentWithFile.setBatch(Batch.builder().code("CODE").build());
     when(resourceService.getFile("id")).thenReturn(anotherFile);
     when(resourceService.markFilesUsed(Collections.singletonList("id"), true)).thenReturn(true);
     when(assignmentRepository.findByIdAndDeletedFalse(assignmentWithFile.getId())).thenReturn(Optional.of(assignment));
@@ -247,8 +288,6 @@ public class AssignmentServiceImplTest {
     verify(resourceService).getFile("id");
     verify(resourceService).markFilesUsed(Collections.singletonList("id"), true);
     verify(resourceService).markFilesUsed(Collections.singletonList(FILE_ID), false);
-    verify(roomService).deleteAllRoomsByAssignmentId(assignmentWithFile.getId());
-    verify(roomService).createRoomsByAssignment(assignmentWithFile);
     verify(assignmentRepository).save(assignmentWithFile);
     verify(assignmentRepository).findByIdAndDeletedFalse(assignmentWithFile.getId());
   }
@@ -285,19 +324,21 @@ public class AssignmentServiceImplTest {
   @Test
   public void copyAssignmentTest() {
     when(assignmentRepository.findByIdAndDeletedFalse("id")).thenReturn(Optional.of(assignment));
-    Batch anotherBatch = Batch.builder().code("CODE").build();
-    when(batchService.getBatchByCode("CODE")).thenReturn(anotherBatch);
+      Batch anotherBatch = Batch.builder().code("CODE").id("ID").build();
+      when(batchService.getBatchById("ID")).thenReturn(anotherBatch);
     Assignment anotherAssignment = Assignment.builder().build();
     BeanUtils.copyProperties(assignment, anotherAssignment, "id");
     anotherAssignment.setBatch(anotherBatch);
     when(assignmentRepository.save(any(Assignment.class))).thenReturn(anotherAssignment);
     when(roomService.createRoomsByAssignment(anotherAssignment)).thenReturn(anotherAssignment);
-    Assignment actual = assignmentService.copyAssignment("id", "CODE");
+      Assignment actual = assignmentService.copyAssignment("id", "ID");
     assertThat(actual.getBatch().getCode()).isEqualTo("CODE");
+      assertThat(actual.getBatch().getId()).isEqualTo("ID");
     assertThat(actual.getId()).isNotEqualTo("id");
     verify(resourceService).markFilesUsed(Collections.singletonList(FILE_ID), true);
     verify(resourceService).getFile(FILE_ID);
-    verify(batchService, times(2)).getBatchByCode("CODE");
+      verify(batchService).getBatchByCode("CODE");
+      verify(batchService).getBatchById("ID");
     verify(assignmentRepository).findByIdAndDeletedFalse("id");
     verify(assignmentRepository).save(any(Assignment.class));
     verify(roomService).createRoomsByAssignment(anotherAssignment);

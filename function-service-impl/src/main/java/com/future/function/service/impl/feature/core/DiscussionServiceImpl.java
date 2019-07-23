@@ -8,7 +8,6 @@ import com.future.function.model.entity.feature.core.User;
 import com.future.function.repository.feature.core.DiscussionRepository;
 import com.future.function.service.api.feature.core.BatchService;
 import com.future.function.service.api.feature.core.DiscussionService;
-import com.future.function.service.api.feature.core.SharedCourseService;
 import com.future.function.service.api.feature.core.UserService;
 import com.future.function.service.impl.helper.PageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,27 +27,22 @@ public class DiscussionServiceImpl implements DiscussionService {
   
   private final UserService userService;
   
-  private final SharedCourseService sharedCourseService;
-  
   private final BatchService batchService;
   
   @Autowired
   public DiscussionServiceImpl(
     DiscussionRepository discussionRepository, UserService userService,
-    SharedCourseService sharedCourseService, BatchService batchService
+    BatchService batchService
   ) {
     
     this.discussionRepository = discussionRepository;
     this.userService = userService;
-    this.sharedCourseService = sharedCourseService;
     this.batchService = batchService;
   }
   
   /**
    * {@inheritDoc}
    *
-   * @param courseId  Id of course's discussion to be retrieved.
-   * @param batchCode Batch code of target discussion.
    * @param pageable  Pageable object for paging data.
    *
    * @return {@code Page<Discussion>} - Page of discussions found in database.
@@ -60,11 +54,9 @@ public class DiscussionServiceImpl implements DiscussionService {
     
     return Optional.of(email)
       .filter(e -> this.isUserValidForAddingDiscussion(e, batchCode))
-      .filter(ignored -> this.isSharedCourseExist(courseId, batchCode))
       .map(ignored -> this.getBatchId(batchCode))
-      .map(
-        batchId -> discussionRepository.findAllByCourseIdAndBatchIdOrderByCreatedAtDesc(
-          courseId, batchId, pageable))
+      .map(batchId -> discussionRepository.findAllByCourseIdAndBatchIdOrderByCreatedAtDesc(
+        courseId, batchId, pageable))
       .orElseGet(() -> PageHelper.empty(pageable));
   }
   
@@ -80,12 +72,10 @@ public class DiscussionServiceImpl implements DiscussionService {
     
     String email = discussion.getUser()
       .getEmail();
-    String courseId = discussion.getCourseId();
     String batchCode = discussion.getBatchCode();
     
     return Optional.of(discussion)
       .filter(ignored -> this.isUserValidForAddingDiscussion(email, batchCode))
-      .filter(ignored -> this.isSharedCourseExist(courseId, batchCode))
       .map(this::setDiscussionUser)
       .map(this::setDiscussionBatch)
       .map(discussionRepository::save)
@@ -124,12 +114,6 @@ public class DiscussionServiceImpl implements DiscussionService {
       .orElseThrow(() -> new ForbiddenException("Invalid Batch"));
   }
   
-  private boolean isSharedCourseExist(String courseId, String batchCode) {
-    
-    return sharedCourseService.getCourseByIdAndBatchCode(courseId, batchCode) !=
-           null;
-  }
-  
   private Discussion setDiscussionUser(Discussion discussion) {
     
     User user = userService.getUserByEmail(discussion.getUser()
@@ -138,6 +122,15 @@ public class DiscussionServiceImpl implements DiscussionService {
     discussion.setUser(user);
     
     return discussion;
+  }
+  
+  @Override
+  public void deleteDiscussions(String courseId, String batchCode) {
+    
+    discussionRepository.deleteAllByCourseIdAndBatchId(courseId,
+                                                       this.getBatchId(
+                                                         batchCode)
+    );
   }
   
 }

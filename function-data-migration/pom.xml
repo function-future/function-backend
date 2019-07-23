@@ -13,8 +13,16 @@
 
     <dependency>
       <groupId>com.future.function</groupId>
+      <artifactId>function-common</artifactId>
+      <version>${project.version}</version>
+      <optional>true</optional>
+    </dependency>
+
+    <dependency>
+      <groupId>com.future.function</groupId>
       <artifactId>function-repository</artifactId>
-      <version>${project.parent.version}</version>
+      <version>${project.version}</version>
+      <optional>true</optional>
     </dependency>
 
     <dependency>
@@ -25,6 +33,7 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-security</artifactId>
+      <optional>true</optional>
     </dependency>
 
   </dependencies>

@@ -5,13 +5,14 @@ import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.service.api.feature.core.AccessService;
 import com.future.function.service.api.feature.core.MenuService;
-import com.future.function.service.api.feature.core.UserService;
+import com.future.function.service.api.feature.core.UserDetailService;
 import com.future.function.web.TestHelper;
 import com.future.function.web.TestSecurityConfiguration;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.mapper.request.core.UserDetailRequestMapper;
 import com.future.function.web.mapper.response.core.UserResponseMapper;
 import com.future.function.web.model.request.core.ChangePasswordWebRequest;
+import com.future.function.web.model.request.core.ChangeProfilePictureWebRequest;
 import com.future.function.web.model.response.base.BaseResponse;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.feature.core.UserWebResponse;
@@ -37,6 +38,7 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -45,6 +47,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(value = UserDetailController.class)
 public class UserDetailControllerTest extends TestHelper {
 
+  private static final String AVATAR_ID = "avatar-id";
+  
   private static final User USER = User.builder()
     .id("id")
     .role(Role.MENTOR)
@@ -53,6 +57,7 @@ public class UserDetailControllerTest extends TestHelper {
     .phone("phone")
     .address("address")
     .pictureV2(FileV2.builder()
+                 .id(AVATAR_ID)
                  .fileUrl("file-url")
                  .build())
     .build();
@@ -63,6 +68,10 @@ public class UserDetailControllerTest extends TestHelper {
 
   private static final ChangePasswordWebRequest CHANGE_PASSWORD_WEB_REQUEST =
     new ChangePasswordWebRequest(OLD_PASSWORD, NEW_PASSWORD);
+  
+  private static final ChangeProfilePictureWebRequest
+    CHANGE_PROFILE_PICTURE_WEB_REQUEST = new ChangeProfilePictureWebRequest(
+    Collections.singletonList(AVATAR_ID));
 
   private static final DataResponse<UserWebResponse> DATA_RESPONSE =
     UserResponseMapper.toUserDataResponse(USER);
@@ -76,16 +85,13 @@ public class UserDetailControllerTest extends TestHelper {
   private JacksonTester<ChangePasswordWebRequest>
     changePasswordWebRequestJacksonTester;
 
+  private JacksonTester<ChangeProfilePictureWebRequest>
+    changeProfilePictureWebRequestJacksonTester;
+
   private JacksonTester<Map<String, Object>> mapJacksonTester;
 
   @MockBean
-  private UserService userService;
-
-  @MockBean
-  private MenuService menuService;
-
-  @MockBean
-  private AccessService accessService;
+  private UserDetailService userDetailService;
 
   @MockBean
   private UserDetailRequestMapper userDetailRequestMapper;
@@ -100,8 +106,34 @@ public class UserDetailControllerTest extends TestHelper {
   @After
   public void tearDown() {
 
-    verifyNoMoreInteractions(
-      userService, menuService, accessService, userDetailRequestMapper);
+    verifyNoMoreInteractions(userDetailService, userDetailRequestMapper);
+  }
+  
+  @Test
+  public void testGivenApiCallByChangingProfilePictureReturnDataResponse()
+    throws Exception {
+    
+    super.setCookie(Role.MENTOR);
+  
+    when(userDetailRequestMapper.toUser(CHANGE_PROFILE_PICTURE_WEB_REQUEST,
+                                        MENTOR_EMAIL
+    )).thenReturn(USER);
+  
+    when(userDetailService.changeProfilePicture(USER)).thenReturn(USER);
+  
+    mockMvc.perform(put("/api/core/user/profile/picture").cookie(cookies)
+                      .contentType(MediaType.APPLICATION_JSON)
+                      .content(
+                        changeProfilePictureWebRequestJacksonTester.write(
+                          CHANGE_PROFILE_PICTURE_WEB_REQUEST)
+                          .getJson()))
+      .andExpect(status().isOk())
+      .andExpect(content().json(dataResponseJacksonTester.write(DATA_RESPONSE)
+                                  .getJson()));
+  
+    verify(userDetailRequestMapper).toUser(CHANGE_PROFILE_PICTURE_WEB_REQUEST,
+                                           MENTOR_EMAIL);
+    verify(userDetailService).changeProfilePicture(USER);
   }
 
   @Test
@@ -110,15 +142,15 @@ public class UserDetailControllerTest extends TestHelper {
 
     super.setCookie(Role.MENTOR);
 
-    when(userService.getUserByEmail(MENTOR_EMAIL)).thenReturn(USER);
+    when(userDetailService.getUserByEmail(MENTOR_EMAIL)).thenReturn(USER);
 
     mockMvc.perform(get("/api/core/user/profile").cookie(cookies))
       .andExpect(status().isOk())
       .andExpect(content().json(dataResponseJacksonTester.write(DATA_RESPONSE)
                                   .getJson()));
 
-    verify(userService).getUserByEmail(MENTOR_EMAIL);
-    verifyZeroInteractions(accessService, menuService, userDetailRequestMapper);
+    verify(userDetailService).getUserByEmail(MENTOR_EMAIL);
+    verifyZeroInteractions(userDetailRequestMapper);
   }
 
   @Test
@@ -131,8 +163,7 @@ public class UserDetailControllerTest extends TestHelper {
         baseResponseJacksonTester.write(UNAUTHORIZED_BASE_RESPONSE)
           .getJson()));
 
-    verifyZeroInteractions(
-      userService, accessService, menuService, userDetailRequestMapper);
+    verifyZeroInteractions(userDetailService, userDetailRequestMapper);
   }
 
   @Test
@@ -157,9 +188,8 @@ public class UserDetailControllerTest extends TestHelper {
 
     verify(userDetailRequestMapper).toOldAndNewPasswordPair(
       CHANGE_PASSWORD_WEB_REQUEST);
-    verify(userService).changeUserPassword(
+    verify(userDetailService).changeUserPassword(
       MENTOR_EMAIL, OLD_PASSWORD, NEW_PASSWORD);
-    verifyZeroInteractions(accessService, menuService);
   }
 
   @Test
@@ -169,15 +199,15 @@ public class UserDetailControllerTest extends TestHelper {
     super.setCookie(Role.JUDGE);
 
     Map<String, Object> menuList = Collections.singletonMap("key", true);
-    when(menuService.getSectionsByRole(Role.JUDGE)).thenReturn(menuList);
+    when(userDetailService.getSectionsByRole(Role.JUDGE)).thenReturn(menuList);
 
     mockMvc.perform(get("/api/core/user/menu-list").cookie(cookies))
       .andExpect(status().isOk())
       .andExpect(content().json(mapJacksonTester.write(menuList)
                                   .getJson()));
 
-    verify(menuService).getSectionsByRole(Role.JUDGE);
-    verifyZeroInteractions(userService, accessService, userDetailRequestMapper);
+    verify(userDetailService).getSectionsByRole(Role.JUDGE);
+    verifyZeroInteractions(userDetailRequestMapper);
   }
 
   @Test
@@ -185,15 +215,15 @@ public class UserDetailControllerTest extends TestHelper {
     throws Exception {
 
     Map<String, Object> defaultMenuList = Collections.emptyMap();
-    when(menuService.getSectionsByRole(null)).thenReturn(defaultMenuList);
+    when(userDetailService.getSectionsByRole(null)).thenReturn(defaultMenuList);
 
     mockMvc.perform(get("/api/core/user/menu-list"))
       .andExpect(status().isOk())
       .andExpect(content().json(mapJacksonTester.write(defaultMenuList)
                                   .getJson()));
 
-    verify(menuService).getSectionsByRole(null);
-    verifyZeroInteractions(userService, accessService, userDetailRequestMapper);
+    verify(userDetailService).getSectionsByRole(Role.UNKNOWN);
+    verifyZeroInteractions(userDetailRequestMapper);
   }
 
   @Test
@@ -204,7 +234,7 @@ public class UserDetailControllerTest extends TestHelper {
 
     String url = "url";
     Map<String, Object> accessList = Collections.singletonMap("key", true);
-    when(accessService.getComponentsByUrlAndRole(url, Role.JUDGE)).thenReturn(
+    when(userDetailService.getComponentsByUrlAndRole(url, Role.JUDGE)).thenReturn(
       accessList);
 
     mockMvc.perform(get("/api/core/user/access-list").cookie(cookies)
@@ -213,8 +243,8 @@ public class UserDetailControllerTest extends TestHelper {
       .andExpect(content().json(mapJacksonTester.write(accessList)
                                   .getJson()));
 
-    verify(accessService).getComponentsByUrlAndRole(url, Role.JUDGE);
-    verifyZeroInteractions(userService, menuService, userDetailRequestMapper);
+    verify(userDetailService).getComponentsByUrlAndRole(url, Role.JUDGE);
+    verifyZeroInteractions(userDetailRequestMapper);
   }
 
   @Test
@@ -223,7 +253,7 @@ public class UserDetailControllerTest extends TestHelper {
 
     String url = "url";
     Map<String, Object> defaultAccessList = Collections.emptyMap();
-    when(accessService.getComponentsByUrlAndRole(url, null)).thenReturn(
+    when(userDetailService.getComponentsByUrlAndRole(url, null)).thenReturn(
       defaultAccessList);
 
     mockMvc.perform(get("/api/core/user/access-list").param("url", url))
@@ -231,8 +261,8 @@ public class UserDetailControllerTest extends TestHelper {
       .andExpect(content().json(mapJacksonTester.write(defaultAccessList)
                                   .getJson()));
 
-    verify(accessService).getComponentsByUrlAndRole(url, null);
-    verifyZeroInteractions(userService, menuService, userDetailRequestMapper);
+    verify(userDetailService).getComponentsByUrlAndRole(url, Role.UNKNOWN);
+    verifyZeroInteractions(userDetailRequestMapper);
   }
 
   @Test
@@ -240,7 +270,7 @@ public class UserDetailControllerTest extends TestHelper {
     throws Exception {
 
     Map<String, Object> defaultAccessList = Collections.emptyMap();
-    when(accessService.getComponentsByUrlAndRole("", null)).thenReturn(
+    when(userDetailService.getComponentsByUrlAndRole("", null)).thenReturn(
       defaultAccessList);
 
     mockMvc.perform(get("/api/core/user/access-list"))
@@ -248,8 +278,8 @@ public class UserDetailControllerTest extends TestHelper {
       .andExpect(content().json(mapJacksonTester.write(defaultAccessList)
                                   .getJson()));
 
-    verify(accessService).getComponentsByUrlAndRole("", null);
-    verifyZeroInteractions(userService, menuService, userDetailRequestMapper);
+    verify(userDetailService).getComponentsByUrlAndRole("", Role.UNKNOWN);
+    verifyZeroInteractions(userDetailRequestMapper);
   }
 
 }

@@ -1,6 +1,7 @@
 package com.future.function.service.api.feature.core;
 
 import com.future.function.model.entity.feature.core.Batch;
+import com.future.function.session.model.Session;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -15,7 +16,7 @@ public interface BatchService {
    *
    * @return {@code List<Batch>} - Batches found in database.
    */
-  Page<Batch> getBatches(Pageable pageable);
+  Page<Batch> getBatches(Session session, Pageable pageable);
   
   /**
    * Retrieves a batch from the database given the batch's code. If not

@@ -63,7 +63,7 @@ public class StudentQuizDetailRepositoryTest {
 
   @Test
   public void findFirstByStudentId() {
-    Optional<StudentQuizDetail> actual = repository.findFirstByStudentQuizIdAndDeletedFalse(STUDENT_QUIZ_ID);
+    Optional<StudentQuizDetail> actual = repository.findTopByStudentQuizIdAndDeletedFalseOrderByCreatedAtDesc(STUDENT_QUIZ_ID);
 
     assertThat(actual.isPresent()).isTrue();
     assertThat(actual.get()).isNotNull();

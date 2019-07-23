@@ -5,6 +5,7 @@ import com.future.function.model.entity.feature.scoring.Option;
 import com.future.function.repository.feature.scoring.OptionRepository;
 import com.future.function.service.api.feature.scoring.OptionService;
 import com.future.function.service.impl.helper.CopyHelper;
+import java.util.ArrayList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,14 +26,14 @@ public class OptionServiceImpl implements OptionService {
   public List<Option> getOptionListByQuestionId(String questionId) {
     return Optional.ofNullable(questionId)
         .map(optionRepository::findAllByQuestionId)
-        .orElseThrow(() -> new NotFoundException("Question not found"));
+        .orElseGet(ArrayList::new);
   }
 
   @Override
   public Option findById(String id) {
     return Optional.ofNullable(id)
         .flatMap(optionRepository::findByIdAndDeletedFalse)
-        .orElseThrow(() -> new NotFoundException("Option not found"));
+        .orElseThrow(() -> new NotFoundException("Failed at #findById #OptionService"));
   }
 
   @Override
@@ -45,11 +46,14 @@ public class OptionServiceImpl implements OptionService {
     return Optional.of(option)
         .map(Option::getId)
         .flatMap(optionRepository::findByIdAndDeletedFalse)
-        .map(oldOption -> {
-          CopyHelper.copyProperties(option, oldOption);
-          return optionRepository.save(oldOption);
-        })
+        .map(oldOption -> copyOptionRequestAttributes(option, oldOption))
+        .map(optionRepository::save)
         .orElse(option);
+  }
+
+  private Option copyOptionRequestAttributes(Option option, Option oldOption) {
+    CopyHelper.copyProperties(option, oldOption);
+    return oldOption;
   }
 
   @Override
@@ -57,17 +61,23 @@ public class OptionServiceImpl implements OptionService {
     return Optional.of(option)
         .map(Option::getId)
         .map(this::findById)
-        .map(optionDB -> option.isCorrect() == optionDB.isCorrect())
+        .map(optionDB -> determineCorrectOption(option, optionDB))
         .orElse(false);
+  }
+
+  private boolean determineCorrectOption(Option option, Option optionDB) {
+    return option.isCorrect() == optionDB.isCorrect();
   }
 
   @Override
   public void deleteById(String id) {
     Optional.ofNullable(id)
         .flatMap(optionRepository::findByIdAndDeletedFalse)
-        .ifPresent(option -> {
-          option.setDeleted(true);
-          optionRepository.save(option);
-        });
+        .ifPresent(this::setDeletedAndSaveOption);
+  }
+
+  private void setDeletedAndSaveOption(Option option) {
+    option.setDeleted(true);
+    optionRepository.save(option);
   }
 }

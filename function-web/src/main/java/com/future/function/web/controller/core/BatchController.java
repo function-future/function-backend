@@ -47,7 +47,7 @@ public class BatchController {
   @ResponseStatus(HttpStatus.OK)
   @GetMapping
   public PagingResponse<BatchWebResponse> getBatches(
-    @WithAnyRole(roles = { Role.ADMIN, Role.JUDGE, Role.MENTOR })
+    @WithAnyRole(roles = { Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT })
       Session session,
     @RequestParam(required = false,
                   defaultValue = "1")
@@ -58,7 +58,7 @@ public class BatchController {
   ) {
     
     return BatchResponseMapper.toBatchesPagingResponse(
-      batchService.getBatches(PageHelper.toPageable(page, size)));
+      batchService.getBatches(session, PageHelper.toPageable(page, size)));
   }
   
   /**
@@ -108,6 +108,7 @@ public class BatchController {
       BatchWebRequest data
   ) {
     
+    data.setId(batchId);
     return BatchResponseMapper.toBatchDataResponse(
       batchService.updateBatch(batchRequestMapper.toBatch(batchId, data)));
   }

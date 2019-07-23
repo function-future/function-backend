@@ -25,6 +25,7 @@ public class StudentQuestion extends BaseEntity {
   @Builder.Default
   private String id = UUID.randomUUID().toString();
 
+  @DBRef(lazy = true)
   @Field(value = FieldName.StudentQuestion.STUDENT_QUIZ_DETAIL)
   private StudentQuizDetail studentQuizDetail;
 

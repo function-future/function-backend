@@ -42,7 +42,7 @@ public class AuthServiceImplTest {
   private static final String PASSWORD = "password";
   
   private static final Session SESSION = new Session(
-    SESSION_ID, USER_ID, EMAIL, Role.MENTOR);
+    SESSION_ID, USER_ID, null, EMAIL, Role.MENTOR);
   
   private static final User USER = User.builder()
     .id("id")
@@ -155,15 +155,27 @@ public class AuthServiceImplTest {
   public void testGivenSessionIdByGettingLoginStatusReturnUser() {
     
     when(valueOperations.get(SESSION_ID)).thenReturn(SESSION);
+    when(sessionProperties.getExpireTime()).thenReturn(0);
+    when(sessionProperties.getMaxAge()).thenReturn(0);
+    when(sessionProperties.getCookieName()).thenReturn(COOKIE_NAME);
+    when(redisTemplate.expire(anyString(), eq(0),
+                              eq(TimeUnit.SECONDS)
+    )).thenReturn(true);
     when(userService.getUserByEmail(EMAIL)).thenReturn(USER);
     
-    User retrievedUser = authService.getLoginStatus(SESSION_ID);
+    MockHttpServletResponse response = new MockHttpServletResponse();
+    
+    User retrievedUser = authService.getLoginStatus(SESSION_ID, response);
     
     assertThat(retrievedUser).isNotNull();
     assertThat(retrievedUser).isEqualTo(USER);
     
+    //    verify(redisTemplate).expire(anyString(), eq(0), eq(TimeUnit
+    // .SECONDS));
+    verify(sessionProperties).getExpireTime();
+    verify(sessionProperties).getMaxAge();
+    verify(sessionProperties).getCookieName();
     verify(userService).getUserByEmail(EMAIL);
-    verifyZeroInteractions(sessionProperties);
   }
   
   @Test
@@ -171,7 +183,9 @@ public class AuthServiceImplTest {
     
     when(valueOperations.get(SESSION_ID)).thenReturn(null);
     
-    catchException(() -> authService.getLoginStatus(SESSION_ID));
+    MockHttpServletResponse response = new MockHttpServletResponse();
+    
+    catchException(() -> authService.getLoginStatus(SESSION_ID, response));
     
     assertThat(caughtException().getClass()).isEqualTo(
       UnauthorizedException.class);

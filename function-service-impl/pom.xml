@@ -15,36 +15,35 @@
 
     <dependency>
       <groupId>com.future.function</groupId>
+      <artifactId>function-common</artifactId>
+      <version>${project.version}</version>
+      <optional>true</optional>
+    </dependency>
+
+    <dependency>
+      <groupId>com.future.function</groupId>
       <artifactId>function-repository</artifactId>
-      <version>${project.parent.version}</version>
-      <scope>compile</scope>
+      <version>${project.version}</version>
+      <optional>true</optional>
     </dependency>
 
     <dependency>
       <groupId>com.future.function</groupId>
       <artifactId>function-service-api</artifactId>
-      <version>${project.parent.version}</version>
-      <scope>compile</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>org.mongodb</groupId>
-          <artifactId>mongodb-driver</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.springframework</groupId>
-          <artifactId>spring-tx</artifactId>
-        </exclusion>
-      </exclusions>
+      <version>${project.version}</version>
+      <optional>true</optional>
     </dependency>
 
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
+      <optional>true</optional>
     </dependency>
 
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
+      <optional>true</optional>
     </dependency>
 
     <dependency>
@@ -56,6 +55,13 @@
     <dependency>
       <groupId>net.coobird</groupId>
       <artifactId>thumbnailator</artifactId>
+      <optional>true</optional>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+      <optional>true</optional>
     </dependency>
 
     <dependency>
@@ -73,6 +79,19 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-data-redis</artifactId>
+      <optional>true</optional>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-security</artifactId>
+      <optional>true</optional>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+      <optional>true</optional>
     </dependency>
 
   </dependencies>

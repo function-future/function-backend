@@ -70,7 +70,7 @@ public class QuestionServiceImplTest {
     question = Question
         .builder()
         .id(QUESTION_ID)
-        .text(QUESTION_TEXT)
+        .label(QUESTION_TEXT)
         .questionBank(questionBank)
         .build();
 
@@ -112,9 +112,10 @@ public class QuestionServiceImplTest {
 
   @Test
   public void findAllByQuestionBankIdNullTest() {
-    catchException(() -> questionService.findAllByQuestionBankId(null, pageable));
-
-    assertThat(caughtException().getClass()).isEqualTo(NotFoundException.class);
+    Page<Question> actual = questionService.findAllByQuestionBankId(null, pageable);
+    assertThat(actual.getNumber()).isEqualTo(pageable.getPageNumber());
+    assertThat(actual.getSize()).isEqualTo(pageable.getPageSize());
+    assertThat(actual.getTotalElements()).isEqualTo(0);
   }
 
   @Test
@@ -124,7 +125,7 @@ public class QuestionServiceImplTest {
     when(optionService.getOptionListByQuestionId(QUESTION_ID)).thenReturn(Collections.singletonList(option));
     List<Question> actual = questionService.findAllByMultipleQuestionBankId(Collections.singletonList(QUESTION_BANK_ID));
     assertThat(actual.size()).isEqualTo(1);
-    assertThat(actual.get(0).getText()).isEqualTo(QUESTION_TEXT);
+    assertThat(actual.get(0).getLabel()).isEqualTo(QUESTION_TEXT);
     verify(questionRepository).findAllByQuestionBankIdAndDeletedFalse(QUESTION_BANK_ID);
     verify(optionService).getOptionListByQuestionId(QUESTION_ID);
   }
@@ -137,15 +138,14 @@ public class QuestionServiceImplTest {
 
   @Test
   public void findById() {
-
     when(questionRepository.findByIdAndDeletedFalse(QUESTION_ID)).thenReturn(Optional.of(question));
     when(optionService.getOptionListByQuestionId(QUESTION_ID)).thenReturn(Collections.singletonList(option));
 
     Question actual = questionService.findById(QUESTION_ID);
 
     assertThat(actual).isEqualTo(question);
-    verify(optionService).getOptionListByQuestionId(QUESTION_ID);
     verify(questionRepository).findByIdAndDeletedFalse(QUESTION_ID);
+    verify(optionService).getOptionListByQuestionId(QUESTION_ID);
   }
 
   @Test
@@ -159,9 +159,9 @@ public class QuestionServiceImplTest {
   public void createQuestion() {
     when(questionRepository.save(question)).thenReturn(question);
     when(optionService.createOption(option)).thenReturn(option);
+    when(questionBankService.findById(QUESTION_BANK_ID)).thenReturn(questionBank);
 
     Question actual = questionService.createQuestion(question, QUESTION_BANK_ID);
-
     assertThat(actual).isEqualTo(question);
     verify(questionRepository).save(question);
     verify(questionBankService).findById(QUESTION_BANK_ID);
@@ -174,6 +174,7 @@ public class QuestionServiceImplTest {
     when(questionRepository.findByIdAndDeletedFalse(QUESTION_ID)).thenReturn(Optional.of(question));
     when(questionRepository.save(question)).thenReturn(question);
     when(optionService.updateOption(option)).thenReturn(option);
+    when(questionBankService.findById(QUESTION_BANK_ID)).thenReturn(questionBank);
 
     Question actual = questionService.updateQuestion(question, QUESTION_BANK_ID);
 

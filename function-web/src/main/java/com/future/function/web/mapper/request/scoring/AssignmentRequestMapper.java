@@ -32,8 +32,8 @@ public class AssignmentRequestMapper {
    * @param request (AssignmentWebRequest)
    * @return Assignment Object
    */
-  public Assignment toAssignment(AssignmentWebRequest request) {
-    return toValidatedAssignment(request);
+  public Assignment toAssignment(AssignmentWebRequest request, String batchCode) {
+      return toValidatedAssignment(request, batchCode);
   }
 
   /**
@@ -43,8 +43,8 @@ public class AssignmentRequestMapper {
    * @param request      (AssignmentWebRequest)
    * @return Assignment Object
    */
-  public Assignment toAssignmentWithId(String assignmentId, AssignmentWebRequest request) {
-    Assignment assignment = toValidatedAssignment(request);
+  public Assignment toAssignmentWithId(String assignmentId, AssignmentWebRequest request, String batchCode) {
+      Assignment assignment = toValidatedAssignment(request, batchCode);
     assignment.setId(assignmentId);
     return assignment;
   }
@@ -55,17 +55,13 @@ public class AssignmentRequestMapper {
    * @param request (AssignmentWebRequest)
    * @return valid Assignment Object
    */
-  private Assignment toValidatedAssignment(AssignmentWebRequest request) {
-    return Optional.of(request)
-        .map(validator::validate)
-        .map(val -> {
-          Assignment assignment = Assignment.builder().build();
-          BeanUtils.copyProperties(val, assignment, "id");
-          assignment.setBatch(Batch.builder().code(request.getBatchCode()).build());
-          assignment.setFile(toFileV2(request));
-          return assignment;
-        })
-        .orElseGet(Assignment::new);
+  private Assignment toValidatedAssignment(AssignmentWebRequest request, String batchCode) {
+      request = validator.validate(request);
+      Assignment assignment = Assignment.builder().build();
+      BeanUtils.copyProperties(request, assignment);
+      assignment.setBatch(Batch.builder().code(batchCode).build());
+      assignment.setFile(toFileV2(request));
+      return assignment;
   }
 
   private FileV2 toFileV2(AssignmentWebRequest request) {

@@ -1,5 +1,6 @@
 package com.future.function.web.mapper.request.scoring;
 
+import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.scoring.Assignment;
 import com.future.function.validation.RequestValidator;
@@ -17,27 +18,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class AssignmentRequestMapperTest {
 
   private static final String ASSIGNMENT_TITLE = "assignment-title";
   private static final String ASSIGNMENT_DESCRIPTION = "assignment-description";
-  private static final String ASSIGNMENT_QUESTION = "assignment-question";
-  private static final String ASSIGNMENT_BATCH = "[2, 3]";
+  private static final String ASSIGNMENT_BATCH = "2";
+  private static final String ASSIGNMENT_ID = "assignment-id";
   private static final long ASSIGNMENT_DEADLINE = 1561520805;
-  private static final String NULL_VALUE = null;
-  private static final String STRING_EMPTY = "";
-  private static final String BAD_REQUEST_EXCEPTION_MSG = "Bad Request";
-  private static final String ASSIGNMENT_REQUEST_JSON =
-      "{\n" + "\"title\": \"" + ASSIGNMENT_TITLE + "\",\n" + "    \"description\": \"" +
-          ASSIGNMENT_DESCRIPTION + "\",\n" + "    \"question\": \"" + ASSIGNMENT_QUESTION + "\",\n" +
-          "    \"deadline\": " + null + ",\n" + "    \"batch\": " + ASSIGNMENT_BATCH +
-          "}";
-  private static String ASSIGNMENT_ID;
   private Assignment assignment;
   private AssignmentWebRequest assignmentWebRequest;
 
@@ -58,6 +48,7 @@ public class AssignmentRequestMapperTest {
         .title(ASSIGNMENT_TITLE)
         .description(ASSIGNMENT_DESCRIPTION)
         .deadline(ASSIGNMENT_DEADLINE)
+            .batch(Batch.builder().code(ASSIGNMENT_BATCH).build())
         .build();
 
     assignmentWebRequest = AssignmentWebRequest
@@ -70,8 +61,6 @@ public class AssignmentRequestMapperTest {
 
     when(validator.validate(assignmentWebRequest))
         .thenReturn(assignmentWebRequest);
-    when(requestMapper.toWebRequestObject(ASSIGNMENT_REQUEST_JSON, AssignmentWebRequest.class))
-        .thenReturn(assignmentWebRequest);
   }
 
   @After
@@ -82,7 +71,7 @@ public class AssignmentRequestMapperTest {
 
   @Test
   public void testToAssignmentFromStringDataJson() {
-    Assignment actual = assignmentRequestMapper.toAssignment(assignmentWebRequest);
+    Assignment actual = assignmentRequestMapper.toAssignment(assignmentWebRequest, ASSIGNMENT_BATCH);
     assertThat(actual.getDescription()).isEqualTo(assignment.getDescription());
     assertThat(actual.getTitle()).isEqualTo(assignment.getTitle());
     verify(validator).validate(assignmentWebRequest);
@@ -92,7 +81,7 @@ public class AssignmentRequestMapperTest {
   public void testToAssignmentFromStringDataJsonFileExist() {
     assignmentWebRequest.setFiles(Collections.singletonList("file-id"));
     assignment.setFile(FileV2.builder().id("file-id").build());
-    Assignment actual = assignmentRequestMapper.toAssignment(assignmentWebRequest);
+    Assignment actual = assignmentRequestMapper.toAssignment(assignmentWebRequest, ASSIGNMENT_BATCH);
     assertThat(actual.getDescription()).isEqualTo(assignment.getDescription());
     assertThat(actual.getTitle()).isEqualTo(assignment.getTitle());
     verify(validator).validate(assignmentWebRequest);
@@ -101,8 +90,8 @@ public class AssignmentRequestMapperTest {
   @Test
   public void testToAssignmentFromStringDataJsonAndStringIdSuccess() {
     assignment.setId(ASSIGNMENT_ID);
-    assignmentWebRequest.setId(ASSIGNMENT_ID);
-    Assignment actual = assignmentRequestMapper.toAssignmentWithId(ASSIGNMENT_ID, assignmentWebRequest);
+    Assignment actual = assignmentRequestMapper.toAssignmentWithId(ASSIGNMENT_ID, assignmentWebRequest,
+            ASSIGNMENT_BATCH);
     assertThat(actual.getDescription()).isEqualTo(assignment.getDescription());
     assertThat(actual.getTitle()).isEqualTo(assignment.getTitle());
     verify(validator).validate(assignmentWebRequest);

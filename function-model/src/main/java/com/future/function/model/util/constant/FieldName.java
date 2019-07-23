@@ -315,7 +315,7 @@ public interface FieldName {
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
   abstract class Question {
 
-    public static final String TEXT = "text";
+    public static final String LABEL = "label";
 
     public static final String QUESTION_BANK = "questionBank";
 
@@ -324,7 +324,7 @@ public interface FieldName {
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
   abstract class Option {
 
-    public static final String LABEL = "text";
+    public static final String LABEL = "label";
 
     public static final String CORRECT = "correct";
 
@@ -408,6 +408,30 @@ public interface FieldName {
 
 
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  abstract class Report {
+
+    public static final String TITLE = "title";
+
+    public static final String DESCRIPTION = "description";
+
+    public static final String USED_AT = "usedAt";
+
+    public static final String BATCH = "batch";
+
+  }
+
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  abstract class ReportDetail {
+
+    public static final String REPORT = "report";
+
+    public static final String USER = "user";
+
+    public static final String POINT = "point";
+
+  }
+
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
   abstract class ActivityBlog {
 
     public static final String TITLE = "title";
@@ -437,6 +461,42 @@ public interface FieldName {
     public static final String ROLE = "role";
 
     public static final String SECTIONS = "sections";
+
+  }
+
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  abstract class Notification {
+
+    public static final String MEMBER = "member";
+
+    public static final String TITLE = "title";
+
+    public static final String CONTENT = "content";
+
+    public static final String IS_SEEN = "isSeen";
+
+  }
+
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  abstract class Reminder {
+
+    public static final String MEMBERS = "members";
+
+    public static final String IS_REPEATED_MONTHLY = "isRepeatedMonthly";
+
+    public static final String MONTHLY_DATE = "monthlyDate";
+
+    public static final String DAYS = "days";
+
+    public static final String REMINDER_HOUR = "reminderHour";
+
+    public static final String REMINDER_MINUTE = "reminderMinute";
+
+    public static final String LAST_REMINDER_SENT = "lastReminderSent";
+
+    public static final String TITLE = "title";
+
+    public static final String CONTENT = "content";
 
   }
 

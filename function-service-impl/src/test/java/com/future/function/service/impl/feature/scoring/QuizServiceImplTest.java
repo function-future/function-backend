@@ -13,7 +13,6 @@ import com.future.function.service.api.feature.scoring.QuestionService;
 import com.future.function.service.api.feature.scoring.StudentQuizService;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -33,12 +32,9 @@ import static com.googlecode.catchexception.CatchException.catchException;
 import static com.googlecode.catchexception.CatchException.caughtException;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
-@Ignore
 public class QuizServiceImplTest {
 
   private static final String QUIZ_ID = UUID.randomUUID().toString();
@@ -56,7 +52,6 @@ public class QuizServiceImplTest {
 
   private static final String QUESTION_ID = "question-id";
   private static final String QUESTION_TEXT = "question-text";
-  private static final String NOT_FOUND_MSG = "Quiz Not Found";
   private int PAGE = 0;
   private int TOTAL = 10;
   private Quiz quiz;
@@ -101,7 +96,7 @@ public class QuizServiceImplTest {
     question = Question
         .builder()
         .questionBank(questionBank)
-        .text(QUESTION_TEXT)
+        .label(QUESTION_TEXT)
         .build();
 
     quiz = Quiz
@@ -124,7 +119,7 @@ public class QuizServiceImplTest {
 
     quizPage = new PageImpl<>(quizList, pageable, TOTAL);
 
-    when(quizRepository.findAllByDeletedFalse(pageable)).thenReturn(quizPage);
+    when(quizRepository.findAllByBatchAndDeletedFalse(batch, pageable)).thenReturn(quizPage);
     when(quizRepository.findByIdAndDeletedFalse(QUIZ_ID)).thenReturn(Optional.of(quiz));
     when(quizRepository.save(quiz)).thenReturn(quiz);
     when(studentQuizService.createStudentQuizByBatchCode(BATCH_CODE, quiz))
@@ -154,15 +149,14 @@ public class QuizServiceImplTest {
     catchException(() -> quizService.findById(null));
 
     assertThat(caughtException().getClass()).isEqualTo(NotFoundException.class);
-    assertThat(caughtException().getMessage()).isEqualTo(NOT_FOUND_MSG);
   }
 
   @Test
   public void testFindQuizByIdAndDeletedFalseBlank() {
+      when(quizRepository.findByIdAndDeletedFalse("")).thenReturn(Optional.empty());
     catchException(() -> quizService.findById(""));
-
     assertThat(caughtException().getClass()).isEqualTo(NotFoundException.class);
-    assertThat(caughtException().getMessage()).isEqualTo(NOT_FOUND_MSG);
+      verify(quizRepository).findByIdAndDeletedFalse("");
   }
 
   @Test
@@ -172,7 +166,7 @@ public class QuizServiceImplTest {
     assertThat(actual.getTotalElements()).isEqualTo(TOTAL);
     assertThat(actual).isEqualTo(quizPage);
 
-    verify(quizRepository).findAllByDeletedFalse(pageable);
+    verify(quizRepository).findAllByBatchAndDeletedFalse(batch, pageable);
   }
 
   @Test
@@ -183,7 +177,7 @@ public class QuizServiceImplTest {
     assertThat(actual.getTotalElements()).isEqualTo(TOTAL);
     assertThat(actual).isEqualTo(quizPage);
 
-    verify(quizRepository).findAllByDeletedFalse(pageable);
+    verify(quizRepository).findAllByBatchAndDeletedFalse(batch, pageable);
   }
 
   @Test
@@ -215,28 +209,11 @@ public class QuizServiceImplTest {
   }
 
   @Test
-  public void testUpdateQuizSuccessChangeBatch() {
-    Batch anotherBatch = Batch.builder().code("abc").build();
-    Quiz request = Quiz.builder().id(QUIZ_ID).batch(anotherBatch).build();
-    quiz.setId(QUIZ_ID);
-    Quiz actual = quizService.updateQuiz(request);
-    assertThat(actual).isEqualTo(quiz);
-
-    verify(quizRepository).findByIdAndDeletedFalse(QUIZ_ID);
-    verify(quizRepository).save(quiz);
-    verify(studentQuizService).deleteByBatchCodeAndQuiz(batch.getCode(), QUIZ_ID);
-    verify(studentQuizService).createStudentQuizByBatchCode("abc", quiz);
-  }
-
-  @Test
-  @Ignore
   public void testUpdateQuizFindByIdNotFound() {
     quiz.setId("randomId");
-    catchException(() -> quizService.updateQuiz(quiz));
-
-    assertThat(caughtException().getClass()).isEqualTo(NotFoundException.class);
-    assertThat(caughtException().getMessage()).isEqualTo(NOT_FOUND_MSG);
-
+      when(quizRepository.findByIdAndDeletedFalse("randomId")).thenReturn(Optional.empty());
+    Quiz actual = quizService.updateQuiz(quiz);
+    assertThat(actual).isEqualTo(quiz);
     verify(quizRepository).findByIdAndDeletedFalse("randomId");
   }
 
@@ -247,20 +224,20 @@ public class QuizServiceImplTest {
     quiz.setDeleted(true);
     verify(quizRepository).findByIdAndDeletedFalse(QUIZ_ID);
     verify(quizRepository).save(quiz);
-    verify(studentQuizService).deleteByBatchCodeAndQuiz(BATCH_CODE, QUIZ_ID);
+      verify(studentQuizService).deleteByBatchCodeAndQuiz(quiz);
   }
 
   @Test
   public void copyQuizWithTargetBatch() {
-    String targetBatch = "ABC";
-    Batch targetBatchObj = Batch.builder().code(targetBatch).build();
-    when(batchService.getBatchByCode(targetBatch)).thenReturn(targetBatchObj);
+      String batchId = "ABC";
+      Batch targetBatchObj = Batch.builder().id(batchId).build();
+      when(batchService.getBatchById(batchId)).thenReturn(targetBatchObj);
     when(studentQuizService.copyQuizWithTargetBatch(targetBatchObj, quiz)).thenReturn(quiz);
-    Quiz actual = quizService.copyQuizWithTargetBatch(targetBatch, quiz);
+      Quiz actual = quizService.copyQuizWithTargetBatchId(batchId, quiz);
     assertThat(actual.getTitle()).isEqualTo(QUIZ_TITLE);
     verify(quizRepository).findByIdAndDeletedFalse(QUIZ_ID);
     verify(studentQuizService).copyQuizWithTargetBatch(targetBatchObj, quiz);
-    quiz.getBatch().setCode(targetBatch);
+      quiz.getBatch().setCode(batchId);
     verify(quizRepository).save(quiz);
   }
 }

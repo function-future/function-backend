@@ -34,11 +34,10 @@ public class QuestionBankController {
 
   @ResponseStatus(value = HttpStatus.OK)
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-  @WithAnyRole(roles = Role.ADMIN)
   public PagingResponse<QuestionBankWebResponse> findAllQuestionBank(
-      @RequestParam(required = false, defaultValue = "1") int page,
-      @RequestParam(required = false, defaultValue = "10") int size,
-      Session session
+          @RequestParam(defaultValue = "1") int page,
+          @RequestParam(defaultValue = "10") int size,
+      @WithAnyRole(roles = Role.ADMIN) Session session
   ) {
     return QuestionBankResponseMapper
         .toPagingQuestionBankWebResponse(questionBankService.findAllByPageable(PageHelper.toPageable(page, size)));
@@ -46,17 +45,16 @@ public class QuestionBankController {
 
   @ResponseStatus(value = HttpStatus.OK)
   @GetMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-  @WithAnyRole(roles = Role.ADMIN)
-  public DataResponse<QuestionBankWebResponse> findQuestionBankById(@PathVariable String id, Session session) {
+  public DataResponse<QuestionBankWebResponse> findQuestionBankById(@PathVariable String id,
+      @WithAnyRole(roles = Role.ADMIN) Session session) {
     return QuestionBankResponseMapper
         .toQuestionBankWebResponse(questionBankService.findById(id));
   }
 
   @ResponseStatus(value = HttpStatus.CREATED)
   @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-  @WithAnyRole(roles = Role.ADMIN)
   public DataResponse<QuestionBankWebResponse> createQuestionBank(@RequestBody QuestionBankWebRequest request,
-      Session session) {
+      @WithAnyRole(roles = Role.ADMIN) Session session) {
     return QuestionBankResponseMapper
         .toQuestionBankWebResponse(
             HttpStatus.CREATED, questionBankService.createQuestionBank(requestMapper.toQuestionBank(request)));
@@ -64,17 +62,15 @@ public class QuestionBankController {
 
   @ResponseStatus(value = HttpStatus.OK)
   @PutMapping(path = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-  @WithAnyRole(roles = Role.ADMIN)
   public DataResponse<QuestionBankWebResponse> updateQuestionBank(@PathVariable String id,
-      @RequestBody QuestionBankWebRequest request, Session session) {
+      @RequestBody QuestionBankWebRequest request, @WithAnyRole(roles = Role.ADMIN) Session session) {
     return QuestionBankResponseMapper
         .toQuestionBankWebResponse(questionBankService.updateQuestionBank(requestMapper.toQuestionBank(id, request)));
   }
 
   @ResponseStatus(value = HttpStatus.OK)
   @DeleteMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-  @WithAnyRole(roles = Role.ADMIN)
-  public BaseResponse deleteQuestionBankById(@PathVariable String id, Session session) {
+  public BaseResponse deleteQuestionBankById(@PathVariable String id, @WithAnyRole(roles = Role.ADMIN) Session session) {
     questionBankService.deleteById(id);
     return ResponseHelper.toBaseResponse(HttpStatus.OK);
   }

@@ -17,6 +17,8 @@ public abstract class TestHelper {
   
   protected static final String STUDENT_ID = "student-id";
   
+  protected static final String BATCH_ID = "batch-id";
+  
   protected static final String MENTOR_ID= "mentor-id";
   
   protected static final String JUDGE_ID= "judge-id";
@@ -40,16 +42,16 @@ public abstract class TestHelper {
   protected static final String ADMIN_SESSION_ID = "session-id-admin";
   
   protected static final Session STUDENT_SESSION = new Session(
-    STUDENT_SESSION_ID, STUDENT_ID, STUDENT_EMAIL, Role.STUDENT);
+    STUDENT_SESSION_ID, STUDENT_ID, BATCH_ID, STUDENT_EMAIL, Role.STUDENT);
   
   protected static final Session MENTOR_SESSION = new Session(
-    MENTOR_SESSION_ID, MENTOR_ID, MENTOR_EMAIL, Role.MENTOR);
+    MENTOR_SESSION_ID, MENTOR_ID, null, MENTOR_EMAIL, Role.MENTOR);
   
   protected static final Session JUDGE_SESSION = new Session(
-    JUDGE_SESSION_ID, JUDGE_ID, JUDGE_EMAIL, Role.JUDGE);
+    JUDGE_SESSION_ID, JUDGE_ID, null, JUDGE_EMAIL, Role.JUDGE);
   
   protected static final Session ADMIN_SESSION = new Session(
-    ADMIN_SESSION_ID, ADMIN_ID, ADMIN_EMAIL, Role.ADMIN);
+    ADMIN_SESSION_ID, ADMIN_ID, null, ADMIN_EMAIL, Role.ADMIN);
   
   protected Cookie[] cookies;
   
