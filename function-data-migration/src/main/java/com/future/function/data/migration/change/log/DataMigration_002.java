@@ -29,6 +29,7 @@ public class DataMigration_002 {
     rootFolder.append(
       FieldName.BaseEntity.UPDATED_AT, System.currentTimeMillis());
     rootFolder.append(FieldName.BaseEntity.UPDATED_BY, "admin@admin.com");
+    rootFolder.append(FieldName.BaseEntity.DELETED, false);
     rootFolder.append(FieldName.BaseEntity.VERSION, 0);
     
     mongoTemplate.insert(rootFolder, DocumentName.FILE);
