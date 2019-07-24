@@ -1,6 +1,7 @@
 package com.future.function.web.controller.scoring;
 
 import com.future.function.common.enumeration.core.Role;
+import com.future.function.common.properties.core.FileProperties;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.User;
@@ -29,7 +30,9 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.UUID;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -47,6 +50,7 @@ public class StudentRoomControllerTest extends TestHelper {
     private static final String USER_ID = "user-id";
     private static final String USER_NAME = "user-name";
     private static String ASSIGNMENT_ID = UUID.randomUUID().toString();
+    private static final String URL_PREFIX = "url-prefix";
     private Pageable pageable;
     private Assignment assignment;
     private Room room;
@@ -57,6 +61,9 @@ public class StudentRoomControllerTest extends TestHelper {
 
     @MockBean
     private AssignmentService assignmentService;
+    
+    @MockBean
+    private FileProperties fileProperties;
 
     @Before
     public void setUp() {
@@ -95,7 +102,7 @@ public class StudentRoomControllerTest extends TestHelper {
         roomPage = new PageImpl<>(Collections.singletonList(room), pageable, 1);
 
         PAGING_RESPONSE = RoomResponseMapper
-                .toPagingRoomWebResponse(roomPage);
+                .toPagingRoomWebResponse(roomPage, URL_PREFIX);
 
         when(assignmentService.findAllRoomsByStudentId(STUDENT_ID, pageable, ADMIN_ID))
                 .thenReturn(roomPage);
@@ -103,11 +110,12 @@ public class StudentRoomControllerTest extends TestHelper {
 
     @After
     public void tearDown() throws Exception {
-        verifyNoMoreInteractions(assignmentService);
+        verifyNoMoreInteractions(assignmentService, fileProperties);
     }
 
     @Test
     public void findAllRoomsByStudentId() throws Exception {
+        when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
         mockMvc.perform(
                 get("/api/scoring/batches/" + BATCH_CODE + "/assignments/" + ASSIGNMENT_ID + "/students/" +
                         STUDENT_ID + "/rooms")
@@ -116,6 +124,7 @@ public class StudentRoomControllerTest extends TestHelper {
                 .andExpect(content().json(
                         pagingResponseJacksonTester.write(PAGING_RESPONSE)
                                 .getJson()));
+        verify(fileProperties).getUrlPrefix();
         verify(assignmentService).findAllRoomsByStudentId(STUDENT_ID, pageable, ADMIN_ID);
     }
 }
