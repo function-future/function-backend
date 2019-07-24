@@ -23,46 +23,48 @@ import java.util.stream.Collectors;
 public final class ActivityBlogResponseMapper {
   
   public static PagingResponse<ActivityBlogWebResponse> toActivityBlogPagingResponse(
-    Page<ActivityBlog> activityBlogs
+    Page<ActivityBlog> activityBlogs, String urlPrefix
   ) {
     
     return ResponseHelper.toPagingResponse(HttpStatus.OK,
                                            ActivityBlogResponseMapper.toActivityBlogWebResponseList(
-                                             activityBlogs),
+                                             activityBlogs, urlPrefix),
                                            PageHelper.toPaging(activityBlogs)
     );
   }
   
   private static List<ActivityBlogWebResponse> toActivityBlogWebResponseList(
-    Page<ActivityBlog> activityBlogs
+    Page<ActivityBlog> activityBlogs, String urlPrefix
   ) {
     
     return activityBlogs.getContent()
       .stream()
-      .map(ActivityBlogResponseMapper::buildActivityBlogWebResponse)
+      .map(
+        activityBlog -> ActivityBlogResponseMapper.buildActivityBlogWebResponse(
+          activityBlog, urlPrefix))
       .collect(Collectors.toList());
   }
   
   public static DataResponse<ActivityBlogWebResponse> toActivityBlogDataResponse(
-    ActivityBlog activityBlog
+    ActivityBlog activityBlog, String urlPrefix
   ) {
     
     return ActivityBlogResponseMapper.toActivityBlogDataResponse(
-      HttpStatus.OK, activityBlog);
+      HttpStatus.OK, activityBlog, urlPrefix);
   }
   
   public static DataResponse<ActivityBlogWebResponse> toActivityBlogDataResponse(
-    HttpStatus httpStatus, ActivityBlog activityBlog
+    HttpStatus httpStatus, ActivityBlog activityBlog, String urlPrefix
   ) {
     
     return ResponseHelper.toDataResponse(httpStatus,
                                          ActivityBlogResponseMapper.buildActivityBlogWebResponse(
-                                           activityBlog)
+                                           activityBlog, urlPrefix)
     );
   }
   
   private static ActivityBlogWebResponse buildActivityBlogWebResponse(
-    ActivityBlog activityBlog
+    ActivityBlog activityBlog, String urlPrefix
   ) {
     
     return ActivityBlogWebResponse.builder()
@@ -70,7 +72,7 @@ public final class ActivityBlogResponseMapper {
       .title(activityBlog.getTitle())
       .description(activityBlog.getDescription())
       .files(EmbeddedFileWebResponseMapper.toEmbeddedFileWebResponses(
-        activityBlog.getFiles()))
+        activityBlog.getFiles(), urlPrefix))
       .updatedAt(activityBlog.getUpdatedAt())
       .author(
         AuthorWebResponseMapper.buildAuthorWebResponse(activityBlog.getUser()))

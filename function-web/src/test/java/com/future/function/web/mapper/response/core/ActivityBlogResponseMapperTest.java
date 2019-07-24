@@ -47,6 +47,8 @@ public class ActivityBlogResponseMapperTest {
     .name(NAME)
     .build();
   
+  private static final String URL_PREFIX = "url-prefix";
+  
   private ActivityBlog activityBlog;
   
   private static final ActivityBlogWebResponse ACTIVITY_BLOG_WEB_RESPONSE =
@@ -55,7 +57,7 @@ public class ActivityBlogResponseMapperTest {
       .title(TITLE)
       .description(DESCRIPTION)
       .files(EmbeddedFileWebResponseMapper.toEmbeddedFileWebResponses(
-        Collections.singletonList(FILE_V2)))
+        Collections.singletonList(FILE_V2), URL_PREFIX))
       .updatedAt(UPDATED_AT)
       .author(AuthorWebResponseMapper.buildAuthorWebResponse(USER))
       .build();
@@ -92,7 +94,8 @@ public class ActivityBlogResponseMapperTest {
         .build();
     
     PagingResponse<ActivityBlogWebResponse> pagingResponse =
-      ActivityBlogResponseMapper.toActivityBlogPagingResponse(activityBlogs);
+      ActivityBlogResponseMapper.toActivityBlogPagingResponse(activityBlogs,
+                                                              URL_PREFIX);
     
     assertThat(pagingResponse).isNotNull();
     assertThat(pagingResponse).isEqualTo(expectedPagingResponse);
@@ -109,7 +112,7 @@ public class ActivityBlogResponseMapperTest {
     
     DataResponse<ActivityBlogWebResponse> createdDataResponse =
       ActivityBlogResponseMapper.toActivityBlogDataResponse(
-        HttpStatus.CREATED, activityBlog);
+        HttpStatus.CREATED, activityBlog, URL_PREFIX);
     
     assertThat(createdDataResponse).isNotNull();
     assertThat(createdDataResponse).isEqualTo(expectedCreatedDataResponse);
@@ -121,7 +124,8 @@ public class ActivityBlogResponseMapperTest {
         .build();
     
     DataResponse<ActivityBlogWebResponse> retrievedDataResponse =
-      ActivityBlogResponseMapper.toActivityBlogDataResponse(activityBlog);
+      ActivityBlogResponseMapper.toActivityBlogDataResponse(activityBlog,
+                                                            URL_PREFIX);
     
     assertThat(retrievedDataResponse).isNotNull();
     assertThat(retrievedDataResponse).isEqualTo(expectedRetrievedDataResponse);
