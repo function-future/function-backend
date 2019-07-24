@@ -1,6 +1,7 @@
 package com.future.function.web.controller.core;
 
 import com.future.function.common.enumeration.core.Role;
+import com.future.function.common.properties.core.FileProperties;
 import com.future.function.service.api.feature.core.AnnouncementService;
 import com.future.function.session.annotation.WithAnyRole;
 import com.future.function.session.model.Session;
@@ -25,14 +26,18 @@ public class AnnouncementController {
   
   private final AnnouncementRequestMapper announcementRequestMapper;
   
+  private final FileProperties fileProperties;
+  
   @Autowired
   public AnnouncementController(
     AnnouncementService announcementService,
-    AnnouncementRequestMapper announcementRequestMapper
+    AnnouncementRequestMapper announcementRequestMapper,
+    FileProperties fileProperties
   ) {
     
     this.announcementService = announcementService;
     this.announcementRequestMapper = announcementRequestMapper;
+    this.fileProperties = fileProperties;
   }
   
   /**
@@ -56,7 +61,8 @@ public class AnnouncementController {
   ) {
     
     return AnnouncementResponseMapper.toAnnouncementsPagingResponse(
-      announcementService.getAnnouncements(PageHelper.toPageable(page, size)));
+      announcementService.getAnnouncements(PageHelper.toPageable(page, size)),
+      fileProperties.getUrlPrefix());
   }
   
   /**
@@ -77,7 +83,9 @@ public class AnnouncementController {
   ) {
     
     return AnnouncementResponseMapper.toAnnouncementDataResponse(
-      announcementService.getAnnouncement(announcementId));
+      announcementService.getAnnouncement(announcementId),
+      fileProperties.getUrlPrefix()
+    );
   }
   
   /**
@@ -101,7 +109,9 @@ public class AnnouncementController {
     
     return AnnouncementResponseMapper.toAnnouncementDataResponse(
       HttpStatus.CREATED, announcementService.createAnnouncement(
-        announcementRequestMapper.toAnnouncement(request)));
+        announcementRequestMapper.toAnnouncement(request)),
+      fileProperties.getUrlPrefix()
+    );
   }
   
   /**
@@ -128,7 +138,7 @@ public class AnnouncementController {
     return AnnouncementResponseMapper.toAnnouncementDataResponse(
       HttpStatus.OK, announcementService.updateAnnouncement(
         announcementRequestMapper.toAnnouncement(
-          announcementId, request)));
+          announcementId, request)), fileProperties.getUrlPrefix());
   }
   
   /**

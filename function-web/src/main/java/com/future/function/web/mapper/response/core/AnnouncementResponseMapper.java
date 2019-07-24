@@ -33,10 +33,10 @@ public class AnnouncementResponseMapper {
    * {@link com.future.function.web.model.response.feature.core.AnnouncementWebResponse}
    */
   public static DataResponse<AnnouncementWebResponse> toAnnouncementDataResponse(
-    Announcement announcement
+    Announcement announcement, String urlPrefix
   ) {
     
-    return toAnnouncementDataResponse(HttpStatus.OK, announcement);
+    return toAnnouncementDataResponse(HttpStatus.OK, announcement, urlPrefix);
   }
   
   /**
@@ -52,17 +52,17 @@ public class AnnouncementResponseMapper {
    * {@link com.future.function.web.model.response.feature.core.AnnouncementWebResponse}
    */
   public static DataResponse<AnnouncementWebResponse> toAnnouncementDataResponse(
-    HttpStatus httpStatus, Announcement announcement
+    HttpStatus httpStatus, Announcement announcement, String urlPrefix
   ) {
     
     return ResponseHelper.toDataResponse(httpStatus,
                                          buildAnnouncementWebResponse(
-                                           announcement)
+                                           announcement, urlPrefix)
     );
   }
   
   private static AnnouncementWebResponse buildAnnouncementWebResponse(
-    Announcement announcement
+    Announcement announcement, String urlPrefix
   ) {
     
     return AnnouncementWebResponse.builder()
@@ -71,7 +71,7 @@ public class AnnouncementResponseMapper {
       .summary(announcement.getSummary())
       .description(announcement.getDescription())
       .files(EmbeddedFileWebResponseMapper.toEmbeddedFileWebResponses(
-        announcement.getFileV2s()))
+        announcement.getFileV2s(), urlPrefix))
       .updatedAt(announcement.getUpdatedAt())
       .build();
   }
@@ -88,22 +88,25 @@ public class AnnouncementResponseMapper {
    * {@link com.future.function.web.model.response.feature.core.AnnouncementWebResponse}
    */
   public static PagingResponse<AnnouncementWebResponse> toAnnouncementsPagingResponse(
-    Page<Announcement> data
+    Page<Announcement> data, String urlPrefix
   ) {
     
     return ResponseHelper.toPagingResponse(HttpStatus.OK,
-                                           toAnnouncementWebResponseList(data),
-                                           PageHelper.toPaging(data)
+                                           toAnnouncementWebResponseList(data,
+                                                                         urlPrefix
+                                           ), PageHelper.toPaging(data)
     );
   }
   
   private static List<AnnouncementWebResponse> toAnnouncementWebResponseList(
-    Page<Announcement> data
+    Page<Announcement> data, String urlPrefix
   ) {
     
     return data.getContent()
       .stream()
-      .map(AnnouncementResponseMapper::buildAnnouncementWebResponse)
+      .map(
+        announcement -> AnnouncementResponseMapper.buildAnnouncementWebResponse(
+          announcement, urlPrefix))
       .collect(Collectors.toList());
   }
   
