@@ -1,6 +1,7 @@
 package com.future.function.web.controller.core;
 
 import com.future.function.common.enumeration.core.Role;
+import com.future.function.common.properties.core.FileProperties;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.service.api.feature.core.AuthService;
@@ -30,6 +31,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -59,8 +61,10 @@ public class AuthControllerTest extends TestHelper {
   private static final AuthWebRequest AUTH_WEB_REQUEST = new AuthWebRequest(
     MENTOR_EMAIL, PASSWORD);
   
+  private static final String URL_PREFIX = "url-prefix";
+  
   private static final DataResponse<AuthWebResponse> DATA_RESPONSE =
-    AuthResponseMapper.toAuthDataResponse(USER);
+    AuthResponseMapper.toAuthDataResponse(USER, URL_PREFIX);
   
   private static final BaseResponse OK_BASE_RESPONSE =
     ResponseHelper.toBaseResponse(HttpStatus.OK);
@@ -69,6 +73,9 @@ public class AuthControllerTest extends TestHelper {
   
   @MockBean
   private AuthService authService;
+  
+  @MockBean
+  private FileProperties fileProperties;
   
   @Override
   @Before
@@ -80,12 +87,14 @@ public class AuthControllerTest extends TestHelper {
   @After
   public void tearDown() {
     
-    verifyNoMoreInteractions(authService);
+    verifyNoMoreInteractions(authService, fileProperties);
   }
   
   @Test
   public void testGivenApiCallByLoggingUserInReturnDataResponse()
     throws Exception {
+    
+    when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
     
     when(authService.login(eq(MENTOR_EMAIL), eq(PASSWORD),
                            any(HttpServletResponse.class)
@@ -100,6 +109,7 @@ public class AuthControllerTest extends TestHelper {
       .andExpect(content().json(dataResponseJacksonTester.write(DATA_RESPONSE)
                                   .getJson()));
     
+    verify(fileProperties).getUrlPrefix();
     verify(authService).login(
       eq(MENTOR_EMAIL), eq(PASSWORD), any(HttpServletResponse.class));
   }
@@ -109,6 +119,8 @@ public class AuthControllerTest extends TestHelper {
     throws Exception {
     
     super.setCookie(Role.MENTOR);
+  
+    when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
     
     when(authService.getLoginStatus(eq(MENTOR_SESSION_ID),
                                     any(HttpServletResponse.class)
@@ -119,6 +131,7 @@ public class AuthControllerTest extends TestHelper {
       .andExpect(content().json(dataResponseJacksonTester.write(DATA_RESPONSE)
                                   .getJson()));
     
+    verify(fileProperties).getUrlPrefix();
     verify(authService).getLoginStatus(eq(MENTOR_SESSION_ID),
                                        any(HttpServletResponse.class)
     );
@@ -138,6 +151,7 @@ public class AuthControllerTest extends TestHelper {
     
     verify(authService).logout(
       eq(MENTOR_SESSION_ID), any(HttpServletResponse.class));
+    verifyZeroInteractions(fileProperties);
   }
   
 }
