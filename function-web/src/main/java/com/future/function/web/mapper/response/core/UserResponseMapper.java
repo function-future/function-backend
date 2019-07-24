@@ -30,13 +30,14 @@ public class UserResponseMapper {
    * @param user User data to be converted to response.
    *
    * @return {@code DataResponse<UserWebResponse>} - The converted user data,
-   * wrapped in {@link com.future.function.web.model.response.base.DataResponse}
-   * and
+   * wrapped in
+   * {@link com.future.function.web.model.response.base.DataResponse} and
    * {@link com.future.function.web.model.response.feature.core.UserWebResponse}
    */
-  public static DataResponse<UserWebResponse> toUserDataResponse(User user) {
+  public static DataResponse<UserWebResponse> toUserDataResponse(User user,
+                                                                 String urlPrefix) {
     
-    return toUserDataResponse(HttpStatus.OK, user);
+    return toUserDataResponse(HttpStatus.OK, user, urlPrefix);
   }
   
   /**
@@ -47,19 +48,20 @@ public class UserResponseMapper {
    * @param user       User data to be converted to response.
    *
    * @return {@code DataResponse<UserWebResponse>} - The converted user data,
-   * wrapped in {@link com.future.function.web.model.response.base.DataResponse}
-   * and
+   * wrapped in
+   * {@link com.future.function.web.model.response.base.DataResponse} and
    * {@link com.future.function.web.model.response.feature.core.UserWebResponse}
    */
   public static DataResponse<UserWebResponse> toUserDataResponse(
-    HttpStatus httpStatus, User user
+    HttpStatus httpStatus, User user, String urlPrefix
   ) {
     
     return ResponseHelper.toDataResponse(
-      httpStatus, buildUserWebResponse(user));
+      httpStatus, buildUserWebResponse(user, urlPrefix));
   }
   
-  private static UserWebResponse buildUserWebResponse(User user) {
+  private static UserWebResponse buildUserWebResponse(User user,
+                                                      String urlPrefix) {
     
     return UserWebResponse.builder()
       .id(user.getId())
@@ -69,7 +71,7 @@ public class UserResponseMapper {
       .name(user.getName())
       .phone(user.getPhone())
       .address(user.getAddress())
-      .avatar(UserResponseMapper.getFileUrl(user.getPictureV2()))
+      .avatar(UserResponseMapper.getFileUrl(user.getPictureV2(), urlPrefix))
       .avatarId(UserResponseMapper.getFileId(user))
       .batch(UserResponseMapper.getBatch(user))
       .university(user.getUniversity())
@@ -90,10 +92,11 @@ public class UserResponseMapper {
       .orElse(null);
   }
   
-  private static String getFileUrl(FileV2 fileV2) {
+  private static String getFileUrl(FileV2 fileV2, String urlPrefix) {
     
     return Optional.ofNullable(fileV2)
       .map(FileV2::getFileUrl)
+      .map(urlPrefix::concat)
       .orElse(null);
   }
   
@@ -105,23 +108,25 @@ public class UserResponseMapper {
    *
    * @return {@code PagingResponse<UserWebResponse} - The converted user data,
    * wrapped in
-   * {@link com.future.function.web.model.response.base.PagingResponse}
-   * and
+   * {@link com.future.function.web.model.response.base.PagingResponse} and
    * {@link com.future.function.web.model.response.feature.core.UserWebResponse}
    */
   public static PagingResponse<UserWebResponse> toUsersPagingResponse(
-    Page<User> data
+    Page<User> data, String urlPrefix
   ) {
     
     return ResponseHelper.toPagingResponse(
-      HttpStatus.OK, toUserWebResponseList(data), PageHelper.toPaging(data));
+      HttpStatus.OK, toUserWebResponseList(data, urlPrefix),
+      PageHelper.toPaging(data));
   }
   
-  private static List<UserWebResponse> toUserWebResponseList(Page<User> data) {
+  private static List<UserWebResponse> toUserWebResponseList(
+    Page<User> data, String urlPrefix
+  ) {
     
     return data.getContent()
       .stream()
-      .map(UserResponseMapper::buildUserWebResponse)
+      .map(user -> buildUserWebResponse(user, urlPrefix))
       .collect(Collectors.toList());
   }
   

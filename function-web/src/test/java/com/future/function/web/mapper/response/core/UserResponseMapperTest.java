@@ -58,6 +58,8 @@ public class UserResponseMapperTest {
     .university(UNIVERSITY)
     .build();
   
+  private static final String URL_PREFIX = "url-prefix";
+  
   private static final UserWebResponse STUDENT_WEB_RESPONSE =
     UserWebResponse.builder()
       .id(STUDENT_ID)
@@ -141,14 +143,14 @@ public class UserResponseMapperTest {
   public void testGivenUserDataByMappingToDataResponseReturnDataResponseObject() {
     
     DataResponse<UserWebResponse> createdStudentDataResponse =
-      UserResponseMapper.toUserDataResponse(HttpStatus.CREATED, STUDENT);
+      UserResponseMapper.toUserDataResponse(HttpStatus.CREATED, STUDENT, URL_PREFIX);
     
     assertThat(createdStudentDataResponse).isNotNull();
     assertThat(createdStudentDataResponse).isEqualTo(
       CREATED_STUDENT_WEB_RESPONSE);
     
     DataResponse<UserWebResponse> retrievedMentorDataResponse =
-      UserResponseMapper.toUserDataResponse(MENTOR);
+      UserResponseMapper.toUserDataResponse(MENTOR, URL_PREFIX);
     
     assertThat(retrievedMentorDataResponse).isNotNull();
     assertThat(retrievedMentorDataResponse).isEqualTo(
@@ -159,7 +161,7 @@ public class UserResponseMapperTest {
   public void testGivenUsersDataByMappingToPagingResponseReturnPagingResponseObject() {
     
     PagingResponse<UserWebResponse> pagingResponse =
-      UserResponseMapper.toUsersPagingResponse(PAGE);
+      UserResponseMapper.toUsersPagingResponse(PAGE, URL_PREFIX);
     
     assertThat(pagingResponse).isNotNull();
     assertThat(pagingResponse).isEqualTo(PAGING_RESPONSE);
