@@ -28,8 +28,6 @@ public class QuestionnaireResponseSummaryServiceImpl implements QuestionnaireRes
 
   private final QuestionResponseSummaryRepository questionResponseSummaryRepository;
 
-  private final QuestionnaireRepository questionnaireRepository;
-
   private final QuestionResponseRepository questionResponseRepository;
 
   private final QuestionQuestionnaireRepository questionQuestionnaireRepository;
@@ -40,7 +38,6 @@ public class QuestionnaireResponseSummaryServiceImpl implements QuestionnaireRes
   public QuestionnaireResponseSummaryServiceImpl(QuestionnaireResponseSummaryRepository questionnaireResponseSummaryRepository, QuestionResponseSummaryRepository questionResponseSummaryRepository, QuestionnaireRepository questionnaireRepository, QuestionResponseRepository questionResponseRepository, QuestionQuestionnaireRepository questionQuestionnaireRepository, UserService userService) {
     this.questionnaireResponseSummaryRepository = questionnaireResponseSummaryRepository;
     this.questionResponseSummaryRepository = questionResponseSummaryRepository;
-    this.questionnaireRepository = questionnaireRepository;
     this.questionResponseRepository = questionResponseRepository;
     this.questionQuestionnaireRepository = questionQuestionnaireRepository;
     this.userService = userService;

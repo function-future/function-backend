@@ -5,7 +5,6 @@ import com.future.function.model.entity.feature.communication.questionnaire.Ques
 import com.future.function.model.entity.feature.communication.questionnaire.Questionnaire;
 import com.future.function.model.entity.feature.communication.questionnaire.QuestionnaireParticipant;
 import com.future.function.model.entity.feature.core.User;
-import com.future.function.model.entity.feature.scoring.Question;
 import com.future.function.repository.feature.communication.questionnaire.QuestionQuestionnaireRepository;
 import com.future.function.repository.feature.communication.questionnaire.QuestionnaireParticipantRepository;
 import com.future.function.repository.feature.communication.questionnaire.QuestionnaireRepository;
@@ -25,7 +24,6 @@ import org.springframework.data.domain.Pageable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.*;
@@ -33,7 +31,7 @@ import static org.mockito.Mockito.*;
 
 /**
  * Author: RickyKennedy
- * Created At:8:33 PM 7/23/2019
+ * Created At: 8:33 PM 7/23/2019
  */
 @RunWith(MockitoJUnitRunner.class)
 public class QuestionnaireServiceImplTest {
