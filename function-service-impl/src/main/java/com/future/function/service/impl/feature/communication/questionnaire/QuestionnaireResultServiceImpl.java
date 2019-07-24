@@ -26,7 +26,7 @@ public class QuestionnaireResultServiceImpl implements QuestionnaireResultServic
 
   @Override
   public Page<UserQuestionnaireSummary> getAppraisalsQuestionnaireSummaryByBatch(Batch batch, Pageable pageable) {
-    return userQuestionnaireSummaryRepository.findAllByRoleAndBatchAndDeletedFalse(Role.STUDENT, batch, pageable);
+    return userQuestionnaireSummaryRepository.findAllByRoleOrRoleAndBatchAndDeletedFalse(Role.MENTOR, Role.STUDENT, batch, pageable);
   }
 
   @Override

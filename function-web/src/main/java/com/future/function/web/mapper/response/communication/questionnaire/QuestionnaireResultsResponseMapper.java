@@ -65,6 +65,13 @@ public class QuestionnaireResultsResponseMapper {
   }
 
   private static BatchWebResponse toBatchResponse(Batch batch) {
+    if(batch == null) {
+      return BatchWebResponse.builder()
+              .id("No Batch")
+              .name("No Batch")
+              .code("No Batch")
+              .build();
+    }
     return BatchWebResponse.builder()
             .id(batch.getId())
             .name(batch.getName())

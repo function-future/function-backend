@@ -122,7 +122,7 @@ public class UserQuestionnaireSummaryRepositoryTest {
   public void testGivenRoleAndBatchByFindingAllUserQuestionnaireSummaryReturnedPagedUserQuestionnaireSummary() {
     Page<UserQuestionnaireSummary> userQuestionnaireSummaries =
       userQuestionnaireSummaryRepository
-        .findAllByRoleAndBatchAndDeletedFalse(Role.STUDENT, batch, PAGEABLE);
+        .findAllByRoleOrRoleAndBatchAndDeletedFalse(Role.MENTOR, Role.STUDENT, batch, PAGEABLE);
 
     assertThat(userQuestionnaireSummaries.getTotalElements()).isEqualTo(2);
   }
