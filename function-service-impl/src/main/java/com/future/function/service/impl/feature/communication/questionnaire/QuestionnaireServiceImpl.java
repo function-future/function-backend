@@ -26,7 +26,6 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
 
   private final QuestionQuestionnaireRepository questionQuestionnaireRepository;
 
-
   private final UserService userService;
 
   private final QuestionnaireParticipantRepository questionnaireParticipantRepository;
@@ -160,8 +159,8 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
   @Override
   public void deleteQuestionnaireAppraiserFromQuestionnaire(String questionnaireParticipantId){
     Optional.ofNullable(questionnaireParticipantId)
-            .map(questionQuestionnaireRepository::findOne)
-            .ifPresent(this::softDeletedHelperQuestionQuestionnaire);
+            .map(questionnaireParticipantRepository::findOne)
+            .ifPresent(this::softDeletedHelperQuestionnaireParticipant);
   }
 
   @Override
@@ -196,7 +195,6 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
     targetQuestionnaire.setTitle(questionnaire.getTitle());
     targetQuestionnaire.setDescription(questionnaire.getDescription());
     targetQuestionnaire.setAuthor(questionnaire.getAuthor());
-//    BeanUtils.copyProperties(questionnaire,targetQuestionnaire);
     return targetQuestionnaire;
   }
 
@@ -213,7 +211,6 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
   }
 
   private QuestionQuestionnaire copyProperties (QuestionQuestionnaire questionQuestionnaire, QuestionQuestionnaire targetQuestionQuestionnaire) {
-//    BeanUtils.copyProperties(questionQuestionnaire, targetQuestionQuestionnaire);
     targetQuestionQuestionnaire.setDescription(questionQuestionnaire.getDescription());
     return targetQuestionQuestionnaire;
   }
@@ -230,19 +227,6 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
     questionnaireParticipant.setParticipantType(ParticipantType.UNKNOWN);
     questionnaireParticipant.setQuestionnaire(null);
     questionnaireParticipantRepository.save(questionnaireParticipant);
-  }
-
-  private QuestionnaireParticipant verifyQuestionnaireParticipant(String questionnaireId, String appraiserId, ParticipantType participantType)
-    throws Exception
-  {
-    Optional<QuestionnaireParticipant> questionnaireParticipantTemp =
-            questionnaireParticipantRepository.findByQuestionnaireAndMemberAndParticipantTypeAndDeletedFalse(
-                    this.getQuestionnaire(questionnaireId), userService.getUser(appraiserId), participantType
-            );
-    if (questionnaireParticipantTemp.get() == null){
-      throw new Exception("error user have been paticipant");
-    }
-    return questionnaireParticipantTemp.get();
   }
 
 }
