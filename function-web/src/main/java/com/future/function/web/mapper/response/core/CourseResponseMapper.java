@@ -34,10 +34,10 @@ public final class CourseResponseMapper {
    * {@link CourseWebResponse}
    */
   public static DataResponse<CourseWebResponse> toCourseDataResponse(
-    Course course
+    Course course, String urlPrefix
   ) {
     
-    return toCourseDataResponse(HttpStatus.OK, course);
+    return toCourseDataResponse(HttpStatus.OK, course, urlPrefix);
   }
   
   /**
@@ -53,23 +53,23 @@ public final class CourseResponseMapper {
    * {@link CourseWebResponse}
    */
   public static DataResponse<CourseWebResponse> toCourseDataResponse(
-    HttpStatus httpStatus, Course course
+    HttpStatus httpStatus, Course course, String urlPrefix
   ) {
     
     return ResponseHelper.toDataResponse(httpStatus,
-                                         buildNormalCourseWebResponseV2(course)
+                                         buildNormalCourseWebResponseV2(course, urlPrefix)
     );
   }
   
   private static CourseWebResponse buildNormalCourseWebResponseV2(
-    Course course
+    Course course, String urlPrefix
   ) {
     
     return CourseWebResponse.builder()
       .id(course.getId())
       .title(course.getTitle())
       .description(course.getDescription())
-      .material(CourseResponseMapper.getFileUrl(course))
+      .material(CourseResponseMapper.getFileUrl(course, urlPrefix))
       .materialId(CourseResponseMapper.getFileId(course))
       .build();
   }
@@ -81,35 +81,40 @@ public final class CourseResponseMapper {
       .orElse(null);
   }
   
-  private static String getFileUrl(Course course) {
+  private static String getFileUrl(Course course, String urlPrefix) {
     
     return Optional.ofNullable(course.getFile())
       .map(FileV2::getFileUrl)
+      .map(urlPrefix::concat)
       .orElse(null);
   }
   
   private static CourseWebResponse buildThumbnailCourseWebResponseV2(
-    Course course
+    Course course, String urlPrefix
   ) {
     
     return CourseWebResponse.builder()
       .id(course.getId())
       .title(course.getTitle())
       .description(course.getDescription())
-      .material(CourseResponseMapper.getMaterial(course))
+      .material(CourseResponseMapper.getMaterial(course, urlPrefix))
       .build();
   }
   
-  private static String getMaterial(Course course) {
+  private static String getMaterial(Course course, String urlPrefix) {
     
-    return Optional.ofNullable(CourseResponseMapper.getThumbnailUrl(course))
-      .orElseGet(() -> CourseResponseMapper.getFileUrl(course));
+    return Optional.ofNullable(CourseResponseMapper.getThumbnailUrl(course,
+                                                                    urlPrefix))
+      .orElseGet(() -> CourseResponseMapper.getFileUrl(course, urlPrefix));
   }
   
-  private static String getThumbnailUrl(Course course) {
+  private static String getThumbnailUrl(
+    Course course, String urlPrefix
+  ) {
     
     return Optional.ofNullable(course.getFile())
       .map(FileV2::getThumbnailUrl)
+      .map(urlPrefix::concat)
       .orElse(null);
   }
   
@@ -125,19 +130,19 @@ public final class CourseResponseMapper {
    * {@link List} and {@link CourseWebResponse}.
    */
   public static DataResponse<List<CourseWebResponse>> toCoursesDataResponse(
-    List<Course> courses
+    List<Course> courses, String urlPrefix
   ) {
     
     return ResponseHelper.toDataResponse(
-      HttpStatus.CREATED, toCourseWebResponseV2List(courses));
+      HttpStatus.CREATED, toCourseWebResponseV2List(courses, urlPrefix));
   }
   
   private static List<CourseWebResponse> toCourseWebResponseV2List(
-    List<Course> data
+    List<Course> data, String urlPrefix
   ) {
     
     return data.stream()
-      .map(CourseResponseMapper::buildThumbnailCourseWebResponseV2)
+      .map(course -> buildThumbnailCourseWebResponseV2(course, urlPrefix))
       .collect(Collectors.toList());
   }
   
@@ -153,20 +158,20 @@ public final class CourseResponseMapper {
    * {@link CourseWebResponse}
    */
   public static PagingResponse<CourseWebResponse> toCoursesPagingResponse(
-    Page<Course> data
+    Page<Course> data, String urlPrefix
   ) {
     
     return ResponseHelper.toPagingResponse(HttpStatus.OK,
-                                           toCourseWebResponseV2List(data),
+                                           toCourseWebResponseV2List(data, urlPrefix),
                                            PageHelper.toPaging(data)
     );
   }
   
   private static List<CourseWebResponse> toCourseWebResponseV2List(
-    Page<Course> data
+    Page<Course> data, String urlPrefix
   ) {
     
-    return toCourseWebResponseV2List(data.getContent());
+    return toCourseWebResponseV2List(data.getContent(), urlPrefix);
   }
   
 }
