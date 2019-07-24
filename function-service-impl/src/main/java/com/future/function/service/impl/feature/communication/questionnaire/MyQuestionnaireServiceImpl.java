@@ -35,8 +35,6 @@ import java.util.Optional;
 @Service
 public class MyQuestionnaireServiceImpl implements MyQuestionnaireService {
 
-  private final QuestionnaireRepository questionnaireRepository;
-
   private final QuestionnaireParticipantRepository questionnaireParticipantRepository;
 
   private final QuestionQuestionnaireRepository questionQuestionnaireRepository;
@@ -52,8 +50,7 @@ public class MyQuestionnaireServiceImpl implements MyQuestionnaireService {
   private final QuestionResponseSummaryRepository questionResponseSummaryRepository;
 
   @Autowired
-  public MyQuestionnaireServiceImpl(QuestionnaireRepository questionnaireRepository, QuestionnaireParticipantRepository questionnaireParticipantRepository, QuestionQuestionnaireRepository questionQuestionnaireRepository, QuestionResponseRepository questionResponseRepository, QuestionnaireResponseRepository questionnaireResponseRepository, QuestionnaireResponseSummaryRepository questionnaireResponseSummaryRepository, UserQuestionnaireSummaryRepository userQuestionnaireSummaryRepository, QuestionResponseSummaryRepository questionResponseSummaryRepository, UserService userService) {
-    this.questionnaireRepository = questionnaireRepository;
+  public MyQuestionnaireServiceImpl( QuestionnaireParticipantRepository questionnaireParticipantRepository, QuestionQuestionnaireRepository questionQuestionnaireRepository, QuestionResponseRepository questionResponseRepository, QuestionnaireResponseRepository questionnaireResponseRepository, QuestionnaireResponseSummaryRepository questionnaireResponseSummaryRepository, UserQuestionnaireSummaryRepository userQuestionnaireSummaryRepository, QuestionResponseSummaryRepository questionResponseSummaryRepository, UserService userService) {
     this.questionnaireParticipantRepository = questionnaireParticipantRepository;
     this.questionQuestionnaireRepository = questionQuestionnaireRepository;
     this.questionResponseRepository = questionResponseRepository;
@@ -152,13 +149,11 @@ public class MyQuestionnaireServiceImpl implements MyQuestionnaireService {
       .scoreSummary(scoreSummary)
       .build();
 
-    questionnaireResponseRepository.save(questionnaireResponse);
-
     this.updateQuestionnaireResponseSummary(questionnaireResponse);
 
     this.updateUserQuestionnaireSummary(questionnaireResponse);
 
-    return questionnaireResponse;
+    return questionnaireResponseRepository.save(questionnaireResponse);
   }
 
   public void updateQuestionResponseSummary(Questionnaire questionnaire, QuestionResponse questionResponse){
