@@ -121,8 +121,9 @@ public class FileServiceImpl implements FileService {
                                                              Role.ADMIN
       ))
       .map(sess -> this.buildFolder(parentId, objectName, sess.getUserId()))
+      .map(fileRepositoryV2::save)
       .map(file -> {
-        file.setPaths(this.getPathsForFileOrFolder(file));
+        file.setPaths(this.getPathsForFileOrFolder(file.getId()));
         return file;
       })
       .map(fileRepositoryV2::save)
@@ -139,7 +140,10 @@ public class FileServiceImpl implements FileService {
     );
     file.setUsed(true);
     file.setUser(userService.getUser(session.getUserId()));
-    file.setPaths(this.getPathsForFileOrFolder(file));
+
+    file = fileRepositoryV2.save(file);
+
+    file.setPaths(this.getPathsForFileOrFolder(file.getId()));
 
     return fileRepositoryV2.save(file);
   }
@@ -156,9 +160,9 @@ public class FileServiceImpl implements FileService {
     return this.getPathsForFileOrFolder(parentId);
   }
   
-  private List<FileV2> getPathsForFileOrFolder(String parentId) {
+  private List<FileV2> getPathsForFileOrFolder(String fileFolderId) {
     
-    FileV2 parentOfFileOrFolder = Optional.ofNullable(parentId)
+    FileV2 parentOfFileOrFolder = Optional.ofNullable(fileFolderId)
       .flatMap(fileRepositoryV2::findByIdAndDeletedFalse)
       .orElse(null);
     

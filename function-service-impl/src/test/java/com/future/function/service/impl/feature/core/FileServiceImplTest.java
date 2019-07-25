@@ -34,10 +34,7 @@ import static com.googlecode.catchexception.CatchException.catchException;
 import static com.googlecode.catchexception.CatchException.caughtException;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class FileServiceImplTest {
@@ -314,6 +311,9 @@ public class FileServiceImplTest {
     
     when(fileRepository.save(any(FileV2.class))).thenReturn(savedFile);
 
+    when(fileRepository.findByIdAndDeletedFalse(savedFile.getId())).thenReturn(
+      Optional.of(savedFile));
+
     FileV2 createdFile = fileService.createFileOrFolder(
       new Session("", userId, "", EMAIL, Role.ADMIN), PARENT_ID, NAME, NAME,
       NAME.getBytes()
@@ -326,12 +326,15 @@ public class FileServiceImplTest {
     assertThat(createdFile.isUsed()).isTrue();
     assertThat(createdFile.isMarkFolder()).isFalse();
     assertThat(createdFile.getUser()).isNotNull();
+    assertThat(createdFile.getPaths()).isEqualTo(
+      Collections.singletonList(savedFile));
 
     verify(resourceService).storeFile(
       null, PARENT_ID, NAME, NAME, NAME.getBytes(), FileOrigin.FILE);
     verify(userService).getUser(userId);
     verify(fileRepository).findByIdAndDeletedFalse(PARENT_ID);
-    verify(fileRepository).save(any(FileV2.class));
+    verify(fileRepository).findByIdAndDeletedFalse(savedFile.getId());
+    verify(fileRepository, times(2)).save(any(FileV2.class));
     verifyZeroInteractions(fileProperties);
   }
 
@@ -351,6 +354,8 @@ public class FileServiceImplTest {
   
     when(fileRepository.findByIdAndDeletedFalse(PARENT_ID)).thenReturn(
       Optional.empty());
+    when(fileRepository.findByIdAndDeletedFalse(
+      returnedFolder.getId())).thenReturn(Optional.of(returnedFolder));
 
     when(fileRepository.save(any(FileV2.class))).thenReturn(returnedFolder);
 
@@ -366,10 +371,13 @@ public class FileServiceImplTest {
     assertThat(createdFolder.isUsed()).isTrue();
     assertThat(createdFolder.isMarkFolder()).isTrue();
     assertThat(createdFolder.getUser()).isNotNull();
+    assertThat(createdFolder.getPaths()).isEqualTo(
+      Collections.singletonList(returnedFolder));
 
     verify(userService).getUser(userId);
     verify(fileRepository).findByIdAndDeletedFalse(PARENT_ID);
-    verify(fileRepository).save(any(FileV2.class));
+    verify(fileRepository).findByIdAndDeletedFalse(returnedFolder.getId());
+    verify(fileRepository, times(2)).save(any(FileV2.class));
     verifyZeroInteractions(resourceService, fileProperties);
   }
 
