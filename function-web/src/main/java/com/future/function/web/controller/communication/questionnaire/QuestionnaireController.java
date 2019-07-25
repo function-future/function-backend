@@ -142,7 +142,7 @@ public class QuestionnaireController {
               consumes = MediaType.APPLICATION_JSON_VALUE,
               produces = MediaType.APPLICATION_JSON_VALUE
               )
-  public DataResponse createQuestionQuestionnaire(@PathVariable String questionnaireId,
+  public DataResponse<QuestionQuestionnaireResponse> createQuestionQuestionnaire(@PathVariable String questionnaireId,
                                                   @RequestBody QuestionQuestionnaireRequest questionQuestionnaireRequest) {
     return QuestionQuestionnaireResponseMapper.toDataResponseQuestionQuestionnaireResponse(
             questionnaireService.createQuestionQuestionnaire(
@@ -161,7 +161,7 @@ public class QuestionnaireController {
           consumes = MediaType.APPLICATION_JSON_VALUE,
           produces = MediaType.APPLICATION_JSON_VALUE
   )
-  public DataResponse updateQuestionQuestionnaire(
+  public DataResponse<QuestionQuestionnaireResponse> updateQuestionQuestionnaire(
           @PathVariable String questionnaireId,
           @PathVariable String questionId,
           @RequestBody QuestionQuestionnaireRequest questionQuestionnaireRequest

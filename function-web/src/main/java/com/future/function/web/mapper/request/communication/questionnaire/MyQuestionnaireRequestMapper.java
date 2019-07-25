@@ -16,13 +16,10 @@ import java.util.stream.Collectors;
 @Component
 public class MyQuestionnaireRequestMapper {
 
-  private final RequestValidator validator;
-
   private final QuestionnaireService questionnaireService;
 
   @Autowired
-  public MyQuestionnaireRequestMapper(RequestValidator validator, QuestionnaireService questionnaireService) {
-    this.validator = validator;
+  public MyQuestionnaireRequestMapper(QuestionnaireService questionnaireService) {
     this.questionnaireService = questionnaireService;
   }
 

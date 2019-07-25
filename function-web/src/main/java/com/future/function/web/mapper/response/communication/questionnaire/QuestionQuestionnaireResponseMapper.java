@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class QuestionQuestionnaireResponseMapper {
 
-  public static DataResponse toDataResponseListQuestionQuestionnaireResponse(List<QuestionQuestionnaire> questionsByIdQuestionnaire, HttpStatus httpStatus) {
+  public static DataResponse<List<QuestionQuestionnaireResponse>> toDataResponseListQuestionQuestionnaireResponse(List<QuestionQuestionnaire> questionsByIdQuestionnaire, HttpStatus httpStatus) {
 
     return ResponseHelper.toDataResponse( httpStatus, toQuestionQuestionnaireResponseList(questionsByIdQuestionnaire));
   }
@@ -35,7 +35,7 @@ public class QuestionQuestionnaireResponseMapper {
             .build();
   }
 
-  public static DataResponse toDataResponseQuestionQuestionnaireResponse(QuestionQuestionnaire questionQuestionnaire, HttpStatus httpStatus) {
+  public static DataResponse<QuestionQuestionnaireResponse> toDataResponseQuestionQuestionnaireResponse(QuestionQuestionnaire questionQuestionnaire, HttpStatus httpStatus) {
     return ResponseHelper.toDataResponse(httpStatus, toQuestionQuestionnaireResponse(questionQuestionnaire));
   }
 }

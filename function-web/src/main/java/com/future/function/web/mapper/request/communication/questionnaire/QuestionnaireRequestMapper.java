@@ -14,7 +14,6 @@ public class QuestionnaireRequestMapper {
 
   private final RequestValidator validator;
 
-
   @Autowired
   public QuestionnaireRequestMapper(RequestValidator validator) {
     this.validator = validator;
