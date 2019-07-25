@@ -6,7 +6,6 @@ import com.future.function.model.entity.feature.core.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,7 +13,6 @@ import java.util.Optional;
 /**
  * Repository class for user database operations.
  */
-@Repository
 public interface UserRepository extends MongoRepository<User, String> {
 
   /**
@@ -68,7 +66,8 @@ public interface UserRepository extends MongoRepository<User, String> {
    *
    * @return {@code List<User>} - List or users found in database.
    */
-  Page<User> findAllByNameContainsIgnoreCaseAndDeletedFalse(String name,
-                                                            Pageable pageable);
+  Page<User> findAllByNameContainsIgnoreCaseAndDeletedFalse(
+    String name, Pageable pageable
+  );
 
 }
