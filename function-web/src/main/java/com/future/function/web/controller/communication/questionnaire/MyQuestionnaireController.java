@@ -18,6 +18,7 @@ import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.feature.communication.questionnaire.AppraisalDataResponse;
 import com.future.function.web.model.response.feature.communication.questionnaire.AppraiseeResponse;
 import com.future.function.web.model.response.feature.communication.questionnaire.QuestionQuestionnaireResponse;
+import com.future.function.web.model.response.feature.communication.questionnaire.QuestionnaireDetailResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -57,10 +58,11 @@ public class MyQuestionnaireController {
 
   @ResponseStatus(HttpStatus.OK)
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-  public PagingResponse getMyQuestionnaires(@RequestParam(required = false, defaultValue = "1") int page,
-                                            @RequestParam(required = false, defaultValue = "10") int size,
-                                            Session session
-                                            )
+  public PagingResponse<QuestionnaireDetailResponse> getMyQuestionnaires(
+    @RequestParam(required = false, defaultValue = "1") int page,
+    @RequestParam(required = false, defaultValue = "10") int size,
+    Session session
+  )
   {
      return QuestionnaireResponseMapper
               .toPagingQuestionnaireDetailResponse(
