@@ -2,6 +2,8 @@ package com.future.function.web.controller.communication.questionnaire;
 
 import com.future.function.common.enumeration.core.Role;
 import com.future.function.model.entity.feature.communication.questionnaire.Answer;
+import com.future.function.model.entity.feature.communication.questionnaire.QuestionQuestionnaire;
+import com.future.function.model.entity.feature.communication.questionnaire.QuestionResponseSummary;
 import com.future.function.model.entity.feature.communication.questionnaire.Questionnaire;
 import com.future.function.model.entity.feature.communication.questionnaire.QuestionnaireResponseSummary;
 import com.future.function.model.entity.feature.communication.questionnaire.UserQuestionnaireSummary;
@@ -13,8 +15,12 @@ import com.future.function.service.api.feature.communication.questionnaire.Quest
 import com.future.function.web.TestHelper;
 import com.future.function.web.TestSecurityConfiguration;
 import com.future.function.web.mapper.response.communication.questionnaire.QuestionnaireResponseMapper;
+import com.future.function.web.mapper.response.communication.questionnaire.QuestionnaireResponseSummaryResponseMapper;
+import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
+import com.future.function.web.model.response.feature.communication.questionnaire.QuestionQuestionnaireSummaryResponse;
 import com.future.function.web.model.response.feature.communication.questionnaire.QuestionnaireSimpleSummaryResponse;
+import com.future.function.web.model.response.feature.communication.questionnaire.QuestionnaireSummaryDescriptionResponse;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,8 +36,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Arrays;
+import java.util.List;
 
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -71,6 +77,12 @@ public class QuestionnaireResponseControllerTest extends TestHelper {
   private static final Long DUE_DATE = Long.valueOf(1);
 
   private static final String QUESTIONNAIRE_RESPONSE_SUMMARY_ID = "questionnaireResponseSummaryId1";
+
+  private static final String QUESTION_ID = "questionId";
+
+  private static final String QUESTION_DESCRIPTION = "questionDescription";
+
+  private static final String QUESTION_RESPONSE_SUMMARY_ID = "questionQuestionnaireSummaryResponseid1";
 
   private static final Answer SCORE = Answer.builder()
     .minimum(0)
@@ -113,6 +125,22 @@ public class QuestionnaireResponseControllerTest extends TestHelper {
 
   private final Page<QuestionnaireResponseSummary> QUESTIONNAIRE_SUMMARY_PAGE
     = new PageImpl<>(Arrays.asList(QUESTIONNAIRE_RESPONSE_SUMMARY), PAGEABLE, 1);
+
+  private static final QuestionQuestionnaire QUESTION_QUESTIONNAIRE =
+    QuestionQuestionnaire.builder()
+      .id(QUESTION_ID)
+      .questionnaire(QUESTIONNAIRE)
+      .description(QUESTION_DESCRIPTION)
+      .build();
+
+  private static final QuestionResponseSummary QUESTION_RESPONSE_SUMMARY =
+    QuestionResponseSummary.builder()
+      .id(QUESTION_RESPONSE_SUMMARY_ID)
+      .question(QUESTION_QUESTIONNAIRE)
+      .questionnaire(QUESTIONNAIRE)
+      .scoreSummary(SCORE)
+      .build();
+
 
   @MockBean
   private QuestionnaireResponseSummaryService questionnaireResponseSummaryService;
@@ -163,9 +191,62 @@ public class QuestionnaireResponseControllerTest extends TestHelper {
 
   @Test
   public void getQuestionnaireSummaryDetail()  throws Exception {
+    when(
+      questionnaireResponseSummaryService
+        .getQuestionnaireResponseSummaryById(QUESTIONNAIRE_RESPONSE_SUMMARY_ID))
+      .thenReturn(QUESTIONNAIRE_RESPONSE_SUMMARY);
+
+    DataResponse<QuestionnaireSummaryDescriptionResponse> response =
+      QuestionnaireResponseSummaryResponseMapper
+        .toDataResponseQuestionnaireDataSummaryDescription(
+          QUESTIONNAIRE_RESPONSE_SUMMARY
+        );
+
+    mockMvc.perform(
+      get("/api/communication/questionnaire-response/"
+          +QUESTIONNAIRE_RESPONSE_SUMMARY_ID
+      )
+        .cookie(cookies))
+      .andExpect(status().isOk())
+      .andExpect(content().json(dataResponseJacksonTester.write(response).getJson()));
+
+    verify(questionnaireResponseSummaryService)
+      .getQuestionnaireResponseSummaryById(QUESTIONNAIRE_RESPONSE_SUMMARY_ID);
   }
 
   @Test
   public void getQuestionSummaryResponse() throws Exception {
+    when(
+      questionnaireResultService
+        .getAppraisalsQuestionnaireSummaryById(USER_SUMMARY_ID_1))
+      .thenReturn(USER_SUMMARY_1);
+
+    when(
+      questionnaireResponseSummaryService
+        .getQuestionsDetailsFromQuestionnaireResponseSummaryIdAndAppraisee(
+          QUESTIONNAIRE_RESPONSE_SUMMARY_ID, MEMBER_1))
+      .thenReturn(Arrays.asList(QUESTION_RESPONSE_SUMMARY));
+
+    DataResponse<List<QuestionQuestionnaireSummaryResponse>> response =
+      QuestionnaireResponseSummaryResponseMapper
+        .toDataResponseQuestionQuestionnaireSummaryResponseList(Arrays.asList(QUESTION_RESPONSE_SUMMARY));
+
+    mockMvc.perform(
+      get("/api/communication/questionnaire-response/"
+        +QUESTIONNAIRE_RESPONSE_SUMMARY_ID
+        +"/questions/"
+        +USER_SUMMARY_ID_1
+      )
+        .cookie(cookies))
+      .andExpect(status().isOk())
+      .andExpect(content().json(dataResponseJacksonTester.write(response).getJson()));
+
+
+    verify(questionnaireResponseSummaryService)
+      .getQuestionsDetailsFromQuestionnaireResponseSummaryIdAndAppraisee(
+        QUESTIONNAIRE_RESPONSE_SUMMARY_ID, MEMBER_1);
+
+    verify(questionnaireResultService)
+      .getAppraisalsQuestionnaireSummaryById(USER_SUMMARY_ID_1);
   }
 }
