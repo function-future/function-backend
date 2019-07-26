@@ -33,12 +33,9 @@ public class QuestionnaireResponseController {
 
   private final QuestionnaireResultService questionnaireResultService;
 
-  private final UserService userService;
-
-  public QuestionnaireResponseController(QuestionnaireResponseSummaryService questionnaireResponseSummaryService, QuestionnaireResultService questionnaireResultService, UserService userService) {
+  public QuestionnaireResponseController(QuestionnaireResponseSummaryService questionnaireResponseSummaryService, QuestionnaireResultService questionnaireResultService) {
     this.questionnaireResponseSummaryService = questionnaireResponseSummaryService;
     this.questionnaireResultService = questionnaireResultService;
-    this.userService = userService;
   }
 
   @ResponseStatus(HttpStatus.OK)

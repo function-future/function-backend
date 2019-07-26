@@ -45,7 +45,6 @@ public class QuestionResponseController {
           @PathVariable String questionResponseSummaryId
   ) {
     return QuestionnaireResponseSummaryResponseMapper.toDataResponseQuestionAnswerDetailResponse(
-
             questionnaireResponseSummaryService.getQuestionResponseByQuestionResponseSummaryId(questionResponseSummaryId)
     );
   }

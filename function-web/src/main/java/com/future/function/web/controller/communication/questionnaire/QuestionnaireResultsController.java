@@ -30,14 +30,11 @@ public class QuestionnaireResultsController {
 
   private final QuestionnaireResultService questionnaireResultService;
 
-  private final UserService userService;
-
   private final BatchService batchService;
 
   @Autowired
-  public QuestionnaireResultsController(QuestionnaireResultService questionnaireResultService, UserService userService, BatchService batchService) {
+  public QuestionnaireResultsController(QuestionnaireResultService questionnaireResultService, BatchService batchService) {
     this.questionnaireResultService = questionnaireResultService;
-    this.userService = userService;
     this.batchService = batchService;
   }
 
