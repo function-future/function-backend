@@ -11,6 +11,7 @@ import com.future.function.service.api.feature.scoring.ReportDetailService;
 import com.future.function.service.api.feature.scoring.SummaryService;
 import com.future.function.service.impl.helper.AuthorizationHelper;
 import com.future.function.service.impl.helper.CopyHelper;
+import java.util.Objects;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -52,6 +53,7 @@ public class ReportDetailServiceImpl implements ReportDetailService {
     private List<StudentSummaryVO> getStudentsSummaryPoints(String userId, List<ReportDetail> list) {
         return list.stream()
                 .map(reportDetail -> getSummaryVOFromReportDetail(userId, reportDetail))
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
 
@@ -61,7 +63,7 @@ public class ReportDetailServiceImpl implements ReportDetailService {
             .map(User::getId)
             .map(studentId -> summaryService.findAllPointSummaryByStudentId(studentId, userId))
             .map(summary -> setSummaryPoint(reportDetail, summary))
-            .orElseGet(() -> createEmptyStudentSummary(reportDetail));
+            .orElse(null);
     }
 
     private StudentSummaryVO createEmptyStudentSummary(ReportDetail reportDetail) {
