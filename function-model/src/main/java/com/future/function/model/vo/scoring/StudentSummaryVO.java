@@ -17,8 +17,8 @@ public class StudentSummaryVO {
   private String studentName;
   private String batchCode;
   private String university;
-    private String avatar;
-    private List<SummaryVO> scores;
+  private String avatar;
+  private List<SummaryVO> scores;
   private int point;
 
 }

@@ -2,6 +2,8 @@ package com.future.function.web.controller.scoring;
 
 import com.future.function.common.enumeration.core.Role;
 import com.future.function.model.entity.feature.core.Batch;
+import com.future.function.model.entity.feature.core.FileV2;
+import com.future.function.model.entity.feature.core.User;
 import com.future.function.model.entity.feature.scoring.Report;
 import com.future.function.service.api.feature.scoring.ReportService;
 import com.future.function.web.TestHelper;
@@ -12,6 +14,8 @@ import com.future.function.web.model.request.scoring.ReportWebRequest;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.base.paging.Paging;
+import com.future.function.web.model.response.feature.core.BatchWebResponse;
+import com.future.function.web.model.response.feature.core.UserWebResponse;
 import com.future.function.web.model.response.feature.scoring.ReportWebResponse;
 import org.junit.After;
 import org.junit.Before;
@@ -43,16 +47,23 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class ReportControllerTest extends TestHelper {
 
     private static final String STUDENT_ID = "student-id";
+    private static final String STUDENT_NAME = "student-name";
+    private static final String STUDENT_PHONE = "student-phone";
+    private static final String STUDENT_AVATAR = "student-avatar";
+    private static final String STUDENT_ADDRESS = "student-address";
+    private static final String STUDENT_EMAIL = "student-email";
+    private static final String STUDENT_UNIVERSITY = "student-university";
     private static final String REPORT_ID = "report-id";
     private static final String TITLE = "title";
     private static final String DESCRIPTION = "description";
     private static final String BATCH_CODE = "batch-code";
     private static final Long CREATED_AT = new Date().getTime();
 
-    private LocalDate usedAt;
     private ReportWebResponse reportWebResponse;
+    private UserWebResponse userWebResponse;
     private ReportWebRequest reportWebRequest;
     private Report report;
+    private User user;
     private Pageable pageable;
     private Paging paging;
     private Batch batch;
@@ -77,16 +88,36 @@ public class ReportControllerTest extends TestHelper {
 
         pageable = new PageRequest(0, 10);
 
-        usedAt = LocalDate.now().atStartOfDay().toLocalDate();
-
         batch = Batch.builder().code(BATCH_CODE).build();
+
+        user = User.builder()
+            .id(STUDENT_ID)
+            .name(STUDENT_NAME)
+            .role(Role.STUDENT)
+            .address(STUDENT_ADDRESS)
+            .phone(STUDENT_PHONE)
+            .pictureV2(FileV2.builder().fileUrl(STUDENT_AVATAR).build())
+            .batch(batch)
+            .email(STUDENT_EMAIL)
+            .university(STUDENT_UNIVERSITY).build();
+
+        userWebResponse = UserWebResponse.builder()
+            .id(STUDENT_ID)
+            .name(STUDENT_NAME)
+            .role(Role.STUDENT.name())
+            .address(STUDENT_ADDRESS)
+            .phone(STUDENT_PHONE)
+            .avatar(STUDENT_AVATAR)
+            .batch(BatchWebResponse.builder().code(BATCH_CODE).build())
+            .email(STUDENT_EMAIL)
+            .university(STUDENT_UNIVERSITY).build();
 
         report = Report.builder()
                 .id(REPORT_ID)
                 .title(TITLE)
                 .description(DESCRIPTION)
                 .batch(batch)
-                .studentIds(Collections.singletonList(STUDENT_ID))
+                .students(Collections.singletonList(user))
                 .build();
 
         report.setCreatedAt(CREATED_AT);
@@ -103,7 +134,7 @@ public class ReportControllerTest extends TestHelper {
                 .description(DESCRIPTION)
                 .batchCode(BATCH_CODE)
                 .studentCount(1)
-                .studentIds(Collections.singletonList(STUDENT_ID))
+                .students(Collections.singletonList(userWebResponse))
                 .build();
 
         reportWebResponse.setUploadedDate(CREATED_AT);
