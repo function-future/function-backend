@@ -123,6 +123,7 @@ public class ReportServiceImpl implements ReportService {
 
   @Override
   public Report updateReport(Report report) {
+      List<User> students = report.getStudents();
         return Optional.ofNullable(report)
                 .map(this::checkStudentIdsChangedAndDeleteIfChanged)
                 .map(Report::getId)
@@ -130,7 +131,8 @@ public class ReportServiceImpl implements ReportService {
                 .map(foundReport -> this.copyReportRequestAttributesIgnoreBatchField(report, foundReport))
                 .map(foundReport -> this.setStudents(foundReport, null))
                 .map(reportRepository::save)
-                .map(foundReport -> this.setStudents(foundReport, report.getStudents()))
+                .map(foundReport -> this.setStudents(foundReport, students))
+                .map(this::findStudentsAndSetReport)
                 .orElse(report);
     }
 
@@ -141,23 +143,30 @@ public class ReportServiceImpl implements ReportService {
 
   private Report checkStudentIdsChangedAndDeleteIfChanged(Report report) {
         return Optional.ofNullable(report)
-                .filter(this::isStudentListChangedFromRepository)
-                .orElseGet(() -> this.deleteAllDetailByReportId(report));
+                .map(this::isStudentListChangedFromRepository)
+                .filter(list -> !list.isEmpty())
+                .map(changedStudentIds -> {
+                  this.deleteReportDetailByStudentIds(changedStudentIds);
+                  return report;
+                })
+                .orElse(report);
     }
 
-  private boolean isStudentListChangedFromRepository(Report report) {
-      List<String> studentIds = report.getStudents().stream().map(User::getId).collect(Collectors.toList());
-      return reportDetailService.findAllDetailByReportId(report.getId()).stream()
+  private List<String> isStudentListChangedFromRepository(Report report) {
+      List<String> requestedStudentIds = report.getStudents().stream().map(User::getId).collect(Collectors.toList());
+      List<String> foundStudentIds = reportDetailService.findAllDetailByReportId(report.getId()).stream()
           .map(ReportDetail::getUser)
           .map(User::getId)
-          .collect(Collectors.toList())
-          .containsAll(studentIds);
+          .filter(existingUserId -> !requestedStudentIds.contains(existingUserId))
+          .collect(Collectors.toList());
+      return report.getStudents().stream()
+          .map(User::getId)
+          .filter(id -> !foundStudentIds.contains(id))
+          .collect(Collectors.toList());
     }
 
-  private Report deleteAllDetailByReportId(Report report) {
-        return Optional.ofNullable(report)
-                .map(this::deleteExistingDetailAndCreateNew)
-                .orElse(report);
+  private void deleteReportDetailByStudentIds(List<String> changedStudentIds) {
+        changedStudentIds.forEach(reportDetailService::deleteReportDetailByStudentId);
     }
 
   private Report deleteExistingDetailAndCreateNew(Report currentReport) {
