@@ -115,6 +115,15 @@ public class ReportDetailServiceImpl implements ReportDetailService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public void deleteReportDetailByStudentId(String studentId) {
+        reportDetailRepository.findByUserIdAndDeletedFalse(studentId)
+            .ifPresent(reportDetail -> {
+                reportDetail.setDeleted(true);
+                reportDetailRepository.save(reportDetail);
+            });
+    }
+
     private ReportDetail findReportDetailAndMapReport(Report report, ReportDetail reportDetail) {
         return Optional.ofNullable(reportDetail)
                 .map(ReportDetail::getUser)

@@ -19,6 +19,8 @@ public interface ReportDetailService {
 
     List<ReportDetail> giveScoreToEachStudentInDetail(Report report, List<ReportDetail> detailList);
 
+    void deleteReportDetailByStudentId(String studentId);
+
     void deleteAllByReportId(String reportId);
 
 }
