@@ -67,7 +67,7 @@ public class QuestionnaireResultServiceImplTest {
         .build();
   }
 
- // @After
+  @After
   public void tearDown() {
     verifyNoMoreInteractions (userQuestionnaireSummaryRepository);
   }
