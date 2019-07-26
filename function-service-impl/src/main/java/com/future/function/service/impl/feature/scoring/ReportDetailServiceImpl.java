@@ -11,14 +11,13 @@ import com.future.function.service.api.feature.scoring.ReportDetailService;
 import com.future.function.service.api.feature.scoring.SummaryService;
 import com.future.function.service.impl.helper.AuthorizationHelper;
 import com.future.function.service.impl.helper.CopyHelper;
-import java.util.Objects;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service
 public class ReportDetailServiceImpl implements ReportDetailService {
@@ -64,19 +63,6 @@ public class ReportDetailServiceImpl implements ReportDetailService {
             .map(studentId -> summaryService.findAllPointSummaryByStudentId(studentId, userId))
             .map(summary -> setSummaryPoint(reportDetail, summary))
             .orElse(null);
-    }
-
-    private StudentSummaryVO createEmptyStudentSummary(ReportDetail reportDetail) {
-        User user = userService.getUser(reportDetail.getUser().getId());
-        return StudentSummaryVO.builder()
-            .studentId(user.getId())
-            .studentName(user.getName())
-            .university(user.getUniversity())
-            .avatar(user.getPictureV2().getFilePath())
-            .batchCode(reportDetail.getReport().getBatch().getCode())
-            .scores(new ArrayList<>())
-            .point(reportDetail.getPoint())
-            .build();
     }
 
     private StudentSummaryVO setSummaryPoint(ReportDetail reportDetail, StudentSummaryVO summary) {
