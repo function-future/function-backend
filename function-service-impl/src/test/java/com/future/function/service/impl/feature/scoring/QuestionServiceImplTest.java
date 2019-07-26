@@ -112,9 +112,10 @@ public class QuestionServiceImplTest {
 
   @Test
   public void findAllByQuestionBankIdNullTest() {
-    catchException(() -> questionService.findAllByQuestionBankId(null, pageable));
-
-    assertThat(caughtException().getClass()).isEqualTo(NotFoundException.class);
+    Page<Question> actual = questionService.findAllByQuestionBankId(null, pageable);
+    assertThat(actual.getNumber()).isEqualTo(pageable.getPageNumber());
+    assertThat(actual.getSize()).isEqualTo(pageable.getPageSize());
+    assertThat(actual.getTotalElements()).isEqualTo(0);
   }
 
   @Test
@@ -158,6 +159,7 @@ public class QuestionServiceImplTest {
   public void createQuestion() {
     when(questionRepository.save(question)).thenReturn(question);
     when(optionService.createOption(option)).thenReturn(option);
+    when(questionBankService.findById(QUESTION_BANK_ID)).thenReturn(questionBank);
 
     Question actual = questionService.createQuestion(question, QUESTION_BANK_ID);
     assertThat(actual).isEqualTo(question);
@@ -172,6 +174,7 @@ public class QuestionServiceImplTest {
     when(questionRepository.findByIdAndDeletedFalse(QUESTION_ID)).thenReturn(Optional.of(question));
     when(questionRepository.save(question)).thenReturn(question);
     when(optionService.updateOption(option)).thenReturn(option);
+    when(questionBankService.findById(QUESTION_BANK_ID)).thenReturn(questionBank);
 
     Question actual = questionService.updateQuestion(question, QUESTION_BANK_ID);
 

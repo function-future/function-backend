@@ -241,6 +241,7 @@ public class StudentQuizServiceImplTest {
     List<StudentQuestion> actual = studentQuizService.findAllQuestionsByStudentQuizId(STUDENT_QUIZ_ID, USER_ID);
     assertThat(actual.size()).isEqualTo(1);
     verify(studentQuizRepository).findByIdAndDeletedFalse(STUDENT_QUIZ_ID);
+    verify(userService).getUser(USER_ID);
     verify(studentQuizDetailService).findAllQuestionsByStudentQuizId(STUDENT_QUIZ_ID);
   }
 
@@ -326,7 +327,7 @@ public class StudentQuizServiceImplTest {
   @Test
   public void deleteByBatchCodeAndQuiz() {
     studentQuiz.setDeleted(true);
-    studentQuizService.deleteByBatchCodeAndQuiz(BATCH_CODE, QUIZ_ID);
+    studentQuizService.deleteByBatchCodeAndQuiz(quiz);
     verify(userService).getStudentsByBatchCode(BATCH_CODE);
     verify(studentQuizDetailService).deleteByStudentQuiz(studentQuiz);
     verify(studentQuizRepository).findByStudentIdAndQuizIdAndDeletedFalse(USER_ID, QUIZ_ID);

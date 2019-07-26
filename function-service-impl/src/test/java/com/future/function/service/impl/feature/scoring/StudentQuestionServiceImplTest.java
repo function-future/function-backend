@@ -1,11 +1,7 @@
 package com.future.function.service.impl.feature.scoring;
 
 import com.future.function.common.exception.NotFoundException;
-import com.future.function.model.entity.feature.scoring.Option;
-import com.future.function.model.entity.feature.scoring.Question;
-import com.future.function.model.entity.feature.scoring.QuestionBank;
-import com.future.function.model.entity.feature.scoring.StudentQuestion;
-import com.future.function.model.entity.feature.scoring.StudentQuizDetail;
+import com.future.function.model.entity.feature.scoring.*;
 import com.future.function.repository.feature.scoring.StudentQuestionRepository;
 import com.future.function.service.api.feature.scoring.QuestionService;
 import org.junit.After;
@@ -17,7 +13,6 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.data.domain.Sort;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -25,10 +20,7 @@ import static com.googlecode.catchexception.CatchException.catchException;
 import static com.googlecode.catchexception.CatchException.caughtException;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class StudentQuestionServiceImplTest {
@@ -125,8 +117,8 @@ public class StudentQuestionServiceImplTest {
 
   @Test
   public void findAllQuestionsFromMultipleQuestionBanks() {
-    List<Question> actual = studentQuestionService.findAllQuestionsFromMultipleQuestionBank(true,
-        Collections.singletonList(questionBank), QUESTION_COUNT);
+    List<Question> actual = studentQuestionService.findAllRandomQuestionsFromMultipleQuestionBank(
+            Collections.singletonList(questionBank), QUESTION_COUNT);
     assertThat(actual.size()).isEqualTo(1);
     assertThat(actual.get(0).getLabel()).isEqualTo(QUESTION_TEXT);
     verify(questionService).findAllByMultipleQuestionBankId(Collections.singletonList(QUESTION_BANK_ID));
@@ -134,16 +126,16 @@ public class StudentQuestionServiceImplTest {
 
   @Test
   public void findAllQuestionsFromMultipleQuestionBanksNotRandom() {
-    List<Question> actual = studentQuestionService.findAllQuestionsFromMultipleQuestionBank(false,
-        Collections.singletonList(questionBank), 0);
+    List<Question> actual = studentQuestionService.findAllRandomQuestionsFromMultipleQuestionBank(
+            Collections.singletonList(questionBank), 0);
     assertThat(actual.size()).isEqualTo(0);
     verify(questionService).findAllByMultipleQuestionBankId(Collections.singletonList(QUESTION_BANK_ID));
   }
 
   @Test
   public void findAllQuestionsFromMultipleQuestionBanksEmptyQuestionBankList() {
-    List<Question> actual = studentQuestionService.findAllQuestionsFromMultipleQuestionBank(true,
-        Collections.emptyList(), QUESTION_COUNT);
+    List<Question> actual = studentQuestionService.findAllRandomQuestionsFromMultipleQuestionBank(
+            Collections.emptyList(), QUESTION_COUNT);
     assertThat(actual.size()).isEqualTo(0);
   }
 
@@ -168,25 +160,10 @@ public class StudentQuestionServiceImplTest {
   @Test
   public void postAnswerForAllStudentQuestion() {
     Integer actual = studentQuestionService
-        .postAnswerForAllStudentQuestion(Collections.singletonList(studentQuestion));
+            .postAnswerForAllStudentQuestion(Collections.singletonList(studentQuestion), STUDENT_QUIZ_DETAIL_ID);
     assertThat(actual).isEqualTo(100);
     verify(studentQuestionRepository).findAllByStudentQuizDetailIdAndDeletedFalseOrderByNumberAsc(STUDENT_QUIZ_DETAIL_ID);
     verify(studentQuestionRepository).save(studentQuestion);
-  }
-
-  @Test(expected = UnsupportedOperationException.class)
-  public void postAnswerForAllStudentQuestionNotSameStudentQuizDetailId() {
-    StudentQuestion anotherOne = StudentQuestion
-        .builder()
-        .number(2)
-        .id("abc")
-        .question(question)
-        .option(option)
-        .studentQuizDetail(StudentQuizDetail.builder().id("abc").build())
-        .build();
-
-    studentQuestionService
-        .postAnswerForAllStudentQuestion(Arrays.asList(studentQuestion, anotherOne));
   }
 
   @Test

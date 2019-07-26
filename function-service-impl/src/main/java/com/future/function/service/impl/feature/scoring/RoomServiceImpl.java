@@ -12,7 +12,9 @@ import com.future.function.repository.feature.scoring.RoomRepository;
 import com.future.function.service.api.feature.core.UserService;
 import com.future.function.service.api.feature.scoring.CommentService;
 import com.future.function.service.api.feature.scoring.RoomService;
+import com.future.function.service.impl.helper.AuthorizationHelper;
 import com.future.function.service.impl.helper.PageHelper;
+import java.util.Arrays;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,9 +29,7 @@ import java.util.Optional;
 public class RoomServiceImpl implements RoomService {
 
     private RoomRepository roomRepository;
-
     private UserService userService;
-
     private CommentService commentService;
 
     @Autowired
@@ -51,16 +51,10 @@ public class RoomServiceImpl implements RoomService {
       User user = userService.getUser(userId);
         return Optional.ofNullable(id)
                 .flatMap(roomRepository::findByIdAndDeletedFalse)
-                .map(room -> checkStudentEligibility(user, room))
+                .filter(room -> AuthorizationHelper.isUserAuthorizedForAccess(user, room.getStudent().getId(),
+                    AuthorizationHelper.getScoringAllowedRoles()))
                 .orElseThrow(() -> new NotFoundException("Room not found"));
     }
-
-  private Room checkStudentEligibility(User user, Room room) {
-      if (user.getRole().equals(Role.STUDENT) && !room.getStudent().getId().equals(user.getId())) {
-          throw new ForbiddenException("Failed at #checkStudentEligibility #RoomService");
-      }
-      return room;
-  }
 
     @Override
     public Page<Comment> findAllCommentsByRoomId(String roomId, Pageable pageable) {
@@ -71,16 +65,11 @@ public class RoomServiceImpl implements RoomService {
     public Page<Room> findAllByStudentId(String studentId, Pageable pageable, String userId) {
         return Optional.ofNullable(userId)
                 .map(userService::getUser)
-                .map(user -> checkUserEligibilityToSeeStudentRoom(studentId, user))
+                .filter(user -> AuthorizationHelper.isUserAuthorizedForAccess(user, studentId,
+                    AuthorizationHelper.getScoringAllowedRoles()))
+                .map(ignored -> studentId)
                 .map(id -> roomRepository.findAllByStudentIdAndDeletedFalse(id, pageable))
                 .orElseGet(() -> PageHelper.empty(pageable));
-    }
-
-    private String checkUserEligibilityToSeeStudentRoom(String studentId, User user) {
-        if (user.getRole().equals(Role.STUDENT) && !user.getId().equals(studentId)) {
-            throw new ForbiddenException("Failed at #checkUserEligibilityToSeeStudentRoom #RoomService");
-        }
-        return studentId;
     }
 
     @Override
@@ -92,20 +81,28 @@ public class RoomServiceImpl implements RoomService {
 
     @Override
     public Comment createComment(Comment comment, String userId) {
-      Room room = this.findById(comment.getRoom().getId(), userId);
-      User author = userService.getUser(userId);
-        return Optional.of(comment)
-                .filter(value -> room.getAssignment().getDeadline() > new Date().getTime())
-                .map(value -> {
-                  comment.setRoom(room);
-                  comment.setAuthor(author);
-                  return comment;
-                })
-                .map(value -> commentService.createCommentByRoom(room, value))
-                .orElseThrow(() -> new UnsupportedOperationException("Deadline has passed"));
+      return Optional.of(comment)
+                .map(Comment::getRoom)
+                .map(Room::getId)
+                .map(roomId -> this.findById(roomId, userId))
+                .filter(this::validateAssignmentDeadlineNotPassed)
+                .map(currentRoom -> setRoomAndAuthor(comment, userId, currentRoom))
+                .map(commentService::createComment)
+                .orElseThrow(() -> new UnsupportedOperationException("Failed at #createComment #RoomService"));
     }
 
-    @Override
+  private Comment setRoomAndAuthor(Comment comment, String userId, Room currentRoom) {
+    comment.setRoom(currentRoom);
+    User author = userService.getUser(userId);
+    comment.setAuthor(author);
+    return comment;
+  }
+
+  private boolean validateAssignmentDeadlineNotPassed(Room room) {
+    return room.getAssignment().getDeadline() > new Date().getTime();
+  }
+
+  @Override
     public Assignment createRoomsByAssignment(Assignment assignment) {
         return Optional.ofNullable(assignment)
             .map(Assignment::getBatch)
@@ -135,24 +132,22 @@ public class RoomServiceImpl implements RoomService {
     public Room giveScoreToRoomByRoomId(String roomId, String userId, Integer point) {
       User user = userService.getUser(userId);
       return Optional.ofNullable(roomId)
-          .filter(condition -> user.getRole().equals(Role.MENTOR))
           .map(id -> this.findById(id, user.getId()))
-          .map(room -> {
-            room.setPoint(point);
-            return room;
-          })
+          .filter(room -> AuthorizationHelper.isAuthorizedForEdit(user.getEmail(), user.getRole(), room, Role.MENTOR))
+          .map(room -> setRoomPoint(point, room))
           .map(roomRepository::save)
-              .orElseThrow(() -> new ForbiddenException("Failed at #giveScoreToRoomByRoomId #RoomService"));
+          .orElseThrow(() -> new ForbiddenException("Failed at #giveScoreToRoomByRoomId #RoomService"));
     }
 
-    @Override
+  private Room setRoomPoint(Integer point, Room room) {
+    room.setPoint(point);
+    return room;
+  }
+
+  @Override
     public void deleteRoomById(String id) {
         Optional.ofNullable(id)
                 .flatMap(roomRepository::findByIdAndDeletedFalse)
-                .map(room -> {
-                    commentService.deleteAllCommentByRoomId(room.getId());
-                    return room;
-                })
                 .ifPresent(this::setDeleteAsTrueAndSave);
     }
 
@@ -160,13 +155,15 @@ public class RoomServiceImpl implements RoomService {
     public void deleteAllRoomsByAssignmentId(String assignmentId) {
         Optional.ofNullable(assignmentId)
                 .map(roomRepository::findAllByAssignmentIdAndDeletedFalse)
-                .ifPresent(list -> list.forEach(room -> {
-                    commentService.deleteAllCommentByRoomId(room.getId());
-                    this.setDeleteAsTrueAndSave(room);
-                }));
+                .ifPresent(this::setEveryRoomAsDeleted);
     }
 
-    private void setDeleteAsTrueAndSave(Room room) {
+  private void setEveryRoomAsDeleted(List<Room> list) {
+    list.forEach(this::setDeleteAsTrueAndSave);
+  }
+
+  private void setDeleteAsTrueAndSave(Room room) {
+        commentService.deleteAllCommentByRoomId(room.getId());
         room.setDeleted(true);
         roomRepository.save(room);
     }

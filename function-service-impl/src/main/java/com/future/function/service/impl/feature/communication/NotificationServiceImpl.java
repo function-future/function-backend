@@ -55,6 +55,7 @@ public class NotificationServiceImpl implements NotificationService {
   public Notification createNotification(Notification notification) {
     return Optional.of(notification)
             .map(this::setMember)
+            .map(n -> this.setSeen(n, false))
             .map(notificationRepository::save)
             .orElseThrow(UnsupportedOperationException::new);
   }
@@ -72,7 +73,7 @@ public class NotificationServiceImpl implements NotificationService {
   private void updateSingleNotificationSeenStatus(Notification notification) {
     Optional.of(notification.getId())
             .map(notificationRepository::findOne)
-            .map(this::setSeenTrue)
+            .map(n -> this.setSeen(n, true))
             .ifPresent(notificationRepository::save);
   }
 
@@ -84,8 +85,8 @@ public class NotificationServiceImpl implements NotificationService {
     return notification;
   }
 
-  private Notification setSeenTrue(Notification notification) {
-    notification.setSeen(true);
+  private Notification setSeen(Notification notification, Boolean value) {
+    notification.setSeen(value);
     return notification;
   }
 }

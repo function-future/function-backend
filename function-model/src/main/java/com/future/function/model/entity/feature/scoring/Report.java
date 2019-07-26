@@ -30,9 +30,6 @@ public class Report extends BaseEntity {
     @Field(FieldName.Report.DESCRIPTION)
     private String description;
 
-    @Field(FieldName.Report.USED_AT)
-    private LocalDate usedAt;
-
     @DBRef(lazy = true)
     @Field(FieldName.Report.BATCH)
     private Batch batch;

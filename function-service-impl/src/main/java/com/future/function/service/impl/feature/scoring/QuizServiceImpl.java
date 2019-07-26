@@ -4,13 +4,13 @@ import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.scoring.QuestionBank;
 import com.future.function.model.entity.feature.scoring.Quiz;
-import com.future.function.model.util.constant.FieldName;
 import com.future.function.repository.feature.scoring.QuizRepository;
 import com.future.function.service.api.feature.core.BatchService;
 import com.future.function.service.api.feature.scoring.QuestionBankService;
 import com.future.function.service.api.feature.scoring.QuizService;
 import com.future.function.service.api.feature.scoring.StudentQuizService;
-import org.springframework.beans.BeanUtils;
+import com.future.function.service.impl.helper.CopyHelper;
+import com.future.function.service.impl.helper.PageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -52,7 +52,6 @@ public class QuizServiceImpl implements QuizService {
   @Override
   public Quiz findById(String id) {
     return Optional.ofNullable(id)
-        .filter(val -> !val.isEmpty())
         .flatMap(quizRepository::findByIdAndDeletedFalse)
             .orElseThrow(() -> new NotFoundException("Failed at #findById #QuizService"));
   }
@@ -66,15 +65,21 @@ public class QuizServiceImpl implements QuizService {
    */
   @Override
   public Page<Quiz> findAllByBatchCodeAndPageable(String batchCode, Pageable pageable) {
-    return quizRepository.findAllByDeletedFalse(pageable);
+    return Optional.ofNullable(batchCode)
+            .map(batchService::getBatchByCode)
+            .map(batch -> quizRepository.findAllByBatchAndDeletedFalse(batch, pageable))
+            .orElseGet(() -> PageHelper.empty(pageable));
   }
 
   @Override
-  public Quiz copyQuizWithTargetBatch(String batchId, Quiz quiz) {
-      Batch batch = batchService.getBatchById(batchId);
-    quiz = this.findById(quiz.getId());
-    quiz = studentQuizService.copyQuizWithTargetBatch(batch, quiz);
-    return quizRepository.save(quiz);
+  public Quiz copyQuizWithTargetBatchId(String targetBatchId, Quiz quiz) {
+    Batch batch = batchService.getBatchById(targetBatchId);
+    return Optional.ofNullable(quiz)
+            .map(Quiz::getId)
+            .map(this::findById)
+            .map(value -> studentQuizService.copyQuizWithTargetBatch(batch, value))
+            .map(quizRepository::save)
+            .orElseThrow(() -> new UnsupportedOperationException("Failed at #copyQuizWithTargetBatchId #QuizService"));
   }
 
   /**
@@ -85,15 +90,17 @@ public class QuizServiceImpl implements QuizService {
    */
   @Override
   public Quiz createQuiz(Quiz request) {
-    return Optional.of(request)
-        .map(quiz -> {
-          quiz.setBatch(batchService.getBatchByCode(quiz.getBatch().getCode()));
-          quiz.setQuestionBanks(getQuestionBanksFromService(quiz.getQuestionBanks()));
-          return quiz;
-        })
+    return Optional.ofNullable(request)
+            .map(this::setBatchAndQuestionBank)
         .map(quizRepository::save)
         .map(quiz -> studentQuizService.createStudentQuizByBatchCode(quiz.getBatch().getCode(), quiz))
             .orElseThrow(() -> new UnsupportedOperationException("Failed on #createQuiz #QuizService"));
+  }
+
+  private Quiz setBatchAndQuestionBank(Quiz quiz) {
+    quiz.setBatch(batchService.getBatchByCode(quiz.getBatch().getCode()));
+    quiz.setQuestionBanks(getQuestionBanksFromService(quiz.getQuestionBanks()));
+    return quiz;
   }
 
   private List<QuestionBank> getQuestionBanksFromService(List<QuestionBank> questionBanks) {
@@ -114,22 +121,16 @@ public class QuizServiceImpl implements QuizService {
   public Quiz updateQuiz(Quiz request) {
     return Optional.ofNullable(request)
         .map(Quiz::getId)
-            .flatMap(quizRepository::findByIdAndDeletedFalse)
-        .map(quiz -> {
-          String requestedBatchCode = getRequestedBatchCode(request, quiz);
-          checkAndEditBatchCodeByRequest(quiz, requestedBatchCode);
-          BeanUtils.copyProperties(
-              request,
-              quiz,
-              FieldName.Quiz.BATCH,
-              FieldName.BaseEntity.CREATED_AT,
-              FieldName.BaseEntity.CREATED_BY,
-              FieldName.BaseEntity.VERSION
-          );
-          return quiz;
-        })
+        .flatMap(quizRepository::findByIdAndDeletedFalse)
+        .map(quiz -> copyRequestedQuizAttributes(request, quiz))
+        .map(this::setBatchAndQuestionBank)
         .map(quizRepository::save)
         .orElse(request);
+  }
+
+  private Quiz copyRequestedQuizAttributes(Quiz request, Quiz quiz) {
+    CopyHelper.copyProperties(request, quiz);
+    return quiz;
   }
 
   /**
@@ -140,31 +141,13 @@ public class QuizServiceImpl implements QuizService {
   @Override
   public void deleteById(String id) {
     Optional.ofNullable(id)
-        .map(this::findById)
-        .ifPresent(val -> {
-          String batchCode = val.getBatch().getCode();
-          studentQuizService.deleteByBatchCodeAndQuiz(batchCode, val.getId());
-          val.setDeleted(true);
-          quizRepository.save(val);
-        });
+            .flatMap(quizRepository::findByIdAndDeletedFalse)
+            .ifPresent(this::deleteAllStudentQuizAndSaveDeletedQuiz);
   }
 
-
-  private String getRequestedBatchCode(Quiz request, Quiz quiz) {
-    return Optional.ofNullable(request)
-        .map(Quiz::getBatch)
-        .map(Batch::getCode)
-        .orElseGet(() -> quiz.getBatch().getCode());
-
-
-  }
-
-  private void checkAndEditBatchCodeByRequest(Quiz quiz, String requestedBatchCode) {
-    if (!quiz.getBatch().getCode().equals(requestedBatchCode)) {
-      studentQuizService.deleteByBatchCodeAndQuiz(quiz.getBatch().getCode(), quiz.getId());
-      Batch batch = batchService.getBatchByCode(requestedBatchCode);
-      quiz.setBatch(batch);
-      studentQuizService.createStudentQuizByBatchCode(requestedBatchCode, quiz);
-    }
+  private void deleteAllStudentQuizAndSaveDeletedQuiz(Quiz quiz) {
+    studentQuizService.deleteByBatchCodeAndQuiz(quiz);
+    quiz.setDeleted(true);
+    quizRepository.save(quiz);
   }
 }

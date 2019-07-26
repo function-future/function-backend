@@ -13,7 +13,7 @@ public interface QuizService {
 
   Page<Quiz> findAllByBatchCodeAndPageable(String batchCode, Pageable pageable);
 
-  Quiz copyQuizWithTargetBatch(String targetBatch, Quiz quiz);
+  Quiz copyQuizWithTargetBatchId(String targetBatchId, Quiz quiz);
 
   Quiz createQuiz(Quiz request);
 

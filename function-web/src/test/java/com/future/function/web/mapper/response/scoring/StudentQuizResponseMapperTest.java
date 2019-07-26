@@ -26,6 +26,7 @@ public class StudentQuizResponseMapperTest {
   private static final String QUIZ_ID = "quiz-id";
   private static final String STUDENT_ID = "student-id";
   private static final String BATCH_CODE = "batch-code";
+  private static final Integer TRIALS = 1;
 
   private Quiz quiz;
   private Batch batch;
@@ -58,6 +59,7 @@ public class StudentQuizResponseMapperTest {
         .id(STUDENT_QUIZ_ID)
         .quiz(quiz)
         .student(student)
+        .trials(TRIALS)
         .build();
 
     pageable = new PageRequest(0, 10);
@@ -73,6 +75,7 @@ public class StudentQuizResponseMapperTest {
   public void toStudentQuizWebResponse() {
     DataResponse<StudentQuizWebResponse> response = StudentQuizResponseMapper.toStudentQuizWebResponse(studentQuiz);
     assertThat(response.getData().getQuiz().getId()).isEqualTo(quiz.getId());
+    assertThat(response.getData().getTrials()).isEqualTo(TRIALS);
   }
 
   @Test
@@ -82,5 +85,6 @@ public class StudentQuizResponseMapperTest {
     assertThat(response.getPaging().getSize()).isEqualTo(10);
     assertThat(response.getPaging().getTotalRecords()).isEqualTo(1);
     assertThat(response.getData().get(0).getQuiz().getId()).isEqualTo(quiz.getId());
+    assertThat(response.getData().get(0).getTrials()).isEqualTo(TRIALS);
   }
 }

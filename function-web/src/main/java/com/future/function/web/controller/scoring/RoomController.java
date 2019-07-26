@@ -30,11 +30,10 @@ public class RoomController {
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    @WithAnyRole(roles = {Role.ADMIN, Role.JUDGE, Role.MENTOR})
     public PagingResponse<RoomWebResponse> findAllRoomsByAssignmentId(@PathVariable String assignmentId,
                                                                       @RequestParam(defaultValue = "1") int page,
                                                                       @RequestParam(defaultValue = "10") int size,
-                                                                      Session session) {
+        @WithAnyRole(roles = {Role.ADMIN, Role.JUDGE, Role.MENTOR}) Session session) {
         return RoomResponseMapper
                 .toPagingRoomWebResponse(assignmentService
                         .findAllRoomsByAssignmentId(assignmentId, PageHelper.toPageable(page, size)));
@@ -42,17 +41,17 @@ public class RoomController {
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @WithAnyRole(roles = {Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT})
-    public DataResponse<RoomWebResponse> findRoomById(@PathVariable String id, Session session) {
+    public DataResponse<RoomWebResponse> findRoomById(@PathVariable String id,
+        @WithAnyRole(roles = {Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT}) Session session) {
         return RoomResponseMapper
             .toDataRoomWebResponse(assignmentService.findRoomById(id, session.getUserId()));
     }
 
     @ResponseStatus(HttpStatus.OK)
     @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @WithAnyRole(roles = Role.MENTOR)
     public DataResponse<RoomWebResponse> updateRoomScore(@PathVariable String id,
-                                                         @RequestBody RoomPointWebRequest request, Session session) {
+                                                         @RequestBody RoomPointWebRequest request,
+                                                         @WithAnyRole(roles = Role.MENTOR) Session session) {
         return RoomResponseMapper
                 .toDataRoomWebResponse(assignmentService
                     .giveScoreToRoomByRoomId(id, session.getUserId(), request.getPoint()));
@@ -60,8 +59,7 @@ public class RoomController {
 
     @ResponseStatus(HttpStatus.OK)
     @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    @WithAnyRole(roles = Role.ADMIN)
-    public BaseResponse deleteRoomById(@PathVariable String id, Session session) {
+    public BaseResponse deleteRoomById(@PathVariable String id, @WithAnyRole(roles = Role.ADMIN) Session session) {
         assignmentService.deleteRoomById(id);
         return ResponseHelper.toBaseResponse(HttpStatus.OK);
     }

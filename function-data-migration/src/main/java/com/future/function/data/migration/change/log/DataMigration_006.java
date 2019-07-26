@@ -621,5 +621,60 @@ public class DataMigration_006 {
     mongoTemplate.insert(studentAccess, DocumentName.ACCESS);
     mongoTemplate.insert(guestAccess, DocumentName.ACCESS);
   }
-  
+
+  @ChangeSet(author = "priagung",
+          id = "notificationAccessListMigration",
+          order = "0010")
+  public void insertNotificationAccessList(MongoTemplate mongoTemplate) {
+    String urlRegex = "^\\/notifications(\\/)?$";
+
+    Map<String, Object> nonGuestComponent = new HashMap<>();
+    nonGuestComponent.put("add", true);
+    nonGuestComponent.put("delete", true);
+    nonGuestComponent.put("edit", true);
+    nonGuestComponent.put("read", true);
+
+    Map<String, Object> guestComponent = new HashMap<>();
+    guestComponent.put("add", false);
+    guestComponent.put("delete", false);
+    guestComponent.put("edit", false);
+    guestComponent.put("read", false);
+
+    Access adminAccess = Access.builder()
+            .role(Role.ADMIN)
+            .urlRegex(urlRegex)
+            .components(nonGuestComponent)
+            .build();
+
+    Access judgeAccess = Access.builder()
+            .role(Role.JUDGE)
+            .components(nonGuestComponent)
+            .urlRegex(urlRegex)
+            .build();
+
+    Access mentorAccess = Access.builder()
+            .role(Role.MENTOR)
+            .components(nonGuestComponent)
+            .urlRegex(urlRegex)
+            .build();
+
+    Access studentAccess = Access.builder()
+            .role(Role.STUDENT)
+            .components(nonGuestComponent)
+            .urlRegex(urlRegex)
+            .build();
+
+    Access guestAccess = Access.builder()
+            .role(Role.UNKNOWN)
+            .components(guestComponent)
+            .urlRegex(urlRegex)
+            .build();
+
+    mongoTemplate.insert(adminAccess, DocumentName.ACCESS);
+    mongoTemplate.insert(judgeAccess, DocumentName.ACCESS);
+    mongoTemplate.insert(mentorAccess, DocumentName.ACCESS);
+    mongoTemplate.insert(studentAccess, DocumentName.ACCESS);
+    mongoTemplate.insert(guestAccess, DocumentName.ACCESS);
+  }
+
 }

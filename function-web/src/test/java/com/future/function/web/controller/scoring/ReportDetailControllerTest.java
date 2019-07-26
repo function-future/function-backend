@@ -8,7 +8,7 @@ import com.future.function.model.entity.feature.scoring.Report;
 import com.future.function.model.entity.feature.scoring.ReportDetail;
 import com.future.function.model.vo.scoring.StudentSummaryVO;
 import com.future.function.model.vo.scoring.SummaryVO;
-import com.future.function.service.api.feature.scoring.ReportDetailService;
+import com.future.function.service.api.feature.scoring.ReportService;
 import com.future.function.web.TestHelper;
 import com.future.function.web.TestSecurityConfiguration;
 import com.future.function.web.mapper.helper.ResponseHelper;
@@ -74,7 +74,7 @@ public class ReportDetailControllerTest extends TestHelper {
     private JacksonTester<ReportDetailScoreWebRequest> webRequestJacksonTester;
 
     @MockBean
-    private ReportDetailService reportDetailService;
+    private ReportService reportService;
 
     @MockBean
     private ReportDetailRequestMapper requestMapper;
@@ -130,33 +130,33 @@ public class ReportDetailControllerTest extends TestHelper {
 
         when(requestMapper.toReportDetailList(reportDetailScoreWebRequest, REPORT_ID))
                 .thenReturn(Collections.singletonList(reportDetail));
-        when(reportDetailService.findAllSummaryByReportId(REPORT_ID, JUDGE_ID))
+        when(reportService.findAllSummaryByReportId(REPORT_ID, JUDGE_ID))
                 .thenReturn(Collections.singletonList(studentSummaryVO));
-        when(reportDetailService.giveScoreToEachStudentInDetail(REPORT_ID, Collections.singletonList(reportDetail)))
+        when(reportService.giveScoreToReportStudents(REPORT_ID, Collections.singletonList(reportDetail)))
                 .thenReturn(Collections.singletonList(reportDetail));
     }
 
     @After
     public void tearDown() throws Exception {
-        verifyNoMoreInteractions(reportDetailService, requestMapper);
+        verifyNoMoreInteractions(reportService, requestMapper);
     }
 
     @Test
     public void findComparisonByReportId() throws Exception {
         mockMvc.perform(
-                get("/api/scoring/batches/" + BATCH_CODE + "/final-judgings/" + REPORT_ID + "/comparison")
+                get("/api/scoring/batches/" + BATCH_CODE + "/final-judgings/" + REPORT_ID + "/comparisons")
                         .cookie(cookies))
                 .andExpect(status().isOk())
                 .andExpect(content().json(
                         dataResponseJacksonTester.write(DATA_RESPONSE)
                                 .getJson()));
-        verify(reportDetailService).findAllSummaryByReportId(REPORT_ID, JUDGE_ID);
+        verify(reportService).findAllSummaryByReportId(REPORT_ID, JUDGE_ID);
     }
 
     @Test
     public void giveFinalScoreToStudentsByReportId() throws Exception {
         mockMvc.perform(
-                post("/api/scoring/batches/" + BATCH_CODE + "/final-judgings/" + REPORT_ID + "/comparison")
+                post("/api/scoring/batches/" + BATCH_CODE + "/final-judgings/" + REPORT_ID + "/comparisons")
                         .cookie(cookies)
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(webRequestJacksonTester.write(reportDetailScoreWebRequest).getJson()))
@@ -165,6 +165,6 @@ public class ReportDetailControllerTest extends TestHelper {
                         dataResponseJacksonTester.write(CREATED_DATA_RESPONSE)
                                 .getJson()));
         verify(requestMapper).toReportDetailList(reportDetailScoreWebRequest, REPORT_ID);
-        verify(reportDetailService).giveScoreToEachStudentInDetail(REPORT_ID, Collections.singletonList(reportDetail));
+        verify(reportService).giveScoreToReportStudents(REPORT_ID, Collections.singletonList(reportDetail));
     }
 }

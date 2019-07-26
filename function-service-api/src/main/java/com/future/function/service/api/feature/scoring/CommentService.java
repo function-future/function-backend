@@ -11,7 +11,7 @@ public interface CommentService {
 
   Page<Comment> findAllCommentsByRoomId(String roomId, Pageable pageable);
 
-  Comment createCommentByRoom(Room room, Comment comment);
+  Comment createComment(Comment comment);
 
   void deleteAllCommentByRoomId(String roomId);
 }

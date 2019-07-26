@@ -157,7 +157,7 @@ public class QuizControllerTest extends TestHelper {
     when(quizService.updateQuiz(quiz)).thenReturn(quiz);
     when(quizService.findAllByBatchCodeAndPageable(QUIZ_BATCH_CODE, pageable))
         .thenReturn(quizPage);
-      when(quizService.copyQuizWithTargetBatch(QUIZ_BATCH_ID, quiz)).thenReturn(quiz);
+      when(quizService.copyQuizWithTargetBatchId(QUIZ_BATCH_ID, quiz)).thenReturn(quiz);
       when(requestMapper.toQuiz(quizWebRequest, QUIZ_BATCH_CODE)).thenReturn(quiz);
       when(requestMapper.toQuiz(QUIZ_ID, quizWebRequest, QUIZ_BATCH_CODE)).thenReturn(quiz);
     when(requestMapper.validateCopyQuizWebRequest(copyQuizWebRequest)).thenReturn(copyQuizWebRequest);
@@ -258,7 +258,7 @@ public class QuizControllerTest extends TestHelper {
                 .getJson()
         ));
     verify(quizService).findById(QUIZ_ID);
-      verify(quizService).copyQuizWithTargetBatch(QUIZ_BATCH_ID, quiz);
+      verify(quizService).copyQuizWithTargetBatchId(QUIZ_BATCH_ID, quiz);
     verify(requestMapper).validateCopyQuizWebRequest(copyQuizWebRequest);
   }
 

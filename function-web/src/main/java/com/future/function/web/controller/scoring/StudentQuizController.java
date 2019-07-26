@@ -27,11 +27,10 @@ public class StudentQuizController {
 
   @ResponseStatus(HttpStatus.OK)
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-  @WithAnyRole(roles = {Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT})
   public PagingResponse<StudentQuizWebResponse> getAllStudentQuiz(@PathVariable String studentId,
                                                                   @RequestParam(defaultValue = "1") int page,
                                                                   @RequestParam(defaultValue = "10") int size,
-                                                                  Session session) {
+      @WithAnyRole(roles = {Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT}) Session session) {
     return StudentQuizResponseMapper
         .toPagingStudentQuizWebResponse(
             studentQuizService
@@ -42,9 +41,8 @@ public class StudentQuizController {
 
   @ResponseStatus(HttpStatus.OK)
   @GetMapping(path = "/{studentQuizId}", produces = MediaType.APPLICATION_JSON_VALUE)
-  @WithAnyRole(roles = {Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT})
   public DataResponse<StudentQuizWebResponse> getStudentQuizById(@PathVariable String studentQuizId,
-                                                                 Session session) {
+      @WithAnyRole(roles = {Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT}) Session session) {
     return StudentQuizResponseMapper
         .toStudentQuizWebResponse(
             studentQuizService
