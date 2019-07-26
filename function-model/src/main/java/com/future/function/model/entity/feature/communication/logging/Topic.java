@@ -1,11 +1,9 @@
 package com.future.function.model.entity.feature.communication.logging;
 
+import com.future.function.model.entity.base.BaseEntity;
 import com.future.function.model.util.constant.DocumentName;
 import com.future.function.model.util.constant.FieldName;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
@@ -18,8 +16,9 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 @Document(collection = DocumentName.TOPIC)
-public class Topic {
+public class Topic extends BaseEntity {
 
   @Id
   private String id;

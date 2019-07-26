@@ -19,9 +19,9 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-//@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
 @Document(collection = DocumentName.LOG_MESSAGE)
-public class LogMessage {
+public class LogMessage extends BaseEntity{
 
     @Id
     private String id;

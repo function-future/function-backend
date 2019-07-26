@@ -1,5 +1,6 @@
 package com.future.function.model.entity.feature.communication.logging;
 
+import com.future.function.model.entity.base.BaseEntity;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.model.util.constant.DocumentName;
 import com.future.function.model.util.constant.FieldName;
@@ -19,8 +20,9 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 @Document(collection = DocumentName.LOGGING_ROOM)
-public class LoggingRoom {
+public class LoggingRoom extends BaseEntity {
 
   @Id
   private String id;
