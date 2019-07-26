@@ -81,4 +81,9 @@ public abstract class DocumentName {
 
   public static final String REPORT_DETAIL = "report-details";
 
+  public static final String LOGGING_ROOM = "logging-room";
+
+  public static final String TOPIC = "topic";
+
+  public static final String LOG_MESSAGE = "logger-message";
 }
