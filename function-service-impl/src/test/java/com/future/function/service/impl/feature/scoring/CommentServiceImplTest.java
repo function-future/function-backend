@@ -71,7 +71,7 @@ public class CommentServiceImplTest {
 
   @Test
   public void createCommentByRoom() {
-    Comment actual = commentService.createCommentByRoom(room, comment);
+    Comment actual = commentService.createComment(comment);
     assertThat(actual.getRoom()).isEqualTo(room);
     assertThat(actual.getAuthor()).isEqualTo(author);
     verify(commentRepository).save(comment);

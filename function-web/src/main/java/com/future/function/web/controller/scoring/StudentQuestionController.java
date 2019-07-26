@@ -38,9 +38,8 @@ public class StudentQuestionController {
 
   @ResponseStatus(HttpStatus.OK)
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-  @WithAnyRole(roles = Role.STUDENT)
   public PagingResponse<StudentQuestionWebResponse> findUnansweredStudentQuestionsByStudentQuizId(
-          @PathVariable String studentQuizId, Session session) {
+          @PathVariable String studentQuizId, @WithAnyRole(roles = Role.STUDENT) Session session) {
     return StudentQuizDetailResponseMapper
         .toStudentQuestionWebResponses(
             studentQuizService
@@ -49,9 +48,9 @@ public class StudentQuestionController {
 
   @ResponseStatus(HttpStatus.CREATED)
   @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-  @WithAnyRole(roles = Role.STUDENT)
   public DataResponse<StudentQuizDetailWebResponse> postAnswersForQuestions(@PathVariable String studentQuizId,
-                                                                            @RequestBody List<StudentQuestionWebRequest> answerRequests, Session session) {
+                                                                            @RequestBody List<StudentQuestionWebRequest> answerRequests,
+                                                                            @WithAnyRole(roles = Role.STUDENT) Session session) {
     return StudentQuizDetailResponseMapper
         .toStudentQuizDetailWebResponse(
             studentQuizService

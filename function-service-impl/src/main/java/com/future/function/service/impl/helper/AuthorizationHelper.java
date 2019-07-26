@@ -3,6 +3,7 @@ package com.future.function.service.impl.helper;
 import com.future.function.common.enumeration.core.Role;
 import com.future.function.common.exception.ForbiddenException;
 import com.future.function.model.entity.base.BaseEntity;
+import com.future.function.model.entity.feature.core.User;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -64,6 +65,17 @@ public final class AuthorizationHelper {
       ));
   }
 
+  public static boolean isUserAuthorizedForAccess(User currentUser, String id, Role... allowedRoles) {
+    return Optional.ofNullable(currentUser)
+            .filter(user -> Role.STUDENT.equals(user.getRole()))
+            .map(user -> user.getId().equals(id))
+            .map(returnValue -> {
+              if (!returnValue) throw new ForbiddenException("User not Allowed");
+              return true;
+            })
+            .orElseGet(() -> isRoleValidForEdit(currentUser.getRole(), Arrays.asList(allowedRoles)));
+  }
+
   public static boolean isRoleValidForEdit(
     Role currentUserRole, Role... allowedRoles
   ) {
@@ -83,6 +95,10 @@ public final class AuthorizationHelper {
       .filter(allowedRoles::contains)
       .map(ignored -> true)
       .orElseThrow(() -> new ForbiddenException("Invalid User Role"));
+  }
+
+  public static Role[] getScoringAllowedRoles() {
+    return Arrays.asList(Role.ADMIN, Role.JUDGE, Role.MENTOR).toArray(new Role[0]);
   }
 
 }

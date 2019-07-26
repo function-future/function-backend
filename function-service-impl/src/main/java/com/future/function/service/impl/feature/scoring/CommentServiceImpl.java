@@ -30,18 +30,18 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public Comment createCommentByRoom(Room room, Comment comment) {
-        comment.setRoom(room);
+    public Comment createComment(Comment comment) {
         return commentRepository.save(comment);
     }
 
     @Override
     public void deleteAllCommentByRoomId(String roomId) {
         commentRepository.findAllByRoomIdOrderByCreatedAtDesc(roomId)
-                .stream()
-                .forEach(comment -> {
-                    comment.setDeleted(true);
-                    commentRepository.save(comment);
-                });
+                .forEach(this::setDeletedAndSaveComment);
+    }
+
+    private void setDeletedAndSaveComment(Comment comment) {
+        comment.setDeleted(true);
+        commentRepository.save(comment);
     }
 }

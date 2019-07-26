@@ -200,8 +200,6 @@ public class AssignmentControllerTest extends TestHelper {
                 dataResponseJacksonTester.write(CREATED_DATA_RESPONSE)
                 .getJson()));
 
-    //TODO return json with file attribute not blank
-
     verify(assignmentService).createAssignment(assignment);
       verify(assignmentRequestMapper).toAssignment(assignmentWebRequest, BATCH_CODE);
   }

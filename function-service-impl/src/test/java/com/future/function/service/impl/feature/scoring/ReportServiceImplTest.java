@@ -6,10 +6,13 @@ import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.model.entity.feature.scoring.Report;
 import com.future.function.model.entity.feature.scoring.ReportDetail;
+import com.future.function.model.vo.scoring.StudentSummaryVO;
 import com.future.function.repository.feature.scoring.ReportRepository;
 import com.future.function.service.api.feature.core.BatchService;
 import com.future.function.service.api.feature.core.UserService;
 import com.future.function.service.api.feature.scoring.ReportDetailService;
+import java.util.Collection;
+import java.util.List;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -40,15 +43,17 @@ public class ReportServiceImplTest {
     private static final String REPORT_ID = "report-id";
     private static final String REPORT_DETAIL_ID = "report-detail-id";
     private static final String USER_ID = "user-id";
+    private static final String STUDENT_NAME = "user-name";
     private static final String TITLE = "title";
     private static final String DESCRIPTION = "description";
     private static final String BATCH_CODE = "batch-code";
-    private static final LocalDate USED_AT = LocalDate.now(ZoneId.systemDefault());
+    private static final Integer POINT = 100;
 
     private Report report;
     private Pageable pageable;
     private Page<Report> reportPage;
     private ReportDetail reportDetail;
+    private StudentSummaryVO studentSummaryVO;
     private User student;
     private Batch batch;
 
@@ -78,7 +83,6 @@ public class ReportServiceImplTest {
                 .title(TITLE)
                 .description(DESCRIPTION)
                 .batch(batch)
-                .usedAt(USED_AT)
                 .build();
 
         student = User.builder()
@@ -93,6 +97,12 @@ public class ReportServiceImplTest {
                 .point(0)
                 .build();
 
+        studentSummaryVO = StudentSummaryVO
+            .builder()
+            .studentName(STUDENT_NAME)
+            .point(POINT)
+            .build();
+
         pageable = new PageRequest(0, 10);
 
         reportPage = new PageImpl<>(Collections.singletonList(report), pageable, 1);
@@ -105,6 +115,9 @@ public class ReportServiceImplTest {
         when(userService.getUser(USER_ID)).thenReturn(student);
         when(reportDetailService.findAllDetailByReportId(REPORT_ID)).thenReturn(Collections.singletonList(reportDetail));
         when(reportDetailService.createReportDetailByReport(report, student)).thenReturn(report);
+        when(reportDetailService.findAllSummaryByReportId(REPORT_ID, USER_ID)).thenReturn(Collections.singletonList(studentSummaryVO));
+        when(reportDetailService.giveScoreToEachStudentInDetail(report, Collections.singletonList(reportDetail)))
+            .thenReturn(Collections.singletonList(reportDetail));
         when(batchService.getBatchByCode(BATCH_CODE)).thenReturn(batch);
     }
 
@@ -229,5 +242,32 @@ public class ReportServiceImplTest {
         BeanUtils.copyProperties(report, deletedReport);
         deletedReport.setDeleted(true);
         verify(reportRepository).save(deletedReport);
+    }
+
+    @Test
+    public void findAllSummaryByReportId() {
+        List<StudentSummaryVO> actual = reportService.findAllSummaryByReportId(REPORT_ID, USER_ID);
+        assertThat(actual.size()).isEqualTo(1);
+        assertThat(actual.get(0).getPoint()).isEqualTo(POINT);
+        assertThat(actual.get(0).getStudentName()).isEqualTo(STUDENT_NAME);
+        verify(reportDetailService).findAllSummaryByReportId(REPORT_ID, USER_ID);
+    }
+
+    @Test
+    public void giveScoreToReportStudentsTest() {
+        reportDetail.setPoint(POINT);
+        List<ReportDetail> actual = reportService.giveScoreToReportStudents(REPORT_ID, Collections.singletonList(reportDetail));
+        assertThat(actual.get(0).getPoint()).isEqualTo(POINT);
+        assertThat(actual.size()).isEqualTo(1);
+        verify(reportRepository).findByIdAndDeletedFalse(REPORT_ID);
+        verify(reportDetailService).giveScoreToEachStudentInDetail(report, Collections.singletonList(reportDetail));
+    }
+
+    @Test
+    public void giveScoreToReportStudentsTestReportNotFound() {
+        when(reportRepository.findByIdAndDeletedFalse(REPORT_ID)).thenReturn(Optional.empty());
+        catchException(() -> reportService.giveScoreToReportStudents(REPORT_ID, Collections.singletonList(reportDetail)));
+        assertThat(caughtException().getClass()).isEqualTo(UnsupportedOperationException.class);
+        verify(reportRepository).findByIdAndDeletedFalse(REPORT_ID);
     }
 }

@@ -14,9 +14,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 
-import java.time.Instant;
-import java.time.ZoneId;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -27,8 +26,8 @@ public class ReportResponseMapperTest {
   private static final String NAME = "final-judge";
   private static final String DESCRIPTION = "final description";
     private static final String BATCH_CODE = "batch-code";
-  private static final long USED_AT = 1561607367;
   private static final String STUDENT_ID = "student-id";
+  private static final Long CREATED_AT = new Date().getTime();
 
   private Report report;
     private Batch batch;
@@ -50,9 +49,10 @@ public class ReportResponseMapperTest {
         .title(NAME)
             .batch(batch)
         .description(DESCRIPTION)
-        .usedAt(Instant.ofEpochSecond(USED_AT).atZone(ZoneId.systemDefault()).toLocalDate())
         .studentIds(studentIds)
         .build();
+
+    report.setCreatedAt(CREATED_AT);
 
     pageable = new PageRequest(0, 10);
 
@@ -67,7 +67,7 @@ public class ReportResponseMapperTest {
   public void toDataReportWebResponse() {
     DataResponse<ReportWebResponse> actual = ReportResponseMapper.toDataReportWebResponse(report);
     assertThat(actual.getData().getId()).isEqualTo(ID);
-    assertThat(actual.getData().getTitle()).isEqualTo(NAME);
+    assertThat(actual.getData().getName()).isEqualTo(NAME);
     assertThat(actual.getData().getDescription()).isEqualTo(DESCRIPTION);
       assertThat(actual.getData().getBatchCode()).isEqualTo(BATCH_CODE);
     assertThat(actual.getData().getStudentCount()).isEqualTo(1);
@@ -77,7 +77,7 @@ public class ReportResponseMapperTest {
   public void toDataReportWebResponseCreated() {
     DataResponse<ReportWebResponse> actual = ReportResponseMapper.toDataReportWebResponse(HttpStatus.CREATED, report);
     assertThat(actual.getData().getId()).isEqualTo(ID);
-    assertThat(actual.getData().getTitle()).isEqualTo(NAME);
+    assertThat(actual.getData().getName()).isEqualTo(NAME);
     assertThat(actual.getData().getDescription()).isEqualTo(DESCRIPTION);
       assertThat(actual.getData().getBatchCode()).isEqualTo(BATCH_CODE);
     assertThat(actual.getData().getStudentCount()).isEqualTo(1);
@@ -87,7 +87,7 @@ public class ReportResponseMapperTest {
   @Test
   public void toPagingReportWebResponse() {
     PagingResponse<ReportWebResponse> actual = ReportResponseMapper.toPagingReportWebResponse(reportPage);
-    assertThat(actual.getData().get(0).getTitle()).isEqualTo(NAME);
+    assertThat(actual.getData().get(0).getName()).isEqualTo(NAME);
     assertThat(actual.getData().get(0).getDescription()).isEqualTo(DESCRIPTION);
       assertThat(actual.getData().get(0).getBatchCode()).isEqualTo(BATCH_CODE);
     assertThat(actual.getData().get(0).getStudentCount()).isEqualTo(1);

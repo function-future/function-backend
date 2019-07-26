@@ -34,20 +34,20 @@ public class CommentController {
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    @WithAnyRole(roles = {Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT})
     public PagingResponse<CommentWebResponse> findAllCommentsByRoomId(@PathVariable String roomId,
                                                                           @RequestParam(defaultValue = "1") int page,
                                                                           @RequestParam(defaultValue = "10") int size,
-                                                                          Session session) {
+
+        @WithAnyRole(roles = {Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT}) Session session) {
         return CommentResponseMapper
                 .toPagingCommentWebResponse(roomService.findAllCommentsByRoomId(roomId, PageHelper.toPageable(page, size)));
     }
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    @WithAnyRole(roles = {Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT})
     public DataResponse<CommentWebResponse> createComment(@PathVariable String roomId,
-                                                          @RequestBody CommentWebRequest webRequest, Session session) {
+                                                          @RequestBody CommentWebRequest webRequest,
+        @WithAnyRole(roles = {Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT}) Session session) {
         return CommentResponseMapper
                 .toDataCommentWebResponse(
                         HttpStatus.CREATED,
