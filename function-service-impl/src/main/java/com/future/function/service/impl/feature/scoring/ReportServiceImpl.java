@@ -143,31 +143,24 @@ public class ReportServiceImpl implements ReportService {
 
   private Report checkStudentIdsChangedAndDeleteIfChanged(Report report) {
         return Optional.ofNullable(report)
-                .map(this::isStudentListChangedFromRepository)
-                .filter(list -> !list.isEmpty())
-                .map(changedStudentIds -> {
-                  this.deleteReportDetailByStudentIds(changedStudentIds);
-                  return report;
-                })
-                .orElse(report);
+                .filter(this::isStudentListChangedFromRepository)
+                .orElseGet(() -> this.deleteAllDetailByReportId(report));
     }
 
-  private List<String> isStudentListChangedFromRepository(Report report) {
-      List<String> requestedStudentIds = report.getStudents().stream().map(User::getId).collect(Collectors.toList());
-      List<String> foundStudentIds = reportDetailService.findAllDetailByReportId(report.getId()).stream()
-          .map(ReportDetail::getUser)
-          .map(User::getId)
-          .filter(existingUserId -> !requestedStudentIds.contains(existingUserId))
-          .collect(Collectors.toList());
-      return report.getStudents().stream()
-          .map(User::getId)
-          .filter(id -> !foundStudentIds.contains(id))
-          .collect(Collectors.toList());
-    }
+  private boolean isStudentListChangedFromRepository(Report report) {
+    List<String> studentIds = report.getStudents().stream().map(User::getId).collect(Collectors.toList());
+    return reportDetailService.findAllDetailByReportId(report.getId()).stream()
+        .map(ReportDetail::getUser)
+        .map(User::getId)
+        .collect(Collectors.toList())
+        .containsAll(studentIds);
+  }
 
-  private void deleteReportDetailByStudentIds(List<String> changedStudentIds) {
-        changedStudentIds.forEach(reportDetailService::deleteReportDetailByStudentId);
-    }
+  private Report deleteAllDetailByReportId(Report report) {
+    return Optional.ofNullable(report)
+        .map(this::deleteExistingDetailAndCreateNew)
+        .orElse(report);
+  }
 
   private Report deleteExistingDetailAndCreateNew(Report currentReport) {
     reportDetailService.deleteAllByReportId(currentReport.getId());
