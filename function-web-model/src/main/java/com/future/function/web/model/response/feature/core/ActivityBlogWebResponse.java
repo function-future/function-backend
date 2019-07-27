@@ -1,7 +1,7 @@
 package com.future.function.web.model.response.feature.core;
 
-import com.future.function.web.model.response.feature.core.embedded.AuthorWebResponse;
 import com.future.function.web.model.response.feature.core.embedded.EmbeddedFileWebResponse;
+import com.future.function.web.model.response.feature.embedded.AuthorWebResponse;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

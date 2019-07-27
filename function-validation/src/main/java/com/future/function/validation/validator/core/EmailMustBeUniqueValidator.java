@@ -5,7 +5,6 @@ import com.future.function.model.entity.feature.core.User;
 import com.future.function.repository.feature.core.UserRepository;
 import com.future.function.validation.annotation.core.EmailMustBeUnique;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.util.Pair;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;

@@ -14,6 +14,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -65,5 +66,10 @@ public class FileV2 extends BaseEntity {
   @Field(FieldName.File.VERSIONS)
   @Builder.Default
   private Map<Long, Version> versions = new LinkedHashMap<>();
+  
+  @Field(FieldName.File.USER)
+  private User user;
+  
+  private List<FileV2> paths;
   
 }

@@ -5,14 +5,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * Model representation for author in web responses.
- */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AuthorWebResponse {
+public class PathWebResponse {
   
   private String id;
   

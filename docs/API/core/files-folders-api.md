@@ -22,37 +22,65 @@ returned; if none found, return empty list.
         {
             "code": 200,
             "status": "OK",
-            "data": [
-                {
-                    "id": "id",
-                    "type": "FOLDER",
-                    "name": "Name 1",
-                    "parentId": "parent-id"
-                },
-                {
-                    "id": "id",
-                    "type": "FOLDER",
-                    "name": "Name 2",
-                    "parentId": "parent-id"
-                },
-                {
-                    "id": "id",
-                    "type": "FILE",
-                    "name": "Name",
-                    "file": "https://www.google.com/images/branding/googlelogo/2x/googlelogo_light_color_272x92dp.png",
-                    "versions": {
-                        "2": {
-                            "timestamp": 1555980050616,
-                            "url": "https://www.google.com/images/branding/googlelogo/2x/googlelogo_light_color_272x92dp.png"
-                        },
-                        "1": {
-                            "timestamp": 1555980050616,
-                            "url": "https://www.google.com/images/branding/googlelogo/2x/googlelogo_light_color_272x92dp.png"
+            "data": {
+                "paths": [
+                    {
+                        "id": "root",
+                        "name": "root"
+                    },
+                    {
+                        "id": "id-1",
+                        "name": "Id 1"
+                    },
+                    {
+                        "id": "parent-id",
+                        "name": "Parent Id"
+                    }
+                ],
+                "content": [
+                    {
+                        "id": "id",
+                        "type": "FOLDER",
+                        "name": "Name 1",
+                        "parentId": "parent-id",
+                        "author": {
+                            "id": "sample-id",
+                            "name": "name"
                         }
                     },
-                    "parentId": "parent-id"
-                }
-            ]
+                    {
+                        "id": "id",
+                        "type": "FOLDER",
+                        "name": "Name 2",
+                        "parentId": "parent-id",
+                        "author": {
+                            "id": "sample-id",
+                            "name": "name"
+                        }
+                    },
+                    {
+                        "id": "id",
+                        "type": "FILE",
+                        "name": "Name",
+                        "file": "https://www.google.com/images/branding/googlelogo/2x/googlelogo_light_color_272x92dp.png",
+                        "versions": {
+                            "2": {
+                                "timestamp": 1555980050616,
+                                "url": "https://www.google.com/images/branding/googlelogo/2x/googlelogo_light_color_272x92dp.png"
+                            },
+                            "1": {
+                                "timestamp": 1555980050616,
+                                "url": "https://www.google.com/images/branding/googlelogo/2x/googlelogo_light_color_272x92dp.png"
+                            }
+                        },
+                        "parentId": "parent-id",
+                        "author": {
+                            "id": "sample-id",
+                            "name": "name"
+                        }
+                    }
+                ]
+            }
         }
 
 + Response 401 (application/json)
@@ -87,17 +115,37 @@ response is returned.
             "code": 201,
             "status": "CREATED",
             "data": {
-                "id": "id",
-                "type": "FILE",
-                "name": "File Name",
-                "file": "https://www.google.com/images/branding/googlelogo/2x/googlelogo_light_color_272x92dp.png",
-                "versions": {
-                    "1": {
-                        "timestamp": 1555980050616,
-                        "url": "https://www.google.com/images/branding/googlelogo/2x/googlelogo_light_color_272x92dp.png"
+                "paths": [
+                    {
+                        "id": "root",
+                        "name": "root"
+                    },
+                    {
+                        "id": "id-1",
+                        "name": "Id 1"
+                    },
+                    {
+                        "id": "parent-id",
+                        "name": "Parent Id"
                     }
-                },
-                "parentId": "parent-id"
+                ],
+                "content": {
+                    "id": "id",
+                    "type": "FILE",
+                    "name": "File Name",
+                    "file": "https://www.google.com/images/branding/googlelogo/2x/googlelogo_light_color_272x92dp.png",
+                    "versions": {
+                        "1": {
+                            "timestamp": 1555980050616,
+                            "url": "https://www.google.com/images/branding/googlelogo/2x/googlelogo_light_color_272x92dp.png"
+                        }
+                    },
+                    "parentId": "parent-id",
+                    "author": {
+                      "id": "sample-id",
+                      "name": "name"
+                    }
+                }
             }
         }
 
@@ -150,21 +198,37 @@ otherwise 401 response is returned; if available; otherwise 404 response is retu
             "code": 200,
             "status": "OK",
             "data": {
-                "id": "id",
-                "type": "FILE",
-                "name": "File Name",
-                "file": "https://www.google.com/images/branding/googlelogo/2x/googlelogo_light_color_272x92dp.png",
-                "versions": {
-                    "2": {
-                        "timestamp": 1555980050616,
-                        "url": "https://www.google.com/images/branding/googlelogo/2x/googlelogo_light_color_272x92dp.png"
+                "paths": [
+                    {
+                        "id": "root",
+                        "name": "root"
                     },
-                    "1": {
-                        "timestamp": 1555980050616,
-                        "url": "https://www.google.com/images/branding/googlelogo/2x/googlelogo_light_color_272x92dp.png"
+                    {
+                        "id": "id-1",
+                        "name": "Id 1"
+                    },
+                    {
+                        "id": "parent-id",
+                        "name": "Parent Id"
                     }
-                },
-                "parentId": "parent-id"
+                ],
+                "content": {
+                    "id": "id",
+                    "type": "FILE",
+                    "name": "File Name",
+                    "file": "https://www.google.com/images/branding/googlelogo/2x/googlelogo_light_color_272x92dp.png",
+                    "versions": {
+                        "1": {
+                            "timestamp": 1555980050616,
+                            "url": "https://www.google.com/images/branding/googlelogo/2x/googlelogo_light_color_272x92dp.png"
+                        }
+                    },
+                    "parentId": "parent-id",
+                    "author": {
+                      "id": "sample-id",
+                      "name": "name"
+                    }
+                }
             }
         }
 
@@ -207,21 +271,37 @@ response is returned; if available; otherwise 404 response is returned. Paramete
             "code": 200,
             "status": "OK",
             "data": {
-                "id": "id",
-                "type": "FILE",
-                "name": "File Name",
-                "file": "https://www.google.com/images/branding/googlelogo/2x/googlelogo_light_color_272x92dp.png",
-                "versions": {
-                    "2": {
-                        "timestamp": 1555980050616,
-                        "url": "https://www.google.com/images/branding/googlelogo/2x/googlelogo_light_color_272x92dp.png"
+                "paths": [
+                    {
+                        "id": "root",
+                        "name": "root"
                     },
-                    "1": {
-                        "timestamp": 1555980050616,
-                        "url": "https://www.google.com/images/branding/googlelogo/2x/googlelogo_light_color_272x92dp.png"
+                    {
+                        "id": "id-1",
+                        "name": "Id 1"
+                    },
+                    {
+                        "id": "parent-id",
+                        "name": "Parent Id"
                     }
-                },
-                "parentId": "parent-id"
+                ],
+                "content": {
+                    "id": "id",
+                    "type": "FILE",
+                    "name": "File Name",
+                    "file": "https://www.google.com/images/branding/googlelogo/2x/googlelogo_light_color_272x92dp.png",
+                    "versions": {
+                        "1": {
+                            "timestamp": 1555980050616,
+                            "url": "https://www.google.com/images/branding/googlelogo/2x/googlelogo_light_color_272x92dp.png"
+                        }
+                    },
+                    "parentId": "parent-id",
+                    "author": {
+                      "id": "sample-id",
+                      "name": "name"
+                    }
+                }
             }
         }
 

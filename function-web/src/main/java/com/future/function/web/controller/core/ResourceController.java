@@ -8,7 +8,7 @@ import com.future.function.session.model.Session;
 import com.future.function.web.mapper.request.core.ResourceRequestMapper;
 import com.future.function.web.mapper.response.core.ResourceResponseMapper;
 import com.future.function.web.model.response.base.DataResponse;
-import com.future.function.web.model.response.feature.core.FileWebResponse;
+import com.future.function.web.model.response.feature.core.FileContentWebResponse;
 import org.springframework.data.util.Pair;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -45,7 +45,7 @@ public class ResourceController {
   @ResponseStatus(HttpStatus.CREATED)
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
                produces = MediaType.APPLICATION_JSON_VALUE)
-  public DataResponse<FileWebResponse> createFile(
+  public DataResponse<FileContentWebResponse> createFile(
     Session session,
     @RequestParam(required = false)
       MultipartFile file,

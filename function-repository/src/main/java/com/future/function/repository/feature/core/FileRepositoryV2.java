@@ -70,4 +70,13 @@ public interface FileRepositoryV2 extends MongoRepository<FileV2, String> {
    */
   Stream<FileV2> findAllByUsedFalse();
   
+  /**
+   * Finds file/folder by its id and mark as deleted false.
+   *
+   * @param id Id of file/folder to-be-retrieved.
+   * @return {@code Optional<FileV2>} - File found in database, if any
+   * exists; otherwise returns {@link Optional#empty()}.
+   */
+  Optional<FileV2> findByIdAndDeletedFalse(String id);
+  
 }

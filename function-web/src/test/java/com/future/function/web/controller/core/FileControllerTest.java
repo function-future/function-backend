@@ -12,13 +12,16 @@ import com.future.function.web.mapper.response.core.FileResponseMapper;
 import com.future.function.web.model.request.core.FileWebRequest;
 import com.future.function.web.model.response.base.BaseResponse;
 import com.future.function.web.model.response.base.DataResponse;
-import com.future.function.web.model.response.base.PagingResponse;
+import com.future.function.web.model.response.feature.core.DataPageResponse;
+import com.future.function.web.model.response.feature.core.FileContentWebResponse;
 import com.future.function.web.model.response.feature.core.FileWebResponse;
+import com.future.function.web.model.response.feature.core.embedded.PathWebResponse;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
@@ -31,6 +34,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Collections;
+import java.util.List;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
@@ -55,27 +59,43 @@ public class FileControllerTest extends TestHelper {
   
   private static final String ID = "id";
   
+  private static final PathWebResponse PATH_WEB_RESPONSE =
+    PathWebResponse.builder()
+      .id(PARENT_ID)
+      .name(null)
+      .build();
+  
+  private static final List<FileV2> PATHS = Collections.singletonList(
+    FileV2.builder()
+      .id(PARENT_ID)
+      .build());
+  
   private static final FileV2 FILE = FileV2.builder()
     .id(ID)
     .parentId(PARENT_ID)
+    .paths(PATHS)
     .build();
   
   private static final Page<FileV2> PAGE = new PageImpl<>(
     Collections.singletonList(FILE), PAGEABLE, 1);
   
-  private static final PagingResponse<FileWebResponse> PAGING_RESPONSE =
-    FileResponseMapper.toFilePagingResponse(PAGE);
+  private static final DataPageResponse<FileWebResponse<List<FileContentWebResponse>>>
+    DATA_PAGE_RESPONSE = FileResponseMapper.toMultipleFileDataResponse(
+    Pair.of(PATHS, PAGE));
   
-  private static final DataResponse<FileWebResponse> RETRIEVED_DATA_RESPONSE =
-    FileResponseMapper.toFileDataResponse(FILE);
+  private static final DataResponse<FileWebResponse<FileContentWebResponse>>
+    RETRIEVED_DATA_RESPONSE = FileResponseMapper.toSingleFileDataResponse(FILE);
   
-  private static final DataResponse<FileWebResponse> CREATED_DATA_RESPONSE =
-    FileResponseMapper.toFileDataResponse(HttpStatus.CREATED, FILE);
+  private static final DataResponse<FileWebResponse<FileContentWebResponse>>
+    CREATED_DATA_RESPONSE = FileResponseMapper.toSingleFileDataResponse(
+    HttpStatus.CREATED, FILE);
   
   private static final BaseResponse OK_BASE_RESPONSE =
     ResponseHelper.toBaseResponse(HttpStatus.OK);
   
   private static final String JSON = "{\"name\":\"NAME\",\"type\":\"FILE\"}";
+  
+  private JacksonTester<DataPageResponse> dataPageResponseJacksonTester;
   
   @MockBean
   private FileService fileService;
@@ -105,12 +125,13 @@ public class FileControllerTest extends TestHelper {
   public void testGivenApiCallAndParentIdByGettingFilesAndFoldersReturnPagingResponse()
     throws Exception {
     
-    when(fileService.getFilesAndFolders(PARENT_ID, PAGEABLE)).thenReturn(PAGE);
+    when(fileService.getFilesAndFolders(PARENT_ID, PAGEABLE)).thenReturn(
+      Pair.of(PATHS, PAGE));
     
     mockMvc.perform(get("/api/core/files/" + PARENT_ID).cookie(cookies))
       .andExpect(status().isOk())
       .andExpect(content().json(
-        pagingResponseJacksonTester.write(PAGING_RESPONSE)
+        dataPageResponseJacksonTester.write(DATA_PAGE_RESPONSE)
           .getJson()));
     
     verify(fileService).getFilesAndFolders(PARENT_ID, PAGEABLE);
@@ -152,7 +173,7 @@ public class FileControllerTest extends TestHelper {
     when(
       fileService.createFileOrFolder(ADMIN_SESSION, PARENT_ID, "NAME", "NAME",
                                      ID.getBytes()
-    )).thenReturn(FILE);
+      )).thenReturn(FILE);
     
     mockMvc.perform(post("/api/core/files/" + PARENT_ID).cookie(cookies)
                       .contentType(MediaType.MULTIPART_FORM_DATA)
