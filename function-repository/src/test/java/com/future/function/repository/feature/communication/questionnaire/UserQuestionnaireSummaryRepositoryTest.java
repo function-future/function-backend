@@ -124,7 +124,7 @@ public class UserQuestionnaireSummaryRepositoryTest {
       userQuestionnaireSummaryRepository
         .findAllByRoleOrRoleAndBatchAndDeletedFalse(Role.MENTOR, Role.STUDENT, batch, PAGEABLE);
 
-    assertThat(userQuestionnaireSummaries.getTotalElements()).isEqualTo(2);
+    assertThat(userQuestionnaireSummaries.getTotalElements()).isEqualTo(3);
   }
 
   @Test
