@@ -1,0 +1,127 @@
+package com.future.function.web.mapper.response.communication.logging;
+
+import com.future.function.model.entity.feature.communication.logging.LogMessage;
+import com.future.function.model.entity.feature.communication.logging.LoggingRoom;
+import com.future.function.model.entity.feature.communication.logging.Topic;
+import com.future.function.model.entity.feature.core.User;
+import com.future.function.web.mapper.helper.PageHelper;
+import com.future.function.web.mapper.helper.ResponseHelper;
+import com.future.function.web.model.response.base.DataResponse;
+import com.future.function.web.model.response.base.PagingResponse;
+import com.future.function.web.model.response.feature.communication.logging.LogMessageResponse;
+import com.future.function.web.model.response.feature.communication.logging.LoggingRoomResponse;
+import com.future.function.web.model.response.feature.communication.logging.MemberResponse;
+import com.future.function.web.model.response.feature.communication.logging.TopicResponse;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+/**
+ * Author : Ricky Kennedy
+ * Created At : 23:41 27/07/2019
+ */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public class LoggingRoomResponseMapper {
+
+  public static PagingResponse<LoggingRoomResponse> toPagingLoggingRoomResponse(
+    Page<LoggingRoom> data
+  ){
+    return ResponseHelper.toPagingResponse(
+      HttpStatus.OK, toLoggingRoomResponseList(data), PageHelper.toPaging(data)
+    );
+  }
+
+  public static List<LoggingRoomResponse> toLoggingRoomResponseList(Page<LoggingRoom> data){
+    return data.getContent()
+            .stream()
+            .map(loggingRoom -> toLoggingRoomResponse(loggingRoom))
+            .collect(Collectors.toList());
+  }
+
+  public static LoggingRoomResponse toLoggingRoomResponse(LoggingRoom loggingRoom){
+    return LoggingRoomResponse.builder()
+            .id(loggingRoom.getId())
+            .description(loggingRoom.getDescription())
+            .members(toListMemberResponse(loggingRoom.getMembers()))
+            .build();
+  }
+
+  private static List<MemberResponse> toListMemberResponse(List<User> members) {
+    return members.stream()
+            .map(member -> toMemberResponse(member))
+            .collect(Collectors.toList());
+  }
+
+  private static MemberResponse toMemberResponse(User member) {
+    return MemberResponse.builder()
+            .id(member.getId())
+            .name(member.getName())
+            .avatar(member.getPictureV2().getThumbnailPath())
+            .Batch(member.getBatch().getName())
+            .role(member.getRole().toString())
+            .university(member.getUniversity())
+            .build();
+  }
+
+  public static DataResponse<LoggingRoomResponse> toDataReponseLoggingRoomResponse(LoggingRoom data) {
+    return ResponseHelper.toDataResponse(HttpStatus.OK, toLoggingRoomResponse(data));
+  }
+
+  public static PagingResponse<TopicResponse> toPagingTopicResponse(Page<Topic> data) {
+
+    return ResponseHelper.toPagingResponse(
+      HttpStatus.OK,
+      toTopicResponseList(data),
+      PageHelper.toPaging(data)
+    );
+  }
+
+  private static List<TopicResponse> toTopicResponseList(Page<Topic> data) {
+    return data.getContent()
+            .stream()
+            .map(topic -> toTopicResponse(topic))
+            .collect(Collectors.toList());
+  }
+
+  private static TopicResponse toTopicResponse(Topic topic) {
+    return TopicResponse.builder()
+            .id(topic.getId())
+            .title(topic.getTitle())
+            .build();
+  }
+
+  public static DataResponse<TopicResponse> toDataResponseTopicResponse(Topic topic) {
+    return ResponseHelper.toDataResponse(HttpStatus.OK, toTopicResponse(topic));
+  }
+
+  public static PagingResponse<LogMessageResponse> toPagingLogMessageResponse(Page<LogMessage> data) {
+    return ResponseHelper.toPagingResponse(
+      HttpStatus.OK,
+      toLogMessageResponseList(data),
+      PageHelper.toPaging(data)
+    );
+  }
+
+  private static List<LogMessageResponse> toLogMessageResponseList(Page<LogMessage> data) {
+    return data.getContent()
+            .stream()
+            .map(logMessage -> toLogMessageResponse(logMessage))
+            .collect(Collectors.toList());
+  }
+
+  private static LogMessageResponse toLogMessageResponse(LogMessage logMessage) {
+    return LogMessageResponse.builder()
+            .id(logMessage.getId())
+            .createdAt(logMessage.getCreatedAt())
+            .senderAvatar(logMessage.getSender().getPictureV2().getThumbnailPath())
+            .senderName(logMessage.getSender().getName())
+            .text(logMessage.getText())
+            .build();
+  }
+
+
+}

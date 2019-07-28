@@ -12,7 +12,7 @@ public interface LoggingRoomRepository extends MongoRepository<LoggingRoom, Stri
 
     Page<LoggingRoom> findAllByDeletedFalseOrderByCreatedAtDesc(Pageable pageable);
 
-    Page<LoggingRoom> findAllTitleContainingIgnoreCaseAndByDeletedFalseOrderByCreatedAtDesc(String keyword, Pageable pageable);
+    Page<LoggingRoom> findAllByTitleContainingIgnoreCaseAndDeletedFalseOrderByCreatedAtDesc(String keyword, Pageable pageable);
 
     Page<LoggingRoom> findAllByMembersAndDeletedFalseOrderByCreatedAtDesc(User member, Pageable pageable);
 

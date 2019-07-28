@@ -6,10 +6,6 @@ import org.springframework.data.domain.Pageable;
 
 public interface LoggingRoomService {
 
-    Page<LoggingRoom> getAllLoggingRooms(Pageable pageable);
-
-    Page<LoggingRoom> getLoggingRoomsWithKeyword(String keyword, Pageable pageable);
-
     Page<LoggingRoom> getLoggingRoomsByMember(String memberId, Pageable pageable);
 
     Page<LoggingRoom> getLoggingRoomsByMemberWithKeyword(String keyword, String memberId, Pageable pageable);

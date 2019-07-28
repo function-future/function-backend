@@ -1,5 +1,6 @@
 package com.future.function.service.impl.feature.communication.logging;
 
+import com.future.function.common.enumeration.core.Role;
 import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.communication.logging.LoggingRoom;
 import com.future.function.model.entity.feature.core.User;
@@ -26,30 +27,26 @@ public class LoggingRoomServiceImpl implements LoggingRoomService {
     }
 
     @Override
-    public Page<LoggingRoom> getAllLoggingRooms(Pageable pageable) {
+    public Page<LoggingRoom> getLoggingRoomsByMember(String memberId, Pageable pageable) {
+        if(userService.getUser(memberId).getRole().equals(Role.STUDENT)) {
+            return loggingRoomRepository.findAllByMembersAndDeletedFalseOrderByCreatedAtDesc(
+                    userService.getUser(memberId),
+                    pageable
+            );
+        }
         return loggingRoomRepository.findAllByDeletedFalseOrderByCreatedAtDesc(pageable);
     }
 
     @Override
-    public Page<LoggingRoom> getLoggingRoomsWithKeyword(String keyword, Pageable pageable) {
-        return loggingRoomRepository.findAllTitleContainingIgnoreCaseAndByDeletedFalseOrderByCreatedAtDesc(keyword, pageable);
-    }
-
-    @Override
-    public Page<LoggingRoom> getLoggingRoomsByMember(String memberId, Pageable pageable) {
-        return loggingRoomRepository.findAllByMembersAndDeletedFalseOrderByCreatedAtDesc(
-                userService.getUser(memberId),
-                pageable
-        );
-    }
-
-    @Override
     public Page<LoggingRoom> getLoggingRoomsByMemberWithKeyword(String keyword, String memberId, Pageable pageable) {
-        return loggingRoomRepository.findAllByTitleContainingIgnoreCaseAndMembersAndDeletedFalseOrderByCreatedAtDesc(
-                keyword,
-                userService.getUser(memberId),
-                pageable
-        );
+        if(userService.getUser(memberId).getRole().equals(Role.STUDENT)) {
+            return loggingRoomRepository.findAllByTitleContainingIgnoreCaseAndMembersAndDeletedFalseOrderByCreatedAtDesc(
+                    keyword,
+                    userService.getUser(memberId),
+                    pageable
+            );
+        }
+        return loggingRoomRepository.findAllByTitleContainingIgnoreCaseAndDeletedFalseOrderByCreatedAtDesc(keyword, pageable);
     }
 
     @Override

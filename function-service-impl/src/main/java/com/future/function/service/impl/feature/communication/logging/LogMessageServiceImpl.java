@@ -27,7 +27,7 @@ public class LogMessageServiceImpl implements LogMessageService {
 
   @Override
   public Page<LogMessage> getLogMessagesByTopic(String topicId, Pageable pageable) {
-    return logMessageRepository.findAllByTopic(
+    return logMessageRepository.findAllByTopicOrderByCreatedAtDesc(
       topicService.getTopic(topicId),
       pageable
     );

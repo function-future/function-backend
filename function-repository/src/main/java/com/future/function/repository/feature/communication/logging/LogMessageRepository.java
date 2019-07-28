@@ -10,5 +10,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface LogMessageRepository extends MongoRepository<LogMessage, String> {
 
-    Page<LogMessage> findAllByTopic (Topic topic, Pageable pageable);
+    Page<LogMessage> findAllByTopicOrderByCreatedAtDesc (Topic topic, Pageable pageable);
 }

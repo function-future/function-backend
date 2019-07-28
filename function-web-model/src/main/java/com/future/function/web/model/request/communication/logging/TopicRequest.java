@@ -1,0 +1,21 @@
+package com.future.function.web.model.request.communication.logging;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.Length;
+
+/**
+ * Author : Ricky Kennedy
+ * Created At : 23:34 27/07/2019
+ */
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class TopicRequest {
+
+  @Length(min = 1, max = 50, message = "Title length must between 1 and 50")
+  private String title;
+}
