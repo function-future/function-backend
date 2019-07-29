@@ -7,6 +7,7 @@ import com.future.function.model.entity.feature.core.User;
 import com.future.function.repository.feature.communication.logging.LoggingRoomRepository;
 import com.future.function.service.api.feature.communication.logging.LoggingRoomService;
 import com.future.function.service.api.feature.core.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -17,10 +18,12 @@ import java.util.Optional;
 
 @Service
 public class LoggingRoomServiceImpl implements LoggingRoomService {
+
     private final LoggingRoomRepository loggingRoomRepository;
 
     private final UserService userService;
 
+    @Autowired
     public LoggingRoomServiceImpl(LoggingRoomRepository loggingRoomRepository, UserService userService) {
         this.loggingRoomRepository = loggingRoomRepository;
         this.userService = userService;

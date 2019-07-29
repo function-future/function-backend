@@ -49,16 +49,23 @@ public class LoggingRoomController {
   public LoggingRoomController (
     LoggingRoomService loggingRoomService,
     TopicService topicService,
-    LogMessageService logMessageService
+    LogMessageService logMessageService,
+    LogMessageRequestMapper logMessageRequestMapper,
+    TopicRequestMapper topicRequestMapper,
+    LoggingRoomRequestMapper loggingRoomRequestMapper
   ){
     this.loggingRoomService = loggingRoomService;
     this.topicService = topicService;
     this.logMessageService = logMessageService;
+    this.logMessageRequestMapper = logMessageRequestMapper;
+    this.topicRequestMapper = topicRequestMapper;
+    this.loggingRoomRequestMapper = loggingRoomRequestMapper;
   }
 
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+  @WithAnyRole(roles = { Role.ADMIN, Role.MENTOR, Role.STUDENT })
   public PagingResponse<LoggingRoomResponse> getLoggingRoomsByMember(
-    @WithAnyRole(roles = { Role.ADMIN, Role.MENTOR, Role.STUDENT }) Session session,
+    Session session,
     @RequestParam(required = false) String search,
     @RequestParam(required = false, defaultValue = "1") int page,
     @RequestParam(required = false, defaultValue = "10") int size

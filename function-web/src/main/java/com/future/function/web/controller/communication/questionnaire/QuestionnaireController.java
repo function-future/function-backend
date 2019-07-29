@@ -23,7 +23,6 @@ import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.feature.communication.questionnaire.QuestionQuestionnaireResponse;
 import com.future.function.web.model.response.feature.communication.questionnaire.QuestionnaireParticipantDescriptionResponse;
 import com.future.function.web.model.response.feature.communication.questionnaire.QuestionnaireDetailResponse;
-import com.future.function.web.model.response.feature.communication.questionnaire.QuestionnaireParticipantDescriptionResponse;
 import com.future.function.web.model.response.feature.communication.questionnaire.QuestionnaireParticipantResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

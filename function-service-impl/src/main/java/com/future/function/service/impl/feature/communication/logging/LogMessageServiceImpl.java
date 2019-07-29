@@ -5,6 +5,7 @@ import com.future.function.repository.feature.communication.logging.LogMessageRe
 import com.future.function.service.api.feature.communication.logging.LogMessageService;
 import com.future.function.service.api.feature.communication.logging.TopicService;
 import com.future.function.service.api.feature.core.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ public class LogMessageServiceImpl implements LogMessageService {
 
   private final UserService userService;
 
+  @Autowired
   public LogMessageServiceImpl(LogMessageRepository logMessageRepository, TopicService topicService, UserService userService) {
     this.logMessageRepository = logMessageRepository;
     this.topicService = topicService;

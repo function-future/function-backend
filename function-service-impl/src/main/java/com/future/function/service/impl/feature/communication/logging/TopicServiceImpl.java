@@ -6,6 +6,7 @@ import com.future.function.repository.feature.communication.logging.TopicReposit
 import com.future.function.service.api.feature.communication.logging.LoggingRoomService;
 import com.future.function.service.api.feature.communication.logging.TopicService;
 import com.future.function.service.api.feature.core.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,7 @@ public class TopicServiceImpl implements TopicService {
 
     private final UserService userService;
 
+    @Autowired
     public TopicServiceImpl(TopicRepository topicRepository, LoggingRoomService loggingRoomService, UserService userService) {
         this.topicRepository = topicRepository;
         this.loggingRoomService = loggingRoomService;

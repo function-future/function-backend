@@ -35,7 +35,6 @@ public class LoggingRoomResponseMapperTest {
   private static final String LOGGING_ROOM_ID2 = "loggingRoomId2";
   private static final String TITLE1 = "title1";
   private static final String TITLE2 = "title2";
-  private static final PageRequest PAGEABLE = new PageRequest(0, 2);
   private LoggingRoom loggingRoom1;
   private LoggingRoom loggingRoom2;
 
