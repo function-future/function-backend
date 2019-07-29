@@ -6,6 +6,7 @@ import com.future.function.validation.annotation.core.TypeAndBytesMustBeValid;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
+import java.util.Optional;
 
 public class TypeAndBytesMustBeValidValidator
   implements ConstraintValidator<TypeAndBytesMustBeValid, FileData> {
@@ -18,14 +19,20 @@ public class TypeAndBytesMustBeValidValidator
   @Override
   public boolean isValid(FileData data, ConstraintValidatorContext context) {
     
-    boolean nonEmptyBytes = data.getBytes().length != 0;
+    String type = Optional.ofNullable(data.getType())
+      .orElse("");
     
-    if (nonEmptyBytes) {
-      return FileType.FILE.name()
-        .equals(data.getType());
-    } else {
-      return FileType.isAnyMatch(data.getType());
-    }
+    return Optional.of(type)
+      .filter(t -> t.equals(FileType.FOLDER.name()))
+      .map(ignored -> this.isByteArrayExist(data))
+      .orElseGet(() -> FileType.isAnyMatch(type));
+  }
+  
+  private boolean isByteArrayExist(FileData data) {
+    
+    return Optional.ofNullable(data.getBytes())
+      .map(bytes -> bytes.length == 0)
+      .orElse(true);
   }
   
 }

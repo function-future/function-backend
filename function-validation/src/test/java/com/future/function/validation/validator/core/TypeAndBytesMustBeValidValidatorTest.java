@@ -43,38 +43,50 @@ public class TypeAndBytesMustBeValidValidatorTest {
   @Test
   public void testGivenEmptyBytesAndFileTypeByValidatingFileWebRequestObjectReturnTrue() {
     
-    when(fileData.getBytes()).thenReturn(new byte[] {});
-    when(fileData.getType()).thenReturn("FILE");
+    when(fileData.getType()).thenReturn("FOLDER");
+    when(fileData.getBytes()).thenReturn(null);
     
     assertThat(validator.isValid(fileData, null)).isTrue();
     
-    verify(fileData).getBytes();
     verify(fileData).getType();
+    verify(fileData).getBytes();
+    verifyZeroInteractions(annotation);
   }
   
   @Test
   public void testGivenNonEmptyBytesAndFileTypeByValidatingFileWebRequestObjectReturnTrue() {
     
-    when(fileData.getBytes()).thenReturn("sample".getBytes());
     when(fileData.getType()).thenReturn("FILE");
     
     assertThat(validator.isValid(fileData, null)).isTrue();
     
-    verify(fileData).getBytes();
     verify(fileData).getType();
     verifyZeroInteractions(annotation);
   }
   
   @Test
-  public void testGivenNonEmptyBytesAndInvalidFileTypeByValidatingFileWebRequestObjectReturnTrue() {
+  public void testGivenNonEmptyBytesAndInvalidFileTypeByValidatingFileWebRequestObjectReturnFalse() {
     
-    when(fileData.getBytes()).thenReturn("sample".getBytes());
     when(fileData.getType()).thenReturn("FOLDER");
+    when(fileData.getBytes()).thenReturn("sample".getBytes());
     
     assertThat(validator.isValid(fileData, null)).isFalse();
     
-    verify(fileData).getBytes();
     verify(fileData).getType();
+    verify(fileData).getBytes();
+    verifyZeroInteractions(annotation);
+  }
+  
+  @Test
+  public void testGivenEmptyBytesAndInvalidFileTypeByValidatingFileWebRequestObjectReturnTrue() {
+    
+    when(fileData.getType()).thenReturn("FOLDER");
+    when(fileData.getBytes()).thenReturn(new byte[0]);
+    
+    assertThat(validator.isValid(fileData, null)).isTrue();
+    
+    verify(fileData).getType();
+    verify(fileData).getBytes();
     verifyZeroInteractions(annotation);
   }
   
