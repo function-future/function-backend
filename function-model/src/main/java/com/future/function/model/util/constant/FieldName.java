@@ -518,7 +518,7 @@ public interface FieldName {
 
     public static final String DESCRIPTION = "description";
 
-    public static final String LOGGING_ROOM = "logging-room";
+    public static final String LOGGING_ROOM = "loggingRoom";
 
   }
 

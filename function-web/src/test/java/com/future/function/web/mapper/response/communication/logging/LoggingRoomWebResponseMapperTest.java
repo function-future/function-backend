@@ -10,15 +10,13 @@ import com.future.function.model.entity.feature.core.User;
 import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
-import com.future.function.web.model.response.feature.communication.logging.LogMessageResponse;
-import com.future.function.web.model.response.feature.communication.logging.LoggingRoomResponse;
-import com.future.function.web.model.response.feature.communication.logging.TopicResponse;
+import com.future.function.web.model.response.feature.communication.logging.LogMessageWebResponse;
+import com.future.function.web.model.response.feature.communication.logging.LoggingRoomWebResponse;
+import com.future.function.web.model.response.feature.communication.logging.TopicWebResponse;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.http.HttpStatus;
 
 import java.util.Arrays;
 
@@ -28,7 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Author : Ricky Kennedy
  * Created At : 22:13 28/07/2019
  */
-public class LoggingRoomResponseMapperTest {
+public class LoggingRoomWebResponseMapperTest {
 
   private static final String DESCRIPTION = "description";
   private static final String LOGGING_ROOM_ID1 = "loggingRoomId1";
@@ -149,7 +147,7 @@ public class LoggingRoomResponseMapperTest {
 
   @Test
   public void toPagingLoggingRoomResponse() {
-    PagingResponse<LoggingRoomResponse> data =
+    PagingResponse<LoggingRoomWebResponse> data =
       LoggingRoomResponseMapper.toPagingLoggingRoomResponse(
         new PageImpl<>(Arrays.asList(loggingRoom1, loggingRoom2),
           PageHelper.toPageable(1,2), 2)
@@ -163,7 +161,7 @@ public class LoggingRoomResponseMapperTest {
 
   @Test
   public void toDataResponseLoggingRoomResponse() {
-    DataResponse<LoggingRoomResponse> data = LoggingRoomResponseMapper.toDataResponseLoggingRoomResponse(
+    DataResponse<LoggingRoomWebResponse> data = LoggingRoomResponseMapper.toDataResponseLoggingRoomResponse(
       loggingRoom1
     );
 
@@ -174,7 +172,7 @@ public class LoggingRoomResponseMapperTest {
 
   @Test
   public void toPagingTopicResponse() {
-    PagingResponse<TopicResponse> data =
+    PagingResponse<TopicWebResponse> data =
       LoggingRoomResponseMapper.toPagingTopicResponse(
         new PageImpl<>(Arrays.asList(topic1, topic2),
           PageHelper.toPageable(1,2), 2)
@@ -188,7 +186,7 @@ public class LoggingRoomResponseMapperTest {
 
   @Test
   public void toDataResponseTopicResponse() {
-    DataResponse<TopicResponse> data =
+    DataResponse<TopicWebResponse> data =
       LoggingRoomResponseMapper.toDataResponseTopicResponse(
         topic1
       );
@@ -200,7 +198,7 @@ public class LoggingRoomResponseMapperTest {
 
   @Test
   public void toPagingLogMessageResponse() {
-    PagingResponse<LogMessageResponse> data =
+    PagingResponse<LogMessageWebResponse> data =
       LoggingRoomResponseMapper.toPagingLogMessageResponse(
         new PageImpl<>(Arrays.asList(logMessage1, logMessage2),
           PageHelper.toPageable(1,2), 2)

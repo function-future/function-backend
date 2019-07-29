@@ -129,7 +129,7 @@ public class LoggingRoomServiceImplTest {
     assertThat(results.getContent().get(0).getId()).isEqualTo(LOGGING_ROOM_ID1);
     assertThat(results.getContent().get(1).getId()).isEqualTo(LOGGING_ROOM_ID2);
 
-    verify(userService,times(2)).getUser(MEMBER_ID);
+    verify(userService).getUser(MEMBER_ID);
     verify(userService).getUser(MEMBER_ID2);
     verify(loggingRoomRepository).findAllByMembersAndDeletedFalseOrderByCreatedAtDesc(
       MEMBER, PAGEABLE);

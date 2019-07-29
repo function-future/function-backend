@@ -8,7 +8,7 @@ import java.lang.annotation.*;
 
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.TYPE, ElementType.FIELD })
+@Target( ElementType.FIELD )
 @Constraint(validatedBy = QuestionnaireTitleValidator.class)
 public @interface LoggingRoomTitle {
   /**

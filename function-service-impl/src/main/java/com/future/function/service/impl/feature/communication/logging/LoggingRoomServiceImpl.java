@@ -31,9 +31,10 @@ public class LoggingRoomServiceImpl implements LoggingRoomService {
 
     @Override
     public Page<LoggingRoom> getLoggingRoomsByMember(String memberId, Pageable pageable) {
-        if(userService.getUser(memberId).getRole().equals(Role.STUDENT)) {
+        User member = userService.getUser(memberId);
+        if(member.getRole().equals(Role.STUDENT)) {
             return loggingRoomRepository.findAllByMembersAndDeletedFalseOrderByCreatedAtDesc(
-                    userService.getUser(memberId),
+                    member,
                     pageable
             );
         }

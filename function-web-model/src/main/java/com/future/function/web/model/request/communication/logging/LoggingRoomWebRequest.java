@@ -19,12 +19,11 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class LoggingRoomRequest {
-
+public class LoggingRoomWebRequest {
   @LoggingRoomTitle(message = "Invalid Title")
   private String title;
 
-  @Length(min= 1, max = 200, message = "Length must be in 1 - 200")
+  @Length(min= 1, max = 200, message = "Length")
   private String description;
 
   @NotEmpty(message = "NotEmpty")

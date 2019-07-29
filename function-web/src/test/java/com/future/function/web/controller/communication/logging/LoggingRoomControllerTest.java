@@ -16,14 +16,14 @@ import com.future.function.web.mapper.request.communication.logging.LogMessageRe
 import com.future.function.web.mapper.request.communication.logging.LoggingRoomRequestMapper;
 import com.future.function.web.mapper.request.communication.logging.TopicRequestMapper;
 import com.future.function.web.mapper.response.communication.logging.LoggingRoomResponseMapper;
-import com.future.function.web.model.request.communication.logging.LogMessageRequest;
-import com.future.function.web.model.request.communication.logging.LoggingRoomRequest;
-import com.future.function.web.model.request.communication.logging.TopicRequest;
+import com.future.function.web.model.request.communication.logging.LogMessageWebRequest;
+import com.future.function.web.model.request.communication.logging.LoggingRoomWebRequest;
+import com.future.function.web.model.request.communication.logging.TopicWebRequest;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
-import com.future.function.web.model.response.feature.communication.logging.LogMessageResponse;
-import com.future.function.web.model.response.feature.communication.logging.LoggingRoomResponse;
-import com.future.function.web.model.response.feature.communication.logging.TopicResponse;
+import com.future.function.web.model.response.feature.communication.logging.LogMessageWebResponse;
+import com.future.function.web.model.response.feature.communication.logging.LoggingRoomWebResponse;
+import com.future.function.web.model.response.feature.communication.logging.TopicWebResponse;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -175,18 +175,18 @@ public class LoggingRoomControllerTest extends TestHelper {
 
   private static final String TEXT = "text";
 
-  private static final LogMessageRequest LOG_MESSAGE_REQUEST =
-    LogMessageRequest.builder()
+  private static final LogMessageWebRequest LOG_MESSAGE_REQUEST =
+    LogMessageWebRequest.builder()
       .text(TEXT)
       .build();
 
-  private static final TopicRequest TOPIC_REQUEST =
-    TopicRequest.builder()
+  private static final TopicWebRequest TOPIC_REQUEST =
+    TopicWebRequest.builder()
       .title(TITLE1)
       .build();
 
-  private static final LoggingRoomRequest LOGGING_ROOM_REQUEST =
-    LoggingRoomRequest.builder()
+  private static final LoggingRoomWebRequest LOGGING_ROOM_REQUEST =
+    LoggingRoomWebRequest.builder()
       .title(TITLE1)
       .description(DESCRIPTION)
       .members(Arrays.asList(MEMBER_ID_1))
@@ -210,11 +210,11 @@ public class LoggingRoomControllerTest extends TestHelper {
   @MockBean
   private LoggingRoomRequestMapper loggingRoomRequestMapper;
 
-  private JacksonTester<LogMessageRequest> logMessageRequestJacksonTester;
+  private JacksonTester<LogMessageWebRequest> logMessageRequestJacksonTester;
 
-  private JacksonTester<TopicRequest> topicRequestJacksonTester;
+  private JacksonTester<TopicWebRequest> topicRequestJacksonTester;
 
-  private JacksonTester<LoggingRoomRequest> loggingRoomRequestJacksonTester;
+  private JacksonTester<LoggingRoomWebRequest> loggingRoomRequestJacksonTester;
 
   @Before
   public void setUp(){
@@ -244,7 +244,7 @@ public class LoggingRoomControllerTest extends TestHelper {
     when(loggingRoomService.getLoggingRoomsByMember(any(String.class), eq(PAGEABLE)))
       .thenReturn(LOGGING_ROOM_PAGE);
 
-    PagingResponse<LoggingRoomResponse> response =
+    PagingResponse<LoggingRoomWebResponse> response =
       LoggingRoomResponseMapper.toPagingLoggingRoomResponse(LOGGING_ROOM_PAGE);
 
     mockMvc.perform(
@@ -255,7 +255,7 @@ public class LoggingRoomControllerTest extends TestHelper {
 
     mockMvc.perform(
       get("/api/communication/logging-rooms")
-        .cookie(cookies))
+        .cookie(cookies).param("search", ""))
       .andExpect(status().isOk())
       .andExpect(content().json(pagingResponseJacksonTester.write(response).getJson()));
 
@@ -271,7 +271,7 @@ public class LoggingRoomControllerTest extends TestHelper {
       .thenReturn(LOGGING_ROOM1);
 
 
-    DataResponse<LoggingRoomResponse> response =
+    DataResponse<LoggingRoomWebResponse> response =
       LoggingRoomResponseMapper.toDataResponseLoggingRoomResponse(LOGGING_ROOM1);
 
     mockMvc.perform(
@@ -293,7 +293,7 @@ public class LoggingRoomControllerTest extends TestHelper {
     when(topicService.getTopicByLoggingRoom(LOGGING_ROOM_ID1, PAGEABLE))
       .thenReturn(TOPIC_PAGE);
 
-    PagingResponse<TopicResponse> response =
+    PagingResponse<TopicWebResponse> response =
       LoggingRoomResponseMapper.toPagingTopicResponse(
         TOPIC_PAGE
       );
@@ -318,7 +318,7 @@ public class LoggingRoomControllerTest extends TestHelper {
       .thenReturn(TOPIC1);
 
 
-    DataResponse<TopicResponse> response =
+    DataResponse<TopicWebResponse> response =
       LoggingRoomResponseMapper.toDataResponseTopicResponse(TOPIC1);
 
     mockMvc.perform(
@@ -342,7 +342,7 @@ public class LoggingRoomControllerTest extends TestHelper {
     when(logMessageService.getLogMessagesByTopic(TOPIC_ID_1, PAGEABLE))
       .thenReturn(LOG_MESSAGE_PAGE);
 
-    PagingResponse<LogMessageResponse> response =
+    PagingResponse<LogMessageWebResponse> response =
       LoggingRoomResponseMapper.toPagingLogMessageResponse(
         LOG_MESSAGE_PAGE
       );
@@ -450,7 +450,7 @@ public class LoggingRoomControllerTest extends TestHelper {
     when(topicService.updateTopic(TOPIC1))
       .thenReturn(TOPIC1);
 
-    DataResponse<TopicResponse> response =
+    DataResponse<TopicWebResponse> response =
       LoggingRoomResponseMapper.toDataResponseTopicResponse(
         TOPIC1
       );
@@ -483,7 +483,7 @@ public class LoggingRoomControllerTest extends TestHelper {
     when(loggingRoomService.updateLoggingRoom(LOGGING_ROOM1))
       .thenReturn(LOGGING_ROOM1);
 
-    DataResponse<LoggingRoomResponse> response =
+    DataResponse<LoggingRoomWebResponse> response =
       LoggingRoomResponseMapper.toDataResponseLoggingRoomResponse(
         LOGGING_ROOM1
       );

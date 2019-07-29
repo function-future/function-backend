@@ -12,15 +12,15 @@ import com.future.function.web.mapper.request.communication.logging.LogMessageRe
 import com.future.function.web.mapper.request.communication.logging.LoggingRoomRequestMapper;
 import com.future.function.web.mapper.request.communication.logging.TopicRequestMapper;
 import com.future.function.web.mapper.response.communication.logging.LoggingRoomResponseMapper;
-import com.future.function.web.model.request.communication.logging.LogMessageRequest;
-import com.future.function.web.model.request.communication.logging.LoggingRoomRequest;
-import com.future.function.web.model.request.communication.logging.TopicRequest;
+import com.future.function.web.model.request.communication.logging.LogMessageWebRequest;
+import com.future.function.web.model.request.communication.logging.LoggingRoomWebRequest;
+import com.future.function.web.model.request.communication.logging.TopicWebRequest;
 import com.future.function.web.model.response.base.BaseResponse;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
-import com.future.function.web.model.response.feature.communication.logging.LogMessageResponse;
-import com.future.function.web.model.response.feature.communication.logging.LoggingRoomResponse;
-import com.future.function.web.model.response.feature.communication.logging.TopicResponse;
+import com.future.function.web.model.response.feature.communication.logging.LogMessageWebResponse;
+import com.future.function.web.model.response.feature.communication.logging.LoggingRoomWebResponse;
+import com.future.function.web.model.response.feature.communication.logging.TopicWebResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -63,11 +63,11 @@ public class LoggingRoomController {
   }
 
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-  public PagingResponse<LoggingRoomResponse> getLoggingRoomsByMember(
+  public PagingResponse<LoggingRoomWebResponse> getLoggingRoomsByMember(
     @WithAnyRole(roles = { Role.ADMIN, Role.MENTOR, Role.STUDENT }) Session session,
-    @RequestParam(required = false) String search,
-    @RequestParam(required = false, defaultValue = "1") int page,
-    @RequestParam(required = false, defaultValue = "10") int size
+    @RequestParam String search,
+    @RequestParam( defaultValue = "1" ) int page,
+    @RequestParam( defaultValue = "10" ) int size
   ) {
     if(search != null && !search.equals("")) {
       return LoggingRoomResponseMapper.toPagingLoggingRoomResponse(
@@ -86,7 +86,7 @@ public class LoggingRoomController {
 
   @GetMapping(value = "/{loggingRoomId}",
             produces = MediaType.APPLICATION_JSON_VALUE)
-  public DataResponse<LoggingRoomResponse> getLoggingRoomDetail(
+  public DataResponse<LoggingRoomWebResponse> getLoggingRoomDetail(
     @WithAnyRole(roles = { Role.ADMIN, Role.MENTOR, Role.STUDENT} ) Session session,
     @PathVariable String loggingRoomId
   ) {
@@ -97,11 +97,11 @@ public class LoggingRoomController {
 
   @GetMapping(value = "/{loggingRoomId}/topics",
     produces = MediaType.APPLICATION_JSON_VALUE)
-  public PagingResponse<TopicResponse> getLoggingRoomTopic(
+  public PagingResponse<TopicWebResponse> getLoggingRoomTopic(
     @WithAnyRole(roles = { Role.ADMIN, Role.MENTOR, Role.STUDENT} ) Session session,
     @PathVariable String loggingRoomId,
-    @RequestParam(required = false, defaultValue = "1") int page,
-    @RequestParam(required = false, defaultValue = "10") int size
+    @RequestParam( defaultValue = "1" ) int page,
+    @RequestParam( defaultValue = "10" ) int size
   ) {
     return LoggingRoomResponseMapper.toPagingTopicResponse(
       topicService.getTopicByLoggingRoom(
@@ -111,7 +111,7 @@ public class LoggingRoomController {
 
   @GetMapping(value = "/{loggingRoomId}/topics/{topicId}",
     produces = MediaType.APPLICATION_JSON_VALUE)
-  public DataResponse<TopicResponse> getLoggingRoomTopicDetail(
+  public DataResponse<TopicWebResponse> getLoggingRoomTopicDetail(
     @WithAnyRole(roles = { Role.ADMIN, Role.MENTOR, Role.STUDENT} ) Session session,
     @PathVariable String loggingRoomId,
     @PathVariable String topicId
@@ -123,12 +123,12 @@ public class LoggingRoomController {
 
   @GetMapping(value = "/{loggingRoomId}/topics/{topicId}/log-messages",
     produces = MediaType.APPLICATION_JSON_VALUE)
-  public PagingResponse<LogMessageResponse> getLogMessages(
+  public PagingResponse<LogMessageWebResponse> getLogMessages(
     @WithAnyRole(roles = { Role.ADMIN, Role.MENTOR, Role.STUDENT} ) Session session,
     @PathVariable String loggingRoomId,
     @PathVariable String topicId,
-    @RequestParam(required = false, defaultValue = "1") int page,
-    @RequestParam(required = false, defaultValue = "10") int size
+    @RequestParam( defaultValue = "1" ) int page,
+    @RequestParam( defaultValue = "10" ) int size
   ) {
     return LoggingRoomResponseMapper.toPagingLogMessageResponse(
       logMessageService.getLogMessagesByTopic(
@@ -146,12 +146,12 @@ public class LoggingRoomController {
     @WithAnyRole(roles = Role.STUDENT ) Session session,
     @PathVariable String loggingRoomId,
     @PathVariable String topicId,
-    @RequestBody LogMessageRequest logMessageRequest
+    @RequestBody LogMessageWebRequest logMessageWebRequest
     ) {
 
     logMessageService.createLogMessage(
       logMessageRequestMapper.toLogMessage(
-        logMessageRequest, session.getId(), topicId)
+        logMessageWebRequest, session.getId(), topicId)
     );
 
     return ResponseHelper.toBaseResponse(HttpStatus.CREATED);
@@ -166,10 +166,10 @@ public class LoggingRoomController {
   public BaseResponse createTopic (
     @WithAnyRole(roles = Role.MENTOR ) Session session,
     @PathVariable String loggingRoomId,
-    @RequestBody TopicRequest topicRequest
+    @RequestBody TopicWebRequest topicWebRequest
   ) {
     topicService.createTopic(
-      topicRequestMapper.toTopic(topicRequest, loggingRoomId, null)
+      topicRequestMapper.toTopic(topicWebRequest, loggingRoomId, null)
     );
     return ResponseHelper.toBaseResponse(HttpStatus.CREATED);
   }
@@ -181,39 +181,39 @@ public class LoggingRoomController {
   @ResponseStatus(value = HttpStatus.CREATED)
   public BaseResponse createLoggingRoom (
     @WithAnyRole(roles = Role.MENTOR ) Session session,
-    @RequestBody LoggingRoomRequest loggingRoomRequest
+    @RequestBody LoggingRoomWebRequest loggingRoomWebRequest
   ) {
     loggingRoomService.createLoggingRoom(
-      loggingRoomRequestMapper.toLoggingRoom(loggingRoomRequest, null)
+      loggingRoomRequestMapper.toLoggingRoom(loggingRoomWebRequest, null)
     );
     return ResponseHelper.toBaseResponse(HttpStatus.CREATED);
   }
 
   @PutMapping(value = "/{loggingRoomId}/topics/{topicId}",
     produces = MediaType.APPLICATION_JSON_VALUE)
-  public DataResponse<TopicResponse> updateTopicDetail(
+  public DataResponse<TopicWebResponse> updateTopicDetail(
     @WithAnyRole(roles = Role.MENTOR ) Session session,
     @PathVariable String loggingRoomId,
     @PathVariable String topicId,
-    @RequestBody TopicRequest topicRequest
+    @RequestBody TopicWebRequest topicWebRequest
   ) {
     return LoggingRoomResponseMapper.toDataResponseTopicResponse(
       topicService.updateTopic(
-        topicRequestMapper.toTopic(topicRequest, loggingRoomId, topicId)
+        topicRequestMapper.toTopic(topicWebRequest, loggingRoomId, topicId)
       )
     );
   }
 
   @PutMapping(value = "/{loggingRoomId}",
     produces = MediaType.APPLICATION_JSON_VALUE)
-  public DataResponse<LoggingRoomResponse> updateLoggingRoomDetail(
+  public DataResponse<LoggingRoomWebResponse> updateLoggingRoomDetail(
     @WithAnyRole(roles = Role.MENTOR ) Session session,
     @PathVariable String loggingRoomId,
-    @RequestBody LoggingRoomRequest loggingRoomRequest
+    @RequestBody LoggingRoomWebRequest loggingRoomWebRequest
   ) {
     return LoggingRoomResponseMapper.toDataResponseLoggingRoomResponse(
       loggingRoomService.updateLoggingRoom(
-        loggingRoomRequestMapper.toLoggingRoom(loggingRoomRequest, loggingRoomId)
+        loggingRoomRequestMapper.toLoggingRoom(loggingRoomWebRequest, loggingRoomId)
       )
     );
   }

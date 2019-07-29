@@ -65,7 +65,7 @@ public class TopicServiceImpl implements TopicService {
                 .map(topicRepository::findOne)
                 .map(savedTopic -> this.copyProperties(savedTopic, topic))
                 .map(topicRepository::save)
-                .orElseThrow(UnsupportedOperationException::new);
+                .orElse(topic);
     }
 
 

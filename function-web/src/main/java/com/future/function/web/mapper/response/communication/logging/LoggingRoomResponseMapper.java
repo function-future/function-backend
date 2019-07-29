@@ -8,10 +8,10 @@ import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
-import com.future.function.web.model.response.feature.communication.logging.LogMessageResponse;
-import com.future.function.web.model.response.feature.communication.logging.LoggingRoomResponse;
+import com.future.function.web.model.response.feature.communication.logging.LogMessageWebResponse;
+import com.future.function.web.model.response.feature.communication.logging.LoggingRoomWebResponse;
 import com.future.function.web.model.response.feature.communication.logging.MemberResponse;
-import com.future.function.web.model.response.feature.communication.logging.TopicResponse;
+import com.future.function.web.model.response.feature.communication.logging.TopicWebResponse;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class LoggingRoomResponseMapper {
 
-  public static PagingResponse<LoggingRoomResponse> toPagingLoggingRoomResponse(
+  public static PagingResponse<LoggingRoomWebResponse> toPagingLoggingRoomResponse(
     Page<LoggingRoom> data
   ){
     return ResponseHelper.toPagingResponse(
@@ -35,15 +35,15 @@ public class LoggingRoomResponseMapper {
     );
   }
 
-  public static List<LoggingRoomResponse> toLoggingRoomResponseList(Page<LoggingRoom> data){
+  public static List<LoggingRoomWebResponse> toLoggingRoomResponseList(Page<LoggingRoom> data){
     return data.getContent()
             .stream()
             .map(loggingRoom -> toLoggingRoomResponse(loggingRoom))
             .collect(Collectors.toList());
   }
 
-  public static LoggingRoomResponse toLoggingRoomResponse(LoggingRoom loggingRoom){
-    return LoggingRoomResponse.builder()
+  public static LoggingRoomWebResponse toLoggingRoomResponse(LoggingRoom loggingRoom){
+    return LoggingRoomWebResponse.builder()
             .id(loggingRoom.getId())
             .description(loggingRoom.getDescription())
             .members(toListMemberResponse(loggingRoom.getMembers()))
@@ -67,11 +67,11 @@ public class LoggingRoomResponseMapper {
             .build();
   }
 
-  public static DataResponse<LoggingRoomResponse> toDataResponseLoggingRoomResponse(LoggingRoom data) {
+  public static DataResponse<LoggingRoomWebResponse> toDataResponseLoggingRoomResponse(LoggingRoom data) {
     return ResponseHelper.toDataResponse(HttpStatus.OK, toLoggingRoomResponse(data));
   }
 
-  public static PagingResponse<TopicResponse> toPagingTopicResponse(Page<Topic> data) {
+  public static PagingResponse<TopicWebResponse> toPagingTopicResponse(Page<Topic> data) {
 
     return ResponseHelper.toPagingResponse(
       HttpStatus.OK,
@@ -80,25 +80,25 @@ public class LoggingRoomResponseMapper {
     );
   }
 
-  private static List<TopicResponse> toTopicResponseList(Page<Topic> data) {
+  private static List<TopicWebResponse> toTopicResponseList(Page<Topic> data) {
     return data.getContent()
             .stream()
             .map(topic -> toTopicResponse(topic))
             .collect(Collectors.toList());
   }
 
-  private static TopicResponse toTopicResponse(Topic topic) {
-    return TopicResponse.builder()
+  private static TopicWebResponse toTopicResponse(Topic topic) {
+    return TopicWebResponse.builder()
             .id(topic.getId())
             .title(topic.getTitle())
             .build();
   }
 
-  public static DataResponse<TopicResponse> toDataResponseTopicResponse(Topic topic) {
+  public static DataResponse<TopicWebResponse> toDataResponseTopicResponse(Topic topic) {
     return ResponseHelper.toDataResponse(HttpStatus.OK, toTopicResponse(topic));
   }
 
-  public static PagingResponse<LogMessageResponse> toPagingLogMessageResponse(Page<LogMessage> data) {
+  public static PagingResponse<LogMessageWebResponse> toPagingLogMessageResponse(Page<LogMessage> data) {
     return ResponseHelper.toPagingResponse(
       HttpStatus.OK,
       toLogMessageResponseList(data),
@@ -106,15 +106,15 @@ public class LoggingRoomResponseMapper {
     );
   }
 
-  private static List<LogMessageResponse> toLogMessageResponseList(Page<LogMessage> data) {
+  private static List<LogMessageWebResponse> toLogMessageResponseList(Page<LogMessage> data) {
     return data.getContent()
             .stream()
             .map(logMessage -> toLogMessageResponse(logMessage))
             .collect(Collectors.toList());
   }
 
-  private static LogMessageResponse toLogMessageResponse(LogMessage logMessage) {
-    return LogMessageResponse.builder()
+  private static LogMessageWebResponse toLogMessageResponse(LogMessage logMessage) {
+    return LogMessageWebResponse.builder()
             .id(logMessage.getId())
             .createdAt(logMessage.getCreatedAt())
             .senderAvatar(logMessage.getSender().getPictureV2().getThumbnailPath())

@@ -2,7 +2,7 @@ package com.future.function.web.mapper.request.communication.logging;
 
 import com.future.function.model.entity.feature.communication.logging.LoggingRoom;
 import com.future.function.validation.RequestValidator;
-import com.future.function.web.model.request.communication.logging.LoggingRoomRequest;
+import com.future.function.web.model.request.communication.logging.LoggingRoomWebRequest;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -19,7 +19,7 @@ import static org.mockito.Mockito.*;
  * Created At : 23:07 28/07/2019
  */
 @RunWith(MockitoJUnitRunner.class)
-public class LoggingRoomRequestMapperTest {
+public class LoggingRoomWebRequestMapperTest {
 
   private static final String DESCRIPTION = "description";
 
@@ -29,8 +29,8 @@ public class LoggingRoomRequestMapperTest {
 
   private static final String LOGGING_ROOM_ID = "loggingRoomId";
 
-  private static final LoggingRoomRequest LOGGING_ROOM_REQUEST=
-    LoggingRoomRequest.builder()
+  private static final LoggingRoomWebRequest LOGGING_ROOM_REQUEST=
+    LoggingRoomWebRequest.builder()
       .title(TITLE)
       .description(DESCRIPTION)
       .members(Arrays.asList(MEMBER_ID))

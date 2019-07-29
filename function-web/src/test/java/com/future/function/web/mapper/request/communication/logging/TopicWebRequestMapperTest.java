@@ -2,7 +2,7 @@ package com.future.function.web.mapper.request.communication.logging;
 
 import com.future.function.model.entity.feature.communication.logging.Topic;
 import com.future.function.validation.RequestValidator;
-import com.future.function.web.model.request.communication.logging.TopicRequest;
+import com.future.function.web.model.request.communication.logging.TopicWebRequest;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -18,7 +18,7 @@ import static org.mockito.Mockito.when;
  * Created At : 23:00 28/07/2019
  */
 @RunWith(MockitoJUnitRunner.class)
-public class TopicRequestMapperTest {
+public class TopicWebRequestMapperTest {
 
   private static final String TITLE = "title";
 
@@ -26,8 +26,8 @@ public class TopicRequestMapperTest {
 
   private static final String TOPIC_ID = "topicId";
 
-  private static final TopicRequest TOPIC_REQUEST =
-    TopicRequest.builder()
+  private static final TopicWebRequest TOPIC_REQUEST =
+    TopicWebRequest.builder()
       .title(TITLE)
       .build();
 

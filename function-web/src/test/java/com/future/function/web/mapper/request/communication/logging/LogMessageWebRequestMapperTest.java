@@ -2,7 +2,7 @@ package com.future.function.web.mapper.request.communication.logging;
 
 import com.future.function.model.entity.feature.communication.logging.LogMessage;
 import com.future.function.validation.RequestValidator;
-import com.future.function.web.model.request.communication.logging.LogMessageRequest;
+import com.future.function.web.model.request.communication.logging.LogMessageWebRequest;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -18,7 +18,7 @@ import static org.mockito.Mockito.when;
  * Created At : 22:49 28/07/2019
  */
 @RunWith(MockitoJUnitRunner.class)
-public class LogMessageRequestMapperTest {
+public class LogMessageWebRequestMapperTest {
 
   private static final String DESCRIPTION = "description";
 
@@ -26,8 +26,8 @@ public class LogMessageRequestMapperTest {
 
   private static final String TOPIC_ID = "topicId";
 
-  private static final LogMessageRequest LOG_MESSAGE_REQUEST =
-    LogMessageRequest.builder()
+  private static final LogMessageWebRequest LOG_MESSAGE_REQUEST =
+    LogMessageWebRequest.builder()
       .text(DESCRIPTION)
       .build();
 

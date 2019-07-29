@@ -5,23 +5,23 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
-import java.util.List;
-
 /**
  * Author : Ricky Kennedy
- * Created At : 23:04 27/07/2019
+ * Created At : 23:09 27/07/2019
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class LoggingRoomResponse {
+public class LogMessageWebResponse {
 
   private String id;
 
-  private String description;
+  private String text;
 
-  private List<MemberResponse> members;
+  private long createdAt;
 
+  private String senderName;
+
+  private String senderAvatar;
 }
