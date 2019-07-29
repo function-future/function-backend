@@ -32,7 +32,7 @@ public class QuestionQuestionnaireRequestMapper {
 
     QuestionQuestionnaire questionQuestionnaire =
             QuestionQuestionnaire.builder()
-                    .description(questionQuestionnaireRequest.getDesc())
+                    .description(questionQuestionnaireRequest.getDescription())
                     .questionnaire(questionnaire)
                     .build();
 

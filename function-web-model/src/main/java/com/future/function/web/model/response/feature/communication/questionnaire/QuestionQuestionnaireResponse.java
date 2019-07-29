@@ -15,5 +15,5 @@ public class QuestionQuestionnaireResponse {
 
   private String questionnaireId;
 
-  private String desc;
+  private String description;
 }

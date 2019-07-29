@@ -42,7 +42,7 @@ public interface UserQuestionnaireSummaryRepository
    *
    * @return {@code - Page<UserQuestionnaireSummary} - user questionnaire summary from database
    */
-  Page<UserQuestionnaireSummary> findAllByRoleAndBatchAndDeletedFalse (Role role, Batch batch, Pageable pageable);
+  Page<UserQuestionnaireSummary> findAllByRoleOrRoleAndBatchAndDeletedFalse (Role role1, Role role, Batch batch, Pageable pageable);
 
   /**
    * Find user Questionnaire summary by role

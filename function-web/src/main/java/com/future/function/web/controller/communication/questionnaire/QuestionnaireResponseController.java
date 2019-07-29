@@ -2,6 +2,7 @@ package com.future.function.web.controller.communication.questionnaire;
 
 import com.future.function.common.enumeration.core.Role;
 import com.future.function.service.api.feature.communication.questionnaire.QuestionnaireResponseSummaryService;
+import com.future.function.service.api.feature.communication.questionnaire.QuestionnaireResultService;
 import com.future.function.service.api.feature.core.UserService;
 import com.future.function.session.annotation.WithAnyRole;
 import com.future.function.web.mapper.helper.PageHelper;
@@ -30,23 +31,23 @@ public class QuestionnaireResponseController {
 
   private final QuestionnaireResponseSummaryService questionnaireResponseSummaryService;
 
-  private final UserService userService;
+  private final QuestionnaireResultService questionnaireResultService;
 
-  public QuestionnaireResponseController(QuestionnaireResponseSummaryService questionnaireResponseSummaryService, UserService userService) {
+  public QuestionnaireResponseController(QuestionnaireResponseSummaryService questionnaireResponseSummaryService, QuestionnaireResultService questionnaireResultService) {
     this.questionnaireResponseSummaryService = questionnaireResponseSummaryService;
-    this.userService = userService;
+    this.questionnaireResultService = questionnaireResultService;
   }
 
   @ResponseStatus(HttpStatus.OK)
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   public PagingResponse<QuestionnaireSimpleSummaryResponse> getQuestionnairesSimpleSummary(
-          @RequestParam String appraiseeId,
+          @RequestParam String userSummaryId,
           @RequestParam(required = false, defaultValue = "1") int page,
           @RequestParam(required = false, defaultValue = "10") int size
   ){
     return QuestionnaireResponseMapper.toPagingQuestionnaireSimpleSummaryResponse(
             questionnaireResponseSummaryService.getQuestionnairesSummariesBasedOnAppraisee(
-                    userService.getUser(appraiseeId), PageHelper.toPageable(page, size)),
+                    questionnaireResultService.getAppraisalsQuestionnaireSummaryById(userSummaryId).getAppraisee(), PageHelper.toPageable(page, size)),
             HttpStatus.OK
     );
   }
@@ -64,15 +65,15 @@ public class QuestionnaireResponseController {
   }
 
   @ResponseStatus(HttpStatus.OK)
-  @GetMapping( value = "/{questionnaireResponseSummaryId}/questions/{appraiseeId}",
+  @GetMapping( value = "/{questionnaireResponseSummaryId}/questions/{userSummaryId}",
     produces = MediaType.APPLICATION_JSON_VALUE)
   public DataResponse<List<QuestionQuestionnaireSummaryResponse>> getQuestionSummaryResponse(
     @PathVariable String questionnaireResponseSummaryId,
-    @PathVariable String appraiseeId
+    @PathVariable String userSummaryId
   ){
     return QuestionnaireResponseSummaryResponseMapper.toDataResponseQuestionQuestionnaireSummaryResponseList(
       questionnaireResponseSummaryService.getQuestionsDetailsFromQuestionnaireResponseSummaryIdAndAppraisee(questionnaireResponseSummaryId,
-              userService.getUser(appraiseeId))
+              questionnaireResultService.getAppraisalsQuestionnaireSummaryById(userSummaryId).getAppraisee())
     );
   }
 }

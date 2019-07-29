@@ -65,7 +65,7 @@ public class QuestionnaireRepositoryTest {
 
   @Test
   public void testByFindingAllQuestionnaireReturnPagedQuestionnaire() {
-    Page<Questionnaire> questionnaires = questionnaireRepository.findAllByDeletedFalse(PAGEABLE);
+    Page<Questionnaire> questionnaires = questionnaireRepository.findAllByDeletedFalseOrderByCreatedAtDesc(PAGEABLE);
 
     assertThat(questionnaires.getTotalElements()).isEqualTo(1);
     assertThat(questionnaires.getContent().get(0).getTitle()).isEqualTo(TITLE_1);
@@ -83,7 +83,7 @@ public class QuestionnaireRepositoryTest {
 
   @Test
   public void testGivenTitleSoughtByFindingAllQuestionnaireReturnPagedQuestionnaire() {
-    Page<Questionnaire> questionnaires = questionnaireRepository.findAllByTitleIgnoreCaseContainingAndDeletedFalse("bc", PAGEABLE);
+    Page<Questionnaire> questionnaires = questionnaireRepository.findAllByTitleIgnoreCaseContainingAndDeletedFalseOrderByCreatedAtDesc("bc", PAGEABLE);
 
     assertThat(questionnaires.getTotalElements()).isEqualTo(1);
     assertThat(questionnaires.getContent().get(0).getTitle()).isEqualTo(TITLE_1);

@@ -28,8 +28,6 @@ public class QuestionnaireResponseSummaryServiceImpl implements QuestionnaireRes
 
   private final QuestionResponseSummaryRepository questionResponseSummaryRepository;
 
-  private final QuestionnaireRepository questionnaireRepository;
-
   private final QuestionResponseRepository questionResponseRepository;
 
   private final QuestionQuestionnaireRepository questionQuestionnaireRepository;
@@ -40,7 +38,6 @@ public class QuestionnaireResponseSummaryServiceImpl implements QuestionnaireRes
   public QuestionnaireResponseSummaryServiceImpl(QuestionnaireResponseSummaryRepository questionnaireResponseSummaryRepository, QuestionResponseSummaryRepository questionResponseSummaryRepository, QuestionnaireRepository questionnaireRepository, QuestionResponseRepository questionResponseRepository, QuestionQuestionnaireRepository questionQuestionnaireRepository, UserService userService) {
     this.questionnaireResponseSummaryRepository = questionnaireResponseSummaryRepository;
     this.questionResponseSummaryRepository = questionResponseSummaryRepository;
-    this.questionnaireRepository = questionnaireRepository;
     this.questionResponseRepository = questionResponseRepository;
     this.questionQuestionnaireRepository = questionQuestionnaireRepository;
     this.userService = userService;
@@ -61,8 +58,8 @@ public class QuestionnaireResponseSummaryServiceImpl implements QuestionnaireRes
 
   @Override
   public List<QuestionResponseSummary> getQuestionsDetailsFromQuestionnaireResponseSummaryIdAndAppraisee(String questionnaireResponseSummaryId, User appraisee) {
-    Questionnaire questionnaire = questionnaireRepository.findOne(questionnaireResponseSummaryId);
-    return questionResponseSummaryRepository.findAllByQuestionnaireAndAppraiseeAndDeletedFalse(questionnaire, appraisee);
+    QuestionnaireResponseSummary questionnaireResponseSummary = questionnaireResponseSummaryRepository.findOne(questionnaireResponseSummaryId);
+    return questionResponseSummaryRepository.findAllByQuestionnaireAndAppraiseeAndDeletedFalse(questionnaireResponseSummary.getQuestionnaire(), appraisee);
   }
 
   @Override
@@ -80,7 +77,7 @@ public class QuestionnaireResponseSummaryServiceImpl implements QuestionnaireRes
             .map(ignored ->
                     questionResponseRepository.findAllByQuestionQuestionnaireAndAppraiseeAndDeletedFalse(
                             questionQuestionnaireRepository.findOne(ignored.getQuestion().getId()),
-                            userService.getUser(ignored.getId())
+                            userService.getUser(ignored.getAppraisee().getId())
                     )
             )
             .orElseGet(Collections::emptyList);

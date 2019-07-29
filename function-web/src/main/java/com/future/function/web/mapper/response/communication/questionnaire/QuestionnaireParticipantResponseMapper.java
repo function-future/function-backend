@@ -1,6 +1,7 @@
 package com.future.function.web.mapper.response.communication.questionnaire;
 
 import com.future.function.model.entity.feature.communication.questionnaire.QuestionnaireParticipant;
+import com.future.function.model.entity.feature.core.User;
 import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.model.response.base.DataResponse;
@@ -33,11 +34,13 @@ public class QuestionnaireParticipantResponseMapper {
 
   private static QuestionnaireParticipantDescriptionResponse toParticipantDescriptionResposne(QuestionnaireParticipant questionnaireParticipant) {
     return QuestionnaireParticipantDescriptionResponse.builder()
-            .id(questionnaireParticipant.getId())
+            .id(questionnaireParticipant.getMember().getId())
+            .participantId(questionnaireParticipant.getId())
             .name(questionnaireParticipant.getMember().getName())
             .university(questionnaireParticipant.getMember().getUniversity())
             .role(questionnaireParticipant.getMember().getRole().toString())
-            .batch(questionnaireParticipant.getMember().getBatch().getCode())
+            .batch(cekRole(questionnaireParticipant.getMember()))
+            .avatar(questionnaireParticipant.getMember().getPictureV2().getThumbnailUrl())
             .build();
   }
 
@@ -55,5 +58,12 @@ public class QuestionnaireParticipantResponseMapper {
             .memberId(questionnaireParticipant.getMember().getId())
             .participantType(questionnaireParticipant.getParticipantType().toString())
             .build();
+  }
+
+  private static String cekRole(User user) {
+    if (user.getRole().toString().equals("MENTOR")) {
+      return "No Batch";
+    }
+    return user.getBatch().getCode();
   }
 }
