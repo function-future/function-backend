@@ -67,7 +67,7 @@ public class LoggingRoomResponseMapper {
             .build();
   }
 
-  public static DataResponse<LoggingRoomResponse> toDataReponseLoggingRoomResponse(LoggingRoom data) {
+  public static DataResponse<LoggingRoomResponse> toDataResponseLoggingRoomResponse(LoggingRoom data) {
     return ResponseHelper.toDataResponse(HttpStatus.OK, toLoggingRoomResponse(data));
   }
 

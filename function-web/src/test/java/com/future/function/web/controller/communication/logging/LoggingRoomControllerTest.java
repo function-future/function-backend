@@ -1,29 +1,55 @@
 package com.future.function.web.controller.communication.logging;
 
 import com.future.function.common.enumeration.core.Role;
+import com.future.function.model.entity.feature.communication.logging.LogMessage;
 import com.future.function.model.entity.feature.communication.logging.LoggingRoom;
+import com.future.function.model.entity.feature.communication.logging.Topic;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.User;
+import com.future.function.service.api.feature.communication.logging.LogMessageService;
 import com.future.function.service.api.feature.communication.logging.LoggingRoomService;
+import com.future.function.service.api.feature.communication.logging.TopicService;
 import com.future.function.web.TestHelper;
+import com.future.function.web.TestSecurityConfiguration;
+import com.future.function.web.mapper.request.communication.logging.LogMessageRequestMapper;
+import com.future.function.web.mapper.request.communication.logging.LoggingRoomRequestMapper;
+import com.future.function.web.mapper.request.communication.logging.TopicRequestMapper;
 import com.future.function.web.mapper.response.communication.logging.LoggingRoomResponseMapper;
+import com.future.function.web.model.request.communication.logging.LogMessageRequest;
+import com.future.function.web.model.request.communication.logging.LoggingRoomRequest;
+import com.future.function.web.model.request.communication.logging.TopicRequest;
+import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
+import com.future.function.web.model.response.feature.communication.logging.LogMessageResponse;
 import com.future.function.web.model.response.feature.communication.logging.LoggingRoomResponse;
+import com.future.function.web.model.response.feature.communication.logging.TopicResponse;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Arrays;
 
-import static org.junit.Assert.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -31,6 +57,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Author : Ricky Kennedy
  * Created At : 11:01 29/07/2019
  */
+@RunWith(SpringRunner.class)
+@Import(TestSecurityConfiguration.class)
+@WebMvcTest(LoggingRoomController.class)
 public class LoggingRoomControllerTest extends TestHelper {
 
   private static final PageRequest PAGEABLE = new PageRequest(0, 10);
@@ -104,23 +133,115 @@ public class LoggingRoomControllerTest extends TestHelper {
   private static final Page<LoggingRoom> LOGGING_ROOM_PAGE =
     new PageImpl<>(Arrays.asList(LOGGING_ROOM1, LOGGING_ROOM2), PAGEABLE, 2);
 
+  private static final String TOPIC_ID_1 = "topicId1";
+  private static final String TOPIC_ID_2 = "topicId2";
+
+  private static final Topic TOPIC1 = Topic.builder()
+    .id(TOPIC_ID_1)
+    .loggingRoom(LOGGING_ROOM1)
+    .title(TITLE1)
+    .build();
+
+  private static final Topic TOPIC2 = Topic.builder()
+    .id(TOPIC_ID_2)
+    .loggingRoom(LOGGING_ROOM2)
+    .title(TITLE2)
+    .build();
+
+  private static final Page<Topic> TOPIC_PAGE =
+    new PageImpl<>(Arrays.asList(TOPIC1, TOPIC2), PAGEABLE,2);
+
+  private static final String LOG_MESSAGE_ID_1 = "logMessageId1";
+  private static final String LOG_MESSAGE_ID_2 = "logMessageId2";
+
+  private LogMessage LOG_MESSAGE1 =
+    LogMessage.builder()
+    .id(LOG_MESSAGE_ID_1)
+        .topic(TOPIC1)
+        .sender(MEMBER)
+        .text(DESCRIPTION)
+        .build();
+
+  private LogMessage LOG_MESSAGE2 =
+    LogMessage.builder()
+    .id(LOG_MESSAGE_ID_2)
+        .topic(TOPIC1)
+        .sender(MEMBER)
+        .text(DESCRIPTION)
+        .build();
+
+  private Page<LogMessage> LOG_MESSAGE_PAGE =
+    new PageImpl<>(Arrays.asList(LOG_MESSAGE1, LOG_MESSAGE2), PAGEABLE, 2);
+
+  private static final String TEXT = "text";
+
+  private static final LogMessageRequest LOG_MESSAGE_REQUEST =
+    LogMessageRequest.builder()
+      .text(TEXT)
+      .build();
+
+  private static final TopicRequest TOPIC_REQUEST =
+    TopicRequest.builder()
+      .title(TITLE1)
+      .build();
+
+  private static final LoggingRoomRequest LOGGING_ROOM_REQUEST =
+    LoggingRoomRequest.builder()
+      .title(TITLE1)
+      .description(DESCRIPTION)
+      .members(Arrays.asList(MEMBER_ID_1))
+      .build();
 
   @MockBean
   private LoggingRoomService loggingRoomService;
 
+  @MockBean
+  private TopicService topicService;
+
+  @MockBean
+  private LogMessageService logMessageService;
+
+  @MockBean
+  private LogMessageRequestMapper logMessageRequestMapper;
+
+  @MockBean
+  private TopicRequestMapper topicRequestMapper;
+
+  @MockBean
+  private LoggingRoomRequestMapper loggingRoomRequestMapper;
+
+  private JacksonTester<LogMessageRequest> logMessageRequestJacksonTester;
+
+  private JacksonTester<TopicRequest> topicRequestJacksonTester;
+
+  private JacksonTester<LoggingRoomRequest> loggingRoomRequestJacksonTester;
+
   @Before
-  public void setUp() throws Exception {
+  public void setUp(){
+    super.setUp();
+    LOG_MESSAGE1.setCreatedAt(1L);
+    LOG_MESSAGE2.setCreatedAt(2L);
   }
 
+
   @After
-  public void tearDown() throws Exception {
+  public void tearDown()  {
+    verifyNoMoreInteractions(
+      loggingRoomService,
+      topicService,
+      logMessageService,
+      logMessageRequestMapper,
+      topicRequestMapper,
+      loggingRoomRequestMapper);
   }
 
   @Test
   public void getLoggingRoomsByMember() throws Exception {
-    when(loggingRoomService.getLoggingRoomsByMemberWithKeyword(KEYWORD, MEMBER_ID_1, PAGEABLE))
+    super.setCookie(Role.ADMIN);
+
+    when(loggingRoomService.getLoggingRoomsByMemberWithKeyword(eq(KEYWORD), any(String.class), eq(PAGEABLE)))
       .thenReturn(LOGGING_ROOM_PAGE);
-    when(loggingRoomService.getLoggingRoomsByMember(MEMBER_ID_1, PAGEABLE))
+    when(loggingRoomService.getLoggingRoomsByMember(any(String.class), eq(PAGEABLE)))
       .thenReturn(LOGGING_ROOM_PAGE);
 
     PagingResponse<LoggingRoomResponse> response =
@@ -138,51 +259,278 @@ public class LoggingRoomControllerTest extends TestHelper {
       .andExpect(status().isOk())
       .andExpect(content().json(pagingResponseJacksonTester.write(response).getJson()));
 
-    verify(loggingRoomService).getLoggingRoomsByMember(MEMBER_ID_1, PAGEABLE);
-    verify(loggingRoomService).getLoggingRoomsByMemberWithKeyword(KEYWORD, MEMBER_ID_1, PAGEABLE);
+    verify(loggingRoomService).getLoggingRoomsByMember(any(String.class), eq(PAGEABLE));
+    verify(loggingRoomService).getLoggingRoomsByMemberWithKeyword(eq(KEYWORD), any(String.class), eq(PAGEABLE));
   }
 
   @Test
-  public void getLoggingRoomDetail() {
+  public void getLoggingRoomDetail() throws Exception{
+    super.setCookie(Role.ADMIN);
+
+    when(loggingRoomService.getLoggingRoom(LOGGING_ROOM_ID1))
+      .thenReturn(LOGGING_ROOM1);
+
+
+    DataResponse<LoggingRoomResponse> response =
+      LoggingRoomResponseMapper.toDataResponseLoggingRoomResponse(LOGGING_ROOM1);
+
+    mockMvc.perform(
+      get("/api/communication/logging-rooms/"
+          +LOGGING_ROOM_ID1
+      )
+        .cookie(cookies))
+      .andExpect(status().isOk())
+      .andExpect(content().json(dataResponseJacksonTester.write(response).getJson()));
+
+
+    verify(loggingRoomService).getLoggingRoom(LOGGING_ROOM_ID1);
   }
 
   @Test
-  public void getLoggingRoomTopic() {
+  public void getLoggingRoomTopic() throws Exception{
+    super.setCookie(Role.ADMIN);
+
+    when(topicService.getTopicByLoggingRoom(LOGGING_ROOM_ID1, PAGEABLE))
+      .thenReturn(TOPIC_PAGE);
+
+    PagingResponse<TopicResponse> response =
+      LoggingRoomResponseMapper.toPagingTopicResponse(
+        TOPIC_PAGE
+      );
+
+    mockMvc.perform(
+      get("/api/communication/logging-rooms/"
+          +LOGGING_ROOM_ID1
+          +"/topics"
+      )
+        .cookie(cookies).param("search", KEYWORD))
+      .andExpect(status().isOk())
+      .andExpect(content().json(pagingResponseJacksonTester.write(response).getJson()));
+
+    verify(topicService).getTopicByLoggingRoom(LOGGING_ROOM_ID1, PAGEABLE);
   }
 
   @Test
-  public void getLoggingRoomTopicDetail() {
+  public void getLoggingRoomTopicDetail() throws Exception {
+    super.setCookie(Role.ADMIN);
+
+    when(topicService.getTopic(TOPIC_ID_1))
+      .thenReturn(TOPIC1);
+
+
+    DataResponse<TopicResponse> response =
+      LoggingRoomResponseMapper.toDataResponseTopicResponse(TOPIC1);
+
+    mockMvc.perform(
+      get("/api/communication/logging-rooms/"
+        +LOGGING_ROOM_ID1
+        +"/topics/"
+        +TOPIC_ID_1
+      )
+        .cookie(cookies))
+      .andExpect(status().isOk())
+      .andExpect(content().json(dataResponseJacksonTester.write(response).getJson()));
+
+
+    verify(topicService).getTopic(TOPIC_ID_1);
   }
 
   @Test
-  public void getLogMessages() {
+  public void getLogMessages() throws Exception {
+    super.setCookie(Role.ADMIN);
+
+    when(logMessageService.getLogMessagesByTopic(TOPIC_ID_1, PAGEABLE))
+      .thenReturn(LOG_MESSAGE_PAGE);
+
+    PagingResponse<LogMessageResponse> response =
+      LoggingRoomResponseMapper.toPagingLogMessageResponse(
+        LOG_MESSAGE_PAGE
+      );
+
+    mockMvc.perform(
+      get("/api/communication/logging-rooms/"
+        +LOGGING_ROOM_ID1
+        +"/topics/"
+        +TOPIC_ID_1
+        +"/log-messages"
+      )
+        .cookie(cookies))
+      .andExpect(status().isOk())
+      .andExpect(content().json(pagingResponseJacksonTester.write(response).getJson()));
+
+    verify(logMessageService).getLogMessagesByTopic(TOPIC_ID_1, PAGEABLE);
   }
 
   @Test
-  public void createLogMessage() {
+  public void createLogMessage() throws Exception {
+    super.setCookie(Role.STUDENT);
+
+    when(logMessageRequestMapper.toLogMessage(
+      eq(LOG_MESSAGE_REQUEST), any(String.class), eq(TOPIC_ID_1)))
+      .thenReturn(LOG_MESSAGE1);
+
+    when(logMessageService.createLogMessage(LOG_MESSAGE1))
+      .thenReturn(LOG_MESSAGE1);
+
+    mockMvc.perform(
+      post("/api/communication/logging-rooms/"
+        +LOGGING_ROOM_ID1
+        +"/topics/"
+        +TOPIC_ID_1
+        +"/log-messages"
+      )
+      .cookie(cookies)
+      .contentType(MediaType.APPLICATION_JSON_VALUE)
+      .content(logMessageRequestJacksonTester.write(LOG_MESSAGE_REQUEST).getJson()))
+      .andExpect(status().isCreated());
+
+    verify(logMessageService).createLogMessage(LOG_MESSAGE1);
+    verify(logMessageRequestMapper).toLogMessage(
+      eq(LOG_MESSAGE_REQUEST), any(String.class), eq(TOPIC_ID_1));
   }
 
   @Test
-  public void createTopic() {
+  public void createTopic() throws Exception {
+    super.setCookie(Role.MENTOR);
+
+    when(topicRequestMapper.toTopic(
+      eq(TOPIC_REQUEST), any(String.class), any()))
+      .thenReturn(TOPIC1);
+
+    when(topicService.createTopic(TOPIC1))
+      .thenReturn(TOPIC1);
+
+    mockMvc.perform(
+      post("/api/communication/logging-rooms/"
+        +LOGGING_ROOM_ID1
+        +"/topics"
+      )
+        .cookie(cookies)
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .content(topicRequestJacksonTester.write(TOPIC_REQUEST).getJson()))
+      .andExpect(status().isCreated());
+
+    verify(topicService).createTopic(TOPIC1);
+    verify(topicRequestMapper).toTopic(
+      eq(TOPIC_REQUEST), any(String.class), any());
   }
 
   @Test
-  public void createLoggingRoom() {
+  public void createLoggingRoom() throws Exception {
+    super.setCookie(Role.MENTOR);
+
+    when(loggingRoomRequestMapper.toLoggingRoom(
+      eq(LOGGING_ROOM_REQUEST), any()))
+      .thenReturn(LOGGING_ROOM1);
+
+    when(loggingRoomService.createLoggingRoom(LOGGING_ROOM1))
+      .thenReturn(LOGGING_ROOM1);
+
+    mockMvc.perform(
+      post("/api/communication/logging-rooms"
+      )
+        .cookie(cookies)
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .content(loggingRoomRequestJacksonTester.write(LOGGING_ROOM_REQUEST).getJson()))
+      .andExpect(status().isCreated());
+
+    verify(loggingRoomRequestMapper).toLoggingRoom(
+      eq(LOGGING_ROOM_REQUEST), any());
+    verify(loggingRoomService).createLoggingRoom(LOGGING_ROOM1);
   }
 
   @Test
-  public void updateTopicDetail() {
+  public void updateTopicDetail() throws Exception {
+    super.setCookie(Role.MENTOR);
+
+    when(topicRequestMapper.toTopic(
+      TOPIC_REQUEST, LOGGING_ROOM_ID1, TOPIC_ID_1))
+      .thenReturn(TOPIC1);
+
+    when(topicService.updateTopic(TOPIC1))
+      .thenReturn(TOPIC1);
+
+    DataResponse<TopicResponse> response =
+      LoggingRoomResponseMapper.toDataResponseTopicResponse(
+        TOPIC1
+      );
+
+    mockMvc.perform(
+      put("/api/communication/logging-rooms/"
+        +LOGGING_ROOM_ID1
+        +"/topics/"
+        +TOPIC_ID_1
+      )
+        .cookie(cookies)
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .content(topicRequestJacksonTester.write(TOPIC_REQUEST).getJson()))
+      .andExpect(status().isOk())
+      .andExpect(content().json(dataResponseJacksonTester.write(response).getJson()));
+
+    verify(topicService).updateTopic(TOPIC1);
+    verify(topicRequestMapper).toTopic(
+      TOPIC_REQUEST, LOGGING_ROOM_ID1, TOPIC_ID_1);
   }
 
   @Test
-  public void updateLoggingRoomDetail() {
+  public void updateLoggingRoomDetail() throws Exception {
+    super.setCookie(Role.MENTOR);
+
+    when(loggingRoomRequestMapper.toLoggingRoom(
+      LOGGING_ROOM_REQUEST, LOGGING_ROOM_ID1))
+      .thenReturn(LOGGING_ROOM1);
+
+    when(loggingRoomService.updateLoggingRoom(LOGGING_ROOM1))
+      .thenReturn(LOGGING_ROOM1);
+
+    DataResponse<LoggingRoomResponse> response =
+      LoggingRoomResponseMapper.toDataResponseLoggingRoomResponse(
+        LOGGING_ROOM1
+      );
+
+    mockMvc.perform(
+      put("/api/communication/logging-rooms/"
+        +LOGGING_ROOM_ID1
+      )
+        .cookie(cookies)
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .content(loggingRoomRequestJacksonTester.write(LOGGING_ROOM_REQUEST).getJson()))
+      .andExpect(status().isOk())
+      .andExpect(content().json(dataResponseJacksonTester.write(response).getJson()));
+
+    verify(loggingRoomService).updateLoggingRoom(LOGGING_ROOM1);
+    verify(loggingRoomRequestMapper).toLoggingRoom(
+      LOGGING_ROOM_REQUEST, LOGGING_ROOM_ID1);
   }
 
   @Test
-  public void deleteTopic() {
+  public void deleteTopic() throws Exception {
+    super.setCookie(Role.MENTOR);
+    doNothing().when(topicService).deleteTopic(TOPIC_ID_1);
+
+    mockMvc.perform(
+      delete("/api/communication/logging-rooms/"
+        +LOGGING_ROOM_ID1
+        +"/topics/"
+        +TOPIC_ID_1
+      )
+        .cookie(cookies))
+      .andExpect(status().isOk());
+
+    verify(topicService).deleteTopic(TOPIC_ID_1);
   }
 
   @Test
-  public void deleteLoggingRoom() {
+  public void deleteLoggingRoom() throws Exception {
+    super.setCookie(Role.MENTOR);
+
+    doNothing().when(loggingRoomService).deleteLoggingRoom(LOGGING_ROOM_ID1);
+
+    mockMvc.perform(
+      delete("/api/communication/logging-rooms/"
+        +LOGGING_ROOM_ID1).cookie(cookies))
+      .andExpect(status().isOk());
+
+    verify(loggingRoomService).deleteLoggingRoom(LOGGING_ROOM_ID1);
   }
 }

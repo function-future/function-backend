@@ -63,9 +63,8 @@ public class LoggingRoomController {
   }
 
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-  @WithAnyRole(roles = { Role.ADMIN, Role.MENTOR, Role.STUDENT })
   public PagingResponse<LoggingRoomResponse> getLoggingRoomsByMember(
-    Session session,
+    @WithAnyRole(roles = { Role.ADMIN, Role.MENTOR, Role.STUDENT }) Session session,
     @RequestParam(required = false) String search,
     @RequestParam(required = false, defaultValue = "1") int page,
     @RequestParam(required = false, defaultValue = "10") int size
@@ -91,7 +90,7 @@ public class LoggingRoomController {
     @WithAnyRole(roles = { Role.ADMIN, Role.MENTOR, Role.STUDENT} ) Session session,
     @PathVariable String loggingRoomId
   ) {
-    return LoggingRoomResponseMapper.toDataReponseLoggingRoomResponse(
+    return LoggingRoomResponseMapper.toDataResponseLoggingRoomResponse(
       loggingRoomService.getLoggingRoom(loggingRoomId)
     );
   }
@@ -159,7 +158,7 @@ public class LoggingRoomController {
   }
 
   @PostMapping(
-    value = "/{loggingRoomId}/topics/",
+    value = "/{loggingRoomId}/topics",
     consumes = MediaType.APPLICATION_JSON_VALUE,
     produces = MediaType.APPLICATION_JSON_VALUE
   )
@@ -212,7 +211,7 @@ public class LoggingRoomController {
     @PathVariable String loggingRoomId,
     @RequestBody LoggingRoomRequest loggingRoomRequest
   ) {
-    return LoggingRoomResponseMapper.toDataReponseLoggingRoomResponse(
+    return LoggingRoomResponseMapper.toDataResponseLoggingRoomResponse(
       loggingRoomService.updateLoggingRoom(
         loggingRoomRequestMapper.toLoggingRoom(loggingRoomRequest, loggingRoomId)
       )

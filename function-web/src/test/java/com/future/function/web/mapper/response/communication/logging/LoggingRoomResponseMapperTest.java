@@ -162,8 +162,8 @@ public class LoggingRoomResponseMapperTest {
   }
 
   @Test
-  public void toDataReponseLoggingRoomResponse() {
-    DataResponse<LoggingRoomResponse> data = LoggingRoomResponseMapper.toDataReponseLoggingRoomResponse(
+  public void toDataResponseLoggingRoomResponse() {
+    DataResponse<LoggingRoomResponse> data = LoggingRoomResponseMapper.toDataResponseLoggingRoomResponse(
       loggingRoom1
     );
 
