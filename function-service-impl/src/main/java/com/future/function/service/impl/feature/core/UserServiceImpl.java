@@ -135,10 +135,30 @@ public class UserServiceImpl implements UserService {
       .map(userRepository::findOne)
       .map(this::deleteUserPicture)
       .map(foundUser -> this.setUserPicture(user, foundUser))
+      .map(foundUser -> this.setFoundUserPassword(user, foundUser))
       .map(foundUser -> this.copyPropertiesAndSaveUser(user, foundUser))
       .orElse(user);
   }
 
+  private String getDefaultPassword(String name) {
+    
+    return Optional.ofNullable(name)
+      .map(String::toLowerCase)
+      .map(n -> n.replace(" ", ""))
+      .map(n -> n.concat("functionapp"))
+      .orElse(null);
+  }
+  
+  private User setFoundUserPassword(User user, User foundUser) {
+  
+    if (encoder.matches(
+      this.getDefaultPassword(foundUser.getName()), foundUser.getPassword())) {
+      foundUser.setPassword(encoder.encode(user.getPassword()));
+    }
+    
+    return foundUser;
+  }
+  
   /**
    * {@inheritDoc}
    *
@@ -253,7 +273,8 @@ public class UserServiceImpl implements UserService {
 
   private User setDefaultEncryptedPassword(User user) {
 
-    return this.setEncryptedPassword(user, user.getPassword());
+    return this.setEncryptedPassword(
+      user, this.getDefaultPassword(user.getName()));
   }
   
   @Override

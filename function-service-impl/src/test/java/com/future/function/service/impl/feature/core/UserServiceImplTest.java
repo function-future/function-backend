@@ -245,7 +245,10 @@ public class UserServiceImplTest {
     when(batchService.getBatchByCode(NUMBER)).thenReturn(BATCH);
     when(resourceService.markFilesUsed(FILE_IDS, true)).thenReturn(true);
     when(resourceService.getFile(PICTURE_ID)).thenReturn(PICTURE);
-    when(encoder.encode(PASSWORD)).thenReturn(PASSWORD);
+    String rawPassword = userStudent.getName()
+                           .toLowerCase()
+                           .replace(" ", "") + "functionapp";
+    when(encoder.encode(rawPassword)).thenReturn(PASSWORD);
     when(userRepository.save(userStudent)).thenReturn(userStudent);
 
     User createdUserStudent = userService.createUser(userStudent);
@@ -259,7 +262,7 @@ public class UserServiceImplTest {
     verify(batchService).getBatchByCode(NUMBER);
     verify(resourceService).markFilesUsed(FILE_IDS, true);
     verify(resourceService).getFile(PICTURE_ID);
-    verify(encoder).encode(PASSWORD);
+    verify(encoder).encode(rawPassword);
     verify(userRepository).save(userStudent);
   }
 
@@ -271,7 +274,10 @@ public class UserServiceImplTest {
     when(batchService.getBatchByCode(NUMBER)).thenReturn(BATCH);
     when(resourceService.markFilesUsed(FILE_IDS, true)).thenReturn(true);
     when(resourceService.getFile(PICTURE_ID)).thenReturn(PICTURE);
-    when(encoder.encode(PASSWORD)).thenReturn(PASSWORD);
+    String rawPassword = userStudent.getName()
+                           .toLowerCase()
+                           .replace(" ", "") + "functionapp";
+    when(encoder.encode(rawPassword)).thenReturn(PASSWORD);
     when(userRepository.save(userStudent)).thenReturn(null);
 
     catchException(() -> userService.createUser(userStudent));
@@ -283,7 +289,7 @@ public class UserServiceImplTest {
     verify(batchService).getBatchByCode(NUMBER);
     verify(resourceService).markFilesUsed(FILE_IDS, true);
     verify(resourceService).getFile(PICTURE_ID);
-    verify(encoder).encode(PASSWORD);
+    verify(encoder).encode(rawPassword);
     verify(userRepository).save(userStudent);
   }
 
@@ -294,6 +300,9 @@ public class UserServiceImplTest {
 
     when(resourceService.markFilesUsed(FILE_IDS, true)).thenReturn(true);
     when(resourceService.getFile(PICTURE_ID)).thenReturn(PICTURE);
+    String rawPassword = userMentor.getName()
+                           .toLowerCase()
+                           .replace(" ", "") + "functionapp";
     when(encoder.encode(PASSWORD)).thenReturn(PASSWORD);
     when(userRepository.save(userMentor)).thenReturn(userMentor);
 
@@ -305,7 +314,7 @@ public class UserServiceImplTest {
 
     verify(resourceService).markFilesUsed(FILE_IDS, true);
     verify(resourceService).getFile(PICTURE_ID);
-    verify(encoder).encode(PASSWORD);
+    verify(encoder).encode(rawPassword);
     verify(userRepository).save(userMentor);
     verifyZeroInteractions(batchService);
   }
@@ -313,7 +322,11 @@ public class UserServiceImplTest {
   @Test
   public void testGivenMentorDataWithoutImageByCreatingUserReturnMentor() {
 
-    when(encoder.encode(PASSWORD)).thenReturn(PASSWORD);
+    String rawPassword = userMentor.getName()
+                           .toLowerCase()
+                           .replace(" ", "") + "functionapp";
+    when(encoder.encode(rawPassword)).thenReturn(
+      PASSWORD);
     when(userRepository.save(userMentor)).thenReturn(userMentor);
 
     User createdUserMentor = userService.createUser(userMentor);
@@ -321,7 +334,7 @@ public class UserServiceImplTest {
     assertThat(createdUserMentor).isNotNull();
     assertThat(createdUserMentor.getPictureV2()).isNull();
 
-    verify(encoder).encode(PASSWORD);
+    verify(encoder).encode(rawPassword);
     verify(userRepository).save(userMentor);
     verifyZeroInteractions(batchService, resourceService);
   }
@@ -336,6 +349,12 @@ public class UserServiceImplTest {
     when(resourceService.markFilesUsed(FILE_IDS, false)).thenReturn(true);
     when(resourceService.markFilesUsed(FILE_IDS, true)).thenReturn(true);
     when(resourceService.getFile(PICTURE_ID)).thenReturn(PICTURE);
+    String rawPassword = userStudent.getName()
+                           .toLowerCase()
+                           .replace(" ", "") + "functionapp";
+    when(encoder.matches(rawPassword, PASSWORD)).thenReturn(true);
+    when(encoder.encode(PASSWORD)).thenReturn(
+      PASSWORD);
     when(userRepository.save(userStudent)).thenReturn(userStudent);
 
     User updatedUserStudent = userService.updateUser(userStudent);
@@ -351,8 +370,9 @@ public class UserServiceImplTest {
     verify(resourceService).markFilesUsed(FILE_IDS, false);
     verify(resourceService).markFilesUsed(FILE_IDS, true);
     verify(resourceService, times(2)).getFile(PICTURE_ID);
+    verify(encoder).matches(rawPassword, PASSWORD);
+    verify(encoder).encode(PASSWORD);
     verify(userRepository).save(userStudent);
-    verifyZeroInteractions(encoder);
   }
 
   @Test
@@ -364,6 +384,10 @@ public class UserServiceImplTest {
     when(resourceService.markFilesUsed(FILE_IDS, false)).thenReturn(true);
     when(resourceService.markFilesUsed(FILE_IDS, true)).thenReturn(true);
     when(resourceService.getFile(PICTURE_ID)).thenReturn(PICTURE);
+    String rawPassword = userMentor.getName()
+                           .toLowerCase()
+                           .replace(" ", "") + "functionapp";
+    when(encoder.matches(rawPassword, PASSWORD)).thenReturn(false);
     when(userRepository.save(userMentor)).thenReturn(userMentor);
 
     User updatedUserMentor = userService.updateUser(userMentor);
@@ -376,8 +400,9 @@ public class UserServiceImplTest {
     verify(resourceService).markFilesUsed(FILE_IDS, false);
     verify(resourceService).markFilesUsed(FILE_IDS, true);
     verify(resourceService, times(2)).getFile(PICTURE_ID);
+    verify(encoder).matches(rawPassword, PASSWORD);
     verify(userRepository).save(userMentor);
-    verifyZeroInteractions(batchService, encoder);
+    verifyZeroInteractions(batchService);
   }
 
   @Test
