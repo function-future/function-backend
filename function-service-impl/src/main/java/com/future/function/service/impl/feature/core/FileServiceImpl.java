@@ -240,10 +240,8 @@ public class FileServiceImpl implements FileService {
                                                         session.getRole(), file,
                                                         Role.ADMIN
         ))
-      .map(ignored -> resourceService.storeFile(fileOrFolderId, parentId,
-                                                objectName, fileName, bytes,
-                                                FileOrigin.FILE
-      ))
+      .map(ignored -> storeOrCreateSourceFile(
+        fileOrFolderId, parentId, objectName, fileName, bytes))
       .map(storedFile -> Pair.of(storedFile,
                                  fileRepositoryV2.findOne(fileV2.getId())
       ))
@@ -251,6 +249,22 @@ public class FileServiceImpl implements FileService {
       .orElse(fileV2);
   }
 
+  private FileV2 storeOrCreateSourceFile(
+    String fileOrFolderId, String parentId, String objectName, String fileName,
+    byte[] bytes
+  ) {
+
+    if (bytes == null || bytes.length == 0) {
+      return FileV2.builder()
+        .name(objectName)
+        .build();
+    }
+    
+    return resourceService.storeFile(fileOrFolderId, parentId, objectName,
+                                     fileName, bytes, FileOrigin.FILE
+    );
+  }
+  
   private FileV2 copyPropertiesAndSaveFileV2(Pair<FileV2, FileV2> pair) {
 
     CopyHelper.copyProperties(pair.getFirst(), pair.getSecond());

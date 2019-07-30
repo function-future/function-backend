@@ -32,4 +32,15 @@ public class FileRequestMapper {
     return validator.validate(request);
   }
   
+  public FileWebRequest toFileWebRequest(String id, String json, byte[] bytes) {
+    
+    FileWebRequest request = requestMapper.toWebRequestObject(
+      json, FileWebRequest.class);
+    
+    request.setId(id);
+    request.setBytes(bytes);
+    
+    return validator.validate(request);
+  }
+  
 }

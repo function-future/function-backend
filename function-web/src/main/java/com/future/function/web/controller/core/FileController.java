@@ -13,8 +13,8 @@ import com.future.function.web.model.request.core.FileWebRequest;
 import com.future.function.web.model.response.base.BaseResponse;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.feature.core.DataPageResponse;
-import com.future.function.web.model.response.feature.core.FileWebResponse;
 import com.future.function.web.model.response.feature.core.FileContentWebResponse;
+import com.future.function.web.model.response.feature.core.FileWebResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
@@ -133,7 +133,7 @@ public class FileController {
       multipartFileRequestMapper.toStringAndByteArrayPair(file);
     
     FileWebRequest request = fileRequestMapper.toFileWebRequest(
-      data, pair.getSecond());
+      fileOrFolderId, data, pair.getSecond());
     
     return FileResponseMapper.toSingleFileDataResponse(
       fileService.updateFileOrFolder(session, fileOrFolderId, parentId,
