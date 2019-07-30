@@ -61,7 +61,7 @@ public class LoggingRoomResponseMapper {
             .id(member.getId())
             .name(member.getName())
             .avatar(member.getPictureV2().getThumbnailPath())
-            .Batch(member.getBatch().getName())
+            .batchName(member.getBatch().getName())
             .role(member.getRole().toString())
             .university(member.getUniversity())
             .build();
