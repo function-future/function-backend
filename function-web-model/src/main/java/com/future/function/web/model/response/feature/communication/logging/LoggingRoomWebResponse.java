@@ -20,6 +20,8 @@ public class LoggingRoomWebResponse {
 
   private String id;
 
+  private String title;
+
   private String description;
 
   private List<MemberResponse> members;

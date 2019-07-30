@@ -45,6 +45,7 @@ public class LoggingRoomResponseMapper {
   public static LoggingRoomWebResponse toLoggingRoomResponse(LoggingRoom loggingRoom){
     return LoggingRoomWebResponse.builder()
             .id(loggingRoom.getId())
+            .title(loggingRoom.getTitle())
             .description(loggingRoom.getDescription())
             .members(toListMemberResponse(loggingRoom.getMembers()))
             .build();
