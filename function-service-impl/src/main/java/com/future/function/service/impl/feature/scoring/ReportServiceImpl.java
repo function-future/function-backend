@@ -89,7 +89,7 @@ public class ReportServiceImpl implements ReportService {
                 .map(currentReport -> createReportDetailByReportAndStudentId(currentReport, report.getStudents()))
                 .map(currentReport -> this.setStudents(currentReport, null))
                 .map(reportRepository::save)
-                .map(currentReport -> this.setStudents(report, report.getStudents()))
+                .map(currentReport -> this.setStudents(currentReport, report.getStudents()))
                 .orElseThrow(() -> new UnsupportedOperationException("Failed at #createReport #ReportService"));
     }
 
