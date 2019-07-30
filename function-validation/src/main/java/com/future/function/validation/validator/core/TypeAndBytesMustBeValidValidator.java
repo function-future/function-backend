@@ -19,7 +19,8 @@ public class TypeAndBytesMustBeValidValidator
   @Override
   public boolean isValid(FileData data, ConstraintValidatorContext context) {
     
-    return Optional.ofNullable(data.getId())
+    return Optional.of(data)
+      .map(FileData::getId)
       .map(ignored -> this.isValidForUpdate(data))
       .orElseGet(() -> this.isValidForCreate(data));
   }
