@@ -199,11 +199,12 @@ public class FileControllerTest extends TestHelper {
       any(MultipartFile.class))).thenReturn(Pair.of("NAME", ID.getBytes()));
     
     FileWebRequest request = FileWebRequest.builder()
+      .id(ID)
       .name("NAME")
       .type("FILE")
       .bytes(ID.getBytes())
       .build();
-    when(fileRequestMapper.toFileWebRequest(JSON, ID.getBytes())).thenReturn(
+    when(fileRequestMapper.toFileWebRequest(ID, JSON, ID.getBytes())).thenReturn(
       request);
     
     when(fileService.updateFileOrFolder(ADMIN_SESSION, ID, PARENT_ID, "NAME",
@@ -222,7 +223,7 @@ public class FileControllerTest extends TestHelper {
     
     verify(multipartFileRequestMapper).toStringAndByteArrayPair(
       any(MultipartFile.class));
-    verify(fileRequestMapper).toFileWebRequest(JSON, ID.getBytes());
+    verify(fileRequestMapper).toFileWebRequest(ID, JSON, ID.getBytes());
     verify(fileService).updateFileOrFolder(
       ADMIN_SESSION, ID, PARENT_ID, "NAME", "NAME", ID.getBytes());
   }

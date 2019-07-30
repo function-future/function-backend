@@ -19,20 +19,37 @@ public class TypeAndBytesMustBeValidValidator
   @Override
   public boolean isValid(FileData data, ConstraintValidatorContext context) {
     
-    String type = Optional.ofNullable(data.getType())
-      .orElse("");
+    return Optional.ofNullable(data.getId())
+      .map(ignored -> this.isValidForUpdate(data))
+      .orElseGet(() -> this.isValidForCreate(data));
+  }
+  
+  private boolean isValidForUpdate(FileData data) {
+    
+    String type = this.getOrEmpty(data.getType());
     
     return Optional.of(type)
       .filter(t -> t.equals(FileType.FOLDER.name()))
-      .map(ignored -> this.isByteArrayExist(data))
+      .map(ignored -> data.getBytes().length == 0)
       .orElseGet(() -> FileType.isAnyMatch(type));
   }
   
-  private boolean isByteArrayExist(FileData data) {
+  private String getOrEmpty(String type) {
     
-    return Optional.ofNullable(data.getBytes())
-      .map(bytes -> bytes.length == 0)
-      .orElse(true);
+    return Optional.ofNullable(type)
+      .orElse("");
+  }
+  
+  private boolean isValidForCreate(FileData data) {
+    
+    boolean nonEmptyBytes = data.getBytes().length != 0;
+    String type = this.getOrEmpty(data.getType());
+    
+    if (nonEmptyBytes) {
+      return type.equals(FileType.FILE.name());
+    } else {
+      return FileType.isAnyMatch(type);
+    }
   }
   
 }

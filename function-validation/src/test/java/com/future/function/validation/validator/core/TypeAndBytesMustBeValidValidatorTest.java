@@ -41,52 +41,88 @@ public class TypeAndBytesMustBeValidValidatorTest {
   }
   
   @Test
-  public void testGivenEmptyBytesAndFileTypeByValidatingFileWebRequestObjectReturnTrue() {
+  public void testGivenEmptyBytesAndFileTypeFolderByValidatingFileWebRequestForCreatingFolderReturnTrue() {
     
-    when(fileData.getType()).thenReturn("FOLDER");
-    when(fileData.getBytes()).thenReturn(null);
-    
-    assertThat(validator.isValid(fileData, null)).isTrue();
-    
-    verify(fileData).getType();
-    verify(fileData).getBytes();
-    verifyZeroInteractions(annotation);
-  }
-  
-  @Test
-  public void testGivenNonEmptyBytesAndFileTypeByValidatingFileWebRequestObjectReturnTrue() {
-    
-    when(fileData.getType()).thenReturn("FILE");
-    
-    assertThat(validator.isValid(fileData, null)).isTrue();
-    
-    verify(fileData).getType();
-    verifyZeroInteractions(annotation);
-  }
-  
-  @Test
-  public void testGivenNonEmptyBytesAndInvalidFileTypeByValidatingFileWebRequestObjectReturnFalse() {
-    
-    when(fileData.getType()).thenReturn("FOLDER");
-    when(fileData.getBytes()).thenReturn("sample".getBytes());
-    
-    assertThat(validator.isValid(fileData, null)).isFalse();
-    
-    verify(fileData).getType();
-    verify(fileData).getBytes();
-    verifyZeroInteractions(annotation);
-  }
-  
-  @Test
-  public void testGivenEmptyBytesAndInvalidFileTypeByValidatingFileWebRequestObjectReturnTrue() {
-    
+    when(fileData.getId()).thenReturn(null);
     when(fileData.getType()).thenReturn("FOLDER");
     when(fileData.getBytes()).thenReturn(new byte[0]);
     
     assertThat(validator.isValid(fileData, null)).isTrue();
     
+    verify(fileData).getId();
     verify(fileData).getType();
     verify(fileData).getBytes();
+    verifyZeroInteractions(annotation);
+  }
+  
+  @Test
+  public void testGivenNonEmptyBytesAndFileTypeFileByValidatingFileWebRequestForCreatingFileReturnTrue() {
+    
+    when(fileData.getId()).thenReturn(null);
+    when(fileData.getType()).thenReturn("FILE");
+    when(fileData.getBytes()).thenReturn(new byte[] { 1, 2, 3 });
+    
+    assertThat(validator.isValid(fileData, null)).isTrue();
+    
+    verify(fileData).getId();
+    verify(fileData).getType();
+    verify(fileData).getBytes();
+    verifyZeroInteractions(annotation);
+  }
+  
+  @Test
+  public void testGivenIdAndEmptyBytesAndFileTypeFolderByValidatingFileWebRequestForUpdatingFolderReturnTrue() {
+    
+    when(fileData.getId()).thenReturn("id");
+    when(fileData.getType()).thenReturn("FOLDER");
+    when(fileData.getBytes()).thenReturn(new byte[0]);
+    
+    assertThat(validator.isValid(fileData, null)).isTrue();
+    
+    verify(fileData).getId();
+    verify(fileData).getType();
+    verify(fileData).getBytes();
+    verifyZeroInteractions(annotation);
+  }
+  
+  @Test
+  public void testGivenIdAndNonEmptyBytesAndFileTypeFolderByValidatingFileWebRequestForUpdatingFolderReturnFalse() {
+    
+    when(fileData.getId()).thenReturn("id");
+    when(fileData.getType()).thenReturn("FOLDER");
+    when(fileData.getBytes()).thenReturn(new byte[] { 1, 2, 3 });
+    
+    assertThat(validator.isValid(fileData, null)).isFalse();
+    
+    verify(fileData).getId();
+    verify(fileData).getType();
+    verify(fileData).getBytes();
+    verifyZeroInteractions(annotation);
+  }
+  
+  @Test
+  public void testGivenIdAndNonEmptyBytesAndFileTypeFileByValidatingFileWebRequestForUpdatingFileReturnTrue() {
+    
+    when(fileData.getId()).thenReturn("id");
+    when(fileData.getType()).thenReturn("FILE");
+    
+    assertThat(validator.isValid(fileData, null)).isTrue();
+    
+    verify(fileData).getId();
+    verify(fileData).getType();
+    verifyZeroInteractions(annotation);
+  }
+  
+  @Test
+  public void testGivenIdAndEmptyBytesAndFileTypeFileByValidatingFileWebRequestForUpdatingFileReturnTrueToAllowChangeOfNameOnly() {
+    
+    when(fileData.getId()).thenReturn("id");
+    when(fileData.getType()).thenReturn("FILE");
+    
+    assertThat(validator.isValid(fileData, null)).isTrue();
+    
+    verify(fileData).getId();
+    verify(fileData).getType();
     verifyZeroInteractions(annotation);
   }
   
