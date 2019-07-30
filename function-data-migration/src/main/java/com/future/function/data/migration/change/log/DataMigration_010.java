@@ -60,7 +60,6 @@ public class DataMigration_010 {
         .build();
 
     mongoTemplate.insert(studentAccess, DocumentName.ACCESS);
-
   }
 
   @ChangeSet(author = "oliver", id = "allScoringListAndDetailPageAccessList", order = "0002")
@@ -119,7 +118,6 @@ public class DataMigration_010 {
         .build();
 
     mongoTemplate.insert(studentAccess, DocumentName.ACCESS);
-
   }
 
 
@@ -178,7 +176,6 @@ public class DataMigration_010 {
         .build();
 
     mongoTemplate.insert(studentAccess, DocumentName.ACCESS);
-
   }
 
   @ChangeSet(author = "oliver", id = "studentQuizAccessList", order = "0004")
@@ -229,7 +226,6 @@ public class DataMigration_010 {
         .build();
 
     mongoTemplate.insert(studentAccess, DocumentName.ACCESS);
-
   }
 
   @ChangeSet(author = "oliver", id = "studentRoomAccessList", order = "0005")
@@ -294,7 +290,6 @@ public class DataMigration_010 {
         .build();
 
     mongoTemplate.insert(studentAccess, DocumentName.ACCESS);
-
   }
 
   @ChangeSet(author = "oliver", id = "finalJudgingComparisonAccessList", order = "0006")
@@ -351,7 +346,6 @@ public class DataMigration_010 {
         .build();
 
     mongoTemplate.insert(studentAccess, DocumentName.ACCESS);
-
   }
 
   @ChangeSet(author = "oliver", id = "pointsAccessList", order = "0007")
@@ -402,7 +396,6 @@ public class DataMigration_010 {
         .build();
 
     mongoTemplate.insert(studentAccess, DocumentName.ACCESS);
-
   }
 
 }
