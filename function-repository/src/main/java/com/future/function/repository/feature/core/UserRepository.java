@@ -39,6 +39,18 @@ public interface UserRepository extends MongoRepository<User, String> {
   Page<User> findAllByRoleAndDeletedFalse(Role role, Pageable pageable);
 
   /**
+   * Finds users by batch, role and page data
+   * ({@link org.springframework.data.domain.Pageable}).
+   *
+   * @param batch    Batch of the users.
+   * @param role     Enum of available roles.
+   * @param pageable Pageable object for paging data.
+   *
+   * @return {@code Page<User>} - Page of users found in database.
+   */
+  Page<User> findAllByBatchAndRoleAndDeletedFalse(Batch batch, Role role, Pageable pageable);
+
+  /**
    * Finds users by role and batch data.
    *
    * @param role  Enum of available roles.

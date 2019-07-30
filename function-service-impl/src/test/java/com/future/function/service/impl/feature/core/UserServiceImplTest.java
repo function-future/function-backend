@@ -209,6 +209,52 @@ public class UserServiceImplTest {
   }
 
   @Test
+  public void testGivenBatchCodeAndRoleStudentByGettingUsersReturnStudentsPage() {
+
+    User additionalUser = User.builder()
+        .role(Role.STUDENT)
+        .email(EMAIL_STUDENT)
+        .name(NAME_STUDENT)
+        .password(PASSWORD)
+        .phone(PHONE)
+        .address(ADDRESS)
+        .pictureV2(PICTURE)
+        .batch(BATCH)
+        .university(UNIVERSITY)
+        .build();
+    additionalUser.setDeleted(false);
+
+    List<User> studentsList = Arrays.asList(userStudent, additionalUser);
+
+    when(userRepository.findAllByBatchAndRoleAndDeletedFalse(BATCH, Role.STUDENT, PAGEABLE)).thenReturn(
+        PageHelper.toPage(studentsList, PAGEABLE));
+
+    when(batchService.getBatchByCode(NUMBER)).thenReturn(BATCH);
+
+    Page<User> foundUserStudentsPage = userService.getStudentsWithinBatch(
+        NUMBER, PAGEABLE);
+
+    assertThat(foundUserStudentsPage).isNotNull();
+    assertThat(foundUserStudentsPage.getContent()).isEqualTo(studentsList);
+
+    verify(userRepository).findAllByBatchAndRoleAndDeletedFalse(BATCH, Role.STUDENT, PAGEABLE);
+    verify(batchService).getBatchByCode(NUMBER);
+    verifyZeroInteractions(resourceService, encoder);
+  }
+
+  @Test
+  public void testGivenNullBatchCodeAndRoleStudentByGettingUsersReturnStudentsPage() {
+
+    Page<User> foundUserStudentsPage = userService.getStudentsWithinBatch(
+        null, PAGEABLE);
+
+    assertThat(foundUserStudentsPage).isNotNull();
+    assertThat(foundUserStudentsPage.getTotalElements()).isEqualTo(0);
+
+    verifyZeroInteractions(userRepository, batchService, resourceService, encoder);
+  }
+
+  @Test
   public void testGivenRoleMentorByGettingUsersReturnMentorsPage() {
 
     User additionalUser = User.builder()
@@ -629,10 +675,10 @@ public class UserServiceImplTest {
       namePart, PAGEABLE);
     verifyZeroInteractions(resourceService, encoder);
   }
-  
+
   @Test
   public void testGivenUserObjectByChangingProfilePictureReturnUpdatedUser() {
-    
+
     FileV2 picture = FileV2.builder()
       .id(PICTURE_ID)
       .build();
@@ -640,35 +686,35 @@ public class UserServiceImplTest {
       .email(EMAIL_STUDENT)
       .pictureV2(picture)
       .build();
-    
+
     when(userRepository.findByEmailAndDeletedFalse(EMAIL_STUDENT)).thenReturn(
       Optional.of(userStudent));
-    
+
     when(resourceService.markFilesUsed(Collections.singletonList(PICTURE_ID),
                                        true
     )).thenReturn(true);
-    
+
     when(resourceService.getFile(PICTURE_ID)).thenReturn(picture);
-    
+
     User savedUser = new User();
     BeanUtils.copyProperties(userStudent, savedUser);
     savedUser.setPictureV2(picture);
     when(userRepository.save(savedUser)).thenReturn(savedUser);
-    
+
     User updatedUser = userService.changeProfilePicture(user);
-    
+
     assertThat(updatedUser).isEqualTo(savedUser);
-    
+
     verify(userRepository).findByEmailAndDeletedFalse(EMAIL_STUDENT);
     verify(resourceService).markFilesUsed(
       Collections.singletonList(PICTURE_ID), true);
     verify(resourceService).getFile(PICTURE_ID);
     verify(userRepository).save(savedUser);
   }
-  
+
   @Test
   public void testGivenUserWithNonExistingEmailByChangingProfilePictureReturnRequestUserObject() {
-  
+
     FileV2 picture = FileV2.builder()
       .id(PICTURE_ID)
       .build();
@@ -676,14 +722,14 @@ public class UserServiceImplTest {
       .email(EMAIL_STUDENT)
       .pictureV2(picture)
       .build();
-  
+
     when(userRepository.findByEmailAndDeletedFalse(EMAIL_STUDENT)).thenReturn(
       Optional.empty());
-    
+
     User updatedUser = userService.changeProfilePicture(user);
-    
+
     assertThat(updatedUser).isEqualTo(user);
-    
+
     verify(userRepository).findByEmailAndDeletedFalse(EMAIL_STUDENT);
     verifyZeroInteractions(resourceService);
   }

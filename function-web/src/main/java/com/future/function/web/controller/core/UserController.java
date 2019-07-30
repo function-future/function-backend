@@ -24,20 +24,20 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping(value = "/api/core/users")
 public class UserController {
-  
+
   private UserRequestMapper userRequestMapper;
-  
+
   private UserService userService;
-  
+
   @Autowired
   public UserController(
     UserService userService, UserRequestMapper userRequestMapper
   ) {
-    
+
     this.userService = userService;
     this.userRequestMapper = userRequestMapper;
   }
-  
+
   /**
    * Creates new user in database.
    *
@@ -57,13 +57,13 @@ public class UserController {
     @RequestBody
       UserWebRequest data
   ) {
-    
+
     return UserResponseMapper.toUserDataResponse(
       HttpStatus.CREATED,
       userService.createUser(userRequestMapper.toUser(data))
     );
   }
-  
+
   /**
    * Deletes user from database.
    *
@@ -80,11 +80,11 @@ public class UserController {
     @PathVariable
       String userId
   ) {
-    
+
     userService.deleteUser(userId);
     return ResponseHelper.toBaseResponse(HttpStatus.OK);
   }
-  
+
   /**
    * Retrieves a user based on given parameter.
    *
@@ -104,10 +104,10 @@ public class UserController {
     @PathVariable
       String userId
   ) {
-    
+
     return UserResponseMapper.toUserDataResponse(userService.getUser(userId));
   }
-  
+
   /**
    * Retrieves users based on given parameters.
    *
@@ -130,11 +130,37 @@ public class UserController {
                   defaultValue = "1")
       int page
   ) {
-    
+
     return UserResponseMapper.toUsersPagingResponse(
       userService.getUsers(Role.toRole(role), PageHelper.toPageable(page, 10)));
   }
-  
+
+  /**
+   * Retrieves students based on given parameters.
+   *
+   * @param batchCode Specified batchCode for data to be retrieved.
+   * @param page Current page of data.
+   *
+   * @return {@code PagingResponse<UserWebResponse>} - The retrieved users data,
+   * wrapped in
+   * {@link com.future.function.web.model.response.base.PagingResponse} and
+   * {@link com.future.function.web.model.response.feature.core.UserWebResponse}
+   */
+  @ResponseStatus(HttpStatus.OK)
+  @GetMapping(value = "/batches/{batchCode}", produces = MediaType.APPLICATION_JSON_VALUE)
+  public PagingResponse<UserWebResponse> getStudentsWithinBatch(
+      @WithAnyRole(roles = Role.ADMIN)
+          Session session,
+      @PathVariable String batchCode,
+      @RequestParam(required = false,
+          defaultValue = "1")
+          int page
+  ) {
+
+    return UserResponseMapper.toUsersPagingResponse(
+        userService.getStudentsWithinBatch(batchCode, PageHelper.toPageable(page, 10)));
+  }
+
   /**
    * Updates existing user in database.
    *
@@ -158,11 +184,11 @@ public class UserController {
     @RequestBody
       UserWebRequest data
   ) {
-    
+
     return UserResponseMapper.toUserDataResponse(
       userService.updateUser(userRequestMapper.toUser(userId, data)));
   }
-  
+
   @ResponseStatus(HttpStatus.OK)
   @GetMapping(value = "/search")
   public PagingResponse<UserWebResponse> getUsersByName(
@@ -177,7 +203,7 @@ public class UserController {
                   defaultValue = "10")
       int size
   ) {
-    
+
     return UserResponseMapper.toUsersPagingResponse(
       userService.getUsersByNameContainsIgnoreCase(name,
                                                    PageHelper.toPageable(page,
@@ -185,5 +211,5 @@ public class UserController {
                                                    )
       ));
   }
-  
+
 }

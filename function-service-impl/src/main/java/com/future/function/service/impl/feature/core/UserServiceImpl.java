@@ -10,6 +10,7 @@ import com.future.function.service.api.feature.core.BatchService;
 import com.future.function.service.api.feature.core.ResourceService;
 import com.future.function.service.api.feature.core.UserService;
 import com.future.function.service.impl.helper.CopyHelper;
+import com.future.function.service.impl.helper.PageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -90,6 +91,22 @@ public class UserServiceImpl implements UserService {
   public Page<User> getUsers(Role role, Pageable pageable) {
 
     return userRepository.findAllByRoleAndDeletedFalse(role, pageable);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @param batchCode   Code represents the batch of to-be-retrieved students
+   * @param pageable    Pageable object for paging data
+   *
+   * @return {@code Page<User>} - Page of users found in database.
+   */
+  @Override
+  public Page<User> getStudentsWithinBatch(String batchCode, Pageable pageable) {
+    return Optional.ofNullable(batchCode)
+        .map(batchService::getBatchByCode)
+        .map(batch -> userRepository.findAllByBatchAndRoleAndDeletedFalse(batch, Role.STUDENT, pageable))
+        .orElseGet(() -> PageHelper.empty(pageable));
   }
 
   /**
@@ -255,10 +272,10 @@ public class UserServiceImpl implements UserService {
 
     return this.setEncryptedPassword(user, user.getPassword());
   }
-  
+
   @Override
   public User changeProfilePicture(User user) {
-    
+
     return userRepository.findByEmailAndDeletedFalse(user.getEmail())
       .map(foundUser -> this.setUserPicture(user, foundUser))
       .map(userRepository::save)
