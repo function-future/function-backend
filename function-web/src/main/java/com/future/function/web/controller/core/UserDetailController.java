@@ -70,7 +70,7 @@ public class UserDetailController {
   }
 
   @ResponseStatus(HttpStatus.OK)
-  @PostMapping("/password")
+  @PutMapping("/password")
   public BaseResponse changePassword(
     @WithAnyRole(roles = { Role.STUDENT, Role.MENTOR, Role.JUDGE, Role.ADMIN })
       Session session,
