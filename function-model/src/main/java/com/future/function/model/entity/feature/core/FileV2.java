@@ -70,6 +70,7 @@ public class FileV2 extends BaseEntity {
   @Field(FieldName.File.USER)
   private User user;
   
+  @Field(FieldName.File.PATHS)
   private List<FileV2> paths;
   
 }
