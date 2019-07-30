@@ -425,6 +425,48 @@ public class FileServiceImplTest {
   }
 
   @Test
+  public void testGivenMethodCallAndEmptyByteArrayByUpdatingFileOrFolderReturnUpdatedFile() {
+
+    when(fileRepository.findByIdAndParentIdAndDeletedFalse(ID,
+                                                           PARENT_ID
+    )).thenReturn(Optional.of(file));
+    when(fileRepository.findOne(ID)).thenReturn(file);
+    when(fileRepository.save(file)).thenReturn(file);
+
+    FileV2 updatedFile = fileService.updateFileOrFolder(
+      SESSION, ID, PARENT_ID, NAME, NAME, new byte[0]);
+
+    assertThat(updatedFile).isNotNull();
+    assertThat(updatedFile).isEqualTo(file);
+
+    verify(fileRepository).findByIdAndParentIdAndDeletedFalse(ID, PARENT_ID);
+    verify(fileRepository).findOne(ID);
+    verify(fileRepository).save(file);
+    verifyZeroInteractions(resourceService, fileProperties, userService);
+  }
+
+  @Test
+  public void testGivenMethodCallAndNullByteArrayByUpdatingFileOrFolderReturnUpdatedFile() {
+
+    when(fileRepository.findByIdAndParentIdAndDeletedFalse(ID,
+                                                           PARENT_ID
+    )).thenReturn(Optional.of(file));
+    when(fileRepository.findOne(ID)).thenReturn(file);
+    when(fileRepository.save(file)).thenReturn(file);
+  
+    FileV2 updatedFile = fileService.updateFileOrFolder(
+      SESSION, ID, PARENT_ID, NAME, NAME, null);
+
+    assertThat(updatedFile).isNotNull();
+    assertThat(updatedFile).isEqualTo(file);
+
+    verify(fileRepository).findByIdAndParentIdAndDeletedFalse(ID, PARENT_ID);
+    verify(fileRepository).findOne(ID);
+    verify(fileRepository).save(file);
+    verifyZeroInteractions(resourceService, fileProperties, userService);
+  }
+
+  @Test
   public void testGivenMethodCallAndEmptyByteArrayByUpdatingFileOrFolderReturnUpdatedFolder() {
 
     FileV2 folder = FileV2.builder()
