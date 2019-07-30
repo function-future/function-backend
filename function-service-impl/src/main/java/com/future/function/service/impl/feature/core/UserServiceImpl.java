@@ -135,7 +135,7 @@ public class UserServiceImpl implements UserService {
       .map(userRepository::findOne)
       .map(this::deleteUserPicture)
       .map(foundUser -> this.setUserPicture(user, foundUser))
-      .map(foundUser -> this.setFoundUserPassword(user, foundUser))
+      .map(foundUser -> this.setUserPassword(user, foundUser))
       .map(foundUser -> this.copyPropertiesAndSaveUser(user, foundUser))
       .orElse(user);
   }
@@ -149,11 +149,13 @@ public class UserServiceImpl implements UserService {
       .orElse(null);
   }
   
-  private User setFoundUserPassword(User user, User foundUser) {
+  private User setUserPassword(User user, User foundUser) {
   
-    if (encoder.matches(
+    if (!encoder.matches(
       this.getDefaultPassword(foundUser.getName()), foundUser.getPassword())) {
-      foundUser.setPassword(encoder.encode(user.getPassword()));
+      user.setPassword(foundUser.getPassword());
+    } else {
+      user.setPassword(encoder.encode(this.getDefaultPassword(user.getName())));
     }
     
     return foundUser;
@@ -204,7 +206,7 @@ public class UserServiceImpl implements UserService {
   ) {
 
     userRepository.findByEmailAndDeletedFalse(email)
-      .filter(user -> encoder.matches(user.getPassword(), oldPassword))
+      .filter(user -> encoder.matches(oldPassword, user.getPassword()))
       .map(user -> this.setEncryptedPassword(user, newPassword))
       .map(userRepository::save)
       .orElseThrow(() -> new UnauthorizedException("Invalid Old Password"));

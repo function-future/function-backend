@@ -353,8 +353,7 @@ public class UserServiceImplTest {
                            .toLowerCase()
                            .replace(" ", "") + "functionapp";
     when(encoder.matches(rawPassword, PASSWORD)).thenReturn(true);
-    when(encoder.encode(PASSWORD)).thenReturn(
-      PASSWORD);
+    when(encoder.encode(rawPassword)).thenReturn(PASSWORD);
     when(userRepository.save(userStudent)).thenReturn(userStudent);
 
     User updatedUserStudent = userService.updateUser(userStudent);
@@ -371,7 +370,7 @@ public class UserServiceImplTest {
     verify(resourceService).markFilesUsed(FILE_IDS, true);
     verify(resourceService, times(2)).getFile(PICTURE_ID);
     verify(encoder).matches(rawPassword, PASSWORD);
-    verify(encoder).encode(PASSWORD);
+    verify(encoder).encode(rawPassword);
     verify(userRepository).save(userStudent);
   }
 
@@ -595,7 +594,7 @@ public class UserServiceImplTest {
     when(userRepository.findByEmailAndDeletedFalse(EMAIL_STUDENT)).thenReturn(
       Optional.of(userStudent));
 
-    when(encoder.matches(userStudent.getPassword(), OLD_PASSWORD)).thenReturn(
+    when(encoder.matches(OLD_PASSWORD, userStudent.getPassword())).thenReturn(
       true);
 
     when(encoder.encode(NEW_PASSWORD)).thenReturn(PASSWORD);
@@ -605,7 +604,7 @@ public class UserServiceImplTest {
     userService.changeUserPassword(EMAIL_STUDENT, OLD_PASSWORD, NEW_PASSWORD);
 
     verify(userRepository).findByEmailAndDeletedFalse(EMAIL_STUDENT);
-    verify(encoder).matches(userStudent.getPassword(), OLD_PASSWORD);
+    verify(encoder).matches(OLD_PASSWORD, userStudent.getPassword());
     verify(encoder).encode(NEW_PASSWORD);
     verify(userRepository).save(userStudent);
     verifyZeroInteractions(resourceService);
@@ -617,7 +616,7 @@ public class UserServiceImplTest {
     when(userRepository.findByEmailAndDeletedFalse(EMAIL_STUDENT)).thenReturn(
       Optional.of(userStudent));
 
-    when(encoder.matches(userStudent.getPassword(), OLD_PASSWORD)).thenReturn(
+    when(encoder.matches(OLD_PASSWORD, userStudent.getPassword())).thenReturn(
       false);
 
     catchException(
@@ -631,7 +630,7 @@ public class UserServiceImplTest {
       "Invalid Old Password");
 
     verify(userRepository).findByEmailAndDeletedFalse(EMAIL_STUDENT);
-    verify(encoder).matches(userStudent.getPassword(), OLD_PASSWORD);
+    verify(encoder).matches(OLD_PASSWORD, userStudent.getPassword());
     verifyZeroInteractions(resourceService);
   }
 
