@@ -75,7 +75,7 @@ public class DataMigration_009 {
              order = "0002")
   public void insertLoginAccessList(MongoTemplate mongoTemplate) {
     
-    String urlRegex = "^\\/login(\\/)?$";
+    String urlRegex = "^\\/login(\\/|\\?.*)?$";
     
     Map<String, Object> loginComponents = new HashMap<>();
     loginComponents.put("add", true);
