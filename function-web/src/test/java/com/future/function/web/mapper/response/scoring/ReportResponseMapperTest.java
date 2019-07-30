@@ -1,9 +1,14 @@
 package com.future.function.web.mapper.response.scoring;
 
+import com.future.function.common.enumeration.core.Role;
 import com.future.function.model.entity.feature.core.Batch;
+import com.future.function.model.entity.feature.core.FileV2;
+import com.future.function.model.entity.feature.core.User;
 import com.future.function.model.entity.feature.scoring.Report;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
+import com.future.function.web.model.response.feature.core.BatchWebResponse;
+import com.future.function.web.model.response.feature.core.UserWebResponse;
 import com.future.function.web.model.response.feature.scoring.ReportWebResponse;
 import org.junit.After;
 import org.junit.Before;
@@ -27,6 +32,12 @@ public class ReportResponseMapperTest {
   private static final String DESCRIPTION = "final description";
     private static final String BATCH_CODE = "batch-code";
   private static final String STUDENT_ID = "student-id";
+  private static final String STUDENT_NAME = "student-name";
+  private static final String STUDENT_PHONE = "student-phone";
+  private static final String STUDENT_AVATAR = "student-avatar";
+  private static final String STUDENT_ADDRESS = "student-address";
+  private static final String STUDENT_EMAIL = "student-email";
+  private static final String STUDENT_UNIVERSITY = "student-university";
   private static final Long CREATED_AT = new Date().getTime();
 
   private Report report;
@@ -34,14 +45,35 @@ public class ReportResponseMapperTest {
   private ReportWebResponse response;
   private Pageable pageable;
   private Page<Report> reportPage;
-  private List<String> studentIds;
+  private User user;
+  private UserWebResponse userWebResponse;
 
   @Before
   public void setUp() throws Exception {
 
-    studentIds = Collections.singletonList(STUDENT_ID);
-
       batch = Batch.builder().code(BATCH_CODE).build();
+
+      userWebResponse = UserWebResponse.builder()
+          .id(STUDENT_ID)
+          .name(STUDENT_NAME)
+          .role(Role.STUDENT.name())
+          .address(STUDENT_ADDRESS)
+          .phone(STUDENT_PHONE)
+          .avatar(STUDENT_AVATAR)
+          .batch(BatchWebResponse.builder().code(BATCH_CODE).build())
+          .email(STUDENT_EMAIL)
+          .university(STUDENT_UNIVERSITY).build();
+
+      user = User.builder()
+          .id(STUDENT_ID)
+          .name(STUDENT_NAME)
+          .role(Role.STUDENT)
+          .address(STUDENT_ADDRESS)
+          .phone(STUDENT_PHONE)
+          .pictureV2(FileV2.builder().fileUrl(STUDENT_AVATAR).build())
+          .batch(batch)
+          .email(STUDENT_EMAIL)
+          .university(STUDENT_UNIVERSITY).build();
 
     report = Report
         .builder()
@@ -49,7 +81,7 @@ public class ReportResponseMapperTest {
         .title(NAME)
             .batch(batch)
         .description(DESCRIPTION)
-        .studentIds(studentIds)
+        .students(Collections.singletonList(user))
         .build();
 
     report.setCreatedAt(CREATED_AT);

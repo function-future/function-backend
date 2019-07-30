@@ -164,9 +164,9 @@ public class ReportServiceImplTest {
 
     @Test
     public void createReport() {
-        report.setStudentIds(Collections.singletonList(USER_ID));
+        report.setStudents(Collections.singletonList(student));
         Report actual = reportService.createReport(report);
-        report.setStudentIds(null);
+        report.setStudents(null);
         assertThat(actual).isEqualTo(report);
         verify(reportRepository).save(report);
         verify(reportDetailService).createReportDetailByReport(report, student);
@@ -175,21 +175,15 @@ public class ReportServiceImplTest {
 
     @Test
     public void createReportThrowException() {
-        report.setStudentIds(null);
+        report.setStudents(null);
         catchException(() -> reportService.createReport(report));
         assertThat(caughtException().getClass()).isEqualTo(UnsupportedOperationException.class);
-    }
-
-    @Test
-    public void createReportMoreThanThreeStudentIdsThrowException() {
-        report.setStudentIds(Arrays.asList("id-1", "id-2", "id-3", "id-4"));
-        catchException(() -> reportService.createReport(report));
-        assertThat(caughtException().getClass()).isEqualTo(UnsupportedOperationException.class);
+        verify(batchService).getBatchByCode(BATCH_CODE);
     }
 
     @Test
     public void updateReport() {
-        report.setStudentIds(Collections.singletonList(USER_ID));
+        report.setStudents(Collections.singletonList(student));
         reportDetail.setUser(student);
         Report actual = reportService.updateReport(report);
         assertThat(actual).isEqualTo(actual);
@@ -204,7 +198,7 @@ public class ReportServiceImplTest {
         User anotherStudent = User.builder().id(id).role(Role.STUDENT).build();
         when(userService.getUser(id)).thenReturn(anotherStudent);
         when(reportDetailService.createReportDetailByReport(report, anotherStudent)).thenReturn(report);
-        report.setStudentIds(Collections.singletonList(id));
+        report.setStudents(Collections.singletonList(anotherStudent));
         reportDetail.setUser(student);
         Report actual = reportService.updateReport(report);
         assertThat(actual).isEqualTo(actual);
@@ -213,24 +207,6 @@ public class ReportServiceImplTest {
         verify(reportDetailService, times(2)).findAllDetailByReportId(REPORT_ID);
         verify(reportDetailService).createReportDetailByReport(report, anotherStudent);
         verify(reportDetailService).deleteAllByReportId(REPORT_ID);
-    }
-
-    @Test
-    public void updateReportEmptyStudentIds() {
-        report.setStudentIds(Collections.emptyList());
-        reportDetail.setUser(student);
-        catchException(() -> reportService.updateReport(report));
-        assertThat(caughtException().getClass()).isEqualTo(UnsupportedOperationException.class);
-        verify(reportDetailService).findAllDetailByReportId(REPORT_ID);
-    }
-
-    @Test
-    public void updateReportMoreThanThreeStudentIds() {
-        report.setStudentIds(Arrays.asList("id-1", "id-2", "id-3", "id-4"));
-        reportDetail.setUser(student);
-        catchException(() -> reportService.updateReport(report));
-        assertThat(caughtException().getClass()).isEqualTo(UnsupportedOperationException.class);
-        verify(reportDetailService).findAllDetailByReportId(REPORT_ID);
     }
 
     @Test

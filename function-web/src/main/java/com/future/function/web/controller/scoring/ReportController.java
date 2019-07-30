@@ -19,7 +19,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/scoring/batches/{batchCode}/final-judgings")
+@RequestMapping("/api/scoring/batches/{batchCode}/judgings")
 public class ReportController {
 
   private ReportService reportService;

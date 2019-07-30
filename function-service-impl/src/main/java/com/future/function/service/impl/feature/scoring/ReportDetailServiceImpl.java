@@ -11,13 +11,13 @@ import com.future.function.service.api.feature.scoring.ReportDetailService;
 import com.future.function.service.api.feature.scoring.SummaryService;
 import com.future.function.service.impl.helper.AuthorizationHelper;
 import com.future.function.service.impl.helper.CopyHelper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service
 public class ReportDetailServiceImpl implements ReportDetailService {
@@ -52,6 +52,7 @@ public class ReportDetailServiceImpl implements ReportDetailService {
     private List<StudentSummaryVO> getStudentsSummaryPoints(String userId, List<ReportDetail> list) {
         return list.stream()
                 .map(reportDetail -> getSummaryVOFromReportDetail(userId, reportDetail))
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
 
@@ -61,7 +62,7 @@ public class ReportDetailServiceImpl implements ReportDetailService {
             .map(User::getId)
             .map(studentId -> summaryService.findAllPointSummaryByStudentId(studentId, userId))
             .map(summary -> setSummaryPoint(reportDetail, summary))
-            .orElseGet(StudentSummaryVO::new);
+            .orElse(null);
     }
 
     private StudentSummaryVO setSummaryPoint(ReportDetail reportDetail, StudentSummaryVO summary) {
@@ -72,7 +73,7 @@ public class ReportDetailServiceImpl implements ReportDetailService {
     @Override
     public Report createReportDetailByReport(Report report, User student) {
         return Optional.ofNullable(report)
-                .map(value -> buildReportDetail(report, student))
+                .map(value -> buildReportDetail(value, student))
                 .map(reportDetailRepository::save)
                 .map(ReportDetail::getReport)
                 .orElseThrow(() -> new UnsupportedOperationException("Failed at #createReportDetailByReport #ReportDetailService"));

@@ -205,13 +205,13 @@ public class AssignmentServiceImpl implements AssignmentService {
             .map(this::findById)
             .ifPresent(assignment -> {
               roomService.deleteAllRoomsByAssignmentId(assignment.getId());
-              markAllFilesAsNotUsed(assignment);
+              markAssignmentFileAsNotUsed(assignment);
               assignment.setDeleted(true);
               assignmentRepository.save(assignment);
             });
   }
 
-  private void markAllFilesAsNotUsed(Assignment assignment) {
+  private void markAssignmentFileAsNotUsed(Assignment assignment) {
     if (Objects.nonNull(assignment.getFile()) && !StringUtils.isEmpty(assignment.getFile().getId())) {
       resourceService.markFilesUsed(Collections.singletonList(assignment.getFile().getId()), false);
     }
