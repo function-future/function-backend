@@ -15,7 +15,6 @@ public class DataMigration_010 {
   @ChangeSet(author = "oliver", id = "questionBankAccessList", order = "0001")
   public void insertQuestionBankAccessList(MongoTemplate mongoTemplate) {
 
-    //TODO need to ask
     String urlRegex = "^\\/question-banks(\\/|\\/.*)?$";
 
     Map<String, Object> adminComponents = new HashMap<>();
@@ -128,7 +127,6 @@ public class DataMigration_010 {
   @ChangeSet(author = "oliver", id = "scoringBatchesPageAccessList", order = "0003")
   public void insertScoringBatchesAccessList(MongoTemplate mongoTemplate) {
 
-    //TODO need to ask (all quiz, assignment, final judging batches page)
     String urlRegex = "^\\/.*\\/batches(\\/|\\/add|\\/.+\\/edit)?$";
 
     Map<String, Object> adminComponents = new HashMap<>();
