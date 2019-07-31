@@ -209,7 +209,7 @@ public class UserServiceImplTest {
   }
 
   @Test
-  public void testGivenBatchCodeAndRoleStudentByGettingUsersReturnStudentsPage() {
+  public void testGivenBatchCodeAndRoleStudentByGettingUsersWithinBatchReturnStudentsPage() {
 
     User additionalUser = User.builder()
         .role(Role.STUDENT)
@@ -243,7 +243,7 @@ public class UserServiceImplTest {
   }
 
   @Test
-  public void testGivenNullBatchCodeAndRoleStudentByGettingUsersReturnStudentsPage() {
+  public void testGivenNullBatchCodeAndRoleStudentByGettingUsersWithinBatchReturnStudentsPage() {
 
     Page<User> foundUserStudentsPage = userService.getStudentsWithinBatch(
         null, PAGEABLE);
