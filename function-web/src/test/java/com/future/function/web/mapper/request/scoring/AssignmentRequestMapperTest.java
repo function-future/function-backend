@@ -6,6 +6,7 @@ import com.future.function.model.entity.feature.scoring.Assignment;
 import com.future.function.validation.RequestValidator;
 import com.future.function.web.mapper.request.WebRequestMapper;
 import com.future.function.web.model.request.scoring.AssignmentWebRequest;
+import com.future.function.web.model.request.scoring.CopyAssignmentWebRequest;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,6 +31,7 @@ public class AssignmentRequestMapperTest {
   private static final long ASSIGNMENT_DEADLINE = 1561520805;
   private Assignment assignment;
   private AssignmentWebRequest assignmentWebRequest;
+  private CopyAssignmentWebRequest copyAssignmentWebRequest;
 
   @Mock
   private WebRequestMapper requestMapper;
@@ -59,8 +61,14 @@ public class AssignmentRequestMapperTest {
         .deadline(ASSIGNMENT_DEADLINE)
         .build();
 
+    copyAssignmentWebRequest = CopyAssignmentWebRequest.builder()
+        .batchCode(ASSIGNMENT_BATCH)
+        .assignmentId(ASSIGNMENT_ID)
+        .build();
+
     when(validator.validate(assignmentWebRequest))
         .thenReturn(assignmentWebRequest);
+    when(validator.validate(copyAssignmentWebRequest)).thenReturn(copyAssignmentWebRequest);
   }
 
   @After
@@ -95,5 +103,13 @@ public class AssignmentRequestMapperTest {
     assertThat(actual.getDescription()).isEqualTo(assignment.getDescription());
     assertThat(actual.getTitle()).isEqualTo(assignment.getTitle());
     verify(validator).validate(assignmentWebRequest);
+  }
+
+  @Test
+  public void testToCopyAssignmentWebRequest() {
+    CopyAssignmentWebRequest
+    request = assignmentRequestMapper.validateCopyAssignmentWebRequest(copyAssignmentWebRequest);
+    assertThat(copyAssignmentWebRequest).isNotNull();
+    verify(validator).validate(copyAssignmentWebRequest);
   }
 }
