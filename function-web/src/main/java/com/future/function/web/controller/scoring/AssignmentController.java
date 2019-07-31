@@ -91,7 +91,7 @@ public class AssignmentController {
     @WithAnyRole(roles = Role.ADMIN) Session session) {
     return AssignmentResponseMapper
         .toAssignmentDataResponse(HttpStatus.CREATED, assignmentService
-                .copyAssignment(request.getAssignmentId(), request.getBatchId()));
+                .copyAssignment(request.getAssignmentId(), request.getBatchCode()));
   }
 
   /**

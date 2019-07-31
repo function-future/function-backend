@@ -132,7 +132,8 @@ public class QuizServiceImplTest {
 
   @After
   public void tearDown() throws Exception {
-    verifyNoMoreInteractions(quizRepository);
+    verifyNoMoreInteractions(quizRepository, batchService, studentQuizService, questionService, batchService,
+        questionBankService);
   }
 
   @Test
@@ -167,6 +168,7 @@ public class QuizServiceImplTest {
     assertThat(actual).isEqualTo(quizPage);
 
     verify(quizRepository).findAllByBatchAndDeletedFalse(batch, pageable);
+    verify(batchService).getBatchByCode(BATCH_CODE);
   }
 
   @Test
@@ -178,6 +180,7 @@ public class QuizServiceImplTest {
     assertThat(actual).isEqualTo(quizPage);
 
     verify(quizRepository).findAllByBatchAndDeletedFalse(batch, pageable);
+    verify(batchService).getBatchByCode(BATCH_CODE);
   }
 
   @Test
@@ -186,6 +189,9 @@ public class QuizServiceImplTest {
     assertThat(actual).isEqualTo(quiz);
 
     verify(quizRepository).save(eq(quiz));
+    verify(batchService).getBatchByCode(BATCH_CODE);
+    verify(studentQuizService).createStudentQuizByBatchCode(BATCH_CODE, quiz);
+    verify(questionBankService).findById(QUESTION_BANK_ID);
   }
 
   @Test
@@ -206,6 +212,8 @@ public class QuizServiceImplTest {
 
     verify(quizRepository).findByIdAndDeletedFalse(eq(QUIZ_ID));
     verify(quizRepository).save(eq(quiz));
+    verify(batchService).getBatchByCode(BATCH_CODE);
+    verify(questionBankService).findById(QUESTION_BANK_ID);
   }
 
   @Test
@@ -229,15 +237,16 @@ public class QuizServiceImplTest {
 
   @Test
   public void copyQuizWithTargetBatch() {
-      String batchId = "ABC";
-      Batch targetBatchObj = Batch.builder().id(batchId).build();
-      when(batchService.getBatchById(batchId)).thenReturn(targetBatchObj);
+      String batchCode = "ABC";
+      Batch targetBatchObj = Batch.builder().code(batchCode).build();
+      when(batchService.getBatchByCode(batchCode)).thenReturn(targetBatchObj);
     when(studentQuizService.copyQuizWithTargetBatch(targetBatchObj, quiz)).thenReturn(quiz);
-      Quiz actual = quizService.copyQuizWithTargetBatchId(batchId, quiz);
+      Quiz actual = quizService.copyQuizWithTargetBatchCode(batchCode, quiz);
     assertThat(actual.getTitle()).isEqualTo(QUIZ_TITLE);
     verify(quizRepository).findByIdAndDeletedFalse(QUIZ_ID);
     verify(studentQuizService).copyQuizWithTargetBatch(targetBatchObj, quiz);
-      quiz.getBatch().setCode(batchId);
+      quiz.getBatch().setCode(batchCode);
     verify(quizRepository).save(quiz);
+    verify(batchService).getBatchByCode(batchCode);
   }
 }

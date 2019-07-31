@@ -55,7 +55,7 @@ public class QuizControllerTest extends TestHelper {
   private static final String QUIZ_QUESTION_BANK_ID = "question-bank-id";
   private static final int QUIZ_QUESTION_COUNT = 3;
   private static final String QUIZ_BATCH_CODE = "3";
-    private static final String QUIZ_BATCH_ID = "batchId";
+    private static final String QUIZ_BATCH_ID = "batchCode";
 
   private Pageable pageable;
   private Quiz quiz;
@@ -131,7 +131,7 @@ public class QuizControllerTest extends TestHelper {
     copyQuizWebRequest = CopyQuizWebRequest
         .builder()
         .quizId(QUIZ_ID)
-            .batchId(QUIZ_BATCH_ID)
+            .batchCode(QUIZ_BATCH_ID)
         .build();
 
     quizList = new ArrayList<>();
@@ -157,7 +157,7 @@ public class QuizControllerTest extends TestHelper {
     when(quizService.updateQuiz(quiz)).thenReturn(quiz);
     when(quizService.findAllByBatchCodeAndPageable(QUIZ_BATCH_CODE, pageable))
         .thenReturn(quizPage);
-      when(quizService.copyQuizWithTargetBatchId(QUIZ_BATCH_ID, quiz)).thenReturn(quiz);
+      when(quizService.copyQuizWithTargetBatchCode(QUIZ_BATCH_ID, quiz)).thenReturn(quiz);
       when(requestMapper.toQuiz(quizWebRequest, QUIZ_BATCH_CODE)).thenReturn(quiz);
       when(requestMapper.toQuiz(QUIZ_ID, quizWebRequest, QUIZ_BATCH_CODE)).thenReturn(quiz);
     when(requestMapper.validateCopyQuizWebRequest(copyQuizWebRequest)).thenReturn(copyQuizWebRequest);
@@ -258,7 +258,7 @@ public class QuizControllerTest extends TestHelper {
                 .getJson()
         ));
     verify(quizService).findById(QUIZ_ID);
-      verify(quizService).copyQuizWithTargetBatchId(QUIZ_BATCH_ID, quiz);
+      verify(quizService).copyQuizWithTargetBatchCode(QUIZ_BATCH_ID, quiz);
     verify(requestMapper).validateCopyQuizWebRequest(copyQuizWebRequest);
   }
 

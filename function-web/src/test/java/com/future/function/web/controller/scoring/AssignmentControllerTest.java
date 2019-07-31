@@ -99,7 +99,7 @@ public class AssignmentControllerTest extends TestHelper {
 
     copyAssignmentWebRequest = CopyAssignmentWebRequest
         .builder()
-            .batchId("BATCH-3")
+            .batchCode("BATCH-3")
         .assignmentId(ASSIGNMENT_ID)
         .build();
 
