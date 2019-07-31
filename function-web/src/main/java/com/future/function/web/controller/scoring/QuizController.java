@@ -76,7 +76,7 @@ public class QuizController {
     return QuizResponseMapper
         .toQuizWebDataResponse(
             HttpStatus.CREATED,
-                quizService.copyQuizWithTargetBatchId(request.getBatchId(),
+                quizService.copyQuizWithTargetBatchCode(request.getBatchCode(),
                         quizService.findById(request.getQuizId())));
   }
 

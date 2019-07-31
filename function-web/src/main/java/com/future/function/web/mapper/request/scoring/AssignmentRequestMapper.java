@@ -5,6 +5,7 @@ import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.scoring.Assignment;
 import com.future.function.validation.RequestValidator;
 import com.future.function.web.model.request.scoring.AssignmentWebRequest;
+import com.future.function.web.model.request.scoring.CopyAssignmentWebRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +48,10 @@ public class AssignmentRequestMapper {
       Assignment assignment = toValidatedAssignment(request, batchCode);
     assignment.setId(assignmentId);
     return assignment;
+  }
+
+  public CopyAssignmentWebRequest validateCopyAssignmentWebRequest(CopyAssignmentWebRequest request) {
+    return validator.validate(request);
   }
 
   /**

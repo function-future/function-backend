@@ -96,12 +96,12 @@ public class QuizRequestMapperTest {
     CopyQuizWebRequest request = CopyQuizWebRequest
         .builder()
         .quizId(QUIZ_ID)
-            .batchId("3")
+        .batchCode("3")
         .build();
     when(validator.validate(request)).thenReturn(request);
     CopyQuizWebRequest actual = requestMapper.validateCopyQuizWebRequest(request);
     assertThat(actual.getQuizId()).isEqualTo(QUIZ_ID);
-      assertThat(actual.getBatchId()).isEqualTo("3");
+      assertThat(actual.getBatchCode()).isEqualTo("3");
     verify(validator).validate(request);
   }
 }

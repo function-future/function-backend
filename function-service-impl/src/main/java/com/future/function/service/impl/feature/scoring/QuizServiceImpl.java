@@ -72,14 +72,14 @@ public class QuizServiceImpl implements QuizService {
   }
 
   @Override
-  public Quiz copyQuizWithTargetBatchId(String targetBatchId, Quiz quiz) {
-    Batch batch = batchService.getBatchById(targetBatchId);
+  public Quiz copyQuizWithTargetBatchCode(String targetBatchCode, Quiz quiz) {
+    Batch batch = batchService.getBatchByCode(targetBatchCode);
     return Optional.ofNullable(quiz)
             .map(Quiz::getId)
             .map(this::findById)
             .map(value -> studentQuizService.copyQuizWithTargetBatch(batch, value))
             .map(quizRepository::save)
-            .orElseThrow(() -> new UnsupportedOperationException("Failed at #copyQuizWithTargetBatchId #QuizService"));
+            .orElseThrow(() -> new UnsupportedOperationException("Failed at #copyQuizWithTargetBatchCode #QuizService"));
   }
 
   /**
