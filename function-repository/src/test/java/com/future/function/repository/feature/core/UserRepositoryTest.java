@@ -117,6 +117,17 @@ public class UserRepositoryTest {
   }
 
   @Test
+  public void testGivenBatchAndRoleAndPageableByFindingUsersByRoleAndPageableReturnPageOfUsers() {
+
+    Page<User> foundUsersPage = userRepository.findAllByBatchAndRoleAndDeletedFalse(
+        BATCH, Role.STUDENT, new PageRequest(0, 5));
+
+    assertThat(foundUsersPage).isNotNull();
+    assertThat(foundUsersPage.getContent()).isNotEmpty();
+    assertThat(foundUsersPage.getNumberOfElements()).isEqualTo(1);
+  }
+
+  @Test
   public void testGivenRoleAndBatchByFindingUsersByRoleAndBatchReturnListOfUsers() {
 
     List<User> foundUsers = userRepository.findAllByRoleAndBatchAndDeletedFalse(
