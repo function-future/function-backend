@@ -14,6 +14,7 @@ import com.future.function.service.impl.helper.AuthorizationHelper;
 import com.future.function.service.impl.helper.CopyHelper;
 import com.future.function.service.impl.helper.PageHelper;
 import com.future.function.session.model.Session;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -241,28 +242,27 @@ public class FileServiceImpl implements FileService {
                                                         Role.ADMIN
         ))
       .map(ignored -> storeOrCreateSourceFile(
-        fileOrFolderId, parentId, objectName, fileName, bytes))
-      .map(storedFile -> Pair.of(storedFile,
-                                 fileRepositoryV2.findOne(fileV2.getId())
-      ))
+        fileOrFolderId, parentId, objectName, fileName, bytes, fileRepositoryV2.findOne(fileV2.getId())))
       .map(this::copyPropertiesAndSaveFileV2)
       .orElse(fileV2);
   }
 
-  private FileV2 storeOrCreateSourceFile(
+  private Pair<FileV2, FileV2> storeOrCreateSourceFile(
     String fileOrFolderId, String parentId, String objectName, String fileName,
-    byte[] bytes
+    byte[] bytes, FileV2 foundFileFolder
   ) {
 
     if (bytes == null || bytes.length == 0) {
-      return FileV2.builder()
-        .name(objectName)
-        .build();
+      FileV2 returnedFile = new FileV2();
+      BeanUtils.copyProperties(foundFileFolder, returnedFile);
+      returnedFile.setName(objectName);
+      return Pair.of(returnedFile, foundFileFolder);
     }
     
-    return resourceService.storeFile(fileOrFolderId, parentId, objectName,
-                                     fileName, bytes, FileOrigin.FILE
-    );
+    return Pair.of(
+      resourceService.storeFile(fileOrFolderId, parentId, objectName, fileName,
+                                bytes, FileOrigin.FILE
+      ), foundFileFolder);
   }
   
   private FileV2 copyPropertiesAndSaveFileV2(Pair<FileV2, FileV2> pair) {
