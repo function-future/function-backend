@@ -151,12 +151,14 @@ public class UserServiceImpl implements UserService {
   
   private User setUserPassword(User user, User foundUser) {
   
-    if (!encoder.matches(
-      this.getDefaultPassword(foundUser.getName()), foundUser.getPassword())) {
-      user.setPassword(foundUser.getPassword());
-    } else {
-      user.setPassword(encoder.encode(this.getDefaultPassword(user.getName())));
-    }
+    String password = Optional.of(foundUser)
+      .filter(u -> !encoder.matches(this.getDefaultPassword(u.getName()),
+                                    u.getPassword()
+      ))
+      .map(User::getPassword)
+      .orElseGet(() -> encoder.encode(this.getDefaultPassword(user.getName())));
+    
+    user.setPassword(password);
     
     return foundUser;
   }
