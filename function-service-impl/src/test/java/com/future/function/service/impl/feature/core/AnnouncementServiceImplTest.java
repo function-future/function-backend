@@ -84,7 +84,7 @@ public class AnnouncementServiceImplTest {
   @Test
   public void testGivenPageableObjectByGettingAnnouncementsReturnAnnouncementsPage() {
     
-    when(announcementRepository.findAll(PAGEABLE)).thenReturn(
+    when(announcementRepository.findAllByOrderByUpdatedAtDesc(PAGEABLE)).thenReturn(
       ANNOUNCEMENT_PAGE);
     
     Page<Announcement> foundAnnouncementsPage =
@@ -93,7 +93,7 @@ public class AnnouncementServiceImplTest {
     assertThat(foundAnnouncementsPage).isNotNull();
     assertThat(foundAnnouncementsPage).isEqualTo(ANNOUNCEMENT_PAGE);
     
-    verify(announcementRepository).findAll(PAGEABLE);
+    verify(announcementRepository).findAllByOrderByUpdatedAtDesc(PAGEABLE);
   }
   
   @Test

@@ -8,14 +8,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.LimitOperation;
+import org.springframework.data.mongodb.core.aggregation.MatchOperation;
+import org.springframework.data.mongodb.core.aggregation.SkipOperation;
+import org.springframework.data.mongodb.core.aggregation.SortOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
-
-import static org.springframework.data.mongodb.core.query.Query.query;
 
 @Repository
 public class ActivityBlogRepositoryImpl
@@ -34,13 +39,27 @@ public class ActivityBlogRepositoryImpl
     String userId, String search, Pageable pageable
   ) {
     
-    List<ActivityBlog> foundActivityBlogs = mongoTemplate.find(
-      query(this.buildCriteria(userId, search)), ActivityBlog.class,
-      DocumentName.ACTIVITY_BLOG
-    );
+    Criteria criteria = this.buildCriteria(userId, search);
+    MatchOperation matchOperation = Aggregation.match(criteria);
     
-    return new PageImpl<>(
-      foundActivityBlogs, pageable, foundActivityBlogs.size());
+    SortOperation sortOperation = Aggregation.sort(
+      new Sort(Sort.Direction.DESC, FieldName.BaseEntity.UPDATED_AT));
+    
+    SkipOperation skipOperation = new SkipOperation(pageable.getOffset());
+    
+    LimitOperation limitOperation = Aggregation.limit(pageable.getPageSize());
+    
+    Aggregation dataAggregation = Aggregation.newAggregation(
+      sortOperation, matchOperation, skipOperation, limitOperation);
+    
+    List<ActivityBlog> foundActivityBlogs = mongoTemplate.aggregate(
+      dataAggregation, DocumentName.ACTIVITY_BLOG, ActivityBlog.class)
+      .getMappedResults();
+    
+    long size = mongoTemplate.count(
+      Query.query(criteria), DocumentName.ACTIVITY_BLOG);
+    
+    return new PageImpl<>(foundActivityBlogs, pageable, size);
   }
   
   private Criteria buildCriteria(String userId, String search) {

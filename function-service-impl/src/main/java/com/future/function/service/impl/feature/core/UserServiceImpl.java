@@ -152,10 +152,34 @@ public class UserServiceImpl implements UserService {
       .map(userRepository::findOne)
       .map(this::deleteUserPicture)
       .map(foundUser -> this.setUserPicture(user, foundUser))
+      .map(foundUser -> this.setUserPassword(user, foundUser))
       .map(foundUser -> this.copyPropertiesAndSaveUser(user, foundUser))
       .orElse(user);
   }
 
+  private String getDefaultPassword(String name) {
+    
+    return Optional.ofNullable(name)
+      .map(String::toLowerCase)
+      .map(n -> n.replace(" ", ""))
+      .map(n -> n.concat("functionapp"))
+      .orElse(null);
+  }
+  
+  private User setUserPassword(User user, User foundUser) {
+  
+    String password = Optional.of(foundUser)
+      .filter(u -> !encoder.matches(this.getDefaultPassword(u.getName()),
+                                    u.getPassword()
+      ))
+      .map(User::getPassword)
+      .orElseGet(() -> encoder.encode(this.getDefaultPassword(user.getName())));
+    
+    user.setPassword(password);
+    
+    return foundUser;
+  }
+  
   /**
    * {@inheritDoc}
    *
@@ -201,7 +225,7 @@ public class UserServiceImpl implements UserService {
   ) {
 
     userRepository.findByEmailAndDeletedFalse(email)
-      .filter(user -> encoder.matches(user.getPassword(), oldPassword))
+      .filter(user -> encoder.matches(oldPassword, user.getPassword()))
       .map(user -> this.setEncryptedPassword(user, newPassword))
       .map(userRepository::save)
       .orElseThrow(() -> new UnauthorizedException("Invalid Old Password"));
@@ -270,7 +294,8 @@ public class UserServiceImpl implements UserService {
 
   private User setDefaultEncryptedPassword(User user) {
 
-    return this.setEncryptedPassword(user, user.getPassword());
+    return this.setEncryptedPassword(
+      user, this.getDefaultPassword(user.getName()));
   }
 
   @Override

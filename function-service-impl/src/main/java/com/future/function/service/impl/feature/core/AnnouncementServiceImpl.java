@@ -49,7 +49,7 @@ public class AnnouncementServiceImpl implements AnnouncementService {
   @Override
   public Page<Announcement> getAnnouncements(Pageable pageable) {
     
-    return announcementRepository.findAll(pageable);
+    return announcementRepository.findAllByOrderByUpdatedAtDesc(pageable);
   }
   
   /**
