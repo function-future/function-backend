@@ -1,11 +1,10 @@
 package com.future.function.data.migration.change.log;
 
 import com.future.function.common.enumeration.core.Role;
+import com.future.function.model.entity.feature.core.User;
 import com.future.function.model.util.constant.DocumentName;
-import com.future.function.model.util.constant.FieldName;
 import com.github.mongobee.changeset.ChangeLog;
 import com.github.mongobee.changeset.ChangeSet;
-import com.mongodb.BasicDBObject;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
@@ -25,20 +24,19 @@ public class DataMigration_001 {
              order = "0001")
   public void insertAdmin(MongoTemplate mongoTemplate) {
 
-    BasicDBObject admin = new BasicDBObject();
-    admin.append(FieldName.User.EMAIL, ADMIN_EMAIL);
-    admin.append(FieldName.User.NAME, "Admin Istrator");
-    admin.append(FieldName.User.ROLE, Role.ADMIN);
-    admin.append(
-      FieldName.User.PASS, ENCODER.encode("administratorfunctionapp"));
-    admin.append(FieldName.User.PHONE, "+6281212341234");
-    admin.append(FieldName.User.ADDRESS, "Admin Address");
-    admin.append(FieldName.BaseEntity.CREATED_AT, System.currentTimeMillis());
-    admin.append(FieldName.BaseEntity.CREATED_BY, ADMIN_EMAIL);
-    admin.append(FieldName.BaseEntity.UPDATED_AT, System.currentTimeMillis());
-    admin.append(FieldName.BaseEntity.UPDATED_BY, ADMIN_EMAIL);
-    admin.append(FieldName.BaseEntity.VERSION, 0);
-    admin.append(FieldName.BaseEntity.DELETED, false);
+    User admin = new User();
+    admin.setEmail(ADMIN_EMAIL);
+    admin.setName("Admin Istrator");
+    admin.setRole(Role.ADMIN);
+    admin.setPassword(ENCODER.encode("administratorfunctionapp"));
+    admin.setPhone("+6281212341234");
+    admin.setAddress("Admin Address");
+    admin.setCreatedAt(System.currentTimeMillis());
+    admin.setCreatedBy(ADMIN_EMAIL);
+    admin.setUpdatedAt(System.currentTimeMillis());
+    admin.setUpdatedBy(ADMIN_EMAIL);
+    admin.setVersion(0L);
+    admin.setDeleted(false);
 
     mongoTemplate.insert(admin, DocumentName.USER);
   }

@@ -141,4 +141,17 @@ public class FileRepositoryV2Test {
     fileRepositoryV2.delete(file1.getId());
   }
   
+  @Test
+  public void testGivenMethodCallByFindingFileOrFolderByIdAndDeletedFalseReturnFileOrFolderObject() {
+  
+    assertThat(fileRepositoryV2.findByIdAndDeletedFalse(FILE_ID)
+                 .isPresent()).isTrue();
+    
+    file.setDeleted(true);
+    fileRepositoryV2.save(file);
+  
+    assertThat(fileRepositoryV2.findByIdAndDeletedFalse(FILE_ID)
+                 .isPresent()).isFalse();
+  }
+  
 }

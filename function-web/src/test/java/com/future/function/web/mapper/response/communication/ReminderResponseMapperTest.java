@@ -21,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Author: PriagungSatyagama
  * Created At: 0:00 11/07/2019
  */
-@RunWith(MockitoJUnitRunner.class)
+
 public class ReminderResponseMapperTest {
 
   private static final String REMINDER_ID_1 = "reminderId1";

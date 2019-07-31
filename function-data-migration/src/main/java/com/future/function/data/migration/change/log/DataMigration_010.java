@@ -15,8 +15,7 @@ public class DataMigration_010 {
   @ChangeSet(author = "oliver", id = "questionBankAccessList", order = "0001")
   public void insertQuestionBankAccessList(MongoTemplate mongoTemplate) {
 
-    //TODO need to ask
-    String urlRegex = "";
+    String urlRegex = "^\\/question-banks(\\/|\\/.*)?$";
 
     Map<String, Object> adminComponents = new HashMap<>();
     adminComponents.put("add", true);
@@ -61,14 +60,14 @@ public class DataMigration_010 {
         .build();
 
     mongoTemplate.insert(studentAccess, DocumentName.ACCESS);
-
   }
 
   @ChangeSet(author = "oliver", id = "allScoringListAndDetailPageAccessList", order = "0002")
   public void insertAllScoringListAndDetailPageAccessList(MongoTemplate mongoTemplate) {
 
-    //TODO need to ask (quiz, assignment, and final judging pages)
-    String urlRegex = "";
+    String urlRegex = "^\\/batches\\/[A-Za-z0-9\\-]+\\" +
+        "/(assignments|quizzes|final-judgings)(\\/|\\/[A-Za-z0-9\\-]+)?(\\/|\\" +
+        "/(detail|addDetail|add)(\\/)?)?$";
 
     Map<String, Object> adminComponents = new HashMap<>();
     adminComponents.put("add", true);
@@ -119,7 +118,6 @@ public class DataMigration_010 {
         .build();
 
     mongoTemplate.insert(studentAccess, DocumentName.ACCESS);
-
   }
 
 
@@ -127,8 +125,7 @@ public class DataMigration_010 {
   @ChangeSet(author = "oliver", id = "scoringBatchesPageAccessList", order = "0003")
   public void insertScoringBatchesAccessList(MongoTemplate mongoTemplate) {
 
-    //TODO need to ask (all quiz, assignment, final judging batches page)
-    String urlRegex = "";
+    String urlRegex = "^\\/.*\\/batches(\\/|\\/add|\\/.+\\/edit)?$";
 
     Map<String, Object> adminComponents = new HashMap<>();
     adminComponents.put("add", true);
@@ -179,14 +176,12 @@ public class DataMigration_010 {
         .build();
 
     mongoTemplate.insert(studentAccess, DocumentName.ACCESS);
-
   }
 
   @ChangeSet(author = "oliver", id = "studentQuizAccessList", order = "0004")
   public void insertStudentQuizAccessList(MongoTemplate mongoTemplate) {
 
-    //TODO need to ask (student quiz pages)
-    String urlRegex = "";
+    String urlRegex = "^\\/quizzes(\\/([A-Za-z0-9\\/\\-]+(\\/(detail|questions)?))?)?$";
 
     Map<String, Object> otherComponents = new HashMap<>();
     otherComponents.put("add", false);
@@ -231,14 +226,12 @@ public class DataMigration_010 {
         .build();
 
     mongoTemplate.insert(studentAccess, DocumentName.ACCESS);
-
   }
 
   @ChangeSet(author = "oliver", id = "studentRoomAccessList", order = "0005")
   public void insertStudentRoomAccessList(MongoTemplate mongoTemplate) {
 
-    //TODO need to ask (student quiz pages)
-    String urlRegex = "";
+    String urlRegex = "^\\/batches\\/.*\\/assignments\\/.*\\/rooms(\\/|\\/.*)?$";
 
     Map<String, Object> adminComponents = new HashMap<>();
     adminComponents.put("add", false);
@@ -268,7 +261,7 @@ public class DataMigration_010 {
 
     Access adminAccess = Access.builder()
         .urlRegex(urlRegex)
-        .components(withScoreComponents)
+        .components(adminComponents)
         .role(Role.ADMIN)
         .build();
 
@@ -297,14 +290,12 @@ public class DataMigration_010 {
         .build();
 
     mongoTemplate.insert(studentAccess, DocumentName.ACCESS);
-
   }
 
   @ChangeSet(author = "oliver", id = "finalJudgingComparisonAccessList", order = "0006")
   public void insertFinalJudgingComparisonAccessList(MongoTemplate mongoTemplate) {
 
-    //TODO need to ask (student quiz pages)
-    String urlRegex = "";
+    String urlRegex = "^\\/batches\\/.*\\/final-judgings\\/.*\\/comparison(\\/)?$";
 
     Map<String, Object> onlyReadComponents = new HashMap<>();
     onlyReadComponents.put("add", false);
@@ -355,14 +346,12 @@ public class DataMigration_010 {
         .build();
 
     mongoTemplate.insert(studentAccess, DocumentName.ACCESS);
-
   }
 
   @ChangeSet(author = "oliver", id = "pointsAccessList", order = "0007")
   public void insertPointsAccessList(MongoTemplate mongoTemplate) {
 
-    //TODO need to ask (student quiz pages)
-    String urlRegex = "";
+    String urlRegex = "^\\/points(\\/)?$";
 
     Map<String, Object> allFalseComponents = new HashMap<>();
     allFalseComponents.put("add", false);
@@ -407,7 +396,6 @@ public class DataMigration_010 {
         .build();
 
     mongoTemplate.insert(studentAccess, DocumentName.ACCESS);
-
   }
 
 }

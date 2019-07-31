@@ -18,6 +18,8 @@ public class AppraiseeResponse {
 
   private String avatar;
 
+  private String role;
+
   private BatchWebResponse batch;
 
   private String university;

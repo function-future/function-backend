@@ -82,6 +82,8 @@ public interface FieldName {
     public static final String NAME = "name";
 
     public static final String PARENT_ID = "parentId";
+    
+    public static final String PATHS = "paths";
 
     public static final String USED = "used";
 
@@ -90,6 +92,8 @@ public interface FieldName {
     public static final String AS_RESOURCE = "asResource";
 
     public static final String VERSIONS = "versions";
+    
+    public static final String USER = "user";
 
   }
 
@@ -186,7 +190,7 @@ public interface FieldName {
   }
 
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
-  abstract class QuestionnairePartiipant {
+  abstract class QuestionnaireParticipant {
 
     public static final String QUESTIONNAIRE = "questionnaire";
 
@@ -497,6 +501,39 @@ public interface FieldName {
     public static final String TITLE = "title";
 
     public static final String CONTENT = "content";
+
+  }
+
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  abstract class LoggingRoom {
+
+    public static final String MEMBERS = "members";
+
+    public static final String TITLE = "title";
+
+    public static final String DESCRIPTION = "description";
+
+  }
+
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  abstract class Topic {
+
+    public static final String TITLE = "title";
+
+    public static final String DESCRIPTION = "description";
+
+    public static final String LOGGING_ROOM = "loggingRoom";
+
+  }
+
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  abstract class LogMessage {
+
+    public static final String SENDER = "sender";
+
+    public static final String TEXT = "text";
+
+    public static final String TOPIC = "topic";
 
   }
 

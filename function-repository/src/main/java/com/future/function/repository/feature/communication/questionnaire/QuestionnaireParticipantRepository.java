@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -23,7 +24,7 @@ public interface QuestionnaireParticipantRepository extends MongoRepository<Ques
    * @return {@code page<QuestionnaireParticipant>} - all questionnaire participant filtered by the query
    */
 
-  Page<QuestionnaireParticipant> findAllByMemberAndParticipantTypeAndDeletedFalse(User member, ParticipantType participantType, Pageable pageable);
+  Page<QuestionnaireParticipant> findAllByMemberAndParticipantTypeAndDeletedFalseOrderByCreatedAtDesc(User member, ParticipantType participantType, Pageable pageable);
 
   /**
    * Find all questionnaire participant by questionnaire
@@ -35,9 +36,11 @@ public interface QuestionnaireParticipantRepository extends MongoRepository<Ques
    */
   Page<QuestionnaireParticipant> findAllByQuestionnaireAndDeletedFalse(Questionnaire questionnaire, Pageable pageable);
 
+  List<QuestionnaireParticipant> findAllByQuestionnaireAndDeletedFalse(Questionnaire questionnaire);
 
   Page<QuestionnaireParticipant> findAllByQuestionnaireAndParticipantTypeAndDeletedFalse(Questionnaire questionnaire, ParticipantType participantType, Pageable pageable);
 
   Optional<QuestionnaireParticipant> findByQuestionnaireAndMemberAndParticipantTypeAndDeletedFalse(Questionnaire questionnaire,User member, ParticipantType participantType);
+
 
 }

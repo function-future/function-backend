@@ -20,13 +20,16 @@ import com.future.function.web.model.request.communication.questionnaire.Questio
 import com.future.function.web.model.response.base.BaseResponse;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
-import com.future.function.web.model.response.feature.communication.questionnaire.QuestionnaireDetailResponse;
+import com.future.function.web.model.response.feature.communication.questionnaire.QuestionQuestionnaireResponse;
 import com.future.function.web.model.response.feature.communication.questionnaire.QuestionnaireParticipantDescriptionResponse;
+import com.future.function.web.model.response.feature.communication.questionnaire.QuestionnaireDetailResponse;
 import com.future.function.web.model.response.feature.communication.questionnaire.QuestionnaireParticipantResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping(value = "/api/communication/questionnaires")
@@ -109,7 +112,7 @@ public class QuestionnaireController {
   )
   public DataResponse<QuestionnaireDetailResponse> updateQuestionnaire(
     @PathVariable String questionnaireId,
-    QuestionnaireRequest questionnaireRequest
+    @RequestBody  QuestionnaireRequest questionnaireRequest
   ) {
     return QuestionnaireResponseMapper.toDataResponseQuestionnaireDetailResponse(
       questionnaireService.updateQuestionnaire(
@@ -121,24 +124,24 @@ public class QuestionnaireController {
   @DeleteMapping(value ="/{questionnaireId}")
   public BaseResponse deleteQuestionnaire(@PathVariable String questionnaireId){
     questionnaireService.deleteQuestionnaire(questionnaireId);
+
     return ResponseHelper.toBaseResponse(HttpStatus.OK);
   }
 
   @ResponseStatus(HttpStatus.OK)
-  @GetMapping(value = "/{questionnaireId}/questions")
-  public DataResponse getQuestionsQuestionnaire(@PathVariable String questionnarieId){
+  @GetMapping(value = "/{questionnaireId}/questions", produces = MediaType.APPLICATION_JSON_VALUE)
+  public DataResponse<List<QuestionQuestionnaireResponse>> getQuestionsQuestionnaire(@PathVariable String questionnaireId){
     return QuestionQuestionnaireResponseMapper.toDataResponseListQuestionQuestionnaireResponse(
-            questionnaireService.getQuestionsByIdQuestionnaire(questionnarieId),
-            HttpStatus.OK
-    );
+            questionnaireService.getQuestionsByIdQuestionnaire(questionnaireId),
+            HttpStatus.OK);
   }
 
   @ResponseStatus(HttpStatus.CREATED)
-  @PostMapping(value = "/{questionnaireId]/questions",
+  @PostMapping(value = "/{questionnaireId}/questions",
               consumes = MediaType.APPLICATION_JSON_VALUE,
               produces = MediaType.APPLICATION_JSON_VALUE
               )
-  public DataResponse createQuestionQuestionnaire(@PathVariable String questionnaireId,
+  public DataResponse<QuestionQuestionnaireResponse> createQuestionQuestionnaire(@PathVariable String questionnaireId,
                                                   @RequestBody QuestionQuestionnaireRequest questionQuestionnaireRequest) {
     return QuestionQuestionnaireResponseMapper.toDataResponseQuestionQuestionnaireResponse(
             questionnaireService.createQuestionQuestionnaire(
@@ -153,14 +156,14 @@ public class QuestionnaireController {
   }
 
   @ResponseStatus(HttpStatus.OK)
-  @PutMapping(value = "/{questionnaireId}/questions/{questionId]",
+  @PutMapping(value = "/{questionnaireId}/questions/{questionId}",
           consumes = MediaType.APPLICATION_JSON_VALUE,
           produces = MediaType.APPLICATION_JSON_VALUE
   )
-  public DataResponse updateQuestionQuestionnaire(
+  public DataResponse<QuestionQuestionnaireResponse> updateQuestionQuestionnaire(
           @PathVariable String questionnaireId,
           @PathVariable String questionId,
-          QuestionQuestionnaireRequest questionQuestionnaireRequest
+          @RequestBody QuestionQuestionnaireRequest questionQuestionnaireRequest
   ) {
     return QuestionQuestionnaireResponseMapper.toDataResponseQuestionQuestionnaireResponse(
             questionnaireService.updateQuestionQuestionnaire(

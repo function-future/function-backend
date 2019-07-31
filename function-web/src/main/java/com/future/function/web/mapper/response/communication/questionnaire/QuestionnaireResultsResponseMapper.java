@@ -26,10 +26,10 @@ public class QuestionnaireResultsResponseMapper {
     return ResponseHelper.toPagingResponse(HttpStatus.OK, toUserSummaryResponseList(data), PageHelper.toPaging(data));
   }
 
-  public static DataResponse<List<UserSummaryResponse>> toDataResponseUserSummaryResponse(
-    Page<UserQuestionnaireSummary> data
+  public static DataResponse<UserSummaryResponse> toDataResponseUserSummaryResponse(
+          UserQuestionnaireSummary data
   ) {
-    return ResponseHelper.toDataResponse(HttpStatus.OK, toUserSummaryResponseList(data));
+    return ResponseHelper.toDataResponse(HttpStatus.OK, toUserSummaryResponse(data));
   }
 
   private static List<UserSummaryResponse> toUserSummaryResponseList(Page<UserQuestionnaireSummary> data) {
@@ -59,6 +59,13 @@ public class QuestionnaireResultsResponseMapper {
   }
 
   private static BatchWebResponse toBatchResponse(Batch batch) {
+    if(batch == null) {
+      return BatchWebResponse.builder()
+              .id("No Batch")
+              .name("No Batch")
+              .code("No Batch")
+              .build();
+    }
     return BatchWebResponse.builder()
             .id(batch.getId())
             .name(batch.getName())
