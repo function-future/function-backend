@@ -91,7 +91,8 @@ Accessible for admin only. Create new batch, if valid session; otherwise 401 res
             "code": 400,
             "status": "BAD_REQUEST",
             "errors": {
-                "code": ["UniqueBatchCode","NoSpace","NotBlank"]
+                "name": ["NotBlank"],
+                "code": ["UniqueBatchCode","NoSpace","NotBlank","Alphanumeric"]
             }
         }
 
@@ -192,7 +193,8 @@ Accessible for admin only. Update batch based on batchId, if valid data; otherwi
             "code": 400,
             "status": "BAD_REQUEST",
             "errors": {
-                "code": ["UniqueBatchCode","NoSpace","NotBlank"]
+                "name": ["NotBlank"],
+                "code": ["UniqueBatchCode","NoSpace","NotBlank","Alphanumeric"]
             }
         }
 
