@@ -84,12 +84,14 @@ public class ReportServiceImpl implements ReportService {
 
   @Override
   public Report createReport(Report report) {
+        List<User> students = report.getStudents();
         return Optional.ofNullable(report)
                 .map(this::setBatch)
                 .map(currentReport -> createReportDetailByReportAndStudentId(currentReport, report.getStudents()))
                 .map(currentReport -> this.setStudents(currentReport, null))
                 .map(reportRepository::save)
-                .map(currentReport -> this.setStudents(currentReport, report.getStudents()))
+                .map(currentReport -> this.setStudents(currentReport, students))
+                .map(this::findStudentsAndSetReport)
                 .orElseThrow(() -> new UnsupportedOperationException("Failed at #createReport #ReportService"));
     }
 
