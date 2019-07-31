@@ -97,7 +97,7 @@ public class FileRequestMapperTest {
       .bytes(bytes)
       .build();
     
-    assertThat(fileRequestMapper.toFileWebRequest(json, bytes)).isEqualTo(
+    assertThat(fileRequestMapper.toFileWebRequest(id, json, bytes)).isEqualTo(
       expectedRequest);
     
     verify(requestMapper).toWebRequestObject(json, FileWebRequest.class);
