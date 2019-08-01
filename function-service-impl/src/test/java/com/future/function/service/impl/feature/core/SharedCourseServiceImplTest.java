@@ -132,9 +132,8 @@ public class SharedCourseServiceImplTest {
     
     when(batchService.getBatchByCode(BATCH_CODE)).thenReturn(BATCH);
     sharedCourse.setId(SHARED_COURSE_ID);
-    when(sharedCourseRepository.findByCourseIdAndBatch(COURSE_ID,
-                                                       BATCH
-    )).thenReturn(Optional.of(sharedCourse));
+    when(sharedCourseRepository.findByIdAndBatch(COURSE_ID, BATCH)).thenReturn(
+      Optional.of(sharedCourse));
     
     Course foundCourse = sharedCourseService.getCourseByIdAndBatchCode(
       COURSE_ID, BATCH_CODE);
@@ -148,7 +147,7 @@ public class SharedCourseServiceImplTest {
                                         .build());
     
     verify(batchService).getBatchByCode(BATCH_CODE);
-    verify(sharedCourseRepository).findByCourseIdAndBatch(COURSE_ID, BATCH);
+    verify(sharedCourseRepository).findByIdAndBatch(COURSE_ID, BATCH);
     verifyZeroInteractions(resourceService, courseService, discussionService);
   }
   
@@ -156,9 +155,8 @@ public class SharedCourseServiceImplTest {
   public void testGivenInvalidCourseIdAndBatchCodeByGettingCourseForBatchReturnNotFoundException() {
     
     when(batchService.getBatchByCode(BATCH_CODE)).thenReturn(BATCH);
-    when(sharedCourseRepository.findByCourseIdAndBatch(COURSE_ID,
-                                                       BATCH
-    )).thenReturn(Optional.empty());
+    when(sharedCourseRepository.findByIdAndBatch(COURSE_ID, BATCH)).thenReturn(
+      Optional.empty());
     
     catchException(
       () -> sharedCourseService.getCourseByIdAndBatchCode(COURSE_ID,
@@ -170,7 +168,7 @@ public class SharedCourseServiceImplTest {
       "Get Course Not Found");
     
     verify(batchService).getBatchByCode(BATCH_CODE);
-    verify(sharedCourseRepository).findByCourseIdAndBatch(COURSE_ID, BATCH);
+    verify(sharedCourseRepository).findByIdAndBatch(COURSE_ID, BATCH);
     verifyZeroInteractions(resourceService, courseService, discussionService);
   }
   
@@ -231,14 +229,13 @@ public class SharedCourseServiceImplTest {
   public void testGivenCourseIdAndBatchCodeByDeletingCourseForBatchReturnSuccessfulDeletion() {
     
     when(batchService.getBatchByCode(BATCH_CODE)).thenReturn(BATCH);
-    when(sharedCourseRepository.findByCourseIdAndBatch(COURSE_ID,
-                                                       BATCH
-    )).thenReturn(Optional.of(sharedCourse));
+    when(sharedCourseRepository.findByIdAndBatch(COURSE_ID, BATCH)).thenReturn(
+      Optional.of(sharedCourse));
     
     sharedCourseService.deleteCourseByIdAndBatchCode(COURSE_ID, BATCH_CODE);
     
     verify(batchService).getBatchByCode(BATCH_CODE);
-    verify(sharedCourseRepository).findByCourseIdAndBatch(COURSE_ID, BATCH);
+    verify(sharedCourseRepository).findByIdAndBatch(COURSE_ID, BATCH);
     verify(resourceService).markFilesUsed(FILE_IDS, false);
     verify(discussionService).deleteDiscussions(
       sharedCourse.getId(), BATCH_CODE);
@@ -250,14 +247,13 @@ public class SharedCourseServiceImplTest {
   public void testGivenInvalidCourseIdAndBatchCodeByDeletingCourseForBatchReturnFailedDeletion() {
     
     when(batchService.getBatchByCode(BATCH_CODE)).thenReturn(BATCH);
-    when(sharedCourseRepository.findByCourseIdAndBatch(COURSE_ID,
-                                                       BATCH
-    )).thenReturn(Optional.empty());
+    when(sharedCourseRepository.findByIdAndBatch(COURSE_ID, BATCH)).thenReturn(
+      Optional.empty());
     
     sharedCourseService.deleteCourseByIdAndBatchCode(COURSE_ID, BATCH_CODE);
     
     verify(batchService).getBatchByCode(BATCH_CODE);
-    verify(sharedCourseRepository).findByCourseIdAndBatch(COURSE_ID, BATCH);
+    verify(sharedCourseRepository).findByIdAndBatch(COURSE_ID, BATCH);
     verifyZeroInteractions(resourceService, courseService);
   }
   
@@ -265,9 +261,8 @@ public class SharedCourseServiceImplTest {
   public void testGivenCourseIdAndBatchCodeAndCourseByUpdatingCourseForBatchReturnUpdatedCourse() {
     
     when(batchService.getBatchByCode(BATCH_CODE)).thenReturn(BATCH);
-    when(sharedCourseRepository.findByCourseIdAndBatch(COURSE_ID,
-                                                       BATCH
-    )).thenReturn(Optional.of(sharedCourse));
+    when(sharedCourseRepository.findByIdAndBatch(COURSE_ID, BATCH)).thenReturn(
+      Optional.of(sharedCourse));
     when(resourceService.markFilesUsed(FILE_IDS, false)).thenReturn(true);
     when(resourceService.markFilesUsed(FILE_IDS, true)).thenReturn(true);
     when(resourceService.getFile(FILE_ID)).thenReturn(FILE);
@@ -280,7 +275,7 @@ public class SharedCourseServiceImplTest {
     assertThat(updatedCourse).isEqualTo(course);
     
     verify(batchService).getBatchByCode(BATCH_CODE);
-    verify(sharedCourseRepository).findByCourseIdAndBatch(COURSE_ID, BATCH);
+    verify(sharedCourseRepository).findByIdAndBatch(COURSE_ID, BATCH);
     verify(resourceService).markFilesUsed(FILE_IDS, false);
     verify(resourceService).markFilesUsed(FILE_IDS, true);
     verify(resourceService).getFile(FILE_ID);
@@ -292,9 +287,8 @@ public class SharedCourseServiceImplTest {
   public void testInvalidGivenCourseIdAndBatchCodeAndCourseByUpdatingCourseForBatchReturnCourseFromParameter() {
     
     when(batchService.getBatchByCode(BATCH_CODE)).thenReturn(BATCH);
-    when(sharedCourseRepository.findByCourseIdAndBatch(COURSE_ID,
-                                                       BATCH
-    )).thenReturn(Optional.empty());
+    when(sharedCourseRepository.findByIdAndBatch(COURSE_ID, BATCH)).thenReturn(
+      Optional.empty());
     
     Course updatedCourse = sharedCourseService.updateCourseForBatch(
       COURSE_ID, BATCH_CODE, course);
@@ -303,7 +297,7 @@ public class SharedCourseServiceImplTest {
     assertThat(updatedCourse).isEqualTo(course);
     
     verify(batchService).getBatchByCode(BATCH_CODE);
-    verify(sharedCourseRepository).findByCourseIdAndBatch(COURSE_ID, BATCH);
+    verify(sharedCourseRepository).findByIdAndBatch(COURSE_ID, BATCH);
     verifyZeroInteractions(resourceService, courseService, discussionService);
   }
   
@@ -375,9 +369,8 @@ public class SharedCourseServiceImplTest {
   public void testGivenEmailAndCourseIdAndBatchCodeByGettingDiscussionsForSharedCourseReturnPageOfDiscussion() {
   
     when(batchService.getBatchByCode(BATCH_CODE)).thenReturn(BATCH);
-    when(sharedCourseRepository.findByCourseIdAndBatch(COURSE_ID,
-                                                       BATCH
-    )).thenReturn(Optional.of(sharedCourse));
+    when(sharedCourseRepository.findByIdAndBatch(COURSE_ID, BATCH)).thenReturn(
+      Optional.of(sharedCourse));
     when(discussionService.getDiscussions(EMAIL, COURSE_ID, BATCH_CODE,
                                           PAGEABLE
     )).thenReturn(
@@ -396,7 +389,7 @@ public class SharedCourseServiceImplTest {
     assertThat(discussions).isEqualTo(expectedDiscussions);
     
     verify(batchService).getBatchByCode(BATCH_CODE);
-    verify(sharedCourseRepository).findByCourseIdAndBatch(COURSE_ID, BATCH);
+    verify(sharedCourseRepository).findByIdAndBatch(COURSE_ID, BATCH);
     verify(discussionService).getDiscussions(EMAIL, COURSE_ID, BATCH_CODE,
                                              PAGEABLE
     );
@@ -408,9 +401,8 @@ public class SharedCourseServiceImplTest {
   public void testGivenDiscussionByCreatingDiscussionReturnCreatedDiscussion() {
   
     when(batchService.getBatchByCode(BATCH_CODE)).thenReturn(BATCH);
-    when(sharedCourseRepository.findByCourseIdAndBatch(COURSE_ID,
-                                                       BATCH
-    )).thenReturn(Optional.of(sharedCourse));
+    when(sharedCourseRepository.findByIdAndBatch(COURSE_ID, BATCH)).thenReturn(
+      Optional.of(sharedCourse));
     
     Discussion discussionRequest = Discussion.builder()
       .courseId(COURSE_ID)
@@ -426,7 +418,7 @@ public class SharedCourseServiceImplTest {
     assertThat(discussion).isEqualTo(this.discussion);
   
     verify(batchService).getBatchByCode(BATCH_CODE);
-    verify(sharedCourseRepository).findByCourseIdAndBatch(COURSE_ID, BATCH);
+    verify(sharedCourseRepository).findByIdAndBatch(COURSE_ID, BATCH);
     verify(discussionService).createDiscussion(discussionRequest);
   
     verifyZeroInteractions(courseService, resourceService);

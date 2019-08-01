@@ -58,7 +58,7 @@ public class SharedCourseServiceImpl implements SharedCourseService {
     
     return this.getBatch(batchCode)
       .flatMap(
-        batch -> sharedCourseRepository.findByCourseIdAndBatch(courseId, batch))
+        batch -> sharedCourseRepository.findByIdAndBatch(courseId, batch))
       .map(this::setCourseId)
       .orElseThrow(() -> new NotFoundException("Get Course Not Found"));
   }
@@ -110,7 +110,7 @@ public class SharedCourseServiceImpl implements SharedCourseService {
     
     this.getBatch(batchCode)
       .flatMap(
-        batch -> sharedCourseRepository.findByCourseIdAndBatch(courseId, batch))
+        batch -> sharedCourseRepository.findByIdAndBatch(courseId, batch))
       .ifPresent(sharedCourse -> {
         this.markCourseFilesUnused(sharedCourse);
         this.deleteDiscussionsForSharedCourse(sharedCourse);
@@ -163,7 +163,7 @@ public class SharedCourseServiceImpl implements SharedCourseService {
       .map(course -> this.buildSharedCourse(course, batchService.getBatchByCode(
         targetBatchCode)))
       .map(sharedCourseRepository::save)
-      .map(SharedCourse::getCourse)
+      .map(this::setCourseId)
       .collect(Collectors.toList());
   }
   
@@ -185,7 +185,7 @@ public class SharedCourseServiceImpl implements SharedCourseService {
       .map(courseAndBatchPair -> this.buildSharedCourse(
         courseAndBatchPair.getFirst(), courseAndBatchPair.getSecond()))
       .map(sharedCourseRepository::save)
-      .map(SharedCourse::getCourse)
+      .map(this::setCourseId)
       .collect(Collectors.toList());
   }
   
@@ -196,12 +196,12 @@ public class SharedCourseServiceImpl implements SharedCourseService {
     
     return this.getBatch(batchCode)
       .flatMap(
-        batch -> sharedCourseRepository.findByCourseIdAndBatch(courseId, batch))
+        batch -> sharedCourseRepository.findByIdAndBatch(courseId, batch))
       .map(this::deleteCourseFile)
       .map(sharedCourse -> this.copyPropertiesAndSaveSharedCourse(sharedCourse,
                                                                   course
       ))
-      .map(SharedCourse::getCourse)
+      .map(this::setCourseId)
       .orElse(course);
   }
   

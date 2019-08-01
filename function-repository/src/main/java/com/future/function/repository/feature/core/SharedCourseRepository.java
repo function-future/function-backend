@@ -28,7 +28,7 @@ public interface SharedCourseRepository
    * database, if any exists; otherwise returns
    * {@link java.util.Optional#empty()}.
    */
-  Optional<SharedCourse> findByCourseIdAndBatch(String courseId, Batch batch);
+  Optional<SharedCourse> findByIdAndBatch(String courseId, Batch batch);
   
   /**
    * Finds shared courses in database based on {@code batch} amd {@code
