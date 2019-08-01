@@ -70,6 +70,8 @@ public class UserResponseMapper {
       .phone(user.getPhone())
       .address(user.getAddress())
       .avatar(UserResponseMapper.getFileUrl(user.getPictureV2()))
+      .avatarId(user.getPictureV2()
+                  .getId())
       .batch(UserResponseMapper.getBatch(user))
       .university(user.getUniversity())
       .build();
