@@ -151,7 +151,7 @@ public class LoggingRoomController {
 
     logMessageService.createLogMessage(
       logMessageRequestMapper.toLogMessage(
-        logMessageWebRequest, session.getId(), topicId)
+        logMessageWebRequest, session.getUserId(), topicId)
     );
 
     return ResponseHelper.toBaseResponse(HttpStatus.CREATED);
