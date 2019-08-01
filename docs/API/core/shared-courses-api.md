@@ -26,13 +26,15 @@ Accessible for all users except guest. Get courses for specified batchCode, if v
                     "id": "sample-id",
                     "title": "Course Title",
                     "description": "Course Description Goes Here",
-                    "material": "https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png"
+                    "material": "https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png",
+                    "materialId": "sample-id"
                 },
                 {
                     "id": "sample-id",
                     "title": "Course Title",
                     "description": "Course Description Goes Here",
-                    "material": "https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png"
+                    "material": "https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png",
+                    "materialId": "sample-id"
                 }
             ],
             "paging": {
@@ -77,13 +79,15 @@ otherwise 401 response is returned; if available; otherwise 404 response is retu
                     "id": "sample-id",
                     "title": "Course Title",
                     "description": "Course Description Goes Here",
-                    "material": "https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png"
+                    "material": "https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png",
+                    "materialId": "sample-id"
                 },
                 {
                     "id": "sample-id",
                     "title": "Course Title",
                     "description": "Course Description Goes Here",
-                    "material": "https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png"
+                    "material": "https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png",
+                    "materialId": "sample-id"
                 }
             ]
         }
@@ -138,7 +142,8 @@ Accessible for all users except guest. Get course detail based on passed courseI
                 "id": "sample-id",
                 "title": "Course Title",
                 "description": "Course Description Goes Here",
-                "material": "https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png"
+                "material": "https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png",
+                "materialId": "sample-id"
             }
         }
 
@@ -184,7 +189,8 @@ returned.
                 "id": "sample-id",
                 "title": "Course Title",
                 "description": "Course Description Goes Here",
-                "material": "https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png"
+                "material": "https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png",
+                "materialId": "sample-id"
             }
         }
 

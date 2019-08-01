@@ -22,4 +22,6 @@ public class CourseWebResponse {
   
   private String material;
   
+  private String materialId;
+  
 }
