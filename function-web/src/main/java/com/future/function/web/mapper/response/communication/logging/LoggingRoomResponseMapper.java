@@ -61,7 +61,7 @@ public class LoggingRoomResponseMapper {
     return MemberResponse.builder()
             .id(member.getId())
             .name(member.getName())
-            .avatar(member.getPictureV2().getThumbnailPath())
+            .avatar(member.getPictureV2().getThumbnailUrl())
             .batchName(member.getBatch().getName())
             .role(member.getRole().toString())
             .university(member.getUniversity())
@@ -118,11 +118,9 @@ public class LoggingRoomResponseMapper {
     return LogMessageWebResponse.builder()
             .id(logMessage.getId())
             .createdAt(logMessage.getCreatedAt())
-            .senderAvatar(logMessage.getSender().getPictureV2().getThumbnailPath())
+            .senderAvatar(logMessage.getSender().getPictureV2().getThumbnailUrl())
             .senderName(logMessage.getSender().getName())
             .text(logMessage.getText())
             .build();
   }
-
-
 }
