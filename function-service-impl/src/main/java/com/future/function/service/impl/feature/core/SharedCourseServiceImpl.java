@@ -59,8 +59,16 @@ public class SharedCourseServiceImpl implements SharedCourseService {
     return this.getBatch(batchCode)
       .flatMap(
         batch -> sharedCourseRepository.findByCourseIdAndBatch(courseId, batch))
-      .map(SharedCourse::getCourse)
+      .map(this::setCourseId)
       .orElseThrow(() -> new NotFoundException("Get Course Not Found"));
+  }
+  
+  private Course setCourseId(SharedCourse sharedCourse) {
+  
+    Course course = sharedCourse.getCourse();
+    course.setId(sharedCourse.getId());
+    
+    return course;
   }
   
   private Optional<Batch> getBatch(String batchCode) {
@@ -93,7 +101,7 @@ public class SharedCourseServiceImpl implements SharedCourseService {
     
     return sharedCourses.getContent()
       .stream()
-      .map(SharedCourse::getCourse)
+      .map(this::setCourseId)
       .collect(Collectors.toList());
   }
   
@@ -113,8 +121,7 @@ public class SharedCourseServiceImpl implements SharedCourseService {
   private void deleteDiscussionsForSharedCourse(SharedCourse sharedCourse) {
     
     discussionService.deleteDiscussions(
-      sharedCourse.getCourse()
-        .getId(), sharedCourse.getBatch()
+      sharedCourse.getId(), sharedCourse.getBatch()
         .getCode());
   }
   
