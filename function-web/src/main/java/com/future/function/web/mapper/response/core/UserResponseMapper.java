@@ -30,8 +30,8 @@ public class UserResponseMapper {
    * @param user User data to be converted to response.
    *
    * @return {@code DataResponse<UserWebResponse>} - The converted user data,
-   * wrapped in
-   * {@link com.future.function.web.model.response.base.DataResponse} and
+   * wrapped in {@link com.future.function.web.model.response.base.DataResponse}
+   * and
    * {@link com.future.function.web.model.response.feature.core.UserWebResponse}
    */
   public static DataResponse<UserWebResponse> toUserDataResponse(User user) {
@@ -47,8 +47,8 @@ public class UserResponseMapper {
    * @param user       User data to be converted to response.
    *
    * @return {@code DataResponse<UserWebResponse>} - The converted user data,
-   * wrapped in
-   * {@link com.future.function.web.model.response.base.DataResponse} and
+   * wrapped in {@link com.future.function.web.model.response.base.DataResponse}
+   * and
    * {@link com.future.function.web.model.response.feature.core.UserWebResponse}
    */
   public static DataResponse<UserWebResponse> toUserDataResponse(
@@ -70,11 +70,17 @@ public class UserResponseMapper {
       .phone(user.getPhone())
       .address(user.getAddress())
       .avatar(UserResponseMapper.getFileUrl(user.getPictureV2()))
-      .avatarId(user.getPictureV2()
-                  .getId())
+      .avatarId(UserResponseMapper.getFileId(user))
       .batch(UserResponseMapper.getBatch(user))
       .university(user.getUniversity())
       .build();
+  }
+  
+  private static String getFileId(User user) {
+    
+    return Optional.ofNullable(user.getPictureV2())
+      .map(FileV2::getId)
+      .orElse(null);
   }
   
   private static BatchWebResponse getBatch(User user) {
@@ -99,7 +105,8 @@ public class UserResponseMapper {
    *
    * @return {@code PagingResponse<UserWebResponse} - The converted user data,
    * wrapped in
-   * {@link com.future.function.web.model.response.base.PagingResponse} and
+   * {@link com.future.function.web.model.response.base.PagingResponse}
+   * and
    * {@link com.future.function.web.model.response.feature.core.UserWebResponse}
    */
   public static PagingResponse<UserWebResponse> toUsersPagingResponse(
