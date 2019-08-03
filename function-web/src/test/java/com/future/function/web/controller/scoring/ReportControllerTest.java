@@ -32,12 +32,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.time.LocalDate;
 import java.util.Collections;
 import java.util.Date;
 
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -45,7 +49,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import(TestSecurityConfiguration.class)
 @WebMvcTest(ReportController.class)
 public class ReportControllerTest extends TestHelper {
-
+    
     private static final String STUDENT_ID = "student-id";
     private static final String STUDENT_NAME = "student-name";
     private static final String STUDENT_PHONE = "student-phone";
@@ -58,6 +62,7 @@ public class ReportControllerTest extends TestHelper {
     private static final String DESCRIPTION = "description";
     private static final String BATCH_CODE = "batch-code";
     private static final Long CREATED_AT = new Date().getTime();
+    private static final String FILE_ID = "file-id";
 
     private ReportWebResponse reportWebResponse;
     private UserWebResponse userWebResponse;
@@ -96,7 +101,7 @@ public class ReportControllerTest extends TestHelper {
             .role(Role.STUDENT)
             .address(STUDENT_ADDRESS)
             .phone(STUDENT_PHONE)
-            .pictureV2(FileV2.builder().fileUrl(STUDENT_AVATAR).build())
+            .pictureV2(FileV2.builder().id(FILE_ID).fileUrl(STUDENT_AVATAR).build())
             .batch(batch)
             .email(STUDENT_EMAIL)
             .university(STUDENT_UNIVERSITY).build();
@@ -108,6 +113,7 @@ public class ReportControllerTest extends TestHelper {
             .address(STUDENT_ADDRESS)
             .phone(STUDENT_PHONE)
             .avatar(STUDENT_AVATAR)
+            .avatarId(FILE_ID)
             .batch(BatchWebResponse.builder().code(BATCH_CODE).build())
             .email(STUDENT_EMAIL)
             .university(STUDENT_UNIVERSITY).build();

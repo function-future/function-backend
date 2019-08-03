@@ -20,15 +20,23 @@ public class FileMongoEventListener extends AbstractMongoEventListener<FileV2> {
     Optional.of(event)
       .map(MongoMappingEvent::getSource)
       .filter(file -> !file.isMarkFolder())
+      .filter(file -> !file.isAsResource())
       .ifPresent(this::updateFileVersions);
   }
   
   private void updateFileVersions(FileV2 file) {
     
-    long nextVersion = file.getVersion() + 1;
+    if (file.getVersion() != 1) {
+      long nextVersion = this.getNextVersion(file);
+      
+      file.getVersions()
+        .put(nextVersion, this.buildVersion(file, nextVersion));
+    }
+  }
+  
+  private long getNextVersion(FileV2 file) {
     
-    file.getVersions()
-      .put(nextVersion, this.buildVersion(file, nextVersion));
+    return (file.getVersion() == 0) ? file.getVersion() + 1 : file.getVersion();
   }
   
   private Version buildVersion(FileV2 file, long nextVersion) {
