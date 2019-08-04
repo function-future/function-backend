@@ -11,7 +11,6 @@ import com.future.function.web.model.response.feature.scoring.AssignmentWebRespo
 import org.assertj.core.api.Assertions;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -31,6 +30,7 @@ public class AssignmentResponseMapperTest {
   private static final long ASSIGNMENT_DEADLINE = new Date().getTime();
   private static final String BATCH_CODE = "batch-code";
   private static final String FILE_URl = "file-url";
+  private static final String FILE_ID = "file-id";
   private Paging paging;
   private Pageable pageable;
   private Assignment assignment;
@@ -47,7 +47,7 @@ public class AssignmentResponseMapperTest {
   public void setUp() throws Exception {
 
     batch = Batch.builder().code(BATCH_CODE).build();
-    fileV2 = FileV2.builder().fileUrl(FILE_URl).build();
+    fileV2 = FileV2.builder().id(FILE_ID).fileUrl(FILE_URl).build();
 
     assignment = Assignment
         .builder()
@@ -69,6 +69,7 @@ public class AssignmentResponseMapperTest {
         .batchCode(BATCH_CODE)
         .uploadedDate(ASSIGNMENT_DEADLINE)
         .file(FILE_URl)
+            .fileId(FILE_ID)
         .build();
 
     assignmentWebResponseDataResponse = DataResponse

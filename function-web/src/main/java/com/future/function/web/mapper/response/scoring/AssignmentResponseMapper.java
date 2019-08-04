@@ -52,6 +52,7 @@ public final class AssignmentResponseMapper {
     BeanUtils.copyProperties(assignment, response);
     response.setBatchCode(assignment.getBatch().getCode());
     response.setFile(assignment.getFile().getFileUrl());
+    response.setFileId(assignment.getFile().getId());
     response.setUploadedDate(assignment.getCreatedAt());
     return response;
   }
