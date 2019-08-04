@@ -30,6 +30,8 @@ public class UserWebResponse {
   @JsonInclude(value = JsonInclude.Include.NON_NULL)
   private String avatar;
   
+  private String avatarId;
+  
   @JsonInclude(value = JsonInclude.Include.NON_NULL)
   private BatchWebResponse batch;
   

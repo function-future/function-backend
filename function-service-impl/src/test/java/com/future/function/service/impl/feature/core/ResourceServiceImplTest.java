@@ -1,7 +1,9 @@
 package com.future.function.service.impl.feature.core;
 
 import com.future.function.common.enumeration.core.FileOrigin;
+import com.future.function.common.enumeration.core.Role;
 import com.future.function.common.exception.NotFoundException;
+import com.future.function.common.exception.UnauthorizedException;
 import com.future.function.common.properties.core.FileProperties;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.embedded.Version;
@@ -90,7 +92,7 @@ public class ResourceServiceImplTest {
   @AfterClass
   public static void tearDownClass() {
     
-    final int numberOfTestMethodInClass = 11;
+    final int numberOfTestMethodInClass = 12;
     
     verify(
       fileProperties, times(numberOfTestMethodInClass)).getImageExtensions();
@@ -299,7 +301,7 @@ public class ResourceServiceImplTest {
     String fileId = UUID.randomUUID()
       .toString();
     when(fileRepositoryV2.findByIdAndAsResource(fileId,
-                                                FileOrigin.ANNOUNCEMENT.isAsResource()
+                                                FileOrigin.BLOG.isAsResource()
     )).thenReturn(Optional.of(FILE_V2));
     
     File file = mock(File.class);
@@ -314,15 +316,13 @@ public class ResourceServiceImplTest {
     String fileName = fileId + ".png";
     doReturn(false).when(FileHelper.class, "isThumbnailName", fileName);
     
-    byte[] bytes = resourceService.getFileAsByteArray(fileName,
-                                                      FileOrigin.ANNOUNCEMENT,
-                                                      null
-    );
+    byte[] bytes = resourceService.getFileAsByteArray(
+      Role.UNKNOWN, fileName, FileOrigin.BLOG, null);
     
     assertThat(bytes).isEqualTo(BYTES);
     
     verify(fileRepositoryV2).findByIdAndAsResource(fileId,
-                                                   FileOrigin.ANNOUNCEMENT.isAsResource()
+                                                   FileOrigin.BLOG.isAsResource()
     );
   }
   
@@ -348,16 +348,13 @@ public class ResourceServiceImplTest {
     String fileName = fileId + ".png";
     doReturn(false).when(FileHelper.class, "isThumbnailName", fileName);
     
-    byte[] bytes = resourceService.getFileAsByteArray(fileName,
-                                                      FileOrigin.ANNOUNCEMENT,
-                                                      1L
-    );
+    byte[] bytes = resourceService.getFileAsByteArray(
+      Role.UNKNOWN, fileName, FileOrigin.ANNOUNCEMENT, 1L);
     
     assertThat(bytes).isEqualTo(BYTES);
     
-    verify(fileRepositoryV2).findByIdAndAsResource(fileId,
-                                                   FileOrigin.ANNOUNCEMENT.isAsResource()
-    );
+    verify(fileRepositoryV2).findByIdAndAsResource(
+      fileId, FileOrigin.ANNOUNCEMENT.isAsResource());
   }
   
   @Test
@@ -367,7 +364,7 @@ public class ResourceServiceImplTest {
     String fileId = UUID.randomUUID()
       .toString();
     when(fileRepositoryV2.findByIdAndAsResource(fileId,
-                                                FileOrigin.ANNOUNCEMENT.isAsResource()
+                                                FileOrigin.COURSE.isAsResource()
     )).thenReturn(Optional.of(FILE_V2));
     
     File file = mock(File.class);
@@ -382,16 +379,13 @@ public class ResourceServiceImplTest {
     String fileName = fileId + THUMBNAIL_SUFFIX + ".png";
     doReturn(true).when(FileHelper.class, "isThumbnailName", fileName);
     
-    byte[] bytes = resourceService.getFileAsByteArray(fileName,
-                                                      FileOrigin.ANNOUNCEMENT,
-                                                      null
-    );
+    byte[] bytes = resourceService.getFileAsByteArray(
+      Role.ADMIN, fileName, FileOrigin.COURSE, null);
     
     assertThat(bytes).isEqualTo(BYTES);
     
-    verify(fileRepositoryV2).findByIdAndAsResource(fileId,
-                                                   FileOrigin.ANNOUNCEMENT.isAsResource()
-    );
+    verify(fileRepositoryV2).findByIdAndAsResource(
+      fileId, FileOrigin.COURSE.isAsResource());
   }
   
   @Test
@@ -400,21 +394,38 @@ public class ResourceServiceImplTest {
     String fileId = UUID.randomUUID()
       .toString();
     when(fileRepositoryV2.findByIdAndAsResource(fileId,
-                                                FileOrigin.ANNOUNCEMENT.isAsResource()
+                                                FileOrigin.COURSE.isAsResource()
     )).thenReturn(Optional.empty());
     
     String fileName = fileId + ".png";
-    catchException(() -> resourceService.getFileAsByteArray(fileName,
-                                                            FileOrigin.ANNOUNCEMENT,
-                                                            null
-    ));
+    catchException(
+      () -> resourceService.getFileAsByteArray(Role.ADMIN, fileName,
+                                               FileOrigin.COURSE, null
+      ));
     
     assertThat(caughtException().getClass()).isEqualTo(NotFoundException.class);
     assertThat(caughtException().getMessage()).isEqualTo("Get File Not Found");
     
-    verify(fileRepositoryV2).findByIdAndAsResource(fileId,
-                                                   FileOrigin.ANNOUNCEMENT.isAsResource()
-    );
+    verify(fileRepositoryV2).findByIdAndAsResource(
+      fileId, FileOrigin.COURSE.isAsResource());
+  }
+  
+  @Test
+  public void testGivenInvalidRoleByGettingFileAsByteArrayReturnUnauthorizedException() {
+    
+    String fileId = UUID.randomUUID()
+      .toString();
+    
+    String fileName = fileId + ".png";
+    catchException(
+      () -> resourceService.getFileAsByteArray(Role.UNKNOWN, fileName,
+                                               FileOrigin.COURSE, null
+      ));
+    
+    assertThat(caughtException().getClass()).isEqualTo(UnauthorizedException.class);
+    assertThat(caughtException().getMessage()).isEqualTo("Invalid Session for Guest");
+    
+    verifyZeroInteractions(fileRepositoryV2);
   }
   
 }

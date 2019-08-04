@@ -65,7 +65,7 @@ public class SharedCourseRepositoryTest {
     Batch foundBatch = getBatch(code);
     
     Optional<SharedCourse> foundSharedCourse =
-      sharedCourseRepository.findByCourseIdAndBatch(courseId, foundBatch);
+      sharedCourseRepository.findByIdAndBatch(sharedCourse.getId(), foundBatch);
     
     assertThat(foundSharedCourse.isPresent()).isTrue();
     assertThat(foundSharedCourse).isEqualTo(Optional.of(sharedCourse));

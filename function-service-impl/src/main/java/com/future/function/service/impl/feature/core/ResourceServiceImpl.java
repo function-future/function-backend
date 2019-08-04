@@ -1,7 +1,9 @@
 package com.future.function.service.impl.feature.core;
 
 import com.future.function.common.enumeration.core.FileOrigin;
+import com.future.function.common.enumeration.core.Role;
 import com.future.function.common.exception.NotFoundException;
+import com.future.function.common.exception.UnauthorizedException;
 import com.future.function.common.properties.core.FileProperties;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.repository.feature.core.FileRepositoryV2;
@@ -126,14 +128,34 @@ public class ResourceServiceImpl implements ResourceService {
   
   @Override
   public byte[] getFileAsByteArray(
-    String fileName, FileOrigin fileOrigin, Long version
+    Role role, String fileName, FileOrigin fileOrigin, Long version
   ) {
     
-    return fileRepositoryV2.findByIdAndAsResource(
-      this.getFileId(fileName), fileOrigin.isAsResource())
+    return Optional.of(fileOrigin)
+      .map(origin -> checkIsValidForGettingData(role, origin))
+      .flatMap(origin -> fileRepositoryV2.findByIdAndAsResource(
+        this.getFileId(fileName), origin.isAsResource()))
       .map(file -> this.getFileOrThumbnail(file, fileName, version))
       .map(FileHelper::toByteArray)
       .orElseThrow(() -> new NotFoundException("Get File Not Found"));
+  }
+  
+  private FileOrigin checkIsValidForGettingData(Role role, FileOrigin fileOrigin) {
+  
+    if (role.equals(Role.UNKNOWN) && this.isFileOriginNotAccessibleByGuest(
+      fileOrigin)) {
+      throw new UnauthorizedException("Invalid Session for Guest");
+    }
+    
+    return fileOrigin;
+  }
+  
+  private boolean isFileOriginNotAccessibleByGuest(FileOrigin fileOrigin) {
+  
+    boolean isAnnouncement = fileOrigin.equals(FileOrigin.ANNOUNCEMENT);
+    boolean isActivityBlog = fileOrigin.equals(FileOrigin.BLOG);
+    
+    return !(isAnnouncement || isActivityBlog);
   }
   
   private File getFileOrThumbnail(FileV2 file, String fileName, Long version) {
