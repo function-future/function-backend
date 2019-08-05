@@ -5,9 +5,7 @@ import com.future.function.model.entity.feature.communication.logging.Topic;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.stereotype.Repository;
 
-@Repository
 public interface TopicRepository extends MongoRepository<Topic, String> {
 
     Page<Topic> findAllByLoggingRoomAndDeletedFalse (LoggingRoom loggingRoom, Pageable pageable);

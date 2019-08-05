@@ -7,12 +7,10 @@ import com.future.function.model.entity.feature.core.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
-@Repository
 public interface QuestionnaireParticipantRepository extends MongoRepository<QuestionnaireParticipant, String> {
   /**
    * Find all questionnaire by member and participant type

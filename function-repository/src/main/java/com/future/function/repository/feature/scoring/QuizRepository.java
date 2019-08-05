@@ -5,14 +5,12 @@ import com.future.function.model.entity.feature.scoring.Quiz;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
 /**
  * Repository class used to manipulate quiz entity in the database
  */
-@Repository
 public interface QuizRepository extends MongoRepository<Quiz, String> {
 
   /**
