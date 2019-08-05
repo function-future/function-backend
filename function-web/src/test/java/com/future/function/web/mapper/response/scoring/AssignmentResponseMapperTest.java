@@ -11,7 +11,6 @@ import com.future.function.web.model.response.feature.scoring.AssignmentWebRespo
 import org.assertj.core.api.Assertions;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;

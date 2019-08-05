@@ -27,7 +27,6 @@ import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/api/core/resources")
-@WithAnyRole(roles = { Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT })
 public class ResourceController {
 
   private final ResourceService resourceService;
@@ -46,7 +45,8 @@ public class ResourceController {
   @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
                produces = MediaType.APPLICATION_JSON_VALUE)
   public DataResponse<FileContentWebResponse> createFile(
-    Session session,
+    @WithAnyRole(roles = { Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT })
+      Session session,
     @RequestParam(required = false)
       MultipartFile file,
     @RequestParam
@@ -65,7 +65,9 @@ public class ResourceController {
   @ResponseStatus(HttpStatus.OK)
   @GetMapping(value = "/{origin}/{fileName:.+}")
   public ResponseEntity getFileAsByteArray(
-    Session session, HttpServletRequest servletRequest,
+    HttpServletRequest servletRequest,
+    @WithAnyRole(noUnauthorized = true)
+      Session session,
     @PathVariable
       String origin,
     @PathVariable
@@ -79,7 +81,7 @@ public class ResourceController {
       .header(HttpHeaders.CONTENT_DISPOSITION,
               String.format("attachment; filename=\"%s\"", fileName)
       )
-      .body(resourceService.getFileAsByteArray(fileName,
+      .body(resourceService.getFileAsByteArray(session.getRole(), fileName,
                                                FileOrigin.toFileOrigin(origin),
                                                version
       ));

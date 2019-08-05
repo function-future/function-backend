@@ -89,9 +89,10 @@ public class AssignmentController {
   @PostMapping(path = "/copy", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
   public DataResponse<AssignmentWebResponse> copyAssignment(@RequestBody CopyAssignmentWebRequest request,
     @WithAnyRole(roles = Role.ADMIN) Session session) {
+    request = assignmentRequestMapper.validateCopyAssignmentWebRequest(request);
     return AssignmentResponseMapper
         .toAssignmentDataResponse(HttpStatus.CREATED, assignmentService
-                .copyAssignment(request.getAssignmentId(), request.getBatchId()));
+                .copyAssignment(request.getAssignmentId(), request.getBatchCode()));
   }
 
   /**

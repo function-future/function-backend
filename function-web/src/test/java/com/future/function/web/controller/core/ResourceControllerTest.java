@@ -76,7 +76,6 @@ public class ResourceControllerTest extends TestHelper {
   public void setUp() {
 
     super.setUp();
-    super.setCookie(Role.MENTOR);
   }
 
   @After
@@ -88,6 +87,8 @@ public class ResourceControllerTest extends TestHelper {
   @Test
   public void testGivenApiCallByStoringFileReturnDataResponseObject()
     throws Exception {
+    
+    super.setCookie(Role.MENTOR);
 
     Pair<String, byte[]> pair = Pair.of(NAME, BYTES);
 
@@ -119,13 +120,12 @@ public class ResourceControllerTest extends TestHelper {
     when(resourceRequestMapper.getMediaType(eq(ORIGINAL_NAME),
                                             any(HttpServletRequest.class)
     )).thenReturn(MediaType.TEXT_PLAIN);
-    when(
-      resourceService.getFileAsByteArray(ORIGINAL_NAME, FileOrigin.ANNOUNCEMENT,
-                                         null
-      )).thenReturn(BYTES);
+    when(resourceService.getFileAsByteArray(Role.UNKNOWN, ORIGINAL_NAME,
+                                            FileOrigin.ANNOUNCEMENT, null
+    )).thenReturn(BYTES);
 
     mockMvc.perform(
-      get("/api/core/resources/" + ORIGIN + "/" + ORIGINAL_NAME).cookie(cookies))
+      get("/api/core/resources/" + ORIGIN + "/" + ORIGINAL_NAME))
       .andExpect(status().isOk())
       .andExpect(header().string(HttpHeaders.CONTENT_DISPOSITION,
                                  "attachment; filename=\"" + ORIGINAL_NAME +
@@ -136,7 +136,7 @@ public class ResourceControllerTest extends TestHelper {
     verify(resourceRequestMapper).getMediaType(
       eq(ORIGINAL_NAME), any(HttpServletRequest.class));
     verify(resourceService).getFileAsByteArray(
-      ORIGINAL_NAME, FileOrigin.ANNOUNCEMENT, null);
+      Role.UNKNOWN, ORIGINAL_NAME, FileOrigin.ANNOUNCEMENT, null);
     verifyZeroInteractions(resourceRequestMapper);
   }
 

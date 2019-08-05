@@ -70,7 +70,15 @@ public final class CourseResponseMapper {
       .title(course.getTitle())
       .description(course.getDescription())
       .material(CourseResponseMapper.getFileUrl(course))
+      .materialId(CourseResponseMapper.getFileId(course))
       .build();
+  }
+  
+  private static String getFileId(Course course) {
+    
+    return Optional.ofNullable(course.getFile())
+      .map(FileV2::getId)
+      .orElse(null);
   }
   
   private static String getFileUrl(Course course) {

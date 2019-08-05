@@ -14,7 +14,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Entity representation for announcements.
@@ -28,9 +27,7 @@ import java.util.UUID;
 public class Announcement extends BaseEntity {
   
   @Id
-  @Builder.Default
-  private String id = UUID.randomUUID()
-    .toString();
+  private String id;
   
   @Field(FieldName.Announcement.TITLE)
   private String title;

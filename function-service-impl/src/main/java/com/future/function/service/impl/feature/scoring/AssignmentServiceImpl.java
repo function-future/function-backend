@@ -88,8 +88,8 @@ public class AssignmentServiceImpl implements AssignmentService {
   }
 
   @Override
-  public Assignment copyAssignment(String assignmentId, String batchId) {
-    Batch targetBatch = batchService.getBatchById(batchId);
+  public Assignment copyAssignment(String assignmentId, String targetBatchCode) {
+    Batch targetBatch = batchService.getBatchByCode(targetBatchCode);
     return Optional.ofNullable(assignmentId)
             .map(this::findById)
             .map(assignment -> initializeNewAssignment(targetBatch, assignment))

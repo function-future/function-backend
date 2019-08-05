@@ -32,14 +32,16 @@ public class CourseResponseMapperTest {
   
   private static final String THUMBNAIL_URL = "thumbnail-url";
   
+  private static final FileV2 FILE = FileV2.builder()
+    .fileUrl(FILE_URL)
+    .thumbnailUrl(THUMBNAIL_URL)
+    .build();
+  
   private static final Course COURSE = Course.builder()
     .id(ID)
     .title(TITLE)
     .description(DESCRIPTION)
-    .file(FileV2.builder()
-            .fileUrl(FILE_URL)
-            .thumbnailUrl(THUMBNAIL_URL)
-            .build())
+    .file(FILE)
     .build();
   
   private static final CourseWebResponse COURSE_WEB_RESPONSE_WITH_THUMBNAIL =
@@ -50,19 +52,9 @@ public class CourseResponseMapperTest {
       .material(THUMBNAIL_URL)
       .build();
   
-  private static final CourseWebResponse COURSE_WEB_RESPONSE_WITHOUT_THUMBNAIL =
-    CourseWebResponse.builder()
-      .id(ID)
-      .title(TITLE)
-      .description(DESCRIPTION)
-      .material(FILE_URL)
-      .build();
+  private CourseWebResponse courseWebResponseWithoutThumbnail;
   
-  private static final DataResponse<CourseWebResponse> CREATED_DATA_RESPONSE =
-    DataResponse.<CourseWebResponse>builder().code(201)
-      .status("CREATED")
-      .data(COURSE_WEB_RESPONSE_WITHOUT_THUMBNAIL)
-      .build();
+  private DataResponse<CourseWebResponse> createdDataResponse;
   
   private static final DataResponse<List<CourseWebResponse>>
     CREATED_DATA_RESPONSE_LIST =
@@ -71,11 +63,7 @@ public class CourseResponseMapperTest {
       .data(Collections.singletonList(COURSE_WEB_RESPONSE_WITH_THUMBNAIL))
       .build();
   
-  private static final DataResponse<CourseWebResponse> RETRIEVED_DATA_RESPONSE =
-    DataResponse.<CourseWebResponse>builder().code(200)
-      .status("OK")
-      .data(COURSE_WEB_RESPONSE_WITHOUT_THUMBNAIL)
-      .build();
+  private DataResponse<CourseWebResponse> retrievedDataResponse;
   
   private static final Pageable PAGEABLE = new PageRequest(0, 2);
   
@@ -96,7 +84,28 @@ public class CourseResponseMapperTest {
       .build();
   
   @Before
-  public void setUp() {}
+  public void setUp() {
+  
+    courseWebResponseWithoutThumbnail =
+      CourseWebResponse.builder()
+        .id(ID)
+        .title(TITLE)
+        .description(DESCRIPTION)
+        .material(FILE_URL)
+        .materialId(FILE.getId())
+        .build();
+  
+    createdDataResponse = DataResponse.<CourseWebResponse>builder().code(201)
+      .status("CREATED")
+      .data(courseWebResponseWithoutThumbnail)
+      .build();
+  
+    retrievedDataResponse =
+      DataResponse.<CourseWebResponse>builder().code(200)
+        .status("OK")
+        .data(courseWebResponseWithoutThumbnail)
+        .build();
+  }
   
   @After
   public void tearDown() {}
@@ -108,14 +117,13 @@ public class CourseResponseMapperTest {
       CourseResponseMapper.toCourseDataResponse(HttpStatus.CREATED, COURSE);
     
     assertThat(createdDataResponse).isNotNull();
-    assertThat(createdDataResponse).isEqualTo(CREATED_DATA_RESPONSE);
+    assertThat(createdDataResponse).isEqualTo(this.createdDataResponse);
     
     DataResponse<CourseWebResponse> retrievedDataResponse =
       CourseResponseMapper.toCourseDataResponse(COURSE);
     
     assertThat(retrievedDataResponse).isNotNull();
-    assertThat(retrievedDataResponse).isEqualTo(RETRIEVED_DATA_RESPONSE);
-    
+    assertThat(retrievedDataResponse).isEqualTo(this.retrievedDataResponse);
   }
   
   @Test

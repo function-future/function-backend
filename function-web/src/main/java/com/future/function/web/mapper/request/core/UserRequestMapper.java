@@ -50,7 +50,6 @@ public class UserRequestMapper {
       .email(request.getEmail()
                .toLowerCase())
       .name(request.getName())
-      .password(getDefaultPassword(request.getName()))
       .phone(request.getPhone())
       .address(request.getAddress())
       .pictureV2(this.getFileV2(request))
@@ -96,15 +95,6 @@ public class UserRequestMapper {
       .map(batchNumber -> Batch.builder()
         .code(batchNumber)
         .build())
-      .orElse(null);
-  }
-  
-  private String getDefaultPassword(String name) {
-    
-    return Optional.ofNullable(name)
-      .map(String::toLowerCase)
-      .map(n -> n.replace(" ", ""))
-      .map(n -> n.concat("functionapp"))
       .orElse(null);
   }
   

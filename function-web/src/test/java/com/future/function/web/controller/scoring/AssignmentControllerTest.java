@@ -99,7 +99,7 @@ public class AssignmentControllerTest extends TestHelper {
 
     copyAssignmentWebRequest = CopyAssignmentWebRequest
         .builder()
-            .batchId("BATCH-3")
+            .batchCode("BATCH-3")
         .assignmentId(ASSIGNMENT_ID)
         .build();
 
@@ -134,6 +134,7 @@ public class AssignmentControllerTest extends TestHelper {
             .thenReturn(assignment);
       when(assignmentRequestMapper.toAssignment(assignmentWebRequest, BATCH_CODE))
             .thenReturn(assignment);
+      when(assignmentRequestMapper.validateCopyAssignmentWebRequest(copyAssignmentWebRequest)).thenReturn(copyAssignmentWebRequest);
       when(assignmentRequestMapper.toAssignmentWithId(ASSIGNMENT_ID, assignmentWebRequest, BATCH_CODE))
             .thenReturn(assignment);
   }
@@ -156,6 +157,7 @@ public class AssignmentControllerTest extends TestHelper {
             dataResponseJacksonTester.write(CREATED_DATA_RESPONSE)
             .getJson()));
     verify(assignmentService).copyAssignment(ASSIGNMENT_ID, "BATCH-3");
+    verify(assignmentRequestMapper).validateCopyAssignmentWebRequest(copyAssignmentWebRequest);
   }
 
   @Test

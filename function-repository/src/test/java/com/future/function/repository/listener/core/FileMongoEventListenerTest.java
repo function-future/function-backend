@@ -30,7 +30,7 @@ public class FileMongoEventListenerTest {
   }
   
   @Test
-  public void testGivenFileV2NotMarkedFolderSaveOperationByListeningToBeforeConversionEventToUpdateFileVersionReturnSuccessfulUpdate() {
+  public void testGivenFileNotMarkedFolderSaveOperationByListeningToBeforeConversionEventToUpdateFileVersionReturnSuccessfulUpdate() {
     
     String id = "id";
     String filePath = "file-path";
@@ -43,13 +43,15 @@ public class FileMongoEventListenerTest {
       .build();
     
     fileRepository.save(file);
+    fileRepository.save(file);
+    fileRepository.save(file);
     
     FileV2 foundFile = fileRepository.findOne(id);
     
     assertThat(foundFile.getId()).isEqualTo(id);
     assertThat(foundFile.getFilePath()).isEqualTo(filePath);
     assertThat(foundFile.getFileUrl()).isEqualTo(fileUrl);
-    assertThat(foundFile.getVersion()).isEqualTo(0);
+    assertThat(foundFile.getVersion()).isEqualTo(2);
     
     assertThat(foundFile.getVersions()).isNotEmpty();
     assertThat(foundFile.getVersions()
@@ -61,6 +63,41 @@ public class FileMongoEventListenerTest {
     assertThat(foundFile.getVersions()
                  .get(1L)
                  .getPath()).isEqualTo(filePath);
+    assertThat(foundFile.getVersions()
+                 .get(2L)
+                 .getTimestamp()).isInstanceOf(Long.class);
+    assertThat(foundFile.getVersions()
+                 .get(2L)
+                 .getUrl()).isEqualTo(fileUrl + "?version=2");
+    assertThat(foundFile.getVersions()
+                 .get(2L)
+                 .getPath()).isEqualTo(filePath);
+  }
+  
+  @Test
+  public void testGivenFileMarkedAsResourceSaveOperationByListeningToBeforeConversionEventToUpdateFileVersionReturnSuccessfulUpdate() {
+    
+    String id = "id";
+    String filePath = "file-path";
+    String fileUrl = "file-url";
+    
+    FileV2 file = FileV2.builder()
+      .id(id)
+      .filePath(filePath)
+      .fileUrl(fileUrl)
+      .asResource(true)
+      .build();
+    
+    fileRepository.save(file);
+    
+    FileV2 foundFile = fileRepository.findOne(id);
+    
+    assertThat(foundFile.getId()).isEqualTo(id);
+    assertThat(foundFile.getFilePath()).isEqualTo(filePath);
+    assertThat(foundFile.getFileUrl()).isEqualTo(fileUrl);
+    assertThat(foundFile.getVersion()).isEqualTo(0);
+    
+    assertThat(foundFile.getVersions()).isEmpty();
   }
   
   @Test

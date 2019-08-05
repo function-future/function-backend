@@ -39,7 +39,7 @@ public class AssignmentServiceImplTest {
   private static final String ASSIGNMENT_DESCRIPTION = "assignment-description";
   private static final long ASSIGNMENT_DEADLINE = new Date().getTime();
   private static final String BATCH_CODE = "batchCode";
-    private static final String BATCH_ID = "batchId";
+    private static final String BATCH_ID = "batchCode";
   private static final String USER_ID = "userId";
 
   private static final String ROOM_ID = "room-id";
@@ -362,20 +362,18 @@ public class AssignmentServiceImplTest {
   public void copyAssignmentTest() {
     when(assignmentRepository.findByIdAndDeletedFalse("id")).thenReturn(Optional.of(assignment));
       Batch anotherBatch = Batch.builder().code("CODE").id("ID").build();
-      when(batchService.getBatchById("ID")).thenReturn(anotherBatch);
+   when(batchService.getBatchByCode("CODE")).thenReturn(anotherBatch);
     Assignment anotherAssignment = Assignment.builder().build();
     BeanUtils.copyProperties(assignment, anotherAssignment, "id");
     anotherAssignment.setBatch(anotherBatch);
     when(assignmentRepository.save(any(Assignment.class))).thenReturn(anotherAssignment);
     when(roomService.createRoomsByAssignment(anotherAssignment)).thenReturn(anotherAssignment);
-      Assignment actual = assignmentService.copyAssignment("id", "ID");
+      Assignment actual = assignmentService.copyAssignment("id", "CODE");
     assertThat(actual.getBatch().getCode()).isEqualTo("CODE");
-      assertThat(actual.getBatch().getId()).isEqualTo("ID");
     assertThat(actual.getId()).isNotEqualTo("id");
     verify(resourceService).markFilesUsed(Collections.singletonList(FILE_ID), true);
     verify(resourceService).getFile(FILE_ID);
-      verify(batchService).getBatchByCode("CODE");
-      verify(batchService).getBatchById("ID");
+      verify(batchService, times(2)).getBatchByCode("CODE");
     verify(assignmentRepository).findByIdAndDeletedFalse("id");
     verify(assignmentRepository).save(any(Assignment.class));
     verify(roomService).createRoomsByAssignment(anotherAssignment);

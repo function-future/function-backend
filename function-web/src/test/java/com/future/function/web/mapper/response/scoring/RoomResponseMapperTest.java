@@ -87,6 +87,7 @@ public class RoomResponseMapperTest {
     BeanUtils.copyProperties(student, userWebResponse);
     userWebResponse.setBatch(batchWebResponse);
     userWebResponse.setAvatar(FILE_URl);
+    userWebResponse.setAvatarId(fileV2.getId());
     userWebResponse.setRole("STUDENT");
     room = Room.builder().assignment(assignment).student(student).point(0).build();
     roomWebResponse = RoomWebResponse.builder().assignment(assignmentWebResponse).student(userWebResponse)
