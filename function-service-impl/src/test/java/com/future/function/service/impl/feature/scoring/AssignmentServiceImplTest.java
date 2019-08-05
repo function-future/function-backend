@@ -248,12 +248,28 @@ public class AssignmentServiceImplTest {
     when(assignmentRepository.save(assignmentWithNoFile))
             .thenReturn(assignmentWithNoFile);
     Assignment actual = assignmentService.updateAssignment(assignmentWithNoFile);
-    assertThat(actual.getFile()).isEqualTo(file);
-    assertThat(actual).isEqualTo(assignment);
-    verify(resourceService).getFile(FILE_ID);
-    verify(resourceService).markFilesUsed(Collections.singletonList(FILE_ID), true);
-    verify(assignmentRepository).save(assignment);
+    assertThat(actual.getFile()).isEqualTo(null);
+    assertThat(actual).isEqualTo(assignmentWithNoFile);
+    verify(resourceService).markFilesUsed(Collections.singletonList(FILE_ID), false);
+    verify(assignmentRepository).save(assignmentWithNoFile);
     verify(assignmentRepository).findByIdAndDeletedFalse(assignmentWithNoFile.getId());
+  }
+
+  @Test
+  public void testUpdateAssignmentWithFileOnRequestSuccess() {
+    Assignment assignmentWithFile = new Assignment();
+    CopyHelper.copyProperties(assignment, assignmentWithFile);
+    assignmentWithFile.setId(ASSIGNMENT_ID);
+    assignmentWithFile.setFile(FileV2.builder().id("id").build());
+    when(assignmentRepository.save(assignmentWithFile))
+        .thenReturn(assignmentWithFile);
+    Assignment actual = assignmentService.updateAssignment(assignmentWithFile);
+    assertThat(actual.getFile().getId()).isEqualTo("id");
+    assertThat(actual).isEqualTo(assignmentWithFile);
+    verify(resourceService).markFilesUsed(Collections.singletonList(FILE_ID), false);
+    verify(resourceService).markFilesUsed(Collections.singletonList("id"), true);
+    verify(assignmentRepository).save(assignmentWithFile);
+    verify(assignmentRepository).findByIdAndDeletedFalse(assignmentWithFile.getId());
   }
 
   @Test
@@ -261,12 +277,12 @@ public class AssignmentServiceImplTest {
     Assignment assignmentWithNoFile = new Assignment();
     CopyHelper.copyProperties(assignment, assignmentWithNoFile);
     assignmentWithNoFile.setId(ASSIGNMENT_ID);
-    assignment.setFile(null);
     assignmentWithNoFile.setFile(null);
     when(assignmentRepository.save(assignmentWithNoFile))
             .thenReturn(assignmentWithNoFile);
     Assignment actual = assignmentService.updateAssignment(assignmentWithNoFile);
     assertThat(actual).isEqualTo(assignment);
+    verify(resourceService).markFilesUsed(Collections.singletonList(FILE_ID), false);
     verify(assignmentRepository).save(assignment);
     verify(assignmentRepository).findByIdAndDeletedFalse(assignmentWithNoFile.getId());
   }
@@ -288,6 +304,27 @@ public class AssignmentServiceImplTest {
     verify(resourceService).getFile("id");
     verify(resourceService).markFilesUsed(Collections.singletonList("id"), true);
     verify(resourceService).markFilesUsed(Collections.singletonList(FILE_ID), false);
+    verify(assignmentRepository).save(assignmentWithFile);
+    verify(assignmentRepository).findByIdAndDeletedFalse(assignmentWithFile.getId());
+  }
+
+  @Test
+  public void testUpdateAssignmentDifferentBatchAndFileSuccessFileFromDBNull() {
+    Assignment assignmentWithFile = new Assignment();
+    FileV2 anotherFile = FileV2.builder().id("id").build();
+    assignment.setFile(null);
+    BeanUtils.copyProperties(assignment, assignmentWithFile);
+    assignmentWithFile.setFile(anotherFile);
+    when(resourceService.getFile("id")).thenReturn(anotherFile);
+    when(resourceService.markFilesUsed(Collections.singletonList("id"), true)).thenReturn(true);
+    when(assignmentRepository.findByIdAndDeletedFalse(assignmentWithFile.getId())).thenReturn(Optional.of(assignment));
+    when(assignmentRepository.save(assignmentWithFile))
+        .thenReturn(assignmentWithFile);
+    Assignment actual = assignmentService.updateAssignment(assignmentWithFile);
+    assertThat(actual.getFile()).isEqualTo(anotherFile);
+    assertThat(actual).isEqualTo(assignmentWithFile);
+    verify(resourceService).getFile("id");
+    verify(resourceService).markFilesUsed(Collections.singletonList("id"), true);
     verify(assignmentRepository).save(assignmentWithFile);
     verify(assignmentRepository).findByIdAndDeletedFalse(assignmentWithFile.getId());
   }

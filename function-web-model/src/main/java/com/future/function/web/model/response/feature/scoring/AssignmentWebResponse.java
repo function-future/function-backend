@@ -26,6 +26,8 @@ public class AssignmentWebResponse {
 
   private String file;
 
+  private String fileId;
+
   private long uploadedDate;
 
 }

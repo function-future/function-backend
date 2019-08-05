@@ -17,7 +17,7 @@ public class StudentQuestionWebRequest {
   @NotNull(message = "NotNull")
   private Integer number;
 
-  @NotBlank(message = "NotBlank")
+  @NotNull(message = "NotNull")
   private String optionId;
 
 }

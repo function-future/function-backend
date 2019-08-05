@@ -174,14 +174,23 @@ public class AssignmentServiceImpl implements AssignmentService {
 
     private Assignment setAssignmentFile(Assignment request, Assignment foundAssignment) {
     return Optional.ofNullable(request)
-        .map(Assignment::getFile)
-        .map(FileV2::getId)
-            .filter(id -> !id.equals(foundAssignment.getFile().getId()))
-            .map(fileId -> {
-              resourceService.markFilesUsed(Collections.singletonList(foundAssignment.getFile().getId()), false);
-              return foundAssignment;
-            })
-            .orElse(foundAssignment);
+        .map(requestedAssignment -> checkAndMarkFileAsNotUsedIfFileInDBExist(requestedAssignment, foundAssignment))
+        .orElse(foundAssignment);
+  }
+
+  private Assignment checkAndMarkFileAsNotUsedIfFileInDBExist(Assignment request, Assignment foundAssignment) {
+    if(Objects.nonNull(foundAssignment.getFile()) && Objects.isNull(request.getFile())) {
+      resourceService.markFilesUsed(Collections.singletonList(foundAssignment.getFile().getId()), false);
+      foundAssignment.setFile(null);
+    } else if(Objects.nonNull(foundAssignment.getFile()) && isFileChangedAndNotNull(request, foundAssignment.getFile().getId())) {
+      resourceService.markFilesUsed(Collections.singletonList(foundAssignment.getFile().getId()), false);
+      foundAssignment.setFile(null);
+    }
+    return foundAssignment;
+  }
+
+  private boolean isFileChangedAndNotNull(Assignment assignment, String id) {
+    return Objects.nonNull(assignment.getFile()) && !id.equals(assignment.getFile().getId());
   }
 
   @Override

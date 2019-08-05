@@ -105,12 +105,6 @@ public class OptionRequestMapperTest {
   }
 
   @Test
-  public void testToOptionWithOptionIdBlank() {
-    catchException(() -> requestMapper.toOptionFromOptionId(""));
-    assertThat(caughtException().getClass()).isEqualTo(BadRequestException.class);
-  }
-
-  @Test
   public void testToOptionWithOptionIdNull() {
     catchException(() -> requestMapper.toOptionFromOptionId(null));
     assertThat(caughtException().getClass()).isEqualTo(BadRequestException.class);

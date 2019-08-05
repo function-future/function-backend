@@ -31,6 +31,7 @@ public class AssignmentResponseMapperTest {
   private static final long ASSIGNMENT_DEADLINE = new Date().getTime();
   private static final String BATCH_CODE = "batch-code";
   private static final String FILE_URl = "file-url";
+  private static final String FILE_ID = "file-id";
   private Paging paging;
   private Pageable pageable;
   private Assignment assignment;
@@ -47,7 +48,7 @@ public class AssignmentResponseMapperTest {
   public void setUp() throws Exception {
 
     batch = Batch.builder().code(BATCH_CODE).build();
-    fileV2 = FileV2.builder().fileUrl(FILE_URl).build();
+    fileV2 = FileV2.builder().id(FILE_ID).fileUrl(FILE_URl).build();
 
     assignment = Assignment
         .builder()
@@ -69,6 +70,7 @@ public class AssignmentResponseMapperTest {
         .batchCode(BATCH_CODE)
         .uploadedDate(ASSIGNMENT_DEADLINE)
         .file(FILE_URl)
+        .fileId(FILE_ID)
         .build();
 
     assignmentWebResponseDataResponse = DataResponse
