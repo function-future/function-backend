@@ -21,7 +21,6 @@ import org.springframework.http.HttpStatus;
 
 import java.util.Collections;
 import java.util.Date;
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -35,6 +34,7 @@ public class ReportResponseMapperTest {
   private static final String STUDENT_NAME = "student-name";
   private static final String STUDENT_PHONE = "student-phone";
   private static final String STUDENT_AVATAR = "student-avatar";
+  private static final String STUDENT_AVATAR_ID = "student-avatar-id";
   private static final String STUDENT_ADDRESS = "student-address";
   private static final String STUDENT_EMAIL = "student-email";
   private static final String STUDENT_UNIVERSITY = "student-university";
@@ -60,6 +60,7 @@ public class ReportResponseMapperTest {
           .address(STUDENT_ADDRESS)
           .phone(STUDENT_PHONE)
           .avatar(STUDENT_AVATAR)
+              .avatarId(STUDENT_AVATAR_ID)
           .batch(BatchWebResponse.builder().code(BATCH_CODE).build())
           .email(STUDENT_EMAIL)
           .university(STUDENT_UNIVERSITY).build();
@@ -70,7 +71,7 @@ public class ReportResponseMapperTest {
           .role(Role.STUDENT)
           .address(STUDENT_ADDRESS)
           .phone(STUDENT_PHONE)
-          .pictureV2(FileV2.builder().fileUrl(STUDENT_AVATAR).build())
+              .pictureV2(FileV2.builder().id(STUDENT_AVATAR_ID).fileUrl(STUDENT_AVATAR).build())
           .batch(batch)
           .email(STUDENT_EMAIL)
           .university(STUDENT_UNIVERSITY).build();

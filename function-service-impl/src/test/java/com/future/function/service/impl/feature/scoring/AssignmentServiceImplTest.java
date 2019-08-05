@@ -240,17 +240,17 @@ public class AssignmentServiceImplTest {
   }
 
   @Test
-  public void testUpdateAssignmentNoFileOnRequestSuccess() {
+  public void testUpdateAssignmentNoFileOnRequestAndDBSuccess() {
     Assignment assignmentWithNoFile = new Assignment();
     CopyHelper.copyProperties(assignment, assignmentWithNoFile);
     assignmentWithNoFile.setId(ASSIGNMENT_ID);
     assignmentWithNoFile.setFile(null);
+    assignment.setFile(null);
     when(assignmentRepository.save(assignmentWithNoFile))
             .thenReturn(assignmentWithNoFile);
     Assignment actual = assignmentService.updateAssignment(assignmentWithNoFile);
     assertThat(actual.getFile()).isEqualTo(null);
     assertThat(actual).isEqualTo(assignmentWithNoFile);
-    verify(resourceService).markFilesUsed(Collections.singletonList(FILE_ID), false);
     verify(assignmentRepository).save(assignmentWithNoFile);
     verify(assignmentRepository).findByIdAndDeletedFalse(assignmentWithNoFile.getId());
   }
@@ -273,7 +273,7 @@ public class AssignmentServiceImplTest {
   }
 
   @Test
-  public void testUpdateAssignmentNoFileOnDBAndRequestSuccess() {
+  public void testUpdateAssignmentNoFileOnRequestExistOnDBSuccess() {
     Assignment assignmentWithNoFile = new Assignment();
     CopyHelper.copyProperties(assignment, assignmentWithNoFile);
     assignmentWithNoFile.setId(ASSIGNMENT_ID);

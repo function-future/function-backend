@@ -15,9 +15,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import static com.googlecode.catchexception.CatchException.catchException;
 import static com.googlecode.catchexception.CatchException.caughtException;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class OptionRequestMapperTest {
@@ -106,7 +104,7 @@ public class OptionRequestMapperTest {
 
   @Test
   public void testToOptionWithOptionIdNull() {
-    catchException(() -> requestMapper.toOptionFromOptionId(null));
-    assertThat(caughtException().getClass()).isEqualTo(BadRequestException.class);
+    Option actual = requestMapper.toOptionFromOptionId(null);
+    assertThat(actual.getId()).isEqualTo("");
   }
 }

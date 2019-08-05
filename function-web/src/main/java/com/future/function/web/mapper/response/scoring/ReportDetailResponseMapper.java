@@ -7,12 +7,12 @@ import com.future.function.model.vo.scoring.StudentSummaryVO;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.feature.scoring.ReportDetailWebResponse;
-import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -60,7 +60,7 @@ public class ReportDetailResponseMapper {
         return Optional.ofNullable(user)
             .map(User::getPictureV2)
             .map(FileV2::getFileUrl)
-            .orElseGet(String::new);
+                .orElse(null);
     }
 
     private static List<ReportDetailWebResponse> buildListFromReportDetailList(List<ReportDetail> reportDetails) {
