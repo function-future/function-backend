@@ -83,7 +83,7 @@ public class DataMigration_012{
 
     Access studentAccess = Access.builder()
       .urlRegex(urlRegex)
-      .role(Role.MENTOR)
+      .role(Role.STUDENT)
       .components(studentComponents)
       .build();
 
@@ -144,7 +144,7 @@ public class DataMigration_012{
 
     Access studentAccess = Access.builder()
       .urlRegex(urlRegex)
-      .role(Role.MENTOR)
+      .role(Role.STUDENT)
       .components(nonMentorComponents)
       .build();
 
@@ -205,7 +205,7 @@ public class DataMigration_012{
 
     Access studentAccess = Access.builder()
       .urlRegex(urlRegex)
-      .role(Role.MENTOR)
+      .role(Role.STUDENT)
       .components(nonMentorComponents)
       .build();
 
