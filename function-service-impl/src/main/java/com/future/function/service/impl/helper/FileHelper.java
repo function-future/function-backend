@@ -11,7 +11,6 @@ import org.apache.commons.io.IOUtils;
 import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
-import java.util.Optional;
 
 /**
  * Helper class for file-related operations.
@@ -32,14 +31,7 @@ public final class FileHelper {
    */
   public static void createJavaIoFile(byte[] bytes, String path) {
     
-    Optional.ofNullable(FileHelper.toJavaIoFile(bytes, path))
-      .ifPresent(file -> {
-        try {
-          log.info("Attempting to create file: {}", file.createNewFile());
-        } catch (IOException e) {
-          log.error("Failed creating file: ", e);
-        }
-      });
+    FileHelper.toJavaIoFile(bytes, path);
   }
   
   /**
@@ -78,10 +70,7 @@ public final class FileHelper {
         .size(150, 150)
         .outputFormat(extension)
         .toFile(Objects.requireNonNull(thumbnailFile));
-      
-      log.info(
-        "Attempting to create thumbnail: {}", thumbnailFile.createNewFile());
-    } catch (IOException | NullPointerException e) {
+    } catch (Exception e) {
       log.error("Failed creating thumbnail: ", e);
     }
   }
