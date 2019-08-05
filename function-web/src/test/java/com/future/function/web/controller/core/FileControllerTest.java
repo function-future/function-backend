@@ -1,6 +1,7 @@
 package com.future.function.web.controller.core;
 
 import com.future.function.common.enumeration.core.Role;
+import com.future.function.common.properties.core.FileProperties;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.service.api.feature.core.FileService;
 import com.future.function.web.TestHelper;
@@ -59,6 +60,8 @@ public class FileControllerTest extends TestHelper {
   
   private static final String ID = "id";
   
+  private static final String URL_PREFIX = "url-prefix/";
+  
   private static final PathWebResponse PATH_WEB_RESPONSE =
     PathWebResponse.builder()
       .id(PARENT_ID)
@@ -81,14 +84,15 @@ public class FileControllerTest extends TestHelper {
   
   private static final DataPageResponse<FileWebResponse<List<FileContentWebResponse>>>
     DATA_PAGE_RESPONSE = FileResponseMapper.toMultipleFileDataResponse(
-    Pair.of(PATHS, PAGE));
+    Pair.of(PATHS, PAGE), URL_PREFIX);
   
   private static final DataResponse<FileWebResponse<FileContentWebResponse>>
-    RETRIEVED_DATA_RESPONSE = FileResponseMapper.toSingleFileDataResponse(FILE);
+    RETRIEVED_DATA_RESPONSE =
+    FileResponseMapper.toSingleFileDataResponse(FILE, URL_PREFIX);
   
   private static final DataResponse<FileWebResponse<FileContentWebResponse>>
     CREATED_DATA_RESPONSE = FileResponseMapper.toSingleFileDataResponse(
-    HttpStatus.CREATED, FILE);
+    HttpStatus.CREATED, FILE, URL_PREFIX);
   
   private static final BaseResponse OK_BASE_RESPONSE =
     ResponseHelper.toBaseResponse(HttpStatus.OK);
@@ -106,6 +110,9 @@ public class FileControllerTest extends TestHelper {
   @MockBean
   private FileRequestMapper fileRequestMapper;
   
+  @MockBean
+  private FileProperties fileProperties;
+  
   @Override
   @Before
   public void setUp() {
@@ -118,12 +125,14 @@ public class FileControllerTest extends TestHelper {
   public void tearDown() {
     
     verifyNoMoreInteractions(
-      fileService, multipartFileRequestMapper, fileRequestMapper);
+      fileService, multipartFileRequestMapper, fileRequestMapper, fileProperties);
   }
   
   @Test
   public void testGivenApiCallAndParentIdByGettingFilesAndFoldersReturnPagingResponse()
     throws Exception {
+    
+    when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
     
     when(fileService.getFilesAndFolders(PARENT_ID, PAGEABLE)).thenReturn(
       Pair.of(PATHS, PAGE));
@@ -134,6 +143,7 @@ public class FileControllerTest extends TestHelper {
         dataPageResponseJacksonTester.write(DATA_PAGE_RESPONSE)
           .getJson()));
     
+    verify(fileProperties).getUrlPrefix();
     verify(fileService).getFilesAndFolders(PARENT_ID, PAGEABLE);
     verifyZeroInteractions(multipartFileRequestMapper, fileRequestMapper);
   }
@@ -141,6 +151,8 @@ public class FileControllerTest extends TestHelper {
   @Test
   public void testGivenApiCallAndFileOrFolderIdAndParentIdByGettingFileOrFolderReturnDataResponse()
     throws Exception {
+  
+    when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
     
     when(fileService.getFileOrFolder(ID, PARENT_ID)).thenReturn(FILE);
     
@@ -151,6 +163,7 @@ public class FileControllerTest extends TestHelper {
         dataResponseJacksonTester.write(RETRIEVED_DATA_RESPONSE)
           .getJson()));
     
+    verify(fileProperties).getUrlPrefix();
     verify(fileService).getFileOrFolder(ID, PARENT_ID);
     verifyZeroInteractions(multipartFileRequestMapper, fileRequestMapper);
   }
@@ -158,6 +171,8 @@ public class FileControllerTest extends TestHelper {
   @Test
   public void testGivenApiCallAndParentIdByCreatingFileOrFolderReturnDataResponse()
     throws Exception {
+  
+    when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
     
     when(multipartFileRequestMapper.toStringAndByteArrayPair(
       any(MultipartFile.class))).thenReturn(Pair.of("NAME", ID.getBytes()));
@@ -184,6 +199,7 @@ public class FileControllerTest extends TestHelper {
         dataResponseJacksonTester.write(CREATED_DATA_RESPONSE)
           .getJson()));
     
+    verify(fileProperties).getUrlPrefix();
     verify(multipartFileRequestMapper).toStringAndByteArrayPair(
       any(MultipartFile.class));
     verify(fileRequestMapper).toFileWebRequest(JSON, ID.getBytes());
@@ -194,6 +210,8 @@ public class FileControllerTest extends TestHelper {
   @Test
   public void testGivenApiCallAndFileOrFolderIdAndParentIdByUpdatingFileOrFolderReturnDataResponse()
     throws Exception {
+  
+    when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
     
     when(multipartFileRequestMapper.toStringAndByteArrayPair(
       any(MultipartFile.class))).thenReturn(Pair.of("NAME", ID.getBytes()));
@@ -221,6 +239,7 @@ public class FileControllerTest extends TestHelper {
         dataResponseJacksonTester.write(RETRIEVED_DATA_RESPONSE)
           .getJson()));
     
+    verify(fileProperties).getUrlPrefix();
     verify(multipartFileRequestMapper).toStringAndByteArrayPair(
       any(MultipartFile.class));
     verify(fileRequestMapper).toFileWebRequest(ID, JSON, ID.getBytes());
@@ -240,7 +259,7 @@ public class FileControllerTest extends TestHelper {
           .getJson()));
     
     verify(fileService).deleteFileOrFolder(ADMIN_SESSION, PARENT_ID, ID);
-    verifyZeroInteractions(multipartFileRequestMapper, fileRequestMapper);
+    verifyZeroInteractions(multipartFileRequestMapper, fileRequestMapper, fileProperties);
   }
   
 }

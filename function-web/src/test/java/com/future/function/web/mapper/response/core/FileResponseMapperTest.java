@@ -42,6 +42,8 @@ public class FileResponseMapperTest {
   
   private static final String PARENT_ID = "parent-id";
   
+  private static final String URL_PREFIX = "url-prefix/";
+  
   private static final Map<Long, Version> VERSIONS = Collections.singletonMap(
     1L, new Version(0L, FILE_PATH, FILE_URL));
   
@@ -116,12 +118,13 @@ public class FileResponseMapperTest {
   private static final FileContentWebResponse FILE_CONTENT_WEB_RESPONSE =
     FileContentWebResponse.builder()
       .id(FILE_ID)
-      .file(THUMBNAIL_URL)
+      .file(URL_PREFIX + THUMBNAIL_URL)
       .type("FILE")
       .name(NAME)
       .parentId(PARENT_ID)
       .versions(
-        Collections.singletonMap(1L, new VersionWebResponse(0L, FILE_URL)))
+        Collections.singletonMap(1L, new VersionWebResponse(0L,
+                                                            URL_PREFIX + FILE_URL)))
       .author(AuthorWebResponseMapper.buildAuthorWebResponse(USER))
       .build();
   
@@ -151,7 +154,7 @@ public class FileResponseMapperTest {
   public void testGivenFileOrFolderByMappingToDataResponseReturnDataResponse() {
     
     DataResponse<FileWebResponse<FileContentWebResponse>> dataResponse =
-      FileResponseMapper.toSingleFileDataResponse(FOLDER);
+      FileResponseMapper.toSingleFileDataResponse(FOLDER, URL_PREFIX);
     
     assertThat(dataResponse).isNotNull();
     assertThat(dataResponse).isEqualTo(FOLDER_DATA_RESPONSE);
@@ -162,7 +165,7 @@ public class FileResponseMapperTest {
     
     DataPageResponse<FileWebResponse<List<FileContentWebResponse>>>
       dataPageResponse = FileResponseMapper.toMultipleFileDataResponse(
-      Pair.of(PATHS, PAGE));
+      Pair.of(PATHS, PAGE), URL_PREFIX);
     
     assertThat(dataPageResponse).isNotNull();
     assertThat(dataPageResponse).isEqualTo(FILE_DATA_PAGE_RESPONSE);
