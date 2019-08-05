@@ -59,9 +59,9 @@ public interface ActivityBlogService {
   /**
    * Deletes activity blog object from database.
    *
-   * @param email          Email of current user.
+   * @param userId          Id of current user.
    * @param activityBlogId Id of activity blog to be deleted.
    */
-  void deleteActivityBlog(String email, String activityBlogId);
+  void deleteActivityBlog(String userId, String activityBlogId);
   
 }

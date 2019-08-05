@@ -28,38 +28,38 @@ public final class AuthorizationHelper {
     Collections.unmodifiableList(AUTHENTICATED_ROLES);
 
   public static <T extends BaseEntity> boolean isAuthorizedForEdit(
-    String currentUserEmail, T obj
+    String currentUserId, T obj
   ) {
 
-    return AuthorizationHelper.isUserCreatorOfObject(currentUserEmail, obj)
+    return AuthorizationHelper.isUserCreatorOfObject(currentUserId, obj)
       .orElseThrow(() -> new ForbiddenException("Invalid User Email"));
   }
 
   private static <T extends BaseEntity> Optional<Boolean> isUserCreatorOfObject(
-    String currentUserEmail, T obj
+    String currentUserId, T obj
   ) {
 
-    return Optional.ofNullable(currentUserEmail)
+    return Optional.ofNullable(currentUserId)
       .filter(e -> e.equals(obj.getCreatedBy()))
       .map(ignored -> true);
   }
 
   public static <T extends BaseEntity> boolean isAuthorizedForEdit(
-    String currentUserEmail, Role currentUserRole, T obj, Role... allowedRoles
+    String currentUserId, Role currentUserRole, T obj, Role... allowedRoles
   ) {
 
-    return AuthorizationHelper.isAuthorizedForEdit(currentUserEmail,
+    return AuthorizationHelper.isAuthorizedForEdit(currentUserId,
                                                    currentUserRole, obj,
                                                    Arrays.asList(allowedRoles)
     );
   }
 
   public static <T extends BaseEntity> boolean isAuthorizedForEdit(
-    String currentUserEmail, Role currentUserRole, T obj,
+    String currentUserId, Role currentUserRole, T obj,
     List<Role> allowedRoles
   ) {
 
-    return AuthorizationHelper.isUserCreatorOfObject(currentUserEmail, obj)
+    return AuthorizationHelper.isUserCreatorOfObject(currentUserId, obj)
       .orElseGet(() -> AuthorizationHelper.isRoleValidForEdit(currentUserRole,
                                                               allowedRoles
       ));

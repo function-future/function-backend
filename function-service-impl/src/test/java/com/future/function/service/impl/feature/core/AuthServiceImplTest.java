@@ -126,8 +126,6 @@ public class AuthServiceImplTest {
     assertThat(cookie.getValue()).isNotBlank();
     
     verify(valueOperations).set(anyString(), any(Session.class));
-    //    verify(redisTemplate).expire(anyString(), eq(0), eq(TimeUnit
-    // .SECONDS));
     verify(userService).getUserByEmailAndPassword(EMAIL, PASSWORD);
     verify(sessionProperties).getExpireTime();
     verify(sessionProperties).getMaxAge();
@@ -170,8 +168,6 @@ public class AuthServiceImplTest {
     assertThat(retrievedUser).isNotNull();
     assertThat(retrievedUser).isEqualTo(USER);
     
-    //    verify(redisTemplate).expire(anyString(), eq(0), eq(TimeUnit
-    // .SECONDS));
     verify(sessionProperties).getExpireTime();
     verify(sessionProperties).getMaxAge();
     verify(sessionProperties).getCookieName();

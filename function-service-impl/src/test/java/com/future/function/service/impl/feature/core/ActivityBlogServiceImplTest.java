@@ -36,6 +36,8 @@ public class ActivityBlogServiceImplTest {
   
   private static final String EMAIL = "email";
   
+  private static final String USER_ID = "user-id";
+  
   private static final PageRequest PAGEABLE = new PageRequest(0, 5);
   
   private static final String ID = "id";
@@ -52,6 +54,7 @@ public class ActivityBlogServiceImplTest {
   private static final List<FileV2> FILES = Collections.singletonList(FILE_V2);
   
   private static final User USER = User.builder()
+    .id(USER_ID)
     .email(EMAIL)
     .build();
   
@@ -76,7 +79,7 @@ public class ActivityBlogServiceImplTest {
   @Before
   public void setUp() {
     
-    activityBlog.setCreatedBy(EMAIL);
+    activityBlog.setCreatedBy(USER_ID);
   }
   
   @After
@@ -159,7 +162,7 @@ public class ActivityBlogServiceImplTest {
                                        false
     )).thenReturn(true);
     
-    activityBlogService.deleteActivityBlog(EMAIL, ID);
+    activityBlogService.deleteActivityBlog(USER_ID, ID);
     
     verify(activityBlogRepository).findOne(ID);
     verify(resourceService).markFilesUsed(Collections.singletonList(FILE_ID),
@@ -174,7 +177,7 @@ public class ActivityBlogServiceImplTest {
     
     when(activityBlogRepository.findOne(ID)).thenReturn(null);
     
-    activityBlogService.deleteActivityBlog(EMAIL, ID);
+    activityBlogService.deleteActivityBlog(USER_ID, ID);
     
     verify(activityBlogRepository).findOne(ID);
     verifyZeroInteractions(resourceService, userService);
@@ -186,7 +189,7 @@ public class ActivityBlogServiceImplTest {
     when(activityBlogRepository.findOne(ID)).thenReturn(activityBlog);
     
     catchException(
-      () -> activityBlogService.deleteActivityBlog(EMAIL + "2", ID));
+      () -> activityBlogService.deleteActivityBlog(USER_ID + "2", ID));
     
     assertThat(caughtException().getClass()).isEqualTo(
       ForbiddenException.class);
@@ -284,7 +287,7 @@ public class ActivityBlogServiceImplTest {
     BeanUtils.copyProperties(this.activityBlog, activityBlog);
     
     User user = User.builder()
-      .email(EMAIL + "2")
+      .email(USER_ID + "2")
       .build();
     activityBlog.setUser(user);
     

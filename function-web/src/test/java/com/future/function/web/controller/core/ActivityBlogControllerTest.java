@@ -235,7 +235,7 @@ public class ActivityBlogControllerTest extends TestHelper {
         baseResponseJacksonTester.write(OK_BASE_RESPONSE)
           .getJson()));
     
-    verify(activityBlogService).deleteActivityBlog(STUDENT_EMAIL, ID);
+    verify(activityBlogService).deleteActivityBlog(STUDENT_ID, ID);
     verifyZeroInteractions(activityBlogRequestMapper);
   }
   

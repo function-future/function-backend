@@ -222,7 +222,7 @@ public class FileServiceImpl implements FileService {
     fileV2.setName(name);
     return Optional.of(fileV2)
       .filter(
-        file -> AuthorizationHelper.isAuthorizedForEdit(session.getEmail(),
+        file -> AuthorizationHelper.isAuthorizedForEdit(session.getUserId(),
                                                         session.getRole(), file,
                                                         Role.ADMIN
         ))
@@ -237,7 +237,7 @@ public class FileServiceImpl implements FileService {
 
     return Optional.of(fileV2)
       .filter(
-        file -> AuthorizationHelper.isAuthorizedForEdit(session.getEmail(),
+        file -> AuthorizationHelper.isAuthorizedForEdit(session.getUserId(),
                                                         session.getRole(), file,
                                                         Role.ADMIN
         ))
@@ -287,7 +287,7 @@ public class FileServiceImpl implements FileService {
       .filter(id -> !id.equalsIgnoreCase(fileProperties.getRootId()))
       .flatMap(id -> fileRepositoryV2.findByIdAndParentIdAndDeletedFalse(id, parentId))
       .filter(
-        file -> AuthorizationHelper.isAuthorizedForEdit(session.getEmail(),
+        file -> AuthorizationHelper.isAuthorizedForEdit(session.getUserId(),
                                                         session.getRole(), file,
                                                         Role.ADMIN
         ))
