@@ -39,6 +39,7 @@ public class ReportResponseMapperTest {
   private static final String STUDENT_EMAIL = "student-email";
   private static final String STUDENT_UNIVERSITY = "student-university";
   private static final Long CREATED_AT = new Date().getTime();
+  private static final String URL_PREFIX = "url-prefix/";
 
   private Report report;
     private Batch batch;
@@ -59,8 +60,8 @@ public class ReportResponseMapperTest {
           .role(Role.STUDENT.name())
           .address(STUDENT_ADDRESS)
           .phone(STUDENT_PHONE)
-          .avatar(STUDENT_AVATAR)
-              .avatarId(STUDENT_AVATAR_ID)
+          .avatar(URL_PREFIX + STUDENT_AVATAR)
+          .avatarId(STUDENT_AVATAR_ID)
           .batch(BatchWebResponse.builder().code(BATCH_CODE).build())
           .email(STUDENT_EMAIL)
           .university(STUDENT_UNIVERSITY).build();
@@ -98,7 +99,8 @@ public class ReportResponseMapperTest {
 
   @Test
   public void toDataReportWebResponse() {
-    DataResponse<ReportWebResponse> actual = ReportResponseMapper.toDataReportWebResponse(report);
+    DataResponse<ReportWebResponse> actual =
+      ReportResponseMapper.toDataReportWebResponse(report, URL_PREFIX);
     assertThat(actual.getData().getId()).isEqualTo(ID);
     assertThat(actual.getData().getName()).isEqualTo(NAME);
     assertThat(actual.getData().getDescription()).isEqualTo(DESCRIPTION);
@@ -108,7 +110,9 @@ public class ReportResponseMapperTest {
 
   @Test
   public void toDataReportWebResponseCreated() {
-    DataResponse<ReportWebResponse> actual = ReportResponseMapper.toDataReportWebResponse(HttpStatus.CREATED, report);
+    DataResponse<ReportWebResponse> actual =
+      ReportResponseMapper.toDataReportWebResponse(HttpStatus.CREATED, report
+        , URL_PREFIX);
     assertThat(actual.getData().getId()).isEqualTo(ID);
     assertThat(actual.getData().getName()).isEqualTo(NAME);
     assertThat(actual.getData().getDescription()).isEqualTo(DESCRIPTION);
@@ -119,7 +123,8 @@ public class ReportResponseMapperTest {
 
   @Test
   public void toPagingReportWebResponse() {
-    PagingResponse<ReportWebResponse> actual = ReportResponseMapper.toPagingReportWebResponse(reportPage);
+    PagingResponse<ReportWebResponse> actual =
+      ReportResponseMapper.toPagingReportWebResponse(reportPage, URL_PREFIX);
     assertThat(actual.getData().get(0).getName()).isEqualTo(NAME);
     assertThat(actual.getData().get(0).getDescription()).isEqualTo(DESCRIPTION);
       assertThat(actual.getData().get(0).getBatchCode()).isEqualTo(BATCH_CODE);

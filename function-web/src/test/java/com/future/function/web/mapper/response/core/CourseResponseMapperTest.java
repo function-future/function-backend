@@ -44,7 +44,7 @@ public class CourseResponseMapperTest {
     .file(FILE)
     .build();
   
-  private static final String URL_PREFIX = "url-prefix";
+  private static final String URL_PREFIX = "url-prefix/";
   
   private static final CourseWebResponse COURSE_WEB_RESPONSE_WITH_THUMBNAIL =
     CourseWebResponse.builder()
@@ -101,7 +101,7 @@ public class CourseResponseMapperTest {
         .id(ID)
         .title(TITLE)
         .description(DESCRIPTION)
-        .material(FILE_URL)
+        .material(URL_PREFIX + FILE_URL)
         .materialId(FILE.getId())
         .build();
   

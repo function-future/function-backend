@@ -155,6 +155,8 @@ public class UserControllerTest extends TestHelper {
       throws Exception {
 
     super.setCookie(Role.ADMIN);
+  
+    when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
 
     given(userService.getStudentsWithinBatch(NUMBER, PAGEABLE)).willReturn(
         new PageImpl<>(STUDENTS_LIST, PAGEABLE, STUDENTS_LIST.size()));
@@ -166,6 +168,7 @@ public class UserControllerTest extends TestHelper {
             pagingResponseJacksonTester.write(PAGING_RESPONSE)
                 .getJson()));
 
+    verify(fileProperties).getUrlPrefix();
     verify(userService).getStudentsWithinBatch(NUMBER, PAGEABLE);
     verifyZeroInteractions(userRequestMapper);
   }
