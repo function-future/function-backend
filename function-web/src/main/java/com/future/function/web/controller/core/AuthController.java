@@ -1,6 +1,7 @@
 package com.future.function.web.controller.core;
 
 import com.future.function.common.enumeration.core.Role;
+import com.future.function.common.properties.core.FileProperties;
 import com.future.function.service.api.feature.core.AuthService;
 import com.future.function.session.annotation.WithAnyRole;
 import com.future.function.session.model.Session;
@@ -28,22 +29,30 @@ public class AuthController {
   
   private final AuthService authService;
   
+  private final FileProperties fileProperties;
+  
   @Autowired
-  public AuthController(AuthService authService) {
+  public AuthController(
+    AuthService authService, FileProperties fileProperties
+  ) {
     
     this.authService = authService;
+    this.fileProperties = fileProperties;
   }
   
   @ResponseStatus(HttpStatus.OK)
   @PostMapping
   public DataResponse<AuthWebResponse> login(
     @RequestBody
-      AuthWebRequest request, HttpServletResponse response
+      AuthWebRequest request, HttpServletResponse servletResponse
   ) {
     
-    return AuthResponseMapper.toAuthDataResponse(authService.login(
-      request.getEmail()
-        .toLowerCase(), request.getPassword(), response));
+    return AuthResponseMapper.toAuthDataResponse(
+      authService.login(
+        request.getEmail()
+          .toLowerCase(), request.getPassword(), servletResponse),
+      fileProperties.getUrlPrefix()
+    );
   }
   
   @ResponseStatus(HttpStatus.OK)
@@ -54,7 +63,9 @@ public class AuthController {
   ) {
     
     return AuthResponseMapper.toAuthDataResponse(
-      authService.getLoginStatus(session.getId(), servletResponse));
+      authService.getLoginStatus(session.getId(), servletResponse),
+      fileProperties.getUrlPrefix()
+    );
   }
   
   @ResponseStatus(HttpStatus.OK)

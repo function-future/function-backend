@@ -1,6 +1,7 @@
 package com.future.function.web.controller.core;
 
 import com.future.function.common.enumeration.core.Role;
+import com.future.function.common.properties.core.FileProperties;
 import com.future.function.model.entity.feature.core.ActivityBlog;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.service.api.feature.core.ActivityBlogService;
@@ -74,16 +75,6 @@ public class ActivityBlogControllerTest extends TestHelper {
   
   private static final long UPDATED_AT = 1L;
   
-  private ActivityBlog activityBlog;
-  
-  private Page<ActivityBlog> activityBlogPage;
-  
-  private DataResponse<ActivityBlogWebResponse> retrievedDataResponse;
-  
-  private DataResponse<ActivityBlogWebResponse> createdDataResponse;
-  
-  private PagingResponse<ActivityBlogWebResponse> pagingResponse;
-  
   private static final BaseResponse OK_BASE_RESPONSE =
     ResponseHelper.toBaseResponse(HttpStatus.OK);
   
@@ -94,6 +85,18 @@ public class ActivityBlogControllerTest extends TestHelper {
       .files(Collections.emptyList())
       .build();
   
+  private static final String URL_PREFIX = "url-prefix";
+  
+  private ActivityBlog activityBlog;
+  
+  private Page<ActivityBlog> activityBlogPage;
+  
+  private DataResponse<ActivityBlogWebResponse> retrievedDataResponse;
+  
+  private DataResponse<ActivityBlogWebResponse> createdDataResponse;
+  
+  private PagingResponse<ActivityBlogWebResponse> pagingResponse;
+  
   private JacksonTester<ActivityBlogWebRequest>
     activityBlogWebRequestJacksonTester;
   
@@ -102,6 +105,9 @@ public class ActivityBlogControllerTest extends TestHelper {
   
   @MockBean
   private ActivityBlogRequestMapper activityBlogRequestMapper;
+  
+  @MockBean
+  private FileProperties fileProperties;
   
   @Override
   @Before
@@ -114,18 +120,19 @@ public class ActivityBlogControllerTest extends TestHelper {
       .user(USER)
       .build();
     activityBlog.setUpdatedAt(UPDATED_AT);
-  
-    activityBlogPage =
-      new PageImpl<>(Collections.singletonList(activityBlog), PAGEABLE, 1);
+    
+    activityBlogPage = new PageImpl<>(
+      Collections.singletonList(activityBlog), PAGEABLE, 1);
     
     retrievedDataResponse =
-      ActivityBlogResponseMapper.toActivityBlogDataResponse(activityBlog);
-  
+      ActivityBlogResponseMapper.toActivityBlogDataResponse(
+        activityBlog, URL_PREFIX);
+    
     createdDataResponse = ActivityBlogResponseMapper.toActivityBlogDataResponse(
-      HttpStatus.CREATED, activityBlog);
-  
-    pagingResponse =
-      ActivityBlogResponseMapper.toActivityBlogPagingResponse(activityBlogPage);
+      HttpStatus.CREATED, activityBlog, URL_PREFIX);
+    
+    pagingResponse = ActivityBlogResponseMapper.toActivityBlogPagingResponse(
+      activityBlogPage, URL_PREFIX);
     
     super.setUp();
   }
@@ -133,12 +140,15 @@ public class ActivityBlogControllerTest extends TestHelper {
   @After
   public void tearDown() {
     
-    verifyNoMoreInteractions(activityBlogService, activityBlogRequestMapper);
+    verifyNoMoreInteractions(
+      activityBlogService, activityBlogRequestMapper, fileProperties);
   }
   
   @Test
   public void testGivenApiCallByGettingActivityBlogsReturnPagingResponse()
     throws Exception {
+  
+    when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
     
     when(activityBlogService.getActivityBlogs("", "", PAGEABLE)).thenReturn(
       activityBlogPage);
@@ -150,12 +160,15 @@ public class ActivityBlogControllerTest extends TestHelper {
           .getJson()));
     
     verify(activityBlogService).getActivityBlogs("", "", PAGEABLE);
+    verify(fileProperties).getUrlPrefix();
     verifyZeroInteractions(activityBlogRequestMapper);
   }
   
   @Test
   public void testGivenApiCallAndActivityBlogIdByGettingActivityBlogReturnDataResponse()
     throws Exception {
+  
+    when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
     
     when(activityBlogService.getActivityBlog(ID)).thenReturn(activityBlog);
     
@@ -166,6 +179,7 @@ public class ActivityBlogControllerTest extends TestHelper {
           .getJson()));
     
     verify(activityBlogService).getActivityBlog(ID);
+    verify(fileProperties).getUrlPrefix();
     
     verifyZeroInteractions(activityBlogRequestMapper);
   }
@@ -175,6 +189,8 @@ public class ActivityBlogControllerTest extends TestHelper {
     throws Exception {
     
     super.setCookie(Role.STUDENT);
+  
+    when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
     
     when(activityBlogRequestMapper.toActivityBlog(STUDENT_EMAIL,
                                                   REQUEST
@@ -194,6 +210,7 @@ public class ActivityBlogControllerTest extends TestHelper {
     
     verify(activityBlogRequestMapper).toActivityBlog(STUDENT_EMAIL, REQUEST);
     verify(activityBlogService).createActivityBlog(activityBlog);
+    verify(fileProperties).getUrlPrefix();
   }
   
   @Test
@@ -201,6 +218,8 @@ public class ActivityBlogControllerTest extends TestHelper {
     throws Exception {
     
     super.setCookie(Role.STUDENT);
+  
+    when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
     
     when(activityBlogRequestMapper.toActivityBlog(STUDENT_EMAIL, ID,
                                                   REQUEST
@@ -221,6 +240,7 @@ public class ActivityBlogControllerTest extends TestHelper {
     verify(activityBlogRequestMapper).toActivityBlog(
       STUDENT_EMAIL, ID, REQUEST);
     verify(activityBlogService).updateActivityBlog(activityBlog);
+    verify(fileProperties).getUrlPrefix();
   }
   
   @Test
@@ -236,7 +256,7 @@ public class ActivityBlogControllerTest extends TestHelper {
           .getJson()));
     
     verify(activityBlogService).deleteActivityBlog(STUDENT_ID, ID);
-    verifyZeroInteractions(activityBlogRequestMapper);
+    verifyZeroInteractions(activityBlogRequestMapper, fileProperties);
   }
   
 }

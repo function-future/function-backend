@@ -1,6 +1,7 @@
 package com.future.function.web.controller.core;
 
 import com.future.function.common.enumeration.core.Role;
+import com.future.function.common.properties.core.FileProperties;
 import com.future.function.service.api.feature.core.UserService;
 import com.future.function.session.annotation.WithAnyRole;
 import com.future.function.session.model.Session;
@@ -24,20 +25,24 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping(value = "/api/core/users")
 public class UserController {
-
+  
+  private final FileProperties fileProperties;
+  
   private UserRequestMapper userRequestMapper;
-
+  
   private UserService userService;
-
+  
   @Autowired
   public UserController(
-    UserService userService, UserRequestMapper userRequestMapper
+    UserService userService, UserRequestMapper userRequestMapper,
+    FileProperties fileProperties
   ) {
-
+    
     this.userService = userService;
     this.userRequestMapper = userRequestMapper;
+    this.fileProperties = fileProperties;
   }
-
+  
   /**
    * Creates new user in database.
    *
@@ -57,13 +62,15 @@ public class UserController {
     @RequestBody
       UserWebRequest data
   ) {
-
-    return UserResponseMapper.toUserDataResponse(
-      HttpStatus.CREATED,
-      userService.createUser(userRequestMapper.toUser(data))
+    
+    return UserResponseMapper.toUserDataResponse(HttpStatus.CREATED,
+                                                 userService.createUser(
+                                                   userRequestMapper.toUser(
+                                                     data)),
+                                                 fileProperties.getUrlPrefix()
     );
   }
-
+  
   /**
    * Deletes user from database.
    *
@@ -80,11 +87,11 @@ public class UserController {
     @PathVariable
       String userId
   ) {
-
+    
     userService.deleteUser(userId);
     return ResponseHelper.toBaseResponse(HttpStatus.OK);
   }
-
+  
   /**
    * Retrieves a user based on given parameter.
    *
@@ -104,10 +111,11 @@ public class UserController {
     @PathVariable
       String userId
   ) {
-
-    return UserResponseMapper.toUserDataResponse(userService.getUser(userId));
+    
+    return UserResponseMapper.toUserDataResponse(
+      userService.getUser(userId), fileProperties.getUrlPrefix());
   }
-
+  
   /**
    * Retrieves users based on given parameters.
    *
@@ -130,9 +138,11 @@ public class UserController {
                   defaultValue = "1")
       int page
   ) {
-
+    
     return UserResponseMapper.toUsersPagingResponse(
-      userService.getUsers(Role.toRole(role), PageHelper.toPageable(page, 10)));
+      userService.getUsers(Role.toRole(role), PageHelper.toPageable(page, 10)),
+      fileProperties.getUrlPrefix()
+    );
   }
 
   /**
@@ -158,7 +168,9 @@ public class UserController {
   ) {
 
     return UserResponseMapper.toUsersPagingResponse(
-        userService.getStudentsWithinBatch(batchCode, PageHelper.toPageable(page, 10)));
+        userService.getStudentsWithinBatch(batchCode,
+                                           PageHelper.toPageable(page, 10)),
+        fileProperties.getUrlPrefix());
   }
 
   /**
@@ -184,11 +196,13 @@ public class UserController {
     @RequestBody
       UserWebRequest data
   ) {
-
+    
     return UserResponseMapper.toUserDataResponse(
-      userService.updateUser(userRequestMapper.toUser(userId, data)));
+      userService.updateUser(userRequestMapper.toUser(userId, data)),
+      fileProperties.getUrlPrefix()
+    );
   }
-
+  
   @ResponseStatus(HttpStatus.OK)
   @GetMapping(value = "/search")
   public PagingResponse<UserWebResponse> getUsersByName(
@@ -203,13 +217,13 @@ public class UserController {
                   defaultValue = "10")
       int size
   ) {
-
+    
     return UserResponseMapper.toUsersPagingResponse(
       userService.getUsersByNameContainsIgnoreCase(name,
                                                    PageHelper.toPageable(page,
                                                                          size
                                                    )
-      ));
+      ), fileProperties.getUrlPrefix());
   }
-
+  
 }

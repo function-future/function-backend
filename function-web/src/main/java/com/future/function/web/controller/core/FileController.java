@@ -1,6 +1,7 @@
 package com.future.function.web.controller.core;
 
 import com.future.function.common.enumeration.core.Role;
+import com.future.function.common.properties.core.FileProperties;
 import com.future.function.service.api.feature.core.FileService;
 import com.future.function.session.annotation.WithAnyRole;
 import com.future.function.session.model.Session;
@@ -43,16 +44,19 @@ public class FileController {
   
   private final FileRequestMapper fileRequestMapper;
   
+  private final FileProperties fileProperties;
+  
   @Autowired
   public FileController(
     FileService fileService,
     MultipartFileRequestMapper multipartFileRequestMapper,
-    FileRequestMapper fileRequestMapper
+    FileRequestMapper fileRequestMapper, FileProperties fileProperties
   ) {
     
     this.fileService = fileService;
     this.multipartFileRequestMapper = multipartFileRequestMapper;
     this.fileRequestMapper = fileRequestMapper;
+    this.fileProperties = fileProperties;
   }
   
   @ResponseStatus(HttpStatus.OK)
@@ -70,7 +74,7 @@ public class FileController {
     return FileResponseMapper.toMultipleFileDataResponse(
       fileService.getFilesAndFolders(parentId,
                                      PageHelper.toPageable(page, size)
-      ));
+      ), fileProperties.getUrlPrefix());
   }
   
   @ResponseStatus(HttpStatus.OK)
@@ -84,7 +88,9 @@ public class FileController {
   ) {
     
     return FileResponseMapper.toSingleFileDataResponse(
-      fileService.getFileOrFolder(fileOrFolderId, parentId));
+      fileService.getFileOrFolder(fileOrFolderId, parentId),
+      fileProperties.getUrlPrefix()
+    );
   }
   
   @ResponseStatus(HttpStatus.CREATED)
@@ -108,9 +114,11 @@ public class FileController {
       data, pair.getSecond());
     
     return FileResponseMapper.toSingleFileDataResponse(
-      HttpStatus.CREATED, fileService.createFileOrFolder(
-        session, parentId, request.getName(), pair.getFirst(),
-        pair.getSecond()));
+      HttpStatus.CREATED,
+      fileService.createFileOrFolder(session, parentId, request.getName(),
+                                     pair.getFirst(), pair.getSecond()
+      ), fileProperties.getUrlPrefix()
+    );
   }
   
   @ResponseStatus(HttpStatus.OK)
@@ -139,7 +147,7 @@ public class FileController {
       fileService.updateFileOrFolder(session, fileOrFolderId, parentId,
                                      request.getName(), pair.getFirst(),
                                      pair.getSecond()
-      ));
+      ), fileProperties.getUrlPrefix());
   }
   
   @ResponseStatus(HttpStatus.OK)

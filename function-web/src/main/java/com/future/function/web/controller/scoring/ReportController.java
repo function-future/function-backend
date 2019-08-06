@@ -1,6 +1,7 @@
 package com.future.function.web.controller.scoring;
 
 import com.future.function.common.enumeration.core.Role;
+import com.future.function.common.properties.core.FileProperties;
 import com.future.function.service.api.feature.scoring.ReportService;
 import com.future.function.session.annotation.WithAnyRole;
 import com.future.function.session.model.Session;
@@ -24,11 +25,13 @@ public class ReportController {
 
   private ReportService reportService;
   private ReportRequestMapper requestMapper;
+  private FileProperties fileProperties;
 
   @Autowired
-  public ReportController(ReportService reportService, ReportRequestMapper requestMapper) {
+  public ReportController(ReportService reportService, ReportRequestMapper requestMapper, FileProperties fileProperties) {
     this.reportService = reportService;
     this.requestMapper = requestMapper;
+    this.fileProperties = fileProperties;
   }
 
   @ResponseStatus(HttpStatus.OK)
@@ -39,14 +42,16 @@ public class ReportController {
           @RequestParam(defaultValue = "10") int size,
           @WithAnyRole(roles = {Role.ADMIN, Role.MENTOR, Role.JUDGE}) Session session) {
     return ReportResponseMapper.toPagingReportWebResponse(reportService
-            .findAllReport(batchCode, PageHelper.toPageable(page, size)));
+            .findAllReport(batchCode, PageHelper.toPageable(page, size)),
+                                                          fileProperties.getUrlPrefix());
   }
 
   @ResponseStatus(HttpStatus.OK)
   @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
   public DataResponse<ReportWebResponse> findOne(@PathVariable String id,
       @WithAnyRole(roles = {Role.ADMIN, Role.JUDGE, Role.MENTOR}) Session session) {
-    return ReportResponseMapper.toDataReportWebResponse(reportService.findById(id));
+    return ReportResponseMapper.toDataReportWebResponse(reportService.findById(id),
+                                                        fileProperties.getUrlPrefix());
   }
 
   @ResponseStatus(HttpStatus.CREATED)
@@ -54,7 +59,8 @@ public class ReportController {
   public DataResponse<ReportWebResponse> createFinalJudging(@PathVariable String batchCode,
       @RequestBody ReportWebRequest request, @WithAnyRole(roles = Role.ADMIN) Session session) {
     return ReportResponseMapper.toDataReportWebResponse(HttpStatus.CREATED,
-        reportService.createReport(requestMapper.toReport(request, batchCode)));
+        reportService.createReport(requestMapper.toReport(request, batchCode)),
+                                                        fileProperties.getUrlPrefix());
   }
 
   @ResponseStatus(HttpStatus.OK)
@@ -62,7 +68,8 @@ public class ReportController {
   public DataResponse<ReportWebResponse> updateFinalJudging(@PathVariable String batchCode, @PathVariable String id,
                                                             @RequestBody ReportWebRequest request,
                                                             @WithAnyRole(roles = Role.ADMIN) Session session) {
-    return ReportResponseMapper.toDataReportWebResponse(reportService.updateReport(requestMapper.toReport(request, id, batchCode)));
+    return ReportResponseMapper.toDataReportWebResponse(reportService.updateReport(requestMapper.toReport(request, id, batchCode)),
+                                                        fileProperties.getUrlPrefix());
   }
 
   @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)

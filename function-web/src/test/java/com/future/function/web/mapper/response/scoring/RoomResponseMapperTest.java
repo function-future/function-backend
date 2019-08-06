@@ -38,6 +38,7 @@ public class RoomResponseMapperTest {
   private static final String FILE_ID = "file-id";
   private static final String ROOM_ID = "room-id";
   private static final String USER_ID = "user-id";
+  private static final String URL_PREFIX = "url-prefix";
   private Paging paging;
   private Pageable pageable;
   private User student;
@@ -86,7 +87,7 @@ public class RoomResponseMapperTest {
     userWebResponse = new UserWebResponse();
     BeanUtils.copyProperties(student, userWebResponse);
     userWebResponse.setBatch(batchWebResponse);
-    userWebResponse.setAvatar(FILE_URl);
+    userWebResponse.setAvatar(URL_PREFIX + FILE_URl);
     userWebResponse.setAvatarId(fileV2.getId());
     userWebResponse.setRole("STUDENT");
     room = Room.builder().assignment(assignment).student(student).point(0).build();
@@ -121,7 +122,8 @@ public class RoomResponseMapperTest {
 
   @Test
   public void toDataRoomWebResponse() {
-    DataResponse<RoomWebResponse> actual = RoomResponseMapper.toDataRoomWebResponse(room);
+    DataResponse<RoomWebResponse> actual =
+      RoomResponseMapper.toDataRoomWebResponse(room, URL_PREFIX);
     assertThat(actual.getData().getAssignment()).isEqualTo(assignmentWebResponse);
     assertThat(actual.getData().getStudent()).isEqualTo(userWebResponse);
     assertThat(actual.getData().getPoint()).isEqualTo(0);
@@ -129,7 +131,8 @@ public class RoomResponseMapperTest {
 
   @Test
   public void toPagingRoomWebResponse() {
-    PagingResponse<RoomWebResponse> actual = RoomResponseMapper.toPagingRoomWebResponse(roomPage);
+    PagingResponse<RoomWebResponse> actual =
+      RoomResponseMapper.toPagingRoomWebResponse(roomPage, URL_PREFIX);
     assertThat(actual.getData().get(0).getAssignment()).isEqualTo(assignmentWebResponse);
     assertThat(actual.getData().get(0).getStudent()).isEqualTo(userWebResponse);
     assertThat(actual.getData().get(0).getPoint()).isEqualTo(0);

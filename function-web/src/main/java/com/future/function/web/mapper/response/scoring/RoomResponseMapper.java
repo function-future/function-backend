@@ -18,26 +18,33 @@ import java.util.stream.Collectors;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class RoomResponseMapper {
 
-  public static DataResponse<RoomWebResponse> toDataRoomWebResponse(Room room) {
-    return ResponseHelper.toDataResponse(HttpStatus.OK, buildRoomWebResponse(room));
+  public static DataResponse<RoomWebResponse> toDataRoomWebResponse(
+    Room room, String urlPrefix
+  ) {
+    return ResponseHelper.toDataResponse(HttpStatus.OK,
+                                         buildRoomWebResponse(room, urlPrefix));
   }
 
-  public static PagingResponse<RoomWebResponse> toPagingRoomWebResponse(Page<Room> roomPage) {
-    return ResponseHelper.toPagingResponse(HttpStatus.OK, buildRoomWebResponses(roomPage), PageHelper.toPaging(roomPage));
+  public static PagingResponse<RoomWebResponse> toPagingRoomWebResponse(Page<Room> roomPage, String urlPrefix) {
+    return ResponseHelper.toPagingResponse(HttpStatus.OK,
+                                           buildRoomWebResponses(roomPage, urlPrefix),
+                                           PageHelper.toPaging(roomPage));
   }
 
-  private static List<RoomWebResponse> buildRoomWebResponses(Page<Room> roomPage) {
+  private static List<RoomWebResponse> buildRoomWebResponses(Page<Room> roomPage, String urlPrefix) {
     return roomPage.getContent()
         .stream()
-        .map(RoomResponseMapper::buildRoomWebResponse)
+        .map(room -> buildRoomWebResponse(room, urlPrefix))
         .collect(Collectors.toList());
   }
 
-  private static RoomWebResponse buildRoomWebResponse(Room room) {
+  private static RoomWebResponse buildRoomWebResponse(Room room,
+                                                      String urlPrefix) {
     return RoomWebResponse
         .builder()
         .assignment(AssignmentResponseMapper.toAssignmentDataResponse(room.getAssignment()).getData())
-        .student(UserResponseMapper.toUserDataResponse(room.getStudent()).getData())
+        .student(UserResponseMapper.toUserDataResponse(room.getStudent(),
+                                                       urlPrefix).getData())
         .point(room.getPoint())
         .id(room.getId())
         .build();

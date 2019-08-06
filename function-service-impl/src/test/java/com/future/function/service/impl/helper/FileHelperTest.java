@@ -18,10 +18,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.powermock.api.mockito.PowerMockito.*;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({
-                  FileHelper.class, File.class, FileUtils.class,
-                  Thumbnails.class
-                })
+@PrepareForTest(value = {
+  FileHelper.class, File.class, FileUtils.class, Thumbnails.class
+})
 public class FileHelperTest {
   
   private static final String NAME = UUID.randomUUID()
@@ -139,9 +138,6 @@ public class FileHelperTest {
     
     verifyStatic(FileUtils.class);
     FileUtils.writeByteArrayToFile(data, bytes);
-    
-    verifyStatic(File.class);
-    data.createNewFile();
   }
   
   @Test
@@ -168,41 +164,6 @@ public class FileHelperTest {
     
     verifyStatic(FileUtils.class);
     FileUtils.writeByteArrayToFile(data, bytes);
-    
-    verifyStatic(File.class);
-    data.createNewFile();
-  }
-  
-  @Test
-  public void testGivenByteArrayAndPathButExceptionOccurredByCreatingFileReturnFailedCreation1()
-    throws Exception {
-    
-    mockStatic(File.class);
-    File data = mock(File.class);
-    
-    String path = "path";
-    whenNew(File.class).withArguments(path)
-      .thenReturn(data);
-    
-    byte[] bytes = new byte[] {};
-    
-    mockStatic(FileUtils.class);
-    doNothing().when(FileUtils.class, "writeByteArrayToFile", data, bytes);
-    
-    when(data.createNewFile()).thenThrow(new IOException());
-    
-    FileHelper.createJavaIoFile(bytes, path);
-    
-    verifyNew(File.class).withArguments(path);
-    
-    verifyStatic(FileUtils.class);
-    FileUtils.writeByteArrayToFile(data, bytes);
-    
-    try {
-      verifyStatic(File.class);
-      data.createNewFile();
-    } catch (Exception e) {
-    }
   }
   
   @Test

@@ -1,6 +1,7 @@
 package com.future.function.web.controller.core;
 
 import com.future.function.common.enumeration.core.Role;
+import com.future.function.common.properties.core.FileProperties;
 import com.future.function.model.entity.feature.core.Course;
 import com.future.function.model.entity.feature.core.Discussion;
 import com.future.function.model.entity.feature.core.FileV2;
@@ -116,14 +117,17 @@ public class SharedCourseControllerTest extends TestHelper {
   private static final BaseResponse OK_BASE_RESPONSE =
     ResponseHelper.toBaseResponse(HttpStatus.OK);
   
+  private static final String URL_PREFIX = "url-prefix";
+  
   private static final DataResponse<CourseWebResponse> RETRIEVED_DATA_RESPONSE =
-    CourseResponseMapper.toCourseDataResponse(COURSE);
+    CourseResponseMapper.toCourseDataResponse(COURSE, URL_PREFIX);
   
   private static final PagingResponse<CourseWebResponse> PAGING_RESPONSE =
-    CourseResponseMapper.toCoursesPagingResponse(COURSE_PAGE);
+    CourseResponseMapper.toCoursesPagingResponse(COURSE_PAGE, URL_PREFIX);
   
   private static final DataResponse<List<CourseWebResponse>>
-    CREATED_DATA_RESPONSE = CourseResponseMapper.toCoursesDataResponse(COURSES);
+    CREATED_DATA_RESPONSE =
+    CourseResponseMapper.toCoursesDataResponse(COURSES, URL_PREFIX);
   
   private static final SharedCourseWebRequest SHARED_COURSE_WEB_REQUEST =
     SharedCourseWebRequest.builder()
@@ -174,6 +178,9 @@ public class SharedCourseControllerTest extends TestHelper {
   @MockBean
   private DiscussionRequestMapper discussionRequestMapper;
   
+  @MockBean
+  private FileProperties fileProperties;
+  
   @Override
   @Before
   public void setUp() {
@@ -220,7 +227,8 @@ public class SharedCourseControllerTest extends TestHelper {
   @After
   public void tearDown() {
     
-    verifyNoMoreInteractions(sharedCourseService, sharedCourseRequestMapper);
+    verifyNoMoreInteractions(
+      sharedCourseService, sharedCourseRequestMapper, fileProperties);
   }
   
   @Test
@@ -238,13 +246,14 @@ public class SharedCourseControllerTest extends TestHelper {
     verify(sharedCourseService).deleteCourseByIdAndBatchCode(COURSE_ID,
                                                              BATCH_CODE
     );
-    verifyZeroInteractions(sharedCourseRequestMapper);
+    verifyZeroInteractions(sharedCourseRequestMapper, fileProperties);
   }
   
   @Test
   public void testGivenApiCallByGettingCourseForBatchReturnDataResponse()
     throws Exception {
     
+    when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
     when(sharedCourseService.getCourseByIdAndBatchCode(COURSE_ID,
                                                        BATCH_CODE
     )).thenReturn(COURSE);
@@ -256,7 +265,8 @@ public class SharedCourseControllerTest extends TestHelper {
       .andExpect(content().json(
         dataResponseJacksonTester.write(RETRIEVED_DATA_RESPONSE)
           .getJson()));
-    
+  
+    verify(fileProperties).getUrlPrefix();
     verify(sharedCourseService).getCourseByIdAndBatchCode(COURSE_ID,
                                                           BATCH_CODE
     );
@@ -266,7 +276,8 @@ public class SharedCourseControllerTest extends TestHelper {
   @Test
   public void testGivenApiCallByGettingCoursesForBatchReturnDataResponse()
     throws Exception {
-    
+  
+    when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
     when(sharedCourseService.getCoursesByBatchCode(BATCH_CODE,
                                                    PAGEABLE
     )).thenReturn(COURSE_PAGE);
@@ -277,7 +288,8 @@ public class SharedCourseControllerTest extends TestHelper {
       .andExpect(content().json(
         pagingResponseJacksonTester.write(PAGING_RESPONSE)
           .getJson()));
-    
+  
+    verify(fileProperties).getUrlPrefix();
     verify(sharedCourseService).getCoursesByBatchCode(BATCH_CODE, PAGEABLE);
     verifyZeroInteractions(sharedCourseRequestMapper);
   }
@@ -285,7 +297,8 @@ public class SharedCourseControllerTest extends TestHelper {
   @Test
   public void testGivenApiCallByUpdatingCourseForBatchReturnDataResponse()
     throws Exception {
-    
+  
+    when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
     when(sharedCourseRequestMapper.toCourse(COURSE_ID,
                                             COURSE_WEB_REQUEST
     )).thenReturn(COURSE_FROM_REQUEST_MAPPER);
@@ -304,7 +317,8 @@ public class SharedCourseControllerTest extends TestHelper {
       .andExpect(content().json(
         dataResponseJacksonTester.write(RETRIEVED_DATA_RESPONSE)
           .getJson()));
-    
+  
+    verify(fileProperties).getUrlPrefix();
     verify(sharedCourseRequestMapper).toCourse(COURSE_ID, COURSE_WEB_REQUEST);
     verify(sharedCourseService).updateCourseForBatch(COURSE_ID, BATCH_CODE,
                                                      COURSE_FROM_REQUEST_MAPPER
@@ -314,7 +328,8 @@ public class SharedCourseControllerTest extends TestHelper {
   @Test
   public void testGivenApiCallByCreatingCoursesForBatchReturnDataResponse()
     throws Exception {
-    
+  
+    when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
     Pair<List<String>, String> courseIdsAndOriginBatchCodePair = Pair.of(
       COURSE_IDS, ORIGIN_BATCH_CODE);
     when(sharedCourseRequestMapper.toCourseIdsAndOriginBatchCodePair(
@@ -333,6 +348,7 @@ public class SharedCourseControllerTest extends TestHelper {
         dataResponseJacksonTester.write(CREATED_DATA_RESPONSE)
           .getJson()));
     
+    verify(fileProperties).getUrlPrefix();
     verify(sharedCourseRequestMapper).toCourseIdsAndOriginBatchCodePair(
       SHARED_COURSE_WEB_REQUEST);
     verify(sharedCourseService).createCourseForBatch(COURSE_IDS,
@@ -360,6 +376,7 @@ public class SharedCourseControllerTest extends TestHelper {
     
     verify(sharedCourseService).getDiscussions(
       JUDGE_EMAIL, COURSE_ID, BATCH_CODE, PAGEABLE);
+    verifyZeroInteractions(fileProperties);
   }
   
   @Test
@@ -389,6 +406,7 @@ public class SharedCourseControllerTest extends TestHelper {
     verify(discussionRequestMapper).toDiscussion(
       DISCUSSION_WEB_REQUEST, JUDGE_EMAIL, COURSE_ID, BATCH_CODE);
     verify(sharedCourseService).createDiscussion(discussionFromRequest);
+    verifyZeroInteractions(fileProperties);
   }
   
 }

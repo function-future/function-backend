@@ -1,6 +1,7 @@
 package com.future.function.web.controller.scoring;
 
 import com.future.function.common.enumeration.core.Role;
+import com.future.function.common.properties.core.FileProperties;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.User;
@@ -63,6 +64,7 @@ public class ReportControllerTest extends TestHelper {
     private static final String BATCH_CODE = "batch-code";
     private static final Long CREATED_AT = new Date().getTime();
     private static final String FILE_ID = "file-id";
+    private static final String URL_PREFIX = "url-prefix/";
 
     private ReportWebResponse reportWebResponse;
     private UserWebResponse userWebResponse;
@@ -83,6 +85,9 @@ public class ReportControllerTest extends TestHelper {
 
     @MockBean
     private ReportRequestMapper requestMapper;
+    
+    @MockBean
+    private FileProperties fileProperties;
 
     @Before
     public void setUp() {
@@ -112,7 +117,7 @@ public class ReportControllerTest extends TestHelper {
             .role(Role.STUDENT.name())
             .address(STUDENT_ADDRESS)
             .phone(STUDENT_PHONE)
-            .avatar(STUDENT_AVATAR)
+            .avatar(URL_PREFIX + STUDENT_AVATAR)
             .avatarId(FILE_ID)
             .batch(BatchWebResponse.builder().code(BATCH_CODE).build())
             .email(STUDENT_EMAIL)
@@ -156,11 +161,12 @@ public class ReportControllerTest extends TestHelper {
         when(reportService.findById(REPORT_ID)).thenReturn(report);
         when(requestMapper.toReport(reportWebRequest, BATCH_CODE)).thenReturn(report);
         when(requestMapper.toReport(reportWebRequest, REPORT_ID, BATCH_CODE)).thenReturn(report);
+        when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
     }
 
     @After
     public void tearDown() throws Exception {
-        verifyNoMoreInteractions(reportService, requestMapper);
+        verifyNoMoreInteractions(reportService, requestMapper, fileProperties);
     }
 
     @Test
@@ -175,6 +181,7 @@ public class ReportControllerTest extends TestHelper {
                         pagingResponseJacksonTester.write(PAGING_RESPONSE)
                                 .getJson()));
         verify(reportService).findAllReport(BATCH_CODE, pageable);
+        verify(fileProperties).getUrlPrefix();
     }
 
     @Test
@@ -187,6 +194,7 @@ public class ReportControllerTest extends TestHelper {
                         dataResponseJacksonTester.write(DATA_RESPONSE)
                                 .getJson()));
         verify(reportService).findById(REPORT_ID);
+        verify(fileProperties).getUrlPrefix();
     }
 
     @Test
@@ -202,6 +210,7 @@ public class ReportControllerTest extends TestHelper {
                                 .getJson()));
         verify(requestMapper).toReport(reportWebRequest, BATCH_CODE);
         verify(reportService).createReport(report);
+        verify(fileProperties).getUrlPrefix();
     }
 
     @Test
@@ -217,6 +226,7 @@ public class ReportControllerTest extends TestHelper {
                                 .getJson()));
         verify(requestMapper).toReport(reportWebRequest, REPORT_ID, BATCH_CODE);
         verify(reportService).updateReport(report);
+        verify(fileProperties).getUrlPrefix();
     }
 
     @Test

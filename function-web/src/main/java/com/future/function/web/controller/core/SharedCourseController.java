@@ -1,6 +1,7 @@
 package com.future.function.web.controller.core;
 
 import com.future.function.common.enumeration.core.Role;
+import com.future.function.common.properties.core.FileProperties;
 import com.future.function.service.api.feature.core.SharedCourseService;
 import com.future.function.session.annotation.WithAnyRole;
 import com.future.function.session.model.Session;
@@ -38,16 +39,20 @@ public class SharedCourseController {
   
   private final DiscussionRequestMapper discussionRequestMapper;
   
+  private final FileProperties fileProperties;
+  
   @Autowired
   public SharedCourseController(
     SharedCourseService sharedCourseService,
     SharedCourseRequestMapper sharedCourseRequestMapper,
-    DiscussionRequestMapper discussionRequestMapper
+    DiscussionRequestMapper discussionRequestMapper,
+    FileProperties fileProperties
   ) {
     
     this.sharedCourseService = sharedCourseService;
     this.sharedCourseRequestMapper = sharedCourseRequestMapper;
     this.discussionRequestMapper = discussionRequestMapper;
+    this.fileProperties = fileProperties;
   }
   
   @ResponseStatus(HttpStatus.OK)
@@ -68,7 +73,7 @@ public class SharedCourseController {
                                                 PageHelper.toPageable(page,
                                                                       size
                                                 )
-      ));
+      ), fileProperties.getUrlPrefix());
   }
   
   @ResponseStatus(HttpStatus.OK)
@@ -83,7 +88,8 @@ public class SharedCourseController {
   ) {
     
     return CourseResponseMapper.toCourseDataResponse(
-      sharedCourseService.getCourseByIdAndBatchCode(courseId, batchCode));
+      sharedCourseService.getCourseByIdAndBatchCode(courseId, batchCode),
+      fileProperties.getUrlPrefix());
   }
   
   @ResponseStatus(HttpStatus.OK)
@@ -120,7 +126,7 @@ public class SharedCourseController {
       sharedCourseService.createCourseForBatch(
         courseIdsAndOriginBatchPair.getFirst(),
         courseIdsAndOriginBatchPair.getSecond(), batchCode
-      ));
+      ), fileProperties.getUrlPrefix());
   }
   
   @ResponseStatus(HttpStatus.OK)
@@ -140,7 +146,7 @@ public class SharedCourseController {
       sharedCourseService.updateCourseForBatch(courseId, batchCode,
                                                sharedCourseRequestMapper.toCourse(
                                                  courseId, request)
-      ));
+      ), fileProperties.getUrlPrefix());
   }
   
   @ResponseStatus(HttpStatus.OK)

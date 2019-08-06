@@ -29,8 +29,6 @@ public class ResourceServiceImpl implements ResourceService {
   
   private final List<String> imageExtensions;
   
-  private final String urlPrefix;
-  
   private final String storagePath;
   
   private final String thumbnailSuffix;
@@ -42,7 +40,6 @@ public class ResourceServiceImpl implements ResourceService {
     this.fileRepositoryV2 = fileRepositoryV2;
     
     imageExtensions = fileProperties.getImageExtensions();
-    urlPrefix = fileProperties.getUrlPrefix() + URL_SEPARATOR;
     storagePath = fileProperties.getStoragePath() + FileHelper.PATH_SEPARATOR;
     thumbnailSuffix = fileProperties.getThumbnailSuffix();
   }
@@ -199,7 +196,7 @@ public class ResourceServiceImpl implements ResourceService {
     FileHelper.createJavaIoFile(bytes, filePath);
     
     fileV2.setFilePath(filePath);
-    fileV2.setFileUrl(constructPathOrUrl(urlPrefix + fileOrigin.name()
+    fileV2.setFileUrl(constructPathOrUrl(URL_SEPARATOR + fileOrigin.name()
       .toLowerCase() + URL_SEPARATOR, fileV2.getId(), extension));
   }
   
@@ -216,7 +213,7 @@ public class ResourceServiceImpl implements ResourceService {
     FileHelper.createThumbnail(bytes, thumbnailPath, extension);
     
     fileV2.setThumbnailPath(thumbnailPath);
-    fileV2.setThumbnailUrl(constructPathOrUrl(urlPrefix + fileOrigin.name()
+    fileV2.setThumbnailUrl(constructPathOrUrl(URL_SEPARATOR + fileOrigin.name()
       .toLowerCase() + URL_SEPARATOR, thumbnailName, extension));
   }
   

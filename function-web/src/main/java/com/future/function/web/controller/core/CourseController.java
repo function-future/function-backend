@@ -1,6 +1,7 @@
 package com.future.function.web.controller.core;
 
 import com.future.function.common.enumeration.core.Role;
+import com.future.function.common.properties.core.FileProperties;
 import com.future.function.service.api.feature.core.CourseService;
 import com.future.function.session.annotation.WithAnyRole;
 import com.future.function.session.model.Session;
@@ -28,12 +29,16 @@ public class CourseController {
   
   private final CourseRequestMapper courseRequestMapper;
   
+  private final FileProperties fileProperties;
+  
   public CourseController(
-    CourseService courseService, CourseRequestMapper courseRequestMapper
+    CourseService courseService, CourseRequestMapper courseRequestMapper,
+    FileProperties fileProperties
   ) {
     
     this.courseService = courseService;
     this.courseRequestMapper = courseRequestMapper;
+    this.fileProperties = fileProperties;
   }
   
   @ResponseStatus(HttpStatus.OK)
@@ -47,7 +52,8 @@ public class CourseController {
   ) {
     
     return CourseResponseMapper.toCoursesPagingResponse(
-      courseService.getCourses(PageHelper.toPageable(page, size)));
+      courseService.getCourses(PageHelper.toPageable(page, size)),
+      fileProperties.getUrlPrefix());
   }
   
   @ResponseStatus(HttpStatus.OK)
@@ -59,7 +65,7 @@ public class CourseController {
   ) {
     
     return CourseResponseMapper.toCourseDataResponse(
-      courseService.getCourse(courseId));
+      courseService.getCourse(courseId), fileProperties.getUrlPrefix());
   }
   
   @ResponseStatus(HttpStatus.CREATED)
@@ -72,7 +78,8 @@ public class CourseController {
     
     return CourseResponseMapper.toCourseDataResponse(
       HttpStatus.CREATED,
-      courseService.createCourse(courseRequestMapper.toCourse(request))
+      courseService.createCourse(courseRequestMapper.toCourse(request)),
+      fileProperties.getUrlPrefix()
     );
   }
   
@@ -87,7 +94,7 @@ public class CourseController {
   ) {
     
     return CourseResponseMapper.toCourseDataResponse(courseService.updateCourse(
-      courseRequestMapper.toCourse(courseId, request)));
+      courseRequestMapper.toCourse(courseId, request)), fileProperties.getUrlPrefix());
   }
   
   @ResponseStatus(HttpStatus.OK)

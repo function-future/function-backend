@@ -1,6 +1,7 @@
 package com.future.function.web.controller.core;
 
 import com.future.function.common.enumeration.core.Role;
+import com.future.function.common.properties.core.FileProperties;
 import com.future.function.model.entity.feature.core.Announcement;
 import com.future.function.service.api.feature.core.AnnouncementService;
 import com.future.function.web.TestHelper;
@@ -35,6 +36,8 @@ import java.util.List;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -76,6 +79,8 @@ public class AnnouncementControllerTest extends TestHelper {
       .files(null)
       .build();
   
+  private static final String URL_PREFIX = "url-prefix";
+  
   private Announcement announcement;
   
   private PagingResponse<AnnouncementWebResponse> pagingResponse;
@@ -92,6 +97,9 @@ public class AnnouncementControllerTest extends TestHelper {
   
   @MockBean
   private AnnouncementRequestMapper announcementRequestMapper;
+  
+  @MockBean
+  private FileProperties fileProperties;
   
   @Override
   @Before
@@ -112,13 +120,15 @@ public class AnnouncementControllerTest extends TestHelper {
       Collections.singletonList(announcement), PAGEABLE, 1);
     
     pagingResponse = AnnouncementResponseMapper.toAnnouncementsPagingResponse(
-      announcementPage);
+      announcementPage, URL_PREFIX);
     
     retrievedDataResponse =
-      AnnouncementResponseMapper.toAnnouncementDataResponse(announcement);
+      AnnouncementResponseMapper.toAnnouncementDataResponse(announcement,
+                                                            URL_PREFIX
+      );
     
     createdDataResponse = AnnouncementResponseMapper.toAnnouncementDataResponse(
-      HttpStatus.CREATED, announcement);
+      HttpStatus.CREATED, announcement, URL_PREFIX);
     
     super.setUp();
   }
@@ -126,12 +136,15 @@ public class AnnouncementControllerTest extends TestHelper {
   @After
   public void tearDown() {
     
-    verifyNoMoreInteractions(announcementService, announcementRequestMapper);
+    verifyNoMoreInteractions(
+      announcementService, announcementRequestMapper, fileProperties);
   }
   
   @Test
   public void testGivenCallToAnnouncementsApiByGettingAnnouncementsFromAnnouncementServiceReturnPagingResponseOfAnnouncements()
     throws Exception {
+    
+    when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
     
     List<Announcement> announcementList = Collections.singletonList(
       announcement);
@@ -146,12 +159,16 @@ public class AnnouncementControllerTest extends TestHelper {
         pagingResponseJacksonTester.write(pagingResponse)
           .getJson()));
     
+    verify(fileProperties).getUrlPrefix();
     verify(announcementService).getAnnouncements(PAGEABLE);
+    verifyZeroInteractions(announcementRequestMapper);
   }
   
   @Test
   public void testGivenCallToAnnouncementsApiWithoutRequestParamsByGettingAnnouncementsFromAnnouncementServiceReturnPagingResponseOfAnnouncements()
     throws Exception {
+    
+    when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
     
     List<Announcement> announcementList = Collections.singletonList(
       announcement);
@@ -165,12 +182,16 @@ public class AnnouncementControllerTest extends TestHelper {
         pagingResponseJacksonTester.write(pagingResponse)
           .getJson()));
     
+    verify(fileProperties).getUrlPrefix();
     verify(announcementService).getAnnouncements(PAGEABLE);
+    verifyZeroInteractions(announcementRequestMapper);
   }
   
   @Test
   public void testGivenAnnouncementIdByGettingAnnouncementFromAnnouncementServiceReturnDataResponse()
     throws Exception {
+    
+    when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
     
     given(announcementService.getAnnouncement(ID)).willReturn(announcement);
     
@@ -180,7 +201,9 @@ public class AnnouncementControllerTest extends TestHelper {
         dataResponseJacksonTester.write(retrievedDataResponse)
           .getJson()));
     
+    verify(fileProperties).getUrlPrefix();
     verify(announcementService).getAnnouncement(ID);
+    verifyZeroInteractions(announcementRequestMapper);
   }
   
   @Test
@@ -196,6 +219,7 @@ public class AnnouncementControllerTest extends TestHelper {
           .getJson()));
     
     verify(announcementService).deleteAnnouncement(ID);
+    verifyZeroInteractions(announcementRequestMapper, fileProperties);
   }
   
   @Test
@@ -203,6 +227,8 @@ public class AnnouncementControllerTest extends TestHelper {
     throws Exception {
     
     super.setCookie(Role.ADMIN);
+    
+    when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
     
     given(announcementService.createAnnouncement(announcement)).willReturn(
       announcement);
@@ -219,6 +245,7 @@ public class AnnouncementControllerTest extends TestHelper {
         dataResponseJacksonTester.write(createdDataResponse)
           .getJson()));
     
+    verify(fileProperties).getUrlPrefix();
     verify(announcementService).createAnnouncement(announcement);
     verify(announcementRequestMapper).toAnnouncement(ANNOUNCEMENT_WEB_REQUEST);
   }
@@ -228,6 +255,8 @@ public class AnnouncementControllerTest extends TestHelper {
     throws Exception {
     
     super.setCookie(Role.ADMIN);
+    
+    when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
     
     given(announcementService.updateAnnouncement(announcement)).
       willReturn(announcement);
@@ -245,6 +274,7 @@ public class AnnouncementControllerTest extends TestHelper {
         dataResponseJacksonTester.write(retrievedDataResponse)
           .getJson()));
     
+    verify(fileProperties).getUrlPrefix();
     verify(announcementService).updateAnnouncement(announcement);
     verify(announcementRequestMapper).toAnnouncement(
       ID, ANNOUNCEMENT_WEB_REQUEST);

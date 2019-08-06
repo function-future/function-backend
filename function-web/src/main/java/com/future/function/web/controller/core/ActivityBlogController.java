@@ -1,6 +1,7 @@
 package com.future.function.web.controller.core;
 
 import com.future.function.common.enumeration.core.Role;
+import com.future.function.common.properties.core.FileProperties;
 import com.future.function.service.api.feature.core.ActivityBlogService;
 import com.future.function.session.annotation.WithAnyRole;
 import com.future.function.session.model.Session;
@@ -28,14 +29,18 @@ public class ActivityBlogController {
   
   private final ActivityBlogRequestMapper activityBlogRequestMapper;
   
+  private final FileProperties fileProperties;
+  
   @Autowired
   public ActivityBlogController(
     ActivityBlogService activityBlogService,
-    ActivityBlogRequestMapper activityBlogRequestMapper
+    ActivityBlogRequestMapper activityBlogRequestMapper,
+    FileProperties fileProperties
   ) {
     
     this.activityBlogService = activityBlogService;
     this.activityBlogRequestMapper = activityBlogRequestMapper;
+    this.fileProperties = fileProperties;
   }
   
   @ResponseStatus(HttpStatus.OK)
@@ -54,7 +59,7 @@ public class ActivityBlogController {
     return ActivityBlogResponseMapper.toActivityBlogPagingResponse(
       activityBlogService.getActivityBlogs(userId, search,
                                            PageHelper.toPageable(page, size)
-      ));
+      ), fileProperties.getUrlPrefix());
   }
   
   @ResponseStatus(HttpStatus.OK)
@@ -65,7 +70,9 @@ public class ActivityBlogController {
   ) {
     
     return ActivityBlogResponseMapper.toActivityBlogDataResponse(
-      activityBlogService.getActivityBlog(activityBlogId));
+      activityBlogService.getActivityBlog(activityBlogId),
+      fileProperties.getUrlPrefix()
+    );
   }
   
   @ResponseStatus(HttpStatus.CREATED)
@@ -79,7 +86,9 @@ public class ActivityBlogController {
     
     return ActivityBlogResponseMapper.toActivityBlogDataResponse(
       HttpStatus.CREATED, activityBlogService.createActivityBlog(
-        activityBlogRequestMapper.toActivityBlog(session.getEmail(), request)));
+        activityBlogRequestMapper.toActivityBlog(session.getEmail(), request)),
+      fileProperties.getUrlPrefix()
+    );
   }
   
   @ResponseStatus(HttpStatus.OK)
@@ -97,7 +106,7 @@ public class ActivityBlogController {
       activityBlogService.updateActivityBlog(
         activityBlogRequestMapper.toActivityBlog(session.getEmail(),
                                                  activityBlogId, request
-        )));
+        )), fileProperties.getUrlPrefix());
   }
   
   @ResponseStatus(HttpStatus.OK)

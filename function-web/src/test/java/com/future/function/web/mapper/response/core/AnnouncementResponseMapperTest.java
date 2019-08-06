@@ -36,6 +36,8 @@ public class AnnouncementResponseMapperTest {
     .totalRecords(1)
     .build();
   
+  private static final String URL_PREFIX = "url-prefix";
+  
   private Announcement announcement;
   
   private AnnouncementWebResponse announcementWebResponse;
@@ -103,13 +105,14 @@ public class AnnouncementResponseMapperTest {
     
     DataResponse<AnnouncementWebResponse> createdDataResponse =
       AnnouncementResponseMapper.toAnnouncementDataResponse(
-        HttpStatus.CREATED, announcement);
+        HttpStatus.CREATED, announcement, URL_PREFIX);
     
     assertThat(createdDataResponse).isNotNull();
     assertThat(createdDataResponse).isEqualTo(this.createdDataResponse);
     
     DataResponse<AnnouncementWebResponse> retrievedDataResponse =
-      AnnouncementResponseMapper.toAnnouncementDataResponse(announcement);
+      AnnouncementResponseMapper.toAnnouncementDataResponse(announcement,
+                                                            URL_PREFIX);
     
     assertThat(retrievedDataResponse).isNotNull();
     assertThat(retrievedDataResponse).isEqualTo(this.retrievedDataResponse);
@@ -119,8 +122,8 @@ public class AnnouncementResponseMapperTest {
   public void testGivenAnnouncementsDataByMappingToPagingResponseReturnPagingResponseObject() {
     
     PagingResponse<AnnouncementWebResponse> pagingResponse =
-      AnnouncementResponseMapper.toAnnouncementsPagingResponse(
-        announcementPage);
+      AnnouncementResponseMapper.toAnnouncementsPagingResponse(announcementPage,
+                                                               URL_PREFIX);
     
     assertThat(pagingResponse).isNotNull();
     assertThat(pagingResponse).isEqualTo(this.pagingResponse);

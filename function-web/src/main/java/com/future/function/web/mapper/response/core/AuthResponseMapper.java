@@ -14,15 +14,18 @@ import java.util.Optional;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class AuthResponseMapper {
 
-  public static DataResponse<AuthWebResponse> toAuthDataResponse(User user) {
+  public static DataResponse<AuthWebResponse> toAuthDataResponse(User user,
+                                                                 String urlPrefix) {
 
     return ResponseHelper.toDataResponse(HttpStatus.OK,
                                          AuthResponseMapper.buildAuthWebResponse(
-                                           user)
+                                           user, urlPrefix)
     );
   }
 
-  private static AuthWebResponse buildAuthWebResponse(User user) {
+  private static AuthWebResponse buildAuthWebResponse(
+    User user, String urlPrefix
+  ) {
 
     return AuthWebResponse.builder()
       .id(user.getId())
@@ -30,21 +33,23 @@ public final class AuthResponseMapper {
       .email(user.getEmail())
       .role(user.getRole()
               .name())
-      .avatar(AuthResponseMapper.getThumbnailUrl(user.getPictureV2()))
+      .avatar(AuthResponseMapper.getThumbnailUrl(user.getPictureV2(), urlPrefix))
       .build();
   }
 
-  private static String getThumbnailUrl(FileV2 file) {
+  private static String getThumbnailUrl(FileV2 file, String urlPrefix) {
 
     return Optional.ofNullable(file)
       .map(FileV2::getThumbnailUrl)
-      .orElseGet(() -> AuthResponseMapper.getFileUrl(file));
+      .map(urlPrefix::concat)
+      .orElseGet(() -> AuthResponseMapper.getFileUrl(file, urlPrefix));
   }
 
-  private static String getFileUrl(FileV2 file) {
+  private static String getFileUrl(FileV2 file, String urlPrefix) {
 
     return Optional.ofNullable(file)
       .map(FileV2::getFileUrl)
+      .map(urlPrefix::concat)
       .orElse(null);
   }
 

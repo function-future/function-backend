@@ -1,10 +1,9 @@
 package com.future.function.web.controller.core;
 
 import com.future.function.common.enumeration.core.Role;
+import com.future.function.common.properties.core.FileProperties;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.User;
-import com.future.function.service.api.feature.core.AccessService;
-import com.future.function.service.api.feature.core.MenuService;
 import com.future.function.service.api.feature.core.UserDetailService;
 import com.future.function.web.TestHelper;
 import com.future.function.web.TestSecurityConfiguration;
@@ -37,7 +36,6 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -72,9 +70,11 @@ public class UserDetailControllerTest extends TestHelper {
   private static final ChangeProfilePictureWebRequest
     CHANGE_PROFILE_PICTURE_WEB_REQUEST = new ChangeProfilePictureWebRequest(
     Collections.singletonList(AVATAR_ID));
+  
+  private static final String URL_PREFIX = "url-prefix";
 
   private static final DataResponse<UserWebResponse> DATA_RESPONSE =
-    UserResponseMapper.toUserDataResponse(USER);
+    UserResponseMapper.toUserDataResponse(USER, URL_PREFIX);
 
   private static final BaseResponse UNAUTHORIZED_BASE_RESPONSE =
     ResponseHelper.toBaseResponse(HttpStatus.UNAUTHORIZED);
@@ -95,6 +95,9 @@ public class UserDetailControllerTest extends TestHelper {
 
   @MockBean
   private UserDetailRequestMapper userDetailRequestMapper;
+  
+  @MockBean
+  private FileProperties fileProperties;
 
   @Override
   @Before
@@ -106,7 +109,8 @@ public class UserDetailControllerTest extends TestHelper {
   @After
   public void tearDown() {
 
-    verifyNoMoreInteractions(userDetailService, userDetailRequestMapper);
+    verifyNoMoreInteractions(
+      userDetailService, userDetailRequestMapper, fileProperties);
   }
   
   @Test
@@ -114,6 +118,8 @@ public class UserDetailControllerTest extends TestHelper {
     throws Exception {
     
     super.setCookie(Role.MENTOR);
+    
+    when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
   
     when(userDetailRequestMapper.toUser(CHANGE_PROFILE_PICTURE_WEB_REQUEST,
                                         MENTOR_EMAIL
@@ -131,6 +137,7 @@ public class UserDetailControllerTest extends TestHelper {
       .andExpect(content().json(dataResponseJacksonTester.write(DATA_RESPONSE)
                                   .getJson()));
   
+    verify(fileProperties).getUrlPrefix();
     verify(userDetailRequestMapper).toUser(CHANGE_PROFILE_PICTURE_WEB_REQUEST,
                                            MENTOR_EMAIL);
     verify(userDetailService).changeProfilePicture(USER);
@@ -141,6 +148,8 @@ public class UserDetailControllerTest extends TestHelper {
     throws Exception {
 
     super.setCookie(Role.MENTOR);
+  
+    when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
 
     when(userDetailService.getUserByEmail(MENTOR_EMAIL)).thenReturn(USER);
 
@@ -149,6 +158,7 @@ public class UserDetailControllerTest extends TestHelper {
       .andExpect(content().json(dataResponseJacksonTester.write(DATA_RESPONSE)
                                   .getJson()));
 
+    verify(fileProperties).getUrlPrefix();
     verify(userDetailService).getUserByEmail(MENTOR_EMAIL);
     verifyZeroInteractions(userDetailRequestMapper);
   }
@@ -163,7 +173,8 @@ public class UserDetailControllerTest extends TestHelper {
         baseResponseJacksonTester.write(UNAUTHORIZED_BASE_RESPONSE)
           .getJson()));
 
-    verifyZeroInteractions(userDetailService, userDetailRequestMapper);
+    verifyZeroInteractions(
+      userDetailService, userDetailRequestMapper, fileProperties);
   }
 
   @Test

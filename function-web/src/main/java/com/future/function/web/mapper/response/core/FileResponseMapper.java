@@ -31,34 +31,34 @@ import java.util.stream.Collectors;
 public final class FileResponseMapper {
   
   public static DataResponse<FileWebResponse<FileContentWebResponse>> toSingleFileDataResponse(
-    FileV2 file
+    FileV2 file, String urlPrefix
   ) {
     
-    return FileResponseMapper.toSingleFileDataResponse(HttpStatus.OK, file);
+    return FileResponseMapper.toSingleFileDataResponse(HttpStatus.OK, file, urlPrefix);
   }
   
   public static DataResponse<FileWebResponse<FileContentWebResponse>> toSingleFileDataResponse(
-    HttpStatus httpStatus, FileV2 file
+    HttpStatus httpStatus, FileV2 file, String urlPrefix
   ) {
     
     return ResponseHelper.toDataResponse(httpStatus,
                                          FileResponseMapper.buildFileWebResponse(
-                                           file)
+                                           file, urlPrefix)
     );
   }
   
   private static FileWebResponse<FileContentWebResponse> buildFileWebResponse(
-    FileV2 file
+    FileV2 file, String urlPrefix
   ) {
     
     return FileWebResponse.<FileContentWebResponse>builder().paths(
       FileResponseMapper.toPathWebResponses(file.getPaths()))
-      .content(buildNormalFileContentWebResponse(file))
+      .content(buildNormalFileContentWebResponse(file, urlPrefix))
       .build();
   }
   
   private static FileContentWebResponse buildNormalFileContentWebResponse(
-    FileV2 file
+    FileV2 file, String urlPrefix
   ) {
     
     return FileContentWebResponse.builder()
@@ -67,8 +67,8 @@ public final class FileResponseMapper {
       .type(FileType.getFileType(file.isMarkFolder()))
       .parentId(file.getParentId())
       .versions(
-        FileResponseMapper.toFileWebResponseVersions(file.getVersions()))
-      .file(FileResponseMapper.getFileUrl(file))
+        FileResponseMapper.toFileWebResponseVersions(file.getVersions(), urlPrefix))
+      .file(FileResponseMapper.getFileUrl(file, urlPrefix))
       .author(FileResponseMapper.toAuthorWebResponse(file))
       .build();
   }
@@ -81,7 +81,7 @@ public final class FileResponseMapper {
   }
   
   private static Map<Long, VersionWebResponse> toFileWebResponseVersions(
-    Map<Long, Version> fileVersions
+    Map<Long, Version> fileVersions, String urlPrefix
   ) {
     
     Map<Long, VersionWebResponse> versions = new LinkedHashMap<>();
@@ -91,21 +91,24 @@ public final class FileResponseMapper {
     
     versionKeys.forEach(key -> versions.put(key,
                                             FileResponseMapper.toVersionWebResponse(
-                                              fileVersions.get(key))
+                                              fileVersions.get(key), urlPrefix)
     ));
     
     return versions;
   }
   
-  private static VersionWebResponse toVersionWebResponse(Version version) {
+  private static VersionWebResponse toVersionWebResponse(Version version,
+                                                         String urlPrefix) {
     
-    return new VersionWebResponse(version.getTimestamp(), version.getUrl());
+    return new VersionWebResponse(version.getTimestamp(),
+                                  urlPrefix + version.getUrl());
   }
   
-  private static String getFileUrl(FileV2 file) {
+  private static String getFileUrl(FileV2 file, String urlPrefix) {
     
     return Optional.of(file)
       .map(FileV2::getFileUrl)
+      .map(urlPrefix::concat)
       .orElse(null);
   }
   
@@ -125,41 +128,41 @@ public final class FileResponseMapper {
   }
   
   public static DataPageResponse<FileWebResponse<List<FileContentWebResponse>>> toMultipleFileDataResponse(
-    Pair<List<FileV2>, Page<FileV2>> data
+    Pair<List<FileV2>, Page<FileV2>> data, String urlPrefix
   ) {
     
     return DataPageResponse.<FileWebResponse<List<FileContentWebResponse>>>builder().code(
       HttpStatus.OK.value())
       .status(HttpStatus.OK.name())
       .data(FileResponseMapper.buildFileWebResponse(data.getFirst(),
-                                                    data.getSecond()
+                                                    data.getSecond(), urlPrefix
       ))
       .paging(PageHelper.toPaging(data.getSecond()))
       .build();
   }
   
   private static FileWebResponse<List<FileContentWebResponse>> buildFileWebResponse(
-    List<FileV2> paths, Page<FileV2> data
+    List<FileV2> paths, Page<FileV2> data, String urlPrefix
   ) {
     
     return FileWebResponse.<List<FileContentWebResponse>>builder().paths(
       FileResponseMapper.toPathWebResponses(paths))
-      .content(FileResponseMapper.toFileContentWebResponses(data))
+      .content(FileResponseMapper.toFileContentWebResponses(data, urlPrefix))
       .build();
   }
   
   private static List<FileContentWebResponse> toFileContentWebResponses(
-    Page<FileV2> data
+    Page<FileV2> data, String urlPrefix
   ) {
     
     return data.getContent()
       .stream()
-      .map(FileResponseMapper::buildThumbnailFileContentWebResponse)
+      .map(file -> FileResponseMapper.buildThumbnailFileContentWebResponse(file, urlPrefix))
       .collect(Collectors.toList());
   }
   
   private static FileContentWebResponse buildThumbnailFileContentWebResponse(
-    FileV2 file
+    FileV2 file, String urlPrefix
   ) {
     
     return FileContentWebResponse.builder()
@@ -168,17 +171,18 @@ public final class FileResponseMapper {
       .type(FileType.getFileType(file.isMarkFolder()))
       .parentId(file.getParentId())
       .versions(
-        FileResponseMapper.toFileWebResponseVersions(file.getVersions()))
-      .file(FileResponseMapper.getThumbnailUrl(file))
+        FileResponseMapper.toFileWebResponseVersions(file.getVersions(), urlPrefix))
+      .file(FileResponseMapper.getThumbnailUrl(file, urlPrefix))
       .author(FileResponseMapper.toAuthorWebResponse(file))
       .build();
   }
   
-  private static String getThumbnailUrl(FileV2 file) {
+  private static String getThumbnailUrl(FileV2 file, String urlPrefix) {
     
     return Optional.of(file)
       .map(FileV2::getThumbnailUrl)
-      .orElseGet(() -> FileResponseMapper.getFileUrl(file));
+      .map(urlPrefix::concat)
+      .orElseGet(() -> FileResponseMapper.getFileUrl(file, urlPrefix));
   }
   
 }

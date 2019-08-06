@@ -44,12 +44,22 @@ public class CourseResponseMapperTest {
     .file(FILE)
     .build();
   
+  private static final String URL_PREFIX = "url-prefix/";
+  
   private static final CourseWebResponse COURSE_WEB_RESPONSE_WITH_THUMBNAIL =
     CourseWebResponse.builder()
       .id(ID)
       .title(TITLE)
       .description(DESCRIPTION)
-      .material(THUMBNAIL_URL)
+      .material(URL_PREFIX + THUMBNAIL_URL)
+      .build();
+  
+  private static final CourseWebResponse COURSE_WEB_RESPONSE_WITHOUT_THUMBNAIL =
+    CourseWebResponse.builder()
+      .id(ID)
+      .title(TITLE)
+      .description(DESCRIPTION)
+      .material(URL_PREFIX + FILE_URL)
       .build();
   
   private CourseWebResponse courseWebResponseWithoutThumbnail;
@@ -91,7 +101,7 @@ public class CourseResponseMapperTest {
         .id(ID)
         .title(TITLE)
         .description(DESCRIPTION)
-        .material(FILE_URL)
+        .material(URL_PREFIX + FILE_URL)
         .materialId(FILE.getId())
         .build();
   
@@ -114,13 +124,14 @@ public class CourseResponseMapperTest {
   public void testGivenCourseDataByMappingToDataResponseReturnDataResponseObject() {
     
     DataResponse<CourseWebResponse> createdDataResponse =
-      CourseResponseMapper.toCourseDataResponse(HttpStatus.CREATED, COURSE);
+      CourseResponseMapper.toCourseDataResponse(HttpStatus.CREATED, COURSE,
+                                                URL_PREFIX);
     
     assertThat(createdDataResponse).isNotNull();
     assertThat(createdDataResponse).isEqualTo(this.createdDataResponse);
     
     DataResponse<CourseWebResponse> retrievedDataResponse =
-      CourseResponseMapper.toCourseDataResponse(COURSE);
+      CourseResponseMapper.toCourseDataResponse(COURSE, URL_PREFIX);
     
     assertThat(retrievedDataResponse).isNotNull();
     assertThat(retrievedDataResponse).isEqualTo(this.retrievedDataResponse);
@@ -130,7 +141,7 @@ public class CourseResponseMapperTest {
   public void testGivenCoursesDataByMappingToPagingResponseReturnPagingResponseObject() {
     
     PagingResponse<CourseWebResponse> pagingResponse =
-      CourseResponseMapper.toCoursesPagingResponse(PAGE);
+      CourseResponseMapper.toCoursesPagingResponse(PAGE, URL_PREFIX);
     
     assertThat(pagingResponse).isNotNull();
     assertThat(pagingResponse).isEqualTo(PAGING_RESPONSE);
@@ -140,7 +151,7 @@ public class CourseResponseMapperTest {
   public void testGivenListOfCoursesByMappingToDataResponseReturnDataResponseObject() {
     
     DataResponse<List<CourseWebResponse>> dataResponse =
-      CourseResponseMapper.toCoursesDataResponse(Collections.singletonList(COURSE));
+      CourseResponseMapper.toCoursesDataResponse(Collections.singletonList(COURSE), URL_PREFIX);
   
     assertThat(dataResponse).isNotNull();
     assertThat(dataResponse).isEqualTo(CREATED_DATA_RESPONSE_LIST);

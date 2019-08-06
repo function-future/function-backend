@@ -15,9 +15,11 @@ public class EmbeddedFileWebResponseMapperTest {
   
   private static final String ID = "id";
   
-  private static final String FILE_URL = "file-url";
+  private static final String FILE_URL = "/file-url";
   
-  private static final String THUMBNAIL_URL = "thumbnail-url";
+  private static final String THUMBNAIL_URL = "/thumbnail-url";
+  
+  private static final String URL_PREFIX = "url-prefix";
   
   @Before
   public void setUp() {}
@@ -38,14 +40,14 @@ public class EmbeddedFileWebResponseMapperTest {
       EmbeddedFileWebResponse.builder()
         .id(ID)
         .file(EmbeddedFileWebResponse.File.builder()
-                .full(FILE_URL)
-                .thumbnail(THUMBNAIL_URL)
+                .full(URL_PREFIX + FILE_URL)
+                .thumbnail(URL_PREFIX + THUMBNAIL_URL)
                 .build())
         .build();
     
     List<EmbeddedFileWebResponse> embeddedFileWebResponses =
       EmbeddedFileWebResponseMapper.toEmbeddedFileWebResponses(
-        Collections.singletonList(fileV2));
+        Collections.singletonList(fileV2), URL_PREFIX);
     
     assertThat(embeddedFileWebResponses).isEqualTo(
       Collections.singletonList(expectedEmbeddedFileWebResponse));

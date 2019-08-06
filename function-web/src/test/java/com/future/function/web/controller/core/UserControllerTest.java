@@ -1,6 +1,7 @@
 package com.future.function.web.controller.core;
 
 import com.future.function.common.enumeration.core.Role;
+import com.future.function.common.properties.core.FileProperties;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.User;
@@ -38,6 +39,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -49,19 +51,19 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import(TestSecurityConfiguration.class)
 @WebMvcTest(value = UserController.class)
 public class UserControllerTest extends TestHelper {
-
+  
   private static final String ADDRESS = "address";
-
+  
   private static final String NAME = "name";
-
+  
   private static final String NUMBER = "1";
-
+  
   private static final String PHONE = "081212341234";
-
+  
   private static final String STUDENT_EMAIL = "student@test.com";
-
+  
   private static final String UNIVERSITY = "university";
-
+  
   private static final User STUDENT = User.builder()
     .role(Role.STUDENT)
     .email(STUDENT_EMAIL)
@@ -74,7 +76,7 @@ public class UserControllerTest extends TestHelper {
              .build())
     .university(UNIVERSITY)
     .build();
-
+  
   private static final UserWebRequest STUDENT_WEB_REQUEST =
     UserWebRequest.builder()
       .role("STUDENT")
@@ -85,22 +87,21 @@ public class UserControllerTest extends TestHelper {
       .batch(NUMBER)
       .university(UNIVERSITY)
       .build();
-
+  
   private static final Pageable PAGEABLE = new PageRequest(0, 10);
-
+  
+  private static final String URL_PREFIX = "url-prefix";
+  
   private static final DataResponse<UserWebResponse> RETRIEVED_DATA_RESPONSE =
-    UserResponseMapper.toUserDataResponse(STUDENT);
-
+    UserResponseMapper.toUserDataResponse(STUDENT, URL_PREFIX);
   private static final DataResponse<UserWebResponse> CREATED_DATA_RESPONSE =
-    UserResponseMapper.toUserDataResponse(HttpStatus.CREATED, STUDENT);
-
+    UserResponseMapper.toUserDataResponse(HttpStatus.CREATED, STUDENT, URL_PREFIX);
   private static final List<User> STUDENTS_LIST = Arrays.asList(
     STUDENT, STUDENT, STUDENT);
 
   private static final PagingResponse<UserWebResponse> PAGING_RESPONSE =
     UserResponseMapper.toUsersPagingResponse(
-      new PageImpl<>(STUDENTS_LIST, PAGEABLE, STUDENTS_LIST.size()));
-
+      new PageImpl<>(STUDENTS_LIST, PAGEABLE, STUDENTS_LIST.size()), URL_PREFIX);
   private static final BaseResponse BASE_RESPONSE =
     ResponseHelper.toBaseResponse(HttpStatus.OK);
 
@@ -111,7 +112,9 @@ public class UserControllerTest extends TestHelper {
 
   @MockBean
   private UserRequestMapper userRequestMapper;
-
+@MockBean
+  private FileProperties fileProperties;
+  
   @Override
   @Before
   public void setUp() {
@@ -122,7 +125,7 @@ public class UserControllerTest extends TestHelper {
   @After
   public void tearDown() {
 
-    verifyNoMoreInteractions(userService, userRequestMapper);
+    verifyNoMoreInteractions(userService, userRequestMapper, fileProperties);
   }
 
   @Test
@@ -130,7 +133,9 @@ public class UserControllerTest extends TestHelper {
     throws Exception {
 
     super.setCookie(Role.ADMIN);
-
+    
+    when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
+    
     given(userService.getUsers(Role.STUDENT, PAGEABLE)).willReturn(
       new PageImpl<>(STUDENTS_LIST, PAGEABLE, STUDENTS_LIST.size()));
 
@@ -140,7 +145,7 @@ public class UserControllerTest extends TestHelper {
       .andExpect(content().json(
         pagingResponseJacksonTester.write(PAGING_RESPONSE)
           .getJson()));
-
+    verify(fileProperties).getUrlPrefix();
     verify(userService).getUsers(Role.STUDENT, PAGEABLE);
     verifyZeroInteractions(userRequestMapper);
   }
@@ -150,6 +155,8 @@ public class UserControllerTest extends TestHelper {
       throws Exception {
 
     super.setCookie(Role.ADMIN);
+  
+    when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
 
     given(userService.getStudentsWithinBatch(NUMBER, PAGEABLE)).willReturn(
         new PageImpl<>(STUDENTS_LIST, PAGEABLE, STUDENTS_LIST.size()));
@@ -161,6 +168,7 @@ public class UserControllerTest extends TestHelper {
             pagingResponseJacksonTester.write(PAGING_RESPONSE)
                 .getJson()));
 
+    verify(fileProperties).getUrlPrefix();
     verify(userService).getStudentsWithinBatch(NUMBER, PAGEABLE);
     verifyZeroInteractions(userRequestMapper);
   }
@@ -179,7 +187,7 @@ public class UserControllerTest extends TestHelper {
       .getResponse();
 
     verify(userService).deleteUser(STUDENT_EMAIL);
-    verifyZeroInteractions(userRequestMapper);
+    verifyZeroInteractions(userRequestMapper, fileProperties);
   }
 
   @Test
@@ -187,7 +195,8 @@ public class UserControllerTest extends TestHelper {
     throws Exception {
 
     super.setCookie(Role.ADMIN);
-
+when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
+    
     given(userService.getUser(STUDENT_EMAIL)).willReturn(STUDENT);
 
     mockMvc.perform(get("/api/core/users/" + STUDENT_EMAIL).cookie(cookies))
@@ -195,7 +204,7 @@ public class UserControllerTest extends TestHelper {
       .andExpect(content().json(
         dataResponseJacksonTester.write(RETRIEVED_DATA_RESPONSE)
           .getJson()));
-
+    verify(fileProperties).getUrlPrefix();
     verify(userService).getUser(STUDENT_EMAIL);
     verifyZeroInteractions(userRequestMapper);
   }
@@ -205,7 +214,9 @@ public class UserControllerTest extends TestHelper {
     throws Exception {
 
     super.setCookie(Role.ADMIN);
-
+    
+    when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
+    
     User student = User.builder()
       .role(Role.STUDENT)
       .email(STUDENT_EMAIL)
@@ -230,17 +241,19 @@ public class UserControllerTest extends TestHelper {
       .andExpect(content().json(
         dataResponseJacksonTester.write(CREATED_DATA_RESPONSE)
           .getJson()));
-
+    verify(fileProperties).getUrlPrefix();
     verify(userService).createUser(student);
     verify(userRequestMapper).toUser(STUDENT_WEB_REQUEST);
   }
 
   @Test
-  public void testGivenEmailFromPathVariableAndUserDataAsStringaAndImageByUpdatingUserReturnDataResponseUser()
+  public void testGivenEmailFromPathVariableAndUserDataAsStringAndImageByUpdatingUserReturnDataResponseUser()
     throws Exception {
 
     super.setCookie(Role.ADMIN);
-
+    
+    when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
+    
     User student = User.builder()
       .role(Role.STUDENT)
       .email(STUDENT_EMAIL)
@@ -267,7 +280,7 @@ public class UserControllerTest extends TestHelper {
       .andExpect(content().json(
         dataResponseJacksonTester.write(RETRIEVED_DATA_RESPONSE)
           .getJson()));
-
+    verify(fileProperties).getUrlPrefix();
     verify(userService).updateUser(student);
     verify(userRequestMapper).toUser(STUDENT_EMAIL, STUDENT_WEB_REQUEST);
   }
@@ -277,7 +290,9 @@ public class UserControllerTest extends TestHelper {
     throws Exception {
 
     super.setCookie(Role.ADMIN);
-
+    
+    when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
+    
     User student = User.builder()
       .role(Role.STUDENT)
       .email(STUDENT_EMAIL)
@@ -296,14 +311,13 @@ public class UserControllerTest extends TestHelper {
 
     PagingResponse<UserWebResponse> pagingResponse =
       UserResponseMapper.toUsersPagingResponse(new PageImpl<>(users, PAGEABLE
-        , users.size()));
-
+        , users.size()), URL_PREFIX);
     mockMvc.perform(get("/api/core/users/search").cookie(cookies)
                       .param("name", NAME))
       .andExpect(status().isOk())
       .andExpect(content().json(pagingResponseJacksonTester.write(pagingResponse)
                                   .getJson()));
-
+    verify(fileProperties).getUrlPrefix();
     verify(userService).getUsersByNameContainsIgnoreCase(NAME, PAGEABLE);
     verifyZeroInteractions(userRequestMapper);
   }
