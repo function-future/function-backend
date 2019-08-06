@@ -69,9 +69,9 @@ public class AuthServiceImpl implements AuthService {
   private String getBatchId(User user) {
     
     return Optional.of(user)
-    .map(User::getBatch)
+      .map(User::getBatch)
       .map(Batch::getId)
-    .orElse(null);
+      .orElse(null);
   }
   
   private void setAuthenticationOnSecurityContextHolder(
@@ -85,7 +85,7 @@ public class AuthServiceImpl implements AuthService {
   private UsernamePasswordAuthenticationToken toAuthentication(User user) {
 
     return new UsernamePasswordAuthenticationToken(
-      user.getEmail(), user.getPassword());
+      user.getId(), user.getPassword());
   }
 
   private void setCookie(

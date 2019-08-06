@@ -14,7 +14,6 @@ import com.future.function.service.api.feature.scoring.CommentService;
 import com.future.function.service.api.feature.scoring.RoomService;
 import com.future.function.service.impl.helper.AuthorizationHelper;
 import com.future.function.service.impl.helper.PageHelper;
-import java.util.Arrays;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -133,7 +132,7 @@ public class RoomServiceImpl implements RoomService {
       User user = userService.getUser(userId);
       return Optional.ofNullable(roomId)
           .map(id -> this.findById(id, user.getId()))
-          .filter(room -> AuthorizationHelper.isAuthorizedForEdit(user.getEmail(), user.getRole(), room, Role.MENTOR))
+          .filter(room -> AuthorizationHelper.isAuthorizedForEdit(user.getId(), user.getRole(), room, Role.MENTOR))
           .map(room -> setRoomPoint(point, room))
           .map(roomRepository::save)
           .orElseThrow(() -> new ForbiddenException("Failed at #giveScoreToRoomByRoomId #RoomService"));

@@ -6,13 +6,11 @@ import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.stereotype.Repository;
 
 /**
  * Author: PriagungSatyagama
  * Created At: 13:10 01/06/2019
  */
-@Repository
 public interface MessageRepository extends MongoRepository<Message, String> {
 
   /**

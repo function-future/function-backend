@@ -12,7 +12,7 @@ import java.util.Optional;
  */
 public interface StickyNoteRepository
   extends MongoRepository<StickyNote, String> {
-  
+
   /**
    * Finds first (latest) sticky note in database based on {@code updatedAt}
    * field.
@@ -21,7 +21,7 @@ public interface StickyNoteRepository
    * any exists; otherwise returns {@link java.util.Optional#empty()}.
    */
   Optional<StickyNote> findFirstByIdIsNotNullOrderByUpdatedAtDesc();
-  
+
   Page<StickyNote> findAllByIdIsNotNullOrderByUpdatedAtDesc(Pageable pageable);
-  
+
 }

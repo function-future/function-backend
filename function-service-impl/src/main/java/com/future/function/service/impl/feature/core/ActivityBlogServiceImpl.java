@@ -111,7 +111,7 @@ public class ActivityBlogServiceImpl implements ActivityBlogService {
       .map(activityBlogRepository::findOne)
       .filter(foundActivityBlog -> AuthorizationHelper.isAuthorizedForEdit(
         activityBlog.getUser()
-          .getEmail(), foundActivityBlog))
+          .getId(), foundActivityBlog))
       .map(this::deleteActivityBlogFiles)
       .map(
         foundActivityBlog -> this.setFileV2s(foundActivityBlog, activityBlog))
@@ -133,16 +133,16 @@ public class ActivityBlogServiceImpl implements ActivityBlogService {
   /**
    * {@inheritDoc}
    *
-   * @param email          Email of current user.
+   * @param userId          Id of current user.
    * @param activityBlogId Id of activity blog to be deleted.
    */
   @Override
-  public void deleteActivityBlog(String email, String activityBlogId) {
+  public void deleteActivityBlog(String userId, String activityBlogId) {
     
     Optional.ofNullable(activityBlogId)
       .map(activityBlogRepository::findOne)
       .filter(
-        foundActivityBlog -> AuthorizationHelper.isAuthorizedForEdit(email,
+        foundActivityBlog -> AuthorizationHelper.isAuthorizedForEdit(userId,
                                                                      foundActivityBlog
         ))
       .ifPresent(activityBlog -> {

@@ -109,7 +109,7 @@ public class ActivityBlogController {
       String activityBlogId
   ) {
     
-    activityBlogService.deleteActivityBlog(session.getEmail(), activityBlogId);
+    activityBlogService.deleteActivityBlog(session.getUserId(), activityBlogId);
     return ResponseHelper.toBaseResponse(HttpStatus.OK);
   }
   

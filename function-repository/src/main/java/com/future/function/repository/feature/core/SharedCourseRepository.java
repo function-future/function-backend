@@ -5,7 +5,6 @@ import com.future.function.model.entity.feature.core.SharedCourse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -13,7 +12,6 @@ import java.util.stream.Stream;
 /**
  * Repository class for shared course database operations.
  */
-@Repository
 public interface SharedCourseRepository
   extends MongoRepository<SharedCourse, String> {
   

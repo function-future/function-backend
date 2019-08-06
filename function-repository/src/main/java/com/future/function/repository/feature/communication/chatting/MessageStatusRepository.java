@@ -4,7 +4,6 @@ import com.future.function.model.entity.feature.communication.chatting.Chatroom;
 import com.future.function.model.entity.feature.communication.chatting.MessageStatus;
 import com.future.function.model.entity.feature.core.User;
 import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
@@ -12,7 +11,6 @@ import java.util.List;
  * Author: PriagungSatyagama
  * Created At: 13:37 01/06/2019
  */
-@Repository
 public interface MessageStatusRepository extends MongoRepository<MessageStatus, String> {
 
   /**

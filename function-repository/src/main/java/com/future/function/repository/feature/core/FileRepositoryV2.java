@@ -4,7 +4,6 @@ import com.future.function.model.entity.feature.core.FileV2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,7 +12,6 @@ import java.util.stream.Stream;
 /**
  * Repository class for file database operations.
  */
-@Repository
 public interface FileRepositoryV2 extends MongoRepository<FileV2, String> {
   
   /**
@@ -60,8 +58,10 @@ public interface FileRepositoryV2 extends MongoRepository<FileV2, String> {
    * @return {@code Optional<FileV2>} - File found in database, if any
    * exists; otherwise returns {@link Optional#empty()}.
    */
-  Optional<FileV2> findByIdAndParentIdAndDeletedFalse(String id, String parentId);
-  
+  Optional<FileV2> findByIdAndParentIdAndDeletedFalse(
+    String id, String parentId
+  );
+
   /**
    * Finds all file by its marking used is false.
    *
