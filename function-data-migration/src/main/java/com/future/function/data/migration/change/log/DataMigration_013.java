@@ -10,8 +10,8 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import java.util.HashMap;
 import java.util.Map;
 
-@ChangeLog(order = "012")
-public class DataMigration_012 {
+@ChangeLog(order = "013")
+public class DataMigration_013 {
 
     @ChangeSet(author = "oliver", id = "studentAssignmentListAccessList", order = "0001")
     public void insertStudentAssignmentListAccessList(MongoTemplate mongoTemplate) {
