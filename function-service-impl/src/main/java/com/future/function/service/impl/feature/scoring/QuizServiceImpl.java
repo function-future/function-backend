@@ -52,7 +52,7 @@ public class QuizServiceImpl implements QuizService {
   @Override
   public Quiz findById(String id) {
     return Optional.ofNullable(id)
-        .flatMap(quizRepository::findByIdAndDeletedFalse)
+            .flatMap(quizRepository::findByIdAndDeletedFalse)
             .orElseThrow(() -> new NotFoundException("Failed at #findById #QuizService"));
   }
 
@@ -72,14 +72,14 @@ public class QuizServiceImpl implements QuizService {
   }
 
   @Override
-  public Quiz copyQuizWithTargetBatchId(String targetBatchId, Quiz quiz) {
-    Batch batch = batchService.getBatchById(targetBatchId);
+  public Quiz copyQuizWithTargetBatchCode(String targetBatchCode, Quiz quiz) {
+    Batch batch = batchService.getBatchByCode(targetBatchCode);
     return Optional.ofNullable(quiz)
             .map(Quiz::getId)
             .map(this::findById)
             .map(value -> studentQuizService.copyQuizWithTargetBatch(batch, value))
             .map(quizRepository::save)
-            .orElseThrow(() -> new UnsupportedOperationException("Failed at #copyQuizWithTargetBatchId #QuizService"));
+            .orElseThrow(() -> new UnsupportedOperationException("Failed at #copyQuizWithTargetBatchCode #QuizService"));
   }
 
   /**
@@ -92,8 +92,8 @@ public class QuizServiceImpl implements QuizService {
   public Quiz createQuiz(Quiz request) {
     return Optional.ofNullable(request)
             .map(this::setBatchAndQuestionBank)
-        .map(quizRepository::save)
-        .map(quiz -> studentQuizService.createStudentQuizByBatchCode(quiz.getBatch().getCode(), quiz))
+            .map(quizRepository::save)
+            .map(quiz -> studentQuizService.createStudentQuizByBatchCode(quiz.getBatch().getCode(), quiz))
             .orElseThrow(() -> new UnsupportedOperationException("Failed on #createQuiz #QuizService"));
   }
 

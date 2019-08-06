@@ -64,9 +64,11 @@ public class QuestionnaireResponseMapper {
   private static QuestionnaireSimpleSummaryResponse toQuestionnaireSimpleSummaryResponse(QuestionnaireResponseSummary questionnaireResponseSummary) {
     return QuestionnaireSimpleSummaryResponse.builder()
             .id(questionnaireResponseSummary.getId())
-            .desc(questionnaireResponseSummary.getQuestionnaire().getDescription())
+            .title(questionnaireResponseSummary.getQuestionnaire().getTitle())
+            .description(questionnaireResponseSummary.getQuestionnaire().getDescription())
             .status(questionnaireResponseSummary.getQuestionnaire().getDueDate() < System.currentTimeMillis() ? "FINISHED" : "ON_GOING")
-            .duedate(questionnaireResponseSummary.getQuestionnaire().getDueDate())
+            .startDate(questionnaireResponseSummary.getQuestionnaire().getStartDate())
+            .dueDate(questionnaireResponseSummary.getQuestionnaire().getDueDate())
             .score(questionnaireResponseSummary.getScoreSummary().getAverage())
             .build();
   }

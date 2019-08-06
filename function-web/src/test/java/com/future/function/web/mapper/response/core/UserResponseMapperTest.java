@@ -67,6 +67,7 @@ public class UserResponseMapperTest {
       .phone(PHONE)
       .address(ADDRESS)
       .avatar(PICTURE.getFileUrl())
+      .avatarId(PICTURE.getId())
       .batch(BatchResponseMapper.toBatchWebResponse(BATCH))
       .university(UNIVERSITY)
       .build();
@@ -97,6 +98,7 @@ public class UserResponseMapperTest {
       .phone(PHONE)
       .address(ADDRESS)
       .avatar(PICTURE.getFileUrl())
+      .avatarId(PICTURE.getId())
       .build();
   
   private static final DataResponse<UserWebResponse>

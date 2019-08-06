@@ -1,5 +1,7 @@
 package com.future.function.web.mapper.response.scoring;
 
+import com.future.function.model.entity.feature.core.FileV2;
+import com.future.function.model.entity.feature.core.User;
 import com.future.function.model.entity.feature.scoring.ReportDetail;
 import com.future.function.model.vo.scoring.StudentSummaryVO;
 import com.future.function.web.mapper.helper.ResponseHelper;
@@ -10,6 +12,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -48,9 +51,16 @@ public class ReportDetailResponseMapper {
                 .studentName(reportDetail.getUser().getName())
                 .batchCode(reportDetail.getUser().getBatch().getCode())
                 .university(reportDetail.getUser().getUniversity())
-                .avatar(reportDetail.getUser().getPictureV2().getFileUrl())
+                .avatar(getNullableUserAvatar(reportDetail.getUser()))
                 .point(reportDetail.getPoint())
                 .build();
+    }
+
+    private static String getNullableUserAvatar(User user) {
+        return Optional.ofNullable(user)
+            .map(User::getPictureV2)
+            .map(FileV2::getFileUrl)
+                .orElse(null);
     }
 
     private static List<ReportDetailWebResponse> buildListFromReportDetailList(List<ReportDetail> reportDetails) {

@@ -5,6 +5,7 @@ import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.scoring.Assignment;
 import com.future.function.validation.RequestValidator;
 import com.future.function.web.model.request.scoring.AssignmentWebRequest;
+import com.future.function.web.model.request.scoring.CopyAssignmentWebRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +50,10 @@ public class AssignmentRequestMapper {
     return assignment;
   }
 
+  public CopyAssignmentWebRequest validateCopyAssignmentWebRequest(CopyAssignmentWebRequest request) {
+    return validator.validate(request);
+  }
+
   /**
    * used to convert AssignmentWebRequest into a proper Assignment Object with validation to validate some pre-requisition
    *
@@ -70,7 +75,7 @@ public class AssignmentRequestMapper {
         .filter(files -> !files.isEmpty())
         .map(files -> files.get(0))
         .map(this::buildFileV2)
-        .orElseGet(FileV2::new);
+        .orElse(null);
   }
 
   private FileV2 buildFileV2(String file) {

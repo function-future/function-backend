@@ -88,8 +88,8 @@ public class AssignmentServiceImpl implements AssignmentService {
   }
 
   @Override
-  public Assignment copyAssignment(String assignmentId, String batchId) {
-    Batch targetBatch = batchService.getBatchById(batchId);
+  public Assignment copyAssignment(String assignmentId, String targetBatchCode) {
+    Batch targetBatch = batchService.getBatchByCode(targetBatchCode);
     return Optional.ofNullable(assignmentId)
             .map(this::findById)
             .map(assignment -> initializeNewAssignment(targetBatch, assignment))
@@ -174,14 +174,19 @@ public class AssignmentServiceImpl implements AssignmentService {
 
     private Assignment setAssignmentFile(Assignment request, Assignment foundAssignment) {
     return Optional.ofNullable(request)
-        .map(Assignment::getFile)
-        .map(FileV2::getId)
-            .filter(id -> !id.equals(foundAssignment.getFile().getId()))
-            .map(fileId -> {
-              resourceService.markFilesUsed(Collections.singletonList(foundAssignment.getFile().getId()), false);
-              return foundAssignment;
-            })
-            .orElse(foundAssignment);
+        .map(requestedAssignment -> checkAndMarkFileAsNotUsedIfFileInDBExist(requestedAssignment, foundAssignment))
+        .orElse(foundAssignment);
+  }
+
+  private Assignment checkAndMarkFileAsNotUsedIfFileInDBExist(Assignment request, Assignment foundAssignment) {
+    if(Objects.nonNull(foundAssignment.getFile()) && Objects.isNull(request.getFile())) {
+      resourceService.markFilesUsed(Collections.singletonList(foundAssignment.getFile().getId()), false);
+      foundAssignment.setFile(null);
+    } else if (Objects.nonNull(foundAssignment.getFile()) && !foundAssignment.getFile().getId().equals(request.getFile().getId())) {
+      resourceService.markFilesUsed(Collections.singletonList(foundAssignment.getFile().getId()), false);
+      foundAssignment.setFile(null);
+    }
+    return foundAssignment;
   }
 
   @Override
@@ -205,13 +210,13 @@ public class AssignmentServiceImpl implements AssignmentService {
             .map(this::findById)
             .ifPresent(assignment -> {
               roomService.deleteAllRoomsByAssignmentId(assignment.getId());
-              markAllFilesAsNotUsed(assignment);
+              markAssignmentFileAsNotUsed(assignment);
               assignment.setDeleted(true);
               assignmentRepository.save(assignment);
             });
   }
 
-  private void markAllFilesAsNotUsed(Assignment assignment) {
+  private void markAssignmentFileAsNotUsed(Assignment assignment) {
     if (Objects.nonNull(assignment.getFile()) && !StringUtils.isEmpty(assignment.getFile().getId())) {
       resourceService.markFilesUsed(Collections.singletonList(assignment.getFile().getId()), false);
     }

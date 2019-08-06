@@ -1,6 +1,7 @@
 package com.future.function.service.impl.feature.scoring;
 
 import com.future.function.common.exception.NotFoundException;
+import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.model.entity.feature.scoring.Room;
 import com.future.function.model.entity.feature.scoring.StudentQuizDetail;
@@ -53,9 +54,16 @@ public class SummaryServiceImpl implements SummaryService {
                 .studentName(pair.getFirst().getName())
                 .batchCode(pair.getFirst().getBatch().getCode())
                 .university(pair.getFirst().getUniversity())
-                .avatar(pair.getFirst().getPictureV2().getFileUrl())
+                .avatar(getNullableUserPicture(pair.getFirst()))
                 .scores(pair.getSecond())
                 .build();
+    }
+
+    private String getNullableUserPicture(User user) {
+        return Optional.ofNullable(user)
+            .map(User::getPictureV2)
+            .map(FileV2::getFileUrl)
+            .orElseGet(String::new);
     }
 
     private Pair<User, List<SummaryVO>> getAllSummaryFromAssignmentAndQuiz(User user) {

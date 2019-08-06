@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/scoring/batches/{batchCode}/final-judgings/{judgingId}/comparisons")
+@RequestMapping("/api/scoring/batches/{batchCode}/judgings/{judgingId}/comparisons")
 public class ReportDetailController {
 
     private ReportService reportService;

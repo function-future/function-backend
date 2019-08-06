@@ -141,6 +141,15 @@ public class ReportDetailServiceImplTest {
     }
 
     @Test
+    public void findAllSummaryByReportIdFailedToGetSummary() {
+        when(summaryService.findAllPointSummaryByStudentId(USER_ID, USER_ID)).thenReturn(null);
+        List<StudentSummaryVO> actual = reportDetailService.findAllSummaryByReportId(REPORT_ID, USER_ID);
+        assertThat(actual.size()).isEqualTo(0);
+        verify(reportDetailRepository).findAllByReportIdAndDeletedFalse(REPORT_ID);
+        verify(summaryService).findAllPointSummaryByStudentId(USER_ID, USER_ID);
+    }
+
+    @Test
     public void createReportDetailByReport() {
         when(reportDetailRepository.save(any(ReportDetail.class))).thenReturn(reportDetail);
         Report actual = reportDetailService.createReportDetailByReport(report, student);

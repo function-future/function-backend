@@ -176,7 +176,7 @@ public class UserDetailControllerTest extends TestHelper {
       CHANGE_PASSWORD_WEB_REQUEST)).thenReturn(
       Pair.of(OLD_PASSWORD, NEW_PASSWORD));
 
-    mockMvc.perform(post("/api/core/user/password").cookie(cookies)
+    mockMvc.perform(put("/api/core/user/password").cookie(cookies)
                       .contentType(MediaType.APPLICATION_JSON)
                       .content(changePasswordWebRequestJacksonTester.write(
                         CHANGE_PASSWORD_WEB_REQUEST)

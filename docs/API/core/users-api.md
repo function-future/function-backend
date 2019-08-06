@@ -32,6 +32,7 @@ batch and university will appear only when the specified parameter role's value 
                     "phone": "088888888888",
                     "address": "Jl. Address 1 Address 2",
                     "avatar": "https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png",
+                    "avatarId": "sample-id",
                     "batch": {
                         "id": "sample-id",
                         "name": "Batch Name",
@@ -47,6 +48,7 @@ batch and university will appear only when the specified parameter role's value 
                     "phone": "088888888888",
                     "address": "Jl. Address 1 Address 2",
                     "avatar": "https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png",
+                    "avatarId": "sample-id",
                     "batch": {
                         "id": "sample-id",
                         "name": "Batch Name",
@@ -62,6 +64,7 @@ batch and university will appear only when the specified parameter role's value 
                     "phone": "088888888888",
                     "address": "Jl. Address 1 Address 2",
                     "avatar": "https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png",
+                    "avatarId": "sample-id",
                     "batch": {
                         "id": "sample-id",
                         "name": "Batch Name",
@@ -77,6 +80,7 @@ batch and university will appear only when the specified parameter role's value 
                     "phone": "088888888888",
                     "address": "Jl. Address 1 Address 2",
                     "avatar": "https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png",
+                    "avatarId": "sample-id",
                     "batch": {
                         "id": "sample-id",
                         "name": "Batch Name",
@@ -92,6 +96,7 @@ batch and university will appear only when the specified parameter role's value 
                     "phone": "088888888888",
                     "address": "Jl. Address 1 Address 2",
                     "avatar": "https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png",
+                    "avatarId": "sample-id",
                     "batch": {
                         "id": "sample-id",
                         "name": "Batch Name",
@@ -158,6 +163,7 @@ specified new/existing user role's value is student; parameters page and role mu
                 "phone": "088888888888",
                 "address": "Jl. Address 1 Address 2",
                 "avatar": "https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png",
+                "avatarId": "sample-id",
                 "batch": {
                     "id": "sample-id",
                     "name": "Batch Name",
@@ -226,6 +232,7 @@ appear only when the specified user's role value is student.
                 "phone": "088888888888",
                 "address": "Jl. Address 1 Address 2",
                 "avatar": "https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png",
+                "avatarId": "sample-id",
                 "batch": {
                     "id": "sample-id",
                     "name": "Batch Name",
@@ -294,6 +301,7 @@ request.
                 "phone": "088888888888",
                 "address": "Jl. Address 1 Address 2",
                 "avatar": "https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png",
+                "avatarId": "sample-id",
                 "batch": {
                     "id": "sample-id",
                     "name": "Batch Name",
@@ -397,6 +405,39 @@ parameter role's value is student.
                     "phone": "088888888888",
                     "address": "Jl. Address 1 Address 2",
                     "avatar": "https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png",
+                    "avatarId": "sample-id",
+                    "batch": {
+                        "id": "sample-id",
+                        "name": "Batch Name",
+                        "code": "3"
+                    },
+                    "university": "Bina Nusantara University"
+                },
+                {
+                    "id": "sample-id",
+                    "role": "STUDENT",
+                    "email": "user@user.com",
+                    "name": "User Name",
+                    "phone": "088888888888",
+                    "address": "Jl. Address 1 Address 2",
+                    "avatar": "https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png",
+                    "avatarId": "sample-id",
+                    "batch": {
+                        "id": "sample-id",
+                        "name": "Batch Name",
+                        "code": "3"
+                    },
+                    "university": "Bina Nusantara University"
+                },
+                {
+                    "id": "sample-id",
+                    "role": "STUDENT",
+                    "email": "user@user.com",
+                    "name": "User Name",
+                    "phone": "088888888888",
+                    "address": "Jl. Address 1 Address 2",
+                    "avatar": "https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png",
+                    "avatarId": "sample-id",
                     "batch": {
                         "id": "sample-id",
                         "name": "Batch Name",
@@ -427,36 +468,7 @@ parameter role's value is student.
                     "phone": "088888888888",
                     "address": "Jl. Address 1 Address 2",
                     "avatar": "https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png",
-                    "batch": {
-                        "id": "sample-id",
-                        "name": "Batch Name",
-                        "code": "3"
-                    },
-                    "university": "Bina Nusantara University"
-                },
-                {
-                    "id": "sample-id",
-                    "role": "STUDENT",
-                    "email": "user@user.com",
-                    "name": "User Name",
-                    "phone": "088888888888",
-                    "address": "Jl. Address 1 Address 2",
-                    "avatar": "https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png",
-                    "batch": {
-                        "id": "sample-id",
-                        "name": "Batch Name",
-                        "code": "3"
-                    },
-                    "university": "Bina Nusantara University"
-                },
-                {
-                    "id": "sample-id",
-                    "role": "STUDENT",
-                    "email": "user@user.com",
-                    "name": "User Name",
-                    "phone": "088888888888",
-                    "address": "Jl. Address 1 Address 2",
-                    "avatar": "https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png",
+                    "avatarId": "sample-id",
                     "batch": {
                         "id": "sample-id",
                         "name": "Batch Name",

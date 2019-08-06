@@ -47,6 +47,16 @@ public interface UserService {
   Page<User> getUsers(Role role, Pageable pageable);
 
   /**
+   * Retrieves users with STUDENT role from database given batch.
+   *
+   * @param batchCode code represents the batch of to-be-retrieved students.
+   * @param pageable Pageable object for paging data.
+   *
+   * @return {@code Page<User>} - Page of users found in database.
+   */
+  Page<User> getStudentsWithinBatch(String batchCode, Pageable pageable);
+
+  /**
    * Creates user object and saves any other data related to the user.
    *
    * @param user User data of new user.
@@ -92,7 +102,7 @@ public interface UserService {
   User getUserByEmail(String email);
 
   void changeUserPassword(String email, String oldPassword, String newPassword);
-  
+
   User changeProfilePicture(User user);
 
   /**

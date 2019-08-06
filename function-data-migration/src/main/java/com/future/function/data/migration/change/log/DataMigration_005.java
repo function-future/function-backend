@@ -13,14 +13,14 @@ import java.util.Map;
 @SuppressWarnings(value = { "squid:S00101", "squid:S1192" })
 @ChangeLog(order = "005")
 public class DataMigration_005 {
-  
+
   // Insert menu list for core and scoring.
-  
+
   @ChangeSet(author = "jonathan",
              id = "menuListMigration",
              order = "0001")
   public void insertMenuList(MongoTemplate mongoTemplate) {
-    
+
     Map<String, Object> adminSections = new HashMap<>();
     adminSections.put("courses", true);
     adminSections.put("files", true);
@@ -32,14 +32,18 @@ public class DataMigration_005 {
     adminSections.put("points", false);
     adminSections.put("chatrooms", true);
     adminSections.put("reminders", true);
-    
+    adminSections.put("myQuestionnaire", false);
+    adminSections.put("questionnaireAdmin", true);
+    adminSections.put("loggingRoom", true);
+
+
     Menu adminMenu = Menu.builder()
       .role(Role.ADMIN)
       .sections(adminSections)
       .build();
-    
+
     mongoTemplate.insert(adminMenu, DocumentName.MENU);
-    
+
     Map<String, Object> judgeSections = new HashMap<>();
     judgeSections.put("courses", true);
     judgeSections.put("files", true);
@@ -51,14 +55,17 @@ public class DataMigration_005 {
     judgeSections.put("points", false);
     judgeSections.put("chatrooms", true);
     judgeSections.put("reminders", false);
+    judgeSections.put("myQuestionnaire", false);
+    judgeSections.put("questionnaireAdmin", false);
+    judgeSections.put("loggingRoom", false);
 
     Menu judgeMenu = Menu.builder()
       .role(Role.JUDGE)
       .sections(judgeSections)
       .build();
-  
+
     mongoTemplate.insert(judgeMenu, DocumentName.MENU);
-  
+
     Map<String, Object> mentorSections = new HashMap<>();
     mentorSections.put("courses", true);
     mentorSections.put("files", true);
@@ -70,14 +77,17 @@ public class DataMigration_005 {
     mentorSections.put("points", false);
     mentorSections.put("chatrooms", true);
     mentorSections.put("reminders", false);
+    mentorSections.put("myQuestionnaire", true);
+    mentorSections.put("questionnaireAdmin", false);
+    mentorSections.put("loggingRoom", true);
 
     Menu mentorMenu = Menu.builder()
       .role(Role.MENTOR)
       .sections(mentorSections)
       .build();
-  
+
     mongoTemplate.insert(mentorMenu, DocumentName.MENU);
-  
+
     Map<String, Object> studentSections = new HashMap<>();
     studentSections.put("courses", true);
     studentSections.put("files", true);
@@ -89,14 +99,17 @@ public class DataMigration_005 {
     studentSections.put("points", true);
     studentSections.put("chatrooms", true);
     studentSections.put("reminders", false);
+    studentSections.put("myQuestionnaire", true);
+    studentSections.put("questionnaireAdmin", false);
+    studentSections.put("loggingRoom", true);
 
     Menu studentMenu = Menu.builder()
       .role(Role.STUDENT)
       .sections(studentSections)
       .build();
-  
+
     mongoTemplate.insert(studentMenu, DocumentName.MENU);
-  
+
     Map<String, Object> guestSections = new HashMap<>();
     guestSections.put("courses", false);
     guestSections.put("files", false);
@@ -107,13 +120,16 @@ public class DataMigration_005 {
     guestSections.put("comparisons", false);
     guestSections.put("points", false);
     guestSections.put("reminders", false);
+    guestSections.put("myQuestionnaire", false);
+    guestSections.put("questionnaireAdmin", false);
+    guestSections.put("loggingRoom", false);
 
     Menu guestMenu = Menu.builder()
       .role(Role.UNKNOWN)
       .sections(guestSections)
       .build();
-  
+
     mongoTemplate.insert(guestMenu, DocumentName.MENU);
   }
-  
+
 }

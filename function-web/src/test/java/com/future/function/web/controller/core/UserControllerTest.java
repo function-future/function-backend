@@ -49,19 +49,19 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import(TestSecurityConfiguration.class)
 @WebMvcTest(value = UserController.class)
 public class UserControllerTest extends TestHelper {
-  
+
   private static final String ADDRESS = "address";
-  
+
   private static final String NAME = "name";
-  
+
   private static final String NUMBER = "1";
-  
+
   private static final String PHONE = "081212341234";
-  
+
   private static final String STUDENT_EMAIL = "student@test.com";
-  
+
   private static final String UNIVERSITY = "university";
-  
+
   private static final User STUDENT = User.builder()
     .role(Role.STUDENT)
     .email(STUDENT_EMAIL)
@@ -74,7 +74,7 @@ public class UserControllerTest extends TestHelper {
              .build())
     .university(UNIVERSITY)
     .build();
-  
+
   private static final UserWebRequest STUDENT_WEB_REQUEST =
     UserWebRequest.builder()
       .role("STUDENT")
@@ -85,107 +85,127 @@ public class UserControllerTest extends TestHelper {
       .batch(NUMBER)
       .university(UNIVERSITY)
       .build();
-  
+
   private static final Pageable PAGEABLE = new PageRequest(0, 10);
-  
+
   private static final DataResponse<UserWebResponse> RETRIEVED_DATA_RESPONSE =
     UserResponseMapper.toUserDataResponse(STUDENT);
-  
+
   private static final DataResponse<UserWebResponse> CREATED_DATA_RESPONSE =
     UserResponseMapper.toUserDataResponse(HttpStatus.CREATED, STUDENT);
-  
+
   private static final List<User> STUDENTS_LIST = Arrays.asList(
     STUDENT, STUDENT, STUDENT);
-  
+
   private static final PagingResponse<UserWebResponse> PAGING_RESPONSE =
     UserResponseMapper.toUsersPagingResponse(
       new PageImpl<>(STUDENTS_LIST, PAGEABLE, STUDENTS_LIST.size()));
-  
+
   private static final BaseResponse BASE_RESPONSE =
     ResponseHelper.toBaseResponse(HttpStatus.OK);
-  
+
   private JacksonTester<UserWebRequest> userWebRequestJacksonTester;
-  
+
   @MockBean
   private UserService userService;
-  
+
   @MockBean
   private UserRequestMapper userRequestMapper;
-  
+
   @Override
   @Before
   public void setUp() {
-    
+
     super.setUp();
   }
-  
+
   @After
   public void tearDown() {
-    
+
     verifyNoMoreInteractions(userService, userRequestMapper);
   }
-  
+
   @Test
   public void testGivenCallToUsersApiByGettingUsersFromUserServiceReturnPagingResponseOfUsers()
     throws Exception {
-    
+
     super.setCookie(Role.ADMIN);
-    
+
     given(userService.getUsers(Role.STUDENT, PAGEABLE)).willReturn(
       new PageImpl<>(STUDENTS_LIST, PAGEABLE, STUDENTS_LIST.size()));
-    
+
     mockMvc.perform(get("/api/core/users").cookie(cookies)
                       .param("role", Role.STUDENT.name()))
       .andExpect(status().isOk())
       .andExpect(content().json(
         pagingResponseJacksonTester.write(PAGING_RESPONSE)
           .getJson()));
-    
+
     verify(userService).getUsers(Role.STUDENT, PAGEABLE);
     verifyZeroInteractions(userRequestMapper);
   }
-  
+
+  @Test
+  public void testGivenCallToUsersApiByGettingStudentsWithinBatchFromUserServiceReturnPagingResponseOfUsers()
+      throws Exception {
+
+    super.setCookie(Role.ADMIN);
+
+    given(userService.getStudentsWithinBatch(NUMBER, PAGEABLE)).willReturn(
+        new PageImpl<>(STUDENTS_LIST, PAGEABLE, STUDENTS_LIST.size()));
+
+    mockMvc.perform(get("/api/core/users/batches/" + NUMBER).cookie(cookies)
+        .param("role", Role.STUDENT.name()))
+        .andExpect(status().isOk())
+        .andExpect(content().json(
+            pagingResponseJacksonTester.write(PAGING_RESPONSE)
+                .getJson()));
+
+    verify(userService).getStudentsWithinBatch(NUMBER, PAGEABLE);
+    verifyZeroInteractions(userRequestMapper);
+  }
+
   @Test
   public void testGivenEmailFromPathVariableByDeletingUserByEmailReturnBaseResponseOK()
     throws Exception {
-    
+
     super.setCookie(Role.ADMIN);
-    
+
     mockMvc.perform(delete("/api/core/users/" + STUDENT_EMAIL).cookie(cookies))
       .andExpect(status().isOk())
       .andExpect(content().json(baseResponseJacksonTester.write(BASE_RESPONSE)
                                   .getJson()))
       .andReturn()
       .getResponse();
-    
+
     verify(userService).deleteUser(STUDENT_EMAIL);
     verifyZeroInteractions(userRequestMapper);
   }
-  
+
   @Test
   public void testGivenEmailFromPathVariableByGettingUserByEmailReturnDataResponseUser()
     throws Exception {
-    
+
     super.setCookie(Role.ADMIN);
-    
+
     given(userService.getUser(STUDENT_EMAIL)).willReturn(STUDENT);
-    
+
     mockMvc.perform(get("/api/core/users/" + STUDENT_EMAIL).cookie(cookies))
       .andExpect(status().isOk())
       .andExpect(content().json(
         dataResponseJacksonTester.write(RETRIEVED_DATA_RESPONSE)
           .getJson()));
-    
+
     verify(userService).getUser(STUDENT_EMAIL);
     verifyZeroInteractions(userRequestMapper);
   }
-  
+
   @Test
   public void testGivenUserDataAsStringAndImageByCreatingUserReturnDataResponseUser()
     throws Exception {
-    
+
     super.setCookie(Role.ADMIN);
-    
+
     User student = User.builder()
       .role(Role.STUDENT)
       .email(STUDENT_EMAIL)
@@ -197,10 +217,10 @@ public class UserControllerTest extends TestHelper {
                .build())
       .university(UNIVERSITY)
       .build();
-    
+
     given(userRequestMapper.toUser(STUDENT_WEB_REQUEST)).willReturn(student);
     given(userService.createUser(student)).willReturn(STUDENT);
-    
+
     mockMvc.perform(post("/api/core/users").cookie(cookies)
                       .contentType(MediaType.APPLICATION_JSON_VALUE)
                       .content(
@@ -210,17 +230,17 @@ public class UserControllerTest extends TestHelper {
       .andExpect(content().json(
         dataResponseJacksonTester.write(CREATED_DATA_RESPONSE)
           .getJson()));
-    
+
     verify(userService).createUser(student);
     verify(userRequestMapper).toUser(STUDENT_WEB_REQUEST);
   }
-  
+
   @Test
   public void testGivenEmailFromPathVariableAndUserDataAsStringaAndImageByUpdatingUserReturnDataResponseUser()
     throws Exception {
-    
+
     super.setCookie(Role.ADMIN);
-    
+
     User student = User.builder()
       .role(Role.STUDENT)
       .email(STUDENT_EMAIL)
@@ -232,12 +252,12 @@ public class UserControllerTest extends TestHelper {
                .build())
       .university(UNIVERSITY)
       .build();
-    
+
     given(
       userRequestMapper.toUser(STUDENT_EMAIL, STUDENT_WEB_REQUEST)).willReturn(
       student);
     given(userService.updateUser(student)).willReturn(STUDENT);
-    
+
     mockMvc.perform(put("/api/core/users/" + STUDENT_EMAIL).cookie(cookies)
                       .contentType(MediaType.APPLICATION_JSON_VALUE)
                       .content(
@@ -247,17 +267,17 @@ public class UserControllerTest extends TestHelper {
       .andExpect(content().json(
         dataResponseJacksonTester.write(RETRIEVED_DATA_RESPONSE)
           .getJson()));
-    
+
     verify(userService).updateUser(student);
     verify(userRequestMapper).toUser(STUDENT_EMAIL, STUDENT_WEB_REQUEST);
   }
-  
+
   @Test
   public void testGivenNameByGettingUsersByNameReturnDataResponseUsers()
     throws Exception {
-    
+
     super.setCookie(Role.ADMIN);
-    
+
     User student = User.builder()
       .role(Role.STUDENT)
       .email(STUDENT_EMAIL)
@@ -269,23 +289,23 @@ public class UserControllerTest extends TestHelper {
                .build())
       .university(UNIVERSITY)
       .build();
-    
+
     List<User> users = Collections.singletonList(student);
     given(userService.getUsersByNameContainsIgnoreCase(NAME, PAGEABLE)).willReturn(new PageImpl<>(users, PAGEABLE
       , users.size()));
-    
+
     PagingResponse<UserWebResponse> pagingResponse =
       UserResponseMapper.toUsersPagingResponse(new PageImpl<>(users, PAGEABLE
         , users.size()));
-    
+
     mockMvc.perform(get("/api/core/users/search").cookie(cookies)
                       .param("name", NAME))
       .andExpect(status().isOk())
       .andExpect(content().json(pagingResponseJacksonTester.write(pagingResponse)
                                   .getJson()));
-    
+
     verify(userService).getUsersByNameContainsIgnoreCase(NAME, PAGEABLE);
     verifyZeroInteractions(userRequestMapper);
   }
-  
+
 }

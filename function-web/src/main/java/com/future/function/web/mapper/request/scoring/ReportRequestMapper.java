@@ -2,9 +2,12 @@ package com.future.function.web.mapper.request.scoring;
 
 import com.future.function.common.exception.BadRequestException;
 import com.future.function.model.entity.feature.core.Batch;
+import com.future.function.model.entity.feature.core.User;
 import com.future.function.model.entity.feature.scoring.Report;
 import com.future.function.validation.RequestValidator;
 import com.future.function.web.model.request.scoring.ReportWebRequest;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -40,8 +43,14 @@ public class ReportRequestMapper {
             .title(value.getName())
             .description(value.getDescription())
             .batch(Batch.builder().code(batchCode).build())
-            .studentIds(value.getStudents())
+            .students(buildStudentsFromStudentIds(value.getStudents()))
             .build())
         .orElseThrow(() -> new BadRequestException("Bad Request"));
+  }
+
+  private List<User> buildStudentsFromStudentIds(List<String> studentIds) {
+    return studentIds.stream()
+        .map(id -> User.builder().id(id).build())
+        .collect(Collectors.toList());
   }
 }

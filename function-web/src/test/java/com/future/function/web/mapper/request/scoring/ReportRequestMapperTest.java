@@ -1,6 +1,7 @@
 package com.future.function.web.mapper.request.scoring;
 
 import com.future.function.common.exception.BadRequestException;
+import com.future.function.model.entity.feature.core.User;
 import com.future.function.model.entity.feature.scoring.Report;
 import com.future.function.validation.RequestValidator;
 import com.future.function.web.model.request.scoring.ReportWebRequest;
@@ -29,7 +30,8 @@ public class ReportRequestMapperTest {
   private static final String STUDENT_ID = "student-id";
 
   private ReportWebRequest request;
-  private List<String> studentIds;
+  private User user;
+  private List<User> students;
 
   @InjectMocks
   private ReportRequestMapper requestMapper;
@@ -40,14 +42,16 @@ public class ReportRequestMapperTest {
   @Before
   public void setUp() throws Exception {
 
-    studentIds = Collections.singletonList(STUDENT_ID);
-
     request = ReportWebRequest
         .builder()
         .name(NAME)
         .description(DESCRIPTION)
-        .students(studentIds)
+        .students(Collections.singletonList(STUDENT_ID))
         .build();
+
+    user = User.builder().id(STUDENT_ID).build();
+
+    students = Collections.singletonList(user);
 
     when(requestValidator.validate(request)).thenReturn(request);
   }
@@ -62,8 +66,8 @@ public class ReportRequestMapperTest {
     Report actual = requestMapper.toReport(request, BATCH_CODE);
     assertThat(actual.getTitle()).isEqualTo(NAME);
     assertThat(actual.getDescription()).isEqualTo(DESCRIPTION);
-      assertThat(actual.getBatch().getCode()).isEqualTo(BATCH_CODE);
-    assertThat(actual.getStudentIds()).isEqualTo(studentIds);
+    assertThat(actual.getBatch().getCode()).isEqualTo(BATCH_CODE);
+    assertThat(actual.getStudents()).isEqualTo(students);
     verify(requestValidator).validate(request);
   }
 

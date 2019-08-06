@@ -2,6 +2,7 @@ package com.future.function.model.entity.feature.scoring;
 
 import com.future.function.model.entity.base.BaseEntity;
 import com.future.function.model.entity.feature.core.Batch;
+import com.future.function.model.entity.feature.core.User;
 import com.future.function.model.util.constant.DocumentName;
 import com.future.function.model.util.constant.FieldName;
 import lombok.*;
@@ -34,6 +35,6 @@ public class Report extends BaseEntity {
     @Field(FieldName.Report.BATCH)
     private Batch batch;
 
-    private List<String> studentIds;
+    private List<User> students;
 
 }

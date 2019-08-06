@@ -63,11 +63,19 @@ public class QuestionnaireResponseSummaryResponseMapper {
   }
 
   private static BatchWebResponse toBatchResponse(Batch batch) {
+    if(batch == null) {
+      return BatchWebResponse.builder()
+              .id("No Batch")
+              .name("No Batch")
+              .code("No Batch")
+              .build();
+    }
     return BatchWebResponse.builder()
-      .id(batch.getId())
-      .name(batch.getName())
-      .code(batch.getCode())
-      .build();
+            .id(batch.getId())
+            .name(batch.getName())
+            .code(batch.getCode())
+            .build();
+
   }
 
   public static DataResponse<List<QuestionQuestionnaireSummaryResponse>> toDataResponseQuestionQuestionnaireSummaryResponseList(List<QuestionResponseSummary> data) {
@@ -97,28 +105,17 @@ public class QuestionnaireResponseSummaryResponseMapper {
     return QuestionQuestionnaireResponse.builder()
             .id(questionQuestionnaire.getId())
             .questionnaireId(questionQuestionnaire.getQuestionnaire().getId())
-            .desc(questionQuestionnaire.getDescription())
+            .description(questionQuestionnaire.getDescription())
             .build();
   }
 
 
-  public static DataResponse<QuestionAnswerDetailResponse> toDataResponseQuestionAnswerDetailResponse(QuestionnaireResponseSummary questionnaireResponseSummary, QuestionResponseSummary questionResponseSummary, List<QuestionResponse> questionResponseByQuestionResponseSummary) {
+  public static DataResponse<List<QuestionAnswerResponse>> toDataResponseQuestionAnswerDetailResponse(List<QuestionResponse> questionResponseByQuestionResponseSummary) {
     return ResponseHelper.toDataResponse(
             HttpStatus.OK,
-            toQuestionAnswerDetailResponse(
-                    questionnaireResponseSummary,
-                    questionResponseSummary,
+            toQuestionAnswerReponseList(
                     questionResponseByQuestionResponseSummary)
     );
-  }
-
-  private static QuestionAnswerDetailResponse toQuestionAnswerDetailResponse(QuestionnaireResponseSummary questionnaireResponseSummary, QuestionResponseSummary questionResponseSummary, List<QuestionResponse> questionResponseByQuestionResponseSummary) {
-
-    return QuestionAnswerDetailResponse.builder()
-            .questionnaireSummary(toQuestionnaireSummaryDescriptionResponse(questionnaireResponseSummary))
-            .questionSummary(toQuestionQuestionnaireSummaryResponse(questionResponseSummary))
-            .QuestionResponse(toQuestionAnswerReponseList(questionResponseByQuestionResponseSummary))
-            .build();
   }
 
   private static List<QuestionAnswerResponse> toQuestionAnswerReponseList(List<QuestionResponse> data) {

@@ -12,5 +12,5 @@ import org.hibernate.validator.constraints.NotBlank;
 @AllArgsConstructor
 public class QuestionQuestionnaireRequest {
   @NotBlank(message = "Not Blank")
-  private String desc;
+  private String description;
 }

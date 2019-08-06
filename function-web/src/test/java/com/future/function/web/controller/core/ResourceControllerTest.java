@@ -9,7 +9,7 @@ import com.future.function.web.TestSecurityConfiguration;
 import com.future.function.web.mapper.request.core.ResourceRequestMapper;
 import com.future.function.web.mapper.response.core.ResourceResponseMapper;
 import com.future.function.web.model.response.base.DataResponse;
-import com.future.function.web.model.response.feature.core.FileWebResponse;
+import com.future.function.web.model.response.feature.core.FileContentWebResponse;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -61,7 +61,7 @@ public class ResourceControllerTest extends TestHelper {
     .thumbnailUrl(null)
     .build();
 
-  private static final DataResponse<FileWebResponse>
+  private static final DataResponse<FileContentWebResponse>
     CREATED_DATA_RESPONSE_NULL_THUMBNAIL =
     ResourceResponseMapper.toResourceDataResponse(FILE_V2_NULL_THUMBNAIL);
 
@@ -76,7 +76,6 @@ public class ResourceControllerTest extends TestHelper {
   public void setUp() {
 
     super.setUp();
-    super.setCookie(Role.MENTOR);
   }
 
   @After
@@ -88,6 +87,8 @@ public class ResourceControllerTest extends TestHelper {
   @Test
   public void testGivenApiCallByStoringFileReturnDataResponseObject()
     throws Exception {
+    
+    super.setCookie(Role.MENTOR);
 
     Pair<String, byte[]> pair = Pair.of(NAME, BYTES);
 
@@ -119,13 +120,12 @@ public class ResourceControllerTest extends TestHelper {
     when(resourceRequestMapper.getMediaType(eq(ORIGINAL_NAME),
                                             any(HttpServletRequest.class)
     )).thenReturn(MediaType.TEXT_PLAIN);
-    when(
-      resourceService.getFileAsByteArray(ORIGINAL_NAME, FileOrigin.ANNOUNCEMENT,
-                                         null
-      )).thenReturn(BYTES);
+    when(resourceService.getFileAsByteArray(Role.UNKNOWN, ORIGINAL_NAME,
+                                            FileOrigin.ANNOUNCEMENT, null
+    )).thenReturn(BYTES);
 
     mockMvc.perform(
-      get("/api/core/resources/" + ORIGIN + "/" + ORIGINAL_NAME).cookie(cookies))
+      get("/api/core/resources/" + ORIGIN + "/" + ORIGINAL_NAME))
       .andExpect(status().isOk())
       .andExpect(header().string(HttpHeaders.CONTENT_DISPOSITION,
                                  "attachment; filename=\"" + ORIGINAL_NAME +
@@ -136,7 +136,7 @@ public class ResourceControllerTest extends TestHelper {
     verify(resourceRequestMapper).getMediaType(
       eq(ORIGINAL_NAME), any(HttpServletRequest.class));
     verify(resourceService).getFileAsByteArray(
-      ORIGINAL_NAME, FileOrigin.ANNOUNCEMENT, null);
+      Role.UNKNOWN, ORIGINAL_NAME, FileOrigin.ANNOUNCEMENT, null);
     verifyZeroInteractions(resourceRequestMapper);
   }
 

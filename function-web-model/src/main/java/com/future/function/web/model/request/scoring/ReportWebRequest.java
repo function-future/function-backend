@@ -22,7 +22,7 @@ public class ReportWebRequest {
     @NotBlank(message = "NotBlank")
     private String description;
 
-    @Size(min = 2, message = "Min")
+    @Size(min = 2, max = 3, message = "Size")
     private List<String> students;
 
 }

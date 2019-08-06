@@ -14,7 +14,6 @@ public class QuestionnaireRequestMapper {
 
   private final RequestValidator validator;
 
-
   @Autowired
   public QuestionnaireRequestMapper(RequestValidator validator) {
     this.validator = validator;
@@ -28,6 +27,7 @@ public class QuestionnaireRequestMapper {
     validator.validate(questionnaireRequest);
 
     Questionnaire newQuestionnaire = Questionnaire.builder()
+      .id(questionnaireId)
       .title(questionnaireRequest.getTitle())
       .description(questionnaireRequest.getDesc())
       .startDate(questionnaireRequest.getStartDate())

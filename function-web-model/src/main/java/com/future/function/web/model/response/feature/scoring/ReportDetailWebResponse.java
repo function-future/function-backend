@@ -18,9 +18,9 @@ public class ReportDetailWebResponse {
     private String studentId;
     private String studentName;
     private String batchCode;
-  private String university;
+    private String university;
     private String avatar;
-  private List<SummaryWebResponse> scores;
+    private List<SummaryWebResponse> scores;
     private Integer point;
 
 }

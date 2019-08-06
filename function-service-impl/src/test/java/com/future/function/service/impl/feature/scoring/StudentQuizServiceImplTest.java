@@ -2,6 +2,7 @@ package com.future.function.service.impl.feature.scoring;
 
 import com.future.function.common.enumeration.core.Role;
 import com.future.function.common.exception.ForbiddenException;
+import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.model.entity.feature.scoring.*;
@@ -225,6 +226,15 @@ public class StudentQuizServiceImplTest {
     assertThat(studentQuiz.getTrials()).isEqualTo(QUIZ_TRIALS);
     verify(userService).getUser(USER_ID);
     verify(studentQuizRepository).findByIdAndDeletedFalse(STUDENT_QUIZ_ID);
+  }
+
+  @Test
+  public void findByIdThrowNotFoundException() {
+    when(studentQuizRepository.findByIdAndDeletedFalse("id")).thenReturn(Optional.empty());
+    catchException(() -> studentQuizService.findById("id", USER_ID));
+    assertThat(caughtException().getClass()).isEqualTo(NotFoundException.class);
+    verify(studentQuizRepository).findByIdAndDeletedFalse("id");
+    verify(userService).getUser(USER_ID);
   }
 
   @Test

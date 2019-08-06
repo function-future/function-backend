@@ -1,14 +1,19 @@
 package com.future.function.web.mapper.response.scoring;
 
+import com.future.function.model.entity.feature.core.User;
 import com.future.function.model.entity.feature.scoring.Report;
+import com.future.function.model.vo.scoring.StudentSummaryVO;
 import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
+import com.future.function.web.mapper.response.core.UserResponseMapper;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
+import com.future.function.web.model.response.feature.core.UserWebResponse;
 import com.future.function.web.model.response.feature.scoring.ReportWebResponse;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 
 import java.time.ZoneId;
@@ -21,6 +26,13 @@ public class ReportResponseMapper {
 
   public static DataResponse<ReportWebResponse> toDataReportWebResponse(Report report) {
     return ResponseHelper.toDataResponse(HttpStatus.OK, buildReportWebResponse(report));
+  }
+
+  private static List<UserWebResponse> mapStudentsToWebResponse(List<User> students) {
+    return students.stream()
+        .map(UserResponseMapper::toUserDataResponse)
+        .map(DataResponse::getData)
+        .collect(Collectors.toList());
   }
 
   public static DataResponse<ReportWebResponse> toDataReportWebResponse(HttpStatus httpStatus, Report report) {
@@ -40,9 +52,9 @@ public class ReportResponseMapper {
             .name(value.getTitle())
             .description(value.getDescription())
             .batchCode(value.getBatch().getCode())
-            .studentCount(value.getStudentIds().size())
+            .studentCount(value.getStudents().size())
+            .students(mapStudentsToWebResponse(value.getStudents()))
             .uploadedDate(value.getCreatedAt())
-            .studentIds(value.getStudentIds())
             .build())
         .orElseThrow(() -> new UnsupportedOperationException("Failed at #buildReportWebResponse #ReportResponseMapper"));
   }
