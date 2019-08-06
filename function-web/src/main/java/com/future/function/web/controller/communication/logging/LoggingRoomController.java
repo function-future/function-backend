@@ -65,7 +65,7 @@ public class LoggingRoomController {
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   public PagingResponse<LoggingRoomWebResponse> getLoggingRoomsByMember(
     @WithAnyRole(roles = { Role.ADMIN, Role.MENTOR, Role.STUDENT }) Session session,
-    @RequestParam String search,
+    @RequestParam(required = false) String search,
     @RequestParam( defaultValue = "1" ) int page,
     @RequestParam( defaultValue = "10" ) int size
   ) {
@@ -86,7 +86,7 @@ public class LoggingRoomController {
 
   @GetMapping(value = "/{loggingRoomId}",
             produces = MediaType.APPLICATION_JSON_VALUE)
-  public DataResponse<LoggingRoomWebResponse> getLoggingRoomDetail(
+  public DataResponse<LoggingRoomWebResponse> getLoggingRoom(
     @WithAnyRole(roles = { Role.ADMIN, Role.MENTOR, Role.STUDENT} ) Session session,
     @PathVariable String loggingRoomId
   ) {
@@ -111,7 +111,7 @@ public class LoggingRoomController {
 
   @GetMapping(value = "/{loggingRoomId}/topics/{topicId}",
     produces = MediaType.APPLICATION_JSON_VALUE)
-  public DataResponse<TopicWebResponse> getLoggingRoomTopicDetail(
+  public DataResponse<TopicWebResponse> getTopic(
     @WithAnyRole(roles = { Role.ADMIN, Role.MENTOR, Role.STUDENT} ) Session session,
     @PathVariable String loggingRoomId,
     @PathVariable String topicId
@@ -151,7 +151,7 @@ public class LoggingRoomController {
 
     logMessageService.createLogMessage(
       logMessageRequestMapper.toLogMessage(
-        logMessageWebRequest, session.getId(), topicId)
+        logMessageWebRequest, session.getUserId(), topicId)
     );
 
     return ResponseHelper.toBaseResponse(HttpStatus.CREATED);
@@ -191,7 +191,7 @@ public class LoggingRoomController {
 
   @PutMapping(value = "/{loggingRoomId}/topics/{topicId}",
     produces = MediaType.APPLICATION_JSON_VALUE)
-  public DataResponse<TopicWebResponse> updateTopicDetail(
+  public DataResponse<TopicWebResponse> updateTopic(
     @WithAnyRole(roles = Role.MENTOR ) Session session,
     @PathVariable String loggingRoomId,
     @PathVariable String topicId,
@@ -206,7 +206,7 @@ public class LoggingRoomController {
 
   @PutMapping(value = "/{loggingRoomId}",
     produces = MediaType.APPLICATION_JSON_VALUE)
-  public DataResponse<LoggingRoomWebResponse> updateLoggingRoomDetail(
+  public DataResponse<LoggingRoomWebResponse> updateLoggingRoom(
     @WithAnyRole(roles = Role.MENTOR ) Session session,
     @PathVariable String loggingRoomId,
     @RequestBody LoggingRoomWebRequest loggingRoomWebRequest
