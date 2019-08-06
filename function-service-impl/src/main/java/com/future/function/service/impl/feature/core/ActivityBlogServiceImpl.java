@@ -1,5 +1,6 @@
 package com.future.function.service.impl.feature.core;
 
+import com.future.function.common.enumeration.core.Role;
 import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.core.ActivityBlog;
 import com.future.function.model.entity.feature.core.FileV2;
@@ -25,23 +26,23 @@ import java.util.stream.Collectors;
  */
 @Service
 public class ActivityBlogServiceImpl implements ActivityBlogService {
-  
+
   private final ActivityBlogRepository activityBlogRepository;
-  
+
   private final ResourceService resourceService;
-  
+
   private final UserService userService;
-  
+
   public ActivityBlogServiceImpl(
     ActivityBlogRepository activityBlogRepository,
     ResourceService resourceService, UserService userService
   ) {
-    
+
     this.activityBlogRepository = activityBlogRepository;
     this.resourceService = resourceService;
     this.userService = userService;
   }
-  
+
   /**
    * {@inheritDoc}
    *
@@ -51,12 +52,12 @@ public class ActivityBlogServiceImpl implements ActivityBlogService {
    */
   @Override
   public ActivityBlog getActivityBlog(String activityBlogId) {
-    
+
     return Optional.ofNullable(activityBlogId)
       .map(activityBlogRepository::findOne)
       .orElseThrow(() -> new NotFoundException("Get Activity Blog Not Found"));
   }
-  
+
   /**
    * {@inheritDoc}
    *
@@ -72,12 +73,12 @@ public class ActivityBlogServiceImpl implements ActivityBlogService {
   public Page<ActivityBlog> getActivityBlogs(
     String userId, String search, Pageable pageable
   ) {
-    
+
     return Optional.ofNullable(
       activityBlogRepository.findAll(userId, search, pageable))
       .orElseGet(() -> PageHelper.empty(pageable));
   }
-  
+
   /**
    * {@inheritDoc}
    *
@@ -87,7 +88,7 @@ public class ActivityBlogServiceImpl implements ActivityBlogService {
    */
   @Override
   public ActivityBlog createActivityBlog(ActivityBlog activityBlog) {
-    
+
     return Optional.of(activityBlog)
       .map(this::setUser)
       .map(this::setFileV2s)
@@ -95,7 +96,7 @@ public class ActivityBlogServiceImpl implements ActivityBlogService {
       .orElseThrow(
         () -> new UnsupportedOperationException("Create Activity Blog Failed"));
   }
-  
+
   /**
    * {@inheritDoc}
    *
@@ -104,14 +105,14 @@ public class ActivityBlogServiceImpl implements ActivityBlogService {
    * @return {@code ActivityBlog} - The activity blog object of the saved data.
    */
   @Override
-  public ActivityBlog updateActivityBlog(ActivityBlog activityBlog) {
-    
+  public ActivityBlog updateActivityBlog(Role role, ActivityBlog activityBlog) {
+
     return Optional.of(activityBlog)
       .map(ActivityBlog::getId)
       .map(activityBlogRepository::findOne)
       .filter(foundActivityBlog -> AuthorizationHelper.isAuthorizedForEdit(
         activityBlog.getUser()
-          .getId(), foundActivityBlog))
+          .getId(), role, foundActivityBlog, Role.ADMIN))
       .map(this::deleteActivityBlogFiles)
       .map(
         foundActivityBlog -> this.setFileV2s(foundActivityBlog, activityBlog))
@@ -119,17 +120,17 @@ public class ActivityBlogServiceImpl implements ActivityBlogService {
         foundActivityBlog, activityBlog))
       .orElse(activityBlog);
   }
-  
+
   private ActivityBlog copyPropertiesAndSaveActivityBlog(
     ActivityBlog foundActivityBlog, ActivityBlog activityBlog
   ) {
-    
+
     CopyHelper.copyProperties(activityBlog, foundActivityBlog);
-    
+
     return activityBlogRepository.save(foundActivityBlog);
-    
+
   }
-  
+
   /**
    * {@inheritDoc}
    *
@@ -137,76 +138,78 @@ public class ActivityBlogServiceImpl implements ActivityBlogService {
    * @param activityBlogId Id of activity blog to be deleted.
    */
   @Override
-  public void deleteActivityBlog(String userId, String activityBlogId) {
-    
+  public void deleteActivityBlog(String userId,
+                                 Role role, String activityBlogId) {
+
     Optional.ofNullable(activityBlogId)
       .map(activityBlogRepository::findOne)
       .filter(
         foundActivityBlog -> AuthorizationHelper.isAuthorizedForEdit(userId,
-                                                                     foundActivityBlog
+                                                                     role,
+                                                                     foundActivityBlog,Role.ADMIN
         ))
       .ifPresent(activityBlog -> {
         this.deleteActivityBlogFiles(activityBlog);
         activityBlogRepository.delete(activityBlog);
       });
   }
-  
+
   private ActivityBlog deleteActivityBlogFiles(ActivityBlog activityBlog) {
-    
+
     List<String> existingFileIds = this.getFileIds(activityBlog);
     resourceService.markFilesUsed(existingFileIds, false);
-    
+
     return activityBlog;
   }
-  
+
   private ActivityBlog setFileV2s(
     ActivityBlog foundActivityBlog, ActivityBlog activityBlog
   ) {
-    
+
     List<String> fileIds = this.getFileIds(activityBlog);
-    
+
     activityBlog.setFiles(this.getFileV2s(fileIds));
-    
+
     resourceService.markFilesUsed(fileIds, true);
-    
+
     return foundActivityBlog;
   }
-  
+
   private ActivityBlog setUser(ActivityBlog activityBlog) {
-    
+
     Optional.of(activityBlog)
       .map(ActivityBlog::getUser)
       .map(User::getEmail)
       .map(userService::getUserByEmail)
       .ifPresent(activityBlog::setUser);
-    
+
     return activityBlog;
   }
-  
+
   private ActivityBlog setFileV2s(ActivityBlog activityBlog) {
-    
+
     List<String> fileIds = this.getFileIds(activityBlog);
-    
+
     activityBlog.setFiles(this.getFileV2s(fileIds));
-    
+
     resourceService.markFilesUsed(fileIds, true);
-    
+
     return activityBlog;
   }
-  
+
   private List<String> getFileIds(ActivityBlog activityBlog) {
-    
+
     return activityBlog.getFiles()
       .stream()
       .map(FileV2::getId)
       .collect(Collectors.toList());
   }
-  
+
   private List<FileV2> getFileV2s(List<String> fileIds) {
-    
+
     return fileIds.stream()
       .map(resourceService::getFile)
       .collect(Collectors.toList());
   }
-  
+
 }
