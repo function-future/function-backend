@@ -3,6 +3,7 @@ package com.future.function.web.mapper.response.communication.logging;
 import com.future.function.model.entity.feature.communication.logging.LogMessage;
 import com.future.function.model.entity.feature.communication.logging.LoggingRoom;
 import com.future.function.model.entity.feature.communication.logging.Topic;
+import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
@@ -18,6 +19,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -61,7 +63,7 @@ public class LoggingRoomResponseMapper {
     return MemberResponse.builder()
             .id(member.getId())
             .name(member.getName())
-            .avatar(member.getPictureV2().getThumbnailUrl())
+            .avatar(getThumnailUrl(member))
             .batchName(member.getBatch().getName())
             .role(member.getRole().toString())
             .university(member.getUniversity())
@@ -118,9 +120,16 @@ public class LoggingRoomResponseMapper {
     return LogMessageWebResponse.builder()
             .id(logMessage.getId())
             .createdAt(logMessage.getCreatedAt())
-            .senderAvatar(logMessage.getSender().getPictureV2().getThumbnailUrl())
+            .senderAvatar(getThumnailUrl(logMessage.getSender()))
             .senderName(logMessage.getSender().getName())
             .text(logMessage.getText())
             .build();
+  }
+
+  private static String getThumnailUrl(User user) {
+    return Optional.ofNullable(user)
+      .map(User::getPictureV2)
+      .map(FileV2::getThumbnailUrl)
+      .orElse(null);
   }
 }
