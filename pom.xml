@@ -54,8 +54,7 @@
         **/bean/**,
         **/model/**,
         **/service/api/**,
-        **/communication/**,
-        **/FileHelper.java
+        **/communication/**
     </sonar.coverage.exclusions>
     <?SORTPOM RESUME?>
     <powermock.version>1.7.4</powermock.version>
@@ -304,7 +303,6 @@
             <exclude>**/model/**,</exclude>
             <exclude>**/service/api/**</exclude>
             <exclude>**/communication/**</exclude>
-            <exclude>**/FileHelper.java</exclude>
           </excludes>
           <?SORTPOM RESUME?>
         </configuration>
