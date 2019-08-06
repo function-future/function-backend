@@ -75,7 +75,7 @@ public class AssignmentRequestMapper {
         .filter(files -> !files.isEmpty())
         .map(files -> files.get(0))
         .map(this::buildFileV2)
-        .orElseGet(FileV2::new);
+        .orElse(null);
   }
 
   private FileV2 buildFileV2(String file) {

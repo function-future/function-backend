@@ -15,6 +15,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import static com.googlecode.catchexception.CatchException.catchException;
+import static com.googlecode.catchexception.CatchException.caughtException;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
@@ -173,6 +175,15 @@ public class StudentQuizDetailServiceImplTest {
     assertThat(actual.getStudentQuiz().getId()).isEqualTo(STUDENT_QUIZ_ID);
     verify(studentQuestionService).createStudentQuestionsByStudentQuizDetail(any(StudentQuizDetail.class),
         eq(Collections.singletonList(studentQuestion)));
+    verify(studentQuizDetailRepository).save(any(StudentQuizDetail.class));
+  }
+
+  @Test
+  public void createStudentQuizDetailThrowUnsupportedOperationException() {
+    when(studentQuizDetailRepository.save(any(StudentQuizDetail.class))).thenReturn(null);
+    catchException(() -> studentQuizDetailService.createStudentQuizDetail(studentQuiz,
+        Collections.singletonList(studentQuestion)));
+    assertThat(caughtException().getClass()).isEqualTo(UnsupportedOperationException.class);
     verify(studentQuizDetailRepository).save(any(StudentQuizDetail.class));
   }
 

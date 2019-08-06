@@ -6,6 +6,7 @@ import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.feature.scoring.AssignmentWebResponse;
+import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.BeanUtils;
@@ -51,9 +52,20 @@ public final class AssignmentResponseMapper {
     AssignmentWebResponse response = new AssignmentWebResponse();
     BeanUtils.copyProperties(assignment, response);
     response.setBatchCode(assignment.getBatch().getCode());
-    response.setFile(assignment.getFile().getFileUrl());
     response.setUploadedDate(assignment.getCreatedAt());
+    response = setNullableFile(response, assignment);
     return response;
+  }
+
+  private static AssignmentWebResponse setNullableFile(AssignmentWebResponse response, Assignment assignment) {
+    return Optional.ofNullable(assignment)
+        .map(Assignment::getFile)
+        .map(file -> {
+          response.setFileId(file.getId());
+          response.setFile(file.getFileUrl());
+          return response;
+        })
+        .orElse(response);
   }
 
   /**
