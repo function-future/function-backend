@@ -114,7 +114,7 @@ public class SessionResolver implements HandlerMethodArgumentResolver {
   private Session reSetSecurityContextHolderAuthentication(Session session) {
 
     UsernamePasswordAuthenticationToken authentication =
-      new UsernamePasswordAuthenticationToken(session.getEmail(), "");
+      new UsernamePasswordAuthenticationToken(session.getUserId(), "");
     SecurityContextHolder.getContext()
       .setAuthentication(authentication);
 
@@ -131,12 +131,12 @@ public class SessionResolver implements HandlerMethodArgumentResolver {
       .orElseThrow(
         () -> new UnauthorizedException("Invalid Session From Resolver"));
   }
-  
+
   private Session buildSessionWithUnknownRole() {
-    
+
     return Session.builder().role(Role.UNKNOWN).build();
   }
-  
+
   private Optional<String> getCustomCookieValue(Cookie[] cookies) {
 
     return Stream.of(cookies)

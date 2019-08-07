@@ -24,25 +24,25 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping(value = "/api/core/activity-blogs")
 public class ActivityBlogController {
-  
+
   private final ActivityBlogService activityBlogService;
-  
+
   private final ActivityBlogRequestMapper activityBlogRequestMapper;
-  
+
   private final FileProperties fileProperties;
-  
+
   @Autowired
   public ActivityBlogController(
     ActivityBlogService activityBlogService,
     ActivityBlogRequestMapper activityBlogRequestMapper,
     FileProperties fileProperties
   ) {
-    
+
     this.activityBlogService = activityBlogService;
     this.activityBlogRequestMapper = activityBlogRequestMapper;
     this.fileProperties = fileProperties;
   }
-  
+
   @ResponseStatus(HttpStatus.OK)
   @GetMapping
   public PagingResponse<ActivityBlogWebResponse> getActivityBlogs(
@@ -55,26 +55,26 @@ public class ActivityBlogController {
     @RequestParam(defaultValue = "")
       String search
   ) {
-    
+
     return ActivityBlogResponseMapper.toActivityBlogPagingResponse(
       activityBlogService.getActivityBlogs(userId, search,
                                            PageHelper.toPageable(page, size)
       ), fileProperties.getUrlPrefix());
   }
-  
+
   @ResponseStatus(HttpStatus.OK)
   @GetMapping("/{activityBlogId}")
   public DataResponse<ActivityBlogWebResponse> getActivityBlog(
     @PathVariable
       String activityBlogId
   ) {
-    
+
     return ActivityBlogResponseMapper.toActivityBlogDataResponse(
       activityBlogService.getActivityBlog(activityBlogId),
       fileProperties.getUrlPrefix()
     );
   }
-  
+
   @ResponseStatus(HttpStatus.CREATED)
   @PostMapping
   public DataResponse<ActivityBlogWebResponse> createActivityBlog(
@@ -83,14 +83,14 @@ public class ActivityBlogController {
     @RequestBody
       ActivityBlogWebRequest request
   ) {
-    
+
     return ActivityBlogResponseMapper.toActivityBlogDataResponse(
       HttpStatus.CREATED, activityBlogService.createActivityBlog(
         activityBlogRequestMapper.toActivityBlog(session.getEmail(), request)),
       fileProperties.getUrlPrefix()
     );
   }
-  
+
   @ResponseStatus(HttpStatus.OK)
   @PutMapping("/{activityBlogId}")
   public DataResponse<ActivityBlogWebResponse> updateActivityBlog(
@@ -101,14 +101,17 @@ public class ActivityBlogController {
     @PathVariable
       String activityBlogId
   ) {
-    
+
     return ActivityBlogResponseMapper.toActivityBlogDataResponse(
-      activityBlogService.updateActivityBlog(
-        activityBlogRequestMapper.toActivityBlog(session.getEmail(),
-                                                 activityBlogId, request
-        )), fileProperties.getUrlPrefix());
+      activityBlogService.updateActivityBlog(session.getUserId(),
+                                             session.getRole(),
+                                             activityBlogRequestMapper.toActivityBlog(
+                                               session.getEmail(),
+                                               activityBlogId, request
+                                             )
+      ), fileProperties.getUrlPrefix());
   }
-  
+
   @ResponseStatus(HttpStatus.OK)
   @DeleteMapping("/{activityBlogId}")
   public BaseResponse deleteActivityBlog(
@@ -117,9 +120,10 @@ public class ActivityBlogController {
     @PathVariable
       String activityBlogId
   ) {
-    
-    activityBlogService.deleteActivityBlog(session.getUserId(), activityBlogId);
+
+    activityBlogService.deleteActivityBlog(
+      session.getUserId(), session.getRole(), activityBlogId);
     return ResponseHelper.toBaseResponse(HttpStatus.OK);
   }
-  
+
 }

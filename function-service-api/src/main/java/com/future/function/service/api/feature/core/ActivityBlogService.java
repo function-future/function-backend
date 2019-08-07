@@ -1,5 +1,6 @@
 package com.future.function.service.api.feature.core;
 
+import com.future.function.common.enumeration.core.Role;
 import com.future.function.model.entity.feature.core.ActivityBlog;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -8,7 +9,7 @@ import org.springframework.data.domain.Pageable;
  * Service interface class for activity blog logic operations declaration.
  */
 public interface ActivityBlogService {
-  
+
   /**
    * Retrieves an activity blog from database given the activity blog's id. If
    * not found, then throw
@@ -19,7 +20,7 @@ public interface ActivityBlogService {
    * @return {@code ActivityBlog} - The activity blog object found in database.
    */
   ActivityBlog getActivityBlog(String activityBlogId);
-  
+
   /**
    * Retrieves activity blogs from database.
    *
@@ -34,7 +35,7 @@ public interface ActivityBlogService {
   Page<ActivityBlog> getActivityBlogs(
     String userId, String search, Pageable pageable
   );
-  
+
   /**
    * Creates activity blog object and saves any other data related to the
    * activity blog.
@@ -44,7 +45,7 @@ public interface ActivityBlogService {
    * @return {@code ActivityBlog} - The activity blog object of the saved data.
    */
   ActivityBlog createActivityBlog(ActivityBlog activityBlog);
-  
+
   /**
    * Updates activity blog object and saves any other data related to the
    * activity blog. If not found, then throw
@@ -54,14 +55,15 @@ public interface ActivityBlogService {
    *
    * @return {@code ActivityBlog} - The activity blog object of the saved data.
    */
-  ActivityBlog updateActivityBlog(ActivityBlog activityBlog);
-  
+  ActivityBlog updateActivityBlog(String userId, Role role,
+                                  ActivityBlog activityBlog);
+
   /**
    * Deletes activity blog object from database.
    *
    * @param userId          Id of current user.
    * @param activityBlogId Id of activity blog to be deleted.
    */
-  void deleteActivityBlog(String userId, String activityBlogId);
-  
+  void deleteActivityBlog(String userId, Role role, String activityBlogId);
+
 }
