@@ -28,14 +28,14 @@ public class FileProperties {
 
   private String thumbnailSuffix;
 
-  private String urlPrefix;
+  private String urlPrefix = "";
 
   private List<String> imageExtensions;
-  
+
   private String rootId;
-  
+
   private long schedulerActivePeriod;
-  
+
   private long minimumFileCreatedPeriod;
-  
+
 }
