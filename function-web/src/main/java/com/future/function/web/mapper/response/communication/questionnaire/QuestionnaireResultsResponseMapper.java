@@ -22,6 +22,9 @@ import java.util.stream.Collectors;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class QuestionnaireResultsResponseMapper {
+
+  private static final String NO_BATCH = "No Batch";
+
   public static PagingResponse<UserSummaryResponse> toPagingUserSummaryResponse(
     Page<UserQuestionnaireSummary> data
   ) {
@@ -37,7 +40,7 @@ public class QuestionnaireResultsResponseMapper {
   private static List<UserSummaryResponse> toUserSummaryResponseList(Page<UserQuestionnaireSummary> data) {
     return data.getContent()
             .stream()
-            .map(userSummary ->  toUserSummaryResponse(userSummary))
+            .map(QuestionnaireResultsResponseMapper::toUserSummaryResponse)
             .collect(Collectors.toList());
   }
 
@@ -63,9 +66,9 @@ public class QuestionnaireResultsResponseMapper {
   private static BatchWebResponse toBatchResponse(Batch batch) {
     if(batch == null) {
       return BatchWebResponse.builder()
-              .id("No Batch")
-              .name("No Batch")
-              .code("No Batch")
+              .id(NO_BATCH)
+              .name(NO_BATCH)
+              .code(NO_BATCH)
               .build();
     }
     return BatchWebResponse.builder()

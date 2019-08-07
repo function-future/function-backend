@@ -46,9 +46,6 @@ public class TopicServiceImplTest {
   @Mock
   private LoggingRoomService loggingRoomService;
 
-  @Mock
-  private UserService userService;
-
   @InjectMocks
   private TopicServiceImpl topicService;
 
@@ -69,8 +66,7 @@ public class TopicServiceImplTest {
   public void tearDown() {
     verifyNoMoreInteractions(
       topicRepository,
-      loggingRoomService,
-      userService
+      loggingRoomService
     );
   }
 

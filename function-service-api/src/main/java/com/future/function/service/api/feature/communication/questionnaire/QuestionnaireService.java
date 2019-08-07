@@ -24,7 +24,7 @@ public interface QuestionnaireService {
 
   Questionnaire updateQuestionnaire(Questionnaire questionnaire);
 
-  void deleteQuestionnaire(String QuestionnaireId);
+  void deleteQuestionnaire(String questionnaireId);
 
   // Questionnaire Questions
   // '/api/communication.questionnaires/{questionnaireId}/questions
@@ -36,7 +36,7 @@ public interface QuestionnaireService {
 
   QuestionQuestionnaire updateQuestionQuestionnaire(QuestionQuestionnaire questionQuestionnaire);
 
-  void deleteQuestionQuestionnaire(String QuestionquestionnaireId);
+  void deleteQuestionQuestionnaire(String questionquestionnaireId);
 
   //Questionnaire Appraiser
 

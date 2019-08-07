@@ -11,7 +11,6 @@ import com.future.function.model.entity.feature.core.User;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.feature.communication.questionnaire.AppraiseeResponse;
-import com.future.function.web.model.response.feature.communication.questionnaire.QuestionAnswerDetailResponse;
 import com.future.function.web.model.response.feature.communication.questionnaire.QuestionAnswerResponse;
 import com.future.function.web.model.response.feature.communication.questionnaire.QuestionQuestionnaireResponse;
 import com.future.function.web.model.response.feature.communication.questionnaire.QuestionQuestionnaireSummaryResponse;
@@ -28,6 +27,8 @@ import java.util.stream.Collectors;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class QuestionnaireResponseSummaryResponseMapper {
+
+  private static final String NO_BATCH = "No Batch";
 
   public static DataResponse<QuestionnaireSummaryDescriptionResponse> toDataResponseQuestionnaireDataSummaryDescription(
     QuestionnaireResponseSummary questionnaireResponseSummary){
@@ -67,9 +68,9 @@ public class QuestionnaireResponseSummaryResponseMapper {
   private static BatchWebResponse toBatchResponse(Batch batch) {
     if(batch == null) {
       return BatchWebResponse.builder()
-              .id("No Batch")
-              .name("No Batch")
-              .code("No Batch")
+              .id(NO_BATCH)
+              .name(NO_BATCH)
+              .code(NO_BATCH)
               .build();
     }
     return BatchWebResponse.builder()
@@ -86,7 +87,7 @@ public class QuestionnaireResponseSummaryResponseMapper {
 
   private static List<QuestionQuestionnaireSummaryResponse> toListQuestionQuestionnaireSummaryResponse(List<QuestionResponseSummary> data) {
     return data.stream()
-            .map(questionResponseSummary -> toQuestionQuestionnaireSummaryResponse(questionResponseSummary))
+            .map(QuestionnaireResponseSummaryResponseMapper::toQuestionQuestionnaireSummaryResponse)
             .collect(Collectors.toList());
   }
 
@@ -122,7 +123,7 @@ public class QuestionnaireResponseSummaryResponseMapper {
 
   private static List<QuestionAnswerResponse> toQuestionAnswerReponseList(List<QuestionResponse> data) {
     return data.stream()
-            .map(questionResponse -> toQuestionAnswerReponse(questionResponse))
+            .map(QuestionnaireResponseSummaryResponseMapper::toQuestionAnswerReponse)
             .collect(Collectors.toList());
 
   }

@@ -83,11 +83,12 @@ public class MyQuestionnaireServiceImpl implements MyQuestionnaireService {
     List<QuestionnaireParticipant> participantsList  = new ArrayList<>();
 
     for (QuestionnaireParticipant participant : participants) {
-      if(!participant.getMember().getId().equals(memberLogin.getId())) {
-        if(! questionnaireResponseRepository
-              .findByQuestionnaireAndAppraiseeAndAppraiserAndDeletedFalse(questionnaire, participant.getMember(), memberLogin).isPresent() ){
+      if(!participant.getMember().getId().equals(memberLogin.getId()) &&
+         !questionnaireResponseRepository
+              .findByQuestionnaireAndAppraiseeAndAppraiserAndDeletedFalse(
+                questionnaire, participant.getMember(), memberLogin).isPresent()
+        ){
           participantsList.add(participant);
-        }
       }
     }
 
@@ -161,7 +162,7 @@ public class MyQuestionnaireServiceImpl implements MyQuestionnaireService {
       questionResponseSummaryRepository.findByAppraiseeAndQuestionQuestionnaireAndDeletedFalse(
         questionResponse.getAppraisee(),
         questionResponse.getQuestion());
-    QuestionResponseSummary questionResponseSummary = QuestionResponseSummary.builder().build();
+    QuestionResponseSummary questionResponseSummary;
 
 
     if ( temp.isPresent() ) {
@@ -206,7 +207,7 @@ public class MyQuestionnaireServiceImpl implements MyQuestionnaireService {
         questionnaireResponse.getQuestionnaire()
       );
 
-    QuestionnaireResponseSummary questionnaireResponseSummary = QuestionnaireResponseSummary.builder().build();
+    QuestionnaireResponseSummary questionnaireResponseSummary;
     if( temp.isPresent()) {
       questionnaireResponseSummary = temp.get();
       Answer tempAnswerSummary = Answer.builder().build();
@@ -239,7 +240,7 @@ public class MyQuestionnaireServiceImpl implements MyQuestionnaireService {
   public void updateUserQuestionnaireSummary(QuestionnaireResponse questionnaireResponse) {
     Optional<UserQuestionnaireSummary> temp = userQuestionnaireSummaryRepository
       .findFirstByAppraiseeAndDeletedFalse(questionnaireResponse.getAppraisee());
-    UserQuestionnaireSummary userQuestionnaireSummary = UserQuestionnaireSummary.builder().build();
+    UserQuestionnaireSummary userQuestionnaireSummary;
     if (! temp.isPresent()) {
       userQuestionnaireSummary = UserQuestionnaireSummary.builder()
         .role(questionnaireResponse.getAppraisee().getRole())

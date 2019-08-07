@@ -1,12 +1,10 @@
 package com.future.function.web.controller.communication.questionnaire;
 
 import com.future.function.common.enumeration.core.Role;
-import com.future.function.model.entity.feature.communication.questionnaire.QuestionResponseSummary;
 import com.future.function.service.api.feature.communication.questionnaire.QuestionnaireResponseSummaryService;
 import com.future.function.session.annotation.WithAnyRole;
 import com.future.function.web.mapper.response.communication.questionnaire.QuestionnaireResponseSummaryResponseMapper;
 import com.future.function.web.model.response.base.DataResponse;
-import com.future.function.web.model.response.feature.communication.questionnaire.QuestionAnswerDetailResponse;
 import com.future.function.web.model.response.feature.communication.questionnaire.QuestionAnswerResponse;
 import com.future.function.web.model.response.feature.communication.questionnaire.QuestionQuestionnaireSummaryResponse;
 import org.springframework.http.HttpStatus;

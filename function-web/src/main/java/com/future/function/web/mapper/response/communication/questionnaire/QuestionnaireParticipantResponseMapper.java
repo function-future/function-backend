@@ -30,7 +30,7 @@ public class QuestionnaireParticipantResponseMapper {
   private static List<QuestionnaireParticipantDescriptionResponse> toParticipantDescriptionResposneList(Page<QuestionnaireParticipant> data){
     return data.getContent()
             .stream()
-            .map(questionnaireParticipant -> toParticipantDescriptionResposne(questionnaireParticipant))
+            .map(QuestionnaireParticipantResponseMapper::toParticipantDescriptionResposne)
             .collect(Collectors.toList());
   }
 

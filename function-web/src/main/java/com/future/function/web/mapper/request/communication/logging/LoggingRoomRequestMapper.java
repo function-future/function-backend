@@ -30,6 +30,7 @@ public class LoggingRoomRequestMapper {
   }
 
   public LoggingRoom toValidatedLoggingRoom(LoggingRoomWebRequest loggingRoomWebRequest, String loggingRoomId){
+    this.validator.validate(loggingRoomWebRequest);
     LoggingRoom loggingRoom = LoggingRoom.builder()
             .title(loggingRoomWebRequest.getTitle())
             .description(loggingRoomWebRequest.getDescription())

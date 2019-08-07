@@ -27,6 +27,8 @@ import static com.future.function.web.mapper.response.communication.questionnair
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class MyQuestionnaireResponseMapper {
 
+  private static final String NO_BATCH = "No-Batch";
+
   public static DataResponse<List<AppraiseeResponse>> toDataResponseAppraiseeResponseList(List<QuestionnaireParticipant> data) {
 
     return ResponseHelper.toDataResponse(
@@ -37,7 +39,7 @@ public class MyQuestionnaireResponseMapper {
 
   private static List<AppraiseeResponse> toAppraiseeResponseList(List<QuestionnaireParticipant> data) {
     return data.stream()
-            .map(questionnaireParticipant -> toAppraiseeResponse(questionnaireParticipant))
+            .map(MyQuestionnaireResponseMapper::toAppraiseeResponse)
             .collect(Collectors.toList());
   }
 
@@ -61,9 +63,9 @@ public class MyQuestionnaireResponseMapper {
               .build();
     }
     return BatchWebResponse.builder()
-            .id("No-Batch")
-            .name("No-Batch")
-            .code("No-Batch")
+            .id(NO_BATCH)
+            .name(NO_BATCH)
+            .code(NO_BATCH)
             .build();
 
   }

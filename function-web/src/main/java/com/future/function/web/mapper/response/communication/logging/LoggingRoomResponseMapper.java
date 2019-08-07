@@ -40,7 +40,7 @@ public class LoggingRoomResponseMapper {
   public static List<LoggingRoomWebResponse> toLoggingRoomResponseList(Page<LoggingRoom> data){
     return data.getContent()
             .stream()
-            .map(loggingRoom -> toLoggingRoomResponse(loggingRoom))
+            .map(LoggingRoomResponseMapper::toLoggingRoomResponse)
             .collect(Collectors.toList());
   }
 
@@ -55,7 +55,7 @@ public class LoggingRoomResponseMapper {
 
   private static List<MemberResponse> toListMemberResponse(List<User> members) {
     return members.stream()
-            .map(member -> toMemberResponse(member))
+            .map(LoggingRoomResponseMapper::toMemberResponse)
             .collect(Collectors.toList());
   }
 
@@ -86,7 +86,7 @@ public class LoggingRoomResponseMapper {
   private static List<TopicWebResponse> toTopicResponseList(Page<Topic> data) {
     return data.getContent()
             .stream()
-            .map(topic -> toTopicResponse(topic))
+            .map(LoggingRoomResponseMapper::toTopicResponse)
             .collect(Collectors.toList());
   }
 
@@ -112,7 +112,7 @@ public class LoggingRoomResponseMapper {
   private static List<LogMessageWebResponse> toLogMessageResponseList(Page<LogMessage> data) {
     return data.getContent()
             .stream()
-            .map(logMessage -> toLogMessageResponse(logMessage))
+            .map(LoggingRoomResponseMapper::toLogMessageResponse)
             .collect(Collectors.toList());
   }
 

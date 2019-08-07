@@ -100,9 +100,7 @@ public class LoggingRoomServiceImpl implements LoggingRoomService {
     private LoggingRoom setMembers(LoggingRoom loggingRoom) {
         List<User> members = new ArrayList<>();
         if (loggingRoom.getMembers() != null) {
-            loggingRoom.getMembers().forEach(member -> {
-                members.add(userService.getUser(member.getId()));
-            });
+            loggingRoom.getMembers().forEach(member -> members.add(userService.getUser(member.getId())));
         }
         loggingRoom.setMembers(members);
         return loggingRoom;
