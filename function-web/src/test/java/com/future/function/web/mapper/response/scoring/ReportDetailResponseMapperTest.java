@@ -28,6 +28,7 @@ public class ReportDetailResponseMapperTest {
     private static final String TITLE = "title";
     private static final String TYPE = "type";
     private static final String FILE_URL = "file-url";
+    private static final String URL_PREFIX = "urlPrefix";
     private static final int POINT = 100;
 
     private ReportDetail reportDetail;
@@ -61,30 +62,31 @@ public class ReportDetailResponseMapperTest {
     @Test
     public void toDataReportDetailWebResponse() {
         DataResponse<ReportDetailWebResponse> actual = ReportDetailResponseMapper.toDataReportDetailWebResponse(
-                studentSummaryVO);
+                studentSummaryVO, URL_PREFIX);
         assertThat(actual.getData().getBatchCode()).isEqualTo(BATCH_CODE);
         assertThat(actual.getData().getStudentName()).isEqualTo(STUDENT_NAME);
         assertThat(actual.getData().getScores().get(0).getTitle()).isEqualTo(TITLE);
+        assertThat(actual.getData().getAvatar()).isEqualTo(URL_PREFIX + FILE_URL);
     }
 
     @Test
     public void toDataListReportDetailWebResponse() {
         DataResponse<List<ReportDetailWebResponse>> actual = ReportDetailResponseMapper.toDataListReportDetailWebResponse(
-                Collections.singletonList(studentSummaryVO));
+                Collections.singletonList(studentSummaryVO), URL_PREFIX);
         assertThat(actual.getData().get(0).getBatchCode()).isEqualTo(BATCH_CODE);
         assertThat(actual.getData().get(0).getStudentName()).isEqualTo(STUDENT_NAME);
         assertThat(actual.getData().get(0).getUniversity()).isEqualTo(UNIVERSITY);
-        assertThat(actual.getData().get(0).getAvatar()).isEqualTo(FILE_URL);
+        assertThat(actual.getData().get(0).getAvatar()).isEqualTo(URL_PREFIX + FILE_URL);
         assertThat(actual.getData().get(0).getScores().get(0).getTitle()).isEqualTo(TITLE);
     }
 
     @Test
     public void toDataListReportDetailWebResponseFromReportDetail() {
         DataResponse<List<ReportDetailWebResponse>> actual = ReportDetailResponseMapper.toDataListReportDetailWebResponseFromReportDetail(
-                HttpStatus.CREATED, Collections.singletonList(reportDetail));
+                HttpStatus.CREATED, Collections.singletonList(reportDetail), URL_PREFIX);
         assertThat(actual.getData().get(0).getBatchCode()).isEqualTo(BATCH_CODE);
         assertThat(actual.getData().get(0).getStudentName()).isEqualTo(STUDENT_NAME);
         assertThat(actual.getData().get(0).getUniversity()).isEqualTo(UNIVERSITY);
-        assertThat(actual.getData().get(0).getAvatar()).isEqualTo(FILE_URL);
+        assertThat(actual.getData().get(0).getAvatar()).isEqualTo(URL_PREFIX + FILE_URL);
     }
 }
