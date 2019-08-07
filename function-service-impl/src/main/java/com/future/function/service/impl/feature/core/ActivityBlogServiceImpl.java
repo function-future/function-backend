@@ -105,14 +105,13 @@ public class ActivityBlogServiceImpl implements ActivityBlogService {
    * @return {@code ActivityBlog} - The activity blog object of the saved data.
    */
   @Override
-  public ActivityBlog updateActivityBlog(Role role, ActivityBlog activityBlog) {
+  public ActivityBlog updateActivityBlog(String userId, Role role, ActivityBlog activityBlog) {
 
     return Optional.of(activityBlog)
       .map(ActivityBlog::getId)
       .map(activityBlogRepository::findOne)
       .filter(foundActivityBlog -> AuthorizationHelper.isAuthorizedForEdit(
-        activityBlog.getUser()
-          .getId(), role, foundActivityBlog, Role.ADMIN))
+        userId, role, foundActivityBlog, Role.ADMIN))
       .map(this::deleteActivityBlogFiles)
       .map(
         foundActivityBlog -> this.setFileV2s(foundActivityBlog, activityBlog))

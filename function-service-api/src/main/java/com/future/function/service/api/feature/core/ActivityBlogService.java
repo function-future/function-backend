@@ -55,7 +55,8 @@ public interface ActivityBlogService {
    *
    * @return {@code ActivityBlog} - The activity blog object of the saved data.
    */
-  ActivityBlog updateActivityBlog(Role role, ActivityBlog activityBlog);
+  ActivityBlog updateActivityBlog(String userId, Role role,
+                                  ActivityBlog activityBlog);
 
   /**
    * Deletes activity blog object from database.

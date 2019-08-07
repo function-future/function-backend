@@ -252,7 +252,7 @@ public class ActivityBlogServiceImplTest {
     when(activityBlogRepository.save(activityBlog)).thenReturn(activityBlog);
 
     ActivityBlog updatedActivityBlog = activityBlogService.updateActivityBlog(
-      Role.ADMIN, activityBlog);
+      USER_ID, Role.ADMIN, activityBlog);
 
     assertThat(updatedActivityBlog).isNotNull();
     assertThat(updatedActivityBlog).isEqualTo(activityBlog);
@@ -271,7 +271,7 @@ public class ActivityBlogServiceImplTest {
     when(activityBlogRepository.findOne(ID)).thenReturn(null);
 
     ActivityBlog updatedActivityBlog = activityBlogService.updateActivityBlog(
-      Role.ADMIN, activityBlog);
+      USER_ID, Role.ADMIN, activityBlog);
 
     assertThat(updatedActivityBlog).isNotNull();
     assertThat(updatedActivityBlog).isEqualTo(activityBlog);
@@ -293,7 +293,8 @@ public class ActivityBlogServiceImplTest {
       .build();
     activityBlog.setUser(user);
 
-    catchException(() -> activityBlogService.updateActivityBlog(Role.STUDENT,
+    catchException(() -> activityBlogService.updateActivityBlog(user.getId(),
+                                                                Role.STUDENT,
                                                                 activityBlog));
 
     assertThat(caughtException().getClass()).isEqualTo(

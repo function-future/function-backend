@@ -103,10 +103,13 @@ public class ActivityBlogController {
   ) {
 
     return ActivityBlogResponseMapper.toActivityBlogDataResponse(
-      activityBlogService.updateActivityBlog(session.getRole(),
-        activityBlogRequestMapper.toActivityBlog(session.getEmail(),
-                                                 activityBlogId, request
-        )), fileProperties.getUrlPrefix());
+      activityBlogService.updateActivityBlog(session.getUserId(),
+                                             session.getRole(),
+                                             activityBlogRequestMapper.toActivityBlog(
+                                               session.getEmail(),
+                                               activityBlogId, request
+                                             )
+      ), fileProperties.getUrlPrefix());
   }
 
   @ResponseStatus(HttpStatus.OK)
