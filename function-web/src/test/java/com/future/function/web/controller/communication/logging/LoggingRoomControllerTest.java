@@ -1,6 +1,7 @@
 package com.future.function.web.controller.communication.logging;
 
 import com.future.function.common.enumeration.core.Role;
+import com.future.function.common.properties.core.FileProperties;
 import com.future.function.model.entity.feature.communication.logging.LogMessage;
 import com.future.function.model.entity.feature.communication.logging.LoggingRoom;
 import com.future.function.model.entity.feature.communication.logging.Topic;
@@ -46,6 +47,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+import static org.mockito.internal.verification.VerificationModeFactory.times;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -61,6 +63,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import(TestSecurityConfiguration.class)
 @WebMvcTest(LoggingRoomController.class)
 public class LoggingRoomControllerTest extends TestHelper {
+
+  private static final String URL_PREFIX = "urlPrefix";
 
   private static final PageRequest PAGEABLE = new PageRequest(0, 10);
 
@@ -210,6 +214,9 @@ public class LoggingRoomControllerTest extends TestHelper {
   @MockBean
   private LoggingRoomRequestMapper loggingRoomRequestMapper;
 
+  @MockBean
+  private FileProperties fileProperties;
+
   private JacksonTester<LogMessageWebRequest> logMessageRequestJacksonTester;
 
   private JacksonTester<TopicWebRequest> topicRequestJacksonTester;
@@ -243,9 +250,10 @@ public class LoggingRoomControllerTest extends TestHelper {
       .thenReturn(LOGGING_ROOM_PAGE);
     when(loggingRoomService.getLoggingRoomsByMember(any(String.class), eq(PAGEABLE)))
       .thenReturn(LOGGING_ROOM_PAGE);
+    when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
 
     PagingResponse<LoggingRoomWebResponse> response =
-      LoggingRoomResponseMapper.toPagingLoggingRoomResponse(LOGGING_ROOM_PAGE);
+      LoggingRoomResponseMapper.toPagingLoggingRoomResponse(LOGGING_ROOM_PAGE, URL_PREFIX);
 
     mockMvc.perform(
       get("/api/communication/logging-rooms")
@@ -259,6 +267,8 @@ public class LoggingRoomControllerTest extends TestHelper {
       .andExpect(status().isOk())
       .andExpect(content().json(pagingResponseJacksonTester.write(response).getJson()));
 
+    verify(fileProperties, times(2)).getUrlPrefix();
+
     verify(loggingRoomService).getLoggingRoomsByMember(any(String.class), eq(PAGEABLE));
     verify(loggingRoomService).getLoggingRoomsByMemberWithKeyword(eq(KEYWORD), any(String.class), eq(PAGEABLE));
   }
@@ -269,10 +279,10 @@ public class LoggingRoomControllerTest extends TestHelper {
 
     when(loggingRoomService.getLoggingRoom(LOGGING_ROOM_ID1))
       .thenReturn(LOGGING_ROOM1);
-
+    when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
 
     DataResponse<LoggingRoomWebResponse> response =
-      LoggingRoomResponseMapper.toDataResponseLoggingRoomResponse(LOGGING_ROOM1);
+      LoggingRoomResponseMapper.toDataResponseLoggingRoomResponse(LOGGING_ROOM1, URL_PREFIX);
 
     mockMvc.perform(
       get("/api/communication/logging-rooms/"
@@ -282,7 +292,7 @@ public class LoggingRoomControllerTest extends TestHelper {
       .andExpect(status().isOk())
       .andExpect(content().json(dataResponseJacksonTester.write(response).getJson()));
 
-
+    verify(fileProperties).getUrlPrefix();
     verify(loggingRoomService).getLoggingRoom(LOGGING_ROOM_ID1);
   }
 
@@ -342,9 +352,12 @@ public class LoggingRoomControllerTest extends TestHelper {
     when(logMessageService.getLogMessagesByTopic(TOPIC_ID_1, PAGEABLE))
       .thenReturn(LOG_MESSAGE_PAGE);
 
+    when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
+
     PagingResponse<LogMessageWebResponse> response =
       LoggingRoomResponseMapper.toPagingLogMessageResponse(
-        LOG_MESSAGE_PAGE
+        LOG_MESSAGE_PAGE,
+        URL_PREFIX
       );
 
     mockMvc.perform(
@@ -357,7 +370,7 @@ public class LoggingRoomControllerTest extends TestHelper {
         .cookie(cookies))
       .andExpect(status().isOk())
       .andExpect(content().json(pagingResponseJacksonTester.write(response).getJson()));
-
+    verify(fileProperties).getUrlPrefix();
     verify(logMessageService).getLogMessagesByTopic(TOPIC_ID_1, PAGEABLE);
   }
 
@@ -483,9 +496,12 @@ public class LoggingRoomControllerTest extends TestHelper {
     when(loggingRoomService.updateLoggingRoom(LOGGING_ROOM1))
       .thenReturn(LOGGING_ROOM1);
 
+    when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
+
     DataResponse<LoggingRoomWebResponse> response =
       LoggingRoomResponseMapper.toDataResponseLoggingRoomResponse(
-        LOGGING_ROOM1
+        LOGGING_ROOM1,
+        URL_PREFIX
       );
 
     mockMvc.perform(
@@ -497,6 +513,8 @@ public class LoggingRoomControllerTest extends TestHelper {
         .content(loggingRoomRequestJacksonTester.write(LOGGING_ROOM_REQUEST).getJson()))
       .andExpect(status().isOk())
       .andExpect(content().json(dataResponseJacksonTester.write(response).getJson()));
+
+    verify(fileProperties).getUrlPrefix();
 
     verify(loggingRoomService).updateLoggingRoom(LOGGING_ROOM1);
     verify(loggingRoomRequestMapper).toLoggingRoom(

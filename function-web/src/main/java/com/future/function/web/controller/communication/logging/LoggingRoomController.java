@@ -1,6 +1,7 @@
 package com.future.function.web.controller.communication.logging;
 
 import com.future.function.common.enumeration.core.Role;
+import com.future.function.common.properties.core.FileProperties;
 import com.future.function.service.api.feature.communication.logging.LogMessageService;
 import com.future.function.service.api.feature.communication.logging.LoggingRoomService;
 import com.future.function.service.api.feature.communication.logging.TopicService;
@@ -33,6 +34,8 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping(value= "/api/communication/logging-rooms")
 public class LoggingRoomController {
+  private final FileProperties fileProperties;
+
   private LoggingRoomService loggingRoomService;
 
   private TopicService topicService;
@@ -46,20 +49,21 @@ public class LoggingRoomController {
   private LoggingRoomRequestMapper loggingRoomRequestMapper;
 
   @Autowired
-  public LoggingRoomController (
+  public LoggingRoomController(
     LoggingRoomService loggingRoomService,
     TopicService topicService,
     LogMessageService logMessageService,
     LogMessageRequestMapper logMessageRequestMapper,
     TopicRequestMapper topicRequestMapper,
-    LoggingRoomRequestMapper loggingRoomRequestMapper
-  ){
+    LoggingRoomRequestMapper loggingRoomRequestMapper,
+    FileProperties fileProperties){
     this.loggingRoomService = loggingRoomService;
     this.topicService = topicService;
     this.logMessageService = logMessageService;
     this.logMessageRequestMapper = logMessageRequestMapper;
     this.topicRequestMapper = topicRequestMapper;
     this.loggingRoomRequestMapper = loggingRoomRequestMapper;
+    this.fileProperties = fileProperties;
   }
 
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
@@ -74,13 +78,15 @@ public class LoggingRoomController {
         loggingRoomService.getLoggingRoomsByMemberWithKeyword(
           search,
           session.getUserId(),
-          PageHelper.toPageable(page, size))
+          PageHelper.toPageable(page, size)),
+        fileProperties.getUrlPrefix()
       );
     }
     return LoggingRoomResponseMapper.toPagingLoggingRoomResponse(
       loggingRoomService.getLoggingRoomsByMember(
         session.getUserId(),
-        PageHelper.toPageable(page, size))
+        PageHelper.toPageable(page, size)),
+      fileProperties.getUrlPrefix()
     );
   }
 
@@ -91,7 +97,8 @@ public class LoggingRoomController {
     @PathVariable String loggingRoomId
   ) {
     return LoggingRoomResponseMapper.toDataResponseLoggingRoomResponse(
-      loggingRoomService.getLoggingRoom(loggingRoomId)
+      loggingRoomService.getLoggingRoom(loggingRoomId),
+      fileProperties.getUrlPrefix()
     );
   }
 
@@ -132,7 +139,8 @@ public class LoggingRoomController {
   ) {
     return LoggingRoomResponseMapper.toPagingLogMessageResponse(
       logMessageService.getLogMessagesByTopic(
-        topicId, PageHelper.toPageable(page, size))
+        topicId, PageHelper.toPageable(page, size)),
+      fileProperties.getUrlPrefix()
     );
   }
 
@@ -214,7 +222,8 @@ public class LoggingRoomController {
     return LoggingRoomResponseMapper.toDataResponseLoggingRoomResponse(
       loggingRoomService.updateLoggingRoom(
         loggingRoomRequestMapper.toLoggingRoom(loggingRoomWebRequest, loggingRoomId)
-      )
+      ),
+      fileProperties.getUrlPrefix()
     );
   }
 
