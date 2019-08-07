@@ -74,7 +74,7 @@ public class RoomResponseMapperTest {
         .description(ASSIGNMENT_DESCRIPTION)
         .deadline(ASSIGNMENT_DEADLINE)
         .batchCode(BATCH_CODE)
-        .file(FILE_URl)
+        .file(URL_PREFIX + FILE_URl)
         .fileId(FILE_ID)
         .build();
     assignmentWebResponse.setUploadedDate(ASSIGNMENT_DEADLINE);

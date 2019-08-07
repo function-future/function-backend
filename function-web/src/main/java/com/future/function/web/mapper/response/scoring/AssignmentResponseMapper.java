@@ -27,8 +27,8 @@ public final class AssignmentResponseMapper {
    * @param assignment
    * @return DataResponse<AssignmentWebResponse>
    */
-  public static DataResponse<AssignmentWebResponse> toAssignmentDataResponse(Assignment assignment) {
-    return ResponseHelper.toDataResponse(HttpStatus.OK, buildAssignmentWebResponse(assignment));
+  public static DataResponse<AssignmentWebResponse> toAssignmentDataResponse(Assignment assignment, String urlPrefix) {
+    return ResponseHelper.toDataResponse(HttpStatus.OK, buildAssignmentWebResponse(assignment, urlPrefix));
   }
 
   /**
@@ -38,8 +38,8 @@ public final class AssignmentResponseMapper {
    * @param assignment
    * @return DataResponse<AssignmentWebResponse> with specific HttpStatus
    */
-  public static DataResponse<AssignmentWebResponse> toAssignmentDataResponse(HttpStatus httpStatus, Assignment assignment) {
-    return ResponseHelper.toDataResponse(httpStatus, buildAssignmentWebResponse(assignment));
+  public static DataResponse<AssignmentWebResponse> toAssignmentDataResponse(HttpStatus httpStatus, Assignment assignment, String urlPrefix) {
+    return ResponseHelper.toDataResponse(httpStatus, buildAssignmentWebResponse(assignment, urlPrefix));
   }
 
   /**
@@ -48,21 +48,21 @@ public final class AssignmentResponseMapper {
    * @param assignment
    * @return AsssignmentWebResponse
    */
-  private static AssignmentWebResponse buildAssignmentWebResponse(Assignment assignment) {
+  private static AssignmentWebResponse buildAssignmentWebResponse(Assignment assignment, String urlPrefix) {
     AssignmentWebResponse response = new AssignmentWebResponse();
     BeanUtils.copyProperties(assignment, response);
     response.setBatchCode(assignment.getBatch().getCode());
     response.setUploadedDate(assignment.getCreatedAt());
-    response = setNullableFile(response, assignment);
+    response = setNullableFile(response, assignment, urlPrefix);
     return response;
   }
 
-  private static AssignmentWebResponse setNullableFile(AssignmentWebResponse response, Assignment assignment) {
+  private static AssignmentWebResponse setNullableFile(AssignmentWebResponse response, Assignment assignment, String urlPrefix) {
     return Optional.ofNullable(assignment)
         .map(Assignment::getFile)
         .map(file -> {
           response.setFileId(file.getId());
-          response.setFile(file.getFileUrl());
+          response.setFile(urlPrefix.concat(file.getFileUrl()));
           return response;
         })
         .orElse(response);
@@ -74,13 +74,13 @@ public final class AssignmentResponseMapper {
    * @param data (Page<Assignment>)
    * @return PagingResponse<AssignmentWebResponse>
    */
-  public static PagingResponse<AssignmentWebResponse> toAssignmentsPagingResponse(Page<Assignment> data) {
+  public static PagingResponse<AssignmentWebResponse> toAssignmentsPagingResponse(Page<Assignment> data, String urlPrefix) {
     return ResponseHelper.toPagingResponse(
         HttpStatus.OK,
         data
             .getContent()
             .stream()
-            .map(AssignmentResponseMapper::buildAssignmentWebResponse)
+            .map(assignment -> AssignmentResponseMapper.buildAssignmentWebResponse(assignment, urlPrefix))
             .collect(Collectors.toList()),
         PageHelper.toPaging(data));
   }

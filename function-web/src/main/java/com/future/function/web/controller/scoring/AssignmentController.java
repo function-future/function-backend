@@ -1,6 +1,7 @@
 package com.future.function.web.controller.scoring;
 
 import com.future.function.common.enumeration.core.Role;
+import com.future.function.common.properties.core.FileProperties;
 import com.future.function.service.api.feature.scoring.AssignmentService;
 import com.future.function.session.annotation.WithAnyRole;
 import com.future.function.session.model.Session;
@@ -27,13 +28,14 @@ import org.springframework.web.bind.annotation.*;
 public class AssignmentController {
 
   private AssignmentService assignmentService;
-
   private AssignmentRequestMapper assignmentRequestMapper;
+  private FileProperties fileProperties;
 
   @Autowired
-  public AssignmentController(AssignmentService assignmentService, AssignmentRequestMapper assignmentRequestMapper) {
+  public AssignmentController(AssignmentService assignmentService, AssignmentRequestMapper assignmentRequestMapper, FileProperties fileProperties) {
     this.assignmentService = assignmentService;
     this.assignmentRequestMapper = assignmentRequestMapper;
+    this.fileProperties = fileProperties;
   }
 
   /**
@@ -52,7 +54,7 @@ public class AssignmentController {
           @WithAnyRole(roles = {Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT}) Session session) {
     return AssignmentResponseMapper
         .toAssignmentsPagingResponse(
-            assignmentService.findAllByBatchCodeAndPageable(batchCode, PageHelper.toPageable(page, size)));
+            assignmentService.findAllByBatchCodeAndPageable(batchCode, PageHelper.toPageable(page, size)), fileProperties.getUrlPrefix());
   }
 
   /**
@@ -65,7 +67,7 @@ public class AssignmentController {
   @GetMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
   public DataResponse<AssignmentWebResponse> findAssignmentById(@PathVariable String id,
       @WithAnyRole(roles = {Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT})Session session) {
-    return AssignmentResponseMapper.toAssignmentDataResponse(assignmentService.findById(id));
+    return AssignmentResponseMapper.toAssignmentDataResponse(assignmentService.findById(id), fileProperties.getUrlPrefix());
   }
 
   /**
@@ -82,7 +84,7 @@ public class AssignmentController {
                                                               @WithAnyRole(roles = Role.ADMIN) Session session) {
     return AssignmentResponseMapper
         .toAssignmentDataResponse(HttpStatus.CREATED, assignmentService
-                .createAssignment(assignmentRequestMapper.toAssignment(data, batchCode)));
+                .createAssignment(assignmentRequestMapper.toAssignment(data, batchCode)), fileProperties.getUrlPrefix());
   }
 
   @ResponseStatus(value = HttpStatus.CREATED)
@@ -92,7 +94,7 @@ public class AssignmentController {
     request = assignmentRequestMapper.validateCopyAssignmentWebRequest(request);
     return AssignmentResponseMapper
         .toAssignmentDataResponse(HttpStatus.CREATED, assignmentService
-                .copyAssignment(request.getAssignmentId(), request.getBatchCode()));
+                .copyAssignment(request.getAssignmentId(), request.getBatchCode()), fileProperties.getUrlPrefix());
   }
 
   /**
@@ -107,7 +109,7 @@ public class AssignmentController {
                                                               @RequestBody AssignmentWebRequest data,
                                                               @WithAnyRole(roles = Role.ADMIN) Session session) {
     return AssignmentResponseMapper.toAssignmentDataResponse(assignmentService
-            .updateAssignment(assignmentRequestMapper.toAssignmentWithId(id, data, batchCode)));
+            .updateAssignment(assignmentRequestMapper.toAssignmentWithId(id, data, batchCode)), fileProperties.getUrlPrefix());
   }
 
   /**

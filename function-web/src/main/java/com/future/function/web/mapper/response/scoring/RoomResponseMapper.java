@@ -42,7 +42,7 @@ public final class RoomResponseMapper {
                                                       String urlPrefix) {
     return RoomWebResponse
         .builder()
-        .assignment(AssignmentResponseMapper.toAssignmentDataResponse(room.getAssignment()).getData())
+        .assignment(AssignmentResponseMapper.toAssignmentDataResponse(room.getAssignment(), urlPrefix).getData())
         .student(UserResponseMapper.toUserDataResponse(room.getStudent(),
                                                        urlPrefix).getData())
         .point(room.getPoint())

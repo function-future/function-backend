@@ -30,6 +30,7 @@ public class AssignmentResponseMapperTest {
   private static final long ASSIGNMENT_DEADLINE = new Date().getTime();
   private static final String BATCH_CODE = "batch-code";
   private static final String FILE_URl = "file-url";
+  private static final String URL_PREFIX = "url-prefix";
   private static final String FILE_ID = "file-id";
   private Paging paging;
   private Pageable pageable;
@@ -68,7 +69,7 @@ public class AssignmentResponseMapperTest {
         .deadline(ASSIGNMENT_DEADLINE)
         .batchCode(BATCH_CODE)
         .uploadedDate(ASSIGNMENT_DEADLINE)
-        .file(FILE_URl)
+        .file(URL_PREFIX + FILE_URl)
         .fileId(FILE_ID)
         .build();
 
@@ -108,7 +109,7 @@ public class AssignmentResponseMapperTest {
 
   @Test
   public void testToAssignmentDataResponseSuccess() {
-    DataResponse<AssignmentWebResponse> actual = AssignmentResponseMapper.toAssignmentDataResponse(assignment);
+    DataResponse<AssignmentWebResponse> actual = AssignmentResponseMapper.toAssignmentDataResponse(assignment, URL_PREFIX);
     Assertions.assertThat(actual.getData()).isEqualTo(assignmentWebResponseDataResponse.getData());
     Assertions.assertThat(actual.getCode()).isEqualTo(assignmentWebResponseDataResponse.getCode());
     Assertions.assertThat(actual.getStatus()).isEqualTo(assignmentWebResponseDataResponse.getStatus());
@@ -119,7 +120,7 @@ public class AssignmentResponseMapperTest {
     assignmentWebResponseDataResponse.setCode(HttpStatus.CREATED.value());
     assignmentWebResponseDataResponse.setStatus(ResponseHelper.toProperStatusFormat(HttpStatus.CREATED.getReasonPhrase()));
     DataResponse<AssignmentWebResponse> actual = AssignmentResponseMapper
-        .toAssignmentDataResponse(HttpStatus.CREATED, assignment);
+        .toAssignmentDataResponse(HttpStatus.CREATED, assignment, URL_PREFIX);
     Assertions.assertThat(actual.getData()).isEqualTo(assignmentWebResponseDataResponse.getData());
     Assertions.assertThat(actual.getCode()).isEqualTo(assignmentWebResponseDataResponse.getCode());
     Assertions.assertThat(actual.getStatus()).isEqualTo(assignmentWebResponseDataResponse.getStatus());
@@ -127,7 +128,7 @@ public class AssignmentResponseMapperTest {
 
   @Test
   public void testToAssignmentPagingResponseSuccess() {
-    PagingResponse<AssignmentWebResponse> actual = AssignmentResponseMapper.toAssignmentsPagingResponse(assignmentPage);
+    PagingResponse<AssignmentWebResponse> actual = AssignmentResponseMapper.toAssignmentsPagingResponse(assignmentPage, URL_PREFIX);
     Assertions.assertThat(actual).isEqualTo(assignmentWebResponsePagingResponse);
     Assertions.assertThat(actual.getData()).isEqualTo(assignmentWebResponsePagingResponse.getData());
     Assertions.assertThat(actual.getCode()).isEqualTo(assignmentWebResponsePagingResponse.getCode());

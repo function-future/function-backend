@@ -55,6 +55,7 @@ public class RoomControllerTest extends TestHelper {
   private static final String ASSIGNMENT_TITLE = "assignment-title";
   private static final String ASSIGNMENT_DESCRIPTION = "assignment-description";
   private static final long ASSIGNMENT_DEADLINE = new Date().getTime();
+  private static final String ASSIGNMENT_FILE_URL = "file-url";
   private static final String BATCH_CODE = "3";
   private static String ASSIGNMENT_ID = UUID.randomUUID().toString();
   private static final String ROOM_ID = "room-id";
@@ -79,7 +80,7 @@ public class RoomControllerTest extends TestHelper {
 
   @MockBean
   private AssignmentService assignmentService;
-  
+
   @MockBean
   private FileProperties fileProperties;
 
@@ -93,7 +94,7 @@ public class RoomControllerTest extends TestHelper {
         .title(ASSIGNMENT_TITLE)
         .description(ASSIGNMENT_DESCRIPTION)
         .deadline(ASSIGNMENT_DEADLINE)
-        .file(FileV2.builder().id("file-id").build())
+        .file(FileV2.builder().id("file-id").fileUrl(ASSIGNMENT_FILE_URL).build())
         .batch(Batch.builder().code(BATCH_CODE).build())
         .build();
 
