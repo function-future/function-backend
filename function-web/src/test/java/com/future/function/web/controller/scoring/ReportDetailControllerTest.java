@@ -1,6 +1,7 @@
 package com.future.function.web.controller.scoring;
 
 import com.future.function.common.enumeration.core.Role;
+import com.future.function.common.properties.core.FileProperties;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.User;
@@ -49,6 +50,7 @@ public class ReportDetailControllerTest extends TestHelper {
     private static final String STUDENT_NAME = "student-name";
     private static final String UNIVERSITY = "university";
     private static final String AVATAR = "avatar";
+    private static final String URL_PREFIX = "url-prefix";
     private static final String BATCH_CODE = "batch-code";
     private static final String TITLE = "quiz-title";
     private static final String TYPE = "type";
@@ -78,6 +80,9 @@ public class ReportDetailControllerTest extends TestHelper {
 
     @MockBean
     private ReportDetailRequestMapper requestMapper;
+
+    @MockBean
+    private FileProperties fileProperties;
 
     @Before
     public void setUp() {
@@ -113,14 +118,14 @@ public class ReportDetailControllerTest extends TestHelper {
                 .studentName(STUDENT_NAME)
                 .university(UNIVERSITY)
                 .batchCode(BATCH_CODE)
-                .avatar(AVATAR)
+                .avatar(URL_PREFIX + AVATAR)
                 .scores(Collections.singletonList(summaryWebResponse))
                 .build();
         createdReportDetailWebResponse = ReportDetailWebResponse.builder()
                 .studentName(STUDENT_NAME)
                 .university(UNIVERSITY)
                 .batchCode(BATCH_CODE)
-                .avatar(AVATAR)
+                .avatar(URL_PREFIX + AVATAR)
                 .point(POINT)
                 .build();
 
@@ -128,6 +133,7 @@ public class ReportDetailControllerTest extends TestHelper {
         CREATED_DATA_RESPONSE = ResponseHelper.toDataResponse(HttpStatus.CREATED,
                 Collections.singletonList(createdReportDetailWebResponse));
 
+        when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
         when(requestMapper.toReportDetailList(reportDetailScoreWebRequest, REPORT_ID))
                 .thenReturn(Collections.singletonList(reportDetail));
         when(reportService.findAllSummaryByReportId(REPORT_ID, JUDGE_ID))

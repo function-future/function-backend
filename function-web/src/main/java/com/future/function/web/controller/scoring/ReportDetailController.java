@@ -1,6 +1,7 @@
 package com.future.function.web.controller.scoring;
 
 import com.future.function.common.enumeration.core.Role;
+import com.future.function.common.properties.core.FileProperties;
 import com.future.function.service.api.feature.scoring.ReportDetailService;
 import com.future.function.service.api.feature.scoring.ReportService;
 import com.future.function.session.annotation.WithAnyRole;
@@ -22,13 +23,15 @@ import java.util.List;
 public class ReportDetailController {
 
     private ReportService reportService;
-
     private ReportDetailRequestMapper requestMapper;
+    private FileProperties fileProperties;
 
     @Autowired
-    public ReportDetailController(ReportService reportService, ReportDetailRequestMapper requestMapper) {
+    public ReportDetailController(ReportService reportService, ReportDetailRequestMapper requestMapper,
+        FileProperties fileProperties) {
         this.reportService = reportService;
         this.requestMapper = requestMapper;
+        this.fileProperties = fileProperties;
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -36,7 +39,7 @@ public class ReportDetailController {
     public DataResponse<List<ReportDetailWebResponse>> findComparisonByReportId(@PathVariable String judgingId,
         @WithAnyRole(roles = {Role.ADMIN, Role.JUDGE, Role.MENTOR}) Session session) {
         return ReportDetailResponseMapper.toDataListReportDetailWebResponse(
-            reportService.findAllSummaryByReportId(judgingId, session.getUserId()));
+            reportService.findAllSummaryByReportId(judgingId, session.getUserId()), fileProperties.getUrlPrefix());
     }
 
     @ResponseStatus(HttpStatus.CREATED)
@@ -48,7 +51,8 @@ public class ReportDetailController {
                 HttpStatus.CREATED,
             reportService.giveScoreToReportStudents(
                         judgingId,
-                        requestMapper.toReportDetailList(request, judgingId)));
+                        requestMapper.toReportDetailList(request, judgingId)),
+            fileProperties.getUrlPrefix());
     }
 
 }

@@ -1,6 +1,7 @@
 package com.future.function.web.controller.scoring;
 
 import com.future.function.common.enumeration.core.Role;
+import com.future.function.common.properties.core.FileProperties;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.scoring.Assignment;
@@ -49,6 +50,7 @@ public class AssignmentControllerTest extends TestHelper {
   private static final long ASSIGNMENT_DEADLINE = new Date().getTime();
   private static final String BATCH_CODE = "3";
   private static final String ASSIGNMENT_FILE_PATH = "assignment-file-path";
+  private static final String URL_PREFIX = "url-prefix";
   private static String ASSIGNMENT_ID = UUID.randomUUID().toString();
   private Pageable pageable;
   private Assignment assignment;
@@ -74,6 +76,9 @@ public class AssignmentControllerTest extends TestHelper {
   @MockBean
   private AssignmentRequestMapper assignmentRequestMapper;
 
+  @MockBean
+  private FileProperties fileProperties;
+
   @Before
   public void setUp() {
     super.setUp();
@@ -84,7 +89,7 @@ public class AssignmentControllerTest extends TestHelper {
             .title(ASSIGNMENT_TITLE)
             .description(ASSIGNMENT_DESCRIPTION)
             .deadline(ASSIGNMENT_DEADLINE)
-            .file(FileV2.builder().id("file-id").build())
+            .file(FileV2.builder().id("file-id").fileUrl(ASSIGNMENT_FILE_PATH).build())
             .batch(Batch.builder().code(BATCH_CODE).build())
             .build();
 
@@ -113,16 +118,17 @@ public class AssignmentControllerTest extends TestHelper {
     ASSIGNMENT_ID = assignment.getId();
 
     DATA_RESPONSE = AssignmentResponseMapper
-            .toAssignmentDataResponse(this.assignment);
+            .toAssignmentDataResponse(this.assignment, URL_PREFIX);
 
     CREATED_DATA_RESPONSE = AssignmentResponseMapper
-            .toAssignmentDataResponse(HttpStatus.CREATED, this.assignment);
+            .toAssignmentDataResponse(HttpStatus.CREATED, this.assignment, URL_PREFIX);
 
     PAGING_RESPONSE = AssignmentResponseMapper
-            .toAssignmentsPagingResponse(assignmentPage);
+            .toAssignmentsPagingResponse(assignmentPage, URL_PREFIX);
 
     BASE_RESPONSE = ResponseHelper.toBaseResponse(HttpStatus.OK);
 
+    when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
     when(assignmentService.findAllByBatchCodeAndPageable(BATCH_CODE, pageable))
             .thenReturn(assignmentPage);
     when(assignmentService.copyAssignment(ASSIGNMENT_ID, "BATCH-3")).thenReturn(assignment);
