@@ -250,10 +250,10 @@ public class LoggingRoomControllerTest extends TestHelper {
       .thenReturn(LOGGING_ROOM_PAGE);
     when(loggingRoomService.getLoggingRoomsByMember(any(String.class), eq(PAGEABLE)))
       .thenReturn(LOGGING_ROOM_PAGE);
-    when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
 
     PagingResponse<LoggingRoomWebResponse> response =
       LoggingRoomResponseMapper.toPagingLoggingRoomResponse(LOGGING_ROOM_PAGE, URL_PREFIX);
+    when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
 
     mockMvc.perform(
       get("/api/communication/logging-rooms")
@@ -370,6 +370,7 @@ public class LoggingRoomControllerTest extends TestHelper {
         .cookie(cookies))
       .andExpect(status().isOk())
       .andExpect(content().json(pagingResponseJacksonTester.write(response).getJson()));
+
     verify(fileProperties).getUrlPrefix();
     verify(logMessageService).getLogMessagesByTopic(TOPIC_ID_1, PAGEABLE);
   }

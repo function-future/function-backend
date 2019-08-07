@@ -133,6 +133,7 @@ public class LoggingRoomResponseMapper {
     return Optional.ofNullable(user)
       .map(User::getPictureV2)
       .map(FileV2::getThumbnailUrl)
+      .map(urlPrefix::concat)
       .orElse(null);
   }
 }
