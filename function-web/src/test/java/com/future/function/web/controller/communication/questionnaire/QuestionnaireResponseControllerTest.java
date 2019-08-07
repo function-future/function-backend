@@ -1,6 +1,7 @@
 package com.future.function.web.controller.communication.questionnaire;
 
 import com.future.function.common.enumeration.core.Role;
+import com.future.function.common.properties.core.FileProperties;
 import com.future.function.model.entity.feature.communication.questionnaire.Answer;
 import com.future.function.model.entity.feature.communication.questionnaire.QuestionQuestionnaire;
 import com.future.function.model.entity.feature.communication.questionnaire.QuestionResponseSummary;
@@ -51,6 +52,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import(TestSecurityConfiguration.class)
 @WebMvcTest(QuestionnaireResponseController.class)
 public class QuestionnaireResponseControllerTest extends TestHelper {
+
+  private static final String URL_PREFIX = "urlPrefix";
 
   private static final String BATCH_ID = "batchId";
 
@@ -148,6 +151,9 @@ public class QuestionnaireResponseControllerTest extends TestHelper {
   @MockBean
   private QuestionnaireResultService questionnaireResultService;
 
+  @MockBean
+  private FileProperties fileProperties;
+
   @Override
   @Before
   public void setUp() {
@@ -159,7 +165,8 @@ public class QuestionnaireResponseControllerTest extends TestHelper {
   public void tearDown() throws Exception {
     verifyNoMoreInteractions(
       questionnaireResponseSummaryService,
-      questionnaireResultService
+      questionnaireResultService,
+      fileProperties
       );
   }
 
@@ -196,10 +203,13 @@ public class QuestionnaireResponseControllerTest extends TestHelper {
         .getQuestionnaireResponseSummaryById(QUESTIONNAIRE_RESPONSE_SUMMARY_ID))
       .thenReturn(QUESTIONNAIRE_RESPONSE_SUMMARY);
 
+    when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
+
     DataResponse<QuestionnaireSummaryDescriptionResponse> response =
       QuestionnaireResponseSummaryResponseMapper
         .toDataResponseQuestionnaireDataSummaryDescription(
-          QUESTIONNAIRE_RESPONSE_SUMMARY
+          QUESTIONNAIRE_RESPONSE_SUMMARY,
+          URL_PREFIX
         );
 
     mockMvc.perform(
@@ -210,6 +220,7 @@ public class QuestionnaireResponseControllerTest extends TestHelper {
       .andExpect(status().isOk())
       .andExpect(content().json(dataResponseJacksonTester.write(response).getJson()));
 
+    verify(fileProperties).getUrlPrefix();
     verify(questionnaireResponseSummaryService)
       .getQuestionnaireResponseSummaryById(QUESTIONNAIRE_RESPONSE_SUMMARY_ID);
   }

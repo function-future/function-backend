@@ -27,6 +27,8 @@ import static org.junit.Assert.*;
  */
 public class QuestionnaireParticipantResponseMapperTest {
 
+  private static final String URL_PREFIX = "urlPrefix";
+
   private static final String THUMBNAIL_URL = "thumbnail";
 
   private static final String MEMBER_ID_1 = "memberId1";
@@ -101,7 +103,8 @@ public class QuestionnaireParticipantResponseMapperTest {
       QuestionnaireParticipantResponseMapper.toPagingParticipantDescriptionResponse(
         new PageImpl<>(Arrays.asList(QUESTIONNAIRE_PARTICIPANT, QUESTIONNAIRE_PARTICIPANT_2),
           PageHelper.toPageable(1, 2), 2
-        )
+        ),
+        URL_PREFIX
       );
 
     assertThat(data).isNotNull();

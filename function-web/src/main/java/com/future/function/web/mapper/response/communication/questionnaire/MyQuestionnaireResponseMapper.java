@@ -29,25 +29,31 @@ public class MyQuestionnaireResponseMapper {
 
   private static final String NO_BATCH = "No-Batch";
 
-  public static DataResponse<List<AppraiseeResponse>> toDataResponseAppraiseeResponseList(List<QuestionnaireParticipant> data) {
+  public static DataResponse<List<AppraiseeResponse>> toDataResponseAppraiseeResponseList(
+    List<QuestionnaireParticipant> data,
+    String urlPrefix
+  ) {
 
     return ResponseHelper.toDataResponse(
             HttpStatus.OK,
-            toAppraiseeResponseList(data)
+            toAppraiseeResponseList(data, urlPrefix)
     );
   }
 
-  private static List<AppraiseeResponse> toAppraiseeResponseList(List<QuestionnaireParticipant> data) {
+  private static List<AppraiseeResponse> toAppraiseeResponseList(List<QuestionnaireParticipant> data, String urlPrefix) {
     return data.stream()
-            .map(MyQuestionnaireResponseMapper::toAppraiseeResponse)
+            .map(questionnaireParticipant -> toAppraiseeResponse(questionnaireParticipant, urlPrefix))
             .collect(Collectors.toList());
   }
 
-  private static AppraiseeResponse toAppraiseeResponse(QuestionnaireParticipant questionnaireParticipant) {
+  public static AppraiseeResponse toAppraiseeResponse(
+    QuestionnaireParticipant questionnaireParticipant,
+    String urlPrefix
+  ) {
     return AppraiseeResponse.builder()
             .id(questionnaireParticipant.getMember().getId())
             .name(questionnaireParticipant.getMember().getName())
-            .avatar(getThumnailUrl(questionnaireParticipant.getMember()))
+            .avatar(getThumnailUrl(questionnaireParticipant.getMember(), urlPrefix))
             .batch(toBatchResponse(questionnaireParticipant.getMember().getBatch(), questionnaireParticipant.getMember().getRole()))
             .role(questionnaireParticipant.getMember().getRole().toString())
             .university(questionnaireParticipant.getMember().getUniversity())
@@ -70,17 +76,21 @@ public class MyQuestionnaireResponseMapper {
 
   }
 
-  public static DataResponse<AppraisalDataResponse> toDataResponseQuestionnaireSummaryDescriptionResponse(Questionnaire questionnaire, User user) {
+  public static DataResponse<AppraisalDataResponse> toDataResponseQuestionnaireSummaryDescriptionResponse(
+    Questionnaire questionnaire, User user, String urlPrefix
+  ) {
     return ResponseHelper.toDataResponse(
             HttpStatus.OK,
-            toQuestionnaireSummaryDescriptionResponse(questionnaire, user)
+            toQuestionnaireSummaryDescriptionResponse(questionnaire, user, urlPrefix)
     );
   }
 
-  private static AppraisalDataResponse toQuestionnaireSummaryDescriptionResponse(Questionnaire questionnaire, User user) {
+  private static AppraisalDataResponse toQuestionnaireSummaryDescriptionResponse(
+    Questionnaire questionnaire, User user, String urlPrefix
+  ) {
     return AppraisalDataResponse.builder()
             .questionnaireDetail(toQuestionnaireDetailResponse(questionnaire))
-            .appraisee(toAppraiseeResponse(user))
+            .appraisee(toAppraiseeResponse(user, urlPrefix))
             .build();
   }
 
@@ -94,11 +104,11 @@ public class MyQuestionnaireResponseMapper {
             .build();
   }
 
-  private static AppraiseeResponse toAppraiseeResponse(User appraisee) {
+  private static AppraiseeResponse toAppraiseeResponse(User appraisee, String urlPrefix) {
     return AppraiseeResponse.builder()
             .id(appraisee.getId())
             .name(appraisee.getName())
-            .avatar(getThumnailUrl(appraisee))
+            .avatar(getThumnailUrl(appraisee, urlPrefix))
             .role(appraisee.getRole().toString())
             .batch(toBatchResponse(appraisee.getBatch(), appraisee.getRole()))
             .university(appraisee.getUniversity())
@@ -109,10 +119,11 @@ public class MyQuestionnaireResponseMapper {
     return ResponseHelper.toDataResponse(HttpStatus.OK, toQuestionQuestionnaireResponseList(data));
   }
 
-  private static String getThumnailUrl(User user) {
+  private static String getThumnailUrl(User user, String urlPrefix) {
     return Optional.ofNullable(user)
       .map(User::getPictureV2)
       .map(FileV2::getThumbnailUrl)
+      .map(urlPrefix::concat)
       .orElse(null);
   }
 }

@@ -2,6 +2,7 @@ package com.future.function.web.controller.communication.questionnaire;
 
 
 import com.future.function.common.enumeration.core.Role;
+import com.future.function.common.properties.core.FileProperties;
 import com.future.function.model.entity.feature.communication.questionnaire.Questionnaire;
 import com.future.function.service.api.feature.communication.questionnaire.QuestionnaireService;
 import com.future.function.service.api.feature.core.UserService;
@@ -44,17 +45,20 @@ public class QuestionnaireController {
 
   private final QuestionQuestionnaireRequestMapper questionQuestionnaireRequestMapper;
 
+  private final FileProperties fileProperties;
+
   @Autowired
   public QuestionnaireController(
-          QuestionnaireService questionnaireService,
-          UserService userService,
-          QuestionnaireRequestMapper questionnaireRequestMapper,
-          QuestionQuestionnaireRequestMapper questionQuestionnaireRequestMapper
-  ) {
+    QuestionnaireService questionnaireService,
+    UserService userService,
+    QuestionnaireRequestMapper questionnaireRequestMapper,
+    QuestionQuestionnaireRequestMapper questionQuestionnaireRequestMapper,
+    FileProperties fileProperties) {
     this.questionnaireService = questionnaireService;
     this.userService = userService;
     this.questionnaireRequestMapper = questionnaireRequestMapper;
     this.questionQuestionnaireRequestMapper = questionQuestionnaireRequestMapper;
+    this.fileProperties = fileProperties;
   }
 
   @ResponseStatus(HttpStatus.OK)
@@ -198,7 +202,9 @@ public class QuestionnaireController {
             questionnaireService.getQuestionnaireAppraiser(
               questionnaireService.getQuestionnaire(questionnaireId),
               PageHelper.toPageable(page, size)
-            ));
+            ),
+            fileProperties.getUrlPrefix()
+    );
   }
 
   @ResponseStatus(HttpStatus.OK)
@@ -235,9 +241,12 @@ public class QuestionnaireController {
   ) {
     return QuestionnaireParticipantResponseMapper.toPagingParticipantDescriptionResponse(
             questionnaireService.getQuestionnaireAppraisee(
-                    questionnaireService.getQuestionnaire(questionnaireId),
-                    PageHelper.toPageable(page, size)
-            ));
+              questionnaireService.getQuestionnaire(questionnaireId),
+              PageHelper.toPageable(page, size)
+            ),
+            fileProperties.getUrlPrefix()
+
+    );
   }
 
   @ResponseStatus(HttpStatus.OK)

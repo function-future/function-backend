@@ -1,6 +1,7 @@
 package com.future.function.web.controller.communication.questionnaire;
 
 import com.future.function.common.enumeration.core.Role;
+import com.future.function.common.properties.core.FileProperties;
 import com.future.function.model.entity.feature.communication.questionnaire.*;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.FileV2;
@@ -22,6 +23,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit4.SpringRunner;
 
 
+import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 
@@ -38,6 +40,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import(TestSecurityConfiguration.class)
 @WebMvcTest(QuestionResponseController.class)
 public class QuestionResponseControllerTest extends TestHelper {
+
+  private static final String URL_PREFIX = "urlPrefix";
 
   private static final String QUESTIONNAIRE_ID_1 = "questionnaireId1";
 
@@ -118,6 +122,9 @@ public class QuestionResponseControllerTest extends TestHelper {
   @MockBean
   private QuestionnaireResponseSummaryService questionnaireResponseSummaryService;
 
+  @MockBean
+  private FileProperties fileProperties;
+
   @Override
   @Before
   public void setUp() {
@@ -126,7 +133,7 @@ public class QuestionResponseControllerTest extends TestHelper {
   }
   @After
   public void tearDown() throws Exception {
-    verifyNoMoreInteractions(questionnaireResponseSummaryService );
+    verifyNoMoreInteractions(questionnaireResponseSummaryService, fileProperties );
   }
 
   @Test
@@ -157,11 +164,12 @@ public class QuestionResponseControllerTest extends TestHelper {
     when(questionnaireResponseSummaryService
       .getQuestionResponseByQuestionResponseSummaryId(QUESTION_RESPONSE_SUMMARY_ID))
         .thenReturn(Arrays.asList(QUESTION_RESPONSE));
-
+    when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
     DataResponse<List<QuestionAnswerResponse>> response =
       QuestionnaireResponseSummaryResponseMapper
         .toDataResponseQuestionAnswerDetailResponse(
-          Arrays.asList(QUESTION_RESPONSE)
+          Arrays.asList(QUESTION_RESPONSE),
+          URL_PREFIX
         );
 
     mockMvc.perform(
@@ -173,7 +181,7 @@ public class QuestionResponseControllerTest extends TestHelper {
       .andExpect(status().isOk())
       .andExpect(content().json(dataResponseJacksonTester.write(response).getJson()));
 
-
+    verify(fileProperties).getUrlPrefix();
     verify(questionnaireResponseSummaryService)
       .getQuestionResponseByQuestionResponseSummaryId(QUESTION_RESPONSE_SUMMARY_ID);
   }
