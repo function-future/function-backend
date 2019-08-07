@@ -1,6 +1,7 @@
 package com.future.function.web.mapper.response.communication.questionnaire;
 
 import com.future.function.model.entity.feature.communication.questionnaire.QuestionnaireParticipant;
+import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
@@ -14,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -40,7 +42,7 @@ public class QuestionnaireParticipantResponseMapper {
             .university(questionnaireParticipant.getMember().getUniversity())
             .role(questionnaireParticipant.getMember().getRole().toString())
             .batch(cekRole(questionnaireParticipant.getMember()))
-            .avatar(questionnaireParticipant.getMember().getPictureV2().getThumbnailUrl())
+            .avatar(getThumnailUrl(questionnaireParticipant.getMember()))
             .build();
   }
 
@@ -65,5 +67,12 @@ public class QuestionnaireParticipantResponseMapper {
       return "No Batch";
     }
     return user.getBatch().getCode();
+  }
+
+  private static String getThumnailUrl(User user) {
+    return Optional.ofNullable(user)
+      .map(User::getPictureV2)
+      .map(FileV2::getThumbnailUrl)
+      .orElse(null);
   }
 }
