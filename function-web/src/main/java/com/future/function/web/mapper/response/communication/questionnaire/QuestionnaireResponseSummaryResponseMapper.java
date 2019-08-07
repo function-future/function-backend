@@ -6,6 +6,7 @@ import com.future.function.model.entity.feature.communication.questionnaire.Ques
 import com.future.function.model.entity.feature.communication.questionnaire.Questionnaire;
 import com.future.function.model.entity.feature.communication.questionnaire.QuestionnaireResponseSummary;
 import com.future.function.model.entity.feature.core.Batch;
+import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.model.response.base.DataResponse;
@@ -22,6 +23,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -56,7 +58,7 @@ public class QuestionnaireResponseSummaryResponseMapper {
     return AppraiseeResponse.builder()
             .id(appraisee.getId())
             .name(appraisee.getName())
-            .avatar(appraisee.getPictureV2().getThumbnailUrl())
+            .avatar(getThumnailUrl(appraisee))
             .batch(toBatchResponse(appraisee.getBatch()))
             .university(appraisee.getUniversity())
             .build();
@@ -128,10 +130,17 @@ public class QuestionnaireResponseSummaryResponseMapper {
   private static QuestionAnswerResponse toQuestionAnswerReponse(QuestionResponse questionResponse) {
     return QuestionAnswerResponse.builder()
             .name(questionResponse.getAppraiser().getName())
-            .avatar(questionResponse.getAppraiser().getPictureV2().getThumbnailUrl())
+            .avatar(getThumnailUrl(questionResponse.getAppraiser()))
             .score(questionResponse.getScore())
             .build();
 
+  }
+
+  private static String getThumnailUrl(User user) {
+    return Optional.ofNullable(user)
+      .map(User::getPictureV2)
+      .map(FileV2::getThumbnailUrl)
+      .orElse(null);
   }
 
 }

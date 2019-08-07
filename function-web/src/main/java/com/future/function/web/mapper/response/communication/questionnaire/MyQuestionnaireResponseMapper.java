@@ -5,6 +5,7 @@ import com.future.function.model.entity.feature.communication.questionnaire.Ques
 import com.future.function.model.entity.feature.communication.questionnaire.Questionnaire;
 import com.future.function.model.entity.feature.communication.questionnaire.QuestionnaireParticipant;
 import com.future.function.model.entity.feature.core.Batch;
+import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.model.response.base.DataResponse;
@@ -18,6 +19,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.future.function.web.mapper.response.communication.questionnaire.QuestionQuestionnaireResponseMapper.toQuestionQuestionnaireResponseList;
@@ -43,7 +45,7 @@ public class MyQuestionnaireResponseMapper {
     return AppraiseeResponse.builder()
             .id(questionnaireParticipant.getMember().getId())
             .name(questionnaireParticipant.getMember().getName())
-            .avatar(questionnaireParticipant.getMember().getPictureV2().getThumbnailUrl())
+            .avatar(getThumnailUrl(questionnaireParticipant.getMember()))
             .batch(toBatchResponse(questionnaireParticipant.getMember().getBatch(), questionnaireParticipant.getMember().getRole()))
             .role(questionnaireParticipant.getMember().getRole().toString())
             .university(questionnaireParticipant.getMember().getUniversity())
@@ -94,7 +96,7 @@ public class MyQuestionnaireResponseMapper {
     return AppraiseeResponse.builder()
             .id(appraisee.getId())
             .name(appraisee.getName())
-            .avatar(appraisee.getPictureV2().getThumbnailUrl())
+            .avatar(getThumnailUrl(appraisee))
             .role(appraisee.getRole().toString())
             .batch(toBatchResponse(appraisee.getBatch(), appraisee.getRole()))
             .university(appraisee.getUniversity())
@@ -103,5 +105,12 @@ public class MyQuestionnaireResponseMapper {
 
   public static DataResponse<List<QuestionQuestionnaireResponse>> toDataResponseQuestionQuestionnaireResponseList(List<QuestionQuestionnaire> data) {
     return ResponseHelper.toDataResponse(HttpStatus.OK, toQuestionQuestionnaireResponseList(data));
+  }
+
+  private static String getThumnailUrl(User user) {
+    return Optional.ofNullable(user)
+      .map(User::getPictureV2)
+      .map(FileV2::getThumbnailUrl)
+      .orElse(null);
   }
 }
