@@ -1,6 +1,6 @@
 package com.future.function.validation.annotation.communication;
 
-import com.future.function.validation.validator.communication.QuestionnaireTitleValidator;
+import com.future.function.validation.validator.communication.TitleValidator;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
@@ -13,8 +13,8 @@ import java.lang.annotation.Target;
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.TYPE, ElementType.FIELD })
-@Constraint(validatedBy = QuestionnaireTitleValidator.class)
-public @interface QuestionnaireTitle {
+@Constraint(validatedBy = TitleValidator.class)
+public @interface Title {
   /**
    * Default message returned when a String field does not fulfill the
    * required values.
