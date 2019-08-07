@@ -19,6 +19,6 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties("reminder")
 public class ReminderProperties {
 
-  private long schedulerPeriod;
+  private long schedulerPeriod = 10000L;
 
 }
