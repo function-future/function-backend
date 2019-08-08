@@ -17,6 +17,8 @@ import java.time.DayOfWeek;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.future.function.web.mapper.response.communication.ParticipantResponseMapper.toParticipantDetailResponse;
+
 /**
  * Author: PriagungSatyagama
  * Created At: 19:39 06/07/2019
@@ -39,7 +41,7 @@ public class ReminderResponseMapper {
             .build();
   }
 
-  private static ReminderDetailResponse toReminderDetailResponse(Reminder reminder) {
+  private static ReminderDetailResponse toReminderDetailResponse(Reminder reminder, String urlPrefix) {
     return ReminderDetailResponse.builder()
             .id(reminder.getId())
             .title(reminder.getTitle())
@@ -51,7 +53,7 @@ public class ReminderResponseMapper {
                     .collect(Collectors.toList()) : null)
             .time(timeToString(reminder.getHour(), reminder.getMinute()))
             .members(reminder.getMembers().stream()
-                    .map(ParticipantResponseMapper::toParticipantDetailResponse)
+                    .map(member -> toParticipantDetailResponse(member, urlPrefix))
                     .collect(Collectors.toList()))
             .build();
   }
@@ -71,8 +73,8 @@ public class ReminderResponseMapper {
             toListReminderResponse(reminders), PageHelper.toPaging(reminders));
   }
 
-  public static DataResponse<ReminderDetailResponse> toSingleReminderDataResponse(Reminder reminder) {
-    return ResponseHelper.toDataResponse(HttpStatus.OK, toReminderDetailResponse(reminder));
+  public static DataResponse<ReminderDetailResponse> toSingleReminderDataResponse(Reminder reminder, String urlPrefix) {
+    return ResponseHelper.toDataResponse(HttpStatus.OK, toReminderDetailResponse(reminder, urlPrefix));
   }
 
 }

@@ -1,6 +1,7 @@
 package com.future.function.web.controller.communication;
 
 import com.future.function.common.enumeration.core.Role;
+import com.future.function.common.properties.core.FileProperties;
 import com.future.function.model.entity.feature.communication.reminder.Reminder;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.service.api.feature.communication.ReminderService;
@@ -53,6 +54,7 @@ public class ReminderControllerTest extends TestHelper {
 
     private static final String REMINDER_ID = "reminderId";
     private static final String USER_ID = "userId";
+    private static final String URL_PREFIX = "localhost:8080";
     private static final User USER = User.builder().id(USER_ID).build();
     private static final Reminder REMINDER = Reminder.builder()
             .isRepeatedMonthly(true)
@@ -73,6 +75,9 @@ public class ReminderControllerTest extends TestHelper {
 
     @MockBean
     private ReminderRequestMapper reminderRequestMapper;
+
+    @MockBean
+    private FileProperties fileProperties;
 
     @Override
     @Before
@@ -99,18 +104,24 @@ public class ReminderControllerTest extends TestHelper {
     @Test
     public void testGivenReminderIdToGetReminderByIdReturnDataResponse() throws Exception {
         when(reminderService.getReminder(REMINDER_ID)).thenReturn(REMINDER);
-        DataResponse<ReminderDetailResponse> response = ReminderResponseMapper.toSingleReminderDataResponse(REMINDER);
+        when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
+
+        DataResponse<ReminderDetailResponse> response = ReminderResponseMapper.toSingleReminderDataResponse(REMINDER, URL_PREFIX);
         mockMvc.perform(get("/api/communication/reminders/" + REMINDER_ID).cookie(cookies))
                 .andExpect(status().isOk())
                 .andExpect(content().json(dataResponseJacksonTester.write(response).getJson()));
         verify(reminderService).getReminder(REMINDER_ID);
+        verify(fileProperties).getUrlPrefix();
+
     }
 
     @Test
     public void testGivenReminderRequestToCreateReminderReturnDataResponse() throws Exception {
         when(reminderService.createReminder(REMINDER)).thenReturn(REMINDER);
         when(reminderRequestMapper.toReminder(REMINDER_REQUEST, null)).thenReturn(REMINDER);
-        DataResponse<ReminderDetailResponse> response = ReminderResponseMapper.toSingleReminderDataResponse(REMINDER);
+        when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
+
+        DataResponse<ReminderDetailResponse> response = ReminderResponseMapper.toSingleReminderDataResponse(REMINDER, URL_PREFIX);
         mockMvc.perform(post("/api/communication/reminders")
                 .cookie(cookies).contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(reminderRequestJacksonTester.write(REMINDER_REQUEST).getJson()))
@@ -118,13 +129,15 @@ public class ReminderControllerTest extends TestHelper {
                 .andExpect(content().json(dataResponseJacksonTester.write(response).getJson()));
         verify(reminderService).createReminder(REMINDER);
         verify(reminderRequestMapper).toReminder(REMINDER_REQUEST, null);
+        verify(fileProperties).getUrlPrefix();
     }
 
     @Test
     public void testGivenReminderRequestToUpdateReminderReturnDataResponse() throws Exception {
         when(reminderService.updateReminder(REMINDER)).thenReturn(REMINDER);
         when(reminderRequestMapper.toReminder(REMINDER_REQUEST, REMINDER_ID)).thenReturn(REMINDER);
-        DataResponse<ReminderDetailResponse> response = ReminderResponseMapper.toSingleReminderDataResponse(REMINDER);
+        when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
+        DataResponse<ReminderDetailResponse> response = ReminderResponseMapper.toSingleReminderDataResponse(REMINDER, URL_PREFIX);
         mockMvc.perform(put("/api/communication/reminders/" + REMINDER_ID)
                 .cookie(cookies).contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(reminderRequestJacksonTester.write(REMINDER_REQUEST).getJson()))
@@ -132,6 +145,7 @@ public class ReminderControllerTest extends TestHelper {
                 .andExpect(content().json(dataResponseJacksonTester.write(response).getJson()));
         verify(reminderService).updateReminder(REMINDER);
         verify(reminderRequestMapper).toReminder(REMINDER_REQUEST, REMINDER_ID);
+        verify(fileProperties).getUrlPrefix();
     }
 
     @Test

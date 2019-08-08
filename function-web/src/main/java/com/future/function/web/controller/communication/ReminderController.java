@@ -1,6 +1,7 @@
 package com.future.function.web.controller.communication;
 
 import com.future.function.common.enumeration.core.Role;
+import com.future.function.common.properties.core.FileProperties;
 import com.future.function.service.api.feature.communication.ReminderService;
 import com.future.function.session.annotation.WithAnyRole;
 import com.future.function.session.model.Session;
@@ -32,10 +33,13 @@ public class ReminderController {
 
   private final ReminderService reminderService;
 
+  private final FileProperties fileProperties;
+
   @Autowired
-  public ReminderController(ReminderRequestMapper reminderRequestMapper, ReminderService reminderService) {
+  public ReminderController(ReminderRequestMapper reminderRequestMapper, ReminderService reminderService, FileProperties fileProperties) {
     this.reminderRequestMapper = reminderRequestMapper;
     this.reminderService = reminderService;
+    this.fileProperties = fileProperties;
   }
 
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
@@ -55,7 +59,7 @@ public class ReminderController {
   public DataResponse<ReminderDetailResponse> getReminder(Session session,
           @PathVariable String reminderId) {
     return ReminderResponseMapper
-            .toSingleReminderDataResponse(reminderService.getReminder(reminderId));
+            .toSingleReminderDataResponse(reminderService.getReminder(reminderId), fileProperties.getUrlPrefix());
   }
 
   @PostMapping(
@@ -64,7 +68,7 @@ public class ReminderController {
   public DataResponse<ReminderDetailResponse> createReminder(
           Session session, @RequestBody ReminderRequest request) {
     return ReminderResponseMapper.toSingleReminderDataResponse(reminderService
-            .createReminder(reminderRequestMapper.toReminder(request, null)));
+            .createReminder(reminderRequestMapper.toReminder(request, null)), fileProperties.getUrlPrefix());
   }
 
   @PutMapping(
@@ -74,7 +78,7 @@ public class ReminderController {
   public DataResponse<ReminderDetailResponse> updateReminder(
           Session session, @RequestBody ReminderRequest request, @PathVariable String reminderId) {
     return ReminderResponseMapper.toSingleReminderDataResponse(reminderService
-            .updateReminder(reminderRequestMapper.toReminder(request, reminderId)));
+            .updateReminder(reminderRequestMapper.toReminder(request, reminderId)), fileProperties.getUrlPrefix());
   }
 
   @DeleteMapping(

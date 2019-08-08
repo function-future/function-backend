@@ -16,10 +16,10 @@ import java.util.Optional;
  * Created At: 19:53 06/07/2019
  */
 public class ParticipantResponseMapper {
-  public static ParticipantDetailResponse toParticipantDetailResponse(User user) {
+  public static ParticipantDetailResponse toParticipantDetailResponse(User user, String urlPrefix) {
     return ParticipantDetailResponse.builder()
             .id(user.getId())
-            .avatar(getAvatarThumbnailUrl(user.getPictureV2()))
+            .avatar(getAvatarThumbnailUrl(user.getPictureV2(), urlPrefix))
             .batch(getBatch(user.getBatch()))
             .name(user.getName())
             .type(getRole(user))
@@ -33,9 +33,10 @@ public class ParticipantResponseMapper {
             .orElse(null);
   }
 
-  public static String getAvatarThumbnailUrl(FileV2 fileV2) {
+  public static String getAvatarThumbnailUrl(FileV2 fileV2, String urlPrefix) {
     return Optional.ofNullable(fileV2)
             .map(FileV2::getThumbnailUrl)
+            .map(urlPrefix::concat)
             .orElse(null);
   }
 

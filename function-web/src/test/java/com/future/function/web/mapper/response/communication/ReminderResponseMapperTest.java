@@ -39,6 +39,7 @@ public class ReminderResponseMapperTest {
           .minute(10)
           .members(Collections.singletonList(MEMBER))
           .build();
+  public static final String URL_PREFIX = "localhost:8080";
 
   @Test
   public void testGivenReminderByCallingToPagingReminderReturnPagingResponse() {
@@ -50,7 +51,7 @@ public class ReminderResponseMapperTest {
 
   @Test
   public void testGivenReminderByCallingToSingleReminderReturnDataResponse() {
-    DataResponse<ReminderDetailResponse> response = ReminderResponseMapper.toSingleReminderDataResponse(REMINDER_1);
+    DataResponse<ReminderDetailResponse> response = ReminderResponseMapper.toSingleReminderDataResponse(REMINDER_1, URL_PREFIX);
     assertThat(response.getData().getId()).isEqualTo(REMINDER_ID_1);
   }
 
