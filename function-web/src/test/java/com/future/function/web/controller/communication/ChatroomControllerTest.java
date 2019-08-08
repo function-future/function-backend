@@ -2,6 +2,7 @@ package com.future.function.web.controller.communication;
 
 import com.future.function.common.enumeration.communication.ChatroomType;
 import com.future.function.common.enumeration.core.Role;
+import com.future.function.common.properties.core.FileProperties;
 import com.future.function.model.entity.feature.communication.chatting.Chatroom;
 import com.future.function.model.entity.feature.communication.chatting.Message;
 import com.future.function.model.entity.feature.communication.chatting.MessageStatus;
@@ -39,6 +40,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.net.URL;
 import java.util.Arrays;
 
 import static org.mockito.Mockito.*;
@@ -69,6 +71,8 @@ public class ChatroomControllerTest extends TestHelper {
 
     private final String MEMBER_ID_2 = "idUser2";
 
+    private final String URL_PREFIX = "localhost:8080";
+
     private final User MEMBER_1 = User.builder()
             .id(MEMBER_ID_1)
             .build();
@@ -97,7 +101,7 @@ public class ChatroomControllerTest extends TestHelper {
             .build();
 
     private final DataResponse<ChatroomDetailResponse> CHATROOM_DETAIL_DATA_RESPONSE =
-            ChatroomResponseMapper.toChatroomDetailDataResponse(CHATROOM);
+            ChatroomResponseMapper.toChatroomDetailDataResponse(CHATROOM, URL_PREFIX);
 
     private final Pageable PAGEABLE = new PageRequest(0, 10);
 
@@ -122,6 +126,9 @@ public class ChatroomControllerTest extends TestHelper {
     private MessageService messageService;
 
     @MockBean
+    private FileProperties fileProperties;
+
+    @MockBean
     private MessageStatusService messageStatusService;
 
     @MockBean
@@ -143,11 +150,13 @@ public class ChatroomControllerTest extends TestHelper {
     @Test
     public void testGivenCalToChatroomsApiByGettingChatroomByIdReturnDataResponseChatroomDetail() throws Exception {
         when(chatroomService.getChatroom(CHATROOM_ID)).thenReturn(CHATROOM);
+        when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
 
         mockMvc.perform(get("/api/communication/chatrooms/" + CHATROOM_ID).cookie(cookies))
                 .andExpect(status().isOk())
                 .andExpect(content().json(dataResponseJacksonTester.write(CHATROOM_DETAIL_DATA_RESPONSE).getJson()));
 
+        verify(fileProperties).getUrlPrefix();
         verify(chatroomService).getChatroom(CHATROOM_ID);
     }
 
@@ -162,12 +171,14 @@ public class ChatroomControllerTest extends TestHelper {
         );
         when(messageService.getLastMessage(CHATROOM_ID)).thenReturn(MESSAGE);
         when(messageStatusService.getSeenStatus(CHATROOM_ID, MEMBER_ID_1)).thenReturn(false);
+        when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
 
         PagingResponse<ChatroomResponse> response = ChatroomResponseMapper.toPagingChatroomResponse(
                 chatroomService.getChatroomsWithKeyword(KEYWORD, MEMBER_ID_1, PAGEABLE),
                 messageService,
                 messageStatusService,
-                MEMBER_ID_1
+                MEMBER_ID_1,
+                URL_PREFIX
         );
 
         mockMvc.perform(get("/api/communication/chatrooms").cookie(cookies).param("search", KEYWORD))
@@ -177,6 +188,7 @@ public class ChatroomControllerTest extends TestHelper {
         verify(chatroomService, times(2)).getChatroomsWithKeyword(KEYWORD, MEMBER_ID_1, PAGEABLE);
         verify(messageService, times(4)).getLastMessage(CHATROOM_ID);
         verify(messageStatusService, times(4)).getSeenStatus(CHATROOM_ID, MEMBER_ID_1);
+        verify(fileProperties).getUrlPrefix();
     }
 
     @Test
@@ -189,12 +201,14 @@ public class ChatroomControllerTest extends TestHelper {
         );
         when(messageService.getLastMessage(CHATROOM_ID)).thenReturn(MESSAGE);
         when(messageStatusService.getSeenStatus(CHATROOM_ID, MEMBER_ID_1)).thenReturn(false);
+        when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
 
         PagingResponse<ChatroomResponse> response = ChatroomResponseMapper.toPagingChatroomResponse(
                 chatroomService.getChatrooms("GROUP", MEMBER_ID_1, PAGEABLE),
                 messageService,
                 messageStatusService,
-                MEMBER_ID_1
+                MEMBER_ID_1,
+                URL_PREFIX
         );
 
         mockMvc.perform(get("/api/communication/chatrooms").cookie(cookies).param("type", "GROUP"))
@@ -204,6 +218,8 @@ public class ChatroomControllerTest extends TestHelper {
         verify(chatroomService, times(2)).getChatrooms("GROUP", MEMBER_ID_1, PAGEABLE);
         verify(messageService, times(4)).getLastMessage(CHATROOM_ID);
         verify(messageStatusService, times(4)).getSeenStatus(CHATROOM_ID, MEMBER_ID_1);
+        verify(fileProperties).getUrlPrefix();
+
     }
 
     @Test
@@ -212,14 +228,16 @@ public class ChatroomControllerTest extends TestHelper {
         Page<Message> messagePage = new PageImpl<>(
                 Arrays.asList(MESSAGE, MESSAGE), PAGEABLE, 2);
         when(messageService.getMessages(CHATROOM_ID, PAGEABLE)).thenReturn(messagePage);
+        when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
 
-        PagingResponse<MessageResponse> response = ChatroomResponseMapper.toMessagePagingResponse(messagePage);
+        PagingResponse<MessageResponse> response = ChatroomResponseMapper.toMessagePagingResponse(messagePage, URL_PREFIX);
 
         mockMvc.perform(get("/api/communication/chatrooms/" + CHATROOM_ID + "/messages").cookie(cookies))
                 .andExpect(status().isOk())
                 .andExpect(content().json(pagingResponseJacksonTester.write(response).getJson()));
 
         verify(messageService).getMessages(CHATROOM_ID, PAGEABLE);
+        verify(fileProperties).getUrlPrefix();
     }
 
     @Test
@@ -230,8 +248,9 @@ public class ChatroomControllerTest extends TestHelper {
         Page<Message> messagePage = new PageImpl<>(
                 Arrays.asList(MESSAGE, MESSAGE), PAGEABLE, 2);
         when(messageService.getMessagesBeforePivot(CHATROOM_ID, messageId, PAGEABLE)).thenReturn(messagePage);
+        when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
 
-        PagingResponse<MessageResponse> response = ChatroomResponseMapper.toMessagePagingResponse(messagePage);
+        PagingResponse<MessageResponse> response = ChatroomResponseMapper.toMessagePagingResponse(messagePage, URL_PREFIX);
 
         mockMvc.perform(get("/api/communication/chatrooms/" + CHATROOM_ID + "/messages/_before")
                 .param("messageId", messageId).cookie(cookies))
@@ -239,6 +258,7 @@ public class ChatroomControllerTest extends TestHelper {
                 .andExpect(content().json(pagingResponseJacksonTester.write(response).getJson()));
 
         verify(messageService).getMessagesBeforePivot(CHATROOM_ID, messageId, PAGEABLE);
+        verify(fileProperties).getUrlPrefix();
     }
 
     @Test
@@ -249,8 +269,9 @@ public class ChatroomControllerTest extends TestHelper {
         Page<Message> messagePage = new PageImpl<>(
                 Arrays.asList(MESSAGE, MESSAGE), PAGEABLE, 2);
         when(messageService.getMessagesAfterPivot(CHATROOM_ID, messageId, PAGEABLE)).thenReturn(messagePage);
+        when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
 
-        PagingResponse<MessageResponse> response = ChatroomResponseMapper.toMessagePagingResponse(messagePage);
+        PagingResponse<MessageResponse> response = ChatroomResponseMapper.toMessagePagingResponse(messagePage, URL_PREFIX);
 
         mockMvc.perform(get("/api/communication/chatrooms/" + CHATROOM_ID + "/messages/_after")
                 .param("messageId", messageId).cookie(cookies))
@@ -258,6 +279,7 @@ public class ChatroomControllerTest extends TestHelper {
                 .andExpect(content().json(pagingResponseJacksonTester.write(response).getJson()));
 
         verify(messageService).getMessagesAfterPivot(CHATROOM_ID, messageId, PAGEABLE);
+        verify(fileProperties).getUrlPrefix();
     }
 
     @Test
@@ -266,8 +288,9 @@ public class ChatroomControllerTest extends TestHelper {
 
         when(chatroomRequestMapper.toChatroom(CHATROOM_WEB_REQUEST, null)).thenReturn(CHATROOM);
         when(chatroomService.createChatroom(CHATROOM)).thenReturn(CHATROOM);
+        when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
 
-        DataResponse<ChatroomDetailResponse> response = ChatroomResponseMapper.toChatroomDetailDataResponse(CHATROOM);
+        DataResponse<ChatroomDetailResponse> response = ChatroomResponseMapper.toChatroomDetailDataResponse(CHATROOM, URL_PREFIX);
 
         mockMvc.perform(post("/api/communication/chatrooms").cookie(cookies)
                 .contentType(MediaType.APPLICATION_JSON_VALUE).content(chatroomRequestJacksonTester.write(CHATROOM_WEB_REQUEST).getJson()))
@@ -276,6 +299,8 @@ public class ChatroomControllerTest extends TestHelper {
 
         verify(chatroomRequestMapper).toChatroom(CHATROOM_WEB_REQUEST, null);
         verify(chatroomService).createChatroom(CHATROOM);
+        verify(fileProperties).getUrlPrefix();
+
     }
 
     @Test
@@ -306,6 +331,7 @@ public class ChatroomControllerTest extends TestHelper {
 
         when(chatroomRequestMapper.toChatroom(CHATROOM_WEB_REQUEST, CHATROOM_ID)).thenReturn(CHATROOM);
         when(chatroomService.updateChatroom(CHATROOM)).thenReturn(CHATROOM);
+        when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
 
         mockMvc.perform(put("/api/communication/chatrooms/" + CHATROOM_ID).cookie(cookies)
                 .contentType(MediaType.APPLICATION_JSON_VALUE).content(chatroomRequestJacksonTester.write(CHATROOM_WEB_REQUEST).getJson()))
@@ -314,6 +340,7 @@ public class ChatroomControllerTest extends TestHelper {
 
         verify(chatroomRequestMapper).toChatroom(CHATROOM_WEB_REQUEST, CHATROOM_ID);
         verify(chatroomService).updateChatroom(CHATROOM);
+        verify(fileProperties).getUrlPrefix();
     }
 
     @Test

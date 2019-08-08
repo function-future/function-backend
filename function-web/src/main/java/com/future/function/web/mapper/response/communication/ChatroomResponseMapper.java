@@ -35,9 +35,9 @@ import static com.future.function.web.mapper.response.communication.ParticipantR
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ChatroomResponseMapper {
 
-    private static ChatroomDetailResponse toChatroomDetailResponse(Chatroom chatroom) {
+    private static ChatroomDetailResponse toChatroomDetailResponse(Chatroom chatroom, String urlPrefix) {
         List<ParticipantDetailResponse> participants = new ArrayList<>();
-        chatroom.getMembers().forEach(member -> participants.add(toParticipantDetailResponse(member)));
+        chatroom.getMembers().forEach(member -> participants.add(toParticipantDetailResponse(member, urlPrefix)));
         return ChatroomDetailResponse.builder()
                 .id(chatroom.getId())
                 .name(chatroom.getTitle())
@@ -47,21 +47,21 @@ public class ChatroomResponseMapper {
     }
 
     public static DataResponse<ChatroomDetailResponse> toChatroomDetailDataResponse(
-            Chatroom chatroom) {
-        return ResponseHelper.toDataResponse(HttpStatus.OK, toChatroomDetailResponse(chatroom));
+            Chatroom chatroom, String urlPrefix) {
+        return ResponseHelper.toDataResponse(HttpStatus.OK, toChatroomDetailResponse(chatroom, urlPrefix));
     }
 
-    private static ChatroomParticipantResponse toChatroomParticipantResponse(User user) {
+    private static ChatroomParticipantResponse toChatroomParticipantResponse(User user, String urlPrefix) {
         return ChatroomParticipantResponse.builder()
                 .id(user.getId())
                 .name(user.getName())
-                .avatar(ParticipantResponseMapper.getAvatarThumbnailUrl(user.getPictureV2()))
+                .avatar(ParticipantResponseMapper.getAvatarThumbnailUrl(user.getPictureV2(), urlPrefix))
                 .build();
     }
 
-    private static ChatroomResponse toChatroomResponse(Chatroom chatroom, Message lastMessage, boolean isSeen) {
+    private static ChatroomResponse toChatroomResponse(Chatroom chatroom, Message lastMessage, boolean isSeen, String urlPrefix) {
         List<ChatroomParticipantResponse> participants = new ArrayList<>();
-        chatroom.getMembers().forEach(member -> participants.add(toChatroomParticipantResponse(member)));
+        chatroom.getMembers().forEach(member -> participants.add(toChatroomParticipantResponse(member, urlPrefix)));
         return ChatroomResponse.builder()
                 .id(chatroom.getId())
                 .participants(participants)
@@ -81,14 +81,16 @@ public class ChatroomResponseMapper {
             Page<Chatroom> data,
             MessageService messageService,
             MessageStatusService messageStatusService,
-            String userId
+            String userId,
+            String urlPrefix
     ) {
         return data.getContent()
                 .stream()
                 .map(content -> toChatroomResponse(
                         content,
                         messageService.getLastMessage(content.getId()),
-                        messageStatusService.getSeenStatus(content.getId(), userId))
+                        messageStatusService.getSeenStatus(content.getId(), userId),
+                        urlPrefix)
                 )
                 .collect(Collectors.toList());
     }
@@ -97,10 +99,11 @@ public class ChatroomResponseMapper {
             Page<Chatroom> data,
             MessageService messageService,
             MessageStatusService messageStatusService,
-            String userId
+            String userId,
+            String urlPrefix
     ) {
         return ResponseHelper.toPagingResponse(
-                HttpStatus.OK, toChatroomResponseList(data, messageService, messageStatusService, userId), PageHelper.toPaging(data));
+                HttpStatus.OK, toChatroomResponseList(data, messageService, messageStatusService, userId, urlPrefix), PageHelper.toPaging(data));
     }
 
     private static LastMessageResponse toLastMessageResponse(Message message, boolean isSeen) {
@@ -113,24 +116,24 @@ public class ChatroomResponseMapper {
                 .orElse(null);
     }
 
-    private static MessageResponse toMessageResponse(Message message) {
+    private static MessageResponse toMessageResponse(Message message, String urlPrefix) {
         return MessageResponse.builder()
                 .id(message.getId())
-                .sender(toChatroomParticipantResponse(message.getSender()))
+                .sender(toChatroomParticipantResponse(message.getSender(), urlPrefix))
                 .text(message.getText())
                 .time(message.getCreatedAt())
                 .build();
     }
 
-    private static List<MessageResponse> toMessageListResponse(Page<Message> data) {
+    private static List<MessageResponse> toMessageListResponse(Page<Message> data, String urlPrefix) {
         return data.getContent()
                 .stream()
-                .map(ChatroomResponseMapper::toMessageResponse)
+                .map(message -> toMessageResponse(message, urlPrefix))
                 .collect(Collectors.toList());
     }
 
-    public static PagingResponse<MessageResponse> toMessagePagingResponse(Page<Message> data) {
-        return ResponseHelper.toPagingResponse(HttpStatus.OK, toMessageListResponse(data), PageHelper.toPaging(data));
+    public static PagingResponse<MessageResponse> toMessagePagingResponse(Page<Message> data, String urlPrefix) {
+        return ResponseHelper.toPagingResponse(HttpStatus.OK, toMessageListResponse(data, urlPrefix), PageHelper.toPaging(data));
     }
 
 

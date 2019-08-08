@@ -2,6 +2,7 @@ package com.future.function.web.mapper.response.communication;
 
 import com.future.function.common.enumeration.communication.ChatroomType;
 import com.future.function.common.enumeration.core.Role;
+import com.future.function.common.properties.core.FileProperties;
 import com.future.function.model.entity.feature.communication.chatting.Chatroom;
 import com.future.function.model.entity.feature.communication.chatting.Message;
 import com.future.function.model.entity.feature.core.Batch;
@@ -63,6 +64,8 @@ public class ChatroomResponseMapperTest {
 
     private static final String CHATROOM_TITLE = "chatroomTitle";
 
+    private static final String URL_PREFIX = "localhost:8080";
+
     private static final User MEMBER_1 = User.builder()
             .id(MEMBER_ID_1)
             .name(MEMBER_NAME_1)
@@ -115,7 +118,7 @@ public class ChatroomResponseMapperTest {
 
     @Test
     public void testGivenChatroomByCallingToChatroomDetailDataReturnDataResponse() {
-        DataResponse<ChatroomDetailResponse> data = ChatroomResponseMapper.toChatroomDetailDataResponse(CHATROOM);
+        DataResponse<ChatroomDetailResponse> data = ChatroomResponseMapper.toChatroomDetailDataResponse(CHATROOM, URL_PREFIX);
 
         assertThat(data).isNotNull();
         assertThat(data.getCode()).isEqualTo(200);
@@ -135,7 +138,8 @@ public class ChatroomResponseMapperTest {
                 new PageImpl<>(Collections.singletonList(CHATROOM), PageHelper.toPageable(1, 1), 1),
                 messageService,
                 messageStatusService,
-                MEMBER_ID_1
+                MEMBER_ID_1,
+                URL_PREFIX
         );
 
         assertThat(data).isNotNull();
@@ -150,7 +154,8 @@ public class ChatroomResponseMapperTest {
     @Test
     public void testGivenPagedMessageByCallingToMessagePagingReturnPaging() {
         PagingResponse<MessageResponse> data = ChatroomResponseMapper.toMessagePagingResponse(
-                new PageImpl<>(Arrays.asList(MESSAGE_1, MESSAGE_2), PageHelper.toPageable(1, 2), 2)
+                new PageImpl<>(Arrays.asList(MESSAGE_1, MESSAGE_2), PageHelper.toPageable(1, 2), 2),
+                URL_PREFIX
         );
 
         assertThat(data).isNotNull();
