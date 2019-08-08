@@ -16,6 +16,7 @@ import com.future.function.service.impl.helper.PageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.expression.spel.ast.Assign;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -179,14 +180,19 @@ public class AssignmentServiceImpl implements AssignmentService {
   }
 
   private Assignment checkAndMarkFileAsNotUsedIfFileInDBExist(Assignment request, Assignment foundAssignment) {
-    if(Objects.nonNull(foundAssignment.getFile()) && Objects.isNull(request.getFile())) {
-      resourceService.markFilesUsed(Collections.singletonList(foundAssignment.getFile().getId()), false);
-      foundAssignment.setFile(null);
-    } else if (Objects.nonNull(foundAssignment.getFile()) && !foundAssignment.getFile().getId().equals(request.getFile().getId())) {
+    if(checkIfRequestedFileNull(request, foundAssignment) || checkIfFileIdEquals(request, foundAssignment)) {
       resourceService.markFilesUsed(Collections.singletonList(foundAssignment.getFile().getId()), false);
       foundAssignment.setFile(null);
     }
     return foundAssignment;
+  }
+
+  private boolean checkIfRequestedFileNull(Assignment request, Assignment foundAssignment) {
+    return Objects.nonNull(foundAssignment.getFile()) && Objects.isNull(request.getFile());
+  }
+
+  private boolean checkIfFileIdEquals(Assignment request, Assignment foundAssignment) {
+    return Objects.nonNull(foundAssignment.getFile()) && !foundAssignment.getFile().getId().equals(request.getFile().getId());
   }
 
   @Override

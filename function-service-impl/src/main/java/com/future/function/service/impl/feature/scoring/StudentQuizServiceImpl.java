@@ -127,7 +127,7 @@ public class StudentQuizServiceImpl implements StudentQuizService {
     return Optional.ofNullable(quiz)
         .map(quizObj -> toStudentQuizWithUserAndQuiz(userId, quizObj))
         .map(studentQuizRepository::save)
-        .orElseThrow(() -> new UnsupportedOperationException("Create quiz failed"));
+        .orElseThrow(() -> new UnsupportedOperationException("Failed at #createStudentQuizAndSave #StudentQuizService"));
   }
 
   @Override
