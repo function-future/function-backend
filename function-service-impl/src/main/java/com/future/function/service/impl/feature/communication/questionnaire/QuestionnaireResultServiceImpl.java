@@ -34,7 +34,7 @@ public class QuestionnaireResultServiceImpl implements QuestionnaireResultServic
 
     return userQuestionnaireSummaryRepository.findAllByUserName(search)
       .stream()
-      .filter(summary  -> summary.getBatch().getCode() == batch.getCode())
+      .filter(summary  -> summary.getBatch().getCode().equals(batch.getCode()))
       .collect(Collectors.toList());
   }
 

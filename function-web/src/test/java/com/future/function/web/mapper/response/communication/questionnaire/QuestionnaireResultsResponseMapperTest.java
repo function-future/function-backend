@@ -26,6 +26,8 @@ import static org.junit.Assert.*;
  */
 public class QuestionnaireResultsResponseMapperTest {
 
+  private static final String URL_PREFIX = "urlPrefix";
+
   private static final String THUMBNAIL_URL = "thumbnail";
 
   private static final String MEMBER_ID_1 = "memberId1";
@@ -94,7 +96,8 @@ public class QuestionnaireResultsResponseMapperTest {
   public void toPagingUserSummaryResponse() {
     PagingResponse<UserSummaryResponse> data =
       QuestionnaireResultsResponseMapper.toPagingUserSummaryResponse(
-      new PageImpl<>(Arrays.asList(USER_SUMMARY_1, USER_SUMMARY_2), PageHelper.toPageable(1, 2), 2)
+        new PageImpl<>(Arrays.asList(USER_SUMMARY_1, USER_SUMMARY_2), PageHelper.toPageable(1, 2), 2),
+        URL_PREFIX
     );
 
     assertThat(data).isNotNull();
@@ -111,7 +114,8 @@ public class QuestionnaireResultsResponseMapperTest {
   public void toDataResponseUserSummaryResponse() {
     DataResponse<UserSummaryResponse> data =
       QuestionnaireResultsResponseMapper.toDataResponseUserSummaryResponse(
-        USER_SUMMARY_1
+        USER_SUMMARY_1,
+        URL_PREFIX
       );
 
     assertThat(data).isNotNull();

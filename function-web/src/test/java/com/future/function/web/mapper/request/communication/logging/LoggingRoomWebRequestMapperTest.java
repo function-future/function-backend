@@ -53,6 +53,6 @@ public class LoggingRoomWebRequestMapperTest {
 
     assertThat(data.getId()).isEqualTo(LOGGING_ROOM_ID);
 
-    verifyZeroInteractions(validator);
+    verify(validator).validate(LOGGING_ROOM_REQUEST);
   }
 }

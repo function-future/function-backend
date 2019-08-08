@@ -1,6 +1,7 @@
 package com.future.function.web.controller.communication.questionnaire;
 
 import com.future.function.common.enumeration.core.Role;
+import com.future.function.common.properties.core.FileProperties;
 import com.future.function.model.entity.feature.communication.questionnaire.Answer;
 import com.future.function.model.entity.feature.communication.questionnaire.UserQuestionnaireSummary;
 import com.future.function.model.entity.feature.core.Batch;
@@ -44,6 +45,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(QuestionnaireResultsController.class)
 public class QuestionnaireResultsControllerTest extends TestHelper {
 
+  private static final String URL_PREFIX = "urlPrefix";
   private static final String BATCH_ID = "batchId";
   private static final String BATCH_CODE = "batchCode";
   private static final String BATCH_NAME = "batchName";
@@ -97,6 +99,9 @@ public class QuestionnaireResultsControllerTest extends TestHelper {
   @MockBean
   private BatchService batchService;
 
+  @MockBean
+  private FileProperties fileProperties;
+
   @Override
   @Before
   public void setUp() {
@@ -117,13 +122,16 @@ public class QuestionnaireResultsControllerTest extends TestHelper {
     when(batchService.getBatchByCode(BATCH_CODE)).thenReturn(BATCH);
     when(questionnaireResultService.getAppraisalsQuestionnaireSummaryByBatch(BATCH, PAGEABLE))
       .thenReturn(USER_QUESTIONNAIRE_SUMMARY_PAGE);
+    when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
+
     PagingResponse<UserSummaryResponse> response =
-      QuestionnaireResultsResponseMapper.toPagingUserSummaryResponse(USER_QUESTIONNAIRE_SUMMARY_PAGE);
+      QuestionnaireResultsResponseMapper.toPagingUserSummaryResponse(USER_QUESTIONNAIRE_SUMMARY_PAGE, URL_PREFIX);
     mockMvc.perform(get("/api/communication/questionnaire-results")
       .cookie(cookies).param("batchCode", BATCH_CODE))
       .andExpect(status().isOk())
       .andExpect(content().json(pagingResponseJacksonTester.write(response).getJson()));
 
+    verify(fileProperties).getUrlPrefix();
     verify(batchService).getBatchByCode(BATCH_CODE);
     verify(questionnaireResultService).getAppraisalsQuestionnaireSummaryByBatch(BATCH, PAGEABLE);
   }
@@ -132,10 +140,11 @@ public class QuestionnaireResultsControllerTest extends TestHelper {
   public void getUserSummaryById() throws Exception {
     when(questionnaireResultService.getAppraisalsQuestionnaireSummaryById(USER_SUMMARY_ID_1))
       .thenReturn(USER_SUMMARY_1);
+    when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
 
     DataResponse<UserSummaryResponse> response =
       QuestionnaireResultsResponseMapper
-        .toDataResponseUserSummaryResponse(USER_SUMMARY_1);
+        .toDataResponseUserSummaryResponse(USER_SUMMARY_1, URL_PREFIX);
 
     mockMvc.perform(
       get("/api/communication/questionnaire-results/"+
@@ -144,6 +153,7 @@ public class QuestionnaireResultsControllerTest extends TestHelper {
       .andExpect(status().isOk())
       .andExpect(content().json(dataResponseJacksonTester.write(response).getJson()));
 
+    verify(fileProperties).getUrlPrefix();
     verify(questionnaireResultService).getAppraisalsQuestionnaireSummaryById(USER_SUMMARY_ID_1);
   }
 }

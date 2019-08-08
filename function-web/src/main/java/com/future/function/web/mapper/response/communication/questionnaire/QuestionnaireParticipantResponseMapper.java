@@ -22,19 +22,25 @@ import java.util.stream.Collectors;
 public class QuestionnaireParticipantResponseMapper {
 
   public static PagingResponse<QuestionnaireParticipantDescriptionResponse> toPagingParticipantDescriptionResponse(
-          Page<QuestionnaireParticipant> data
+          Page<QuestionnaireParticipant> data,
+          String urlPrefix
   ){
-    return ResponseHelper.toPagingResponse(HttpStatus.OK, toParticipantDescriptionResposneList(data), PageHelper.toPaging(data));
+    return ResponseHelper.toPagingResponse(HttpStatus.OK, toParticipantDescriptionResposneList(data, urlPrefix), PageHelper.toPaging(data));
   }
 
-  private static List<QuestionnaireParticipantDescriptionResponse> toParticipantDescriptionResposneList(Page<QuestionnaireParticipant> data){
+  private static List<QuestionnaireParticipantDescriptionResponse> toParticipantDescriptionResposneList(
+    Page<QuestionnaireParticipant> data, String urlPrefix
+  ){
     return data.getContent()
             .stream()
-            .map(questionnaireParticipant -> toParticipantDescriptionResposne(questionnaireParticipant))
+            .map((questionnaireParticipant) -> toParticipantDescriptionResposne(questionnaireParticipant, urlPrefix))
             .collect(Collectors.toList());
   }
 
-  private static QuestionnaireParticipantDescriptionResponse toParticipantDescriptionResposne(QuestionnaireParticipant questionnaireParticipant) {
+  private static QuestionnaireParticipantDescriptionResponse toParticipantDescriptionResposne(
+    QuestionnaireParticipant questionnaireParticipant,
+    String urlPrefix
+  ) {
     return QuestionnaireParticipantDescriptionResponse.builder()
             .id(questionnaireParticipant.getMember().getId())
             .participantId(questionnaireParticipant.getId())
@@ -42,7 +48,7 @@ public class QuestionnaireParticipantResponseMapper {
             .university(questionnaireParticipant.getMember().getUniversity())
             .role(questionnaireParticipant.getMember().getRole().toString())
             .batch(cekRole(questionnaireParticipant.getMember()))
-            .avatar(getThumnailUrl(questionnaireParticipant.getMember()))
+            .avatar(getThumnailUrl(questionnaireParticipant.getMember(), urlPrefix))
             .build();
   }
 
@@ -69,10 +75,11 @@ public class QuestionnaireParticipantResponseMapper {
     return user.getBatch().getCode();
   }
 
-  private static String getThumnailUrl(User user) {
+  private static String getThumnailUrl(User user, String urlPrefix) {
     return Optional.ofNullable(user)
       .map(User::getPictureV2)
       .map(FileV2::getThumbnailUrl)
+      .map(urlPrefix::concat)
       .orElse(null);
   }
 }

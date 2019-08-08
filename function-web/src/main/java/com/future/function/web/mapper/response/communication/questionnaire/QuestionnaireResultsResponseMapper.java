@@ -22,39 +22,44 @@ import java.util.stream.Collectors;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class QuestionnaireResultsResponseMapper {
+
+  private static final String NO_BATCH = "No Batch";
+
   public static PagingResponse<UserSummaryResponse> toPagingUserSummaryResponse(
-    Page<UserQuestionnaireSummary> data
+    Page<UserQuestionnaireSummary> data,
+    String urlPrefix
   ) {
-    return ResponseHelper.toPagingResponse(HttpStatus.OK, toUserSummaryResponseList(data), PageHelper.toPaging(data));
+    return ResponseHelper.toPagingResponse(HttpStatus.OK, toUserSummaryResponseList(data, urlPrefix), PageHelper.toPaging(data));
   }
 
   public static DataResponse<UserSummaryResponse> toDataResponseUserSummaryResponse(
-          UserQuestionnaireSummary data
+          UserQuestionnaireSummary data,
+          String urlPrefix
   ) {
-    return ResponseHelper.toDataResponse(HttpStatus.OK, toUserSummaryResponse(data));
+    return ResponseHelper.toDataResponse(HttpStatus.OK, toUserSummaryResponse(data, urlPrefix));
   }
 
-  private static List<UserSummaryResponse> toUserSummaryResponseList(Page<UserQuestionnaireSummary> data) {
+  private static List<UserSummaryResponse> toUserSummaryResponseList(Page<UserQuestionnaireSummary> data, String urlPrefix) {
     return data.getContent()
             .stream()
-            .map(userSummary ->  toUserSummaryResponse(userSummary))
+            .map((userSummary) -> toUserSummaryResponse(userSummary, urlPrefix))
             .collect(Collectors.toList());
   }
 
-  private static UserSummaryResponse toUserSummaryResponse(UserQuestionnaireSummary userSummary) {
+  private static UserSummaryResponse toUserSummaryResponse(UserQuestionnaireSummary userSummary, String urlPrefix) {
     return UserSummaryResponse.builder()
             .id(userSummary.getId())
-            .member(toMemberResponse(userSummary.getAppraisee()))
+            .member(toMemberResponse(userSummary.getAppraisee(), urlPrefix))
             .rating(userSummary.getScoreSummary().getAverage())
             .build();
   }
 
-  private static MemberResponse toMemberResponse(User appraisee) {
+  private static MemberResponse toMemberResponse(User appraisee, String urlPrefix) {
     return MemberResponse.builder()
             .id(appraisee.getId())
             .role(appraisee.getRole().toString())
             .name(appraisee.getName())
-            .avatar(getThumnailUrl(appraisee))
+            .avatar(getThumnailUrl(appraisee, urlPrefix))
             .batch(toBatchResponse(appraisee.getBatch()))
             .university(appraisee.getUniversity())
             .build();
@@ -63,9 +68,9 @@ public class QuestionnaireResultsResponseMapper {
   private static BatchWebResponse toBatchResponse(Batch batch) {
     if(batch == null) {
       return BatchWebResponse.builder()
-              .id("No Batch")
-              .name("No Batch")
-              .code("No Batch")
+              .id(NO_BATCH)
+              .name(NO_BATCH)
+              .code(NO_BATCH)
               .build();
     }
     return BatchWebResponse.builder()
@@ -76,10 +81,11 @@ public class QuestionnaireResultsResponseMapper {
 
   }
 
-  private static String getThumnailUrl(User user) {
+  private static String getThumnailUrl(User user, String urlPrefix) {
     return Optional.ofNullable(user)
       .map(User::getPictureV2)
       .map(FileV2::getThumbnailUrl)
+      .map(urlPrefix::concat)
       .orElse(null);
   }
 }

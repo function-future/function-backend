@@ -1,13 +1,13 @@
 package com.future.function.validation.validator.communication;
 
-import com.future.function.validation.annotation.communication.QuestionnaireTitle;
+import com.future.function.validation.annotation.communication.Title;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-public class QuestionnaireTitleValidator implements ConstraintValidator<QuestionnaireTitle, String> {
+public class TitleValidator implements ConstraintValidator<Title, String> {
   @Override
-  public void initialize(QuestionnaireTitle constraintAnnotation) {
+  public void initialize(Title constraintAnnotation) {
     // No initialization needed.
   }
 

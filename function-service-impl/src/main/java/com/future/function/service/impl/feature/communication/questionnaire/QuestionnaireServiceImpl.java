@@ -90,9 +90,7 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
       .map(this::softDeleteHelperQuestionnaire)
       .map(questionnaireParticipantRepository::findAllByQuestionnaireAndDeletedFalse)
       .ifPresent(questionnaireParticipants -> questionnaireParticipants.forEach(
-        questionnaireParticipant -> {
-          this.softDeletedHelperQuestionnaireParticipant(questionnaireParticipant);
-        }
+        this::softDeletedHelperQuestionnaireParticipant
       ));
   }
 
@@ -109,7 +107,6 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
     return Optional.of(questionQuestionnaireId)
             .map(questionQuestionnaireRepository::findOne)
             .orElseThrow(() -> new NotFoundException("Question with Id" + questionQuestionnaireId + "not found"));
-
   }
 
   @Override
@@ -145,7 +142,7 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
   @Override
   public QuestionnaireParticipant addQuestionnaireAppraiserToQuestionnaire(String questionnaireId, String appraiserId){
 
-    QuestionnaireParticipant questionnaireParticipant = new QuestionnaireParticipant().builder()
+    QuestionnaireParticipant questionnaireParticipant = QuestionnaireParticipant.builder()
             .participantType(ParticipantType.APPRAISER)
             .member(userService.getUser(appraiserId))
             .questionnaire(questionnaireRepository.findOne(questionnaireId))

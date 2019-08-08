@@ -1,6 +1,7 @@
 package com.future.function.web.controller.communication.questionnaire;
 
 import com.future.function.common.enumeration.core.Role;
+import com.future.function.common.properties.core.FileProperties;
 import com.future.function.service.api.feature.communication.questionnaire.MyQuestionnaireService;
 import com.future.function.service.api.feature.communication.questionnaire.QuestionnaireService;
 import com.future.function.service.api.feature.core.UserService;
@@ -46,14 +47,17 @@ public class MyQuestionnaireController {
 
   private final MyQuestionnaireRequestMapper myQuestionnaireRequestMapper;
 
+  private final FileProperties fileProperties;
+
   @Autowired
   public MyQuestionnaireController(
-          MyQuestionnaireService myQuestionnaireService,
-          QuestionnaireService questionnaireService, UserService userService, MyQuestionnaireRequestMapper myQuestionnaireRequestMapper) {
+    MyQuestionnaireService myQuestionnaireService,
+    QuestionnaireService questionnaireService, UserService userService, MyQuestionnaireRequestMapper myQuestionnaireRequestMapper, FileProperties fileProperties) {
     this.myQuestionnaireService = myQuestionnaireService;
     this.questionnaireService = questionnaireService;
     this.userService = userService;
     this.myQuestionnaireRequestMapper = myQuestionnaireRequestMapper;
+    this.fileProperties = fileProperties;
   }
 
   @ResponseStatus(HttpStatus.OK)
@@ -84,7 +88,8 @@ public class MyQuestionnaireController {
             myQuestionnaireService.getListAppraisedByQuestionnaireAndMemberLoginAsAppraiser(
               questionnaireService.getQuestionnaire(questionnaireId),
               userService.getUser(session.getUserId())
-            )
+            ),
+            fileProperties.getUrlPrefix()
     );
   }
 
@@ -96,7 +101,8 @@ public class MyQuestionnaireController {
   ){
     return MyQuestionnaireResponseMapper.toDataResponseQuestionnaireSummaryDescriptionResponse(
             questionnaireService.getQuestionnaire(questionnaireId),
-            userService.getUser(appraiseeId)
+            userService.getUser(appraiseeId),
+            fileProperties.getUrlPrefix()
     );
   }
 

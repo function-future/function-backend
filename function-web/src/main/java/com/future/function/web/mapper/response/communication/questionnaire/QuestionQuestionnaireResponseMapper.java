@@ -21,14 +21,13 @@ public class QuestionQuestionnaireResponseMapper {
 
   public static List<QuestionQuestionnaireResponse> toQuestionQuestionnaireResponseList(List<QuestionQuestionnaire> questionQuestionnaires) {
     return questionQuestionnaires.stream()
-            .map(questionQuestionnaire ->
-              toQuestionQuestionnaireResponse(questionQuestionnaire)
+            .map(QuestionQuestionnaireResponseMapper::toQuestionQuestionnaireResponse
             )
             .collect(Collectors.toList());
   }
 
   public static QuestionQuestionnaireResponse toQuestionQuestionnaireResponse(QuestionQuestionnaire questionQuestionnaire) {
-      return new QuestionQuestionnaireResponse().builder()
+      return QuestionQuestionnaireResponse.builder()
             .id(questionQuestionnaire.getId())
             .questionnaireId(questionQuestionnaire.getQuestionnaire().getId())
             .description(questionQuestionnaire.getDescription())

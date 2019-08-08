@@ -20,13 +20,10 @@ public class TopicServiceImpl implements TopicService {
 
     private final LoggingRoomService loggingRoomService;
 
-    private final UserService userService;
-
     @Autowired
-    public TopicServiceImpl(TopicRepository topicRepository, LoggingRoomService loggingRoomService, UserService userService) {
+    public TopicServiceImpl(TopicRepository topicRepository, LoggingRoomService loggingRoomService) {
         this.topicRepository = topicRepository;
         this.loggingRoomService = loggingRoomService;
-        this.userService = userService;
     }
 
     @Override

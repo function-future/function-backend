@@ -19,7 +19,6 @@ import java.util.stream.Collectors;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class QuestionnaireResponseMapper {
 
-
   public static PagingResponse<QuestionnaireDetailResponse> toPagingQuestionnaireDetailResponse(
           Page<Questionnaire> data
   ) {
@@ -29,7 +28,7 @@ public class QuestionnaireResponseMapper {
   private static List<QuestionnaireDetailResponse> toQuestionnaireDetailResponseList(Page<Questionnaire> data){
     return data.getContent()
             .stream()
-            .map(questionnaire -> toQuestionnaireDetailResponse(questionnaire))
+            .map(QuestionnaireResponseMapper::toQuestionnaireDetailResponse)
             .collect(Collectors.toList());
   }
 
@@ -57,7 +56,7 @@ public class QuestionnaireResponseMapper {
   private static List<QuestionnaireSimpleSummaryResponse> toQuestionnaireSimpleSummaryResponseList(Page<QuestionnaireResponseSummary> data) {
     return data.getContent()
             .stream()
-            .map(questionnaireResponseSummary -> toQuestionnaireSimpleSummaryResponse(questionnaireResponseSummary))
+            .map(QuestionnaireResponseMapper::toQuestionnaireSimpleSummaryResponse)
             .collect(Collectors.toList());
   }
 

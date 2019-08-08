@@ -28,6 +28,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class LoggingRoomWebResponseMapperTest {
 
+  private static final String URL_PREFIX = "urlPrefix";
   private static final String DESCRIPTION = "description";
   private static final String LOGGING_ROOM_ID1 = "loggingRoomId1";
   private static final String LOGGING_ROOM_ID2 = "loggingRoomId2";
@@ -150,7 +151,8 @@ public class LoggingRoomWebResponseMapperTest {
     PagingResponse<LoggingRoomWebResponse> data =
       LoggingRoomResponseMapper.toPagingLoggingRoomResponse(
         new PageImpl<>(Arrays.asList(loggingRoom1, loggingRoom2),
-          PageHelper.toPageable(1,2), 2)
+          PageHelper.toPageable(1,2), 2),
+        URL_PREFIX
       );
 
     assertThat(data).isNotNull();
@@ -162,7 +164,8 @@ public class LoggingRoomWebResponseMapperTest {
   @Test
   public void toDataResponseLoggingRoomResponse() {
     DataResponse<LoggingRoomWebResponse> data = LoggingRoomResponseMapper.toDataResponseLoggingRoomResponse(
-      loggingRoom1
+      loggingRoom1,
+      URL_PREFIX
     );
 
     assertThat(data).isNotNull();
@@ -201,7 +204,8 @@ public class LoggingRoomWebResponseMapperTest {
     PagingResponse<LogMessageWebResponse> data =
       LoggingRoomResponseMapper.toPagingLogMessageResponse(
         new PageImpl<>(Arrays.asList(logMessage1, logMessage2),
-          PageHelper.toPageable(1,2), 2)
+          PageHelper.toPageable(1,2), 2),
+        URL_PREFIX
       );
 
     assertThat(data).isNotNull();

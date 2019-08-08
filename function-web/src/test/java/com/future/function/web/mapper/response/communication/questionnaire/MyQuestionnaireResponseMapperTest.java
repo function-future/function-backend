@@ -29,6 +29,8 @@ import static org.junit.Assert.*;
  */
 public class MyQuestionnaireResponseMapperTest {
 
+  private static final String URL_PREFIX = "urlPrefix";
+
   private static final String THUMBNAIL_URL = "thumbnail";
 
   private static final String MEMBER_ID_1 = "memberId1";
@@ -136,7 +138,8 @@ public class MyQuestionnaireResponseMapperTest {
 
     DataResponse<List<AppraiseeResponse>> data =
       MyQuestionnaireResponseMapper.toDataResponseAppraiseeResponseList(
-        Arrays.asList(QUESTIONNAIRE_PARTICIPANT)
+        Arrays.asList(QUESTIONNAIRE_PARTICIPANT),
+        URL_PREFIX
     );
 
     assertThat(data).isNotNull();
@@ -144,20 +147,21 @@ public class MyQuestionnaireResponseMapperTest {
     assertThat(data.getData().get(0).getId()).isEqualTo(MEMBER_ID_1);
     assertThat(data.getData().get(0).getName()).isEqualTo(MEMBER_NAME_1);
     assertThat(data.getData().get(0).getBatch().getId()).isEqualTo(BATCH_ID);
-    assertThat(data.getData().get(0).getAvatar()).isEqualTo(THUMBNAIL_URL);
+    assertThat(data.getData().get(0).getAvatar()).isEqualTo(URL_PREFIX.concat(THUMBNAIL_URL));
     assertThat(data.getData().get(0).getRole()).isEqualTo(Role.STUDENT.toString());
     assertThat(data.getData().get(0).getUniversity()).isEqualTo(UNIVERSITY);
 
     data = MyQuestionnaireResponseMapper.toDataResponseAppraiseeResponseList(
-        Arrays.asList(QUESTIONNAIRE_PARTICIPANT_2)
-      );
+      Arrays.asList(QUESTIONNAIRE_PARTICIPANT_2),
+      URL_PREFIX
+    );
 
     assertThat(data).isNotNull();
     assertThat(data.getCode()).isEqualTo(200);
     assertThat(data.getData().get(0).getId()).isEqualTo(MEMBER_ID_2);
     assertThat(data.getData().get(0).getName()).isEqualTo(MEMBER_NAME_2);
     assertThat(data.getData().get(0).getBatch().getId()).isEqualTo(NO_BATCH);
-    assertThat(data.getData().get(0).getAvatar()).isEqualTo(THUMBNAIL_URL);
+    assertThat(data.getData().get(0).getAvatar()).isEqualTo(URL_PREFIX.concat(THUMBNAIL_URL));
     assertThat(data.getData().get(0).getRole()).isEqualTo(Role.MENTOR.toString());
 
   }
@@ -167,7 +171,7 @@ public class MyQuestionnaireResponseMapperTest {
 
     DataResponse<AppraisalDataResponse> data =
       MyQuestionnaireResponseMapper
-        .toDataResponseQuestionnaireSummaryDescriptionResponse(QUESTIONNAIRE, MEMBER_1);
+        .toDataResponseQuestionnaireSummaryDescriptionResponse(QUESTIONNAIRE, MEMBER_1, URL_PREFIX);
 
     assertThat(data).isNotNull();
     assertThat(data.getCode()).isEqualTo(200);
@@ -188,8 +192,6 @@ public class MyQuestionnaireResponseMapperTest {
     assertThat(data.getData().get(0).getId()).isEqualTo(QUESTION_ID);
     assertThat(data.getData().get(0).getQuestionnaireId()).isEqualTo(QUESTIONNAIRE_ID_1);
     assertThat(data.getData().get(0).getDescription()).isEqualTo(QUESTION_DESCRIPTION);
-
-
   }
 
 }

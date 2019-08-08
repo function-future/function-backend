@@ -26,15 +26,13 @@ public class QuestionnaireRequestMapper {
   private Questionnaire toValidateQuestionnaire(QuestionnaireRequest questionnaireRequest, String questionnaireId) {
     validator.validate(questionnaireRequest);
 
-    Questionnaire newQuestionnaire = Questionnaire.builder()
+    return Questionnaire.builder()
       .id(questionnaireId)
       .title(questionnaireRequest.getTitle())
       .description(questionnaireRequest.getDesc())
       .startDate(questionnaireRequest.getStartDate())
       .dueDate(questionnaireRequest.getDueDate())
       .build();
-
-    return newQuestionnaire;
   }
 
 

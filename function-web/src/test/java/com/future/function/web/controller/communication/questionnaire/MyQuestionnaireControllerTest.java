@@ -2,6 +2,7 @@ package com.future.function.web.controller.communication.questionnaire;
 
 import com.future.function.common.enumeration.communication.ParticipantType;
 import com.future.function.common.enumeration.core.Role;
+import com.future.function.common.properties.core.FileProperties;
 import com.future.function.model.entity.feature.communication.questionnaire.*;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.FileV2;
@@ -55,6 +56,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import(TestSecurityConfiguration.class)
 @WebMvcTest(MyQuestionnaireController.class)
 public class MyQuestionnaireControllerTest extends TestHelper {
+
+  private static final String URL_PREFIX = "urlPrefix";
 
   private static final String USER_ID = "userId";
 
@@ -179,6 +182,9 @@ public class MyQuestionnaireControllerTest extends TestHelper {
   @MockBean
   private MyQuestionnaireRequestMapper myQuestionnaireRequestMapper;
 
+  @MockBean
+  private FileProperties fileProperties;
+
   private JacksonTester<QuestionnaireResponseRequest> questionnaireResponseRequestJaksonTester;
 
   @Override
@@ -194,7 +200,9 @@ public class MyQuestionnaireControllerTest extends TestHelper {
       myQuestionnaireService,
       questionnaireService,
       userService,
-      myQuestionnaireRequestMapper);
+      myQuestionnaireRequestMapper,
+      fileProperties
+    );
   }
 
   @Test
@@ -222,9 +230,11 @@ public class MyQuestionnaireControllerTest extends TestHelper {
     when(questionnaireService.getQuestionnaire(QUESTIONNAIRE_ID_1)).thenReturn(QUESTIONNAIRE);
     when(myQuestionnaireService.getListAppraisedByQuestionnaireAndMemberLoginAsAppraiser(QUESTIONNAIRE, USER))
       .thenReturn(Arrays.asList(QUESTIONNAIRE_PARTICIPANT, QUESTIONNAIRE_PARTICIPANT_2));
+    when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
 
     DataResponse<List<AppraiseeResponse>> response =  MyQuestionnaireResponseMapper.toDataResponseAppraiseeResponseList(
-      Arrays.asList(QUESTIONNAIRE_PARTICIPANT, QUESTIONNAIRE_PARTICIPANT_2)
+      Arrays.asList(QUESTIONNAIRE_PARTICIPANT, QUESTIONNAIRE_PARTICIPANT_2),
+      URL_PREFIX
     );
 
     mockMvc.perform(get("/api/communication/my-questionnaires/"+QUESTIONNAIRE_ID_1+"/appraisees").cookie(cookies))
@@ -234,16 +244,18 @@ public class MyQuestionnaireControllerTest extends TestHelper {
     verify(userService).getUser(any(String.class));
     verify(questionnaireService).getQuestionnaire(QUESTIONNAIRE_ID_1);
     verify(myQuestionnaireService).getListAppraisedByQuestionnaireAndMemberLoginAsAppraiser(QUESTIONNAIRE, USER);
+    verify(fileProperties).getUrlPrefix();
   }
 
   @Test
   public void getQuestionnaireData() throws Exception  {
     when(userService.getUser(MEMBER_ID_1)).thenReturn(MEMBER_1);
     when(questionnaireService.getQuestionnaire(QUESTIONNAIRE_ID_1)).thenReturn(QUESTIONNAIRE);
-
+    when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
     DataResponse<AppraisalDataResponse> response =
       MyQuestionnaireResponseMapper.toDataResponseQuestionnaireSummaryDescriptionResponse(
-        QUESTIONNAIRE, MEMBER_1
+        QUESTIONNAIRE, MEMBER_1,
+        URL_PREFIX
       );
 
     mockMvc.perform(get("/api/communication/my-questionnaires/"+QUESTIONNAIRE_ID_1+"/appraisees/"+MEMBER_ID_1).cookie(cookies))
@@ -251,6 +263,7 @@ public class MyQuestionnaireControllerTest extends TestHelper {
       .andExpect(content().json(dataResponseJacksonTester.write(response).getJson()));
 
 
+    verify(fileProperties).getUrlPrefix();
     verify(userService).getUser(MEMBER_ID_1);
     verify(questionnaireService).getQuestionnaire(QUESTIONNAIRE_ID_1);
 

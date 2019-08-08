@@ -11,7 +11,6 @@ import com.future.function.model.entity.feature.core.User;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.feature.communication.questionnaire.AppraiseeResponse;
-import com.future.function.web.model.response.feature.communication.questionnaire.QuestionAnswerDetailResponse;
 import com.future.function.web.model.response.feature.communication.questionnaire.QuestionAnswerResponse;
 import com.future.function.web.model.response.feature.communication.questionnaire.QuestionQuestionnaireResponse;
 import com.future.function.web.model.response.feature.communication.questionnaire.QuestionQuestionnaireSummaryResponse;
@@ -29,17 +28,22 @@ import java.util.stream.Collectors;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class QuestionnaireResponseSummaryResponseMapper {
 
-  public static DataResponse<QuestionnaireSummaryDescriptionResponse> toDataResponseQuestionnaireDataSummaryDescription(
-    QuestionnaireResponseSummary questionnaireResponseSummary){
+  private static final String NO_BATCH = "No Batch";
 
-    return ResponseHelper.toDataResponse(HttpStatus.OK, toQuestionnaireSummaryDescriptionResponse(questionnaireResponseSummary));
+  public static DataResponse<QuestionnaireSummaryDescriptionResponse> toDataResponseQuestionnaireDataSummaryDescription(
+    QuestionnaireResponseSummary questionnaireResponseSummary,
+    String urlPrefix){
+
+    return ResponseHelper.toDataResponse(HttpStatus.OK, toQuestionnaireSummaryDescriptionResponse(questionnaireResponseSummary, urlPrefix));
   }
 
   private static QuestionnaireSummaryDescriptionResponse toQuestionnaireSummaryDescriptionResponse(
-    QuestionnaireResponseSummary questionnaireResponseSummary) {
+    QuestionnaireResponseSummary questionnaireResponseSummary,
+    String urlPrefix
+  ) {
     return QuestionnaireSummaryDescriptionResponse.builder()
             .questionnaireDetail(toQuestionnaireDetailResponse(questionnaireResponseSummary.getQuestionnaire()))
-            .appraisee(toAppraiseeResponse(questionnaireResponseSummary.getAppraisee()))
+            .appraisee(toAppraiseeResponse(questionnaireResponseSummary.getAppraisee(), urlPrefix))
             .rating(questionnaireResponseSummary.getScoreSummary().getAverage())
             .build();
   }
@@ -54,11 +58,11 @@ public class QuestionnaireResponseSummaryResponseMapper {
             .build();
   }
 
-  private static AppraiseeResponse toAppraiseeResponse(User appraisee) {
+  private static AppraiseeResponse toAppraiseeResponse(User appraisee, String urlPrefix) {
     return AppraiseeResponse.builder()
             .id(appraisee.getId())
             .name(appraisee.getName())
-            .avatar(getThumnailUrl(appraisee))
+            .avatar(getThumnailUrl(appraisee, urlPrefix))
             .batch(toBatchResponse(appraisee.getBatch()))
             .university(appraisee.getUniversity())
             .build();
@@ -67,9 +71,9 @@ public class QuestionnaireResponseSummaryResponseMapper {
   private static BatchWebResponse toBatchResponse(Batch batch) {
     if(batch == null) {
       return BatchWebResponse.builder()
-              .id("No Batch")
-              .name("No Batch")
-              .code("No Batch")
+              .id(NO_BATCH)
+              .name(NO_BATCH)
+              .code(NO_BATCH)
               .build();
     }
     return BatchWebResponse.builder()
@@ -86,7 +90,7 @@ public class QuestionnaireResponseSummaryResponseMapper {
 
   private static List<QuestionQuestionnaireSummaryResponse> toListQuestionQuestionnaireSummaryResponse(List<QuestionResponseSummary> data) {
     return data.stream()
-            .map(questionResponseSummary -> toQuestionQuestionnaireSummaryResponse(questionResponseSummary))
+            .map(QuestionnaireResponseSummaryResponseMapper::toQuestionQuestionnaireSummaryResponse)
             .collect(Collectors.toList());
   }
 
@@ -112,34 +116,35 @@ public class QuestionnaireResponseSummaryResponseMapper {
   }
 
 
-  public static DataResponse<List<QuestionAnswerResponse>> toDataResponseQuestionAnswerDetailResponse(List<QuestionResponse> questionResponseByQuestionResponseSummary) {
-    return ResponseHelper.toDataResponse(
-            HttpStatus.OK,
-            toQuestionAnswerReponseList(
-                    questionResponseByQuestionResponseSummary)
+  public static DataResponse<List<QuestionAnswerResponse>> toDataResponseQuestionAnswerDetailResponse(
+    List<QuestionResponse> questionResponseByQuestionResponseSummary, String urlPrefix) {
+      return ResponseHelper.toDataResponse(
+              HttpStatus.OK,
+              toQuestionAnswerReponseList(questionResponseByQuestionResponseSummary, urlPrefix)
     );
   }
 
-  private static List<QuestionAnswerResponse> toQuestionAnswerReponseList(List<QuestionResponse> data) {
+  private static List<QuestionAnswerResponse> toQuestionAnswerReponseList(List<QuestionResponse> data, String urlPrefix) {
     return data.stream()
-            .map(questionResponse -> toQuestionAnswerReponse(questionResponse))
+            .map((questionResponse) -> toQuestionAnswerReponse(questionResponse, urlPrefix))
             .collect(Collectors.toList());
 
   }
 
-  private static QuestionAnswerResponse toQuestionAnswerReponse(QuestionResponse questionResponse) {
+  private static QuestionAnswerResponse toQuestionAnswerReponse(QuestionResponse questionResponse, String urlPrefix) {
     return QuestionAnswerResponse.builder()
             .name(questionResponse.getAppraiser().getName())
-            .avatar(getThumnailUrl(questionResponse.getAppraiser()))
+            .avatar(getThumnailUrl(questionResponse.getAppraiser(), urlPrefix))
             .score(questionResponse.getScore())
             .build();
 
   }
 
-  private static String getThumnailUrl(User user) {
+  private static String getThumnailUrl(User user, String urlPrefix) {
     return Optional.ofNullable(user)
       .map(User::getPictureV2)
       .map(FileV2::getThumbnailUrl)
+      .map(urlPrefix::concat)
       .orElse(null);
   }
 

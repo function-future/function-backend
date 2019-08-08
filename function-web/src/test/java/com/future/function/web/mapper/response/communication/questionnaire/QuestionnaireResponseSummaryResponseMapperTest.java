@@ -28,6 +28,7 @@ import static org.junit.Assert.*;
  */
 public class QuestionnaireResponseSummaryResponseMapperTest {
 
+  private static final String URL_PREFIX = "urlPrefix";
 
   private static final String QUESTIONNAIRE_ID_1 = "questionnaireId1";
 
@@ -139,7 +140,8 @@ public class QuestionnaireResponseSummaryResponseMapperTest {
     DataResponse<QuestionnaireSummaryDescriptionResponse> data =
       QuestionnaireResponseSummaryResponseMapper
         .toDataResponseQuestionnaireDataSummaryDescription(
-          QUESTIONNAIRE_RESPONSE_SUMMARY
+          QUESTIONNAIRE_RESPONSE_SUMMARY,
+          URL_PREFIX
         );
 
     assertThat(data).isNotNull();
@@ -150,7 +152,8 @@ public class QuestionnaireResponseSummaryResponseMapperTest {
 
     data = QuestionnaireResponseSummaryResponseMapper
         .toDataResponseQuestionnaireDataSummaryDescription(
-          QUESTIONNAIRE_RESPONSE_SUMMARY_2
+          QUESTIONNAIRE_RESPONSE_SUMMARY_2,
+          URL_PREFIX
         );
 
     assertThat(data).isNotNull();
@@ -187,13 +190,14 @@ public class QuestionnaireResponseSummaryResponseMapperTest {
   public void toDataResponseQuestionAnswerDetailResponse() {
     DataResponse<List<QuestionAnswerResponse>> data =
       QuestionnaireResponseSummaryResponseMapper.toDataResponseQuestionAnswerDetailResponse(
-        Arrays.asList(QUESTION_RESPONSE)
+        Arrays.asList(QUESTION_RESPONSE),
+        URL_PREFIX
       );
 
     assertThat(data).isNotNull();
     assertThat(data.getCode()).isEqualTo(200);
     assertThat(data.getData().get(0).getName()).isEqualTo(MEMBER_NAME_1);
-    assertThat(data.getData().get(0).getAvatar()).isEqualTo(THUMBNAIL_URL);
+    assertThat(data.getData().get(0).getAvatar()).isEqualTo(URL_PREFIX.concat(THUMBNAIL_URL));
 
 
   }

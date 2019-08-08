@@ -2,6 +2,7 @@ package com.future.function.web.controller.communication.questionnaire;
 
 import com.future.function.common.enumeration.communication.ParticipantType;
 import com.future.function.common.enumeration.core.Role;
+import com.future.function.common.properties.core.FileProperties;
 import com.future.function.model.entity.feature.communication.questionnaire.QuestionQuestionnaire;
 import com.future.function.model.entity.feature.communication.questionnaire.Questionnaire;
 import com.future.function.model.entity.feature.communication.questionnaire.QuestionnaireParticipant;
@@ -28,6 +29,7 @@ import com.future.function.web.model.response.feature.communication.questionnair
 import com.future.function.web.model.response.feature.communication.questionnaire.QuestionnaireDetailResponse;
 import com.future.function.web.model.response.feature.communication.questionnaire.QuestionnaireParticipantDescriptionResponse;
 import com.future.function.web.model.response.feature.communication.questionnaire.QuestionnaireParticipantResponse;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -47,9 +49,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -65,6 +65,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import(TestSecurityConfiguration.class)
 @WebMvcTest(QuestionnaireController.class)
 public class QuestionnaireControllerTest extends TestHelper {
+
+  private static final String URL_PREFIX = "urlPrefix";
 
   private static final String BATCH_ID = "batchId";
 
@@ -167,6 +169,9 @@ public class QuestionnaireControllerTest extends TestHelper {
   @MockBean
   private QuestionQuestionnaireRequestMapper questionQuestionnaireRequestMapper;
 
+  @MockBean
+  private FileProperties fileProperties;
+
   private JacksonTester<QuestionnaireRequest> questionnaireRequestJacksonTester;
 
   private JacksonTester<QuestionQuestionnaireRequest> questionQuestionnaireRequestJacksonTester;
@@ -178,6 +183,17 @@ public class QuestionnaireControllerTest extends TestHelper {
   public void setUp() {
     super.setUp();
     super.setCookie(Role.ADMIN);
+  }
+
+  @After
+  public void tearDown() {
+    verifyNoMoreInteractions(
+      questionnaireService,
+      userService,
+      questionnaireRequestMapper,
+      questionQuestionnaireRequestMapper,
+      fileProperties
+    );
   }
 
   @Test
@@ -449,11 +465,13 @@ public class QuestionnaireControllerTest extends TestHelper {
 
     when(questionnaireService.getQuestionnaireAppraiser(QUESTIONNAIRE, PAGEABLE))
       .thenReturn(QUESTIONNAIRE_PARTICIPANT_PAGE);
-
+    when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
     PagingResponse<QuestionnaireParticipantDescriptionResponse> response =
       QuestionnaireParticipantResponseMapper
         .toPagingParticipantDescriptionResponse(
-          QUESTIONNAIRE_PARTICIPANT_PAGE);
+          QUESTIONNAIRE_PARTICIPANT_PAGE,
+          URL_PREFIX
+        );
 
     mockMvc.perform(
       get("/api/communication/questionnaires/"
@@ -464,9 +482,9 @@ public class QuestionnaireControllerTest extends TestHelper {
       .andExpect(status().isOk())
       .andExpect(content().json(pagingResponseJacksonTester.write(response).getJson()));
 
+    verify(fileProperties).getUrlPrefix();
     verify(questionnaireService)
       .getQuestionnaire(QUESTIONNAIRE_ID_1);
-
     verify(questionnaireService).getQuestionnaireAppraiser(QUESTIONNAIRE, PAGEABLE);
   }
 
@@ -521,10 +539,14 @@ public class QuestionnaireControllerTest extends TestHelper {
     when(questionnaireService.getQuestionnaireAppraisee(QUESTIONNAIRE, PAGEABLE))
       .thenReturn(QUESTIONNAIRE_PARTICIPANT_PAGE);
 
+    when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
+
     PagingResponse<QuestionnaireParticipantDescriptionResponse> response =
       QuestionnaireParticipantResponseMapper
         .toPagingParticipantDescriptionResponse(
-          QUESTIONNAIRE_PARTICIPANT_PAGE);
+          QUESTIONNAIRE_PARTICIPANT_PAGE,
+          URL_PREFIX
+        );
 
     mockMvc.perform(
       get("/api/communication/questionnaires/"
@@ -535,6 +557,7 @@ public class QuestionnaireControllerTest extends TestHelper {
       .andExpect(status().isOk())
       .andExpect(content().json(pagingResponseJacksonTester.write(response).getJson()));
 
+    verify(fileProperties).getUrlPrefix();
     verify(questionnaireService)
       .getQuestionnaire(QUESTIONNAIRE_ID_1);
 
