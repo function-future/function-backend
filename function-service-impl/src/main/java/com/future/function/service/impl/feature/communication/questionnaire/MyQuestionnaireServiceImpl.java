@@ -118,8 +118,8 @@ public class MyQuestionnaireServiceImpl implements MyQuestionnaireService {
       User appraisee) {
 
     Answer scoreSummary = Answer.builder()
-            .maximum(0)
-            .minimum(6)
+            .maximum(0F)
+            .minimum(6F)
             .build();
 
     Float avarageScore = new Float(0.0);

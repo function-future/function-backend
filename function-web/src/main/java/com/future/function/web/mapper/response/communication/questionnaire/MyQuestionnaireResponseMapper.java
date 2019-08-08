@@ -33,7 +33,6 @@ public class MyQuestionnaireResponseMapper {
     List<QuestionnaireParticipant> data,
     String urlPrefix
   ) {
-
     return ResponseHelper.toDataResponse(
             HttpStatus.OK,
             toAppraiseeResponseList(data, urlPrefix)

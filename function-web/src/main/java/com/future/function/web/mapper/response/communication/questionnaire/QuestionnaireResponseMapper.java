@@ -19,7 +19,6 @@ import java.util.stream.Collectors;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class QuestionnaireResponseMapper {
 
-
   public static PagingResponse<QuestionnaireDetailResponse> toPagingQuestionnaireDetailResponse(
           Page<Questionnaire> data
   ) {

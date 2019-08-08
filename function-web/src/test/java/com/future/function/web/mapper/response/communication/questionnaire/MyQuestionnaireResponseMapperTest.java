@@ -192,8 +192,6 @@ public class MyQuestionnaireResponseMapperTest {
     assertThat(data.getData().get(0).getId()).isEqualTo(QUESTION_ID);
     assertThat(data.getData().get(0).getQuestionnaireId()).isEqualTo(QUESTIONNAIRE_ID_1);
     assertThat(data.getData().get(0).getDescription()).isEqualTo(QUESTION_DESCRIPTION);
-
-
   }
 
 }

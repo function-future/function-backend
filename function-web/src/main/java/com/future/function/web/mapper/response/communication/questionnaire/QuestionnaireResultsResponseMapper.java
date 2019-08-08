@@ -42,7 +42,7 @@ public class QuestionnaireResultsResponseMapper {
   private static List<UserSummaryResponse> toUserSummaryResponseList(Page<UserQuestionnaireSummary> data, String urlPrefix) {
     return data.getContent()
             .stream()
-            .map((UserQuestionnaireSummary userSummary) -> toUserSummaryResponse(userSummary, urlPrefix))
+            .map((userSummary) -> toUserSummaryResponse(userSummary, urlPrefix))
             .collect(Collectors.toList());
   }
 

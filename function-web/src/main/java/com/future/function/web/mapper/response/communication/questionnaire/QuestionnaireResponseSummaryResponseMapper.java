@@ -126,7 +126,7 @@ public class QuestionnaireResponseSummaryResponseMapper {
 
   private static List<QuestionAnswerResponse> toQuestionAnswerReponseList(List<QuestionResponse> data, String urlPrefix) {
     return data.stream()
-            .map((QuestionResponse questionResponse) -> toQuestionAnswerReponse(questionResponse, urlPrefix))
+            .map((questionResponse) -> toQuestionAnswerReponse(questionResponse, urlPrefix))
             .collect(Collectors.toList());
 
   }

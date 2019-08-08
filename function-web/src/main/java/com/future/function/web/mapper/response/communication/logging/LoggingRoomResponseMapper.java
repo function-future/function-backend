@@ -115,7 +115,7 @@ public class LoggingRoomResponseMapper {
   private static List<LogMessageWebResponse> toLogMessageResponseList(Page<LogMessage> data, String urlPrefix) {
     return data.getContent()
             .stream()
-            .map((LogMessage logMessage) -> toLogMessageResponse(logMessage, urlPrefix))
+            .map((logMessage) -> toLogMessageResponse(logMessage, urlPrefix))
             .collect(Collectors.toList());
   }
 

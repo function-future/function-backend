@@ -33,7 +33,7 @@ public class QuestionnaireParticipantResponseMapper {
   ){
     return data.getContent()
             .stream()
-            .map((QuestionnaireParticipant questionnaireParticipant) -> toParticipantDescriptionResposne(questionnaireParticipant, urlPrefix))
+            .map((questionnaireParticipant) -> toParticipantDescriptionResposne(questionnaireParticipant, urlPrefix))
             .collect(Collectors.toList());
   }
 
