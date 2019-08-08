@@ -50,14 +50,19 @@ public enum IndexName {
     FieldName.ActivityBlog.USER + ".$" + FieldName.BaseEntity.ID,
     FieldName.ActivityBlog.TITLE, FieldName.ActivityBlog.DESCRIPTION
   ),
+  ACTIVITY_BLOG_TITLE(FieldName.ActivityBlog.TITLE),
+  ACTIVITY_BLOG_USER_ID_TITLE(
+    FieldName.ActivityBlog.USER + ".$" + FieldName.BaseEntity.ID,
+    FieldName.ActivityBlog.TITLE
+  ),
   MENU_ROLE(FieldName.Menu.ROLE),
   ACCESS_ROLE(FieldName.Access.ROLE);
-  
+
   private String[] fields;
-  
+
   IndexName(String... fields) {
-    
+
     this.fields = fields;
   }
-  
+
 }

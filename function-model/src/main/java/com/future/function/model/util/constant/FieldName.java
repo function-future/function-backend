@@ -82,7 +82,7 @@ public interface FieldName {
     public static final String NAME = "name";
 
     public static final String PARENT_ID = "parentId";
-    
+
     public static final String PATHS = "paths";
 
     public static final String USED = "used";
@@ -92,7 +92,7 @@ public interface FieldName {
     public static final String AS_RESOURCE = "asResource";
 
     public static final String VERSIONS = "versions";
-    
+
     public static final String USER = "user";
 
   }
@@ -106,7 +106,7 @@ public interface FieldName {
 
     public static final String DESCRIPTION = "description";
 
-    public static final String FILE = "file";
+    public static final String FILES = "files";
 
   }
 
