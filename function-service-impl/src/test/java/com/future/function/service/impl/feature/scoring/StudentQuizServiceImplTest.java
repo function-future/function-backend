@@ -297,6 +297,12 @@ public class StudentQuizServiceImplTest {
   }
 
   @Test
+  public void createStudentQuizAndSaveRequestQuizIsNull() {
+    catchException(() -> studentQuizService.createStudentQuizAndSave(USER_ID, null));
+    assertThat(caughtException().getClass()).isEqualTo(UnsupportedOperationException.class);
+  }
+
+  @Test
   public void createStudentQuizByBatchCode() {
     Quiz actual = studentQuizService.createStudentQuizByBatchCode(BATCH_CODE, quiz);
     assertThat(actual.getBatch().getCode()).isEqualTo(BATCH_CODE);

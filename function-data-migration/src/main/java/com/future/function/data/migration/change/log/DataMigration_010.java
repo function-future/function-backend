@@ -66,7 +66,7 @@ public class DataMigration_010 {
   public void insertAllScoringListAndDetailPageAccessList(MongoTemplate mongoTemplate) {
 
     String urlRegex = "^\\/batches\\/[A-Za-z0-9\\-]+\\" +
-        "/(assignments|quizzes|final-judgings)(\\/|\\/[A-Za-z0-9\\-]+)?(\\/|\\" +
+        "/(assignments|quizzes|final-judging)(\\/|\\/[A-Za-z0-9\\-]+)?(\\/|\\" +
         "/(detail|addDetail|add)(\\/)?)?$";
 
     Map<String, Object> adminComponents = new HashMap<>();
@@ -295,7 +295,7 @@ public class DataMigration_010 {
   @ChangeSet(author = "oliver", id = "finalJudgingComparisonAccessList", order = "0006")
   public void insertFinalJudgingComparisonAccessList(MongoTemplate mongoTemplate) {
 
-    String urlRegex = "^\\/batches\\/.*\\/final-judgings\\/.*\\/comparison(\\/)?$";
+    String urlRegex = "^\\/batches\\/.*\\/final-judging\\/.*\\/comparison(\\/)?$";
 
     Map<String, Object> onlyReadComponents = new HashMap<>();
     onlyReadComponents.put("add", false);
