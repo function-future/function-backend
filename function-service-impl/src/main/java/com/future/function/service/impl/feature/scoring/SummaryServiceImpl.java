@@ -13,6 +13,7 @@ import com.future.function.service.api.feature.scoring.RoomService;
 import com.future.function.service.api.feature.scoring.StudentQuizService;
 import com.future.function.service.api.feature.scoring.SummaryService;
 import com.future.function.service.impl.helper.AuthorizationHelper;
+import java.util.stream.IntStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
@@ -56,7 +57,15 @@ public class SummaryServiceImpl implements SummaryService {
                 .university(pair.getFirst().getUniversity())
                 .avatar(getNullableUserPicture(pair.getFirst()))
                 .scores(pair.getSecond())
+                .totalPoint(getTotalPointFromSummaryVOList(pair.getSecond()))
                 .build();
+    }
+
+    private Integer getTotalPointFromSummaryVOList(List<SummaryVO> summaryVOList) {
+        return summaryVOList
+            .stream()
+            .map(SummaryVO::getPoint)
+            .reduce(0, Integer::sum);
     }
 
     private String getNullableUserPicture(User user) {
