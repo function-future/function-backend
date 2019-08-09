@@ -8,6 +8,7 @@ import com.future.function.service.api.feature.communication.ChatroomService;
 import com.future.function.service.api.feature.communication.MessageService;
 import com.future.function.service.api.feature.core.UserService;
 import com.future.function.service.impl.helper.PageHelper;
+import com.future.function.session.model.Session;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -38,63 +39,63 @@ public class MessageServiceImpl implements MessageService {
   }
 
   @Override
-  public Message getMessage(String messageId) {
+  public Message getMessage(String messageId, Session session) {
     return Optional.of(messageId)
             .map(messageRepository::findOne)
             .orElseThrow(() -> new NotFoundException("Message not found"));
   }
 
   @Override
-  public Page<Message> getMessages(String chatroomId, Pageable pageable) {
+  public Page<Message> getMessages(String chatroomId, Pageable pageable, Session session) {
     if (chatroomId.equalsIgnoreCase("public")) {
       Chatroom publicChatroom = chatroomService.getPublicChatroom();
       chatroomId = publicChatroom.getId();
     }
     return Optional.of(chatroomId)
-            .map(chatroomService::getChatroom)
+            .map(id -> chatroomService.getChatroom(id, session))
             .map(chatroom -> messageRepository.findAllByChatroomOrderByCreatedAtDesc(chatroom, pageable))
             .orElse(PageHelper.empty(pageable));
   }
 
   @Override
-  public Page<Message> getMessagesAfterPivot(String chatroomId, String messageId, Pageable pageable) {
+  public Page<Message> getMessagesAfterPivot(String chatroomId, String messageId, Pageable pageable, Session session) {
     if (chatroomId.equalsIgnoreCase("public")) {
       Chatroom publicChatroom = chatroomService.getPublicChatroom();
       chatroomId = publicChatroom.getId();
     }
     return Optional.of(chatroomId)
-            .map(chatroomService::getChatroom)
+            .map(id -> chatroomService.getChatroom(id, session))
             .map(chatroom -> messageRepository
                     .findAllByChatroomAndIdGreaterThanOrderByCreatedAtDesc(chatroom, new ObjectId(messageId), pageable))
             .orElse(PageHelper.empty(pageable));
   }
 
   @Override
-  public Page<Message> getMessagesBeforePivot(String chatroomId, String messageId, Pageable pageable) {
+  public Page<Message> getMessagesBeforePivot(String chatroomId, String messageId, Pageable pageable, Session session) {
     if (chatroomId.equalsIgnoreCase("public")) {
       Chatroom publicChatroom = chatroomService.getPublicChatroom();
       chatroomId = publicChatroom.getId();
     }
     return Optional.of(chatroomId)
-            .map(chatroomService::getChatroom)
+            .map(id -> chatroomService.getChatroom(id, session))
             .map(chatroom -> messageRepository
                     .findAllByChatroomAndIdLessThanOrderByCreatedAtDesc(chatroom, new ObjectId(messageId), pageable))
             .orElse(PageHelper.empty(pageable));
   }
 
   @Override
-  public Message getLastMessage(String chatroomId) {
+  public Message getLastMessage(String chatroomId, Session session) {
     return Optional.of(chatroomId)
-            .map(chatroomService::getChatroom)
+            .map(id -> chatroomService.getChatroom(id, session))
             .map(messageRepository::findFirstByChatroomOrderByCreatedAtDesc)
             .orElse(null);
   }
 
   @Override
-  public Message createMessage(Message message) {
+  public Message createMessage(Message message, Session session) {
     return Optional.of(message)
             .map(this::setSender)
-            .map(this::setChatroom)
+            .map(msg -> this.setChatroom(msg, session))
             .map(messageRepository::save)
             .orElseThrow(UnsupportedOperationException::new);
   }
@@ -104,10 +105,10 @@ public class MessageServiceImpl implements MessageService {
     return message;
   }
 
-  private Message setChatroom(Message message) {
-    Chatroom chatroom = chatroomService.getChatroom(message.getChatroom().getId());
+  private Message setChatroom(Message message, Session session) {
+    Chatroom chatroom = chatroomService.getChatroom(message.getChatroom().getId(), session);
     chatroom.setUpdatedAt(new Date().getTime());
-    message.setChatroom(chatroomService.updateChatroom(chatroom));
+    message.setChatroom(chatroomService.updateChatroom(chatroom, session));
     return message;
   }
 

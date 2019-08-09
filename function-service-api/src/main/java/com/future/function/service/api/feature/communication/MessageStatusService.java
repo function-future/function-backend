@@ -1,6 +1,7 @@
 package com.future.function.service.api.feature.communication;
 
 import com.future.function.model.entity.feature.communication.chatting.MessageStatus;
+import com.future.function.session.model.Session;
 
 import java.util.List;
 
@@ -10,16 +11,16 @@ import java.util.List;
  */
 public interface MessageStatusService {
 
-  List<MessageStatus> getUnseenMessageStatus(String chatroomId, String userId);
+  List<MessageStatus> getUnseenMessageStatus(String chatroomId, String userId, Session session);
 
-  List<MessageStatus> getUnseenMessageStatusBeforeTimestamp(String chatroomId, String userId, Long timestamp);
+  List<MessageStatus> getUnseenMessageStatusBeforeTimestamp(String chatroomId, String userId, Long timestamp, Session session);
 
-  boolean getSeenStatus(String chatroomId, String userId);
+  boolean getSeenStatus(String chatroomId, String userId, Session session);
 
-  MessageStatus createMessageStatus(MessageStatus messageStatus);
+  MessageStatus createMessageStatus(MessageStatus messageStatus, Session session);
 
-  void updateSeenStatus(String chatroomId, String messageId, String userId);
+  void updateSeenStatus(String chatroomId, String messageId, String userId, Session session);
 
-  MessageStatus updateMessageStatus(MessageStatus messageStatus);
+  MessageStatus updateMessageStatus(MessageStatus messageStatus, Session session);
 
 }
