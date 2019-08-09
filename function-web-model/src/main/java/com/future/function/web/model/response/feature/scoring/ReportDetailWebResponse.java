@@ -22,5 +22,6 @@ public class ReportDetailWebResponse {
     private String avatar;
     private List<SummaryWebResponse> scores;
     private Integer point;
+    private Integer totalPoint;
 
 }
