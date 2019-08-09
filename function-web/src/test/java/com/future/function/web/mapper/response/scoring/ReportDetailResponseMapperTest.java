@@ -30,6 +30,7 @@ public class ReportDetailResponseMapperTest {
     private static final String FILE_URL = "file-url";
     private static final String URL_PREFIX = "urlPrefix";
     private static final int POINT = 100;
+    private static final int TOTAL_POINT = 100;
 
     private ReportDetail reportDetail;
     private FileV2 fileV2;
@@ -52,7 +53,7 @@ public class ReportDetailResponseMapperTest {
         student = User.builder().name(STUDENT_NAME).batch(batch).university(UNIVERSITY).pictureV2(fileV2).build();
         reportDetail = ReportDetail.builder().id(REPORT_DETAIL_ID).user(student).point(0).build();
         studentSummaryVO = StudentSummaryVO.builder().studentName(STUDENT_NAME).batchCode(BATCH_CODE)
-                .university(UNIVERSITY).avatar(FILE_URL).scores(Collections.singletonList(summaryVO)).build();
+                .university(UNIVERSITY).avatar(FILE_URL).scores(Collections.singletonList(summaryVO)).totalPoint(TOTAL_POINT).build();
     }
 
     @After
@@ -89,4 +90,16 @@ public class ReportDetailResponseMapperTest {
         assertThat(actual.getData().get(0).getUniversity()).isEqualTo(UNIVERSITY);
         assertThat(actual.getData().get(0).getAvatar()).isEqualTo(URL_PREFIX + FILE_URL);
     }
+
+  @Test
+  public void toDataListReportDetailWebResponseWithEmptyAvatar() {
+      studentSummaryVO.setAvatar("");
+    DataResponse<List<ReportDetailWebResponse>> actual = ReportDetailResponseMapper.toDataListReportDetailWebResponse(
+        Collections.singletonList(studentSummaryVO), URL_PREFIX);
+    assertThat(actual.getData().get(0).getBatchCode()).isEqualTo(BATCH_CODE);
+    assertThat(actual.getData().get(0).getStudentName()).isEqualTo(STUDENT_NAME);
+    assertThat(actual.getData().get(0).getUniversity()).isEqualTo(UNIVERSITY);
+    assertThat(actual.getData().get(0).getAvatar()).isNull();
+    assertThat(actual.getData().get(0).getScores().get(0).getTitle()).isEqualTo(TITLE);
+  }
 }

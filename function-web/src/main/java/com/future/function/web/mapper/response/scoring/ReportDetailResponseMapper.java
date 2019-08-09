@@ -33,9 +33,10 @@ public class ReportDetailResponseMapper {
             .studentName(summaryDTO.getStudentName())
             .batchCode(summaryDTO.getBatchCode())
             .university(summaryDTO.getUniversity())
-                .avatar(urlPrefix.concat(summaryDTO.getAvatar()))
+            .avatar(getNullableAvatar(summaryDTO.getAvatar(), urlPrefix))
             .scores(ScoreSummaryResponseMapper.toDataListSummaryResponse(summaryDTO.getScores()).getData())
-                .point(summaryDTO.getPoint())
+            .point(summaryDTO.getPoint())
+            .totalPoint(summaryDTO.getTotalPoint())
                 .build();
     }
 
@@ -54,6 +55,13 @@ public class ReportDetailResponseMapper {
                 .avatar(getNullableUserAvatar(reportDetail.getUser(), urlPrefix))
                 .point(reportDetail.getPoint())
                 .build();
+    }
+
+    private static String getNullableAvatar(String fileUrl, String urlPrefix) {
+        return Optional.ofNullable(fileUrl)
+            .filter(string -> !string.equals(""))
+            .map(urlPrefix::concat)
+            .orElse(null);
     }
 
     private static String getNullableUserAvatar(User user, String urlPrefix) {
