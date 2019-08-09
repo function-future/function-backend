@@ -151,29 +151,6 @@ public class UserControllerTest extends TestHelper {
   }
 
   @Test
-  public void testGivenCallToUsersApiByGettingStudentsWithinBatchFromUserServiceReturnPagingResponseOfUsers()
-      throws Exception {
-
-    super.setCookie(Role.ADMIN);
-  
-    when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
-
-    given(userService.getStudentsWithinBatch(NUMBER, PAGEABLE)).willReturn(
-        new PageImpl<>(STUDENTS_LIST, PAGEABLE, STUDENTS_LIST.size()));
-
-    mockMvc.perform(get("/api/core/users/batches/" + NUMBER).cookie(cookies)
-        .param("role", Role.STUDENT.name()))
-        .andExpect(status().isOk())
-        .andExpect(content().json(
-            pagingResponseJacksonTester.write(PAGING_RESPONSE)
-                .getJson()));
-
-    verify(fileProperties).getUrlPrefix();
-    verify(userService).getStudentsWithinBatch(NUMBER, PAGEABLE);
-    verifyZeroInteractions(userRequestMapper);
-  }
-
-  @Test
   public void testGivenEmailFromPathVariableByDeletingUserByEmailReturnBaseResponseOK()
     throws Exception {
 

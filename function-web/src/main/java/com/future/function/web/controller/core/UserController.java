@@ -146,34 +146,6 @@ public class UserController {
   }
 
   /**
-   * Retrieves students based on given parameters.
-   *
-   * @param batchCode Specified batchCode for data to be retrieved.
-   * @param page Current page of data.
-   *
-   * @return {@code PagingResponse<UserWebResponse>} - The retrieved users data,
-   * wrapped in
-   * {@link com.future.function.web.model.response.base.PagingResponse} and
-   * {@link com.future.function.web.model.response.feature.core.UserWebResponse}
-   */
-  @ResponseStatus(HttpStatus.OK)
-  @GetMapping(value = "/batches/{batchCode}", produces = MediaType.APPLICATION_JSON_VALUE)
-  public PagingResponse<UserWebResponse> getStudentsWithinBatch(
-      @WithAnyRole(roles = Role.ADMIN)
-          Session session,
-      @PathVariable String batchCode,
-      @RequestParam(required = false,
-          defaultValue = "1")
-          int page
-  ) {
-
-    return UserResponseMapper.toUsersPagingResponse(
-        userService.getStudentsWithinBatch(batchCode,
-                                           PageHelper.toPageable(page, 10)),
-        fileProperties.getUrlPrefix());
-  }
-
-  /**
    * Updates existing user in database.
    *
    * @param userId Id of to-be-updated user.
