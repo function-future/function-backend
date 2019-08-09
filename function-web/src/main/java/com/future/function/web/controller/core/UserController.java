@@ -204,7 +204,7 @@ public class UserController {
   }
   
   @ResponseStatus(HttpStatus.OK)
-  @GetMapping(value = "/search")
+  @GetMapping(value = "/_search")
   public PagingResponse<UserWebResponse> getUsersByName(
     @WithAnyRole(roles = { Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT })
       Session session,
