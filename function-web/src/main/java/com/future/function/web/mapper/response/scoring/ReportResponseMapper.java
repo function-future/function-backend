@@ -1,13 +1,11 @@
 package com.future.function.web.mapper.response.scoring;
 
-import com.future.function.model.entity.feature.core.User;
 import com.future.function.model.entity.feature.scoring.Report;
 import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.mapper.response.core.UserResponseMapper;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
-import com.future.function.web.model.response.feature.core.UserWebResponse;
 import com.future.function.web.model.response.feature.scoring.ReportWebResponse;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -24,15 +22,6 @@ public class ReportResponseMapper {
   public static DataResponse<ReportWebResponse> toDataReportWebResponse(Report report, String urlPrefix) {
     return ResponseHelper.toDataResponse(HttpStatus.OK,
                                          buildReportWebResponse(report, urlPrefix));
-  }
-
-  private static List<UserWebResponse> mapStudentsToWebResponse(
-    List<User> students, String urlPrefix
-  ) {
-    return students.stream()
-        .map(student -> UserResponseMapper.toUserDataResponse(student, urlPrefix))
-        .map(DataResponse::getData)
-        .collect(Collectors.toList());
   }
 
   public static DataResponse<ReportWebResponse> toDataReportWebResponse(HttpStatus httpStatus, Report report, String urlPrefix) {
@@ -56,7 +45,7 @@ public class ReportResponseMapper {
             .description(value.getDescription())
             .batchCode(value.getBatch().getCode())
             .studentCount(value.getStudents().size())
-            .students(mapStudentsToWebResponse(value.getStudents(), urlPrefix))
+            .students(UserResponseMapper.toUserWebResponseList(value.getStudents(), urlPrefix))
             .uploadedDate(value.getCreatedAt())
             .build())
         .orElseThrow(() -> new UnsupportedOperationException("Failed at #buildReportWebResponse #ReportResponseMapper"));

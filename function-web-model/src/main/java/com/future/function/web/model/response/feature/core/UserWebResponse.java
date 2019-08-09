@@ -37,5 +37,8 @@ public class UserWebResponse {
   
   @JsonInclude(value = JsonInclude.Include.NON_NULL)
   private String university;
-  
+
+  @JsonInclude(value = JsonInclude.Include.NON_NULL)
+  private Integer finalPoint;
+
 }

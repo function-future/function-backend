@@ -31,6 +31,7 @@ import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Optional;
+import org.springframework.data.util.Pair;
 
 import static com.googlecode.catchexception.CatchException.catchException;
 import static com.googlecode.catchexception.CatchException.caughtException;
@@ -48,10 +49,13 @@ public class ReportServiceImplTest {
     private static final String DESCRIPTION = "description";
     private static final String BATCH_CODE = "batch-code";
     private static final Integer POINT = 100;
+    private static final Integer FINAL_POINT = 100;
 
     private Report report;
     private Pageable pageable;
+    private Pair pair;
     private Page<Report> reportPage;
+    private Page<Pair<User, Integer>> pairPage;
     private ReportDetail reportDetail;
     private StudentSummaryVO studentSummaryVO;
     private User student;
@@ -94,7 +98,7 @@ public class ReportServiceImplTest {
                 .id(REPORT_DETAIL_ID)
                 .report(report)
                 .user(student)
-                .point(0)
+                .point(POINT)
                 .build();
 
         studentSummaryVO = StudentSummaryVO
@@ -105,7 +109,11 @@ public class ReportServiceImplTest {
 
         pageable = new PageRequest(0, 10);
 
+        pair = Pair.of(student, 100);
+
         reportPage = new PageImpl<>(Collections.singletonList(report), pageable, 1);
+
+        pairPage = new PageImpl<>(Collections.singletonList(pair), pageable, 1);
 
         when(reportRepository.findAll(pageable)).thenReturn(reportPage);
         when(reportRepository.findAllByBatchAndDeletedFalse(batch, pageable))
@@ -113,7 +121,10 @@ public class ReportServiceImplTest {
         when(reportRepository.findByIdAndDeletedFalse(REPORT_ID)).thenReturn(Optional.of(report));
         when(reportRepository.save(report)).thenReturn(report);
         when(userService.getUser(USER_ID)).thenReturn(student);
+        when(userService.getStudentsWithinBatch(BATCH_CODE, pageable))
+            .thenReturn(new PageImpl<>(Collections.singletonList(student), pageable, 1));
         when(reportDetailService.findAllDetailByReportId(REPORT_ID)).thenReturn(Collections.singletonList(reportDetail));
+        when(reportDetailService.findByStudentId(USER_ID, USER_ID)).thenReturn(reportDetail);
         when(reportDetailService.createReportDetailByReport(report, student)).thenReturn(report);
         when(reportDetailService.findAllSummaryByReportId(REPORT_ID, USER_ID)).thenReturn(Collections.singletonList(studentSummaryVO));
         when(reportDetailService.giveScoreToEachStudentInDetail(report, Collections.singletonList(reportDetail)))
@@ -146,6 +157,24 @@ public class ReportServiceImplTest {
         verify(reportRepository).findAllByBatchAndDeletedFalse(batch, pageable);
         verify(batchService).getBatchByCode(BATCH_CODE);
         verify(reportDetailService).findAllDetailByReportId(REPORT_ID);
+    }
+
+    @Test
+    public void findAllStudentsAndFinalPointByBatch() {
+        Page<Pair<User, Integer>> actual = reportService.findAllStudentsAndFinalPointByBatch(BATCH_CODE, pageable);
+        assertThat(actual.getContent()).isEqualTo(Collections.singletonList(pair));
+        verify(userService).getStudentsWithinBatch(BATCH_CODE, pageable);
+        verify(reportDetailService).findByStudentId(USER_ID, USER_ID);
+    }
+
+    @Test
+    public void findAllStudentsAndFinalPointByBatchAndReportDetailNull() {
+        when(reportDetailService.findByStudentId(USER_ID, USER_ID)).thenReturn(null);
+        pair = Pair.of(student, 0);
+        Page<Pair<User, Integer>> actual = reportService.findAllStudentsAndFinalPointByBatch(BATCH_CODE, pageable);
+        assertThat(actual.getContent()).isEqualTo(Collections.singletonList(pair));
+        verify(userService).getStudentsWithinBatch(BATCH_CODE, pageable);
+        verify(reportDetailService).findByStudentId(USER_ID, USER_ID);
     }
 
     @Test

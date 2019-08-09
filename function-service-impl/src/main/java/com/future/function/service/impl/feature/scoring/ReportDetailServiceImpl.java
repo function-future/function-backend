@@ -73,10 +73,11 @@ public class ReportDetailServiceImpl implements ReportDetailService {
     @Override
     public Report createReportDetailByReport(Report report, User student) {
         return Optional.ofNullable(report)
+                .filter(ignored -> Objects.isNull(this.findByStudentId(student.getId(), student.getId())))
                 .map(value -> buildReportDetail(value, student))
                 .map(reportDetailRepository::save)
                 .map(ReportDetail::getReport)
-                .orElseThrow(() -> new UnsupportedOperationException("Failed at #createReportDetailByReport #ReportDetailService"));
+                .orElseThrow(() -> new UnsupportedOperationException("ComparisonExists"));
     }
 
     private ReportDetail buildReportDetail(Report report, User student) {
@@ -90,7 +91,7 @@ public class ReportDetailServiceImpl implements ReportDetailService {
                 .filter(user -> AuthorizationHelper.isUserAuthorizedForAccess(user, studentId,
                     AuthorizationHelper.getScoringAllowedRoles()))
                 .flatMap(user -> reportDetailRepository.findByUserIdAndDeletedFalse(studentId))
-                .orElseThrow(() -> new NotFoundException("Failed at #findByStudentId #ReportDetailService"));
+                .orElse(null);
     }
 
     @Override

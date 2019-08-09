@@ -16,7 +16,9 @@ import com.future.function.service.impl.helper.CopyHelper;
 import com.future.function.service.impl.helper.PageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -179,6 +181,28 @@ public class ReportServiceImpl implements ReportService {
   @Override
   public List<StudentSummaryVO> findAllSummaryByReportId(String reportId, String userId) {
     return reportDetailService.findAllSummaryByReportId(reportId, userId);
+  }
+
+  @Override
+  public Page<Pair<User, Integer>> findAllStudentsAndFinalPointByBatch(String batchCode, Pageable pageable) {
+    Page<User> userPage = userService.getStudentsWithinBatch(batchCode, pageable);
+        return userPage.getContent()
+        .stream()
+        .map(this::findFinalPointAndMapToPair)
+        .collect(Collectors.collectingAndThen(Collectors.toList(),
+            pairList -> new PageImpl<>(pairList, pageable, userPage.getTotalElements())
+        ));
+  }
+
+  private Pair<User, Integer> findFinalPointAndMapToPair(User user) {
+    Integer totalPoint = getFinalPointFromNullableReportDetail(reportDetailService.findByStudentId(user.getId(), user.getId()));
+    return Pair.of(user, totalPoint);
+  }
+
+  private Integer getFinalPointFromNullableReportDetail(ReportDetail reportDetail) {
+      return Optional.ofNullable(reportDetail)
+          .map(ReportDetail::getPoint)
+          .orElse(0);
   }
 
   @Override

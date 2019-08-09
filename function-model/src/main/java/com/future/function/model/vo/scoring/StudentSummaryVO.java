@@ -19,6 +19,7 @@ public class StudentSummaryVO {
   private String university;
   private String avatar;
   private List<SummaryVO> scores;
+  private Integer totalPoint;
   private int point;
 
 }

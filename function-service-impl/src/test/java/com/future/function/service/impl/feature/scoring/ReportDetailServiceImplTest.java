@@ -151,16 +151,37 @@ public class ReportDetailServiceImplTest {
 
     @Test
     public void createReportDetailByReport() {
+        when(reportDetailRepository.findByUserIdAndDeletedFalse(USER_ID)).thenReturn(Optional.empty());
         when(reportDetailRepository.save(any(ReportDetail.class))).thenReturn(reportDetail);
         Report actual = reportDetailService.createReportDetailByReport(report, student);
         assertThat(actual).isEqualTo(report);
         verify(reportDetailRepository).save(any(ReportDetail.class));
+        verify(reportDetailRepository).findByUserIdAndDeletedFalse(USER_ID);
+        verify(userService).getUser(USER_ID);
+    }
+
+    @Test
+    public void createReportDetailByReportAndReportDetailByStudentExist() {
+        when(reportDetailRepository.save(any(ReportDetail.class))).thenReturn(reportDetail);
+        catchException(() -> reportDetailService.createReportDetailByReport(report, student));
+        assertThat(caughtException().getClass()).isEqualTo(UnsupportedOperationException.class);
+        verify(userService).getUser(USER_ID);
+        verify(reportDetailRepository).findByUserIdAndDeletedFalse(USER_ID);
     }
 
     @Test
     public void findByStudentId() {
         ReportDetail actual = reportDetailService.findByStudentId(USER_ID, USER_ID);
         assertThat(actual).isEqualTo(reportDetail);
+        verify(reportDetailRepository).findByUserIdAndDeletedFalse(USER_ID);
+        verify(userService).getUser(USER_ID);
+    }
+
+    @Test
+    public void findByStudentIdAndNotExistsInDB() {
+        when(reportDetailRepository.findByUserIdAndDeletedFalse(USER_ID)).thenReturn(Optional.empty());
+        ReportDetail actual = reportDetailService.findByStudentId(USER_ID, USER_ID);
+        assertThat(actual).isNull();
         verify(reportDetailRepository).findByUserIdAndDeletedFalse(USER_ID);
         verify(userService).getUser(USER_ID);
     }
