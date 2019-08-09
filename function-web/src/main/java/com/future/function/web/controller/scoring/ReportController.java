@@ -8,11 +8,13 @@ import com.future.function.session.model.Session;
 import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.mapper.request.scoring.ReportRequestMapper;
+import com.future.function.web.mapper.response.core.UserResponseMapper;
 import com.future.function.web.mapper.response.scoring.ReportResponseMapper;
 import com.future.function.web.model.request.scoring.ReportWebRequest;
 import com.future.function.web.model.response.base.BaseResponse;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
+import com.future.function.web.model.response.feature.core.UserWebResponse;
 import com.future.function.web.model.response.feature.scoring.ReportWebResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -44,6 +46,23 @@ public class ReportController {
     return ReportResponseMapper.toPagingReportWebResponse(reportService
             .findAllReport(batchCode, PageHelper.toPageable(page, size)),
                                                           fileProperties.getUrlPrefix());
+  }
+
+  @ResponseStatus(HttpStatus.OK)
+  @GetMapping(value = "/students", produces = MediaType.APPLICATION_JSON_VALUE)
+  public PagingResponse<UserWebResponse> getStudentsWithinBatch(
+      @WithAnyRole(roles = Role.ADMIN)
+          Session session,
+      @PathVariable String batchCode,
+      @RequestParam(required = false,
+          defaultValue = "1")
+          int page
+  ) {
+
+    return UserResponseMapper.toUsersPagingResponseWithFinalPoint(
+        reportService.findAllStudentsAndFinalPointByBatch(batchCode,
+            PageHelper.toPageable(page, 10)),
+        fileProperties.getUrlPrefix());
   }
 
   @ResponseStatus(HttpStatus.OK)

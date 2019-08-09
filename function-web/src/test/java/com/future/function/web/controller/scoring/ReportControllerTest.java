@@ -18,10 +18,12 @@ import com.future.function.web.model.response.base.paging.Paging;
 import com.future.function.web.model.response.feature.core.BatchWebResponse;
 import com.future.function.web.model.response.feature.core.UserWebResponse;
 import com.future.function.web.model.response.feature.scoring.ReportWebResponse;
+import java.util.List;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.BeanUtils;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -35,6 +37,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Collections;
 import java.util.Date;
+import org.springframework.data.util.Pair;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -65,9 +68,11 @@ public class ReportControllerTest extends TestHelper {
     private static final Long CREATED_AT = new Date().getTime();
     private static final String FILE_ID = "file-id";
     private static final String URL_PREFIX = "url-prefix/";
+    private static final Integer FINAL_POINT = 100;
 
     private ReportWebResponse reportWebResponse;
     private UserWebResponse userWebResponse;
+    private UserWebResponse userWebResponseWithFinalPoint;
     private ReportWebRequest reportWebRequest;
     private Report report;
     private User user;
@@ -78,6 +83,7 @@ public class ReportControllerTest extends TestHelper {
     private DataResponse<ReportWebResponse> DATA_RESPONSE;
     private DataResponse<ReportWebResponse> CREATED_DATA_RESPONSE;
     private PagingResponse<ReportWebResponse> PAGING_RESPONSE;
+    private PagingResponse<UserWebResponse> USER_PAGING_RESPONSE;
     private JacksonTester<ReportWebRequest> webRequestJacksonTester;
 
     @MockBean
@@ -121,7 +127,12 @@ public class ReportControllerTest extends TestHelper {
             .avatarId(FILE_ID)
             .batch(BatchWebResponse.builder().code(BATCH_CODE).build())
             .email(STUDENT_EMAIL)
-            .university(STUDENT_UNIVERSITY).build();
+            .university(STUDENT_UNIVERSITY)
+            .build();
+
+        userWebResponseWithFinalPoint = new UserWebResponse();
+        BeanUtils.copyProperties(userWebResponse, userWebResponseWithFinalPoint);
+        userWebResponseWithFinalPoint.setFinalPoint(FINAL_POINT);
 
         report = Report.builder()
                 .id(REPORT_ID)
@@ -148,14 +159,20 @@ public class ReportControllerTest extends TestHelper {
                 .students(Collections.singletonList(userWebResponse))
                 .build();
 
+        List<Pair<User, Integer>> pairList = Collections.singletonList(Pair.of(user, FINAL_POINT));
+
         reportWebResponse.setUploadedDate(CREATED_AT);
 
         DATA_RESPONSE = ResponseHelper.toDataResponse(HttpStatus.OK, reportWebResponse);
         CREATED_DATA_RESPONSE = ResponseHelper.toDataResponse(HttpStatus.CREATED, reportWebResponse);
         PAGING_RESPONSE = ResponseHelper.toPagingResponse(HttpStatus.OK,
                 Collections.singletonList(reportWebResponse), paging);
+        USER_PAGING_RESPONSE = ResponseHelper.toPagingResponse(HttpStatus.OK,
+                Collections.singletonList(userWebResponseWithFinalPoint), paging);
         when(reportService.findAllReport(BATCH_CODE, pageable))
                 .thenReturn(new PageImpl<>(Collections.singletonList(report), pageable, 1));
+        when(reportService.findAllStudentsAndFinalPointByBatch(BATCH_CODE, pageable)).thenReturn(
+            new PageImpl<>(pairList, pageable, 1));
         when(reportService.createReport(report)).thenReturn(report);
         when(reportService.updateReport(report)).thenReturn(report);
         when(reportService.findById(REPORT_ID)).thenReturn(report);
@@ -182,6 +199,24 @@ public class ReportControllerTest extends TestHelper {
                                 .getJson()));
         verify(reportService).findAllReport(BATCH_CODE, pageable);
         verify(fileProperties).getUrlPrefix();
+    }
+
+
+    @Test
+    public void findAllStudentsAndFinalPointWithinBatch()
+        throws Exception {
+
+        super.setCookie(Role.ADMIN);
+
+        mockMvc.perform(get("/api/scoring/batches/" + BATCH_CODE + "/judgings/students").cookie(cookies)
+            .param("role", Role.STUDENT.name()))
+            .andExpect(status().isOk())
+            .andExpect(content().json(
+                pagingResponseJacksonTester.write(USER_PAGING_RESPONSE)
+                    .getJson()));
+
+        verify(fileProperties).getUrlPrefix();
+        verify(reportService).findAllStudentsAndFinalPointByBatch(BATCH_CODE, pageable);
     }
 
     @Test
