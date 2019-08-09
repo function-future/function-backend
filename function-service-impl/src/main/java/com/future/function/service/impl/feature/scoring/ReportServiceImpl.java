@@ -185,12 +185,13 @@ public class ReportServiceImpl implements ReportService {
 
   @Override
   public Page<Pair<User, Integer>> findAllStudentsAndFinalPointByBatch(String batchCode, Pageable pageable) {
-    List<Pair<User, Integer>> pairList = userService.getStudentsWithinBatch(batchCode, pageable)
-        .getContent()
+    Page<User> userPage = userService.getStudentsWithinBatch(batchCode, pageable);
+        return userPage.getContent()
         .stream()
         .map(this::findFinalPointAndMapToPair)
-        .collect(Collectors.toList());
-    return new PageImpl<>(pairList, pageable, pairList.size());
+        .collect(Collectors.collectingAndThen(Collectors.toList(),
+            pairList -> new PageImpl<>(pairList, pageable, userPage.getTotalElements())
+        ));
   }
 
   private Pair<User, Integer> findFinalPointAndMapToPair(User user) {
