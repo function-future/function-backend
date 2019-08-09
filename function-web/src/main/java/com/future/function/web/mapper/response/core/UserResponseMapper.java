@@ -11,6 +11,7 @@ import com.future.function.web.model.response.feature.core.UserWebResponse;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 
 import java.util.List;
@@ -116,18 +117,34 @@ public class UserResponseMapper {
   ) {
     
     return ResponseHelper.toPagingResponse(
-      HttpStatus.OK, toUserWebResponseList(data, urlPrefix),
+      HttpStatus.OK, toUserWebResponseList(data.getContent(), urlPrefix),
       PageHelper.toPaging(data));
   }
-  
-  private static List<UserWebResponse> toUserWebResponseList(
-    Page<User> data, String urlPrefix
+
+  public static List<UserWebResponse> toUserWebResponseList(
+    List<User> data, String urlPrefix
   ) {
     
-    return data.getContent()
+    return data
       .stream()
       .map(user -> buildUserWebResponse(user, urlPrefix))
       .collect(Collectors.toList());
   }
   
+  public static PagingResponse<UserWebResponse> toUsersPagingResponseWithFinalPoint(
+      Page<Pair<User, Integer>> pairPage, String urlPrefix) {
+    return ResponseHelper.toPagingResponse(HttpStatus.OK, buildUserWebResponseAndSetFinalPoint(pairPage, urlPrefix), PageHelper.toPaging(pairPage));
+  }
+
+  private static List<UserWebResponse> buildUserWebResponseAndSetFinalPoint(Page<Pair<User, Integer>> pairPage, String urlPrefix) {
+    return pairPage.getContent()
+        .stream()
+        .map(pair -> {
+          UserWebResponse response = buildUserWebResponse(pair.getFirst(), urlPrefix);
+          response.setFinalPoint(pair.getSecond());
+          return response;
+        })
+        .collect(Collectors.toList());
+  }
+
 }

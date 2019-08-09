@@ -8,13 +8,16 @@ import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.base.paging.Paging;
 import com.future.function.web.model.response.feature.core.UserWebResponse;
+import java.util.Collections;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 
 import java.util.Arrays;
@@ -58,6 +61,7 @@ public class UserResponseMapperTest {
     .university(UNIVERSITY)
     .build();
   
+  private static final Pair<User, Integer> STUDENT_AND_FINAL_POINT_PAIR = Pair.of(STUDENT, 100);
   private static final String URL_PREFIX = "url-prefix";
   
   private static final UserWebResponse STUDENT_WEB_RESPONSE =
@@ -120,6 +124,10 @@ public class UserResponseMapperTest {
   private static final Page<User> PAGE = new PageImpl<>(
     USERS, PAGEABLE, USERS.size());
   
+
+  private static final Page<Pair<User, Integer>> STUDENT_AND_FINAL_POINT_PAIR_PAGE =
+      new PageImpl<>(Collections.singletonList(STUDENT_AND_FINAL_POINT_PAIR), PAGEABLE, 1);
+
   private static final Paging PAGING = Paging.builder()
     .page(1)
     .size(2)
@@ -167,4 +175,20 @@ public class UserResponseMapperTest {
     assertThat(pagingResponse).isEqualTo(PAGING_RESPONSE);
   }
   
+  @Test
+  public void testGivenListOfPairOfUserAndIntegerByMappingToPagingResponseReturnPagingResponseObject() {
+
+    UserWebResponse response = new UserWebResponse();
+    BeanUtils.copyProperties(STUDENT_WEB_RESPONSE, response);
+    response.setFinalPoint(100);
+    PAGING_RESPONSE.setData(Collections.singletonList(response));
+
+    PAGING.setTotalRecords(1);
+
+    PagingResponse<UserWebResponse> pagingResponse =
+        UserResponseMapper.toUsersPagingResponseWithFinalPoint(STUDENT_AND_FINAL_POINT_PAIR_PAGE, URL_PREFIX);
+
+    assertThat(pagingResponse).isNotNull();
+    assertThat(pagingResponse).isEqualTo(PAGING_RESPONSE);
+  }
 }
