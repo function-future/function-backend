@@ -130,11 +130,6 @@ public class OptionServiceImplTest {
   }
 
   @Test
-  public void deleteByIdNull() {
-    optionService.deleteById(null);
-  }
-
-  @Test
   public void isOptionCorrectTest() {
     when(optionRepository.findByIdAndDeletedFalse(OPTION_ID)).thenReturn(Optional.of(option));
     boolean actual = optionService.isOptionCorrect(option);
