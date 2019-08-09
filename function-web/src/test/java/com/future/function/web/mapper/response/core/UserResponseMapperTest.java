@@ -26,29 +26,29 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class UserResponseMapperTest {
-  
+
   private static final String EMAIL = "email";
-  
+
   private static final String NAME = "name";
-  
+
   private static final String STUDENT_ID = "student-id";
-  
+
   private static final String MENTOR_ID = "mentor-id";
-  
+
   private static final Role STUDENT_ROLE = Role.STUDENT;
-  
+
   private static final Role MENTOR_ROLE = Role.MENTOR;
-  
+
   private static final String PHONE = "phone";
-  
+
   private static final String ADDRESS = "address";
-  
+
   private static final FileV2 PICTURE = new FileV2();
-  
+
   private static final Batch BATCH = new Batch("id-1", "name-1", "1");
-  
+
   private static final String UNIVERSITY = "university";
-  
+
   private static final User STUDENT = User.builder()
     .id(STUDENT_ID)
     .email(EMAIL)
@@ -60,10 +60,10 @@ public class UserResponseMapperTest {
     .batch(BATCH)
     .university(UNIVERSITY)
     .build();
-  
+
   private static final Pair<User, Integer> STUDENT_AND_FINAL_POINT_PAIR = Pair.of(STUDENT, 100);
   private static final String URL_PREFIX = "url-prefix";
-  
+
   private static final UserWebResponse STUDENT_WEB_RESPONSE =
     UserWebResponse.builder()
       .id(STUDENT_ID)
@@ -77,14 +77,14 @@ public class UserResponseMapperTest {
       .batch(BatchResponseMapper.toBatchWebResponse(BATCH))
       .university(UNIVERSITY)
       .build();
-  
+
   private static final DataResponse<UserWebResponse>
     CREATED_STUDENT_WEB_RESPONSE = DataResponse.<UserWebResponse>builder().code(
     201)
     .status("CREATED")
     .data(STUDENT_WEB_RESPONSE)
     .build();
-  
+
   private static final User MENTOR = User.builder()
     .id(MENTOR_ID)
     .email(EMAIL)
@@ -94,7 +94,7 @@ public class UserResponseMapperTest {
     .address(ADDRESS)
     .pictureV2(new FileV2())
     .build();
-  
+
   private static final UserWebResponse MENTOR_WEB_RESPONSE =
     UserWebResponse.builder()
       .id(MENTOR_ID)
@@ -106,24 +106,24 @@ public class UserResponseMapperTest {
       .avatar(PICTURE.getFileUrl())
       .avatarId(PICTURE.getId())
       .build();
-  
+
   private static final DataResponse<UserWebResponse>
     RETRIEVED_MENTOR_WEB_RESPONSE =
     DataResponse.<UserWebResponse>builder().code(200)
       .status("OK")
       .data(MENTOR_WEB_RESPONSE)
       .build();
-  
+
   private static final Pageable PAGEABLE = new PageRequest(0, 2);
-  
+
   private static final List<User> USERS = Arrays.asList(STUDENT, MENTOR);
-  
+
   private static final List<UserWebResponse> USER_WEB_RESPONSES = Arrays.asList(
     STUDENT_WEB_RESPONSE, MENTOR_WEB_RESPONSE);
-  
+
   private static final Page<User> PAGE = new PageImpl<>(
     USERS, PAGEABLE, USERS.size());
-  
+
 
   private static final Page<Pair<User, Integer>> STUDENT_AND_FINAL_POINT_PAIR_PAGE =
       new PageImpl<>(Collections.singletonList(STUDENT_AND_FINAL_POINT_PAIR), PAGEABLE, 1);
@@ -133,62 +133,74 @@ public class UserResponseMapperTest {
     .size(2)
     .totalRecords(2)
     .build();
-  
+
+  private static final Paging STUDENT_AND_FINAL_POINT_PAGING = Paging.builder()
+      .page(1)
+      .size(2)
+      .totalRecords(1)
+      .build();
+
   private static final PagingResponse<UserWebResponse> PAGING_RESPONSE =
     PagingResponse.<UserWebResponse>builder().code(200)
       .status("OK")
       .data(USER_WEB_RESPONSES)
       .paging(PAGING)
       .build();
-  
+
+  private static final PagingResponse<UserWebResponse> STUDENT_AND_FINAL_POINT_PAGING_RESPONSE =
+      PagingResponse.<UserWebResponse>builder().code(200)
+          .status("OK")
+          .data(USER_WEB_RESPONSES)
+          .paging(STUDENT_AND_FINAL_POINT_PAGING)
+          .build();
+
   @Before
   public void setUp() {}
-  
+
   @After
   public void tearDown() {}
-  
+
   @Test
   public void testGivenUserDataByMappingToDataResponseReturnDataResponseObject() {
-    
+
     DataResponse<UserWebResponse> createdStudentDataResponse =
       UserResponseMapper.toUserDataResponse(HttpStatus.CREATED, STUDENT, URL_PREFIX);
-    
+
     assertThat(createdStudentDataResponse).isNotNull();
     assertThat(createdStudentDataResponse).isEqualTo(
       CREATED_STUDENT_WEB_RESPONSE);
-    
+
     DataResponse<UserWebResponse> retrievedMentorDataResponse =
       UserResponseMapper.toUserDataResponse(MENTOR, URL_PREFIX);
-    
+
     assertThat(retrievedMentorDataResponse).isNotNull();
     assertThat(retrievedMentorDataResponse).isEqualTo(
       RETRIEVED_MENTOR_WEB_RESPONSE);
   }
-  
+
   @Test
   public void testGivenUsersDataByMappingToPagingResponseReturnPagingResponseObject() {
-    
+
     PagingResponse<UserWebResponse> pagingResponse =
       UserResponseMapper.toUsersPagingResponse(PAGE, URL_PREFIX);
-    
+
     assertThat(pagingResponse).isNotNull();
     assertThat(pagingResponse).isEqualTo(PAGING_RESPONSE);
   }
-  
+
   @Test
   public void testGivenListOfPairOfUserAndIntegerByMappingToPagingResponseReturnPagingResponseObject() {
 
     UserWebResponse response = new UserWebResponse();
     BeanUtils.copyProperties(STUDENT_WEB_RESPONSE, response);
     response.setFinalPoint(100);
-    PAGING_RESPONSE.setData(Collections.singletonList(response));
 
-    PAGING.setTotalRecords(1);
+    STUDENT_AND_FINAL_POINT_PAGING_RESPONSE.setData(Collections.singletonList(response));
 
     PagingResponse<UserWebResponse> pagingResponse =
         UserResponseMapper.toUsersPagingResponseWithFinalPoint(STUDENT_AND_FINAL_POINT_PAIR_PAGE, URL_PREFIX);
 
     assertThat(pagingResponse).isNotNull();
-    assertThat(pagingResponse).isEqualTo(PAGING_RESPONSE);
+    assertThat(pagingResponse).isEqualTo(STUDENT_AND_FINAL_POINT_PAGING_RESPONSE);
   }
 }
