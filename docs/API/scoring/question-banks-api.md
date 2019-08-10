@@ -1,8 +1,6 @@
 ## Scoring - Question Bank [/api/scoring/question-banks{?page,size}]
 
 + Parameters
-
-    + search (optional, string) - search parameter for searching specific assignments in request
     + page (optional, number) - describing the currently displayed page in request
     + size (optional, number) - describing how many data currently displayed on the page in request
 
