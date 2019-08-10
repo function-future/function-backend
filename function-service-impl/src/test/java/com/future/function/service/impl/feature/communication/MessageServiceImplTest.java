@@ -97,51 +97,51 @@ public class MessageServiceImplTest {
 
   @Test
   public void testGivenChatroomByGettingMessagesByChatroomReturnPagedMessages() {
-    when(chatroomService.getChatroom(CHATROOM_ID, SESSION)).thenReturn(CHATROOM);
+    when(chatroomService.getChatroom(CHATROOM_ID, SESSION.getUserId())).thenReturn(CHATROOM);
     when(messageRepository.findAllByChatroomOrderByCreatedAtDesc(CHATROOM, PAGEABLE))
             .thenReturn(new PageImpl<>(Arrays.asList(message2, message1), PAGEABLE, 2));
 
-    Page<Message> messagePage = messageService.getMessages(CHATROOM_ID, PAGEABLE, SESSION);
+    Page<Message> messagePage = messageService.getMessages(CHATROOM_ID, PAGEABLE, SESSION.getUserId());
 
     assertThat(messagePage.getTotalElements()).isEqualTo(2);
     assertThat(messagePage.getContent().get(0).getId()).isEqualTo(MESSAGE_ID_2);
     assertThat(messagePage.getContent().get(1).getId()).isEqualTo(MESSAGE_ID_1);
 
-    verify(chatroomService).getChatroom(CHATROOM_ID, SESSION);
+    verify(chatroomService).getChatroom(CHATROOM_ID, SESSION.getUserId());
     verify(messageRepository).findAllByChatroomOrderByCreatedAtDesc(CHATROOM, PAGEABLE);
   }
 
   @Test
   public void testGivenChatroomAndMessageIdByGettingMessagesByChatroomAndMessageIdGreaterReturnPagedMessages() {
     ObjectId objectId = new ObjectId();
-    when(chatroomService.getChatroom(CHATROOM_ID, SESSION)).thenReturn(CHATROOM);
+    when(chatroomService.getChatroom(CHATROOM_ID, SESSION.getUserId())).thenReturn(CHATROOM);
     when(messageRepository.findAllByChatroomAndIdGreaterThanOrderByCreatedAtDesc(CHATROOM, objectId, PAGEABLE))
             .thenReturn(new PageImpl<>(Arrays.asList(message2, message1), PAGEABLE, 2));
 
-    Page<Message> messagePage = messageService.getMessagesAfterPivot(CHATROOM_ID, objectId.toHexString(), PAGEABLE, SESSION);
+    Page<Message> messagePage = messageService.getMessagesAfterPivot(CHATROOM_ID, objectId.toHexString(), PAGEABLE, SESSION.getUserId());
 
     assertThat(messagePage.getTotalElements()).isEqualTo(2);
     assertThat(messagePage.getContent().get(0).getId()).isEqualTo(MESSAGE_ID_2);
     assertThat(messagePage.getContent().get(1).getId()).isEqualTo(MESSAGE_ID_1);
 
-    verify(chatroomService).getChatroom(CHATROOM_ID, SESSION);
+    verify(chatroomService).getChatroom(CHATROOM_ID, SESSION.getUserId());
     verify(messageRepository).findAllByChatroomAndIdGreaterThanOrderByCreatedAtDesc(CHATROOM, objectId, PAGEABLE);
   }
 
   @Test
   public void testGivenChatroomAndMessageIdByGettingMessagesByChatroomAndMessageIdLessReturnPagedMessages() {
     ObjectId objectId = new ObjectId();
-    when(chatroomService.getChatroom(CHATROOM_ID, SESSION)).thenReturn(CHATROOM);
+    when(chatroomService.getChatroom(CHATROOM_ID, SESSION.getUserId())).thenReturn(CHATROOM);
     when(messageRepository.findAllByChatroomAndIdLessThanOrderByCreatedAtDesc(CHATROOM, objectId, PAGEABLE))
             .thenReturn(new PageImpl<>(Arrays.asList(message2, message1), PAGEABLE, 2));
 
-    Page<Message> messagePage = messageService.getMessagesBeforePivot(CHATROOM_ID, objectId.toHexString(), PAGEABLE, SESSION);
+    Page<Message> messagePage = messageService.getMessagesBeforePivot(CHATROOM_ID, objectId.toHexString(), PAGEABLE, SESSION.getUserId());
 
     assertThat(messagePage.getTotalElements()).isEqualTo(2);
     assertThat(messagePage.getContent().get(0).getId()).isEqualTo(MESSAGE_ID_2);
     assertThat(messagePage.getContent().get(1).getId()).isEqualTo(MESSAGE_ID_1);
 
-    verify(chatroomService).getChatroom(CHATROOM_ID, SESSION);
+    verify(chatroomService).getChatroom(CHATROOM_ID, SESSION.getUserId());
     verify(messageRepository).findAllByChatroomAndIdLessThanOrderByCreatedAtDesc(CHATROOM, objectId, PAGEABLE);
   }
 
@@ -171,16 +171,16 @@ public class MessageServiceImplTest {
 
   @Test
   public void testGivenChatroomByGettingLastMessageByChatroomReturnMessage() {
-    when(chatroomService.getChatroom(CHATROOM_ID, SESSION)).thenReturn(CHATROOM);
+    when(chatroomService.getChatroom(CHATROOM_ID, SESSION.getUserId())).thenReturn(CHATROOM);
     when(messageRepository.findFirstByChatroomOrderByCreatedAtDesc(CHATROOM)).thenReturn(message2);
 
-    Message messageResult = messageService.getLastMessage(CHATROOM_ID, SESSION);
+    Message messageResult = messageService.getLastMessage(CHATROOM_ID, SESSION.getUserId());
 
     assertThat(messageResult).isNotNull();
     assertThat(messageResult.getId()).isEqualTo(MESSAGE_ID_2);
     assertThat(messageResult.getText()).isEqualTo(MESSAGE_TEXT_2);
 
-    verify(chatroomService).getChatroom(CHATROOM_ID, SESSION);
+    verify(chatroomService).getChatroom(CHATROOM_ID, SESSION.getUserId());
     verify(messageRepository).findFirstByChatroomOrderByCreatedAtDesc(CHATROOM);
   }
 
@@ -188,13 +188,13 @@ public class MessageServiceImplTest {
   public void testGivenChatroomByCreatingChatroomReturnChatroom() {
     when(messageRepository.save(message1)).thenReturn(message1);
     when(userService.getUser(USER_ID)).thenReturn(USER);
-    when(chatroomService.getChatroom(CHATROOM_ID, SESSION)).thenReturn(CHATROOM);
-    when(chatroomService.updateChatroom(CHATROOM, SESSION)).thenReturn(CHATROOM);
+    when(chatroomService.getChatroom(CHATROOM_ID, SESSION.getUserId())).thenReturn(CHATROOM);
+    when(chatroomService.updateChatroom(CHATROOM, SESSION.getUserId())).thenReturn(CHATROOM);
 
     message1.setChatroom(CHATROOM);
     message1.setSender(USER);
 
-    Message messageResult = messageService.createMessage(message1, SESSION);
+    Message messageResult = messageService.createMessage(message1, SESSION.getUserId());
 
     assertThat(messageResult).isNotNull();
     assertThat(messageResult.getId()).isEqualTo(MESSAGE_ID_1);
@@ -202,8 +202,8 @@ public class MessageServiceImplTest {
 
     verify(messageRepository).save(message1);
     verify(userService).getUser(USER_ID);
-    verify(chatroomService).getChatroom(CHATROOM_ID, SESSION);
-    verify(chatroomService).updateChatroom(CHATROOM, SESSION);
+    verify(chatroomService).getChatroom(CHATROOM_ID, SESSION.getUserId());
+    verify(chatroomService).updateChatroom(CHATROOM, SESSION.getUserId());
   }
 
 

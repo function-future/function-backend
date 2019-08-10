@@ -56,10 +56,10 @@ public class ChatroomServiceImpl implements ChatroomService {
   }
 
   @Override
-  public Chatroom getChatroom(String chatroomId, Session session) {
+  public Chatroom getChatroom(String chatroomId, String userId) {
     return Optional.ofNullable(chatroomId)
             .map(chatroomRepository::findOne)
-            .map(chatroom -> this.validateAuthorization(chatroom, session))
+            .map(chatroom -> this.validateAuthorization(chatroom, userId))
             .orElseThrow(() -> new NotFoundException("Get Chatroom Not Found"));
   }
 
@@ -92,11 +92,11 @@ public class ChatroomServiceImpl implements ChatroomService {
   }
 
   @Override
-  public Chatroom updateChatroom(Chatroom chatroom, Session session) {
+  public Chatroom updateChatroom(Chatroom chatroom, String userId) {
     return Optional.of(chatroom)
             .map(Chatroom::getId)
             .map(chatroomRepository::findOne)
-            .map(c -> this.validateAuthorization(c, session))
+            .map(c -> this.validateAuthorization(c, userId))
             .map(room -> this.updateMember(room, chatroom))
             .map(room -> this.updateTitle(room, chatroom))
             .map(chatroomRepository::save)
@@ -132,8 +132,8 @@ public class ChatroomServiceImpl implements ChatroomService {
     return existingChatroom;
   }
 
-  private Chatroom validateAuthorization(Chatroom chatroom, Session session) {
-    if (!chatroom.getMembers().contains(userService.getUser(session.getUserId())) && chatroom.getType() != ChatroomType.PUBLIC) {
+  private Chatroom validateAuthorization(Chatroom chatroom, String userId) {
+    if (!chatroom.getMembers().contains(userService.getUser(userId)) && chatroom.getType() != ChatroomType.PUBLIC) {
       throw new ForbiddenException("Chatroom did not belong to this user");
     }
     return chatroom;

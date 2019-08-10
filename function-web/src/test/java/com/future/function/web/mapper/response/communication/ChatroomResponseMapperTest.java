@@ -134,15 +134,15 @@ public class ChatroomResponseMapperTest {
     @Test
     public void testGivenPagedChatroomAndMessageAndBooleanByCallingToPagingChatroomResponseReturnPaging() {
 
-        when(messageService.getLastMessage(CHATROOM_ID, SESSION)).thenReturn(MESSAGE_1);
-        when(messageStatusService.getSeenStatus(CHATROOM_ID, MEMBER_ID_1, SESSION)).thenReturn(IS_SEEN);
+        when(messageService.getLastMessage(CHATROOM_ID, SESSION.getUserId())).thenReturn(MESSAGE_1);
+        when(messageStatusService.getSeenStatus(CHATROOM_ID, SESSION.getUserId())).thenReturn(IS_SEEN);
 
         PagingResponse<ChatroomResponse> data = ChatroomResponseMapper.toPagingChatroomResponse(
                 new PageImpl<>(Collections.singletonList(CHATROOM), PageHelper.toPageable(1, 1), 1),
                 messageService,
                 messageStatusService,
                 URL_PREFIX,
-                SESSION
+                SESSION.getUserId()
                 );
 
         assertThat(data).isNotNull();
@@ -150,8 +150,8 @@ public class ChatroomResponseMapperTest {
         assertThat(data.getPaging().getSize()).isEqualTo(1);
         assertThat(data.getData().get(0).getId()).isEqualTo(CHATROOM_ID);
 
-        verify(messageService).getLastMessage(CHATROOM_ID, SESSION);
-        verify(messageStatusService).getSeenStatus(CHATROOM_ID, MEMBER_ID_1, SESSION);
+        verify(messageService).getLastMessage(CHATROOM_ID, SESSION.getUserId());
+        verify(messageStatusService).getSeenStatus(CHATROOM_ID, SESSION.getUserId());
     }
 
     @Test

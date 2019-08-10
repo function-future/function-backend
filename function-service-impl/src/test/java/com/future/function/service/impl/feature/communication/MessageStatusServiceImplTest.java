@@ -136,36 +136,36 @@ public class MessageStatusServiceImplTest {
   @Test
   public void testGivenChatroomIdAndUserIdByGettingUnseenMessageStatusReturnListOfMessageStatus() {
     when(userService.getUser(USER_ID)).thenReturn(USER);
-    when(chatroomService.getChatroom(CHATROOM_ID, SESSION)).thenReturn(CHATROOM);
+    when(chatroomService.getChatroom(CHATROOM_ID, SESSION.getUserId())).thenReturn(CHATROOM);
     when(messageStatusRepository.findAllByChatroomAndMemberAndSeenIsFalseOrderByCreatedAtDesc(CHATROOM, USER))
             .thenReturn(Arrays.asList(messageStatus3, messageStatus2));
 
-    List<MessageStatus> messageStatuses = messageStatusService.getUnseenMessageStatus(CHATROOM_ID, USER_ID, SESSION);
+    List<MessageStatus> messageStatuses = messageStatusService.getUnseenMessageStatus(CHATROOM_ID, USER_ID);
 
     assertThat(messageStatuses.size()).isEqualTo(2);
     assertThat(messageStatuses.get(0).getId()).isEqualTo(MESSAGE_ST_ID_3);
     assertThat(messageStatuses.get(1).getId()).isEqualTo(MESSAGE_ST_ID_2);
 
     verify(userService).getUser(USER_ID);
-    verify(chatroomService).getChatroom(CHATROOM_ID, SESSION);
+    verify(chatroomService).getChatroom(CHATROOM_ID, SESSION.getUserId());
     verify(messageStatusRepository).findAllByChatroomAndMemberAndSeenIsFalseOrderByCreatedAtDesc(CHATROOM, USER);
   }
 
   @Test
   public void testGivenChatroomIdAndUserIdAndTimestampByGettingUnseenMessageStatusBeforeTimestampReturnListOfMessageStatus() {
     when(userService.getUser(USER_ID)).thenReturn(USER);
-    when(chatroomService.getChatroom(CHATROOM_ID, SESSION)).thenReturn(CHATROOM);
+    when(chatroomService.getChatroom(CHATROOM_ID, SESSION.getUserId())).thenReturn(CHATROOM);
     when(messageStatusRepository.findAllByChatroomAndMemberAndCreatedAtLessThanEqualAndSeenIsFalseOrderByCreatedAtDesc(
             CHATROOM, USER, TIMESTAMP)).thenReturn(Collections.singletonList(messageStatus2));
 
     List<MessageStatus> messageStatuses = messageStatusService.getUnseenMessageStatusBeforeTimestamp(
-            CHATROOM_ID, USER_ID, TIMESTAMP, SESSION);
+            CHATROOM_ID, USER_ID, TIMESTAMP);
 
     assertThat(messageStatuses.size()).isEqualTo(1);
     assertThat(messageStatuses.get(0).getId()).isEqualTo(MESSAGE_ST_ID_2);
 
     verify(userService).getUser(USER_ID);
-    verify(chatroomService).getChatroom(CHATROOM_ID, SESSION);
+    verify(chatroomService).getChatroom(CHATROOM_ID, SESSION.getUserId());
     verify(messageStatusRepository).findAllByChatroomAndMemberAndCreatedAtLessThanEqualAndSeenIsFalseOrderByCreatedAtDesc(
             CHATROOM, USER, TIMESTAMP);
   }
@@ -173,14 +173,14 @@ public class MessageStatusServiceImplTest {
   @Test
   public void testGivenChatroomIdAndUserIdByGettingSeenStatusReturnBoolean() {
     when(userService.getUser(USER_ID)).thenReturn(USER);
-    when(chatroomService.getChatroom(CHATROOM_ID, SESSION)).thenReturn(CHATROOM);
+    when(chatroomService.getChatroom(CHATROOM_ID, SESSION.getUserId())).thenReturn(CHATROOM);
     when(messageStatusRepository.findAllByChatroomAndMemberAndSeenIsFalseOrderByCreatedAtDesc(CHATROOM, USER))
             .thenReturn(Arrays.asList(messageStatus3, messageStatus2));
 
-    assertThat(messageStatusService.getSeenStatus(CHATROOM_ID, USER_ID, SESSION)).isFalse();
+    assertThat(messageStatusService.getSeenStatus(CHATROOM_ID, USER_ID)).isFalse();
 
     verify(userService).getUser(USER_ID);
-    verify(chatroomService).getChatroom(CHATROOM_ID, SESSION);
+    verify(chatroomService).getChatroom(CHATROOM_ID, SESSION.getUserId());
     verify(messageStatusRepository).findAllByChatroomAndMemberAndSeenIsFalseOrderByCreatedAtDesc(CHATROOM, USER);
   }
 
@@ -188,10 +188,10 @@ public class MessageStatusServiceImplTest {
   public void testGivenMessageStatusByCreatingMessageStatusReturnMessageStatus() {
     when(userService.getUser(USER_ID)).thenReturn(USER);
     when(messageService.getMessage(MESSAGE_ID_1)).thenReturn(MESSAGE_1);
-    when(chatroomService.getChatroom(CHATROOM_ID, SESSION)).thenReturn(CHATROOM);
+    when(chatroomService.getChatroom(CHATROOM_ID, SESSION.getUserId())).thenReturn(CHATROOM);
     when(messageStatusRepository.save(messageStatus1)).thenReturn(messageStatus1);
 
-    MessageStatus messageStatusResult = messageStatusService.createMessageStatus(messageStatus1, SESSION);
+    MessageStatus messageStatusResult = messageStatusService.createMessageStatus(messageStatus1, SESSION.getUserId());
 
     assertThat(messageStatusResult).isNotNull();
     assertThat(messageStatusResult.getId()).isEqualTo(MESSAGE_ST_ID_1);
@@ -200,7 +200,7 @@ public class MessageStatusServiceImplTest {
     assertThat(messageStatusResult.getMember().getId()).isEqualTo(USER_ID);
 
     verify(userService).getUser(USER_ID);
-    verify(chatroomService).getChatroom(CHATROOM_ID, SESSION);
+    verify(chatroomService).getChatroom(CHATROOM_ID, SESSION.getUserId());
     verify(messageService).getMessage(MESSAGE_ID_1);
     verify(messageStatusRepository).save(messageStatus1);
   }
@@ -208,7 +208,7 @@ public class MessageStatusServiceImplTest {
   @Test
   public void testGivenChatroomIdAndMessageIdByUpdatingSeenStatusReturnVoid() {
     when(userService.getUser(USER_ID)).thenReturn(USER);
-    when(chatroomService.getChatroom(CHATROOM_ID, SESSION)).thenReturn(CHATROOM);
+    when(chatroomService.getChatroom(CHATROOM_ID, SESSION.getUserId())).thenReturn(CHATROOM);
     when(messageStatusRepository.findAllByChatroomAndMemberAndSeenIsFalseOrderByCreatedAtDesc(
             CHATROOM, USER)).thenReturn(Arrays.asList(messageStatus3, messageStatus2));
     when(messageService.getMessage(MESSAGE_ID_3)).thenReturn(MESSAGE_3);
@@ -216,10 +216,10 @@ public class MessageStatusServiceImplTest {
     when(messageStatusRepository.save(messageStatus2)).thenReturn(messageStatus2);
     when(messageStatusRepository.save(messageStatus3)).thenReturn(messageStatus3);
 
-    messageStatusService.updateSeenStatus(CHATROOM_ID, MESSAGE_ID_3, USER_ID, SESSION);
+    messageStatusService.updateSeenStatus(CHATROOM_ID, MESSAGE_ID_3, USER_ID);
 
     verify(userService, times(3)).getUser(USER_ID);
-    verify(chatroomService, times(3)).getChatroom(CHATROOM_ID, SESSION);
+    verify(chatroomService, times(3)).getChatroom(CHATROOM_ID, SESSION.getUserId());
     verify(messageStatusRepository).findAllByChatroomAndMemberAndSeenIsFalseOrderByCreatedAtDesc(
             CHATROOM, USER);
     verify(messageService, times(2)).getMessage(MESSAGE_ID_3);

@@ -13,14 +13,14 @@ public interface MessageService {
 
   Message getMessage(String messageId);
 
-  Page<Message> getMessages(String chatroomId, Pageable pageable, Session session);
+  Page<Message> getMessages(String chatroomId, Pageable pageable, String userId);
 
-  Page<Message> getMessagesAfterPivot(String chatroomId, String messageId, Pageable pageable, Session session);
+  Page<Message> getMessagesAfterPivot(String chatroomId, String messageId, Pageable pageable, String userId);
 
-  Page<Message> getMessagesBeforePivot(String chatroomId, String messageId, Pageable pageable, Session session);
+  Page<Message> getMessagesBeforePivot(String chatroomId, String messageId, Pageable pageable, String userId);
 
-  Message getLastMessage(String chatroomId, Session session);
+  Message getLastMessage(String chatroomId, String userId);
 
-  Message createMessage(Message message, Session session);
+  Message createMessage(Message message, String userId);
 
 }

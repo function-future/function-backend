@@ -46,56 +46,56 @@ public class MessageServiceImpl implements MessageService {
   }
 
   @Override
-  public Page<Message> getMessages(String chatroomId, Pageable pageable, Session session) {
+  public Page<Message> getMessages(String chatroomId, Pageable pageable, String userId) {
     if (chatroomId.equalsIgnoreCase("public")) {
       Chatroom publicChatroom = chatroomService.getPublicChatroom();
       chatroomId = publicChatroom.getId();
     }
     return Optional.of(chatroomId)
-            .map(id -> chatroomService.getChatroom(id, session))
+            .map(id -> chatroomService.getChatroom(id, userId))
             .map(chatroom -> messageRepository.findAllByChatroomOrderByCreatedAtDesc(chatroom, pageable))
             .orElse(PageHelper.empty(pageable));
   }
 
   @Override
-  public Page<Message> getMessagesAfterPivot(String chatroomId, String messageId, Pageable pageable, Session session) {
+  public Page<Message> getMessagesAfterPivot(String chatroomId, String messageId, Pageable pageable, String userId) {
     if (chatroomId.equalsIgnoreCase("public")) {
       Chatroom publicChatroom = chatroomService.getPublicChatroom();
       chatroomId = publicChatroom.getId();
     }
     return Optional.of(chatroomId)
-            .map(id -> chatroomService.getChatroom(id, session))
+            .map(id -> chatroomService.getChatroom(id, userId))
             .map(chatroom -> messageRepository
                     .findAllByChatroomAndIdGreaterThanOrderByCreatedAtDesc(chatroom, new ObjectId(messageId), pageable))
             .orElse(PageHelper.empty(pageable));
   }
 
   @Override
-  public Page<Message> getMessagesBeforePivot(String chatroomId, String messageId, Pageable pageable, Session session) {
+  public Page<Message> getMessagesBeforePivot(String chatroomId, String messageId, Pageable pageable, String userId) {
     if (chatroomId.equalsIgnoreCase("public")) {
       Chatroom publicChatroom = chatroomService.getPublicChatroom();
       chatroomId = publicChatroom.getId();
     }
     return Optional.of(chatroomId)
-            .map(id -> chatroomService.getChatroom(id, session))
+            .map(id -> chatroomService.getChatroom(id, userId))
             .map(chatroom -> messageRepository
                     .findAllByChatroomAndIdLessThanOrderByCreatedAtDesc(chatroom, new ObjectId(messageId), pageable))
             .orElse(PageHelper.empty(pageable));
   }
 
   @Override
-  public Message getLastMessage(String chatroomId, Session session) {
+  public Message getLastMessage(String chatroomId, String userId) {
     return Optional.of(chatroomId)
-            .map(id -> chatroomService.getChatroom(id, session))
+            .map(id -> chatroomService.getChatroom(id, userId))
             .map(messageRepository::findFirstByChatroomOrderByCreatedAtDesc)
             .orElse(null);
   }
 
   @Override
-  public Message createMessage(Message message, Session session) {
+  public Message createMessage(Message message, String userId) {
     return Optional.of(message)
             .map(this::setSender)
-            .map(msg -> this.setChatroom(msg, session))
+            .map(msg -> this.setChatroom(msg, userId))
             .map(messageRepository::save)
             .orElseThrow(UnsupportedOperationException::new);
   }
@@ -105,10 +105,10 @@ public class MessageServiceImpl implements MessageService {
     return message;
   }
 
-  private Message setChatroom(Message message, Session session) {
-    Chatroom chatroom = chatroomService.getChatroom(message.getChatroom().getId(), session);
+  private Message setChatroom(Message message, String userId) {
+    Chatroom chatroom = chatroomService.getChatroom(message.getChatroom().getId(), userId);
     chatroom.setUpdatedAt(new Date().getTime());
-    message.setChatroom(chatroomService.updateChatroom(chatroom, session));
+    message.setChatroom(chatroomService.updateChatroom(chatroom, userId));
     return message;
   }
 

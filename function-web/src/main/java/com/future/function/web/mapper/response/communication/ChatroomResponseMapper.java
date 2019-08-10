@@ -82,15 +82,15 @@ public class ChatroomResponseMapper {
             Page<Chatroom> data,
             MessageService messageService,
             MessageStatusService messageStatusService,
-            Session session,
+            String userId,
             String urlPrefix
     ) {
         return data.getContent()
                 .stream()
                 .map(content -> toChatroomResponse(
                         content,
-                        messageService.getLastMessage(content.getId(), session),
-                        messageStatusService.getSeenStatus(content.getId(), session.getUserId(), session),
+                        messageService.getLastMessage(content.getId(), userId),
+                        messageStatusService.getSeenStatus(content.getId(), userId),
                         urlPrefix)
                 )
                 .collect(Collectors.toList());
@@ -101,10 +101,10 @@ public class ChatroomResponseMapper {
             MessageService messageService,
             MessageStatusService messageStatusService,
             String urlPrefix,
-            Session session
+            String userId
     ) {
         return ResponseHelper.toPagingResponse(
-                HttpStatus.OK, toChatroomResponseList(data, messageService, messageStatusService, session, urlPrefix), PageHelper.toPaging(data));
+                HttpStatus.OK, toChatroomResponseList(data, messageService, messageStatusService, userId, urlPrefix), PageHelper.toPaging(data));
     }
 
     private static LastMessageResponse toLastMessageResponse(Message message, boolean isSeen) {

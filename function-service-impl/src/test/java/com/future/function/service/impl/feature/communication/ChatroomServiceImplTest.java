@@ -159,7 +159,7 @@ public class ChatroomServiceImplTest {
     when(chatroomRepository.findOne(CHATROOM_ID)).thenReturn(chatroom);
     when(userService.getUser(USER_ID_1)).thenReturn(MEMBER_1);
 
-    Chatroom chatroomResult = chatroomService.getChatroom(CHATROOM_ID, SESSION);
+    Chatroom chatroomResult = chatroomService.getChatroom(CHATROOM_ID, SESSION.getUserId());
 
     assertThat(chatroomResult).isNotNull();
     assertThat(chatroomResult.getId()).isEqualTo(CHATROOM_ID);
@@ -174,7 +174,7 @@ public class ChatroomServiceImplTest {
   public void testGivenChatroomIdByGettingChatroomByIdReturnNotFoundException() {
     when(chatroomRepository.findOne(CHATROOM_ID_FAKE)).thenReturn(null);
 
-    catchException(() -> chatroomService.getChatroom(CHATROOM_ID_FAKE, SESSION));
+    catchException(() -> chatroomService.getChatroom(CHATROOM_ID_FAKE, SESSION.getUserId()));
 
     assertThat(caughtException().getClass()).isEqualTo(NotFoundException.class);
     assertThat(caughtException().getMessage()).isEqualTo("Get Chatroom Not Found");
@@ -187,7 +187,7 @@ public class ChatroomServiceImplTest {
     when(chatroomRepository.findOne(CHATROOM_ID)).thenReturn(chatroom);
     when(userService.getUser(USER_ID_3)).thenReturn(MEMBER_3);
 
-    catchException(() -> chatroomService.getChatroom(CHATROOM_ID, SESSION_2));
+    catchException(() -> chatroomService.getChatroom(CHATROOM_ID, SESSION_2.getUserId()));
 
     assertThat(caughtException().getClass()).isEqualTo(ForbiddenException.class);
     assertThat(caughtException().getMessage()).isEqualTo("Chatroom did not belong to this user");
@@ -247,7 +247,7 @@ public class ChatroomServiceImplTest {
     when(userService.getUser(USER_ID_1)).thenReturn(MEMBER_1);
     when(userService.getUser(USER_ID_2)).thenReturn(MEMBER_2);
 
-    Chatroom chatroomResult = chatroomService.updateChatroom(newChatroom, SESSION);
+    Chatroom chatroomResult = chatroomService.updateChatroom(newChatroom, SESSION.getUserId());
 
     assertThat(chatroomResult).isNotNull();
     assertThat(chatroomResult.getId()).isEqualTo(CHATROOM_ID);

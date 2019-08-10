@@ -11,16 +11,16 @@ import java.util.List;
  */
 public interface MessageStatusService {
 
-  List<MessageStatus> getUnseenMessageStatus(String chatroomId, String userId, Session session);
+  List<MessageStatus> getUnseenMessageStatus(String chatroomId, String userId);
 
-  List<MessageStatus> getUnseenMessageStatusBeforeTimestamp(String chatroomId, String userId, Long timestamp, Session session);
+  List<MessageStatus> getUnseenMessageStatusBeforeTimestamp(String chatroomId, String userId, Long timestamp);
 
-  boolean getSeenStatus(String chatroomId, String userId, Session session);
+  boolean getSeenStatus(String chatroomId, String userId);
 
-  MessageStatus createMessageStatus(MessageStatus messageStatus, Session session);
+  MessageStatus createMessageStatus(MessageStatus messageStatus, String userId);
 
-  void updateSeenStatus(String chatroomId, String messageId, String userId, Session session);
+  void updateSeenStatus(String chatroomId, String messageId, String userId);
 
-  MessageStatus updateMessageStatus(MessageStatus messageStatus, Session session);
+  MessageStatus updateMessageStatus(MessageStatus messageStatus, String userId);
 
 }

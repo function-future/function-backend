@@ -15,11 +15,11 @@ public interface ChatroomService {
 
   Page<Chatroom> getChatroomsWithKeyword(String keyword, String userId, Pageable pageable);
 
-  Chatroom getChatroom(String chatroomId, Session session);
+  Chatroom getChatroom(String chatroomId, String userId);
 
   Chatroom createChatroom(Chatroom chatroom);
 
-  Chatroom updateChatroom(Chatroom chatroom, Session session);
+  Chatroom updateChatroom(Chatroom chatroom, String userId);
 
   Chatroom getPublicChatroom();
 

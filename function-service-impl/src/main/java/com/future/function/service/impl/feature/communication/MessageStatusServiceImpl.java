@@ -44,29 +44,29 @@ public class MessageStatusServiceImpl implements MessageStatusService {
   }
 
   @Override
-  public List<MessageStatus> getUnseenMessageStatus(String chatroomId, String userId, Session session) {
+  public List<MessageStatus> getUnseenMessageStatus(String chatroomId, String userId) {
     User user = userService.getUser(userId);
-    Chatroom chatroom = chatroomService.getChatroom(chatroomId, session);
+    Chatroom chatroom = chatroomService.getChatroom(chatroomId, userId);
     return messageStatusRepository.findAllByChatroomAndMemberAndSeenIsFalseOrderByCreatedAtDesc(chatroom, user);
   }
 
   @Override
-  public List<MessageStatus> getUnseenMessageStatusBeforeTimestamp(String chatroomId, String userId, Long timestamp, Session session) {
+  public List<MessageStatus> getUnseenMessageStatusBeforeTimestamp(String chatroomId, String userId, Long timestamp) {
     User user = userService.getUser(userId);
-    Chatroom chatroom = chatroomService.getChatroom(chatroomId, session);
+    Chatroom chatroom = chatroomService.getChatroom(chatroomId, userId);
     return messageStatusRepository.findAllByChatroomAndMemberAndCreatedAtLessThanEqualAndSeenIsFalseOrderByCreatedAtDesc(
             chatroom, user, timestamp);
   }
 
   @Override
-  public boolean getSeenStatus(String chatroomId, String userId, Session session) {
-    return this.getUnseenMessageStatus(chatroomId, userId, session).size() == 0;
+  public boolean getSeenStatus(String chatroomId, String userId) {
+    return this.getUnseenMessageStatus(chatroomId, userId).size() == 0;
   }
 
   @Override
-  public MessageStatus createMessageStatus(MessageStatus messageStatus, Session session) {
+  public MessageStatus createMessageStatus(MessageStatus messageStatus, String userId) {
     return Optional.of(messageStatus)
-            .map(msgStatus -> this.setChatroom(msgStatus, session))
+            .map(msgStatus -> this.setChatroom(msgStatus, userId))
             .map(this::setMember)
             .map(this::setMessage)
             .map(messageStatusRepository::save)
@@ -74,25 +74,25 @@ public class MessageStatusServiceImpl implements MessageStatusService {
   }
 
   @Override
-  public void updateSeenStatus(String chatroomId, String messageId, String userId, Session session) {
+  public void updateSeenStatus(String chatroomId, String messageId, String userId) {
     Long timestamp = Optional.of(messageId)
             .map(messageService::getMessage)
             .map(Message::getCreatedAt)
             .orElse(0L);
-    this.getUnseenMessageStatus(chatroomId, userId, session).forEach(messageStatus -> {
+    this.getUnseenMessageStatus(chatroomId, userId).forEach(messageStatus -> {
       if (messageStatus.getMessage().getCreatedAt() <= timestamp) {
         messageStatus.setSeen(true);
-        this.updateMessageStatus(messageStatus, session);
+        this.updateMessageStatus(messageStatus, userId);
       }
     });
   }
 
   @Override
-  public MessageStatus updateMessageStatus(MessageStatus messageStatus, Session session) {
+  public MessageStatus updateMessageStatus(MessageStatus messageStatus, String userId) {
     return Optional.of(messageStatus)
             .map(this::setMember)
             .map(this::setMessage)
-            .map(msgStatus -> this.setChatroom(msgStatus, session))
+            .map(msgStatus -> this.setChatroom(msgStatus, userId))
             .map(messageStatusRepository::save)
             .orElse(messageStatus);
   }
@@ -108,9 +108,9 @@ public class MessageStatusServiceImpl implements MessageStatusService {
     return messageStatus;
   }
 
-  private MessageStatus setChatroom(MessageStatus messageStatus, Session session) {
+  private MessageStatus setChatroom(MessageStatus messageStatus, String userId) {
     messageStatus.setChatroom(chatroomService.getChatroom(
-            messageStatus.getChatroom().getId(), session));
+            messageStatus.getChatroom().getId(), userId));
     return messageStatus;
   }
 

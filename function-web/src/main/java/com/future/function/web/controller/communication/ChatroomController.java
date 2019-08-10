@@ -92,7 +92,7 @@ public class ChatroomController {
                     messageService,
                     messageStatusService,
                     fileProperties.getUrlPrefix(),
-                    session
+                    session.getUserId()
             );
         }
         else {
@@ -101,7 +101,7 @@ public class ChatroomController {
                     messageService,
                     messageStatusService,
                     fileProperties.getUrlPrefix(),
-                    session
+                    session.getUserId()
             );
         }
     }
@@ -109,7 +109,7 @@ public class ChatroomController {
     @GetMapping(value = "/{chatroomId:.+}", produces = MediaType.APPLICATION_JSON_VALUE)
     public DataResponse<ChatroomDetailResponse> getChatroom(Session session,
                                                             @PathVariable String chatroomId) {
-        return ChatroomResponseMapper.toChatroomDetailDataResponse(chatroomService.getChatroom(chatroomId, session), fileProperties.getUrlPrefix());
+        return ChatroomResponseMapper.toChatroomDetailDataResponse(chatroomService.getChatroom(chatroomId, session.getUserId()), fileProperties.getUrlPrefix());
     }
 
     @GetMapping(value = "/{chatroomId:.+}/messages", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -120,7 +120,7 @@ public class ChatroomController {
             @RequestParam(required = false, defaultValue = "10") int size
     ) {
         return ChatroomResponseMapper.toMessagePagingResponse(
-                messageService.getMessages(chatroomId, PageHelper.toPageable(page, size), session), fileProperties.getUrlPrefix());
+                messageService.getMessages(chatroomId, PageHelper.toPageable(page, size), session.getUserId()), fileProperties.getUrlPrefix());
     }
 
     @GetMapping(value = "/{chatroomId:.+}/messages/_after", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -132,7 +132,7 @@ public class ChatroomController {
             @RequestParam(required = true) String messageId
     ) {
         return ChatroomResponseMapper.toMessagePagingResponse(
-                messageService.getMessagesAfterPivot(chatroomId, messageId, PageHelper.toPageable(page, size), session), fileProperties.getUrlPrefix());
+                messageService.getMessagesAfterPivot(chatroomId, messageId, PageHelper.toPageable(page, size), session.getUserId()), fileProperties.getUrlPrefix());
     }
 
     @GetMapping(value = "/{chatroomId:.+}/messages/_before", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -144,7 +144,7 @@ public class ChatroomController {
             @RequestParam(required = true) String messageId
     ) {
         return ChatroomResponseMapper.toMessagePagingResponse(
-                messageService.getMessagesBeforePivot(chatroomId, messageId, PageHelper.toPageable(page, size), session), fileProperties.getUrlPrefix());
+                messageService.getMessagesBeforePivot(chatroomId, messageId, PageHelper.toPageable(page, size), session.getUserId()), fileProperties.getUrlPrefix());
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE,
@@ -164,15 +164,15 @@ public class ChatroomController {
         if (chatroomId.equalsIgnoreCase("public")) {
             chatroomId = chatroomService.getPublicChatroom().getId();
         }
-        Message message = messageService.createMessage(messageRequestMapper.toMessage(messageRequest, session.getUserId(), chatroomId), session);
-        Chatroom chatroom = chatroomService.getChatroom(chatroomId, session);
+        Message message = messageService.createMessage(messageRequestMapper.toMessage(messageRequest, session.getUserId(), chatroomId), session.getUserId());
+        Chatroom chatroom = chatroomService.getChatroom(chatroomId, session.getUserId());
         if (!chatroom.getType().equals(ChatroomType.PUBLIC)) {
             chatroom.getMembers().forEach(member -> messageStatusService.createMessageStatus(MessageStatus.builder()
                     .message(message)
                     .chatroom(chatroom)
                     .member(member)
                     .seen(member.getId().equals(session.getUserId()))
-                    .build(), session)
+                    .build(), session.getUserId())
             );
         }
         return ResponseHelper.toBaseResponse(HttpStatus.CREATED);
@@ -184,7 +184,7 @@ public class ChatroomController {
     public DataResponse<ChatroomDetailResponse> updateChatroom(Session session, @PathVariable String chatroomId,
                                                                @RequestBody ChatroomRequest chatroomRequest) {
         return ChatroomResponseMapper.toChatroomDetailDataResponse(
-                chatroomService.updateChatroom(chatroomRequestMapper.toChatroom(chatroomRequest, chatroomId), session), fileProperties.getUrlPrefix());
+                chatroomService.updateChatroom(chatroomRequestMapper.toChatroom(chatroomRequest, chatroomId), session.getUserId()), fileProperties.getUrlPrefix());
     }
 
     @PutMapping(value = "/{chatroomId:.+}/messages/{messageId:.+}/_read", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -193,7 +193,7 @@ public class ChatroomController {
         if (chatroomId.equalsIgnoreCase("public")) {
             chatroomId = chatroomService.getPublicChatroom().getId();
         }
-        messageStatusService.updateSeenStatus(chatroomId, messageId, session.getUserId(), session);
+        messageStatusService.updateSeenStatus(chatroomId, messageId, session.getUserId());
         return ResponseHelper.toBaseResponse(HttpStatus.OK);
     }
 
