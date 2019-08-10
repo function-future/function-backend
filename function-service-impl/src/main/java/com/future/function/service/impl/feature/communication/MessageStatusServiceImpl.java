@@ -68,7 +68,7 @@ public class MessageStatusServiceImpl implements MessageStatusService {
     return Optional.of(messageStatus)
             .map(msgStatus -> this.setChatroom(msgStatus, session))
             .map(this::setMember)
-            .map(msgStatus -> this.setMessage(msgStatus, session))
+            .map(this::setMessage)
             .map(messageStatusRepository::save)
             .orElseThrow(UnsupportedOperationException::new);
   }
@@ -76,7 +76,7 @@ public class MessageStatusServiceImpl implements MessageStatusService {
   @Override
   public void updateSeenStatus(String chatroomId, String messageId, String userId, Session session) {
     Long timestamp = Optional.of(messageId)
-            .map(id -> messageService.getMessage(id, session))
+            .map(messageService::getMessage)
             .map(Message::getCreatedAt)
             .orElse(0L);
     this.getUnseenMessageStatus(chatroomId, userId, session).forEach(messageStatus -> {
@@ -91,7 +91,7 @@ public class MessageStatusServiceImpl implements MessageStatusService {
   public MessageStatus updateMessageStatus(MessageStatus messageStatus, Session session) {
     return Optional.of(messageStatus)
             .map(this::setMember)
-            .map(msgStatus -> this.setMessage(msgStatus, session))
+            .map(this::setMessage)
             .map(msgStatus -> this.setChatroom(msgStatus, session))
             .map(messageStatusRepository::save)
             .orElse(messageStatus);
@@ -102,9 +102,9 @@ public class MessageStatusServiceImpl implements MessageStatusService {
     return messageStatus;
   }
 
-  private MessageStatus setMessage(MessageStatus messageStatus, Session session) {
+  private MessageStatus setMessage(MessageStatus messageStatus) {
     messageStatus.setMessage(
-            messageService.getMessage(messageStatus.getMessage().getId(), session));
+            messageService.getMessage(messageStatus.getMessage().getId()));
     return messageStatus;
   }
 

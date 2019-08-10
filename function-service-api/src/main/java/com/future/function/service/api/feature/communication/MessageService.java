@@ -11,7 +11,7 @@ import org.springframework.data.domain.Pageable;
  */
 public interface MessageService {
 
-  Message getMessage(String messageId, Session session);
+  Message getMessage(String messageId);
 
   Page<Message> getMessages(String chatroomId, Pageable pageable, Session session);
 

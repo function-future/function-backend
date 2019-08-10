@@ -149,7 +149,7 @@ public class MessageServiceImplTest {
   public void testGivenMessageIdByGettingMessageByMessageIdReturnMessage() {
     when(messageRepository.findOne(MESSAGE_ID_1)).thenReturn(message1);
 
-    Message message = messageService.getMessage(MESSAGE_ID_1, SESSION);
+    Message message = messageService.getMessage(MESSAGE_ID_1);
 
     assertThat(message).isNotNull();
     assertThat(message.getId()).isEqualTo(MESSAGE_ID_1);
@@ -161,7 +161,7 @@ public class MessageServiceImplTest {
   public void testGivenMessageIdByGettingMessageByMessageIdReturnNotFoundException() {
     when(messageRepository.findOne(MESSAGE_ID_1)).thenReturn(null);
 
-    catchException(() -> messageService.getMessage(MESSAGE_ID_1, SESSION));
+    catchException(() -> messageService.getMessage(MESSAGE_ID_1));
 
     assertThat(caughtException().getClass()).isEqualTo(NotFoundException.class);
     assertThat(caughtException().getMessage()).isEqualTo("Message not found");

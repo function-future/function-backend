@@ -187,7 +187,7 @@ public class MessageStatusServiceImplTest {
   @Test
   public void testGivenMessageStatusByCreatingMessageStatusReturnMessageStatus() {
     when(userService.getUser(USER_ID)).thenReturn(USER);
-    when(messageService.getMessage(MESSAGE_ID_1, SESSION)).thenReturn(MESSAGE_1);
+    when(messageService.getMessage(MESSAGE_ID_1)).thenReturn(MESSAGE_1);
     when(chatroomService.getChatroom(CHATROOM_ID, SESSION)).thenReturn(CHATROOM);
     when(messageStatusRepository.save(messageStatus1)).thenReturn(messageStatus1);
 
@@ -201,7 +201,7 @@ public class MessageStatusServiceImplTest {
 
     verify(userService).getUser(USER_ID);
     verify(chatroomService).getChatroom(CHATROOM_ID, SESSION);
-    verify(messageService).getMessage(MESSAGE_ID_1, SESSION);
+    verify(messageService).getMessage(MESSAGE_ID_1);
     verify(messageStatusRepository).save(messageStatus1);
   }
 
@@ -211,8 +211,8 @@ public class MessageStatusServiceImplTest {
     when(chatroomService.getChatroom(CHATROOM_ID, SESSION)).thenReturn(CHATROOM);
     when(messageStatusRepository.findAllByChatroomAndMemberAndSeenIsFalseOrderByCreatedAtDesc(
             CHATROOM, USER)).thenReturn(Arrays.asList(messageStatus3, messageStatus2));
-    when(messageService.getMessage(MESSAGE_ID_3, SESSION)).thenReturn(MESSAGE_3);
-    when(messageService.getMessage(MESSAGE_ID_2, SESSION)).thenReturn(MESSAGE_2);
+    when(messageService.getMessage(MESSAGE_ID_3)).thenReturn(MESSAGE_3);
+    when(messageService.getMessage(MESSAGE_ID_2)).thenReturn(MESSAGE_2);
     when(messageStatusRepository.save(messageStatus2)).thenReturn(messageStatus2);
     when(messageStatusRepository.save(messageStatus3)).thenReturn(messageStatus3);
 
@@ -222,8 +222,8 @@ public class MessageStatusServiceImplTest {
     verify(chatroomService, times(3)).getChatroom(CHATROOM_ID, SESSION);
     verify(messageStatusRepository).findAllByChatroomAndMemberAndSeenIsFalseOrderByCreatedAtDesc(
             CHATROOM, USER);
-    verify(messageService, times(2)).getMessage(MESSAGE_ID_3, SESSION);
-    verify(messageService).getMessage(MESSAGE_ID_2, SESSION);
+    verify(messageService, times(2)).getMessage(MESSAGE_ID_3);
+    verify(messageService).getMessage(MESSAGE_ID_2);
     verify(messageStatusRepository).save(messageStatus2);
     verify(messageStatusRepository).save(messageStatus3);
   }

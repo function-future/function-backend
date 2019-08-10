@@ -39,7 +39,7 @@ public class MessageServiceImpl implements MessageService {
   }
 
   @Override
-  public Message getMessage(String messageId, Session session) {
+  public Message getMessage(String messageId) {
     return Optional.of(messageId)
             .map(messageRepository::findOne)
             .orElseThrow(() -> new NotFoundException("Message not found"));
