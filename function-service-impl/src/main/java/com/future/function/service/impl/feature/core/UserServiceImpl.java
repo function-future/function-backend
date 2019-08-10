@@ -9,9 +9,11 @@ import com.future.function.repository.feature.core.UserRepository;
 import com.future.function.service.api.feature.core.BatchService;
 import com.future.function.service.api.feature.core.ResourceService;
 import com.future.function.service.api.feature.core.UserService;
+import com.future.function.service.api.feature.scoring.MediatorService;
 import com.future.function.service.impl.helper.CopyHelper;
 import com.future.function.service.impl.helper.PageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -33,17 +35,21 @@ public class UserServiceImpl implements UserService {
 
   private final ResourceService resourceService;
 
+  private final MediatorService mediatorService;
+
   private final BCryptPasswordEncoder encoder;
 
   @Autowired
   public UserServiceImpl(
-    BatchService batchService, UserRepository userRepository,
-    ResourceService resourceService, BCryptPasswordEncoder encoder
+          BatchService batchService, UserRepository userRepository,
+          ResourceService resourceService, @Lazy MediatorService mediatorService,
+          BCryptPasswordEncoder encoder
   ) {
 
     this.batchService = batchService;
     this.userRepository = userRepository;
     this.resourceService = resourceService;
+    this.mediatorService = mediatorService;
     this.encoder = encoder;
   }
 
@@ -128,6 +134,7 @@ public class UserServiceImpl implements UserService {
       .map(this::setDefaultEncryptedPassword)
       .map(this::setUserPicture)
       .map(userRepository::save)
+            .map(mediatorService::createQuizAndAssignmentsByStudent)
       .orElseThrow(
         () -> new UnsupportedOperationException("Failed Create User"));
   }

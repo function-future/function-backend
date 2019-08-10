@@ -247,15 +247,6 @@ public class StudentQuizServiceImplTest {
   }
 
   @Test
-  public void findAllQuestionsByStudentQuizId() {
-    List<StudentQuestion> actual = studentQuizService.findAllQuestionsByStudentQuizId(STUDENT_QUIZ_ID, USER_ID);
-    assertThat(actual.size()).isEqualTo(1);
-    verify(studentQuizRepository).findByIdAndDeletedFalse(STUDENT_QUIZ_ID);
-    verify(userService).getUser(USER_ID);
-    verify(studentQuizDetailService).findAllQuestionsByStudentQuizId(STUDENT_QUIZ_ID);
-  }
-
-  @Test
   public void findAllUnansweredQuestionsByStudentQuizId() {
     List<StudentQuestion> actual = studentQuizService.findAllUnansweredQuestionByStudentQuizId(STUDENT_QUIZ_ID, USER_ID);
     assertThat(actual.size()).isEqualTo(1);
@@ -287,18 +278,17 @@ public class StudentQuizServiceImplTest {
 
   @Test
   public void createStudentQuizAndSave() {
-    StudentQuiz actual = studentQuizService.createStudentQuizAndSave(USER_ID, quiz);
+    StudentQuiz actual = studentQuizService.createStudentQuizAndSave(student, quiz);
     assertThat(actual.getQuiz().getId()).isEqualTo(QUIZ_ID);
     assertThat(actual.getQuiz().getTrials()).isEqualTo(QUIZ_TRIALS);
     assertThat(actual.getStudent().getId()).isEqualTo(USER_ID);
     assertThat(actual.getStudent().getName()).isEqualTo(USER_NAME);
-    verify(userService).getUser(USER_ID);
     verify(studentQuizRepository).save(any(StudentQuiz.class));
   }
 
   @Test
   public void createStudentQuizAndSaveRequestQuizIsNull() {
-    catchException(() -> studentQuizService.createStudentQuizAndSave(USER_ID, null));
+    catchException(() -> studentQuizService.createStudentQuizAndSave(student, null));
     assertThat(caughtException().getClass()).isEqualTo(UnsupportedOperationException.class);
   }
 
@@ -307,7 +297,6 @@ public class StudentQuizServiceImplTest {
     Quiz actual = studentQuizService.createStudentQuizByBatchCode(BATCH_CODE, quiz);
     assertThat(actual.getBatch().getCode()).isEqualTo(BATCH_CODE);
     verify(userService).getStudentsByBatchCode(BATCH_CODE);
-    verify(userService).getUser(USER_ID);
     verify(studentQuizDetailService).createStudentQuizDetail(studentQuiz, null);
     verify(studentQuizRepository).save(any(StudentQuiz.class));
   }
@@ -328,7 +317,6 @@ public class StudentQuizServiceImplTest {
     assertThat(actual.getId()).isNotEqualTo(QUIZ_ID);
     verify(studentQuizRepository).save(any(StudentQuiz.class));
     verify(userService).getStudentsByBatchCode(TARGET_BATCH);
-    verify(userService).getUser(USER_ID);
     verify(studentQuizDetailService).createStudentQuizDetail(studentQuiz, null);
   }
 

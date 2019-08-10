@@ -1,5 +1,6 @@
 package com.future.function.service.api.feature.scoring;
 
+import com.future.function.model.entity.feature.core.User;
 import com.future.function.model.entity.feature.scoring.Assignment;
 import com.future.function.model.entity.feature.scoring.Room;
 import org.springframework.data.domain.Page;
@@ -27,6 +28,8 @@ public interface AssignmentService {
   Assignment updateAssignment(Assignment request);
 
   Room giveScoreToRoomByRoomId(String roomId, String userId, Integer point);
+
+    void createRoomByStudentAndAssignment(User user, Assignment assignment);
 
   void deleteRoomById(String id);
 

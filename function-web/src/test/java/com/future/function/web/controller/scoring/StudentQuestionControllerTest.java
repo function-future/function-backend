@@ -1,11 +1,7 @@
 package com.future.function.web.controller.scoring;
 
 import com.future.function.common.enumeration.core.Role;
-import com.future.function.model.entity.feature.scoring.Option;
-import com.future.function.model.entity.feature.scoring.Question;
-import com.future.function.model.entity.feature.scoring.StudentQuestion;
-import com.future.function.model.entity.feature.scoring.StudentQuiz;
-import com.future.function.model.entity.feature.scoring.StudentQuizDetail;
+import com.future.function.model.entity.feature.scoring.*;
 import com.future.function.service.api.feature.scoring.StudentQuizService;
 import com.future.function.web.TestHelper;
 import com.future.function.web.TestSecurityConfiguration;
@@ -32,9 +28,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.Collections;
 import java.util.List;
 
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -126,8 +120,6 @@ public class StudentQuestionControllerTest extends TestHelper {
     when(studentQuizService.answerQuestionsByStudentQuizId(STUDENT_QUIZ_ID, STUDENT_ID,
         Collections.singletonList(studentQuestion)))
         .thenReturn(studentQuizDetail);
-    when(studentQuizService.findAllQuestionsByStudentQuizId(STUDENT_QUIZ_ID, STUDENT_ID))
-        .thenReturn(Collections.singletonList(studentQuestion));
     when(studentQuizService.findAllUnansweredQuestionByStudentQuizId(STUDENT_QUIZ_ID, STUDENT_ID))
         .thenReturn(Collections.singletonList(studentQuestion));
     when(requestMapper.toStudentQuestionList(Collections.singletonList(studentQuestionWebRequest)))

@@ -3,6 +3,7 @@ package com.future.function.service.impl.feature.scoring;
 import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.FileV2;
+import com.future.function.model.entity.feature.core.User;
 import com.future.function.model.entity.feature.scoring.Assignment;
 import com.future.function.model.entity.feature.scoring.Room;
 import com.future.function.model.util.constant.FieldName;
@@ -16,7 +17,6 @@ import com.future.function.service.impl.helper.PageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.expression.spel.ast.Assign;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -199,6 +199,14 @@ public class AssignmentServiceImpl implements AssignmentService {
   public Room giveScoreToRoomByRoomId(String roomId, String userId, Integer point) {
     return roomService.giveScoreToRoomByRoomId(roomId, userId, point);
   }
+
+    @Override
+    public void createRoomByStudentAndAssignment(User user, Assignment assignment) {
+        try {
+            roomService.createRoomForUserAndSave(user, assignment);
+        } catch (Exception ignore) {
+        }
+    }
 
   @Override
   public void deleteRoomById(String id) {
