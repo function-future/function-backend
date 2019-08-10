@@ -93,7 +93,7 @@ public class StudentQuizServiceImpl implements StudentQuizService {
     return Optional.ofNullable(studentQuizId)
             .map(id -> this.updateStudentQuizTrialsAndReturnId(id, userId))
             .map(studentQuizDetailService::findAllUnansweredQuestionsByStudentQuizId)
-        .orElseGet(ArrayList::new);
+            .orElseThrow(() -> new UnsupportedOperationException("EMPTY_TRIALS"));
   }
 
   private String updateStudentQuizTrialsAndReturnId(String studentQuizId, String userId) {

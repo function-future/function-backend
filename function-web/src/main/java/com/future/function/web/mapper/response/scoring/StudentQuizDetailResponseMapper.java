@@ -27,6 +27,7 @@ public final class StudentQuizDetailResponseMapper {
     return StudentQuizDetailWebResponse
         .builder()
         .point(studentQuizDetail.getPoint())
+            .trials(studentQuizDetail.getStudentQuiz().getTrials())
         .build();
   }
 

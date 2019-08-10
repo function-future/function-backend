@@ -9,6 +9,7 @@ import com.future.function.service.impl.helper.CopyHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -48,9 +49,10 @@ public class StudentQuizDetailServiceImpl implements StudentQuizDetailService {
         .map(this::findLatestByStudentQuizId)
         .map(StudentQuizDetail::getStudentQuiz)
         .map(StudentQuiz::getQuiz)
+            .filter(quiz -> quiz.getEndDate() > new Date().getTime())
             .map(this::findAllQuestionsFromStudentQuestionService)
             .map(questionList -> createStudentQuestions(studentQuizId, questionList))
-            .orElseThrow(() -> new NotFoundException("Failed at #findAllUnansweredQuestionsByStudentQuizId #StudentQuizDetailService"));
+            .orElseThrow(() -> new UnsupportedOperationException("DEADLINE"));
   }
 
     private List<StudentQuestion> createStudentQuestions(String studentQuizId, List<Question> questionList) {

@@ -269,8 +269,8 @@ public class StudentQuizServiceImplTest {
   @Test
   public void findAllUnansweredQuestionsByStudentQuizIdAndTrialEqualZero() {
     studentQuiz.setTrials(0);
-    List<StudentQuestion> actual = studentQuizService.findAllUnansweredQuestionByStudentQuizId(STUDENT_QUIZ_ID, USER_ID);
-    assertThat(actual.size()).isEqualTo(0);
+    catchException(() -> studentQuizService.findAllUnansweredQuestionByStudentQuizId(STUDENT_QUIZ_ID, USER_ID));
+    assertThat(caughtException().getClass()).isEqualTo(UnsupportedOperationException.class);
     verify(studentQuizRepository).findByIdAndDeletedFalse(STUDENT_QUIZ_ID);
     verify(userService).getUser(USER_ID);
   }
