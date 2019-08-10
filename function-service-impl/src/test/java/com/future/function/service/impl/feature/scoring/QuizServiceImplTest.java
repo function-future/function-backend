@@ -18,6 +18,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -194,6 +195,18 @@ public class QuizServiceImplTest {
     verify(questionBankService).findById(QUESTION_BANK_ID);
   }
 
+    @Test
+    public void testCreateQuizAllQuestionBankSuccess() {
+        quiz.setQuestionBanks(Collections.singletonList(QuestionBank.builder().id("ALL").build()));
+        Quiz actual = quizService.createQuiz(quiz);
+        assertThat(actual).isEqualTo(quiz);
+
+        verify(quizRepository).save(eq(quiz));
+        verify(batchService).getBatchByCode(BATCH_CODE);
+        verify(studentQuizService).createStudentQuizByBatchCode(BATCH_CODE, quiz);
+        verify(questionBankService).findAll();
+    }
+
   @Test
   public void testCreateQuizFail() {
     when(quizRepository.save(quiz)).thenThrow(BadRequestException.class);
@@ -215,6 +228,24 @@ public class QuizServiceImplTest {
     verify(batchService).getBatchByCode(BATCH_CODE);
     verify(questionBankService).findById(QUESTION_BANK_ID);
   }
+
+    @Test
+    public void testUpdateQuizSuccessDifferentTrials() {
+        quiz.setId(QUIZ_ID);
+        Quiz request = new Quiz();
+        BeanUtils.copyProperties(quiz, request);
+        request.setTrials(15);
+        when(studentQuizService.updateQuizTrials(request)).thenReturn(request);
+
+        Quiz actual = quizService.updateQuiz(request);
+        assertThat(actual).isEqualTo(request);
+
+        verify(quizRepository).findByIdAndDeletedFalse(eq(QUIZ_ID));
+        verify(quizRepository).save(eq(quiz));
+        verify(batchService).getBatchByCode(BATCH_CODE);
+        verify(questionBankService).findById(QUESTION_BANK_ID);
+        verify(studentQuizService).updateQuizTrials(request);
+    }
 
   @Test
   public void testUpdateQuizFindByIdNotFound() {

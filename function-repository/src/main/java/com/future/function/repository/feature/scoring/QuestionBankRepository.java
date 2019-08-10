@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface QuestionBankRepository extends MongoRepository<QuestionBank, String> {
@@ -12,5 +13,7 @@ public interface QuestionBankRepository extends MongoRepository<QuestionBank, St
   Optional<QuestionBank> findByIdAndDeletedFalse(String id);
 
   Page<QuestionBank> findAllByDeletedFalse(Pageable pageable);
+
+    List<QuestionBank> findAllByDeletedFalse();
 
 }

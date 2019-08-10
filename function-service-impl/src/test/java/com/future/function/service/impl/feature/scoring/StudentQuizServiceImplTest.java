@@ -349,4 +349,14 @@ public class StudentQuizServiceImplTest {
     verify(studentQuizRepository).findByStudentIdAndQuizIdAndDeletedFalse(USER_ID, QUIZ_ID);
     verify(studentQuizRepository).save(studentQuiz);
   }
+
+  @Test
+  public void updateStudentQuizTrials() {
+    quiz.setTrials(100);
+    Quiz actual = studentQuizService.updateQuizTrials(quiz);
+    assertThat(actual).isEqualTo(quiz);
+    verify(userService).getStudentsByBatchCode(BATCH_CODE);
+    verify(studentQuizRepository).findByStudentIdAndQuizIdAndDeletedFalse(USER_ID, QUIZ_ID);
+    verify(studentQuizRepository).save(any(StudentQuiz.class));
+  }
 }

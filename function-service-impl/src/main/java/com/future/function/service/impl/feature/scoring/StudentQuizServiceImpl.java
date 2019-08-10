@@ -106,6 +106,29 @@ public class StudentQuizServiceImpl implements StudentQuizService {
             .orElse(null);
   }
 
+    @Override
+    public Quiz updateQuizTrials(Quiz quiz) {
+        return Optional.of(quiz)
+                .map(Quiz::getBatch)
+                .map(Batch::getCode)
+                .map(userService::getStudentsByBatchCode)
+                .map(students -> this.updateEveryStudentQuiz(quiz, students))
+                .orElse(quiz);
+    }
+
+    private Quiz updateEveryStudentQuiz(Quiz quiz, List<User> students) {
+        students.stream()
+                .map(User::getId)
+                .map(userId -> studentQuizRepository.findByStudentIdAndQuizIdAndDeletedFalse(userId, quiz.getId()))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .forEach(studentQuiz -> {
+                    studentQuiz.setTrials(quiz.getTrials());
+                    studentQuizRepository.save(studentQuiz);
+                });
+        return quiz;
+    }
+
   private StudentQuiz reduceStudentQuizTrials(StudentQuiz studentQuiz) {
     studentQuiz.setTrials(studentQuiz.getTrials() - 1);
     return studentQuiz;
