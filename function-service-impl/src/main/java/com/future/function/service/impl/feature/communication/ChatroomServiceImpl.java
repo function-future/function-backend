@@ -133,7 +133,7 @@ public class ChatroomServiceImpl implements ChatroomService {
   }
 
   private Chatroom validateAuthorization(Chatroom chatroom, Session session) {
-    if (!chatroom.getMembers().contains(userService.getUser(session.getUserId()))) {
+    if (!chatroom.getMembers().contains(userService.getUser(session.getUserId())) && chatroom.getType() != ChatroomType.PUBLIC) {
       throw new ForbiddenException("Chatroom did not belong to this user");
     }
     return chatroom;
