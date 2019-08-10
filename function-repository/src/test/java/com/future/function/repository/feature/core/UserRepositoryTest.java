@@ -150,5 +150,17 @@ public class UserRepositoryTest {
     assertThat(foundUsers.getContent()).isEqualTo(
       Collections.singletonList(user1));
   }
+  
+  @Test
+  public void testGivenRoleAndNameByFindingUsersByRoleAndNameContainsIgnoreCaseReturnPageOfUsers() {
+    
+    Page<User> foundUsers =
+      userRepository.findAllByRoleAndNameContainsIgnoreCaseAndDeletedFalse(
+        Role.ADMIN, "E-1", new PageRequest(0, 10));
+    
+    assertThat(foundUsers.getContent()).isNotEmpty();
+    assertThat(foundUsers.getContent()).isEqualTo(
+      Collections.singletonList(user1));
+  }
 
 }

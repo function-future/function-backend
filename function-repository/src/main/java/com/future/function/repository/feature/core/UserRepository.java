@@ -35,6 +35,10 @@ public interface UserRepository extends MongoRepository<User, String> {
    * @return {@code Page<User>} - Page of users found in database.
    */
   Page<User> findAllByRoleAndDeletedFalse(Role role, Pageable pageable);
+  
+  Page<User> findAllByRoleAndNameContainsIgnoreCaseAndDeletedFalse(
+    Role role, String name, Pageable pageable
+  );
 
   /**
    * Finds users by batch, role and page data
