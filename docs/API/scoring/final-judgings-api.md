@@ -547,15 +547,16 @@
         }
 
 
-## Scoring - Final Judging Students List Within Batch [/api/scoring/batches/{batchCode}/judgings/students{?page,size}]       
+## Scoring - Final Judging Students List [/api/scoring/batches/{batchCode}/judgings/students{?page,size}]  
 
-    + page (optional, number) - specifying the page number
-    + size (optional, number) - specifying the page size
-    + batchCode (string) - specifying the batch by code
- 
+    + Parameters
+        + page (optional, number) - specifying the page number
+        + size (optional, number) - specifying the page size
+        + batchCode (string) - specifying the batch by code
+
 ### Get Students Within Batch [GET]
 
-+ Request (application/octet-stream)
++ Request (application/application-json)
 
     + Headers
     
@@ -616,7 +617,7 @@
                         "code": "3"
                     },
                     "university": "Bina Nusantara University",
-                    finalPoint": 100
+                    "finalPoint": 100
                 },
                 {
                     "id": "sample-id",
@@ -673,4 +674,3 @@
             "code": 403,
             "status": "FORBIDDEN"
         }
-
