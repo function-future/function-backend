@@ -10,6 +10,7 @@ import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.service.api.feature.communication.MessageService;
 import com.future.function.service.api.feature.communication.MessageStatusService;
+import com.future.function.session.model.Session;
 import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
@@ -65,6 +66,8 @@ public class ChatroomResponseMapperTest {
     private static final String CHATROOM_TITLE = "chatroomTitle";
 
     private static final String URL_PREFIX = "localhost:8080";
+
+    private static final Session SESSION = Session.builder().userId(MEMBER_ID_1).build();
 
     private static final User MEMBER_1 = User.builder()
             .id(MEMBER_ID_1)
@@ -131,24 +134,24 @@ public class ChatroomResponseMapperTest {
     @Test
     public void testGivenPagedChatroomAndMessageAndBooleanByCallingToPagingChatroomResponseReturnPaging() {
 
-        when(messageService.getLastMessage(CHATROOM_ID)).thenReturn(MESSAGE_1);
-        when(messageStatusService.getSeenStatus(CHATROOM_ID, MEMBER_ID_1)).thenReturn(IS_SEEN);
+        when(messageService.getLastMessage(CHATROOM_ID, SESSION)).thenReturn(MESSAGE_1);
+        when(messageStatusService.getSeenStatus(CHATROOM_ID, MEMBER_ID_1, SESSION)).thenReturn(IS_SEEN);
 
         PagingResponse<ChatroomResponse> data = ChatroomResponseMapper.toPagingChatroomResponse(
                 new PageImpl<>(Collections.singletonList(CHATROOM), PageHelper.toPageable(1, 1), 1),
                 messageService,
                 messageStatusService,
-                MEMBER_ID_1,
-                URL_PREFIX
-        );
+                URL_PREFIX,
+                SESSION
+                );
 
         assertThat(data).isNotNull();
         assertThat(data.getPaging().getPage()).isEqualTo(1);
         assertThat(data.getPaging().getSize()).isEqualTo(1);
         assertThat(data.getData().get(0).getId()).isEqualTo(CHATROOM_ID);
 
-        verify(messageService).getLastMessage(CHATROOM_ID);
-        verify(messageStatusService).getSeenStatus(CHATROOM_ID, MEMBER_ID_1);
+        verify(messageService).getLastMessage(CHATROOM_ID, SESSION);
+        verify(messageStatusService).getSeenStatus(CHATROOM_ID, MEMBER_ID_1, SESSION);
     }
 
     @Test

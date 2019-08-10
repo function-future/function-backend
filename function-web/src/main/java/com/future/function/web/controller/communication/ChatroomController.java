@@ -91,8 +91,8 @@ public class ChatroomController {
                     chatroomService.getChatroomsWithKeyword(search, session.getUserId(), PageHelper.toPageable(page, size)),
                     messageService,
                     messageStatusService,
-                    session.getUserId(),
-                    fileProperties.getUrlPrefix()
+                    fileProperties.getUrlPrefix(),
+                    session
             );
         }
         else {
@@ -100,8 +100,8 @@ public class ChatroomController {
                     chatroomService.getChatrooms(type, session.getUserId(), PageHelper.toPageable(page, size)),
                     messageService,
                     messageStatusService,
-                    session.getUserId(),
-                    fileProperties.getUrlPrefix()
+                    fileProperties.getUrlPrefix(),
+                    session
             );
         }
     }

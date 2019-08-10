@@ -1,11 +1,13 @@
 package com.future.function.service.impl.feature.communication;
 
 import com.future.function.common.enumeration.communication.ChatroomType;
+import com.future.function.common.exception.ForbiddenException;
 import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.communication.chatting.Chatroom;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.repository.feature.communication.chatting.ChatroomRepository;
 import com.future.function.service.api.feature.core.UserService;
+import com.future.function.session.model.Session;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -58,9 +60,17 @@ public class ChatroomServiceImplTest {
 
   private static final String USER_ID_2 = "user2";
 
+  private static final String USER_ID_3 = "user3";
+
   private static final String USER_NAME_1 = "Priagung";
 
   private static final String USER_NAME_2 = "Satyagama";
+
+  private static final Session SESSION = Session.builder().userId(USER_ID_1).build();
+
+  private static final Session SESSION_2 = Session.builder().userId(USER_ID_3).build();
+
+
 
   private static final User MEMBER_1 = User.builder()
           .id(USER_ID_1)
@@ -70,6 +80,10 @@ public class ChatroomServiceImplTest {
   private static final User MEMBER_2 = User.builder()
           .id(USER_ID_2)
           .name(USER_NAME_2)
+          .build();
+
+  private static final User MEMBER_3 = User.builder()
+          .id(USER_ID_3)
           .build();
 
   private Chatroom chatroom;
@@ -143,8 +157,9 @@ public class ChatroomServiceImplTest {
   @Test
   public void testGivenChatroomIdByGettingChatroomByIdReturnChatroom() {
     when(chatroomRepository.findOne(CHATROOM_ID)).thenReturn(chatroom);
+    when(userService.getUser(USER_ID_1)).thenReturn(MEMBER_1);
 
-    Chatroom chatroomResult = chatroomService.getChatroom(CHATROOM_ID);
+    Chatroom chatroomResult = chatroomService.getChatroom(CHATROOM_ID, SESSION);
 
     assertThat(chatroomResult).isNotNull();
     assertThat(chatroomResult.getId()).isEqualTo(CHATROOM_ID);
@@ -152,18 +167,33 @@ public class ChatroomServiceImplTest {
     assertThat(chatroomResult.getType()).isEqualTo(TYPE);
 
     verify(chatroomRepository).findOne(CHATROOM_ID);
+    verify(userService).getUser(USER_ID_1);
   }
 
   @Test
   public void testGivenChatroomIdByGettingChatroomByIdReturnNotFoundException() {
     when(chatroomRepository.findOne(CHATROOM_ID_FAKE)).thenReturn(null);
 
-    catchException(() -> chatroomService.getChatroom(CHATROOM_ID_FAKE));
+    catchException(() -> chatroomService.getChatroom(CHATROOM_ID_FAKE, SESSION));
 
     assertThat(caughtException().getClass()).isEqualTo(NotFoundException.class);
     assertThat(caughtException().getMessage()).isEqualTo("Get Chatroom Not Found");
 
     verify(chatroomRepository).findOne(CHATROOM_ID_FAKE);
+  }
+
+  @Test
+  public void testGivenChatroomIdByGettingChatroomByIdReturnForbiddenException() {
+    when(chatroomRepository.findOne(CHATROOM_ID)).thenReturn(chatroom);
+    when(userService.getUser(USER_ID_3)).thenReturn(MEMBER_3);
+
+    catchException(() -> chatroomService.getChatroom(CHATROOM_ID, SESSION_2));
+
+    assertThat(caughtException().getClass()).isEqualTo(ForbiddenException.class);
+    assertThat(caughtException().getMessage()).isEqualTo("Chatroom did not belong to this user");
+
+    verify(chatroomRepository).findOne(CHATROOM_ID);
+    verify(userService).getUser(USER_ID_3);
   }
 
   @Test
@@ -217,7 +247,7 @@ public class ChatroomServiceImplTest {
     when(userService.getUser(USER_ID_1)).thenReturn(MEMBER_1);
     when(userService.getUser(USER_ID_2)).thenReturn(MEMBER_2);
 
-    Chatroom chatroomResult = chatroomService.updateChatroom(newChatroom);
+    Chatroom chatroomResult = chatroomService.updateChatroom(newChatroom, SESSION);
 
     assertThat(chatroomResult).isNotNull();
     assertThat(chatroomResult.getId()).isEqualTo(CHATROOM_ID);
@@ -226,7 +256,7 @@ public class ChatroomServiceImplTest {
 
     verify(chatroomRepository).findOne(CHATROOM_ID);
     verify(chatroomRepository).save(chatroom);
-    verify(userService).getUser(USER_ID_1);
+    verify(userService, times(2)).getUser(USER_ID_1);
     verify(userService).getUser(USER_ID_2);
   }
 

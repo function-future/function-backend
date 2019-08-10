@@ -6,6 +6,7 @@ import com.future.function.model.entity.feature.communication.chatting.Message;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.service.api.feature.communication.MessageService;
 import com.future.function.service.api.feature.communication.MessageStatusService;
+import com.future.function.session.model.Session;
 import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.model.response.base.DataResponse;
@@ -81,15 +82,15 @@ public class ChatroomResponseMapper {
             Page<Chatroom> data,
             MessageService messageService,
             MessageStatusService messageStatusService,
-            String userId,
+            Session session,
             String urlPrefix
     ) {
         return data.getContent()
                 .stream()
                 .map(content -> toChatroomResponse(
                         content,
-                        messageService.getLastMessage(content.getId()),
-                        messageStatusService.getSeenStatus(content.getId(), userId),
+                        messageService.getLastMessage(content.getId(), session),
+                        messageStatusService.getSeenStatus(content.getId(), session.getUserId(), session),
                         urlPrefix)
                 )
                 .collect(Collectors.toList());
@@ -99,11 +100,11 @@ public class ChatroomResponseMapper {
             Page<Chatroom> data,
             MessageService messageService,
             MessageStatusService messageStatusService,
-            String userId,
-            String urlPrefix
+            String urlPrefix,
+            Session session
     ) {
         return ResponseHelper.toPagingResponse(
-                HttpStatus.OK, toChatroomResponseList(data, messageService, messageStatusService, userId, urlPrefix), PageHelper.toPaging(data));
+                HttpStatus.OK, toChatroomResponseList(data, messageService, messageStatusService, session, urlPrefix), PageHelper.toPaging(data));
     }
 
     private static LastMessageResponse toLastMessageResponse(Message message, boolean isSeen) {
