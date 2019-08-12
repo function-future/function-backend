@@ -134,13 +134,17 @@ public class UserController {
       Session session,
     @RequestParam(required = false)
       String role,
-    @RequestParam(required = false,
-                  defaultValue = "1")
-      int page
+    @RequestParam(defaultValue = "")
+      String name,
+    @RequestParam(defaultValue = "1")
+      int page,
+    @RequestParam(defaultValue = "10")
+      int size
   ) {
     
     return UserResponseMapper.toUsersPagingResponse(
-      userService.getUsers(Role.toRole(role), PageHelper.toPageable(page, 10)),
+      userService.getUsers(
+        Role.toRole(role), name, PageHelper.toPageable(page, size)),
       fileProperties.getUrlPrefix()
     );
   }

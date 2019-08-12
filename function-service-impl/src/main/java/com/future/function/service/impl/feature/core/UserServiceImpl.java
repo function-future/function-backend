@@ -94,9 +94,10 @@ public class UserServiceImpl implements UserService {
    * @return {@code Page<User>} - Page of users found in database.
    */
   @Override
-  public Page<User> getUsers(Role role, Pageable pageable) {
+  public Page<User> getUsers(Role role, String name, Pageable pageable) {
 
-    return userRepository.findAllByRoleAndDeletedFalse(role, pageable);
+    return userRepository.findAllByRoleAndNameContainsIgnoreCaseAndDeletedFalse(
+      role, name, pageable);
   }
 
   /**

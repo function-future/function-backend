@@ -199,16 +199,19 @@ public class UserServiceImplTest {
 
     List<User> studentsList = Arrays.asList(userStudent, additionalUser);
 
-    when(userRepository.findAllByRoleAndDeletedFalse(Role.STUDENT, PAGEABLE)).thenReturn(
+    when(userRepository.findAllByRoleAndNameContainsIgnoreCaseAndDeletedFalse(
+      Role.STUDENT, "", PAGEABLE)).thenReturn(
       PageHelper.toPage(studentsList, PAGEABLE));
 
     Page<User> foundUserStudentsPage = userService.getUsers(
-      Role.STUDENT, PAGEABLE);
+      Role.STUDENT, "", PAGEABLE);
 
     assertThat(foundUserStudentsPage).isNotNull();
     assertThat(foundUserStudentsPage.getContent()).isEqualTo(studentsList);
 
-    verify(userRepository).findAllByRoleAndDeletedFalse(Role.STUDENT, PAGEABLE);
+    verify(
+      userRepository).findAllByRoleAndNameContainsIgnoreCaseAndDeletedFalse(
+      Role.STUDENT, "", PAGEABLE);
     verifyZeroInteractions(batchService, resourceService, encoder);
   }
 
@@ -259,12 +262,12 @@ public class UserServiceImplTest {
   }
 
   @Test
-  public void testGivenRoleMentorByGettingUsersReturnMentorsPage() {
+  public void testGivenRoleMentorAndNameByGettingUsersReturnMentorsPage() {
 
     User additionalUser = User.builder()
       .role(Role.MENTOR)
       .email(EMAIL_MENTOR)
-      .name(NAME_STUDENT)
+      .name(NAME_MENTOR)
       .password(PASSWORD)
       .phone(PHONE)
       .address(ADDRESS)
@@ -274,16 +277,20 @@ public class UserServiceImplTest {
 
     List<User> mentorsList = Arrays.asList(userMentor, additionalUser);
 
-    when(userRepository.findAllByRoleAndDeletedFalse(Role.MENTOR, PAGEABLE)).thenReturn(
+    String name = "MENT";
+    when(userRepository.findAllByRoleAndNameContainsIgnoreCaseAndDeletedFalse(
+      Role.MENTOR, name, PAGEABLE)).thenReturn(
       PageHelper.toPage(mentorsList, PAGEABLE));
 
     Page<User> foundUserMentorsPage = userService.getUsers(
-      Role.MENTOR, PAGEABLE);
+      Role.MENTOR, name, PAGEABLE);
 
     assertThat(foundUserMentorsPage).isNotNull();
     assertThat(foundUserMentorsPage.getContent()).isEqualTo(mentorsList);
 
-    verify(userRepository).findAllByRoleAndDeletedFalse(Role.MENTOR, PAGEABLE);
+    verify(
+      userRepository).findAllByRoleAndNameContainsIgnoreCaseAndDeletedFalse(
+      Role.MENTOR, name, PAGEABLE);
     verifyZeroInteractions(batchService, resourceService, encoder);
   }
 

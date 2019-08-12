@@ -5,7 +5,9 @@ HOST: http://function.apiblueprint.org/
 
 + Parameters
     + page (optional,number) - Indicating number of page in request
-    + role (string) - Selected role to be viewed, options are (case-sensitive): [admin, mentor, judge, student]
+    + size (optional,number) - Indicating size of page in request
+    + role (string) - Selected role to be viewed, options are (case-sensitive): [ADMIN, MENTOR, JUDGE, STUDENT]
+    + name (optional,string) - Query for users with specific role containing name
 
 ### Get Users [GET]
 

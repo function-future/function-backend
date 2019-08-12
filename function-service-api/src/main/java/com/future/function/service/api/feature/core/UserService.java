@@ -44,7 +44,7 @@ public interface UserService {
    *
    * @return {@code Page<User>} - Page of users found in database.
    */
-  Page<User> getUsers(Role role, Pageable pageable);
+  Page<User> getUsers(Role role, String name, Pageable pageable);
 
   /**
    * Retrieves users with STUDENT role from database given batch.
