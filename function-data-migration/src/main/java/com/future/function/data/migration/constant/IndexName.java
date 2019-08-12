@@ -7,6 +7,9 @@ import lombok.Getter;
 public enum IndexName {
   USER_EMAIL_DELETED(FieldName.User.EMAIL, FieldName.BaseEntity.DELETED),
   USER_ROLE_DELETED(FieldName.User.ROLE, FieldName.BaseEntity.DELETED),
+  USER_ROLE_NAME_DELETED(FieldName.User.ROLE, FieldName.User.NAME,
+                         FieldName.BaseEntity.DELETED
+  ),
   USER_ROLE_BATCH_DELETED(FieldName.User.ROLE, FieldName.User.BATCH,
                           FieldName.BaseEntity.DELETED
   ),
