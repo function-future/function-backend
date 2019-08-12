@@ -93,7 +93,7 @@ public class StudentQuizServiceImpl implements StudentQuizService {
     return Optional.ofNullable(studentQuizId)
             .map(id -> this.updateStudentQuizTrialsAndReturnId(id, userId))
             .map(studentQuizDetailService::findAllUnansweredQuestionsByStudentQuizId)
-        .orElseGet(ArrayList::new);
+            .orElseThrow(() -> new UnsupportedOperationException("EMPTY_TRIALS"));
   }
 
   private String updateStudentQuizTrialsAndReturnId(String studentQuizId, String userId) {
@@ -105,6 +105,29 @@ public class StudentQuizServiceImpl implements StudentQuizService {
             .map(StudentQuiz::getId)
             .orElse(null);
   }
+
+    @Override
+    public Quiz updateQuizTrials(Quiz quiz) {
+        return Optional.of(quiz)
+                .map(Quiz::getBatch)
+                .map(Batch::getCode)
+                .map(userService::getStudentsByBatchCode)
+                .map(students -> this.updateEveryStudentQuiz(quiz, students))
+                .orElse(quiz);
+    }
+
+    private Quiz updateEveryStudentQuiz(Quiz quiz, List<User> students) {
+        students.stream()
+                .map(User::getId)
+                .map(userId -> studentQuizRepository.findByStudentIdAndQuizIdAndDeletedFalse(userId, quiz.getId()))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .forEach(studentQuiz -> {
+                    studentQuiz.setTrials(quiz.getTrials());
+                    studentQuizRepository.save(studentQuiz);
+                });
+        return quiz;
+    }
 
   private StudentQuiz reduceStudentQuizTrials(StudentQuiz studentQuiz) {
     studentQuiz.setTrials(studentQuiz.getTrials() - 1);

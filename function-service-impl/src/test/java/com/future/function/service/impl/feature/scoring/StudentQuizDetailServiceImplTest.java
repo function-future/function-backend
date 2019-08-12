@@ -11,9 +11,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static com.googlecode.catchexception.CatchException.catchException;
 import static com.googlecode.catchexception.CatchException.caughtException;
@@ -80,6 +78,7 @@ public class StudentQuizDetailServiceImplTest {
         .builder()
         .id(QUIZ_ID)
         .questionCount(QUESTION_COUNT)
+            .endDate(new Date(2020, Calendar.MARCH, 1).getTime())
         .questionBanks(Collections.singletonList(questionBank))
         .build();
 
@@ -156,6 +155,15 @@ public class StudentQuizDetailServiceImplTest {
               studentQuiz.getQuiz().getQuestionCount());
     verify(studentQuestionService)
         .createStudentQuestionsFromQuestionList(Collections.singletonList(question), studentQuizDetail);
+  }
+
+  @Test
+  public void findAllUnansweredQuestionsByStudentQuizIdDeadlineHasPassed() {
+    Date deadline = new Date();
+    quiz.setEndDate(deadline.getTime() - 10000000L);
+    catchException(() -> studentQuizDetailService.findAllUnansweredQuestionsByStudentQuizId(STUDENT_QUIZ_ID));
+    assertThat(caughtException().getClass()).isEqualTo(UnsupportedOperationException.class);
+    verify(studentQuizDetailRepository).findTopByStudentQuizIdAndDeletedFalseOrderByCreatedAtDesc(STUDENT_QUIZ_ID);
   }
 
   @Test

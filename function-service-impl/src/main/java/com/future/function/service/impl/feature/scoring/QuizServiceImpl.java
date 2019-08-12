@@ -104,11 +104,18 @@ public class QuizServiceImpl implements QuizService {
   }
 
   private List<QuestionBank> getQuestionBanksFromService(List<QuestionBank> questionBanks) {
+    return Optional.of(questionBanks)
+            .filter(questionBankList -> !questionBankList.get(0).getId().equals("ALL"))
+            .map(this::getSelectedQuestionBanks)
+            .orElseGet(questionBankService::findAll);
+  }
+
+  private List<QuestionBank> getSelectedQuestionBanks(List<QuestionBank> questionBanks) {
     return questionBanks
-        .stream()
-        .map(QuestionBank::getId)
-        .map(questionBankService::findById)
-        .collect(Collectors.toList());
+            .stream()
+            .map(QuestionBank::getId)
+            .map(questionBankService::findById)
+            .collect(Collectors.toList());
   }
 
   /**
@@ -122,10 +129,18 @@ public class QuizServiceImpl implements QuizService {
     return Optional.ofNullable(request)
         .map(Quiz::getId)
         .flatMap(quizRepository::findByIdAndDeletedFalse)
+            .map(quiz -> updateStudentQuizTrialsIfChanged(request, quiz))
         .map(quiz -> copyRequestedQuizAttributes(request, quiz))
         .map(this::setBatchAndQuestionBank)
         .map(quizRepository::save)
         .orElse(request);
+  }
+
+  private Quiz updateStudentQuizTrialsIfChanged(Quiz request, Quiz quiz) {
+    return Optional.of(quiz)
+            .filter(currentQuiz -> currentQuiz.getTrials() != request.getTrials())
+            .map(studentQuizService::updateQuizTrials)
+            .orElse(quiz);
   }
 
   private Quiz copyRequestedQuizAttributes(Quiz request, Quiz quiz) {

@@ -269,8 +269,8 @@ public class StudentQuizServiceImplTest {
   @Test
   public void findAllUnansweredQuestionsByStudentQuizIdAndTrialEqualZero() {
     studentQuiz.setTrials(0);
-    List<StudentQuestion> actual = studentQuizService.findAllUnansweredQuestionByStudentQuizId(STUDENT_QUIZ_ID, USER_ID);
-    assertThat(actual.size()).isEqualTo(0);
+    catchException(() -> studentQuizService.findAllUnansweredQuestionByStudentQuizId(STUDENT_QUIZ_ID, USER_ID));
+    assertThat(caughtException().getClass()).isEqualTo(UnsupportedOperationException.class);
     verify(studentQuizRepository).findByIdAndDeletedFalse(STUDENT_QUIZ_ID);
     verify(userService).getUser(USER_ID);
   }
@@ -348,5 +348,15 @@ public class StudentQuizServiceImplTest {
     verify(studentQuizDetailService).deleteByStudentQuiz(studentQuiz);
     verify(studentQuizRepository).findByStudentIdAndQuizIdAndDeletedFalse(USER_ID, QUIZ_ID);
     verify(studentQuizRepository).save(studentQuiz);
+  }
+
+  @Test
+  public void updateStudentQuizTrials() {
+    quiz.setTrials(100);
+    Quiz actual = studentQuizService.updateQuizTrials(quiz);
+    assertThat(actual).isEqualTo(quiz);
+    verify(userService).getStudentsByBatchCode(BATCH_CODE);
+    verify(studentQuizRepository).findByStudentIdAndQuizIdAndDeletedFalse(USER_ID, QUIZ_ID);
+    verify(studentQuizRepository).save(any(StudentQuiz.class));
   }
 }

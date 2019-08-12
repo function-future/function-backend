@@ -64,6 +64,15 @@ public class QuestionBankServiceImplTest {
   }
 
   @Test
+  public void findAllSuccess() {
+    when(questionBankRepository.findAllByDeletedFalse()).thenReturn(Collections.singletonList(questionBank));
+    List<QuestionBank> actual = questionBankService.findAll();
+    assertThat(actual.size()).isEqualTo(1);
+    assertThat(actual.get(0)).isEqualTo(questionBank);
+    verify(questionBankRepository).findAllByDeletedFalse();
+  }
+
+  @Test
   public void testFindByIdSuccess() {
 
     when(questionBankRepository.findByIdAndDeletedFalse(QUESTIONBANK_ID))

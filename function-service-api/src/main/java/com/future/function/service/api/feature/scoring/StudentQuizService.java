@@ -22,7 +22,9 @@ public interface StudentQuizService {
 
   List<StudentQuestion> findAllUnansweredQuestionByStudentQuizId(String studentQuizId, String userId);
 
-  StudentQuizDetail answerQuestionsByStudentQuizId(String studentQuizId, String userId, List<StudentQuestion> answers);
+    Quiz updateQuizTrials(Quiz quiz);
+
+    StudentQuizDetail answerQuestionsByStudentQuizId(String studentQuizId, String userId, List<StudentQuestion> answers);
 
   StudentQuiz createStudentQuizAndSave(String userId, Quiz quiz);
 
