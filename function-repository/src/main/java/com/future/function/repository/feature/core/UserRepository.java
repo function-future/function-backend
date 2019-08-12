@@ -24,17 +24,6 @@ public interface UserRepository extends MongoRepository<User, String> {
    * otherwise return {@link java.util.Optional#empty()}
    */
   Optional<User> findByEmailAndDeletedFalse(String email);
-
-  /**
-   * Finds users by role and page data
-   * ({@link org.springframework.data.domain.Pageable}).
-   *
-   * @param role     Enum of available roles.
-   * @param pageable Pageable object for paging data.
-   *
-   * @return {@code Page<User>} - Page of users found in database.
-   */
-  Page<User> findAllByRoleAndDeletedFalse(Role role, Pageable pageable);
   
   Page<User> findAllByRoleAndNameContainsIgnoreCaseAndDeletedFalse(
     Role role, String name, Pageable pageable

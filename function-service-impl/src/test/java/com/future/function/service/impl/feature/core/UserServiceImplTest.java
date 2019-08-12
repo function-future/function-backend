@@ -195,7 +195,8 @@ public class UserServiceImplTest {
 
     List<User> studentsList = Arrays.asList(userStudent, additionalUser);
 
-    when(userRepository.findAllByRoleAndDeletedFalse(Role.STUDENT, PAGEABLE)).thenReturn(
+    when(userRepository.findAllByRoleAndNameContainsIgnoreCaseAndDeletedFalse(
+      Role.STUDENT, "", PAGEABLE)).thenReturn(
       PageHelper.toPage(studentsList, PAGEABLE));
 
     Page<User> foundUserStudentsPage = userService.getUsers(
@@ -204,7 +205,9 @@ public class UserServiceImplTest {
     assertThat(foundUserStudentsPage).isNotNull();
     assertThat(foundUserStudentsPage.getContent()).isEqualTo(studentsList);
 
-    verify(userRepository).findAllByRoleAndDeletedFalse(Role.STUDENT, PAGEABLE);
+    verify(
+      userRepository).findAllByRoleAndNameContainsIgnoreCaseAndDeletedFalse(
+      Role.STUDENT, "", PAGEABLE);
     verifyZeroInteractions(batchService, resourceService, encoder);
   }
 

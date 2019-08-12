@@ -90,13 +90,8 @@ public class UserServiceImpl implements UserService {
   @Override
   public Page<User> getUsers(Role role, String name, Pageable pageable) {
 
-    return Optional.ofNullable(name)
-      .filter(n -> !n.isEmpty())
-      .map(
-        ignored -> userRepository.findAllByRoleAndNameContainsIgnoreCaseAndDeletedFalse(
-          role, name, pageable))
-      .orElseGet(
-        () -> userRepository.findAllByRoleAndDeletedFalse(role, pageable));
+    return userRepository.findAllByRoleAndNameContainsIgnoreCaseAndDeletedFalse(
+      role, name, pageable);
   }
 
   /**

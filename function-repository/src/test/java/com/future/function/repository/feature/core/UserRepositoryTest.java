@@ -99,24 +99,6 @@ public class UserRepositoryTest {
   }
 
   @Test
-  public void testGivenRoleAndPageableByFindingUsersByRoleAndPageableReturnPageOfUsers() {
-
-    Page<User> foundUsersPage1 = userRepository.findAllByRoleAndDeletedFalse(
-      Role.ADMIN, new PageRequest(0, 5));
-
-    assertThat(foundUsersPage1).isNotNull();
-    assertThat(foundUsersPage1.getContent()).isNotEmpty();
-    assertThat(foundUsersPage1.getNumberOfElements()).isEqualTo(1);
-
-    Page<User> foundUsersPage2 = userRepository.findAllByRoleAndDeletedFalse(
-      Role.JUDGE, new PageRequest(0, 5));
-
-    assertThat(foundUsersPage2).isNotNull();
-    assertThat(foundUsersPage2.getContent()).isEmpty();
-    assertThat(foundUsersPage2.getNumberOfElements()).isEqualTo(0);
-  }
-
-  @Test
   public void testGivenBatchAndRoleAndPageableByFindingUsersByRoleAndPageableReturnPageOfUsers() {
 
     Page<User> foundUsersPage = userRepository.findAllByBatchAndRoleAndDeletedFalse(
