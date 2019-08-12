@@ -200,14 +200,6 @@ public class AssignmentServiceImpl implements AssignmentService {
     return roomService.giveScoreToRoomByRoomId(roomId, userId, point);
   }
 
-    @Override
-    public void createRoomByStudentAndAssignment(User user, Assignment assignment) {
-        try {
-            roomService.createRoomForUserAndSave(user, assignment);
-        } catch (Exception ignore) {
-        }
-    }
-
   @Override
   public void deleteRoomById(String id) {
     roomService.deleteRoomById(id);

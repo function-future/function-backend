@@ -4,6 +4,7 @@ import com.future.function.common.enumeration.core.Role;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.service.api.feature.scoring.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.PageRequest;
@@ -14,7 +15,8 @@ import java.util.Optional;
 
 @Service
 @Lazy
-public class MediatorServiceImpl implements MediatorService {
+@Slf4j
+public class ScoringMediatorServiceImpl implements ScoringMediatorService {
 
     private static final Pageable MAX_PAGEABLE = new PageRequest(0, Integer.MAX_VALUE);
 
@@ -45,16 +47,12 @@ public class MediatorServiceImpl implements MediatorService {
                 .forEach(quiz -> {
                     try {
                         studentQuizService.createStudentQuizAndSave(user, quiz);
-                    } catch (Exception ignore) {
+                    } catch (Exception e) {
+                      log.info("ScoringMediatorException: {}", e.getMessage(), e);
                     }
                 });
         assignmentService.findAllByBatchCodeAndPageable(batchCode, pageable).getContent()
-                .forEach(assignment -> {
-                    try {
-                        roomService.createRoomForUserAndSave(user, assignment);
-                    } catch (Exception ignore) {
-                    }
-                });
+                .forEach(assignment -> roomService.createRoomForUserAndSave(user, assignment));
         return user;
     }
 }

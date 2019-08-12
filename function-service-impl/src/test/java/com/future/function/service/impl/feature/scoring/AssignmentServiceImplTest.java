@@ -382,10 +382,4 @@ public class AssignmentServiceImplTest {
     verify(assignmentRepository).save(any(Assignment.class));
     verify(roomService).createRoomsByAssignment(anotherAssignment);
   }
-
-  @Test
-  public void createRoomByStudentAndAssignment() {
-    assignmentService.createRoomByStudentAndAssignment(student, assignment);
-    verify(roomService).createRoomForUserAndSave(student, assignment);
-  }
 }

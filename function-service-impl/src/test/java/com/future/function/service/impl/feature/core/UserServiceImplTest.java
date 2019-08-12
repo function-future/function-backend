@@ -9,7 +9,7 @@ import com.future.function.model.entity.feature.core.User;
 import com.future.function.repository.feature.core.UserRepository;
 import com.future.function.service.api.feature.core.BatchService;
 import com.future.function.service.api.feature.core.ResourceService;
-import com.future.function.service.api.feature.scoring.MediatorService;
+import com.future.function.service.api.feature.scoring.ScoringMediatorService;
 import com.future.function.service.impl.helper.PageHelper;
 import org.junit.After;
 import org.junit.Before;
@@ -96,7 +96,7 @@ public class UserServiceImplTest {
   private ResourceService resourceService;
 
     @Mock
-    private MediatorService mediatorService;
+    private ScoringMediatorService scoringMediatorService;
 
   @Mock
   private BCryptPasswordEncoder encoder;
@@ -136,7 +136,7 @@ public class UserServiceImplTest {
   public void tearDown() {
 
     verifyNoMoreInteractions(
-            batchService, userRepository, resourceService, mediatorService, encoder);
+            batchService, userRepository, resourceService, scoringMediatorService, encoder);
   }
 
   @Test
@@ -300,7 +300,7 @@ public class UserServiceImplTest {
                            .replace(" ", "") + "functionapp";
     when(encoder.encode(rawPassword)).thenReturn(PASSWORD);
     when(userRepository.save(userStudent)).thenReturn(userStudent);
-      when(mediatorService.createQuizAndAssignmentsByStudent(userStudent)).thenReturn(userStudent);
+      when(scoringMediatorService.createQuizAndAssignmentsByStudent(userStudent)).thenReturn(userStudent);
 
     User createdUserStudent = userService.createUser(userStudent);
 
@@ -313,7 +313,7 @@ public class UserServiceImplTest {
     verify(batchService).getBatchByCode(NUMBER);
     verify(resourceService).markFilesUsed(FILE_IDS, true);
     verify(resourceService).getFile(PICTURE_ID);
-      verify(mediatorService).createQuizAndAssignmentsByStudent(userStudent);
+      verify(scoringMediatorService).createQuizAndAssignmentsByStudent(userStudent);
     verify(encoder).encode(rawPassword);
     verify(userRepository).save(userStudent);
   }
@@ -357,7 +357,7 @@ public class UserServiceImplTest {
                            .replace(" ", "") + "functionapp";
     when(encoder.encode(PASSWORD)).thenReturn(PASSWORD);
     when(userRepository.save(userMentor)).thenReturn(userMentor);
-      when(mediatorService.createQuizAndAssignmentsByStudent(userMentor)).thenReturn(userMentor);
+      when(scoringMediatorService.createQuizAndAssignmentsByStudent(userMentor)).thenReturn(userMentor);
 
     User createdUserMentor = userService.createUser(userMentor);
 
@@ -367,7 +367,7 @@ public class UserServiceImplTest {
 
     verify(resourceService).markFilesUsed(FILE_IDS, true);
     verify(resourceService).getFile(PICTURE_ID);
-      verify(mediatorService).createQuizAndAssignmentsByStudent(userMentor);
+      verify(scoringMediatorService).createQuizAndAssignmentsByStudent(userMentor);
     verify(encoder).encode(rawPassword);
     verify(userRepository).save(userMentor);
     verifyZeroInteractions(batchService);
@@ -382,7 +382,7 @@ public class UserServiceImplTest {
     when(encoder.encode(rawPassword)).thenReturn(
       PASSWORD);
     when(userRepository.save(userMentor)).thenReturn(userMentor);
-      when(mediatorService.createQuizAndAssignmentsByStudent(userMentor)).thenReturn(userMentor);
+      when(scoringMediatorService.createQuizAndAssignmentsByStudent(userMentor)).thenReturn(userMentor);
 
     User createdUserMentor = userService.createUser(userMentor);
 
@@ -391,7 +391,7 @@ public class UserServiceImplTest {
 
     verify(encoder).encode(rawPassword);
     verify(userRepository).save(userMentor);
-      verify(mediatorService).createQuizAndAssignmentsByStudent(userMentor);
+      verify(scoringMediatorService).createQuizAndAssignmentsByStudent(userMentor);
     verifyZeroInteractions(batchService, resourceService);
   }
 

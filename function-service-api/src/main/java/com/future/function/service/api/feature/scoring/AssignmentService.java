@@ -29,8 +29,6 @@ public interface AssignmentService {
 
   Room giveScoreToRoomByRoomId(String roomId, String userId, Integer point);
 
-    void createRoomByStudentAndAssignment(User user, Assignment assignment);
-
   void deleteRoomById(String id);
 
   void deleteById(String id);

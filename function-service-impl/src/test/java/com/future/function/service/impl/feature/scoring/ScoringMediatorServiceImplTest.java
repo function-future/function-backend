@@ -27,7 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
-public class MediatorServiceImplTest {
+public class ScoringMediatorServiceImplTest {
 
     private static final String QUIZ_ID = "quiz-id";
     private static final String QUIZ_TITLE = "quiz-title";
@@ -70,7 +70,7 @@ public class MediatorServiceImplTest {
     private RoomService roomService;
 
     @InjectMocks
-    private MediatorServiceImpl mediatorService;
+    private ScoringMediatorServiceImpl mediatorService;
 
     @Before
     public void setUp() throws Exception {
