@@ -56,7 +56,42 @@ public enum IndexName {
     FieldName.ActivityBlog.TITLE
   ),
   MENU_ROLE(FieldName.Menu.ROLE),
-  ACCESS_ROLE(FieldName.Access.ROLE);
+    ACCESS_ROLE(FieldName.Access.ROLE),
+
+    ENTITY_DELETED(FieldName.BaseEntity.DELETED),
+
+    STUDENT_QUIZ_USER_ID_AND_QUIZ_ID_AND_DELETED(FieldName.StudentQuiz.STUDENT.concat(".").concat("_").concat(FieldName.BaseEntity.ID)
+            , FieldName.StudentQuiz.QUIZ.concat(".").concat("_").concat(FieldName.BaseEntity.ID)
+            , FieldName.BaseEntity.DELETED),
+
+    STUDENT_QUIZ_USER_ID_AND_DELETED(FieldName.StudentQuiz.STUDENT.concat(".").concat("_").concat(FieldName.BaseEntity.ID)
+            , FieldName.BaseEntity.DELETED),
+
+    STUDENT_QUIZ_DETAIL_STUDENT_QUIZ_ID_AND_CREATED_AT_AND_DELETED(FieldName.StudentQuizDetail.STUDENT_QUIZ.concat(".")
+            .concat("_").concat(FieldName.BaseEntity.ID), FieldName.BaseEntity.CREATED_AT, FieldName.BaseEntity.DELETED),
+
+    STUDENT_QUESTION_STUDENT_QUIZ_DETAIL_ID_AND_NUMBER(FieldName.StudentQuestion.STUDENT_QUIZ_DETAIL.concat(".")
+            .concat("_").concat(FieldName.BaseEntity.ID), FieldName.StudentQuestion.NUMBER),
+
+    QUESTION_QUESTION_BANK_ID_AND_DELETED(FieldName.Question.QUESTION_BANK.concat(".").concat("_").concat(FieldName.BaseEntity.ID)
+            , FieldName.BaseEntity.DELETED),
+
+    OPTION_QUESTION_ID(FieldName.Option.QUESTION.concat(".").concat("_").concat(FieldName.BaseEntity.ID)),
+
+    ROOM_ASSIGNMENT_ID_AND_DELETED(FieldName.Room.ASSIGNMENT.concat(".").concat("_").concat(FieldName.BaseEntity.ID)
+            , FieldName.BaseEntity.DELETED),
+
+    ROOM_ASSIGNMENT_USER_ID_AND_DELETED(FieldName.Room.STUDENT.concat(".").concat("_").concat(FieldName.BaseEntity.ID)
+            , FieldName.BaseEntity.DELETED),
+
+    DISCUSSION_ROOM_ID_AND_CREATED_AT(FieldName.Comment.ROOM.concat(".").concat("_").concat(FieldName.BaseEntity.ID)
+            , FieldName.BaseEntity.CREATED_AT),
+
+    REPORT_DETAIL_REPORT_ID_AND_DELETED(FieldName.ReportDetail.REPORT.concat(".").concat("_").concat(FieldName.BaseEntity.ID)
+            , FieldName.BaseEntity.DELETED),
+    REPORT_DETAIL_USER_ID_AND_DELETED(FieldName.ReportDetail.USER.concat(".").concat("_").concat(FieldName.BaseEntity.ID)
+            , FieldName.BaseEntity.DELETED);
+
 
   private String[] fields;
 
