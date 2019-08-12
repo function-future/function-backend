@@ -132,4 +132,16 @@ public class ScoringMediatorServiceImplTest {
         assertThat(actual.getId()).isEqualTo(USER_ID);
         assertThat(actual.getName()).isEqualTo(USERNAME);
     }
+
+    @Test
+    public void createQuizAndAssignmentsByStudentThrowException() {
+        doThrow(Exception.class).when(studentQuizService).createStudentQuizAndSave(user, quiz);
+        User actual = mediatorService.createQuizAndAssignmentsByStudent(user);
+        assertThat(actual.getId()).isEqualTo(USER_ID);
+        assertThat(actual.getName()).isEqualTo(USERNAME);
+        verify(quizService).findAllByBatchCodeAndPageable(BATCH_CODE, pageable);
+        verify(assignmentService).findAllByBatchCodeAndPageable(BATCH_CODE, pageable);
+        verify(studentQuizService).createStudentQuizAndSave(user, quiz);
+        verify(roomService).createRoomForUserAndSave(user, assignment);
+    }
 }
