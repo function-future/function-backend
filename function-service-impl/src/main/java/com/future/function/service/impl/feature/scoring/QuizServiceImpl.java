@@ -129,7 +129,7 @@ public class QuizServiceImpl implements QuizService {
     return Optional.ofNullable(request)
         .map(Quiz::getId)
         .flatMap(quizRepository::findByIdAndDeletedFalse)
-            .map(quiz -> updateStudentQuizTrialsIfChanged(request, quiz))
+        .map(quiz -> updateStudentQuizTrialsIfChanged(request, quiz))
         .map(quiz -> copyRequestedQuizAttributes(request, quiz))
         .map(this::setBatchAndQuestionBank)
         .map(quizRepository::save)
@@ -137,9 +137,10 @@ public class QuizServiceImpl implements QuizService {
   }
 
   private Quiz updateStudentQuizTrialsIfChanged(Quiz request, Quiz quiz) {
-    return Optional.of(quiz)
-            .filter(currentQuiz -> currentQuiz.getTrials() != request.getTrials())
+    return Optional.of(request)
+            .filter(currentQuiz -> currentQuiz.getTrials() != quiz.getTrials())
             .map(studentQuizService::updateQuizTrials)
+            .map(ignored -> quiz)
             .orElse(quiz);
   }
 

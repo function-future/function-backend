@@ -283,6 +283,7 @@ public class StudentQuizServiceImplTest {
     assertThat(actual.getQuiz().getTrials()).isEqualTo(QUIZ_TRIALS);
     assertThat(actual.getStudent().getId()).isEqualTo(USER_ID);
     assertThat(actual.getStudent().getName()).isEqualTo(USER_NAME);
+    verify(studentQuizDetailService).createStudentQuizDetail(studentQuiz,null);
     verify(studentQuizRepository).save(any(StudentQuiz.class));
   }
 

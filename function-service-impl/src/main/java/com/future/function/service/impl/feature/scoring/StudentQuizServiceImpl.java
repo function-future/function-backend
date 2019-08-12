@@ -137,6 +137,7 @@ public class StudentQuizServiceImpl implements StudentQuizService {
     return Optional.ofNullable(quiz)
             .map(quizObj -> toStudentQuizWithUserAndQuiz(user, quizObj))
         .map(studentQuizRepository::save)
+        .map(this::createStudentQuizDetailAndSave)
         .orElseThrow(() -> new UnsupportedOperationException("Failed at #createStudentQuizAndSave #StudentQuizService"));
   }
 
@@ -146,19 +147,13 @@ public class StudentQuizServiceImpl implements StudentQuizService {
         .map(userService::getStudentsByBatchCode)
         .filter(userList -> !userList.isEmpty())
         .map(userList -> createStudentQuizFromUserList(quiz, userList))
-        .map(studentQuizList -> {
-          this.createStudentQuizzes(studentQuizList);
-          return quiz;
-        })
+        .map(ignored -> quiz)
         .orElseThrow(() -> new UnsupportedOperationException("Failed at#CreateStudentQuizByBatchCode #StudentQuizService"));
   }
 
-  private void createStudentQuizzes(List<StudentQuiz> studentQuizzes) {
-    studentQuizzes.forEach(this::createStudentQuizDetailAndSave);
-  }
-
-  private void createStudentQuizDetailAndSave(StudentQuiz studentQuiz) {
+  private StudentQuiz createStudentQuizDetailAndSave(StudentQuiz studentQuiz) {
     studentQuizDetailService.createStudentQuizDetail(studentQuiz, null);
+    return studentQuiz;
   }
 
   @Override
