@@ -1,6 +1,7 @@
 package com.future.function.service.api.feature.scoring;
 
 import com.future.function.model.entity.feature.core.Batch;
+import com.future.function.model.entity.feature.core.User;
 import com.future.function.model.entity.feature.scoring.Quiz;
 import com.future.function.model.entity.feature.scoring.StudentQuestion;
 import com.future.function.model.entity.feature.scoring.StudentQuiz;
@@ -18,15 +19,13 @@ public interface StudentQuizService {
 
   StudentQuiz findById(String id, String userId);
 
-  List<StudentQuestion> findAllQuestionsByStudentQuizId(String studentQuizId, String userId);
-
   List<StudentQuestion> findAllUnansweredQuestionByStudentQuizId(String studentQuizId, String userId);
 
     Quiz updateQuizTrials(Quiz quiz);
 
     StudentQuizDetail answerQuestionsByStudentQuizId(String studentQuizId, String userId, List<StudentQuestion> answers);
 
-  StudentQuiz createStudentQuizAndSave(String userId, Quiz quiz);
+    StudentQuiz createStudentQuizAndSave(User user, Quiz quiz);
 
   Quiz createStudentQuizByBatchCode(String batchCode, Quiz quiz);
 

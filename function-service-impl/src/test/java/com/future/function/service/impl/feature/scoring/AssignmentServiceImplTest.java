@@ -3,6 +3,7 @@ package com.future.function.service.impl.feature.scoring;
 import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.FileV2;
+import com.future.function.model.entity.feature.core.User;
 import com.future.function.model.entity.feature.scoring.Assignment;
 import com.future.function.model.entity.feature.scoring.Room;
 import com.future.function.repository.feature.scoring.AssignmentRepository;
@@ -52,6 +53,7 @@ public class AssignmentServiceImplTest {
   private Pageable pageable;
   private Batch batch;
   private Room room;
+  private User student;
   private Page<Assignment> assignmentPage;
   private Page<Room> roomPage;
   private List<Assignment> assignmentList;
@@ -75,6 +77,8 @@ public class AssignmentServiceImplTest {
   public void setUp() throws Exception {
 
       batch = Batch.builder().code(BATCH_CODE).id(BATCH_ID).build();
+
+    student = User.builder().id(USER_ID).build();
 
     file = FileV2
         .builder()

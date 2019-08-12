@@ -51,7 +51,8 @@ public class QuizServiceImplTest {
   private static final String QUESTION_BANK_ID = "question-bank-id";
   private static final String QUESTION_BANK_DESCRIPTION = "question-bank-description";
 
-  private static final String QUESTION_ID = "question-id";
+    private static final String USER_ID = "user-id";
+
   private static final String QUESTION_TEXT = "question-text";
   private int PAGE = 0;
   private int TOTAL = 10;

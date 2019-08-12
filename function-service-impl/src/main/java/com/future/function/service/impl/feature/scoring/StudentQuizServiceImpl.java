@@ -29,8 +29,8 @@ import java.util.stream.Collectors;
 public class StudentQuizServiceImpl implements StudentQuizService {
 
   private StudentQuizRepository studentQuizRepository;
-  private UserService userService;
   private StudentQuizDetailService studentQuizDetailService;
+  private UserService userService;
 
   @Autowired
   public StudentQuizServiceImpl(StudentQuizRepository studentQuizRepository, UserService userService,
@@ -73,19 +73,6 @@ public class StudentQuizServiceImpl implements StudentQuizService {
             .filter(studentQuiz -> AuthorizationHelper.isUserAuthorizedForAccess(user, studentQuiz.getStudent().getId(),
                 AuthorizationHelper.getScoringAllowedRoles()))
             .orElseThrow(() -> new NotFoundException("Failed at #findById #StudentQuizService"));
-  }
-
-  @Override
-  public List<StudentQuestion> findAllQuestionsByStudentQuizId(String studentQuizId, String userId) {
-    User currentUser = userService.getUser(userId);
-    return Optional.of(studentQuizId)
-        .flatMap(studentQuizRepository::findByIdAndDeletedFalse)
-        .map(StudentQuiz::getStudent)
-            .map(User::getId)
-            .filter(studentId -> AuthorizationHelper.isUserAuthorizedForAccess(currentUser, studentId, Role.STUDENT))
-            .map(ignored -> studentQuizId)
-            .map(studentQuizDetailService::findAllQuestionsByStudentQuizId)
-        .orElseGet(ArrayList::new);
   }
 
   @Override
@@ -146,9 +133,9 @@ public class StudentQuizServiceImpl implements StudentQuizService {
   }
 
   @Override
-  public StudentQuiz createStudentQuizAndSave(String userId, Quiz quiz) {
+  public StudentQuiz createStudentQuizAndSave(User user, Quiz quiz) {
     return Optional.ofNullable(quiz)
-        .map(quizObj -> toStudentQuizWithUserAndQuiz(userId, quizObj))
+            .map(quizObj -> toStudentQuizWithUserAndQuiz(user, quizObj))
         .map(studentQuizRepository::save)
         .orElseThrow(() -> new UnsupportedOperationException("Failed at #createStudentQuizAndSave #StudentQuizService"));
   }
@@ -230,16 +217,15 @@ public class StudentQuizServiceImpl implements StudentQuizService {
 
   private List<StudentQuiz> createStudentQuizFromUserList(Quiz quiz, List<User> userList) {
     return userList.stream()
-        .map(User::getId)
-        .map(userId -> createStudentQuizAndSave(userId, quiz))
+            .map(user -> createStudentQuizAndSave(user, quiz))
         .collect(Collectors.toList());
   }
 
-  private StudentQuiz toStudentQuizWithUserAndQuiz(String userId, Quiz quiz) {
+  private StudentQuiz toStudentQuizWithUserAndQuiz(User user, Quiz quiz) {
     return StudentQuiz
         .builder()
         .quiz(quiz)
-        .student(userService.getUser(userId))
+            .student(user)
         .trials(quiz.getTrials())
         .done(false)
         .build();

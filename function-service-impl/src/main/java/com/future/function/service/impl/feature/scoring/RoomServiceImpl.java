@@ -117,7 +117,8 @@ public class RoomServiceImpl implements RoomService {
     return list;
   }
 
-  private void createRoomForUserAndSave(User user, Assignment assignment) {
+    @Override
+    public void createRoomForUserAndSave(User user, Assignment assignment) {
         Room room = Room
                 .builder()
                 .assignment(assignment)

@@ -1,5 +1,6 @@
 package com.future.function.service.api.feature.scoring;
 
+import com.future.function.model.entity.feature.core.User;
 import com.future.function.model.entity.feature.scoring.Assignment;
 import com.future.function.model.entity.feature.scoring.Comment;
 import com.future.function.model.entity.feature.scoring.Room;
@@ -23,6 +24,8 @@ public interface RoomService {
   Comment createComment(Comment comment, String userId);
 
   Assignment createRoomsByAssignment(Assignment assignment);
+
+    void createRoomForUserAndSave(User user, Assignment assignment);
 
   Room giveScoreToRoomByRoomId(String roomId, String userId, Integer point);
 
