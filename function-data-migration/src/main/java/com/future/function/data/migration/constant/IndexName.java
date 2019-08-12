@@ -76,7 +76,7 @@ public enum IndexName {
     QUESTION_QUESTION_BANK_ID_AND_DELETED(FieldName.Question.QUESTION_BANK.concat(".").concat("_").concat(FieldName.BaseEntity.ID)
             , FieldName.BaseEntity.DELETED),
 
-    OPTION_QUESTION__ID(FieldName.Option.QUESTION.concat(".").concat("_").concat(FieldName.BaseEntity.ID)),
+    OPTION_QUESTION_ID(FieldName.Option.QUESTION.concat(".").concat("_").concat(FieldName.BaseEntity.ID)),
 
     ROOM_ASSIGNMENT_ID_AND_DELETED(FieldName.Room.ASSIGNMENT.concat(".").concat("_").concat(FieldName.BaseEntity.ID)
             , FieldName.BaseEntity.DELETED),

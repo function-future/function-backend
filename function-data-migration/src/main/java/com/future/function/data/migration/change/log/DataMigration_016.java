@@ -124,8 +124,8 @@ public class DataMigration_016 {
     public void addOptionIndexes(MongoDatabase mongoDatabase) {
         mongoDatabase.getCollection(DocumentName.OPTION)
                 .createIndex(
-                        Indexes.ascending(OPTION_QUESTION__ID.getFields()),
-                        new IndexOptions().name(OPTION_QUESTION__ID.name())
+                        Indexes.ascending(OPTION_QUESTION_ID.getFields()),
+                        new IndexOptions().name(OPTION_QUESTION_ID.name())
                 );
     }
 
