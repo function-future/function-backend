@@ -10,10 +10,6 @@ import org.hibernate.validator.constraints.Range;
 
 import java.util.List;
 
-/**
- * Author: PriagungSatyagama
- * Created At: 18:44 06/07/2019
- */
 @Data
 @Builder
 @NoArgsConstructor

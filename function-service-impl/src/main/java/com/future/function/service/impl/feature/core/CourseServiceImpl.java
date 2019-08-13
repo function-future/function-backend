@@ -15,9 +15,6 @@ import org.springframework.stereotype.Service;
 import java.util.Collections;
 import java.util.Optional;
 
-/**
- * Service implementation class for course logic operations implementation.
- */
 @Service
 public class CourseServiceImpl implements CourseService {
   
@@ -34,13 +31,6 @@ public class CourseServiceImpl implements CourseService {
     this.resourceService = resourceService;
   }
   
-  /**
-   * {@inheritDoc}
-   *
-   * @param course Course data of new course.
-   *
-   * @return {@code Course} - The course object of the saved data.
-   */
   @Override
   public Course createCourse(Course course) {
     
@@ -69,13 +59,6 @@ public class CourseServiceImpl implements CourseService {
     return course;
   }
   
-  /**
-   * {@inheritDoc}
-   *
-   * @param course Course data of new course.
-   *
-   * @return {@code Course} - The course object of the saved data.
-   */
   @Override
   public Course updateCourse(Course course) {
     
@@ -107,13 +90,6 @@ public class CourseServiceImpl implements CourseService {
       .orElse(course);
   }
   
-  /**
-   * {@inheritDoc}
-   *
-   * @param courseId Id of course to be retrieved
-   *
-   * @return {@code Course} - The retrieved course object.
-   */
   @Override
   public Course getCourse(String courseId) {
     
@@ -128,11 +104,6 @@ public class CourseServiceImpl implements CourseService {
     return courseRepository.findAll(pageable);
   }
   
-  /**
-   * {@inheritDoc}
-   *
-   * @param courseId Id of course to be deleted.
-   */
   @Override
   public void deleteCourse(String courseId) {
     

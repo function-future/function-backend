@@ -15,9 +15,6 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-/**
- * Service implementation class for batch logic operations implementation.
- */
 @Service
 public class BatchServiceImpl implements BatchService {
   
@@ -29,11 +26,6 @@ public class BatchServiceImpl implements BatchService {
     this.batchRepository = batchRepository;
   }
   
-  /**
-   * {@inheritDoc}
-   *
-   * @return {@code Batch} - Batches found in database.
-   */
   @Override
   public Page<Batch> getBatches(Session session, Pageable pageable) {
   
@@ -52,13 +44,6 @@ public class BatchServiceImpl implements BatchService {
       .anyMatch(role -> role.equals(session.getRole()));
   }
   
-  /**
-   * {@inheritDoc}
-   *
-   * @param code Number of the batch to be retrieved.
-   *
-   * @return {@code Batch} - The batch object found in database.
-   */
   @Override
   public Batch getBatchByCode(String code) {
     
@@ -75,11 +60,6 @@ public class BatchServiceImpl implements BatchService {
       .orElseThrow(() -> new NotFoundException("Get Batch Not Found"));
   }
   
-  /**
-   * {@inheritDoc}
-   *
-   * @return {@code Batch} - The batch object of the saved data.
-   */
   @Override
   public Batch createBatch(Batch batch) {
     

@@ -7,9 +7,6 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
-/**
- * Service interface class for questionnaire logic operations declaration.
- */
 public interface QuestionnaireResultService {
 
   Page<UserQuestionnaireSummary> getAppraisalsQuestionnaireSummaryByBatch(Batch batch, Pageable pageable);

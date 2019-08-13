@@ -12,9 +12,6 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.List;
 
-/**
- * Represent the assignment request in the web as AssignmentWebRequest
- */
 @Data
 @Builder
 @NoArgsConstructor

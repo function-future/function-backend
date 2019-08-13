@@ -9,9 +9,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
-/**
- * Mapper class for incoming request for course feature.
- */
 @Component
 public class CourseRequestMapper {
   
@@ -25,14 +22,6 @@ public class CourseRequestMapper {
     this.validator = validator;
   }
   
-  /**
-   * Converts JSON data to {@code Course} object. This method is used for
-   * update course purposes.
-   *
-   * @param request JSON data (in form of CourseWebRequest) to be converted.
-   *
-   * @return {@code Course} - Converted course object.
-   */
   public Course toCourse(CourseWebRequest request) {
     
     return toCourse(null, request);
@@ -55,15 +44,6 @@ public class CourseRequestMapper {
       .build();
   }
   
-  /**
-   * Converts JSON data to {@code Course} object. This method is used for
-   * update course purposes.
-   *
-   * @param courseId Id of course to be updated.
-   * @param request  JSON data (in form of CourseWebRequest) to be converted.
-   *
-   * @return {@code Course} - Converted course object.
-   */
   public Course toCourse(String courseId, CourseWebRequest request) {
     
     validator.validate(request);

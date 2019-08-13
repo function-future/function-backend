@@ -16,12 +16,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface EmailMustBeUnique {
   
-  /**
-   * Default message returned when a String field (email) is not unique in
-   * database.
-   *
-   * @return {@code String} - The name of this annotation.
-   */
   String message() default "EmailMustBeUnique";
   
   Class<?>[] groups() default {};

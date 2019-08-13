@@ -2,7 +2,6 @@ package com.future.function.repository.feature.communication.logging;
 
 import com.future.function.model.entity.feature.communication.logging.LogMessage;
 import com.future.function.model.entity.feature.communication.logging.Topic;
-import com.future.function.model.entity.feature.core.User;
 import com.future.function.repository.TestApplication;
 import org.junit.After;
 import org.junit.Before;
@@ -16,10 +15,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * Author : Ricky Kennedy
- * Created At : 11:47 28/07/2019
- */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = TestApplication.class)
 public class LogMessageRepositoryTest {

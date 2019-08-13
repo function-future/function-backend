@@ -26,9 +26,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-/**
- * Controller class for course APIs.
- */
 @RestController
 @RequestMapping(value = "/api/core/batches/{batchCode}/courses")
 public class SharedCourseController {

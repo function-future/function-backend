@@ -41,10 +41,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
-/**
- * Author: ricky.kennedy
- * Created At: 2:28 PM 7/24/2019
- */
 @RunWith(MockitoJUnitRunner.class)
 public class MyQuestionnaireServiceImplTest {
 

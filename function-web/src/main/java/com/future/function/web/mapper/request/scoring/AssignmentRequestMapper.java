@@ -13,9 +13,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
-/**
- * Bean class used to map AssignmentWebRequest from json string
- */
 @Slf4j
 @Component
 public class AssignmentRequestMapper {
@@ -27,23 +24,10 @@ public class AssignmentRequestMapper {
     this.validator = validator;
   }
 
-  /**
-   * used to convert json in string format into a proper Assignment Object
-   *
-   * @param request (AssignmentWebRequest)
-   * @return Assignment Object
-   */
   public Assignment toAssignment(AssignmentWebRequest request, String batchCode) {
       return toValidatedAssignment(request, batchCode);
   }
 
-  /**
-   * Used to convert json in string format and assignment id into a proper Assignment Object
-   *
-   * @param assignmentId (String)
-   * @param request      (AssignmentWebRequest)
-   * @return Assignment Object
-   */
   public Assignment toAssignmentWithId(String assignmentId, AssignmentWebRequest request, String batchCode) {
       Assignment assignment = toValidatedAssignment(request, batchCode);
     assignment.setId(assignmentId);
@@ -54,12 +38,6 @@ public class AssignmentRequestMapper {
     return validator.validate(request);
   }
 
-  /**
-   * used to convert AssignmentWebRequest into a proper Assignment Object with validation to validate some pre-requisition
-   *
-   * @param request (AssignmentWebRequest)
-   * @return valid Assignment Object
-   */
   private Assignment toValidatedAssignment(AssignmentWebRequest request, String batchCode) {
       request = validator.validate(request);
       Assignment assignment = Assignment.builder().build();

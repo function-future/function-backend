@@ -8,10 +8,6 @@ import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.NotNull;
 
-/**
- * Author: PriagungSatyagama
- * Created At: 19:07 06/07/2019
- */
 @Data
 @Builder
 @NoArgsConstructor

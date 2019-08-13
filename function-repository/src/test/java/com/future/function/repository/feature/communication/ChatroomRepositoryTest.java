@@ -15,15 +15,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.junit4.SpringRunner;
+
 import java.util.Arrays;
 import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * Author: PriagungSatyagama
- * Created At: 8:54 01/06/2019
- */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = TestApplication.class)
 public class ChatroomRepositoryTest {

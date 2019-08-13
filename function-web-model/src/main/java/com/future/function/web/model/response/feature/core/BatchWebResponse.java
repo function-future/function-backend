@@ -6,9 +6,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * Model representation for batch web response.
- */
 @Data
 @Builder
 @NoArgsConstructor

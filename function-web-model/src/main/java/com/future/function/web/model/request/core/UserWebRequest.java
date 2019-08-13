@@ -19,9 +19,6 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.List;
 
-/**
- * Model representation for user web request.
- */
 @Data
 @Builder
 @NoArgsConstructor

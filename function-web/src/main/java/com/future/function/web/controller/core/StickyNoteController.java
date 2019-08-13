@@ -21,9 +21,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * Controller class for sticky note APIs.
- */
 @RestController
 @RequestMapping(value = "/api/core/sticky-notes")
 public class StickyNoteController {
@@ -42,14 +39,6 @@ public class StickyNoteController {
     this.stickyNoteRequestMapper = stickyNoteRequestMapper;
   }
   
-  /**
-   * Retrieves last inserted sticky note in database.
-   *
-   * @return {@code DataResponse<StickyNoteWebResponse>} - The retrieved
-   * sticky note data, wrapped in
-   * {@link com.future.function.web.model.response.base.DataResponse} and
-   * {@link com.future.function.web.model.response.feature.core.StickyNoteWebResponse}
-   */
   @ResponseStatus(HttpStatus.OK)
   @GetMapping
   public PagingResponse<StickyNoteWebResponse> getStickyNote(
@@ -65,16 +54,6 @@ public class StickyNoteController {
       stickyNoteService.getStickyNote(PageHelper.toPageable(page, size)));
   }
   
-  /**
-   * Creates new sticky note in database.
-   *
-   * @param request Data of new sticky note in JSON format.
-   *
-   * @return {@code DataResponse<StickyNoteWebResponse>} - The created
-   * sticky note data, wrapped in
-   * {@link com.future.function.web.model.response.base.DataResponse} and
-   * {@link com.future.function.web.model.response.feature.core.StickyNoteWebResponse}
-   */
   @ResponseStatus(HttpStatus.CREATED)
   @PostMapping
   public DataResponse<StickyNoteWebResponse> createStickyNote(

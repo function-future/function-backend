@@ -16,12 +16,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface FileMustBeImage {
   
-  /**
-   * Default message returned when a List of String field of file ids do not
-   * fulfill the required condition.
-   *
-   * @return {@code String} - The name of this annotation.
-   */
   String message() default "FileMustBeImage";
   
   Class<?>[] groups() default {};

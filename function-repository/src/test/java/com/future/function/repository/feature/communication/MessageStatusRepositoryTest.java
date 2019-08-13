@@ -19,10 +19,6 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
-/**
- * Author: PriagungSatyagama
- * Created At: 14:23 01/06/2019
- */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = TestApplication.class)
 public class MessageStatusRepositoryTest {

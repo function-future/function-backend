@@ -3,9 +3,6 @@ package com.future.function.model.util.constant;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
-/**
- * Interface class containing name of fields in database.
- */
 public interface FieldName {
 
   @NoArgsConstructor(access = AccessLevel.PRIVATE)

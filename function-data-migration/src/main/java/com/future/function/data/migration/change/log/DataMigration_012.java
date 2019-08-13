@@ -7,14 +7,9 @@ import com.github.mongobee.changeset.ChangeLog;
 import com.github.mongobee.changeset.ChangeSet;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
-
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Author: ricky.kennedy
- * Created At: 9:50 AM 8/5/2019
- */
 @ChangeLog(order = "012")
 public class DataMigration_012{
 

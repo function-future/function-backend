@@ -16,23 +16,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-/**
- * Mapper class for course web response.
- */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class CourseResponseMapper {
   
-  /**
-   * Converts a course data to {@code CourseWebResponse}, wrapped in {@code
-   * DataResponse}.
-   *
-   * @param course Course data to be converted to response.
-   *
-   * @return {@code DataResponse<CourseWebResponse>} - The converted course
-   * data, wrapped in
-   * {@link com.future.function.web.model.response.base.DataResponse} and
-   * {@link CourseWebResponse}
-   */
   public static DataResponse<CourseWebResponse> toCourseDataResponse(
     Course course, String urlPrefix
   ) {
@@ -40,18 +26,6 @@ public final class CourseResponseMapper {
     return toCourseDataResponse(HttpStatus.OK, course, urlPrefix);
   }
   
-  /**
-   * Converts a course data to {@code CourseWebResponse} given {@code
-   * HttpStatus}, wrapped in {@code DataResponse}.
-   *
-   * @param httpStatus Http status to be shown in the response.
-   * @param course     Course data to be converted to response.
-   *
-   * @return {@code DataResponse<CourseWebResponse>} - The converted course
-   * data, wrapped in
-   * {@link com.future.function.web.model.response.base.DataResponse} and
-   * {@link CourseWebResponse}
-   */
   public static DataResponse<CourseWebResponse> toCourseDataResponse(
     HttpStatus httpStatus, Course course, String urlPrefix
   ) {
@@ -118,17 +92,6 @@ public final class CourseResponseMapper {
       .orElse(null);
   }
   
-  /**
-   * Converts courses data to {@code List<CourseWebResponse>}, wrapped in {@code
-   * DataResponse}.
-   *
-   * @param courses Course data to be converted to response.
-   *
-   * @return {@code DataResponse<List<CourseWebResponse>>} - The converted
-   * course data, wrapped in
-   * {@link com.future.function.web.model.response.base.DataResponse} and
-   * {@link List} and {@link CourseWebResponse}.
-   */
   public static DataResponse<List<CourseWebResponse>> toCoursesDataResponse(
     List<Course> courses, String urlPrefix
   ) {
@@ -146,17 +109,6 @@ public final class CourseResponseMapper {
       .collect(Collectors.toList());
   }
   
-  /**
-   * Converts courses data to {@code CourseWebResponse} given {@code
-   * HttpStatus}, wrapped in {@code PagingResponse}.
-   *
-   * @param data Courses data to be converted to response.
-   *
-   * @return {@code PagingResponse<CourseWebResponse} - The converted course
-   * data, wrapped in
-   * {@link com.future.function.web.model.response.base.PagingResponse} and
-   * {@link CourseWebResponse}
-   */
   public static PagingResponse<CourseWebResponse> toCoursesPagingResponse(
     Page<Course> data, String urlPrefix
   ) {

@@ -17,10 +17,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-/**
- * Service implementation class for announcement logic operations
- * implementation.
- */
 @Service
 public class AnnouncementServiceImpl implements AnnouncementService {
   
@@ -38,27 +34,12 @@ public class AnnouncementServiceImpl implements AnnouncementService {
     this.resourceService = resourceService;
   }
   
-  /**
-   * {@inheritDoc}
-   *
-   * @param pageable Pageable object for paging data.
-   *
-   * @return {@code Page<Announcement>} - Page of announcements found in
-   * database.
-   */
   @Override
   public Page<Announcement> getAnnouncements(Pageable pageable) {
     
     return announcementRepository.findAllByOrderByUpdatedAtDesc(pageable);
   }
   
-  /**
-   * {@inheritDoc}
-   *
-   * @param announcementId Id of announcement to be retrieved.
-   *
-   * @return {@code Announcement} - The announcement object found in database.
-   */
   @Override
   public Announcement getAnnouncement(String announcementId) {
     
@@ -67,13 +48,6 @@ public class AnnouncementServiceImpl implements AnnouncementService {
       .orElseThrow(() -> new NotFoundException("Get Announcement Not Found"));
   }
   
-  /**
-   * {@inheritDoc}
-   *
-   * @param announcement Announcement data of new announcement.
-   *
-   * @return {@code Announcement} - The announcement object of the saved data.
-   */
   @Override
   public Announcement createAnnouncement(Announcement announcement) {
     
@@ -106,13 +80,6 @@ public class AnnouncementServiceImpl implements AnnouncementService {
       .collect(Collectors.toList());
   }
   
-  /**
-   * {@inheritDoc}
-   *
-   * @param announcement Announcement data of new announcement.
-   *
-   * @return {@code Announcement} - The announcement object of the saved data.
-   */
   @Override
   public Announcement updateAnnouncement(
     Announcement announcement
@@ -126,11 +93,6 @@ public class AnnouncementServiceImpl implements AnnouncementService {
       .orElse(announcement);
   }
   
-  /**
-   * {@inheritDoc}
-   *
-   * @param announcementId Id of announcement to be deleted.
-   */
   @Override
   public void deleteAnnouncement(String announcementId) {
     

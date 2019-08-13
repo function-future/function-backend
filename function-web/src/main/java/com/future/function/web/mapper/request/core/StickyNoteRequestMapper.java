@@ -6,9 +6,6 @@ import com.future.function.web.model.request.core.StickyNoteWebRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-/**
- * Mapper class for incoming request for sticky note feature.
- */
 @Component
 public class StickyNoteRequestMapper {
   
@@ -22,13 +19,6 @@ public class StickyNoteRequestMapper {
     this.validator = validator;
   }
   
-  /**
-   * Converts Jackson-mapped JSON data to {@code StickyNote} object.
-   *
-   * @param request JSON data (in form of StickyNoteWebRequest) to be converted.
-   *
-   * @return {@code StickyNote} - Converted sticky note object.
-   */
   public StickyNote toStickyNote(StickyNoteWebRequest request) {
   
     return toValidatedStickyNote(request);

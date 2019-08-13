@@ -7,9 +7,6 @@ import com.future.function.web.model.request.core.DiscussionWebRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-/**
- * Mapper class for incoming request for announcement feature.
- */
 @Component
 public class DiscussionRequestMapper {
   

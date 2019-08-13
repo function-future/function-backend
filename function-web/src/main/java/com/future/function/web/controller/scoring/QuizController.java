@@ -19,9 +19,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
-/**
- * Controller class used to interact with http request for quiz entity
- */
 @RestController
 @RequestMapping(path = "/api/scoring/batches/{batchCode}/quizzes")
 public class QuizController {
@@ -35,13 +32,6 @@ public class QuizController {
     this.quizRequestMapper = quizRequestMapper;
   }
 
-  /**
-   * Used to get list of quiz entity object with paging, filter, and search parameters
-   *
-   * @param page   (int, required false)
-   * @param size   (int, required false)
-   * @return PagingResponse<QuizWebResponse> with status OK
-   */
   @ResponseStatus(value = HttpStatus.OK)
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   public PagingResponse<QuizWebResponse> getAllQuiz(
@@ -55,12 +45,6 @@ public class QuizController {
             quizService.findAllByBatchCodeAndPageable(batchCode, PageHelper.toPageable(page, size)));
   }
 
-  /**
-   * Used to get specific quiz by passing the id in the path variable
-   *
-   * @param id (String)
-   * @return DataResponse<QuizWebResponse> with status OK
-   */
   @ResponseStatus(value = HttpStatus.OK)
   @GetMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
   public DataResponse<QuizWebResponse> getQuizById(@PathVariable String id,
@@ -80,12 +64,6 @@ public class QuizController {
                         quizService.findById(request.getQuizId())));
   }
 
-  /**
-   * Used to create new quiz by passing the QuizWebRequest object as JSON
-   *
-   * @param quizWebRequest (JSON)
-   * @return DataResponse<QuizWebResponse> with status CREATED
-   */
   @ResponseStatus(value = HttpStatus.CREATED)
   @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
   public DataResponse<QuizWebResponse> createQuiz(@PathVariable("batchCode") String batchCode,
@@ -96,13 +74,6 @@ public class QuizController {
                     batchCode)));
   }
 
-  /**
-   * Used to update existing quiz by passing the QuizWebRequest object in the body and quiz id in path variable
-   *
-   * @param id      (String)
-   * @param request (JSON)
-   * @return DataResponse<QuizWebResponse> with status OK
-   */
   @ResponseStatus(value = HttpStatus.OK)
   @PutMapping(path = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
   public DataResponse<QuizWebResponse> updateQuiz(@PathVariable("batchCode") String batchCode,
@@ -112,12 +83,6 @@ public class QuizController {
             batchCode)));
   }
 
-  /**
-   * Used to delete existing quiz by passing the quiz id in path variable
-   *
-   * @param id (String)
-   * @return BaseResponse with status OK
-   */
   @ResponseStatus(value = HttpStatus.OK)
   @DeleteMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
   public BaseResponse deleteQuizById(@PathVariable String id, @WithAnyRole(roles = Role.ADMIN) Session session) {

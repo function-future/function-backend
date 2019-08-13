@@ -11,12 +11,10 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
-/**
- * Author: PriagungSatyagama
- * Created At: 0:12 11/07/2019
- */
 @RunWith(MockitoJUnitRunner.class)
 public class NotificationRequestMapperTest {
 

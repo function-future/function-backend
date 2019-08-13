@@ -5,10 +5,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-/**
- * Author: PriagungSatyagama
- * Created At: 14:43 06/07/2019
- */
 public interface ReminderRepository extends MongoRepository<Reminder, String> {
 
   Page<Reminder> findAllByTitleContainingIgnoreCaseOrderByUpdatedAtDesc(String title, Pageable pageable);

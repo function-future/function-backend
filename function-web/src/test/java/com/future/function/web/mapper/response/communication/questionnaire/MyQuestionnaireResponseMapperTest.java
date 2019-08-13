@@ -15,18 +15,12 @@ import com.future.function.web.model.response.feature.core.BatchWebResponse;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
 
-/**
- * Author: ricky.kennedy
- * Created At: 9:10 AM 7/25/2019
- */
 public class MyQuestionnaireResponseMapperTest {
 
   private static final String URL_PREFIX = "urlPrefix";

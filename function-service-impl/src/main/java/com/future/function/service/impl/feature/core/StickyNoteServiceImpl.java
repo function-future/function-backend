@@ -21,11 +21,6 @@ public class StickyNoteServiceImpl implements StickyNoteService {
     this.stickyNoteRepository = stickyNoteRepository;
   }
   
-  /**
-   * {@inheritDoc}
-   *
-   * @return {@code StickyNote} - The sticky note object found in database
-   */
   @Override
   public Page<StickyNote> getStickyNote(Pageable pageable) {
     
@@ -33,13 +28,6 @@ public class StickyNoteServiceImpl implements StickyNoteService {
       pageable);
   }
   
-  /**
-   * {@inheritDoc}
-   *
-   * @param stickyNote Sticky note data of new sticky note.
-   *
-   * @return {@code StickyNote} - The sticky note object of the saved data.
-   */
   @Override
   public StickyNote createStickyNote(StickyNote stickyNote) {
     

@@ -1,6 +1,5 @@
 package com.future.function.web.mapper.response.communication;
 
-import com.future.function.model.entity.feature.communication.chatting.Chatroom;
 import com.future.function.model.entity.feature.communication.reminder.Reminder;
 import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
@@ -19,10 +18,6 @@ import java.util.stream.Collectors;
 
 import static com.future.function.web.mapper.response.communication.ParticipantResponseMapper.toParticipantDetailResponse;
 
-/**
- * Author: PriagungSatyagama
- * Created At: 19:39 06/07/2019
- */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ReminderResponseMapper {
 

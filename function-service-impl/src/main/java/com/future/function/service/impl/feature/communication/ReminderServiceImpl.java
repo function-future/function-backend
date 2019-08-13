@@ -15,10 +15,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-/**
- * Author: PriagungSatyagama
- * Created At: 15:21 06/07/2019
- */
 @Service
 public class ReminderServiceImpl implements ReminderService {
 

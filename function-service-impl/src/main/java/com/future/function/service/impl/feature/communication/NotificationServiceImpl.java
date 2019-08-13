@@ -14,14 +14,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
-/**
- * Author: PriagungSatyagama
- * Created At: 15:21 06/07/2019
- */
 @Service
 public class NotificationServiceImpl implements NotificationService {
 

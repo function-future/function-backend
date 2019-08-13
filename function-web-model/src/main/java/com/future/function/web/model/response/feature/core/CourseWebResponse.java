@@ -5,9 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * Model representation for course web response.
- */
 @Data
 @Builder
 @NoArgsConstructor

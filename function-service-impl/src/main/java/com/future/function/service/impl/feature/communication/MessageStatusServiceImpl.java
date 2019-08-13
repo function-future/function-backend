@@ -9,17 +9,12 @@ import com.future.function.service.api.feature.communication.ChatroomService;
 import com.future.function.service.api.feature.communication.MessageService;
 import com.future.function.service.api.feature.communication.MessageStatusService;
 import com.future.function.service.api.feature.core.UserService;
-import com.future.function.session.model.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Author: PriagungSatyagama
- * Created At: 19:27 04/06/2019
- */
 @Service
 public class MessageStatusServiceImpl implements MessageStatusService {
 

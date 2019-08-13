@@ -1,12 +1,9 @@
 package com.future.function.service.impl.feature.communication.logging;
 
-import com.future.function.model.entity.feature.communication.logging.LogMessage;
 import com.future.function.model.entity.feature.communication.logging.LoggingRoom;
 import com.future.function.model.entity.feature.communication.logging.Topic;
 import com.future.function.repository.feature.communication.logging.TopicRepository;
 import com.future.function.service.api.feature.communication.logging.LoggingRoomService;
-import com.future.function.service.api.feature.communication.logging.TopicService;
-import com.future.function.service.api.feature.core.UserService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,12 +18,10 @@ import org.springframework.data.domain.PageRequest;
 import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
-/**
- * Author : Ricky Kennedy
- * Created At : 17:48 28/07/2019
- */
 @RunWith(MockitoJUnitRunner.class)
 public class TopicServiceImplTest {
 

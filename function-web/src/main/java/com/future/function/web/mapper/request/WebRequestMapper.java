@@ -8,10 +8,6 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
-/**
- * Mapper class for incoming request for general mapping. Wraps
- * {@link ObjectMapper} bean for better code and testing.
- */
 @Slf4j
 @Component
 public class WebRequestMapper {
@@ -24,16 +20,6 @@ public class WebRequestMapper {
     this.objectMapper = objectMapper;
   }
   
-  /**
-   * Maps given JSON data in parameter {@code json} to an object of {@code
-   * type} specified in method parameter.
-   *
-   * @param json JSON data to be mapped.
-   * @param type Type of object to be returned.
-   * @param <T>  Type of class of the specified JSON
-   *
-   * @return T - The mapped object.
-   */
   public <T> T toWebRequestObject(String json, Class<T> type) {
     
     T request;

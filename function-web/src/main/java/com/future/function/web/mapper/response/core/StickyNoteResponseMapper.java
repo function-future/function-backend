@@ -14,23 +14,9 @@ import org.springframework.http.HttpStatus;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * Mapper class for sticky note web response.
- */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class StickyNoteResponseMapper {
   
-  /**
-   * Converts a sticky note data to {@code StickyNoteWebResponse}, wrapped in
-   * {@code DataResponse}.
-   *
-   * @param data Sticky note data to be converted to response.
-   *
-   * @return {@code DataResponse<StickyNoteWebResponse>} - The converted sticky
-   * note data, wrapped in
-   * {@link com.future.function.web.model.response.base.DataResponse} and
-   * {@link com.future.function.web.model.response.feature.core.StickyNoteWebResponse}
-   */
   public static PagingResponse<StickyNoteWebResponse> toStickyNotePagingResponse(
     Page<StickyNote> data
   ) {
@@ -63,18 +49,6 @@ public class StickyNoteResponseMapper {
       .build();
   }
   
-  /**
-   * Converts a sticky note data to {@code StickyNoteWebResponse}, wrapped in
-   * {@code DataResponse}.
-   *
-   * @param httpStatus Http status to be shown in the response.
-   * @param stickyNote Sticky note data to be converted to response.
-   *
-   * @return {@code DataResponse<StickyNoteWebResponse>} - The converted sticky
-   * note data, wrapped in
-   * {@link com.future.function.web.model.response.base.DataResponse} and
-   * {@link com.future.function.web.model.response.feature.core.StickyNoteWebResponse}
-   */
   public static DataResponse<StickyNoteWebResponse> toStickyNoteDataResponse(
     HttpStatus httpStatus, StickyNote stickyNote
   ) {

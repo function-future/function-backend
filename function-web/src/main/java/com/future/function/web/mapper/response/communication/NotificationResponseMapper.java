@@ -15,10 +15,6 @@ import org.springframework.http.HttpStatus;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * Author: PriagungSatyagama
- * Created At: 19:32 06/07/2019
- */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class NotificationResponseMapper {
 

@@ -5,14 +5,9 @@ import com.future.function.model.entity.feature.communication.logging.Topic;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.validation.RequestValidator;
 import com.future.function.web.model.request.communication.logging.LogMessageWebRequest;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-/**
- * Author : Ricky Kennedy
- * Created At : 10:37 28/07/2019
- */
 @Component
 public class LogMessageRequestMapper {
 

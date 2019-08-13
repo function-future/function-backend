@@ -22,10 +22,6 @@ import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * Author : Ricky Kennedy
- * Created At : 22:13 28/07/2019
- */
 public class LoggingRoomWebResponseMapperTest {
 
   private static final String URL_PREFIX = "urlPrefix";

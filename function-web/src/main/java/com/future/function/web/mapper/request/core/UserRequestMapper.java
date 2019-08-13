@@ -12,9 +12,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
-/**
- * Mapper class for incoming request for user feature.
- */
 @Slf4j
 @Component
 public class UserRequestMapper {
@@ -27,13 +24,6 @@ public class UserRequestMapper {
     this.validator = validator;
   }
   
-  /**
-   * Converts JSON data to {@code User} object.
-   *
-   * @param request JSON data (in form of String) to be converted.
-   *
-   * @return {@code User} - Converted user object.
-   */
   public User toUser(UserWebRequest request) {
     
     return toValidatedUser(null, request);
@@ -98,15 +88,6 @@ public class UserRequestMapper {
       .orElse(null);
   }
   
-  /**
-   * Converts JSON request to {@code User} object. This method is used for
-   * update user purposes.
-   *
-   * @param userId  Id of user to be updated.
-   * @param request JSON request (in form of String) to be converted.
-   *
-   * @return {@code User} - Converted user object.
-   */
   public User toUser(String userId, UserWebRequest request) {
     
     return toValidatedUser(userId, request);

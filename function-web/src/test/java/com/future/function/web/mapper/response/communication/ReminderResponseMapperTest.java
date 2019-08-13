@@ -8,19 +8,12 @@ import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.feature.communication.reminder.ReminderDetailResponse;
 import com.future.function.web.model.response.feature.communication.reminder.ReminderResponse;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.data.domain.PageImpl;
 
 import java.util.Arrays;
 import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
-/**
- * Author: PriagungSatyagama
- * Created At: 0:00 11/07/2019
- */
 
 public class ReminderResponseMapperTest {
 

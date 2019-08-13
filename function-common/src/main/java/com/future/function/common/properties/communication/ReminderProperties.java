@@ -7,10 +7,6 @@ import lombok.NoArgsConstructor;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
-/**
- * Author: PriagungSatyagama
- * Created At: 13:27 07/07/2019
- */
 @Data
 @Builder
 @Component

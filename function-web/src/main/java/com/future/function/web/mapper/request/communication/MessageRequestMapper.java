@@ -9,10 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-/**
- * Author: priagung.satyagama
- * Created At: 1:30 PM 6/10/2019
- */
 @Slf4j
 @Component
 public class MessageRequestMapper {

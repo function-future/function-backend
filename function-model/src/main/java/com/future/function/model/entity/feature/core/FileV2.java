@@ -18,9 +18,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-/**
- * Entity representation for files.
- */
 @Data
 @Builder
 @NoArgsConstructor

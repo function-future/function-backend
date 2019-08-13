@@ -14,11 +14,6 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-/**
- * Author: PriagungSatyagama
- * Created At: 22:38 30/05/2019
- */
-
 @Data
 @Builder
 @NoArgsConstructor

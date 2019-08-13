@@ -19,12 +19,7 @@ import org.springframework.http.HttpStatus;
 import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
 
-/**
- * Author: ricky.kennedy
- * Created At: 1:41 PM 7/25/2019
- */
 public class QuestionnaireParticipantResponseMapperTest {
 
   private static final String URL_PREFIX = "urlPrefix";
