@@ -33,7 +33,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.util.Collections;
 import java.util.List;
 
-import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -66,10 +65,6 @@ public class AnnouncementControllerTest extends TestHelper {
   
   private static final BaseResponse DELETED_BASE_RESPONSE =
     ResponseHelper.toBaseResponse(HttpStatus.OK);
-  
-  private static final String DATA =
-    "{\"title\":" + TITLE + "," + "\"summary\":" + SUMMARY +
-    ",\"description\":" + DESCRIPTION_HTML + "}";
   
   private static final AnnouncementWebRequest ANNOUNCEMENT_WEB_REQUEST =
     AnnouncementWebRequest.builder()
@@ -149,7 +144,7 @@ public class AnnouncementControllerTest extends TestHelper {
     List<Announcement> announcementList = Collections.singletonList(
       announcement);
     
-    given(announcementService.getAnnouncements(PAGEABLE)).willReturn(
+    when(announcementService.getAnnouncements(PAGEABLE)).thenReturn(
       new PageImpl<>(announcementList, PAGEABLE, announcementList.size()));
     
     mockMvc.perform(get("/api/core/announcements").param("page", "1")
@@ -173,7 +168,7 @@ public class AnnouncementControllerTest extends TestHelper {
     List<Announcement> announcementList = Collections.singletonList(
       announcement);
     
-    given(announcementService.getAnnouncements(PAGEABLE)).willReturn(
+    when(announcementService.getAnnouncements(PAGEABLE)).thenReturn(
       new PageImpl<>(announcementList, PAGEABLE, announcementList.size()));
     
     mockMvc.perform(get("/api/core/announcements"))
@@ -193,7 +188,7 @@ public class AnnouncementControllerTest extends TestHelper {
     
     when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
     
-    given(announcementService.getAnnouncement(ID)).willReturn(announcement);
+    when(announcementService.getAnnouncement(ID)).thenReturn(announcement);
     
     mockMvc.perform(get("/api/core/announcements/" + ID))
       .andExpect(status().isOk())
@@ -230,10 +225,10 @@ public class AnnouncementControllerTest extends TestHelper {
     
     when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
     
-    given(announcementService.createAnnouncement(announcement)).willReturn(
+    when(announcementService.createAnnouncement(announcement)).thenReturn(
       announcement);
-    given(announcementRequestMapper.toAnnouncement(
-      ANNOUNCEMENT_WEB_REQUEST)).willReturn(announcement);
+    when(announcementRequestMapper.toAnnouncement(
+      ANNOUNCEMENT_WEB_REQUEST)).thenReturn(announcement);
     
     mockMvc.perform(post("/api/core/announcements").cookie(cookies)
                       .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -258,11 +253,11 @@ public class AnnouncementControllerTest extends TestHelper {
     
     when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
     
-    given(announcementService.updateAnnouncement(announcement)).
-      willReturn(announcement);
-    given(announcementRequestMapper.toAnnouncement(ID,
+    when(announcementService.updateAnnouncement(announcement)).
+      thenReturn(announcement);
+    when(announcementRequestMapper.toAnnouncement(ID,
                                                    ANNOUNCEMENT_WEB_REQUEST
-    )).willReturn(announcement);
+    )).thenReturn(announcement);
     
     mockMvc.perform(put("/api/core/announcements/" + ID).cookie(cookies)
                       .contentType(MediaType.APPLICATION_JSON_VALUE)
