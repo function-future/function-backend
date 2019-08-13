@@ -6,6 +6,7 @@ import com.future.function.model.entity.feature.communication.chatting.Message;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.service.api.feature.communication.MessageService;
 import com.future.function.service.api.feature.communication.MessageStatusService;
+import com.future.function.session.model.Session;
 import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.model.response.base.DataResponse;
@@ -88,7 +89,7 @@ public class ChatroomResponseMapper {
                 .stream()
                 .map(content -> toChatroomResponse(
                         content,
-                        messageService.getLastMessage(content.getId()),
+                        messageService.getLastMessage(content.getId(), userId),
                         messageStatusService.getSeenStatus(content.getId(), userId),
                         urlPrefix)
                 )
@@ -99,8 +100,8 @@ public class ChatroomResponseMapper {
             Page<Chatroom> data,
             MessageService messageService,
             MessageStatusService messageStatusService,
-            String userId,
-            String urlPrefix
+            String urlPrefix,
+            String userId
     ) {
         return ResponseHelper.toPagingResponse(
                 HttpStatus.OK, toChatroomResponseList(data, messageService, messageStatusService, userId, urlPrefix), PageHelper.toPaging(data));

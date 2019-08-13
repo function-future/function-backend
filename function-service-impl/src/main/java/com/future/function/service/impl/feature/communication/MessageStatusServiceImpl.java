@@ -9,6 +9,7 @@ import com.future.function.service.api.feature.communication.ChatroomService;
 import com.future.function.service.api.feature.communication.MessageService;
 import com.future.function.service.api.feature.communication.MessageStatusService;
 import com.future.function.service.api.feature.core.UserService;
+import com.future.function.session.model.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -45,14 +46,14 @@ public class MessageStatusServiceImpl implements MessageStatusService {
   @Override
   public List<MessageStatus> getUnseenMessageStatus(String chatroomId, String userId) {
     User user = userService.getUser(userId);
-    Chatroom chatroom = chatroomService.getChatroom(chatroomId);
+    Chatroom chatroom = chatroomService.getChatroom(chatroomId, userId);
     return messageStatusRepository.findAllByChatroomAndMemberAndSeenIsFalseOrderByCreatedAtDesc(chatroom, user);
   }
 
   @Override
   public List<MessageStatus> getUnseenMessageStatusBeforeTimestamp(String chatroomId, String userId, Long timestamp) {
     User user = userService.getUser(userId);
-    Chatroom chatroom = chatroomService.getChatroom(chatroomId);
+    Chatroom chatroom = chatroomService.getChatroom(chatroomId, userId);
     return messageStatusRepository.findAllByChatroomAndMemberAndCreatedAtLessThanEqualAndSeenIsFalseOrderByCreatedAtDesc(
             chatroom, user, timestamp);
   }
@@ -63,9 +64,9 @@ public class MessageStatusServiceImpl implements MessageStatusService {
   }
 
   @Override
-  public MessageStatus createMessageStatus(MessageStatus messageStatus) {
+  public MessageStatus createMessageStatus(MessageStatus messageStatus, String userId) {
     return Optional.of(messageStatus)
-            .map(this::setChatroom)
+            .map(msgStatus -> this.setChatroom(msgStatus, userId))
             .map(this::setMember)
             .map(this::setMessage)
             .map(messageStatusRepository::save)
@@ -81,17 +82,17 @@ public class MessageStatusServiceImpl implements MessageStatusService {
     this.getUnseenMessageStatus(chatroomId, userId).forEach(messageStatus -> {
       if (messageStatus.getMessage().getCreatedAt() <= timestamp) {
         messageStatus.setSeen(true);
-        this.updateMessageStatus(messageStatus);
+        this.updateMessageStatus(messageStatus, userId);
       }
     });
   }
 
   @Override
-  public MessageStatus updateMessageStatus(MessageStatus messageStatus) {
+  public MessageStatus updateMessageStatus(MessageStatus messageStatus, String userId) {
     return Optional.of(messageStatus)
             .map(this::setMember)
             .map(this::setMessage)
-            .map(this::setChatroom)
+            .map(msgStatus -> this.setChatroom(msgStatus, userId))
             .map(messageStatusRepository::save)
             .orElse(messageStatus);
   }
@@ -107,9 +108,9 @@ public class MessageStatusServiceImpl implements MessageStatusService {
     return messageStatus;
   }
 
-  private MessageStatus setChatroom(MessageStatus messageStatus) {
+  private MessageStatus setChatroom(MessageStatus messageStatus, String userId) {
     messageStatus.setChatroom(chatroomService.getChatroom(
-            messageStatus.getChatroom().getId()));
+            messageStatus.getChatroom().getId(), userId));
     return messageStatus;
   }
 

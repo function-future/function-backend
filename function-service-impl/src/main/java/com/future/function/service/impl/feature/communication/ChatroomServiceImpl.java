@@ -1,6 +1,7 @@
 package com.future.function.service.impl.feature.communication;
 
 import com.future.function.common.enumeration.communication.ChatroomType;
+import com.future.function.common.exception.ForbiddenException;
 import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.communication.chatting.Chatroom;
 import com.future.function.model.entity.feature.core.User;
@@ -8,6 +9,7 @@ import com.future.function.repository.feature.communication.chatting.ChatroomRep
 import com.future.function.service.api.feature.communication.ChatroomService;
 import com.future.function.service.api.feature.core.UserService;
 import com.future.function.service.impl.helper.PageHelper;
+import com.future.function.session.model.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -54,9 +56,10 @@ public class ChatroomServiceImpl implements ChatroomService {
   }
 
   @Override
-  public Chatroom getChatroom(String chatroomId) {
+  public Chatroom getChatroom(String chatroomId, String userId) {
     return Optional.ofNullable(chatroomId)
             .map(chatroomRepository::findOne)
+            .map(chatroom -> this.validateAuthorization(chatroom, userId))
             .orElseThrow(() -> new NotFoundException("Get Chatroom Not Found"));
   }
 
@@ -89,10 +92,11 @@ public class ChatroomServiceImpl implements ChatroomService {
   }
 
   @Override
-  public Chatroom updateChatroom(Chatroom chatroom) {
+  public Chatroom updateChatroom(Chatroom chatroom, String userId) {
     return Optional.of(chatroom)
             .map(Chatroom::getId)
             .map(chatroomRepository::findOne)
+            .map(c -> this.validateAuthorization(c, userId))
             .map(room -> this.updateMember(room, chatroom))
             .map(room -> this.updateTitle(room, chatroom))
             .map(chatroomRepository::save)
@@ -126,6 +130,13 @@ public class ChatroomServiceImpl implements ChatroomService {
   private Chatroom updateTitle(Chatroom existingChatroom, Chatroom newChatroom) {
     existingChatroom.setTitle(newChatroom.getTitle());
     return existingChatroom;
+  }
+
+  private Chatroom validateAuthorization(Chatroom chatroom, String userId) {
+    if (!chatroom.getMembers().contains(userService.getUser(userId)) && chatroom.getType() != ChatroomType.PUBLIC) {
+      throw new ForbiddenException("Chatroom did not belong to this user");
+    }
+    return chatroom;
   }
 
   private Chatroom setMembers(Chatroom chatroom) {
