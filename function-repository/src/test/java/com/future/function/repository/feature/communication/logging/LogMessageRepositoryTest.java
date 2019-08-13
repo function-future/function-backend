@@ -20,28 +20,36 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class LogMessageRepositoryTest {
 
   private static final String TOPIC_ID = "topicId";
+
   private static final String LOG_MESSAGE_ID_1 = "logMessageId1";
+
   private static final String LOG_MESSAGE_ID_2 = "logMessageId2";
+
   private static final PageRequest PAGEABLE = new PageRequest(0, 2);
-  private static final Topic TOPIC = Topic.builder().id(TOPIC_ID).build();
+
+  private static final Topic TOPIC = Topic.builder()
+    .id(TOPIC_ID)
+    .build();
 
   @Autowired
   private LogMessageRepository logMessageRepository;
 
+  {
+  }
+
   @Before
-  public void setUp () {
-    LogMessage logMessage1 =
-      LogMessage.builder()
-        .id(LOG_MESSAGE_ID_1)
-        .topic(TOPIC)
-        .build();
+  public void setUp() {
+
+    LogMessage logMessage1 = LogMessage.builder()
+      .id(LOG_MESSAGE_ID_1)
+      .topic(TOPIC)
+      .build();
     logMessage1.setCreatedAt(1L);
 
-    LogMessage logMessage2 =
-      LogMessage.builder()
-        .id(LOG_MESSAGE_ID_2)
-        .topic(TOPIC)
-        .build();
+    LogMessage logMessage2 = LogMessage.builder()
+      .id(LOG_MESSAGE_ID_2)
+      .topic(TOPIC)
+      .build();
     logMessage2.setCreatedAt(2L);
 
     logMessageRepository.save(logMessage1);
@@ -49,17 +57,23 @@ public class LogMessageRepositoryTest {
   }
 
   @After
-  public void tearDown () {
+  public void tearDown() {
+
     logMessageRepository.deleteAll();
   }
 
   @Test
   public void testGivenTopicByFindingAllLogMessagesReturnPagedLogMessages() {
-    Page<LogMessage> results = logMessageRepository.findAllByTopicOrderByCreatedAtDesc(TOPIC, PAGEABLE);
+
+    Page<LogMessage> results =
+      logMessageRepository.findAllByTopicOrderByCreatedAtDesc(TOPIC, PAGEABLE);
 
     assertThat(results).isNotNull();
-    assertThat(results.getContent().get(0).getId()).isEqualTo(LOG_MESSAGE_ID_2);
-    assertThat(results.getContent().get(1).getId()).isEqualTo(LOG_MESSAGE_ID_1);
-  } {
+    assertThat(results.getContent()
+                 .get(0)
+                 .getId()).isEqualTo(LOG_MESSAGE_ID_2);
+    assertThat(results.getContent()
+                 .get(1)
+                 .getId()).isEqualTo(LOG_MESSAGE_ID_1);
   }
 }

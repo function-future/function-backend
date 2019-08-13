@@ -9,19 +9,19 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class DataPageResponse<T> extends BaseResponse {
-  
+
   private T data;
-  
+
   private Paging paging;
-  
+
   public DataPageResponse() {}
-  
+
   @Builder
   private DataPageResponse(int code, String status, T data, Paging paging) {
-    
+
     super(code, status);
     this.data = data;
     this.paging = paging;
   }
-  
+
 }

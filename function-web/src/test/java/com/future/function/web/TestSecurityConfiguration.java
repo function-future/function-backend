@@ -6,12 +6,12 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 
 @TestConfiguration
 public class TestSecurityConfiguration extends WebSecurityConfigurerAdapter {
-  
+
   @Override
   protected void configure(
     HttpSecurity http
   ) throws Exception {
-    
+
     http.formLogin()
       .disable()
       .csrf()
@@ -22,5 +22,5 @@ public class TestSecurityConfiguration extends WebSecurityConfigurerAdapter {
       .antMatchers("*/*")
       .permitAll();
   }
-  
+
 }

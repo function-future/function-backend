@@ -7,12 +7,17 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.Optional;
 
-public interface QuestionnaireRepository extends MongoRepository<Questionnaire, String> {
+public interface QuestionnaireRepository
+  extends MongoRepository<Questionnaire, String> {
 
-  Page<Questionnaire> findAllByDeletedFalseOrderByCreatedAtDesc (Pageable pageable);
+  Page<Questionnaire> findAllByDeletedFalseOrderByCreatedAtDesc(
+    Pageable pageable
+  );
 
-  Optional<Questionnaire> findById (String questionnaireId);
+  Optional<Questionnaire> findById(String questionnaireId);
 
-  Page<Questionnaire> findAllByTitleIgnoreCaseContainingAndDeletedFalseOrderByCreatedAtDesc(String titleName, Pageable pageable);
+  Page<Questionnaire> findAllByTitleIgnoreCaseContainingAndDeletedFalseOrderByCreatedAtDesc(
+    String titleName, Pageable pageable
+  );
 
 }

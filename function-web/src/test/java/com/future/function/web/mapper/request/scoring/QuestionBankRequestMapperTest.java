@@ -22,7 +22,9 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class QuestionBankRequestMapperTest {
 
-  private static final String QUESTION_BANK_DESCRIPTION = "questionbank-description";
+  private static final String QUESTION_BANK_DESCRIPTION =
+    "questionbank-description";
+
   private static final String QUESTION_BANK_ID = "questionbank-id";
 
   @InjectMocks
@@ -32,48 +34,55 @@ public class QuestionBankRequestMapperTest {
   private RequestValidator validator;
 
   private QuestionBankWebRequest webRequest;
+
   private QuestionBank questionBank;
 
   @Before
   public void setUp() throws Exception {
-    webRequest = QuestionBankWebRequest
-        .builder()
-        .description(QUESTION_BANK_DESCRIPTION)
-        .build();
 
-    questionBank = QuestionBank
-        .builder()
-        .id(QUESTION_BANK_ID)
-        .description(QUESTION_BANK_DESCRIPTION)
-        .build();
+    webRequest = QuestionBankWebRequest.builder()
+      .description(QUESTION_BANK_DESCRIPTION)
+      .build();
 
-    when(validator.validate(webRequest))
-        .thenReturn(webRequest);
+    questionBank = QuestionBank.builder()
+      .id(QUESTION_BANK_ID)
+      .description(QUESTION_BANK_DESCRIPTION)
+      .build();
+
+    when(validator.validate(webRequest)).thenReturn(webRequest);
   }
 
   @After
   public void tearDown() throws Exception {
+
     verifyNoMoreInteractions(validator);
   }
 
   @Test
   public void testToQuestionBank() {
+
     questionBank.setId(null);
     QuestionBank actual = requestMapper.toQuestionBank(webRequest);
-    assertThat(actual.getDescription()).isEqualTo(questionBank.getDescription());
+    assertThat(actual.getDescription()).isEqualTo(
+      questionBank.getDescription());
     verify(validator).validate(webRequest);
   }
 
   @Test
   public void testToQuestionBankWithId() {
-    QuestionBank actual = requestMapper.toQuestionBank(QUESTION_BANK_ID, webRequest);
+
+    QuestionBank actual = requestMapper.toQuestionBank(
+      QUESTION_BANK_ID, webRequest);
     assertThat(actual).isEqualTo(questionBank);
     verify(validator).validate(webRequest);
   }
 
   @Test
   public void testToQuestionBankBadRequestException() {
+
     catchException(() -> requestMapper.toQuestionBank(null));
-    assertThat(caughtException().getClass()).isEqualTo(BadRequestException.class);
+    assertThat(caughtException().getClass()).isEqualTo(
+      BadRequestException.class);
   }
+
 }

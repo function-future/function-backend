@@ -13,25 +13,36 @@ import org.springframework.stereotype.Component;
 @Component
 public class MessageRequestMapper {
 
-    private final RequestValidator validator;
+  private final RequestValidator validator;
 
-    @Autowired
-    public MessageRequestMapper(RequestValidator validator) {
-        this.validator = validator;
-    }
+  @Autowired
+  public MessageRequestMapper(RequestValidator validator) {
 
-    public Message toMessage(MessageRequest request, String userId, String chatroomId) {
-        return toValidatedMessage(request, userId, chatroomId);
-    }
+    this.validator = validator;
+  }
 
-    private Message toValidatedMessage(MessageRequest request, String userId, String chatroomId) {
-        validator.validate(request);
+  public Message toMessage(
+    MessageRequest request, String userId, String chatroomId
+  ) {
 
-        return Message.builder()
-                .chatroom(Chatroom.builder().id(chatroomId).build())
-                .sender(User.builder().id(userId).build())
-                .text(request.getMessage())
-                .build();
-    }
+    return toValidatedMessage(request, userId, chatroomId);
+  }
+
+  private Message toValidatedMessage(
+    MessageRequest request, String userId, String chatroomId
+  ) {
+
+    validator.validate(request);
+
+    return Message.builder()
+      .chatroom(Chatroom.builder()
+                  .id(chatroomId)
+                  .build())
+      .sender(User.builder()
+                .id(userId)
+                .build())
+      .text(request.getMessage())
+      .build();
+  }
 
 }

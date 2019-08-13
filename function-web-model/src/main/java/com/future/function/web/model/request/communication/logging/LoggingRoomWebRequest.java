@@ -15,12 +15,16 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class LoggingRoomWebRequest {
+
   @Title(message = "Invalid Title")
   private String title;
 
-  @Length(min = 1, max = 200, message = "Length")
+  @Length(min = 1,
+          max = 200,
+          message = "Length")
   private String description;
 
   @NotEmpty(message = "NotEmpty")
   private List<String> members;
+
 }

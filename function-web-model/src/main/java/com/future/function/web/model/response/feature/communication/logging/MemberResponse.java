@@ -22,4 +22,5 @@ public class MemberResponse {
   private String university;
 
   private String batchName;
+
 }

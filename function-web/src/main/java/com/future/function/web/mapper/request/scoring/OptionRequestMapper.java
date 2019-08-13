@@ -16,28 +16,37 @@ public class OptionRequestMapper {
 
   @Autowired
   public OptionRequestMapper(RequestValidator validator) {
+
     this.validator = validator;
   }
 
   public Option toOption(OptionWebRequest request) {
-    return Optional.ofNullable(request)
-        .map(this::toValidatedOption)
-        .orElseThrow(() -> new BadRequestException("Bad Request"));
-  }
 
-  public Option toOptionFromOptionId(String optionId) {
-    return Optional.ofNullable(optionId)
-        .map(id -> Option.builder().id(id).build())
-            .orElseGet(() -> Option.builder().id("").build());
+    return Optional.ofNullable(request)
+      .map(this::toValidatedOption)
+      .orElseThrow(() -> new BadRequestException("Bad Request"));
   }
 
   private Option toValidatedOption(OptionWebRequest request) {
+
     request = validator.validate(request);
     return Option.builder()
-        .id(request.getId())
-        .label(request.getLabel())
-        .correct(request.getCorrect() != null && request.getCorrect().equals(true))
-        .build();
+      .id(request.getId())
+      .label(request.getLabel())
+      .correct(request.getCorrect() != null && request.getCorrect()
+        .equals(true))
+      .build();
+  }
+
+  public Option toOptionFromOptionId(String optionId) {
+
+    return Optional.ofNullable(optionId)
+      .map(id -> Option.builder()
+        .id(id)
+        .build())
+      .orElseGet(() -> Option.builder()
+        .id("")
+        .build());
   }
 
 }

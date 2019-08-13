@@ -14,15 +14,20 @@ import com.future.function.web.model.response.feature.scoring.StudentQuizDetailW
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
 
 @RestController
-@RequestMapping(path = "/api/scoring/students/{studentId}/quizzes/{studentQuizId}/questions")
+@RequestMapping(path = "/api/scoring/students/{studentId}/quizzes" +
+                       "/{studentQuizId}/questions")
 public class StudentQuestionController {
 
   private StudentQuizService studentQuizService;
@@ -30,8 +35,11 @@ public class StudentQuestionController {
   private StudentQuestionRequestMapper studentQuestionRequestMapper;
 
   @Autowired
-  public StudentQuestionController(StudentQuizService studentQuizService,
-                                   StudentQuestionRequestMapper studentQuestionRequestMapper) {
+  public StudentQuestionController(
+    StudentQuizService studentQuizService,
+    StudentQuestionRequestMapper studentQuestionRequestMapper
+  ) {
+
     this.studentQuizService = studentQuizService;
     this.studentQuestionRequestMapper = studentQuestionRequestMapper;
   }
@@ -39,25 +47,36 @@ public class StudentQuestionController {
   @ResponseStatus(HttpStatus.OK)
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   public PagingResponse<StudentQuestionWebResponse> findUnansweredStudentQuestionsByStudentQuizId(
-          @PathVariable String studentQuizId, @WithAnyRole(roles = Role.STUDENT) Session session) {
-    return StudentQuizDetailResponseMapper
-        .toStudentQuestionWebResponses(
-            studentQuizService
-                .findAllUnansweredQuestionByStudentQuizId(studentQuizId, session.getUserId()));
+    @PathVariable
+      String studentQuizId,
+    @WithAnyRole(roles = Role.STUDENT)
+      Session session
+  ) {
+
+    return StudentQuizDetailResponseMapper.toStudentQuestionWebResponses(
+      studentQuizService.findAllUnansweredQuestionByStudentQuizId(studentQuizId,
+                                                                  session.getUserId()
+      ));
   }
 
   @ResponseStatus(HttpStatus.CREATED)
-  @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-  public DataResponse<StudentQuizDetailWebResponse> postAnswersForQuestions(@PathVariable String studentQuizId,
-                                                                            @RequestBody List<StudentQuestionWebRequest> answerRequests,
-                                                                            @WithAnyRole(roles = Role.STUDENT) Session session) {
-    return StudentQuizDetailResponseMapper
-        .toStudentQuizDetailWebResponse(
-            studentQuizService
-                .answerQuestionsByStudentQuizId(
-                    studentQuizId,
-                    session.getUserId(),
-                    studentQuestionRequestMapper
-                        .toStudentQuestionList(answerRequests)));
+  @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE,
+               produces = MediaType.APPLICATION_JSON_VALUE)
+  public DataResponse<StudentQuizDetailWebResponse> postAnswersForQuestions(
+    @PathVariable
+      String studentQuizId,
+    @RequestBody
+      List<StudentQuestionWebRequest> answerRequests,
+    @WithAnyRole(roles = Role.STUDENT)
+      Session session
+  ) {
+
+    return StudentQuizDetailResponseMapper.toStudentQuizDetailWebResponse(
+      studentQuizService.answerQuestionsByStudentQuizId(studentQuizId,
+                                                        session.getUserId(),
+                                                        studentQuestionRequestMapper.toStudentQuestionList(
+                                                          answerRequests)
+      ));
   }
+
 }

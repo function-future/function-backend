@@ -15,13 +15,13 @@ import java.lang.annotation.Target;
 @Target({ ElementType.TYPE, ElementType.TYPE_USE })
 @Constraint(validatedBy = TypeAndBytesMustBeValidValidator.class)
 public @interface TypeAndBytesMustBeValid {
-  
+
   String message() default "TypeAndBytesMustBeValid";
-  
+
   Class<?>[] groups() default {};
-  
+
   Class<? extends Payload>[] payload() default {};
-  
+
   String field() default "type";
-  
+
 }

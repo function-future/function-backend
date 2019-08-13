@@ -8,11 +8,17 @@ public interface MessageService {
 
   Message getMessage(String messageId);
 
-  Page<Message> getMessages(String chatroomId, Pageable pageable, String userId);
+  Page<Message> getMessages(
+    String chatroomId, Pageable pageable, String userId
+  );
 
-  Page<Message> getMessagesAfterPivot(String chatroomId, String messageId, Pageable pageable, String userId);
+  Page<Message> getMessagesAfterPivot(
+    String chatroomId, String messageId, Pageable pageable, String userId
+  );
 
-  Page<Message> getMessagesBeforePivot(String chatroomId, String messageId, Pageable pageable, String userId);
+  Page<Message> getMessagesBeforePivot(
+    String chatroomId, String messageId, Pageable pageable, String userId
+  );
 
   Message getLastMessage(String chatroomId, String userId);
 

@@ -14,32 +14,50 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class QuestionnaireResultServiceImpl implements QuestionnaireResultService {
+public class QuestionnaireResultServiceImpl
+  implements QuestionnaireResultService {
 
 
-  private final UserQuestionnaireSummaryRepository userQuestionnaireSummaryRepository;
+  private final UserQuestionnaireSummaryRepository
+    userQuestionnaireSummaryRepository;
 
   @Autowired
-  public QuestionnaireResultServiceImpl(UserQuestionnaireSummaryRepository userQuestionnaireSummaryRepository) {
-    this.userQuestionnaireSummaryRepository = userQuestionnaireSummaryRepository;
+  public QuestionnaireResultServiceImpl(
+    UserQuestionnaireSummaryRepository userQuestionnaireSummaryRepository
+  ) {
+
+    this.userQuestionnaireSummaryRepository =
+      userQuestionnaireSummaryRepository;
   }
 
   @Override
-  public Page<UserQuestionnaireSummary> getAppraisalsQuestionnaireSummaryByBatch(Batch batch, Pageable pageable) {
-    return userQuestionnaireSummaryRepository.findAllByRoleOrRoleAndBatchAndDeletedFalse(Role.MENTOR, Role.STUDENT, batch, pageable);
+  public Page<UserQuestionnaireSummary> getAppraisalsQuestionnaireSummaryByBatch(
+    Batch batch, Pageable pageable
+  ) {
+
+    return userQuestionnaireSummaryRepository.findAllByRoleOrRoleAndBatchAndDeletedFalse(
+      Role.MENTOR, Role.STUDENT, batch, pageable);
   }
 
   @Override
-  public List<UserQuestionnaireSummary> getAppraisalsQuestionnaireSummary(Batch batch, String search, Pageable pageable) {
+  public List<UserQuestionnaireSummary> getAppraisalsQuestionnaireSummary(
+    Batch batch, String search, Pageable pageable
+  ) {
 
     return userQuestionnaireSummaryRepository.findAllByUserName(search)
       .stream()
-      .filter(summary  -> summary.getBatch().getCode().equals(batch.getCode()))
+      .filter(summary -> summary.getBatch()
+        .getCode()
+        .equals(batch.getCode()))
       .collect(Collectors.toList());
   }
 
   @Override
-  public UserQuestionnaireSummary getAppraisalsQuestionnaireSummaryById(String id) {
+  public UserQuestionnaireSummary getAppraisalsQuestionnaireSummaryById(
+    String id
+  ) {
+
     return userQuestionnaireSummaryRepository.findOne(id);
   }
+
 }

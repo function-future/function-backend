@@ -24,21 +24,21 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping(value = "/api/core/sticky-notes")
 public class StickyNoteController {
-  
+
   private final StickyNoteService stickyNoteService;
-  
+
   private final StickyNoteRequestMapper stickyNoteRequestMapper;
-  
+
   @Autowired
   public StickyNoteController(
     StickyNoteService stickyNoteService,
     StickyNoteRequestMapper stickyNoteRequestMapper
   ) {
-    
+
     this.stickyNoteService = stickyNoteService;
     this.stickyNoteRequestMapper = stickyNoteRequestMapper;
   }
-  
+
   @ResponseStatus(HttpStatus.OK)
   @GetMapping
   public PagingResponse<StickyNoteWebResponse> getStickyNote(
@@ -49,11 +49,11 @@ public class StickyNoteController {
                   defaultValue = "1")
       int size
   ) {
-    
+
     return StickyNoteResponseMapper.toStickyNotePagingResponse(
       stickyNoteService.getStickyNote(PageHelper.toPageable(page, size)));
   }
-  
+
   @ResponseStatus(HttpStatus.CREATED)
   @PostMapping
   public DataResponse<StickyNoteWebResponse> createStickyNote(
@@ -62,10 +62,12 @@ public class StickyNoteController {
     @RequestBody
       StickyNoteWebRequest request
   ) {
-    
-    return StickyNoteResponseMapper.toStickyNoteDataResponse(
-      HttpStatus.CREATED, stickyNoteService.createStickyNote(
-        stickyNoteRequestMapper.toStickyNote(request)));
+
+    return StickyNoteResponseMapper.toStickyNoteDataResponse(HttpStatus.CREATED,
+                                                             stickyNoteService.createStickyNote(
+                                                               stickyNoteRequestMapper.toStickyNote(
+                                                                 request))
+    );
   }
-  
+
 }

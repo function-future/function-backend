@@ -43,15 +43,18 @@ public class MyQuestionnaireResponseMapperTest {
 
   private static final String APPRAISEE_RESPONSE_ID = "appraiseeId";
 
-  private static final String QUESTIONNAIRE_PARTICIPANT_ID = "questionniareParticipantId";
+  private static final String QUESTIONNAIRE_PARTICIPANT_ID =
+    "questionniareParticipantId";
 
-  private static final String QUESTIONNAIRE_PARTICIPANT_ID_2 = "questionniareParticipantId2";
+  private static final String QUESTIONNAIRE_PARTICIPANT_ID_2 =
+    "questionniareParticipantId2";
 
   private static final String QUESTIONNAIRE_ID_1 = "questionnaireId1";
 
   private static final String QUESTIONNAIRE_TITLE = "questionnaireTitle";
 
-  private static final String QUESTIONNAIRE_DESCRIPTION = "questionnaireDescription";
+  private static final String QUESTIONNAIRE_DESCRIPTION =
+    "questionnaireDescription";
 
   private static final Long START_DATE = Long.valueOf(0);
 
@@ -64,8 +67,12 @@ public class MyQuestionnaireResponseMapperTest {
   private static final User MEMBER_1 = User.builder()
     .id(MEMBER_ID_1)
     .name(MEMBER_NAME_1)
-    .pictureV2(FileV2.builder().thumbnailUrl(THUMBNAIL_URL).build())
-    .batch(Batch.builder().id(BATCH_ID).build())
+    .pictureV2(FileV2.builder()
+                 .thumbnailUrl(THUMBNAIL_URL)
+                 .build())
+    .batch(Batch.builder()
+             .id(BATCH_ID)
+             .build())
     .role(Role.STUDENT)
     .university(UNIVERSITY)
     .build();
@@ -73,22 +80,26 @@ public class MyQuestionnaireResponseMapperTest {
   private static final User MEMBER_2 = User.builder()
     .id(MEMBER_ID_2)
     .name(MEMBER_NAME_2)
-    .pictureV2(FileV2.builder().thumbnailUrl(THUMBNAIL_URL).build())
+    .pictureV2(FileV2.builder()
+                 .thumbnailUrl(THUMBNAIL_URL)
+                 .build())
     .role(Role.MENTOR)
     .build();
 
-  private static final BatchWebResponse BATCH_WEB_RESPONSE = BatchWebResponse.builder()
-    .id(BATCH_ID)
-    .build();
+  private static final BatchWebResponse BATCH_WEB_RESPONSE =
+    BatchWebResponse.builder()
+      .id(BATCH_ID)
+      .build();
 
-  private static final AppraiseeResponse APPRAISEE_RESPONSE = AppraiseeResponse.builder()
-    .id(APPRAISEE_RESPONSE_ID)
-    .name(MEMBER_NAME_1)
-    .avatar(THUMBNAIL_URL)
-    .batch(BATCH_WEB_RESPONSE)
-    .role(Role.STUDENT.toString())
-    .university(UNIVERSITY)
-    .build();
+  private static final AppraiseeResponse APPRAISEE_RESPONSE =
+    AppraiseeResponse.builder()
+      .id(APPRAISEE_RESPONSE_ID)
+      .name(MEMBER_NAME_1)
+      .avatar(THUMBNAIL_URL)
+      .batch(BATCH_WEB_RESPONSE)
+      .role(Role.STUDENT.toString())
+      .university(UNIVERSITY)
+      .build();
 
   private static final QuestionnaireParticipant QUESTIONNAIRE_PARTICIPANT =
     QuestionnaireParticipant.builder()
@@ -125,6 +136,7 @@ public class MyQuestionnaireResponseMapperTest {
 
   @After
   public void tearDown() {
+
   }
 
   @Test
@@ -132,31 +144,51 @@ public class MyQuestionnaireResponseMapperTest {
 
     DataResponse<List<AppraiseeResponse>> data =
       MyQuestionnaireResponseMapper.toDataResponseAppraiseeResponseList(
-        Arrays.asList(QUESTIONNAIRE_PARTICIPANT),
-        URL_PREFIX
-    );
+        Arrays.asList(QUESTIONNAIRE_PARTICIPANT), URL_PREFIX);
 
     assertThat(data).isNotNull();
     assertThat(data.getCode()).isEqualTo(200);
-    assertThat(data.getData().get(0).getId()).isEqualTo(MEMBER_ID_1);
-    assertThat(data.getData().get(0).getName()).isEqualTo(MEMBER_NAME_1);
-    assertThat(data.getData().get(0).getBatch().getId()).isEqualTo(BATCH_ID);
-    assertThat(data.getData().get(0).getAvatar()).isEqualTo(URL_PREFIX.concat(THUMBNAIL_URL));
-    assertThat(data.getData().get(0).getRole()).isEqualTo(Role.STUDENT.toString());
-    assertThat(data.getData().get(0).getUniversity()).isEqualTo(UNIVERSITY);
+    assertThat(data.getData()
+                 .get(0)
+                 .getId()).isEqualTo(MEMBER_ID_1);
+    assertThat(data.getData()
+                 .get(0)
+                 .getName()).isEqualTo(MEMBER_NAME_1);
+    assertThat(data.getData()
+                 .get(0)
+                 .getBatch()
+                 .getId()).isEqualTo(BATCH_ID);
+    assertThat(data.getData()
+                 .get(0)
+                 .getAvatar()).isEqualTo(URL_PREFIX.concat(THUMBNAIL_URL));
+    assertThat(data.getData()
+                 .get(0)
+                 .getRole()).isEqualTo(Role.STUDENT.toString());
+    assertThat(data.getData()
+                 .get(0)
+                 .getUniversity()).isEqualTo(UNIVERSITY);
 
     data = MyQuestionnaireResponseMapper.toDataResponseAppraiseeResponseList(
-      Arrays.asList(QUESTIONNAIRE_PARTICIPANT_2),
-      URL_PREFIX
-    );
+      Arrays.asList(QUESTIONNAIRE_PARTICIPANT_2), URL_PREFIX);
 
     assertThat(data).isNotNull();
     assertThat(data.getCode()).isEqualTo(200);
-    assertThat(data.getData().get(0).getId()).isEqualTo(MEMBER_ID_2);
-    assertThat(data.getData().get(0).getName()).isEqualTo(MEMBER_NAME_2);
-    assertThat(data.getData().get(0).getBatch().getId()).isEqualTo(NO_BATCH);
-    assertThat(data.getData().get(0).getAvatar()).isEqualTo(URL_PREFIX.concat(THUMBNAIL_URL));
-    assertThat(data.getData().get(0).getRole()).isEqualTo(Role.MENTOR.toString());
+    assertThat(data.getData()
+                 .get(0)
+                 .getId()).isEqualTo(MEMBER_ID_2);
+    assertThat(data.getData()
+                 .get(0)
+                 .getName()).isEqualTo(MEMBER_NAME_2);
+    assertThat(data.getData()
+                 .get(0)
+                 .getBatch()
+                 .getId()).isEqualTo(NO_BATCH);
+    assertThat(data.getData()
+                 .get(0)
+                 .getAvatar()).isEqualTo(URL_PREFIX.concat(THUMBNAIL_URL));
+    assertThat(data.getData()
+                 .get(0)
+                 .getRole()).isEqualTo(Role.MENTOR.toString());
 
   }
 
@@ -164,28 +196,38 @@ public class MyQuestionnaireResponseMapperTest {
   public void toDataResponseQuestionnaireSummaryDescriptionResponse() {
 
     DataResponse<AppraisalDataResponse> data =
-      MyQuestionnaireResponseMapper
-        .toDataResponseQuestionnaireSummaryDescriptionResponse(QUESTIONNAIRE, MEMBER_1, URL_PREFIX);
+      MyQuestionnaireResponseMapper.toDataResponseQuestionnaireSummaryDescriptionResponse(
+        QUESTIONNAIRE, MEMBER_1, URL_PREFIX);
 
     assertThat(data).isNotNull();
     assertThat(data.getCode()).isEqualTo(200);
-    assertThat(data.getData().getQuestionnaireDetail().getId()).isEqualTo(QUESTIONNAIRE_ID_1);
-    assertThat(data.getData().getAppraisee().getId()).isEqualTo(MEMBER_ID_1);
+    assertThat(data.getData()
+                 .getQuestionnaireDetail()
+                 .getId()).isEqualTo(QUESTIONNAIRE_ID_1);
+    assertThat(data.getData()
+                 .getAppraisee()
+                 .getId()).isEqualTo(MEMBER_ID_1);
 
   }
 
   @Test
   public void toDataResponseQuestionQuestionnaireResponseList() {
+
     DataResponse<List<QuestionQuestionnaireResponse>> data =
       MyQuestionnaireResponseMapper.toDataResponseQuestionQuestionnaireResponseList(
-        Arrays.asList(QUESTION_QUESTIONNAIRE)
-      );
+        Arrays.asList(QUESTION_QUESTIONNAIRE));
 
     assertThat(data).isNotNull();
     assertThat(data.getCode()).isEqualTo(200);
-    assertThat(data.getData().get(0).getId()).isEqualTo(QUESTION_ID);
-    assertThat(data.getData().get(0).getQuestionnaireId()).isEqualTo(QUESTIONNAIRE_ID_1);
-    assertThat(data.getData().get(0).getDescription()).isEqualTo(QUESTION_DESCRIPTION);
+    assertThat(data.getData()
+                 .get(0)
+                 .getId()).isEqualTo(QUESTION_ID);
+    assertThat(data.getData()
+                 .get(0)
+                 .getQuestionnaireId()).isEqualTo(QUESTIONNAIRE_ID_1);
+    assertThat(data.getData()
+                 .get(0)
+                 .getDescription()).isEqualTo(QUESTION_DESCRIPTION);
   }
 
 }

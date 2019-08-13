@@ -15,34 +15,39 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 @RunWith(MockitoJUnitRunner.class)
 public class ChatroomNameValidatorTest {
 
-    private static final String VALID_NAME = "Chatroom Name 123";
+  private static final String VALID_NAME = "Chatroom Name 123";
 
-    private static final String INVALID_NAME = "Chatroom Name 123 name name name name name";
+  private static final String INVALID_NAME =
+    "Chatroom Name 123 name name name name name";
 
-    @Mock
-    private ChatroomName annotation;
+  @Mock
+  private ChatroomName annotation;
 
-    @InjectMocks
-    private ChatroomNameValidator validator;
+  @InjectMocks
+  private ChatroomNameValidator validator;
 
-    @Before
-    public void setUp() {
-        validator.initialize(annotation);
-    }
+  @Before
+  public void setUp() {
 
-    @After
-    public void tearDown() {
-        verifyNoMoreInteractions(annotation);
-    }
+    validator.initialize(annotation);
+  }
 
-    @Test
-    public void testGivenValidNameByValidatingNameReturnTrue() {
-        assertThat(validator.isValid(VALID_NAME, null)).isTrue();
-    }
+  @After
+  public void tearDown() {
 
-    @Test
-    public void testGivenInvalidNameByValidatingNameReturnFalse() {
-        assertThat(validator.isValid(INVALID_NAME, null)).isFalse();
-    }
+    verifyNoMoreInteractions(annotation);
+  }
+
+  @Test
+  public void testGivenValidNameByValidatingNameReturnTrue() {
+
+    assertThat(validator.isValid(VALID_NAME, null)).isTrue();
+  }
+
+  @Test
+  public void testGivenInvalidNameByValidatingNameReturnFalse() {
+
+    assertThat(validator.isValid(INVALID_NAME, null)).isFalse();
+  }
 
 }

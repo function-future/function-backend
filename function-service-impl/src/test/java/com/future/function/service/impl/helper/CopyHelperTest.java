@@ -9,16 +9,16 @@ import org.junit.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class CopyHelperTest {
-  
+
   @Before
   public void setUp() {}
-  
+
   @After
   public void tearDown() {}
-  
+
   @Test
   public void testGivenSourceAndTargetByCopyingPropertiesReturnSuccessfulCopy() {
-    
+
     Dummy dummySource = Dummy.builder()
       .id("dummy-source-id")
       .user(User.builder()
@@ -29,22 +29,22 @@ public class CopyHelperTest {
     dummySource.setCreatedAt(1L);
     dummySource.setCreatedBy("dummy-source-user-email");
     dummySource.setUpdatedAt(2L);
-    
+
     Dummy expectedDummyTarget = Dummy.builder()
       .anotherField("another-field")
       .build();
     expectedDummyTarget.setUpdatedAt(2L);
-    
+
     Dummy dummyTarget = new Dummy();
-    
+
     CopyHelper.copyProperties(dummySource, dummyTarget);
-    
+
     assertThat(dummyTarget).isEqualTo(expectedDummyTarget);
   }
-  
+
   @Test
   public void testGivenSourceAndTargetAndAdditionalIgnoredPropertiesByCopyingPropertiesReturnSuccessfulCopy() {
-    
+
     Dummy dummySource = Dummy.builder()
       .id("dummy-source-id")
       .user(User.builder()
@@ -55,16 +55,16 @@ public class CopyHelperTest {
     dummySource.setCreatedAt(1L);
     dummySource.setCreatedBy("dummy-source-user-email");
     dummySource.setUpdatedAt(2L);
-    
+
     Dummy expectedDummyTarget = Dummy.builder()
       .build();
     expectedDummyTarget.setUpdatedAt(2L);
-    
+
     Dummy dummyTarget = new Dummy();
-    
+
     CopyHelper.copyProperties(dummySource, dummyTarget, "anotherField");
-    
+
     assertThat(dummyTarget).isEqualTo(expectedDummyTarget);
   }
-  
+
 }

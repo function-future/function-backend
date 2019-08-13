@@ -23,19 +23,29 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 public class QuizRepositoryTest {
 
-  private String QUIZ_ID = UUID.randomUUID().toString();
+  private String QUIZ_ID = UUID.randomUUID()
+    .toString();
+
   private String QUIZ_TITLE = "quiz-title";
+
   private String QUIZ_DESCRIPTION = "quiz-description";
+
   private long DATE = 0;
+
   private long TIME_LIMIT = 0;
+
   private int TRIALS = 0;
+
   private int QUESTION_COUNT = 0;
 
   private int PAGE = 0;
+
   private int TOTAL = 10;
 
   private Quiz quiz;
+
   private Pageable pageable;
+
   private List<Quiz> quizList;
 
   @Autowired
@@ -43,17 +53,17 @@ public class QuizRepositoryTest {
 
   @Before
   public void setUp() throws Exception {
-    quiz = Quiz
-        .builder()
-        .id(QUIZ_ID)
-        .title(QUIZ_TITLE)
-        .description(QUIZ_DESCRIPTION)
-        .startDate(DATE)
-        .endDate(DATE)
-        .timeLimit(TIME_LIMIT)
-        .trials(TRIALS)
-        .questionCount(QUESTION_COUNT)
-        .build();
+
+    quiz = Quiz.builder()
+      .id(QUIZ_ID)
+      .title(QUIZ_TITLE)
+      .description(QUIZ_DESCRIPTION)
+      .startDate(DATE)
+      .endDate(DATE)
+      .timeLimit(TIME_LIMIT)
+      .trials(TRIALS)
+      .questionCount(QUESTION_COUNT)
+      .build();
 
     quizList = Collections.singletonList(quiz);
 
@@ -64,11 +74,13 @@ public class QuizRepositoryTest {
 
   @After
   public void tearDown() throws Exception {
+
     quizRepository.deleteAll();
   }
 
   @Test
   public void testFindQuizByIdAndDeletedFalse() {
+
     Optional<Quiz> actual = quizRepository.findByIdAndDeletedFalse(QUIZ_ID);
     assertThat(actual.isPresent()).isTrue();
     assertThat(actual.get()).isEqualTo(quiz);
@@ -76,6 +88,7 @@ public class QuizRepositoryTest {
 
   @Test
   public void testDeleteQuizById() {
+
     quizRepository.delete(QUIZ_ID);
     Optional<Quiz> actual = quizRepository.findByIdAndDeletedFalse(QUIZ_ID);
     assertThat(actual.isPresent()).isFalse();
@@ -83,6 +96,7 @@ public class QuizRepositoryTest {
 
   @Test
   public void testSaveQuizWithQuizObject() {
+
     quizRepository.save(quiz);
     Optional<Quiz> actual = quizRepository.findByIdAndDeletedFalse(QUIZ_ID);
     assertThat(actual.isPresent()).isTrue();
@@ -91,7 +105,9 @@ public class QuizRepositoryTest {
 
   @Test
   public void testFindAllQuizPageWithPageableFilterAndSearch() {
+
     Page<Quiz> actual = quizRepository.findAll(pageable);
     assertThat(actual.getContent()).isEqualTo(quizList);
   }
+
 }

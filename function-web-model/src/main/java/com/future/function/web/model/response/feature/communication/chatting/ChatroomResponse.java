@@ -23,5 +23,4 @@ public class ChatroomResponse {
 
   private LastMessageResponse lastMessage;
 
-
 }

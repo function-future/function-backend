@@ -25,11 +25,18 @@ import org.springframework.web.bind.annotation.*;
 public class AssignmentController {
 
   private AssignmentService assignmentService;
+
   private AssignmentRequestMapper assignmentRequestMapper;
+
   private FileProperties fileProperties;
 
   @Autowired
-  public AssignmentController(AssignmentService assignmentService, AssignmentRequestMapper assignmentRequestMapper, FileProperties fileProperties) {
+  public AssignmentController(
+    AssignmentService assignmentService,
+    AssignmentRequestMapper assignmentRequestMapper,
+    FileProperties fileProperties
+  ) {
+
     this.assignmentService = assignmentService;
     this.assignmentRequestMapper = assignmentRequestMapper;
     this.fileProperties = fileProperties;
@@ -38,54 +45,106 @@ public class AssignmentController {
   @ResponseStatus(value = HttpStatus.OK)
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   public PagingResponse<AssignmentWebResponse> findAllAssignment(
-          @PathVariable String batchCode,
-          @RequestParam(defaultValue = "1") int page,
-          @RequestParam(defaultValue = "10") int size,
-          @WithAnyRole(roles = {Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT}) Session session) {
-    return AssignmentResponseMapper
-        .toAssignmentsPagingResponse(
-            assignmentService.findAllByBatchCodeAndPageable(batchCode, PageHelper.toPageable(page, size)), fileProperties.getUrlPrefix());
+    @PathVariable
+      String batchCode,
+    @RequestParam(defaultValue = "1")
+      int page,
+    @RequestParam(defaultValue = "10")
+      int size,
+    @WithAnyRole(roles = { Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT })
+      Session session
+  ) {
+
+    return AssignmentResponseMapper.toAssignmentsPagingResponse(
+      assignmentService.findAllByBatchCodeAndPageable(batchCode,
+                                                      PageHelper.toPageable(
+                                                        page, size)
+      ), fileProperties.getUrlPrefix());
   }
 
   @ResponseStatus(value = HttpStatus.OK)
-  @GetMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-  public DataResponse<AssignmentWebResponse> findAssignmentById(@PathVariable String id,
-      @WithAnyRole(roles = {Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT})Session session) {
-    return AssignmentResponseMapper.toAssignmentDataResponse(assignmentService.findById(id), fileProperties.getUrlPrefix());
+  @GetMapping(path = "/{id}",
+              produces = MediaType.APPLICATION_JSON_VALUE)
+  public DataResponse<AssignmentWebResponse> findAssignmentById(
+    @PathVariable
+      String id,
+    @WithAnyRole(roles = { Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT })
+      Session session
+  ) {
+
+    return AssignmentResponseMapper.toAssignmentDataResponse(
+      assignmentService.findById(id), fileProperties.getUrlPrefix());
   }
 
   @ResponseStatus(value = HttpStatus.CREATED)
-  @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-  public DataResponse<AssignmentWebResponse> createAssignment(@PathVariable String batchCode,
-                                                              @RequestBody AssignmentWebRequest data,
-                                                              @WithAnyRole(roles = Role.ADMIN) Session session) {
-    return AssignmentResponseMapper
-        .toAssignmentDataResponse(HttpStatus.CREATED, assignmentService
-                .createAssignment(assignmentRequestMapper.toAssignment(data, batchCode)), fileProperties.getUrlPrefix());
+  @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE,
+               produces = MediaType.APPLICATION_JSON_VALUE)
+  public DataResponse<AssignmentWebResponse> createAssignment(
+    @PathVariable
+      String batchCode,
+    @RequestBody
+      AssignmentWebRequest data,
+    @WithAnyRole(roles = Role.ADMIN)
+      Session session
+  ) {
+
+    return AssignmentResponseMapper.toAssignmentDataResponse(
+      HttpStatus.CREATED, assignmentService.createAssignment(
+        assignmentRequestMapper.toAssignment(
+          data, batchCode)), fileProperties.getUrlPrefix());
   }
 
   @ResponseStatus(value = HttpStatus.CREATED)
-  @PostMapping(path = "/copy", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-  public DataResponse<AssignmentWebResponse> copyAssignment(@RequestBody CopyAssignmentWebRequest request,
-    @WithAnyRole(roles = Role.ADMIN) Session session) {
+  @PostMapping(path = "/copy",
+               consumes = MediaType.APPLICATION_JSON_VALUE,
+               produces = MediaType.APPLICATION_JSON_VALUE)
+  public DataResponse<AssignmentWebResponse> copyAssignment(
+    @RequestBody
+      CopyAssignmentWebRequest request,
+    @WithAnyRole(roles = Role.ADMIN)
+      Session session
+  ) {
+
     request = assignmentRequestMapper.validateCopyAssignmentWebRequest(request);
-    return AssignmentResponseMapper
-        .toAssignmentDataResponse(HttpStatus.CREATED, assignmentService
-                .copyAssignment(request.getAssignmentId(), request.getBatchCode()), fileProperties.getUrlPrefix());
+    return AssignmentResponseMapper.toAssignmentDataResponse(
+      HttpStatus.CREATED, assignmentService.copyAssignment(
+        request.getAssignmentId(), request.getBatchCode()),
+      fileProperties.getUrlPrefix()
+    );
   }
 
   @ResponseStatus(value = HttpStatus.OK)
-  @PutMapping(path = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-  public DataResponse<AssignmentWebResponse> updateAssignment(@PathVariable String batchCode, @PathVariable String id,
-                                                              @RequestBody AssignmentWebRequest data,
-                                                              @WithAnyRole(roles = Role.ADMIN) Session session) {
-    return AssignmentResponseMapper.toAssignmentDataResponse(assignmentService
-            .updateAssignment(assignmentRequestMapper.toAssignmentWithId(id, data, batchCode)), fileProperties.getUrlPrefix());
+  @PutMapping(path = "/{id}",
+              consumes = MediaType.APPLICATION_JSON_VALUE,
+              produces = MediaType.APPLICATION_JSON_VALUE)
+  public DataResponse<AssignmentWebResponse> updateAssignment(
+    @PathVariable
+      String batchCode,
+    @PathVariable
+      String id,
+    @RequestBody
+      AssignmentWebRequest data,
+    @WithAnyRole(roles = Role.ADMIN)
+      Session session
+  ) {
+
+    return AssignmentResponseMapper.toAssignmentDataResponse(
+      assignmentService.updateAssignment(
+        assignmentRequestMapper.toAssignmentWithId(id, data, batchCode)),
+      fileProperties.getUrlPrefix()
+    );
   }
 
   @ResponseStatus(value = HttpStatus.OK)
-  @DeleteMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-  public BaseResponse deleteAssignmentById(@PathVariable String id, @WithAnyRole(roles = Role.ADMIN) Session session) {
+  @DeleteMapping(path = "/{id}",
+                 produces = MediaType.APPLICATION_JSON_VALUE)
+  public BaseResponse deleteAssignmentById(
+    @PathVariable
+      String id,
+    @WithAnyRole(roles = Role.ADMIN)
+      Session session
+  ) {
+
     assignmentService.deleteById(id);
     return ResponseHelper.toBaseResponse(HttpStatus.OK);
   }

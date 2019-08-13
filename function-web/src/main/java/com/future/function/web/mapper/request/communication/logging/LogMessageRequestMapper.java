@@ -15,20 +15,32 @@ public class LogMessageRequestMapper {
 
   @Autowired
   public LogMessageRequestMapper(RequestValidator validator) {
+
     this.validator = validator;
   }
 
-  public LogMessage toLogMessage(LogMessageWebRequest logMessageWebRequest, String memberId, String topicId){
+  public LogMessage toLogMessage(
+    LogMessageWebRequest logMessageWebRequest, String memberId, String topicId
+  ) {
+
     return toValidatedLogMessage(logMessageWebRequest, memberId, topicId);
   }
 
-  private LogMessage toValidatedLogMessage(LogMessageWebRequest logMessageWebRequest, String memberId, String topicId) {
+  private LogMessage toValidatedLogMessage(
+    LogMessageWebRequest logMessageWebRequest, String memberId, String topicId
+  ) {
+
     validator.validate(logMessageWebRequest);
 
     return LogMessage.builder()
-            .text(logMessageWebRequest.getText())
-            .sender(User.builder().id(memberId).build())
-            .topic(Topic.builder().id(topicId).build())
-            .build();
+      .text(logMessageWebRequest.getText())
+      .sender(User.builder()
+                .id(memberId)
+                .build())
+      .topic(Topic.builder()
+               .id(topicId)
+               .build())
+      .build();
   }
+
 }

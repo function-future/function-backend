@@ -22,22 +22,22 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @Document(collection = DocumentName.ACTIVITY_BLOG)
 public class ActivityBlog extends BaseEntity {
-  
+
   @Id
   private String id;
-  
+
   @Field(FieldName.ActivityBlog.TITLE)
   private String title;
-  
+
   @Field(FieldName.ActivityBlog.DESCRIPTION)
   private String description;
-  
+
   @Field(FieldName.ActivityBlog.USER)
   @DBRef(lazy = true)
   private User user;
-  
+
   @Field(FieldName.ActivityBlog.FILES)
   @DBRef(lazy = true)
   private List<FileV2> files;
-  
+
 }

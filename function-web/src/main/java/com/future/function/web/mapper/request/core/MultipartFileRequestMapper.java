@@ -9,31 +9,31 @@ import java.util.Optional;
 
 @Component
 public class MultipartFileRequestMapper {
-  
+
   public Pair<String, byte[]> toStringAndByteArrayPair(
     MultipartFile multipartFile
   ) {
-    
+
     return Pair.of(this.getOriginalFilename(multipartFile),
                    toByteArray(multipartFile)
     );
   }
-  
+
   private String getOriginalFilename(MultipartFile multipartFile) {
-    
+
     return Optional.ofNullable(multipartFile)
       .map(MultipartFile::getOriginalFilename)
       .map(FilenameUtils::getName)
       .orElse("");
   }
-  
+
   public byte[] toByteArray(MultipartFile multipartFile) {
-    
+
     try {
       return multipartFile.getBytes();
     } catch (Exception e) {
       return new byte[] {};
     }
   }
-  
+
 }

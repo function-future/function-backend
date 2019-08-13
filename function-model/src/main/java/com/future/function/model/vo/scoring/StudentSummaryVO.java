@@ -14,12 +14,19 @@ import java.util.List;
 public class StudentSummaryVO {
 
   private String studentId;
+
   private String studentName;
+
   private String batchCode;
+
   private String university;
+
   private String avatar;
+
   private List<SummaryVO> scores;
+
   private Integer totalPoint;
+
   private int point;
 
 }

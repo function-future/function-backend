@@ -20,4 +20,5 @@ public class LogMessageWebResponse {
   private String senderName;
 
   private String senderAvatar;
+
 }

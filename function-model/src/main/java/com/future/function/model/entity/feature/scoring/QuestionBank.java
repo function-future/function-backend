@@ -22,11 +22,13 @@ import java.util.UUID;
 public class QuestionBank extends BaseEntity {
 
   @Builder.Default
-  private String id = UUID.randomUUID().toString();
+  private String id = UUID.randomUUID()
+    .toString();
 
   @Field(FieldName.QuestionBank.TITLE)
   private String title;
 
   @Field(value = FieldName.QuestionBank.DESCRIPTION)
   private String description;
+
 }

@@ -14,15 +14,23 @@ public interface UserQuestionnaireSummaryRepository
   extends MongoRepository<UserQuestionnaireSummary, String>,
   UserQuestionnaireSummaryRepositoryCustom {
 
-  Page<UserQuestionnaireSummary> findAllByDeletedFalse (Pageable pageable);
+  Page<UserQuestionnaireSummary> findAllByDeletedFalse(Pageable pageable);
 
-  Optional<UserQuestionnaireSummary> findFirstByAppraiseeAndDeletedFalse (User appraisee);
+  Optional<UserQuestionnaireSummary> findFirstByAppraiseeAndDeletedFalse(
+    User appraisee
+  );
 
-  Page<UserQuestionnaireSummary> findAllByRoleOrRoleAndBatchAndDeletedFalse (Role role1, Role role, Batch batch, Pageable pageable);
+  Page<UserQuestionnaireSummary> findAllByRoleOrRoleAndBatchAndDeletedFalse(
+    Role role1, Role role, Batch batch, Pageable pageable
+  );
 
-  Page<UserQuestionnaireSummary> findAllByRoleAndDeletedFalse (Role role, Pageable pageable);
+  Page<UserQuestionnaireSummary> findAllByRoleAndDeletedFalse(
+    Role role, Pageable pageable
+  );
 
-//  @Query()
-//  Page<UserQuestionnaireSummary> findAllByRoleAndBatchAndDeletedFalseAndMemberNameIgnoreCaseContaining(Role role, Batch batch, String keyword,Pageable pageable)
+  //  @Query()
+  //  Page<UserQuestionnaireSummary>
+  //  findAllByRoleAndBatchAndDeletedFalseAndMemberNameIgnoreCaseContaining
+  //  (Role role, Batch batch, String keyword,Pageable pageable)
 
 }

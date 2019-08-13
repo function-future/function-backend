@@ -26,16 +26,20 @@ public class NotificationRequestMapperTest {
 
   @After
   public void tearDown() {
+
     verifyNoMoreInteractions(requestValidator);
   }
 
   @Test
   public void testGivenNotificationRequestByCallingToNotificationReturnNotification() {
+
     NotificationRequest request = NotificationRequest.builder()
-            .title("title").build();
+      .title("title")
+      .build();
     when(requestValidator.validate(request)).thenReturn(request);
 
-    Notification notification = notificationRequestMapper.toNotification(request);
+    Notification notification = notificationRequestMapper.toNotification(
+      request);
 
     assertThat(notification.getTitle()).isEqualTo("title");
     verify(requestValidator).validate(request);

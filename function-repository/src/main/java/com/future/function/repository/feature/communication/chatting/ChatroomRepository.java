@@ -12,11 +12,16 @@ import java.util.Optional;
 
 public interface ChatroomRepository extends MongoRepository<Chatroom, String> {
 
-  Page<Chatroom> findAllByTypeAndMembersOrderByUpdatedAtDesc(ChatroomType type, User member, Pageable pageable);
+  Page<Chatroom> findAllByTypeAndMembersOrderByUpdatedAtDesc(
+    ChatroomType type, User member, Pageable pageable
+  );
 
-  Page<Chatroom> findAllByTitleContainingIgnoreCaseAndMembersOrderByUpdatedAtDesc(String titleKeyword, User member, Pageable pageable);
+  Page<Chatroom> findAllByTitleContainingIgnoreCaseAndMembersOrderByUpdatedAtDesc(
+    String titleKeyword, User member, Pageable pageable
+  );
 
   Optional<Chatroom> findByType(String type);
 
   List<Chatroom> findAllByMembersContaining(List<User> members);
+
 }

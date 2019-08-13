@@ -16,15 +16,15 @@ import org.hibernate.validator.constraints.NotBlank;
 @AllArgsConstructor
 @UniqueBatchCode
 public class BatchWebRequest implements BatchData {
-  
+
   private String id;
-  
+
   @NotBlank(message = "NotBlank")
   private String name;
-  
+
   @NoSpace
   @Alphanumeric
   @NotBlank(message = "NotBlank")
   private String code;
-  
+
 }

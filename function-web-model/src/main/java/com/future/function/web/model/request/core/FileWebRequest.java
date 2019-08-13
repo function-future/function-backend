@@ -15,15 +15,15 @@ import org.hibernate.validator.constraints.NotBlank;
 @AllArgsConstructor
 @TypeAndBytesMustBeValid
 public class FileWebRequest implements FileData {
-  
+
   private String id;
-  
+
   @NotBlank(message = "NotBlank")
   private String name;
-  
+
   @TypeMustExist
   private String type;
-  
+
   private byte[] bytes;
-  
+
 }

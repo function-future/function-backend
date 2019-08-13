@@ -191,7 +191,8 @@ public class ActivityBlogServiceImplTest {
 
     catchException(
       () -> activityBlogService.deleteActivityBlog(USER_ID + "2", Role.STUDENT,
-                                                   ID));
+                                                   ID
+      ));
 
     assertThat(caughtException().getClass()).isEqualTo(
       ForbiddenException.class);
@@ -293,9 +294,10 @@ public class ActivityBlogServiceImplTest {
       .build();
     activityBlog.setUser(user);
 
-    catchException(() -> activityBlogService.updateActivityBlog(user.getId(),
-                                                                Role.STUDENT,
-                                                                activityBlog));
+    catchException(
+      () -> activityBlogService.updateActivityBlog(user.getId(), Role.STUDENT,
+                                                   activityBlog
+      ));
 
     assertThat(caughtException().getClass()).isEqualTo(
       ForbiddenException.class);

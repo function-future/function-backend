@@ -23,34 +23,44 @@ import java.util.List;
 @WithAnyRole(roles = { Role.ADMIN })
 public class QuestionResponseController {
 
-  private final QuestionnaireResponseSummaryService questionnaireResponseSummaryService;
+  private final QuestionnaireResponseSummaryService
+    questionnaireResponseSummaryService;
 
   private final FileProperties fileProperties;
 
   @Autowired
-  public QuestionResponseController(QuestionnaireResponseSummaryService questionnaireResponseSummaryService, FileProperties fileProperties) {
-    this.questionnaireResponseSummaryService = questionnaireResponseSummaryService;
+  public QuestionResponseController(
+    QuestionnaireResponseSummaryService questionnaireResponseSummaryService,
+    FileProperties fileProperties
+  ) {
+
+    this.questionnaireResponseSummaryService =
+      questionnaireResponseSummaryService;
     this.fileProperties = fileProperties;
   }
 
   @ResponseStatus(HttpStatus.OK)
   @GetMapping(value = "/{questionResponseSummaryId}")
   public DataResponse<QuestionQuestionnaireSummaryResponse> getQuestionQuestionnaireSummaryResponse(
-          @PathVariable String questionResponseSummaryId
+    @PathVariable
+      String questionResponseSummaryId
   ) {
+
     return QuestionnaireResponseSummaryResponseMapper.toDataResponseQuestionQuestionnaireSummaryResponse(
-      questionnaireResponseSummaryService.getQuestionResponseSummaryById(questionResponseSummaryId)
-    );
+      questionnaireResponseSummaryService.getQuestionResponseSummaryById(
+        questionResponseSummaryId));
   }
 
   @ResponseStatus(HttpStatus.OK)
   @GetMapping(value = "/{questionResponseSummaryId}/responses")
   public DataResponse<List<QuestionAnswerResponse>> getQuestionnaireAnswerDetailSummary(
-          @PathVariable String questionResponseSummaryId
+    @PathVariable
+      String questionResponseSummaryId
   ) {
+
     return QuestionnaireResponseSummaryResponseMapper.toDataResponseQuestionAnswerDetailResponse(
-            questionnaireResponseSummaryService.getQuestionResponseByQuestionResponseSummaryId(questionResponseSummaryId),
-            fileProperties.getUrlPrefix()
-    );
+      questionnaireResponseSummaryService.getQuestionResponseByQuestionResponseSummaryId(
+        questionResponseSummaryId), fileProperties.getUrlPrefix());
   }
+
 }

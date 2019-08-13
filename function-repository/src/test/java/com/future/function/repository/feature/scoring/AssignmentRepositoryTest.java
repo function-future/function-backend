@@ -20,7 +20,9 @@ import static org.junit.Assert.assertTrue;
 public class AssignmentRepositoryTest {
 
   private static final String ASSIGNMENT_TITLE = "assignment-title";
+
   private static final String ASSIGNMENT_DESCRIPTION = "assignment-description";
+
   private static final long ASSIGNMENT_DEADLINE = new Date().getTime();
 
   @Autowired
@@ -28,26 +30,30 @@ public class AssignmentRepositoryTest {
 
   @Before
   public void setUp() throws Exception {
+
   }
 
   @After
   public void tearDown() throws Exception {
+
     assignmentRepository.deleteAll();
   }
 
   @Test
   public void findAssignmentByIdAndDeletedFalse() {
-    Assignment assignment = Assignment
-        .builder()
-        .title(ASSIGNMENT_TITLE)
-        .description(ASSIGNMENT_DESCRIPTION)
-        .deadline(ASSIGNMENT_DEADLINE)
-        .build();
+
+    Assignment assignment = Assignment.builder()
+      .title(ASSIGNMENT_TITLE)
+      .description(ASSIGNMENT_DESCRIPTION)
+      .deadline(ASSIGNMENT_DEADLINE)
+      .build();
 
     assignmentRepository.save(assignment);
 
-    Optional<Assignment> result = assignmentRepository.findByIdAndDeletedFalse(assignment.getId());
+    Optional<Assignment> result = assignmentRepository.findByIdAndDeletedFalse(
+      assignment.getId());
     assertTrue(result.isPresent());
     assertEquals(assignment, result.get());
   }
+
 }

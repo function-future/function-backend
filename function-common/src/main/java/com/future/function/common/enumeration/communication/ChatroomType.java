@@ -9,13 +9,16 @@ public enum ChatroomType {
   GROUP;
 
   public static ChatroomType fromString(String name) {
+
     return Optional.ofNullable(name)
-            .filter(ChatroomType::isNameEqualAnyType)
-            .map(ChatroomType::valueOf)
-            .orElse(ChatroomType.PUBLIC);
+      .filter(ChatroomType::isNameEqualAnyType)
+      .map(ChatroomType::valueOf)
+      .orElse(ChatroomType.PUBLIC);
   }
 
   private static boolean isNameEqualAnyType(String name) {
-    return Stream.of(ChatroomType.values()).anyMatch(type -> name.equals(type.name()));
+
+    return Stream.of(ChatroomType.values())
+      .anyMatch(type -> name.equals(type.name()));
   }
 }

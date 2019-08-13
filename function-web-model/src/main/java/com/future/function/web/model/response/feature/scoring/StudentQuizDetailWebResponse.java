@@ -23,5 +23,4 @@ public class StudentQuizDetailWebResponse {
 
   private Integer trials;
 
-
 }

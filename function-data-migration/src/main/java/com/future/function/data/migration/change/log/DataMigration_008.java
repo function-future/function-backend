@@ -14,9 +14,10 @@ import java.util.Map;
 public class DataMigration_008 {
 
   @ChangeSet(author = "Ricky Kennedy",
-    id = "questionnaireAccessListMigration",
-    order = "0001")
+             id = "questionnaireAccessListMigration",
+             order = "0001")
   public void insertQuestionnaireAccessList(MongoTemplate mongoTemplate) {
+
     String urlRegex = "^(\\/)questionnaires(\\/)?(.?)*$";
 
     Map<String, Object> nonAdminComponent = new HashMap<>();
@@ -69,9 +70,10 @@ public class DataMigration_008 {
   }
 
   @ChangeSet(author = "Ricky Kennedy",
-    id = "myAccessListMigration",
-    order = "0002")
+             id = "myAccessListMigration",
+             order = "0002")
   public void insertMyQuestionnaireAccessList(MongoTemplate mongoTemplate) {
+
     String urlRegex = "^(\\/)my-questionnaire(\\/)?(.?)*$$";
 
     Map<String, Object> nonParticipantComponent = new HashMap<>();
@@ -124,9 +126,12 @@ public class DataMigration_008 {
   }
 
   @ChangeSet(author = "Ricky Kennedy",
-    id = "questionnaireResultsAccessListMigration",
-    order = "0003")
-  public void insertQuestionnaireResultsAccessList(MongoTemplate mongoTemplate) {
+             id = "questionnaireResultsAccessListMigration",
+             order = "0003")
+  public void insertQuestionnaireResultsAccessList(
+    MongoTemplate mongoTemplate
+  ) {
+
     String urlRegex = "^(\\/)questionnaire-results(\\/)?(.?)*$";
 
     Map<String, Object> nonAdminComponent = new HashMap<>();
@@ -177,4 +182,5 @@ public class DataMigration_008 {
     mongoTemplate.insert(studentAccess, DocumentName.ACCESS);
     mongoTemplate.insert(guestAccess, DocumentName.ACCESS);
   }
+
 }

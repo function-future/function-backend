@@ -19,15 +19,15 @@ import java.util.List;
 @AllArgsConstructor
 @BatchCodesMustBeDistinct
 public class SharedCourseWebRequest implements SharedCourseData {
-  
+
   @BatchMustExist(field = "originBatch")
   private String originBatch;
-  
+
   private String targetBatch;
-  
+
   @CourseMustExist
   @CourseMustBeDistinct
   @NotEmpty(message = "NotEmpty")
   private List<String> courses;
-  
+
 }

@@ -15,16 +15,16 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CourseWebRequest {
-  
+
   @NotBlank(message = "NotBlank")
   private String title;
-  
+
   @NotBlank(message = "NotBlank")
   private String description;
-  
+
   @Size(max = 1,
         message = "Size")
   @FileMustExist
   private List<String> material;
-  
+
 }

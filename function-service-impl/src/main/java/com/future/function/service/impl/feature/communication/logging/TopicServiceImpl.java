@@ -5,7 +5,6 @@ import com.future.function.model.entity.feature.communication.logging.Topic;
 import com.future.function.repository.feature.communication.logging.TopicRepository;
 import com.future.function.service.api.feature.communication.logging.LoggingRoomService;
 import com.future.function.service.api.feature.communication.logging.TopicService;
-import com.future.function.service.api.feature.core.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,71 +15,83 @@ import java.util.Optional;
 @Service
 public class TopicServiceImpl implements TopicService {
 
-    private final TopicRepository topicRepository;
+  private final TopicRepository topicRepository;
 
-    private final LoggingRoomService loggingRoomService;
+  private final LoggingRoomService loggingRoomService;
 
-    @Autowired
-    public TopicServiceImpl(TopicRepository topicRepository, LoggingRoomService loggingRoomService) {
-        this.topicRepository = topicRepository;
-        this.loggingRoomService = loggingRoomService;
-    }
+  @Autowired
+  public TopicServiceImpl(
+    TopicRepository topicRepository, LoggingRoomService loggingRoomService
+  ) {
 
-    @Override
-    public Page<Topic> getTopicByLoggingRoom(String loggingRoomId, Pageable pageable) {
-        return topicRepository.findAllByLoggingRoomAndDeletedFalse(
-                loggingRoomService.getLoggingRoom(loggingRoomId),
-                pageable
-                );
-    }
+    this.topicRepository = topicRepository;
+    this.loggingRoomService = loggingRoomService;
+  }
 
-    @Override
-    public Topic getTopic(String topicId) {
-        return Optional.of(topicId)
-                .map(topicRepository::findOne)
-                .orElseThrow(() -> new NotFoundException("Topic Not found"));
-    }
+  @Override
+  public Page<Topic> getTopicByLoggingRoom(
+    String loggingRoomId, Pageable pageable
+  ) {
 
-    @Override
-    public Topic createTopic(Topic topic) {
-        return Optional.of(topic)
-                .map(this::setLoggingRoom)
-                .map(topicRepository::save)
-                .orElseThrow(UnsupportedOperationException::new);
-    }
+    return topicRepository.findAllByLoggingRoomAndDeletedFalse(
+      loggingRoomService.getLoggingRoom(loggingRoomId), pageable);
+  }
 
-    private Topic setLoggingRoom(Topic topic) {
-        topic.setLoggingRoom(
-          loggingRoomService.getLoggingRoom(topic.getLoggingRoom().getId()));
-        return topic;
-    }
+  @Override
+  public Topic getTopic(String topicId) {
 
-    @Override
-    public Topic updateTopic(Topic topic) {
-        return Optional.of(topic)
-                .map(Topic::getId)
-                .map(topicRepository::findOne)
-                .map(savedTopic -> this.copyProperties(savedTopic, topic))
-                .map(topicRepository::save)
-                .orElse(topic);
-    }
+    return Optional.of(topicId)
+      .map(topicRepository::findOne)
+      .orElseThrow(() -> new NotFoundException("Topic Not found"));
+  }
+
+  @Override
+  public Topic createTopic(Topic topic) {
+
+    return Optional.of(topic)
+      .map(this::setLoggingRoom)
+      .map(topicRepository::save)
+      .orElseThrow(UnsupportedOperationException::new);
+  }
+
+  private Topic setLoggingRoom(Topic topic) {
+
+    topic.setLoggingRoom(loggingRoomService.getLoggingRoom(
+      topic.getLoggingRoom()
+        .getId()));
+    return topic;
+  }
+
+  @Override
+  public Topic updateTopic(Topic topic) {
+
+    return Optional.of(topic)
+      .map(Topic::getId)
+      .map(topicRepository::findOne)
+      .map(savedTopic -> this.copyProperties(savedTopic, topic))
+      .map(topicRepository::save)
+      .orElse(topic);
+  }
 
 
-    @Override
-    public void deleteTopic(String topicId) {
-        Optional.ofNullable(topicId)
-          .map(topicRepository::findOne)
-          .ifPresent(this::softDeletedHelper);
-    }
+  @Override
+  public void deleteTopic(String topicId) {
 
-    private void softDeletedHelper(Topic topic) {
-        topic.setDeleted(true);
-        topicRepository.save(topic);
-    }
+    Optional.ofNullable(topicId)
+      .map(topicRepository::findOne)
+      .ifPresent(this::softDeletedHelper);
+  }
 
-    private Topic copyProperties(Topic savedTopic, Topic topic) {
-        savedTopic.setTitle(topic.getTitle());
-        return savedTopic;
-    }
+  private void softDeletedHelper(Topic topic) {
+
+    topic.setDeleted(true);
+    topicRepository.save(topic);
+  }
+
+  private Topic copyProperties(Topic savedTopic, Topic topic) {
+
+    savedTopic.setTitle(topic.getTitle());
+    return savedTopic;
+  }
 
 }

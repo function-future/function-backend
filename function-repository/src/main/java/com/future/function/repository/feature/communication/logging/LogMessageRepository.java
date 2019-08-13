@@ -6,7 +6,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-public interface LogMessageRepository extends MongoRepository<LogMessage, String> {
+public interface LogMessageRepository
+  extends MongoRepository<LogMessage, String> {
 
-    Page<LogMessage> findAllByTopicOrderByCreatedAtDesc (Topic topic, Pageable pageable);
+  Page<LogMessage> findAllByTopicOrderByCreatedAtDesc(
+    Topic topic, Pageable pageable
+  );
+
 }

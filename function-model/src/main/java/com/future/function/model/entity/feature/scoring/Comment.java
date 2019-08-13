@@ -23,18 +23,19 @@ import java.util.UUID;
 @Document(collection = DocumentName.COMMENT)
 public class Comment extends BaseEntity {
 
-    @Builder.Default
-    private String id = UUID.randomUUID().toString();
+  @Builder.Default
+  private String id = UUID.randomUUID()
+    .toString();
 
-    @DBRef(lazy = true)
-    @Field(FieldName.Comment.AUTHOR)
-    private User author;
+  @DBRef(lazy = true)
+  @Field(FieldName.Comment.AUTHOR)
+  private User author;
 
-    @Field(FieldName.Comment.TEXT)
-    private String text;
+  @Field(FieldName.Comment.TEXT)
+  private String text;
 
-    @DBRef(lazy = true)
-    @Field(FieldName.Comment.ROOM)
-    private Room room;
+  @DBRef(lazy = true)
+  @Field(FieldName.Comment.ROOM)
+  private Room room;
 
 }

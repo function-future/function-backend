@@ -67,13 +67,13 @@ public class AuthServiceImpl implements AuthService {
   }
 
   private String getBatchId(User user) {
-    
+
     return Optional.of(user)
       .map(User::getBatch)
       .map(Batch::getId)
       .orElse(null);
   }
-  
+
   private void setAuthenticationOnSecurityContextHolder(
     Authentication authentication
   ) {
@@ -86,18 +86,6 @@ public class AuthServiceImpl implements AuthService {
 
     return new UsernamePasswordAuthenticationToken(
       user.getId(), user.getPassword());
-  }
-
-  private void setCookie(
-    HttpServletResponse response, String sessionId, int maxAge
-  ) {
-
-    Cookie cookie = new Cookie(sessionProperties.getCookieName(), sessionId);
-    cookie.setMaxAge(maxAge);
-    cookie.setHttpOnly(true);
-    cookie.setPath("/");
-
-    response.addCookie(cookie);
   }
 
   @Override
@@ -139,11 +127,23 @@ public class AuthServiceImpl implements AuthService {
   private void setRedisExpirationAndCookie(
     HttpServletResponse response, Session session
   ) {
-    
+
     redisTemplate.expire(
       session.getId(), sessionProperties.getExpireTime(), TimeUnit.SECONDS);
-    
+
     this.setCookie(response, session.getId(), sessionProperties.getMaxAge());
   }
-  
+
+  private void setCookie(
+    HttpServletResponse response, String sessionId, int maxAge
+  ) {
+
+    Cookie cookie = new Cookie(sessionProperties.getCookieName(), sessionId);
+    cookie.setMaxAge(maxAge);
+    cookie.setHttpOnly(true);
+    cookie.setPath("/");
+
+    response.addCookie(cookie);
+  }
+
 }

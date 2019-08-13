@@ -18,4 +18,5 @@ public class QuestionnaireParticipantResponse {
   private String memberId;
 
   private String participantType;
+
 }

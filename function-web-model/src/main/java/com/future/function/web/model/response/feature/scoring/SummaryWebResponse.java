@@ -11,8 +11,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class SummaryWebResponse {
 
-    private String type;
-    private String title;
-    private int point;
+  private String type;
+
+  private String title;
+
+  private int point;
 
 }

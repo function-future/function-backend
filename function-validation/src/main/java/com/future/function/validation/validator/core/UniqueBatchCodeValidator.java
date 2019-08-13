@@ -11,22 +11,22 @@ import javax.validation.ConstraintValidatorContext;
 
 public class UniqueBatchCodeValidator
   implements ConstraintValidator<UniqueBatchCode, BatchData> {
-  
+
   @Autowired
   private BatchRepository batchRepository;
-  
+
   @Override
   public void initialize(UniqueBatchCode constraintAnnotation) {
     // No initialization needed.
   }
-  
+
   @Override
   public boolean isValid(BatchData data, ConstraintValidatorContext context) {
-    
+
     return batchRepository.findByCodeAndDeletedFalse(data.getCode())
       .map(Batch::getId)
       .map(id -> id.equals(data.getId()))
       .orElse(true);
   }
-  
+
 }

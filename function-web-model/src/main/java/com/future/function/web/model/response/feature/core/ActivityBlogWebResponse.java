@@ -14,17 +14,17 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ActivityBlogWebResponse {
-  
+
   private String id;
-  
+
   private String title;
-  
+
   private String description;
-  
+
   private List<EmbeddedFileWebResponse> files;
-  
+
   private long updatedAt;
-  
+
   private AuthorWebResponse author;
-  
+
 }

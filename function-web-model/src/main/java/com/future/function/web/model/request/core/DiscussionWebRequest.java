@@ -11,8 +11,8 @@ import org.hibernate.validator.constraints.NotBlank;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DiscussionWebRequest {
-  
+
   @NotBlank(message = "NotBlank")
   private String comment;
-  
+
 }

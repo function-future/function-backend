@@ -13,36 +13,36 @@ import java.util.Optional;
 
 @Component
 public class UserDetailRequestMapper {
-  
+
   private final RequestValidator validator;
-  
+
   @Autowired
   public UserDetailRequestMapper(RequestValidator validator) {
-    
+
     this.validator = validator;
   }
-  
+
   public Pair<String, String> toOldAndNewPasswordPair(
     ChangePasswordWebRequest request
   ) {
-    
+
     validator.validate(request);
-    
+
     return Pair.of(request.getOldPassword(), request.getNewPassword());
   }
-  
+
   public User toUser(ChangeProfilePictureWebRequest request, String email) {
-    
+
     validator.validate(request);
-    
+
     return User.builder()
       .email(email)
       .pictureV2(getFileV2(request))
       .build();
   }
-  
+
   private FileV2 getFileV2(ChangeProfilePictureWebRequest request) {
-    
+
     return Optional.of(request)
       .map(ChangeProfilePictureWebRequest::getAvatar)
       .filter(avatarSingleList -> !avatarSingleList.isEmpty())
@@ -50,9 +50,9 @@ public class UserDetailRequestMapper {
       .map(this::buildFileV2)
       .orElse(null);
   }
-  
+
   private FileV2 buildFileV2(String fileId) {
-    
+
     return FileV2.builder()
       .id(fileId)
       .build();

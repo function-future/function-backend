@@ -23,18 +23,19 @@ import java.util.UUID;
 @Document(collection = DocumentName.ROOM)
 public class Room extends BaseEntity {
 
-    @Builder.Default
-    private String id = UUID.randomUUID().toString();
+  @Builder.Default
+  private String id = UUID.randomUUID()
+    .toString();
 
-    @DBRef(lazy = true)
-    @Field(FieldName.Room.STUDENT)
-    private User student;
+  @DBRef(lazy = true)
+  @Field(FieldName.Room.STUDENT)
+  private User student;
 
-    @DBRef(lazy = true)
-    @Field(FieldName.Room.ASSIGNMENT)
-    private Assignment assignment;
+  @DBRef(lazy = true)
+  @Field(FieldName.Room.ASSIGNMENT)
+  private Assignment assignment;
 
-    @Field(FieldName.Room.POINT)
-    private Integer point;
+  @Field(FieldName.Room.POINT)
+  private Integer point;
 
 }

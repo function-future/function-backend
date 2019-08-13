@@ -8,16 +8,21 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import java.util.List;
 import java.util.Optional;
 
-public interface StudentQuizRepository extends MongoRepository<StudentQuiz, String> {
+public interface StudentQuizRepository
+  extends MongoRepository<StudentQuiz, String> {
 
   Optional<StudentQuiz> findByIdAndDeletedFalse(String id);
 
-  Optional<StudentQuiz> findByStudentIdAndQuizIdAndDeletedFalse(String studentId, String quizId);
+  Optional<StudentQuiz> findByStudentIdAndQuizIdAndDeletedFalse(
+    String studentId, String quizId
+  );
 
-  Page<StudentQuiz> findAllByStudentIdAndDeletedFalse(String studentId, Pageable pageable);
+  Page<StudentQuiz> findAllByStudentIdAndDeletedFalse(
+    String studentId, Pageable pageable
+  );
 
   Page<StudentQuiz> findAllByStudentId(String studentId, Pageable pageable);
 
-    List<StudentQuiz> findAllByStudentIdAndDeletedFalse(String studentId);
+  List<StudentQuiz> findAllByStudentIdAndDeletedFalse(String studentId);
 
 }

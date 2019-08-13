@@ -13,8 +13,11 @@ import lombok.NoArgsConstructor;
 public class CommentWebResponse {
 
   private String id;
+
   private AuthorWebResponse author;
+
   private String comment;
+
   private Long createdAt;
 
 }

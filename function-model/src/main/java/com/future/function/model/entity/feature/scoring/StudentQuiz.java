@@ -24,7 +24,8 @@ import java.util.UUID;
 public class StudentQuiz extends BaseEntity {
 
   @Builder.Default
-  private String id = UUID.randomUUID().toString();
+  private String id = UUID.randomUUID()
+    .toString();
 
   @DBRef(lazy = true)
   @Field(FieldName.StudentQuiz.STUDENT)
@@ -38,4 +39,5 @@ public class StudentQuiz extends BaseEntity {
 
   @Field(FieldName.StudentQuiz.DONE)
   private boolean done;
+
 }

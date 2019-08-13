@@ -27,13 +27,17 @@ import static org.mockito.Mockito.when;
 public class QuestionRequestMapperTest {
 
   private static final String QUESTION_TEXT = "question-label";
+
   private static final String QUESTION_ID = "question-id";
 
   private static final String OPTION_LABEL = "option-label";
 
   private Question question;
+
   private Option option;
+
   private QuestionWebRequest questionWebRequest;
+
   private OptionWebRequest optionWebRequest;
 
   @InjectMocks
@@ -48,34 +52,31 @@ public class QuestionRequestMapperTest {
   @Before
   public void setUp() throws Exception {
 
-    optionWebRequest = OptionWebRequest
-        .builder()
-        .label(OPTION_LABEL)
-        .correct(true)
-        .build();
+    optionWebRequest = OptionWebRequest.builder()
+      .label(OPTION_LABEL)
+      .correct(true)
+      .build();
 
-    option = Option
-        .builder()
-        .label(OPTION_LABEL)
-        .correct(true)
-        .build();
+    option = Option.builder()
+      .label(OPTION_LABEL)
+      .correct(true)
+      .build();
 
-    questionWebRequest = QuestionWebRequest
-        .builder()
-        .label(QUESTION_TEXT)
-        .options(Collections.singletonList(optionWebRequest))
-        .build();
+    questionWebRequest = QuestionWebRequest.builder()
+      .label(QUESTION_TEXT)
+      .options(Collections.singletonList(optionWebRequest))
+      .build();
 
-    question = Question
-        .builder()
-        .label(QUESTION_TEXT)
-        .options(Collections.singletonList(option))
-        .build();
+    question = Question.builder()
+      .label(QUESTION_TEXT)
+      .options(Collections.singletonList(option))
+      .build();
 
   }
 
   @After
   public void tearDown() throws Exception {
+
     verifyNoMoreInteractions(validator, optionRequestMapper);
   }
 
@@ -87,7 +88,9 @@ public class QuestionRequestMapperTest {
 
     Question actual = requestMapper.toQuestion(questionWebRequest);
 
-    assertThat(actual.getOptions().get(0).getLabel()).isEqualTo(option.getLabel());
+    assertThat(actual.getOptions()
+                 .get(0)
+                 .getLabel()).isEqualTo(option.getLabel());
     assertThat(actual.getLabel()).isEqualTo(question.getLabel());
 
     verify(validator).validate(questionWebRequest);
@@ -96,9 +99,11 @@ public class QuestionRequestMapperTest {
 
   @Test
   public void toQuestionNull() {
+
     catchException(() -> requestMapper.toQuestion(null));
 
-    assertThat(caughtException().getClass()).isEqualTo(BadRequestException.class);
+    assertThat(caughtException().getClass()).isEqualTo(
+      BadRequestException.class);
   }
 
   @Test
@@ -109,7 +114,9 @@ public class QuestionRequestMapperTest {
 
     Question actual = requestMapper.toQuestion(questionWebRequest, QUESTION_ID);
     assertThat(actual.getLabel()).isEqualTo(question.getLabel());
-    assertThat(actual.getOptions().get(0).getLabel()).isEqualTo(option.getLabel());
+    assertThat(actual.getOptions()
+                 .get(0)
+                 .getLabel()).isEqualTo(option.getLabel());
 
     verify(validator).validate(questionWebRequest);
     verify(optionRequestMapper).toOption(optionWebRequest);
@@ -122,8 +129,10 @@ public class QuestionRequestMapperTest {
 
     catchException(() -> requestMapper.toQuestion(questionWebRequest, null));
 
-    assertThat(caughtException().getClass()).isEqualTo(BadRequestException.class);
+    assertThat(caughtException().getClass()).isEqualTo(
+      BadRequestException.class);
     verify(validator).validate(questionWebRequest);
     verify(optionRequestMapper).toOption(optionWebRequest);
   }
+
 }

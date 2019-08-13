@@ -24,4 +24,5 @@ public class QuestionnaireSimpleSummaryResponse {
   long dueDate;
 
   float score;
+
 }

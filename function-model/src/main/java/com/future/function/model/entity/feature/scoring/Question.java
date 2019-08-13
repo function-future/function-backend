@@ -24,7 +24,8 @@ import java.util.UUID;
 public class Question extends BaseEntity {
 
   @Builder.Default
-  private String id = UUID.randomUUID().toString();
+  private String id = UUID.randomUUID()
+    .toString();
 
   @Field(FieldName.Question.LABEL)
   private String label;
@@ -34,4 +35,5 @@ public class Question extends BaseEntity {
   private QuestionBank questionBank;
 
   private List<Option> options;
+
 }

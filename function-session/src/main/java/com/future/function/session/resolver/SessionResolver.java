@@ -134,7 +134,9 @@ public class SessionResolver implements HandlerMethodArgumentResolver {
 
   private Session buildSessionWithUnknownRole() {
 
-    return Session.builder().role(Role.UNKNOWN).build();
+    return Session.builder()
+      .role(Role.UNKNOWN)
+      .build();
   }
 
   private Optional<String> getCustomCookieValue(Cookie[] cookies) {

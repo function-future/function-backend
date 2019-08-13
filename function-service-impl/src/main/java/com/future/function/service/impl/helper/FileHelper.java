@@ -15,18 +15,18 @@ import java.util.Objects;
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class FileHelper {
-  
+
   public static final String DOT = ".";
-  
+
   public static final String PATH_SEPARATOR = File.separator;
-  
+
   public static void createJavaIoFile(byte[] bytes, String path) {
-    
+
     FileHelper.toJavaIoFile(bytes, path);
   }
-  
+
   public static File toJavaIoFile(byte[] bytes, String path) {
-    
+
     File file = new File(path);
     try {
       FileUtils.writeByteArrayToFile(file, bytes);
@@ -36,11 +36,11 @@ public final class FileHelper {
       return null;
     }
   }
-  
+
   public static void createThumbnail(
     byte[] bytes, String path, String extension
   ) {
-    
+
     File thumbnailFile = FileHelper.toJavaIoFile(bytes, path);
     try {
       Thumbnails.of(thumbnailFile)
@@ -51,22 +51,22 @@ public final class FileHelper {
       log.error("Failed creating thumbnail: ", e);
     }
   }
-  
+
   public static byte[] toByteArray(File file) {
-    
+
     try {
       return IOUtils.toByteArray(file.toURI());
     } catch (IOException e) {
       return new byte[] {};
     }
   }
-  
+
   public static boolean isThumbnailName(String name) {
-    
+
     int maxNonThumbnailFilenameLength =
       36 + DOT.length() + FilenameUtils.getExtension(name)
         .length();
     return name.length() > maxNonThumbnailFilenameLength;
   }
-  
+
 }

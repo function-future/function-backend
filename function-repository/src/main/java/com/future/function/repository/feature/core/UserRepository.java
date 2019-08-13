@@ -13,12 +13,14 @@ import java.util.Optional;
 public interface UserRepository extends MongoRepository<User, String> {
 
   Optional<User> findByEmailAndDeletedFalse(String email);
-  
+
   Page<User> findAllByRoleAndNameContainsIgnoreCaseAndDeletedFalse(
     Role role, String name, Pageable pageable
   );
 
-  Page<User> findAllByBatchAndRoleAndDeletedFalse(Batch batch, Role role, Pageable pageable);
+  Page<User> findAllByBatchAndRoleAndDeletedFalse(
+    Batch batch, Role role, Pageable pageable
+  );
 
   List<User> findAllByRoleAndBatchAndDeletedFalse(Role role, Batch batch);
 

@@ -21,33 +21,49 @@ public final class RoomResponseMapper {
   public static DataResponse<RoomWebResponse> toDataRoomWebResponse(
     Room room, String urlPrefix
   ) {
+
     return ResponseHelper.toDataResponse(HttpStatus.OK,
-                                         buildRoomWebResponse(room, urlPrefix));
+                                         buildRoomWebResponse(room, urlPrefix)
+    );
   }
 
-  public static PagingResponse<RoomWebResponse> toPagingRoomWebResponse(Page<Room> roomPage, String urlPrefix) {
+  private static RoomWebResponse buildRoomWebResponse(
+    Room room, String urlPrefix
+  ) {
+
+    return RoomWebResponse.builder()
+      .assignment(
+        AssignmentResponseMapper.toAssignmentDataResponse(room.getAssignment(),
+                                                          urlPrefix
+        )
+          .getData())
+      .student(
+        UserResponseMapper.toUserDataResponse(room.getStudent(), urlPrefix)
+          .getData())
+      .point(room.getPoint())
+      .id(room.getId())
+      .build();
+  }
+
+  public static PagingResponse<RoomWebResponse> toPagingRoomWebResponse(
+    Page<Room> roomPage, String urlPrefix
+  ) {
+
     return ResponseHelper.toPagingResponse(HttpStatus.OK,
-                                           buildRoomWebResponses(roomPage, urlPrefix),
-                                           PageHelper.toPaging(roomPage));
+                                           buildRoomWebResponses(roomPage,
+                                                                 urlPrefix
+                                           ), PageHelper.toPaging(roomPage)
+    );
   }
 
-  private static List<RoomWebResponse> buildRoomWebResponses(Page<Room> roomPage, String urlPrefix) {
+  private static List<RoomWebResponse> buildRoomWebResponses(
+    Page<Room> roomPage, String urlPrefix
+  ) {
+
     return roomPage.getContent()
-        .stream()
-        .map(room -> buildRoomWebResponse(room, urlPrefix))
-        .collect(Collectors.toList());
-  }
-
-  private static RoomWebResponse buildRoomWebResponse(Room room,
-                                                      String urlPrefix) {
-    return RoomWebResponse
-        .builder()
-        .assignment(AssignmentResponseMapper.toAssignmentDataResponse(room.getAssignment(), urlPrefix).getData())
-        .student(UserResponseMapper.toUserDataResponse(room.getStudent(),
-                                                       urlPrefix).getData())
-        .point(room.getPoint())
-        .id(room.getId())
-        .build();
+      .stream()
+      .map(room -> buildRoomWebResponse(room, urlPrefix))
+      .collect(Collectors.toList());
   }
 
 }

@@ -16,4 +16,5 @@ public class QuestionnaireResponseRequest {
 
   @NotEmpty(message = "NotEmpty")
   private List<QuestionResponseRequest> responses;
+
 }

@@ -11,13 +11,13 @@ import java.util.stream.Stream;
 
 public interface SharedCourseRepository
   extends MongoRepository<SharedCourse, String> {
-  
+
   Optional<SharedCourse> findByIdAndBatch(String courseId, Batch batch);
-  
+
   Page<SharedCourse> findAllByBatch(Batch batch, Pageable pageable);
-  
+
   Stream<SharedCourse> findAllByBatch(Batch batch);
-  
+
   Stream<SharedCourse> findAllByCourseId(String courseId);
-  
+
 }

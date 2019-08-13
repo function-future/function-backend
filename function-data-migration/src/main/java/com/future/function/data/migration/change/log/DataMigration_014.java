@@ -18,7 +18,9 @@ public class DataMigration_014 {
   @ChangeSet(author = "jonathan",
              id = "updateActivityBlogIndexesContainingDescription",
              order = "0001")
-  public void updateActivityBlogCollectionIndexesContainingDescription(MongoDatabase mongoDatabase) {
+  public void updateActivityBlogCollectionIndexesContainingDescription(
+    MongoDatabase mongoDatabase
+  ) {
 
     mongoDatabase.getCollection(DocumentName.ACTIVITY_BLOG)
       .dropIndex(ACTIVITY_BLOG_TITLE_DESCRIPTION.name());
@@ -26,14 +28,12 @@ public class DataMigration_014 {
       .dropIndex(ACTIVITY_BLOG_USER_ID_TITLE_DESCRIPTION.name());
 
     mongoDatabase.getCollection(DocumentName.ACTIVITY_BLOG)
-      .createIndex(
-        Indexes.ascending(ACTIVITY_BLOG_TITLE.getFields()),
-        new IndexOptions().name(ACTIVITY_BLOG_TITLE.name())
+      .createIndex(Indexes.ascending(ACTIVITY_BLOG_TITLE.getFields()),
+                   new IndexOptions().name(ACTIVITY_BLOG_TITLE.name())
       );
     mongoDatabase.getCollection(DocumentName.ACTIVITY_BLOG)
-      .createIndex(
-        Indexes.ascending(ACTIVITY_BLOG_USER_ID_TITLE.getFields()),
-        new IndexOptions().name(ACTIVITY_BLOG_USER_ID_TITLE.name())
+      .createIndex(Indexes.ascending(ACTIVITY_BLOG_USER_ID_TITLE.getFields()),
+                   new IndexOptions().name(ACTIVITY_BLOG_USER_ID_TITLE.name())
       );
   }
 

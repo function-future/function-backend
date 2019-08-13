@@ -19,53 +19,73 @@ import java.util.List;
 import static com.googlecode.catchexception.CatchException.catchException;
 import static com.googlecode.catchexception.CatchException.caughtException;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 
 @RunWith(MockitoJUnitRunner.class)
 public class ReportDetailRequestMapperTest {
 
-    private static final String STUDENT_ID = "student-id";
-    private static final String REPORT_ID = "report-id";
-    private static final int SCORE = 100;
+  private static final String STUDENT_ID = "student-id";
 
-    private ScoreStudentWebRequest scoreStudentWebRequest;
-    private ReportDetailScoreWebRequest reportDetailScoreWebRequest;
+  private static final String REPORT_ID = "report-id";
 
-    @InjectMocks
-    private ReportDetailRequestMapper requestMapper;
+  private static final int SCORE = 100;
 
-    @Mock
-    private RequestValidator validator;
+  private ScoreStudentWebRequest scoreStudentWebRequest;
 
-    @Before
-    public void setUp() throws Exception {
+  private ReportDetailScoreWebRequest reportDetailScoreWebRequest;
 
-        scoreStudentWebRequest = ScoreStudentWebRequest.builder().studentId(STUDENT_ID).score(SCORE).build();
-        reportDetailScoreWebRequest = ReportDetailScoreWebRequest.builder()
-                .scores(Collections.singletonList(scoreStudentWebRequest))
-                .build();
-        when(validator.validate(reportDetailScoreWebRequest)).thenReturn(reportDetailScoreWebRequest);
-    }
+  @InjectMocks
+  private ReportDetailRequestMapper requestMapper;
 
-    @After
-    public void tearDown() throws Exception {
-        verifyNoMoreInteractions(validator);
-    }
+  @Mock
+  private RequestValidator validator;
 
-    @Test
-    public void toReportDetailList() {
-        List<ReportDetail> actual = requestMapper.toReportDetailList(reportDetailScoreWebRequest, REPORT_ID);
-        assertThat(actual.size()).isEqualTo(1);
-        assertThat(actual.get(0).getReport().getId()).isEqualTo(REPORT_ID);
-        assertThat(actual.get(0).getUser().getId()).isEqualTo(STUDENT_ID);
-        assertThat(actual.get(0).getPoint()).isEqualTo(SCORE);
-        verify(validator).validate(reportDetailScoreWebRequest);
-    }
+  @Before
+  public void setUp() throws Exception {
 
-    @Test
-    public void toReportDetailListNullRequest() {
-        catchException(() -> requestMapper.toReportDetailList(null, REPORT_ID));
-        assertThat(caughtException().getClass()).isEqualTo(BadRequestException.class);
-    }
+    scoreStudentWebRequest = ScoreStudentWebRequest.builder()
+      .studentId(STUDENT_ID)
+      .score(SCORE)
+      .build();
+    reportDetailScoreWebRequest = ReportDetailScoreWebRequest.builder()
+      .scores(Collections.singletonList(scoreStudentWebRequest))
+      .build();
+    when(validator.validate(reportDetailScoreWebRequest)).thenReturn(
+      reportDetailScoreWebRequest);
+  }
+
+  @After
+  public void tearDown() throws Exception {
+
+    verifyNoMoreInteractions(validator);
+  }
+
+  @Test
+  public void toReportDetailList() {
+
+    List<ReportDetail> actual = requestMapper.toReportDetailList(
+      reportDetailScoreWebRequest, REPORT_ID);
+    assertThat(actual.size()).isEqualTo(1);
+    assertThat(actual.get(0)
+                 .getReport()
+                 .getId()).isEqualTo(REPORT_ID);
+    assertThat(actual.get(0)
+                 .getUser()
+                 .getId()).isEqualTo(STUDENT_ID);
+    assertThat(actual.get(0)
+                 .getPoint()).isEqualTo(SCORE);
+    verify(validator).validate(reportDetailScoreWebRequest);
+  }
+
+  @Test
+  public void toReportDetailListNullRequest() {
+
+    catchException(() -> requestMapper.toReportDetailList(null, REPORT_ID));
+    assertThat(caughtException().getClass()).isEqualTo(
+      BadRequestException.class);
+  }
+
 }

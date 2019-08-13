@@ -19,44 +19,45 @@ import java.util.Optional;
 
 @Service
 public class DiscussionServiceImpl implements DiscussionService {
-  
+
   private final DiscussionRepository discussionRepository;
-  
+
   private final UserService userService;
-  
+
   private final BatchService batchService;
-  
+
   @Autowired
   public DiscussionServiceImpl(
     DiscussionRepository discussionRepository, UserService userService,
     BatchService batchService
   ) {
-    
+
     this.discussionRepository = discussionRepository;
     this.userService = userService;
     this.batchService = batchService;
   }
-  
+
   @Override
   public Page<Discussion> getDiscussions(
     String email, String courseId, String batchCode, Pageable pageable
   ) {
-    
+
     return Optional.of(email)
       .filter(e -> this.isUserValidForAddingDiscussion(e, batchCode))
       .map(ignored -> this.getBatchId(batchCode))
-      .map(batchId -> discussionRepository.findAllByCourseIdAndBatchIdOrderByCreatedAtDesc(
-        courseId, batchId, pageable))
+      .map(
+        batchId -> discussionRepository.findAllByCourseIdAndBatchIdOrderByCreatedAtDesc(
+          courseId, batchId, pageable))
       .orElseGet(() -> PageHelper.empty(pageable));
   }
-  
+
   @Override
   public Discussion createDiscussion(Discussion discussion) {
-    
+
     String email = discussion.getUser()
       .getEmail();
     String batchCode = discussion.getBatchCode();
-    
+
     return Optional.of(discussion)
       .filter(ignored -> this.isUserValidForAddingDiscussion(email, batchCode))
       .map(this::setDiscussionUser)
@@ -65,30 +66,49 @@ public class DiscussionServiceImpl implements DiscussionService {
       .orElseThrow(
         () -> new UnsupportedOperationException("Create Discussion Failed"));
   }
-  
+
   private Discussion setDiscussionBatch(Discussion discussion) {
-    
+
     discussion.setBatchId(this.getBatchId(discussion.getBatchCode()));
-    
+
     return discussion;
   }
-  
+
+  private Discussion setDiscussionUser(Discussion discussion) {
+
+    User user = userService.getUserByEmail(discussion.getUser()
+                                             .getEmail());
+
+    discussion.setUser(user);
+
+    return discussion;
+  }
+
+  @Override
+  public void deleteDiscussions(String courseId, String batchCode) {
+
+    discussionRepository.deleteAllByCourseIdAndBatchId(courseId,
+                                                       this.getBatchId(
+                                                         batchCode)
+    );
+  }
+
   private String getBatchId(String batchCode) {
-    
+
     return batchService.getBatchByCode(batchCode)
       .getId();
   }
-  
+
   private boolean isUserValidForAddingDiscussion(
     String email, String batchCode
   ) {
-    
+
     User userByEmail = userService.getUserByEmail(email);
-    
+
     if (userByEmail.getRole() != Role.STUDENT) {
       return true;
     }
-    
+
     return Optional.of(userByEmail)
       .map(User::getBatch)
       .map(Batch::getCode)
@@ -96,24 +116,5 @@ public class DiscussionServiceImpl implements DiscussionService {
       .map(code -> true)
       .orElseThrow(() -> new ForbiddenException("Invalid Batch"));
   }
-  
-  private Discussion setDiscussionUser(Discussion discussion) {
-    
-    User user = userService.getUserByEmail(discussion.getUser()
-                                             .getEmail());
-    
-    discussion.setUser(user);
-    
-    return discussion;
-  }
-  
-  @Override
-  public void deleteDiscussions(String courseId, String batchCode) {
-    
-    discussionRepository.deleteAllByCourseIdAndBatchId(courseId,
-                                                       this.getBatchId(
-                                                         batchCode)
-    );
-  }
-  
+
 }

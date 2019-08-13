@@ -25,14 +25,6 @@ public class BatchResponseMapper {
       HttpStatus.OK, toBatchWebResponse(batch));
   }
 
-  public static DataResponse<BatchWebResponse> toBatchDataResponse(
-    HttpStatus httpStatus, Batch batch
-  ) {
-
-    return ResponseHelper.toDataResponse(
-      httpStatus, toBatchWebResponse(batch));
-  }
-
   public static BatchWebResponse toBatchWebResponse(Batch batch) {
 
     return BatchWebResponse.builder()
@@ -40,6 +32,13 @@ public class BatchResponseMapper {
       .name(batch.getName())
       .code(batch.getCode())
       .build();
+  }
+
+  public static DataResponse<BatchWebResponse> toBatchDataResponse(
+    HttpStatus httpStatus, Batch batch
+  ) {
+
+    return ResponseHelper.toDataResponse(httpStatus, toBatchWebResponse(batch));
   }
 
   public static PagingResponse<BatchWebResponse> toBatchesPagingResponse(

@@ -2,7 +2,6 @@ package com.future.function.service.impl.feature.communication.questionnaire;
 
 import com.future.function.model.entity.feature.communication.questionnaire.QuestionResponse;
 import com.future.function.model.entity.feature.communication.questionnaire.QuestionResponseSummary;
-import com.future.function.model.entity.feature.communication.questionnaire.Questionnaire;
 import com.future.function.model.entity.feature.communication.questionnaire.QuestionnaireResponseSummary;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.repository.feature.communication.questionnaire.QuestionQuestionnaireRepository;
@@ -22,11 +21,14 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class QuestionnaireResponseSummaryServiceImpl implements QuestionnaireResponseSummaryService {
+public class QuestionnaireResponseSummaryServiceImpl
+  implements QuestionnaireResponseSummaryService {
 
-  private final QuestionnaireResponseSummaryRepository questionnaireResponseSummaryRepository;
+  private final QuestionnaireResponseSummaryRepository
+    questionnaireResponseSummaryRepository;
 
-  private final QuestionResponseSummaryRepository questionResponseSummaryRepository;
+  private final QuestionResponseSummaryRepository
+    questionResponseSummaryRepository;
 
   private final QuestionResponseRepository questionResponseRepository;
 
@@ -35,8 +37,17 @@ public class QuestionnaireResponseSummaryServiceImpl implements QuestionnaireRes
   private final UserService userService;
 
   @Autowired
-  public QuestionnaireResponseSummaryServiceImpl(QuestionnaireResponseSummaryRepository questionnaireResponseSummaryRepository, QuestionResponseSummaryRepository questionResponseSummaryRepository, QuestionnaireRepository questionnaireRepository, QuestionResponseRepository questionResponseRepository, QuestionQuestionnaireRepository questionQuestionnaireRepository, UserService userService) {
-    this.questionnaireResponseSummaryRepository = questionnaireResponseSummaryRepository;
+  public QuestionnaireResponseSummaryServiceImpl(
+    QuestionnaireResponseSummaryRepository questionnaireResponseSummaryRepository,
+    QuestionResponseSummaryRepository questionResponseSummaryRepository,
+    QuestionnaireRepository questionnaireRepository,
+    QuestionResponseRepository questionResponseRepository,
+    QuestionQuestionnaireRepository questionQuestionnaireRepository,
+    UserService userService
+  ) {
+
+    this.questionnaireResponseSummaryRepository =
+      questionnaireResponseSummaryRepository;
     this.questionResponseSummaryRepository = questionResponseSummaryRepository;
     this.questionResponseRepository = questionResponseRepository;
     this.questionQuestionnaireRepository = questionQuestionnaireRepository;
@@ -45,41 +56,61 @@ public class QuestionnaireResponseSummaryServiceImpl implements QuestionnaireRes
 
 
   @Override
-  public Page<QuestionnaireResponseSummary> getQuestionnairesSummariesBasedOnAppraisee(User appraisee, Pageable pageable) {
-    return questionnaireResponseSummaryRepository.findAllByAppraiseeAndDeletedFalse(appraisee, pageable);
+  public Page<QuestionnaireResponseSummary> getQuestionnairesSummariesBasedOnAppraisee(
+    User appraisee, Pageable pageable
+  ) {
+
+    return questionnaireResponseSummaryRepository.findAllByAppraiseeAndDeletedFalse(
+      appraisee, pageable);
   }
 
   @Override
-  public QuestionnaireResponseSummary getQuestionnaireResponseSummaryById(String questionnaireResponseSummaryId) {
+  public QuestionnaireResponseSummary getQuestionnaireResponseSummaryById(
+    String questionnaireResponseSummaryId
+  ) {
+
     return Optional.of(questionnaireResponseSummaryId)
-            .map(questionnaireResponseSummaryRepository::findOne)
-            .orElse(null);
+      .map(questionnaireResponseSummaryRepository::findOne)
+      .orElse(null);
   }
 
   @Override
-  public List<QuestionResponseSummary> getQuestionsDetailsFromQuestionnaireResponseSummaryIdAndAppraisee(String questionnaireResponseSummaryId, User appraisee) {
-    QuestionnaireResponseSummary questionnaireResponseSummary = questionnaireResponseSummaryRepository.findOne(questionnaireResponseSummaryId);
-    return questionResponseSummaryRepository.findAllByQuestionnaireAndAppraiseeAndDeletedFalse(questionnaireResponseSummary.getQuestionnaire(), appraisee);
+  public List<QuestionResponseSummary> getQuestionsDetailsFromQuestionnaireResponseSummaryIdAndAppraisee(
+    String questionnaireResponseSummaryId, User appraisee
+  ) {
+
+    QuestionnaireResponseSummary questionnaireResponseSummary =
+      questionnaireResponseSummaryRepository.findOne(
+        questionnaireResponseSummaryId);
+    return questionResponseSummaryRepository.findAllByQuestionnaireAndAppraiseeAndDeletedFalse(
+      questionnaireResponseSummary.getQuestionnaire(), appraisee);
   }
 
   @Override
-  public QuestionResponseSummary getQuestionResponseSummaryById(String questionResponseSummaryId) {
+  public QuestionResponseSummary getQuestionResponseSummaryById(
+    String questionResponseSummaryId
+  ) {
+
     return Optional.of(questionResponseSummaryId)
-            .map(questionResponseSummaryRepository::findOne)
-            .orElse(null);
+      .map(questionResponseSummaryRepository::findOne)
+      .orElse(null);
   }
 
   @Override
-  public List<QuestionResponse> getQuestionResponseByQuestionResponseSummaryId(String questionResponseSummaryId) {
+  public List<QuestionResponse> getQuestionResponseByQuestionResponseSummaryId(
+    String questionResponseSummaryId
+  ) {
 
     return Optional.of(questionResponseSummaryId)
-            .map(questionResponseSummaryRepository::findOne)
-            .map(ignored ->
-                    questionResponseRepository.findAllByQuestionQuestionnaireAndAppraiseeAndDeletedFalse(
-                            questionQuestionnaireRepository.findOne(ignored.getQuestion().getId()),
-                            userService.getUser(ignored.getAppraisee().getId())
-                    )
-            )
-            .orElseGet(Collections::emptyList);
+      .map(questionResponseSummaryRepository::findOne)
+      .map(
+        ignored -> questionResponseRepository.findAllByQuestionQuestionnaireAndAppraiseeAndDeletedFalse(
+          questionQuestionnaireRepository.findOne(ignored.getQuestion()
+                                                    .getId()),
+          userService.getUser(ignored.getAppraisee()
+                                .getId())
+        ))
+      .orElseGet(Collections::emptyList);
   }
+
 }

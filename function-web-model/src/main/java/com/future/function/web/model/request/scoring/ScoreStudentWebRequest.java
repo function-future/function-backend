@@ -15,11 +15,12 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 public class ScoreStudentWebRequest {
 
-    @NotBlank(message = "NotBlank")
-    private String studentId;
+  @NotBlank(message = "NotBlank")
+  private String studentId;
 
-    @NotNull(message = "NotNull")
-    @Min(message = "Min", value = 0)
-    private Integer score;
+  @NotNull(message = "NotNull")
+  @Min(message = "Min",
+       value = 0)
+  private Integer score;
 
 }

@@ -16,6 +16,9 @@ public class QuestionWebResponse {
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private String id;
+
   private String label;
+
   private List<OptionWebResponse> options;
+
 }

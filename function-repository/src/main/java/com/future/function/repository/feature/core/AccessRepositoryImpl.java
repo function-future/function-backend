@@ -15,24 +15,24 @@ import static org.springframework.data.mongodb.core.query.Query.query;
 
 @Repository
 public class AccessRepositoryImpl implements AccessRepositoryCustom {
-  
+
   private final MongoTemplate mongoTemplate;
-  
+
   public AccessRepositoryImpl(MongoTemplate mongoTemplate) {
-    
+
     this.mongoTemplate = mongoTemplate;
   }
-  
+
   @Override
   public Optional<Access> findByUrlAndRole(String url, Role role) {
-    
+
     List<Access> accesses = mongoTemplate.find(query(
       Criteria.where(FieldName.Access.ROLE)
         .is(role)), Access.class, DocumentName.ACCESS);
-    
+
     return accesses.stream()
       .filter(a -> url.matches(a.getUrlRegex()))
       .findFirst();
   }
-  
+
 }

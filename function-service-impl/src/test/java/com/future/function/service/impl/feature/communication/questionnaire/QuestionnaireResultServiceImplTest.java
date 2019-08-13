@@ -30,7 +30,8 @@ public class QuestionnaireResultServiceImplTest {
 
   private static final Pageable PAGEABLE = new PageRequest(0, 10);
 
-  private static final String USER_QUESTIONNAIRE_SUMMARY_ID_1 = "userQuestionnaireSummaryId1";
+  private static final String USER_QUESTIONNAIRE_SUMMARY_ID_1 =
+    "userQuestionnaireSummaryId1";
 
   private static final String BATCH_ID = "batch_id";
 
@@ -56,49 +57,57 @@ public class QuestionnaireResultServiceImplTest {
       .code(BATCH_CODE)
       .build();
 
-    userQuestionnaireSummary1 =
-      UserQuestionnaireSummary.builder()
-        .id(USER_QUESTIONNAIRE_SUMMARY_ID_1)
-        .batch(batch)
-        .build();
+    userQuestionnaireSummary1 = UserQuestionnaireSummary.builder()
+      .id(USER_QUESTIONNAIRE_SUMMARY_ID_1)
+      .batch(batch)
+      .build();
   }
 
   @After
   public void tearDown() {
-    verifyNoMoreInteractions (userQuestionnaireSummaryRepository);
+
+    verifyNoMoreInteractions(userQuestionnaireSummaryRepository);
   }
 
   @Test
   public void getAppraisalsQuestionnaireSummaryByBatch() {
+
     when(
-      userQuestionnaireSummaryRepository
-        .findAllByRoleOrRoleAndBatchAndDeletedFalse(
-          Role.MENTOR, Role.STUDENT, batch, PAGEABLE))
-      .thenReturn(new PageImpl<>(Collections.singletonList(userQuestionnaireSummary1), PAGEABLE, 1));
+      userQuestionnaireSummaryRepository.findAllByRoleOrRoleAndBatchAndDeletedFalse(
+        Role.MENTOR, Role.STUDENT, batch, PAGEABLE)).thenReturn(
+      new PageImpl<>(Collections.singletonList(userQuestionnaireSummary1),
+                     PAGEABLE, 1
+      ));
 
     Page<UserQuestionnaireSummary> userQuestionnaireSummaries =
-      questionnaireResultService.getAppraisalsQuestionnaireSummaryByBatch(batch, PAGEABLE);
+      questionnaireResultService.getAppraisalsQuestionnaireSummaryByBatch(
+        batch, PAGEABLE);
 
     assertThat(userQuestionnaireSummaries.getTotalElements()).isEqualTo(1);
-    assertThat(userQuestionnaireSummaries.getContent().get(0).getId()).isEqualTo(USER_QUESTIONNAIRE_SUMMARY_ID_1);
+    assertThat(userQuestionnaireSummaries.getContent()
+                 .get(0)
+                 .getId()).isEqualTo(USER_QUESTIONNAIRE_SUMMARY_ID_1);
 
 
-    verify(userQuestionnaireSummaryRepository)
-        .findAllByRoleOrRoleAndBatchAndDeletedFalse(
-          Role.MENTOR, Role.STUDENT, batch, PAGEABLE);
+    verify(
+      userQuestionnaireSummaryRepository).findAllByRoleOrRoleAndBatchAndDeletedFalse(
+      Role.MENTOR, Role.STUDENT, batch, PAGEABLE);
   }
 
   @Test
   public void getAppraisalsQuestionnaireSummary() {
-    when(userQuestionnaireSummaryRepository.findAllByUserName(KEYWORD))
-      .thenReturn(Arrays.asList(userQuestionnaireSummary1));
+
+    when(
+      userQuestionnaireSummaryRepository.findAllByUserName(KEYWORD)).thenReturn(
+      Arrays.asList(userQuestionnaireSummary1));
 
     List<UserQuestionnaireSummary> userQuestionnaireSummaries =
-      questionnaireResultService.getAppraisalsQuestionnaireSummary(batch, KEYWORD, PAGEABLE);
+      questionnaireResultService.getAppraisalsQuestionnaireSummary(
+        batch, KEYWORD, PAGEABLE);
 
     assertThat(userQuestionnaireSummaries.size()).isEqualTo(1);
-    assertThat(userQuestionnaireSummaries.get(0).getId())
-      .isEqualTo(USER_QUESTIONNAIRE_SUMMARY_ID_1);
+    assertThat(userQuestionnaireSummaries.get(0)
+                 .getId()).isEqualTo(USER_QUESTIONNAIRE_SUMMARY_ID_1);
 
     verify(userQuestionnaireSummaryRepository).findAllByUserName(KEYWORD);
 
@@ -106,14 +115,19 @@ public class QuestionnaireResultServiceImplTest {
 
   @Test
   public void getAppraisalsQuestionnaireSummaryById() {
-    when(userQuestionnaireSummaryRepository.findOne(USER_QUESTIONNAIRE_SUMMARY_ID_1))
-      .thenReturn(userQuestionnaireSummary1);
+
+    when(userQuestionnaireSummaryRepository.findOne(
+      USER_QUESTIONNAIRE_SUMMARY_ID_1)).thenReturn(userQuestionnaireSummary1);
 
     UserQuestionnaireSummary userQuestionnaireSummary =
-      questionnaireResultService.getAppraisalsQuestionnaireSummaryById(USER_QUESTIONNAIRE_SUMMARY_ID_1);
+      questionnaireResultService.getAppraisalsQuestionnaireSummaryById(
+        USER_QUESTIONNAIRE_SUMMARY_ID_1);
 
-    assertThat(userQuestionnaireSummary.getId()).isEqualTo(USER_QUESTIONNAIRE_SUMMARY_ID_1);
+    assertThat(userQuestionnaireSummary.getId()).isEqualTo(
+      USER_QUESTIONNAIRE_SUMMARY_ID_1);
 
-    verify(userQuestionnaireSummaryRepository).findOne(USER_QUESTIONNAIRE_SUMMARY_ID_1);
+    verify(userQuestionnaireSummaryRepository).findOne(
+      USER_QUESTIONNAIRE_SUMMARY_ID_1);
   }
+
 }

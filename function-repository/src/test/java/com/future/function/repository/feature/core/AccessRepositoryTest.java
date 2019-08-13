@@ -18,36 +18,36 @@ import static org.assertj.core.api.Assertions.assertThat;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = TestApplication.class)
 public class AccessRepositoryTest {
-  
+
   private static final String URL_REGEX = "\\/[0-9A-Za-z]+(\\-[0-9A-Za-z]+)*$";
-  
+
   @Autowired
   private AccessRepository accessRepository;
-  
+
   @Before
   public void setUp() {
-    
+
     Access access = Access.builder()
       .urlRegex(URL_REGEX)
       .role(Role.STUDENT)
       .build();
     accessRepository.save(access);
   }
-  
+
   @After
   public void tearDown() {
-    
+
     accessRepository.deleteAll();
   }
-  
+
   @Test
   public void testGivenUrlAndRoleByFindingAccessByUrlAndRoleReturnAccess() {
-    
+
     String url = "/test";
-    
+
     assertThat(
       accessRepository.findByUrlAndRole(url, Role.STUDENT)).isNotEqualTo(
       Optional.empty());
   }
-  
+
 }

@@ -17,30 +17,38 @@ public class StudentQuestionRequestMapper {
   private OptionRequestMapper optionRequestMapper;
 
   @Autowired
-  public StudentQuestionRequestMapper(RequestValidator validator, OptionRequestMapper optionRequestMapper) {
+  public StudentQuestionRequestMapper(
+    RequestValidator validator, OptionRequestMapper optionRequestMapper
+  ) {
+
     this.validator = validator;
     this.optionRequestMapper = optionRequestMapper;
   }
 
+  public List<StudentQuestion> toStudentQuestionList(
+    List<StudentQuestionWebRequest> requests
+  ) {
+
+    return requests.stream()
+      .map(this::toStudentQuestion)
+      .collect(Collectors.toList());
+  }
+
   public StudentQuestion toStudentQuestion(StudentQuestionWebRequest request) {
+
     return toValidatedStudentQuestion(request);
   }
 
-  private StudentQuestion toValidatedStudentQuestion(StudentQuestionWebRequest request) {
+  private StudentQuestion toValidatedStudentQuestion(
+    StudentQuestionWebRequest request
+  ) {
+
     request = validator.validate(request);
 
-    return StudentQuestion
-        .builder()
-        .number(request.getNumber())
-        .option(optionRequestMapper.toOptionFromOptionId(request.getOptionId()))
-        .build();
-  }
-
-  public List<StudentQuestion> toStudentQuestionList(List<StudentQuestionWebRequest> requests) {
-    return requests
-        .stream()
-        .map(this::toStudentQuestion)
-        .collect(Collectors.toList());
+    return StudentQuestion.builder()
+      .number(request.getNumber())
+      .option(optionRequestMapper.toOptionFromOptionId(request.getOptionId()))
+      .build();
   }
 
 }
