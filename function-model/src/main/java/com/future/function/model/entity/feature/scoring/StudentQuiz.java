@@ -9,13 +9,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.UUID;
 
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper = true)
 @Data
 @Builder
 @NoArgsConstructor
@@ -23,6 +24,7 @@ import java.util.UUID;
 @Document(collection = DocumentName.STUDENT_QUIZ)
 public class StudentQuiz extends BaseEntity {
 
+  @Id
   @Builder.Default
   private String id = UUID.randomUUID().toString();
 
