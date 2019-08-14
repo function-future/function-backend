@@ -6,6 +6,7 @@ import com.future.function.model.entity.feature.core.User;
 import com.future.function.model.util.constant.DocumentName;
 import com.future.function.model.util.constant.FieldName;
 import lombok.*;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
@@ -22,6 +23,7 @@ import java.util.UUID;
 @Document(collection = DocumentName.REPORT)
 public class Report extends BaseEntity {
 
+    @Id
     @Builder.Default
     private String id = UUID.randomUUID().toString();
 

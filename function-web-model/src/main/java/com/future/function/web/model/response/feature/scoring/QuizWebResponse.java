@@ -29,7 +29,7 @@ public class QuizWebResponse {
 
   private Integer questionCount;
 
-  private List<String> questionBanks;
+  private List<QuestionBankWebResponse> questionBanks;
 
   private String batchCode;
 

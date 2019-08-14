@@ -7,6 +7,7 @@ import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
+import com.future.function.web.model.response.feature.scoring.QuestionBankWebResponse;
 import com.future.function.web.model.response.feature.scoring.QuizWebResponse;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -57,21 +58,24 @@ public final class QuizResponseMapper {
         .map(val -> {
           QuizWebResponse response = new QuizWebResponse();
           BeanUtils.copyProperties(val, response);
-          response.setQuestionBanks(getQuestionBankIds(quiz));
+          response.setQuestionBanks(getQuestionBankWebResponses(quiz));
           response.setBatchCode(quiz.getBatch().getCode());
           return response;
         })
         .orElseThrow(() -> new BadRequestException("Bad Request"));
   }
 
-  private static List<String> getQuestionBankIds(Quiz quiz) {
-    if (quiz.getQuestionBanks() != null)
+  private static List<QuestionBankWebResponse> getQuestionBankWebResponses(Quiz quiz) {
+    if (quiz.getQuestionBanks() != null) {
       return quiz
           .getQuestionBanks()
           .stream()
-          .map(QuestionBank::getId)
+          .map(QuestionBankResponseMapper::toQuestionBankWebResponse)
+          .map(DataResponse::getData)
           .collect(Collectors.toList());
-    return new ArrayList<>();
+    } else {
+      return new ArrayList<>();
+    }
   }
 
   /**
