@@ -1,7 +1,7 @@
 ## Communication - Questionnaire Results Members [/api/communication/questionnaire-results{?batchCode, page, size}]
 
 + Parameters
-    + search (optional, string) - search parameter for searching spesific data in request
+    + batchCode  (optional, string) - batchCode  parameter for searching spesific data in request
     + page (number) - describing the page currently displayed in request
     + size (number) - describing how many data is currently displayed within the page in request
 
