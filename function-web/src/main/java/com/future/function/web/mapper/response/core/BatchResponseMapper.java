@@ -14,23 +14,9 @@ import org.springframework.http.HttpStatus;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * Mapper class for batch web response.
- */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class BatchResponseMapper {
 
-  /**
-   * Converts a batch data to {@code BatchWebResponse} object, wrapped in
-   * {@code DataResponse}.
-   *
-   * @param batch Batch data to be converted to response.
-   *
-   * @return {@code DataResponse<BatchWebResponse} - The converted batch data,
-   * wrapped in
-   * {@link com.future.function.web.model.response.base.DataResponse} and
-   * {@link com.future.function.web.model.response.feature.core.BatchWebResponse}
-   */
   public static DataResponse<BatchWebResponse> toBatchDataResponse(
     Batch batch
   ) {
@@ -39,17 +25,6 @@ public class BatchResponseMapper {
       HttpStatus.OK, toBatchWebResponse(batch));
   }
 
-  /**
-   * Converts a batch data to {@code BatchWebResponse} object, wrapped in
-   * {@code DataResponse}.
-   *
-   * @param batch Batch data to be converted to response.
-   *
-   * @return {@code DataResponse<BatchWebResponse} - The converted batch data,
-   * wrapped in
-   * {@link com.future.function.web.model.response.base.DataResponse} and
-   * {@link com.future.function.web.model.response.feature.core.BatchWebResponse}
-   */
   public static DataResponse<BatchWebResponse> toBatchDataResponse(
     HttpStatus httpStatus, Batch batch
   ) {
@@ -67,16 +42,6 @@ public class BatchResponseMapper {
       .build();
   }
 
-  /**
-   * Converts batches data to {@code BatchWebResponse} object, wrapped in
-   * {@code PagingResponse}.
-   *
-   * @param data Batches to be converted to response.
-   *
-   * @return {@code PagingResponse<BatchWebResponse>} - Batches' code found in
-   * database, wrapped in
-   * {@link com.future.function.web.model.response.base.PagingResponse}.
-   */
   public static PagingResponse<BatchWebResponse> toBatchesPagingResponse(
     Page<Batch> data
   ) {

@@ -16,9 +16,6 @@ import org.springframework.http.HttpStatus;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * Mapper class for announcement web response.
- */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ActivityBlogResponseMapper {
   

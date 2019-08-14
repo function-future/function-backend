@@ -21,10 +21,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-/**
- * Author: ricky.kennedy
- * Created At: 3:31 PM 7/25/2019
- */
 @RunWith(MockitoJUnitRunner.class)
 public class MyQuestionnaireRequestMapperTest {
 

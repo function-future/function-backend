@@ -19,9 +19,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
-/**
- * Controller class for user APIs.
- */
 @RestController
 @RequestMapping(value = "/api/core/users")
 public class UserController {
@@ -43,16 +40,6 @@ public class UserController {
     this.fileProperties = fileProperties;
   }
   
-  /**
-   * Creates new user in database.
-   *
-   * @param data Data of new user in JSON format.
-   *
-   * @return {@code DataResponse<UserWebResponse>} - The created user data,
-   * wrapped in
-   * {@link com.future.function.web.model.response.base.DataResponse} and
-   * {@link com.future.function.web.model.response.feature.core.UserWebResponse}
-   */
   @ResponseStatus(HttpStatus.CREATED)
   @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE,
                produces = MediaType.APPLICATION_JSON_VALUE)
@@ -71,13 +58,6 @@ public class UserController {
     );
   }
   
-  /**
-   * Deletes user from database.
-   *
-   * @param userId Id of to be deleted user.
-   *
-   * @return {@code BaseResponse} - Indicating successful deletion.
-   */
   @ResponseStatus(HttpStatus.OK)
   @DeleteMapping(value = "/{userId:.+}",
                  produces = MediaType.APPLICATION_JSON_VALUE)
@@ -92,16 +72,6 @@ public class UserController {
     return ResponseHelper.toBaseResponse(HttpStatus.OK);
   }
   
-  /**
-   * Retrieves a user based on given parameter.
-   *
-   * @param userId Id of user to be retrieved.
-   *
-   * @return {@code DataResponse<UserWebResponse>} - The retrieved user data,
-   * wrapped in
-   * {@link com.future.function.web.model.response.base.DataResponse} and
-   * {@link com.future.function.web.model.response.feature.core.UserWebResponse}
-   */
   @ResponseStatus(HttpStatus.OK)
   @GetMapping(value = "/{userId:.+}",
               produces = MediaType.APPLICATION_JSON_VALUE)
@@ -116,17 +86,6 @@ public class UserController {
       userService.getUser(userId), fileProperties.getUrlPrefix());
   }
   
-  /**
-   * Retrieves users based on given parameters.
-   *
-   * @param role Specified role for data to be retrieved.
-   * @param page Current page of data.
-   *
-   * @return {@code PagingResponse<UserWebResponse>} - The retrieved users data,
-   * wrapped in
-   * {@link com.future.function.web.model.response.base.PagingResponse} and
-   * {@link com.future.function.web.model.response.feature.core.UserWebResponse}
-   */
   @ResponseStatus(HttpStatus.OK)
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   public PagingResponse<UserWebResponse> getUsers(
@@ -149,17 +108,6 @@ public class UserController {
     );
   }
 
-  /**
-   * Updates existing user in database.
-   *
-   * @param userId Id of to-be-updated user.
-   * @param data   Data of existing user in JSON format.
-   *
-   * @return {@code DataResponse<UserWebResponse>} - The updated user data,
-   * wrapped in
-   * {@link com.future.function.web.model.response.base.DataResponse} and
-   * {@link com.future.function.web.model.response.feature.core.UserWebResponse}
-   */
   @ResponseStatus(HttpStatus.OK)
   @PutMapping(value = "/{userId:.+}",
               consumes = MediaType.APPLICATION_JSON_VALUE,

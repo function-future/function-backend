@@ -20,12 +20,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
 
-/**
- * Author: ricky.kennedy
- * Created At: 2:37 PM 7/25/2019
- */
 public class QuestionnaireResponseSummaryResponseMapperTest {
 
   private static final String URL_PREFIX = "urlPrefix";

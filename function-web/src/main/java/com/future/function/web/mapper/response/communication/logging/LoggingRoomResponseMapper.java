@@ -22,10 +22,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-/**
- * Author : Ricky Kennedy
- * Created At : 23:41 27/07/2019
- */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class LoggingRoomResponseMapper {
 

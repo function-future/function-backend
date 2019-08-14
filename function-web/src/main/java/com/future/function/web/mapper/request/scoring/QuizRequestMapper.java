@@ -14,9 +14,6 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * Bean class used to map web request for Quiz entity
- */
 @Slf4j
 @Component
 public class QuizRequestMapper {
@@ -28,13 +25,6 @@ public class QuizRequestMapper {
     this.validator = validator;
   }
 
-  /**
-   * Used to map web request to quiz entity object with quiz id
-   *
-   * @param id      (String)
-   * @param request (QuizWebRequest)
-   * @return Quiz object
-   */
   public Quiz toQuiz(String id, QuizWebRequest request, String batchCode) {
       Quiz quiz = toValidatedQuiz(request, batchCode);
       quiz.setId(id);
@@ -45,22 +35,10 @@ public class QuizRequestMapper {
     return validator.validate(request);
   }
 
-  /**
-   * Used to map web request to quiz entity object
-   *
-   * @param request (QuizWebRequest)
-   * @return Quiz object
-   */
   public Quiz toQuiz(QuizWebRequest request, String batchCode) {
       return toValidatedQuiz(request, batchCode);
   }
 
-  /**
-   * Private method used to validate web request and map to quiz entity object
-   *
-   * @param request (QuizWebRequest)
-   * @return Quiz object
-   */
   private Quiz toValidatedQuiz(QuizWebRequest request, String batchCode) {
       request = validator.validate(request);
       Quiz quiz = new Quiz();

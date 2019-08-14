@@ -6,10 +6,6 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
-/**
- * Author: PriagungSatyagama
- * Created At: 15:06 06/07/2019
- */
 public interface ReminderService {
 
   List<Reminder> getAllReminder();

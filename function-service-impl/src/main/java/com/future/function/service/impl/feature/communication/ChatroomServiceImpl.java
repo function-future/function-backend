@@ -9,7 +9,6 @@ import com.future.function.repository.feature.communication.chatting.ChatroomRep
 import com.future.function.service.api.feature.communication.ChatroomService;
 import com.future.function.service.api.feature.core.UserService;
 import com.future.function.service.impl.helper.PageHelper;
-import com.future.function.session.model.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,10 +19,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-/**
- * Author: PriagungSatyagama
- * Created At: 14:21 03/06/2019
- */
 @Service
 public class ChatroomServiceImpl implements ChatroomService {
 

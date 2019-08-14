@@ -12,17 +12,13 @@ import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.http.HttpStatus;
 
 import java.util.Arrays;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 
 
-/**
- * Author: PriagungSatyagama
- * Created At: 23:42 10/07/2019
- */
 @RunWith(MockitoJUnitRunner.class)
 public class NotificationResponseMapperTest {
 

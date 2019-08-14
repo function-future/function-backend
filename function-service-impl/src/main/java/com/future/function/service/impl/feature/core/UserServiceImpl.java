@@ -23,9 +23,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Service implementation class for user logic operations implementation.
- */
 @Service
 public class UserServiceImpl implements UserService {
 
@@ -53,13 +50,6 @@ public class UserServiceImpl implements UserService {
     this.encoder = encoder;
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @param userId Id of user to be retrieved.
-   *
-   * @return {@code User} - The user object found in database.
-   */
   @Override
   public User getUser(String userId) {
 
@@ -68,14 +58,6 @@ public class UserServiceImpl implements UserService {
       .orElseThrow(() -> new NotFoundException("Get User Not Found"));
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @param email    Email of user to be retrieved.
-   * @param password Password of user.
-   *
-   * @return {@code User} - The user object found in database.
-   */
   @Override
   public User getUserByEmailAndPassword(String email, String password) {
 
@@ -85,14 +67,6 @@ public class UserServiceImpl implements UserService {
       .orElseThrow(() -> new UnauthorizedException("Invalid Email/Password"));
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @param role     Role enum of to-be-retrieved users
-   * @param pageable Pageable object for paging data
-   *
-   * @return {@code Page<User>} - Page of users found in database.
-   */
   @Override
   public Page<User> getUsers(Role role, String name, Pageable pageable) {
 
@@ -100,14 +74,6 @@ public class UserServiceImpl implements UserService {
       role, name, pageable);
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @param batchCode   Code represents the batch of to-be-retrieved students
-   * @param pageable    Pageable object for paging data
-   *
-   * @return {@code Page<User>} - Page of users found in database.
-   */
   @Override
   public Page<User> getStudentsWithinBatch(String batchCode, Pageable pageable) {
     return Optional.ofNullable(batchCode)
@@ -116,13 +82,6 @@ public class UserServiceImpl implements UserService {
         .orElseGet(() -> PageHelper.empty(pageable));
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @param user User data of new user.
-   *
-   * @return {@code User} - The user object of the saved data.
-   */
   @Override
   public User createUser(User user) {
 
@@ -140,13 +99,6 @@ public class UserServiceImpl implements UserService {
         () -> new UnsupportedOperationException("Failed Create User"));
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @param user User data of existing user.
-   *
-   * @return {@code User} - The user object of the saved data.
-   */
   @Override
   public User updateUser(User user) {
 
@@ -188,11 +140,6 @@ public class UserServiceImpl implements UserService {
     return foundUser;
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @param userId Id of user to be deleted.
-   */
   @Override
   public void deleteUser(String userId) {
 
@@ -201,13 +148,6 @@ public class UserServiceImpl implements UserService {
       .ifPresent(this::markDeleted);
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @param batchCode Batch code for students.
-   *
-   * @return {@code List<User>} - List of users found in database.
-   */
   @Override
   public List<User> getStudentsByBatchCode(
     String batchCode

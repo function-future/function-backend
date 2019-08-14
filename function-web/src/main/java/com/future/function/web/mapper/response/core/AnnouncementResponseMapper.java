@@ -15,23 +15,9 @@ import org.springframework.http.HttpStatus;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * Mapper class for announcement web response.
- */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class AnnouncementResponseMapper {
   
-  /**
-   * Converts an announcement data to {@code AnnouncementWebResponse},
-   * wrapped in {@code DataResponse}.
-   *
-   * @param announcement Announcement data to be converted to response.
-   *
-   * @return {@code DataResponse<AnnouncementWebResponse>} - The converted
-   * announcement data, wrapped in
-   * {@link com.future.function.web.model.response.base.DataResponse} and
-   * {@link com.future.function.web.model.response.feature.core.AnnouncementWebResponse}
-   */
   public static DataResponse<AnnouncementWebResponse> toAnnouncementDataResponse(
     Announcement announcement, String urlPrefix
   ) {
@@ -39,18 +25,6 @@ public class AnnouncementResponseMapper {
     return toAnnouncementDataResponse(HttpStatus.OK, announcement, urlPrefix);
   }
   
-  /**
-   * Converts a announcement data to {@code AnnouncementWebResponse} given
-   * {@code HttpStatus}, wrapped in {@code DataResponse}.
-   *
-   * @param httpStatus   Http status to be shown in the response.
-   * @param announcement Announcement data to be converted to response.
-   *
-   * @return {@code DataResponse<AnnouncementWebResponse>} - The converted
-   * announcement data, wrapped in
-   * {@link com.future.function.web.model.response.base.DataResponse} and
-   * {@link com.future.function.web.model.response.feature.core.AnnouncementWebResponse}
-   */
   public static DataResponse<AnnouncementWebResponse> toAnnouncementDataResponse(
     HttpStatus httpStatus, Announcement announcement, String urlPrefix
   ) {
@@ -76,17 +50,6 @@ public class AnnouncementResponseMapper {
       .build();
   }
   
-  /**
-   * Converts announcements data to {@code AnnouncementWebResponse} given
-   * {@code HttpStatus}, wrapped in {@code PagingResponse}.
-   *
-   * @param data Announcements data to be converted to response.
-   *
-   * @return {@code PagingResponse<AnnouncementWebResponse} - The converted
-   * announcements data, wrapped in
-   * {@link com.future.function.web.model.response.base.PagingResponse} and
-   * {@link com.future.function.web.model.response.feature.core.AnnouncementWebResponse}
-   */
   public static PagingResponse<AnnouncementWebResponse> toAnnouncementsPagingResponse(
     Page<Announcement> data, String urlPrefix
   ) {

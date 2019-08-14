@@ -11,10 +11,6 @@ import com.future.function.web.model.response.feature.embedded.ParticipantDetail
 
 import java.util.Optional;
 
-/**
- * Author: PriagungSatyagama
- * Created At: 19:53 06/07/2019
- */
 public class ParticipantResponseMapper {
   public static ParticipantDetailResponse toParticipantDetailResponse(User user, String urlPrefix) {
     return ParticipantDetailResponse.builder()

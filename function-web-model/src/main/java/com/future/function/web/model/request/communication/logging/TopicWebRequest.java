@@ -6,10 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 
-/**
- * Author : Ricky Kennedy
- * Created At : 23:34 27/07/2019
- */
 @Data
 @Builder
 @NoArgsConstructor

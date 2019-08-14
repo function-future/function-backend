@@ -13,10 +13,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-/**
- * Author : Ricky Kennedy
- * Created At : 23:00 28/07/2019
- */
 @RunWith(MockitoJUnitRunner.class)
 public class TopicWebRequestMapperTest {
 

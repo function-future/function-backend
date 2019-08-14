@@ -22,12 +22,11 @@ import java.util.Collections;
 import static com.googlecode.catchexception.CatchException.catchException;
 import static com.googlecode.catchexception.CatchException.caughtException;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
-/**
- * Author: PriagungSatyagama
- * Created At: 21:09 10/07/2019
- */
 @RunWith(MockitoJUnitRunner.class)
 public class NotificationServiceImplTest {
 

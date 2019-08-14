@@ -17,9 +17,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
-/**
- * Service implementation class for discussion logic operations implementation.
- */
 @Service
 public class DiscussionServiceImpl implements DiscussionService {
   
@@ -40,13 +37,6 @@ public class DiscussionServiceImpl implements DiscussionService {
     this.batchService = batchService;
   }
   
-  /**
-   * {@inheritDoc}
-   *
-   * @param pageable  Pageable object for paging data.
-   *
-   * @return {@code Page<Discussion>} - Page of discussions found in database.
-   */
   @Override
   public Page<Discussion> getDiscussions(
     String email, String courseId, String batchCode, Pageable pageable
@@ -60,13 +50,6 @@ public class DiscussionServiceImpl implements DiscussionService {
       .orElseGet(() -> PageHelper.empty(pageable));
   }
   
-  /**
-   * {@inheritDoc}
-   *
-   * @param discussion Discussion object to be saved.
-   *
-   * @return {@code Discussion} - The discussion object of the saved data.
-   */
   @Override
   public Discussion createDiscussion(Discussion discussion) {
     

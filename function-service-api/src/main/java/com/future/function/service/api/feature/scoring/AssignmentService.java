@@ -1,14 +1,10 @@
 package com.future.function.service.api.feature.scoring;
 
-import com.future.function.model.entity.feature.core.User;
 import com.future.function.model.entity.feature.scoring.Assignment;
 import com.future.function.model.entity.feature.scoring.Room;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-/**
- * Interface to act as Assignment Service API
- */
 public interface AssignmentService {
 
   Page<Assignment> findAllByBatchCodeAndPageable(String batchCode, Pageable pageable);

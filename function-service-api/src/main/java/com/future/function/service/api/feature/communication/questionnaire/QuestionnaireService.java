@@ -9,9 +9,6 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
-/**
- * Service interface class for questionnaire logic operations declaration.
- */
 public interface QuestionnaireService {
 
   Page<Questionnaire> getAllQuestionnaires(Pageable pageable);

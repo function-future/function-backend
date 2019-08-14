@@ -14,9 +14,6 @@ import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.UUID;
 
-/**
- * Entity representation for courses.
- */
 @Data
 @Builder
 @NoArgsConstructor

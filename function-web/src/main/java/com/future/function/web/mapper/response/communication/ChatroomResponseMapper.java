@@ -6,17 +6,16 @@ import com.future.function.model.entity.feature.communication.chatting.Message;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.service.api.feature.communication.MessageService;
 import com.future.function.service.api.feature.communication.MessageStatusService;
-import com.future.function.session.model.Session;
 import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.feature.communication.chatting.ChatroomDetailResponse;
-import com.future.function.web.model.response.feature.embedded.ParticipantDetailResponse;
 import com.future.function.web.model.response.feature.communication.chatting.ChatroomParticipantResponse;
 import com.future.function.web.model.response.feature.communication.chatting.ChatroomResponse;
 import com.future.function.web.model.response.feature.communication.chatting.LastMessageResponse;
 import com.future.function.web.model.response.feature.communication.chatting.MessageResponse;
+import com.future.function.web.model.response.feature.embedded.ParticipantDetailResponse;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -29,10 +28,6 @@ import java.util.stream.Collectors;
 
 import static com.future.function.web.mapper.response.communication.ParticipantResponseMapper.toParticipantDetailResponse;
 
-/**
- * Author: priagung.satyagama
- * Created At: 9:23 AM 6/11/2019
- */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ChatroomResponseMapper {
 

@@ -12,10 +12,6 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Author: PriagungSatyagama
- * Created At: 15:40 01/06/2019
- */
 @Slf4j
 @Component
 public class ChatroomRequestMapper {

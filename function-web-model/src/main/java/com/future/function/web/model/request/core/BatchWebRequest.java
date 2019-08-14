@@ -10,9 +10,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.NotBlank;
 
-/**
- * Model representation for batch web request.
- */
 @Data
 @Builder
 @NoArgsConstructor

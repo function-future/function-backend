@@ -9,9 +9,6 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-/**
- * Model representation for announcement web response.
- */
 @Data
 @Builder
 @NoArgsConstructor

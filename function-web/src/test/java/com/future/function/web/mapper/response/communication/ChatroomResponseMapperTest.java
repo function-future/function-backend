@@ -2,7 +2,6 @@ package com.future.function.web.mapper.response.communication;
 
 import com.future.function.common.enumeration.communication.ChatroomType;
 import com.future.function.common.enumeration.core.Role;
-import com.future.function.common.properties.core.FileProperties;
 import com.future.function.model.entity.feature.communication.chatting.Chatroom;
 import com.future.function.model.entity.feature.communication.chatting.Message;
 import com.future.function.model.entity.feature.core.Batch;
@@ -29,12 +28,10 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
-/**
- * Author: priagung.satyagama
- * Created At: 10:25 AM 6/11/2019
- */
 @RunWith(MockitoJUnitRunner.class)
 @Ignore
 public class ChatroomResponseMapperTest {

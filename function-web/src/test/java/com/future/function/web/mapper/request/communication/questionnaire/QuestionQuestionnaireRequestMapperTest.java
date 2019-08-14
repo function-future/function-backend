@@ -17,10 +17,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
-/**
- * Author: ricky.kennedy
- * Created At: 3:06 PM 7/25/2019
- */
 @RunWith(MockitoJUnitRunner.class)
 public class QuestionQuestionnaireRequestMapperTest {
 

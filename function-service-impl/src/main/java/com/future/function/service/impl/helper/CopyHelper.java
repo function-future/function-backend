@@ -6,9 +6,6 @@ import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.BeanUtils;
 
-/**
- * Helper class for copying object properties operations.
- */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class CopyHelper {
   
@@ -18,27 +15,11 @@ public final class CopyHelper {
     FieldName.User.class.getSimpleName().toLowerCase()
   };
   
-  /**
-   * Copies properties of object with type {@code T} to another object of
-   * type  {@code T}, with default ignored properties.
-   *
-   * @param source Object acting as source for data to be copied.
-   * @param target Object acting as target.
-   * @param <T>    Type of class of the specified data.
-   */
   public static <T> void copyProperties(T source, T target) {
     
     BeanUtils.copyProperties(source, target, IGNORED_PROPERTIES);
   }
   
-  /**
-   * Copies properties of object with type {@code T} to another object of
-   * type  {@code T}, with default ignored properties.
-   *
-   * @param source Object acting as source for data to be copied.
-   * @param target Object acting as target.
-   * @param <T>    Type of class of the specified data.
-   */
   public static <T> void copyProperties(
     T source, T target, String... ignoredProperties
   ) {

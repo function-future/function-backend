@@ -18,12 +18,7 @@ import org.springframework.data.domain.PageImpl;
 import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
 
-/**
- * Author: ricky.kennedy
- * Created At: 2:08 PM 7/25/2019
- */
 public class QuestionnaireResultsResponseMapperTest {
 
   private static final String URL_PREFIX = "urlPrefix";

@@ -18,9 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-/**
- * Controller class for activity blog APIs.
- */
 @RestController
 @RequestMapping(value = "/api/core/activity-blogs")
 public class ActivityBlogController {

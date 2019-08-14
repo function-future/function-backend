@@ -4,18 +4,12 @@ import com.future.function.model.entity.feature.communication.reminder.Reminder;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.validation.RequestValidator;
 import com.future.function.web.model.request.communication.ReminderRequest;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.DayOfWeek;
-import java.util.Date;
 import java.util.stream.Collectors;
 
-/**
- * Author: PriagungSatyagama
- * Created At: 21:20 06/07/2019
- */
 @Component
 public class ReminderRequestMapper {
 

@@ -12,9 +12,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
 
-/**
- * Helper class for file-related operations.
- */
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class FileHelper {
@@ -23,25 +20,11 @@ public final class FileHelper {
   
   public static final String PATH_SEPARATOR = File.separator;
   
-  /**
-   * Creates file from {@code byte[]} on specific path.
-   *
-   * @param bytes Data to be 'inserted' to file.
-   * @param path  Path of the created file.
-   */
   public static void createJavaIoFile(byte[] bytes, String path) {
     
     FileHelper.toJavaIoFile(bytes, path);
   }
   
-  /**
-   * Converts {@code byte[]} to {@link java.io.File}.
-   *
-   * @param bytes Data to be 'inserted' to file.
-   * @param path  Path of the created file.
-   *
-   * @return {@code File} - The converted data in form of {@code File}.
-   */
   public static File toJavaIoFile(byte[] bytes, String path) {
     
     File file = new File(path);
@@ -54,12 +37,6 @@ public final class FileHelper {
     }
   }
   
-  /**
-   * Creates file from {@code byte[]} on specific path with specific extenstion.
-   *
-   * @param bytes Data to be 'inserted' to file.
-   * @param path  Path of the created file.
-   */
   public static void createThumbnail(
     byte[] bytes, String path, String extension
   ) {
@@ -75,13 +52,6 @@ public final class FileHelper {
     }
   }
   
-  /**
-   * Converts {@link java.io.File} to {@code byte[]}.
-   *
-   * @param file File to be converted.
-   *
-   * @return {@code byte[]} - The converted data in form of {@code byte[]}.
-   */
   public static byte[] toByteArray(File file) {
     
     try {
@@ -91,14 +61,6 @@ public final class FileHelper {
     }
   }
   
-  /**
-   * Checks if a given file name has suffix '-thumbnail' or not.
-   *
-   * @param name Name of the file to be checked.
-   *
-   * @return {@code boolean} - The result of check whether the name contains
-   * suffix '-thumbnail' or not.
-   */
   public static boolean isThumbnailName(String name) {
     
     int maxNonThumbnailFilenameLength =

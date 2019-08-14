@@ -1,6 +1,5 @@
 package com.future.function.repository.feature.communication.logging;
 
-import com.future.function.model.entity.feature.communication.logging.LogMessage;
 import com.future.function.model.entity.feature.communication.logging.LoggingRoom;
 import com.future.function.model.entity.feature.communication.logging.Topic;
 import com.future.function.repository.TestApplication;
@@ -12,15 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * Author : Ricky Kennedy
- * Created At : 17:01 28/07/2019
- */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = TestApplication.class)
 public class TopicRepositoryTest {

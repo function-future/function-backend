@@ -9,9 +9,6 @@ import org.hibernate.validator.constraints.NotBlank;
 
 import java.util.List;
 
-/**
- * Model representation for activity blog web request.
- */
 @Data
 @Builder
 @NoArgsConstructor

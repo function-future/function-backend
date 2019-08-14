@@ -20,10 +20,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-/**
- * Service class used to manipulate Quiz Entity
- * Used QuizRepository and QuestionBankService to help manipulate quiz entity
- */
 @Service
 public class QuizServiceImpl implements QuizService {
 
@@ -43,12 +39,6 @@ public class QuizServiceImpl implements QuizService {
     this.batchService = batchService;
   }
 
-  /**
-   * Used to find quiz from repository by passing the quiz id
-   *
-   * @param id (String)
-   * @return Quiz object
-   */
   @Override
   public Quiz findById(String id) {
     return Optional.ofNullable(id)
@@ -56,13 +46,6 @@ public class QuizServiceImpl implements QuizService {
             .orElseThrow(() -> new NotFoundException("Failed at #findById #QuizService"));
   }
 
-  /**
-   * Used to find all quiz from repository in paging format by passing pageable, filter, and search parameter
-   *
-   * @param pageable (Pageable)
-   * @param batchCode (String)
-   * @return Page<Quiz> object
-   */
   @Override
   public Page<Quiz> findAllByBatchCodeAndPageable(String batchCode, Pageable pageable) {
     return Optional.ofNullable(batchCode)
@@ -82,12 +65,6 @@ public class QuizServiceImpl implements QuizService {
             .orElseThrow(() -> new UnsupportedOperationException("Failed at #copyQuizWithTargetBatchCode #QuizService"));
   }
 
-  /**
-   * Used to create new quiz in repository by passing the requested quiz entity object
-   *
-   * @param request (Quiz)
-   * @return Quiz object
-   */
   @Override
   public Quiz createQuiz(Quiz request) {
     return Optional.ofNullable(request)
@@ -118,12 +95,6 @@ public class QuizServiceImpl implements QuizService {
             .collect(Collectors.toList());
   }
 
-  /**
-   * Used to update existing quiz from repository by passing the requested quiz entity object with its id
-   *
-   * @param request (Quiz)
-   * @return Quiz object
-   */
   @Override
   public Quiz updateQuiz(Quiz request) {
     return Optional.ofNullable(request)
@@ -149,11 +120,6 @@ public class QuizServiceImpl implements QuizService {
     return quiz;
   }
 
-  /**
-   * Used to delete existing quiz from repository by passing the quiz id
-   *
-   * @param id (String)
-   */
   @Override
   public void deleteById(String id) {
     Optional.ofNullable(id)

@@ -16,10 +16,6 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 
-/**
- * Author: PriagungSatyagama
- * Created At: 13:21 07/07/2019
- */
 @Component
 public class ReminderScheduler {
 

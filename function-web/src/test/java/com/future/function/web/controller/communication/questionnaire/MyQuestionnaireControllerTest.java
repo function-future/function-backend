@@ -3,7 +3,10 @@ package com.future.function.web.controller.communication.questionnaire;
 import com.future.function.common.enumeration.communication.ParticipantType;
 import com.future.function.common.enumeration.core.Role;
 import com.future.function.common.properties.core.FileProperties;
-import com.future.function.model.entity.feature.communication.questionnaire.*;
+import com.future.function.model.entity.feature.communication.questionnaire.QuestionQuestionnaire;
+import com.future.function.model.entity.feature.communication.questionnaire.QuestionResponse;
+import com.future.function.model.entity.feature.communication.questionnaire.Questionnaire;
+import com.future.function.model.entity.feature.communication.questionnaire.QuestionnaireParticipant;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.User;
@@ -42,16 +45,15 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-/**
- * Author: ricky.kennedy
- * Created At: 4:12 PM 7/25/2019
- */
 @RunWith(SpringRunner.class)
 @Import(TestSecurityConfiguration.class)
 @WebMvcTest(MyQuestionnaireController.class)

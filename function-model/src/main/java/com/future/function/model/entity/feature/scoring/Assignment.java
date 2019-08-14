@@ -17,9 +17,6 @@ import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.UUID;
 
-/**
- * Entity representation for assignments.
- */
 @Data
 @Builder
 @NoArgsConstructor

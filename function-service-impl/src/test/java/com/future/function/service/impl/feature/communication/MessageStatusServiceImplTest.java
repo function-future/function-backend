@@ -27,10 +27,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
-/**
- * Author: PriagungSatyagama
- * Created At: 18:18 05/06/2019
- */
 @RunWith(MockitoJUnitRunner.class)
 public class MessageStatusServiceImplTest {
 

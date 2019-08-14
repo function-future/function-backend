@@ -11,12 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
 
-/**
- * Author: ricky.kennedy
- * Created At: 1:57 PM 7/25/2019
- */
 public class QuestionQuestionnaireResponseMapperTest {
 
   private static final String QUESTIONNAIRE_ID_1 = "questionnaireId1";

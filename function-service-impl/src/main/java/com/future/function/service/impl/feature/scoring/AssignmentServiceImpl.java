@@ -3,7 +3,6 @@ package com.future.function.service.impl.feature.scoring;
 import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.FileV2;
-import com.future.function.model.entity.feature.core.User;
 import com.future.function.model.entity.feature.scoring.Assignment;
 import com.future.function.model.entity.feature.scoring.Room;
 import com.future.function.model.util.constant.FieldName;
@@ -24,10 +23,6 @@ import java.util.Collections;
 import java.util.Objects;
 import java.util.Optional;
 
-/**
- * Service class used to manipulate Assignment Entity
- * Used AssignmentRepository and FileService to support manipulation of Assignment Entity
- */
 @Service
 public class AssignmentServiceImpl implements AssignmentService {
 
@@ -45,12 +40,6 @@ public class AssignmentServiceImpl implements AssignmentService {
     this.batchService = batchService;
   }
 
-  /**
-   * Used to find All Assignment Object from Repository With Paging, Filtering, And Search Keyword
-   *
-   * @param pageable (Pageable Object)
-   * @return Page<Assignment>
-   */
   @Override
   public Page<Assignment> findAllByBatchCodeAndPageable(String batchCode, Pageable pageable) {
     return Optional.ofNullable(batchCode)
@@ -59,13 +48,6 @@ public class AssignmentServiceImpl implements AssignmentService {
             .orElseGet(() -> PageHelper.empty(pageable));
   }
 
-  /**
-   * Used to Find Assignment Object From Repository With Passed Id and Not Deleted
-   *
-   * @param id (String)
-   * @return Assignment Object
-   * @throws NotFoundException if Assignment Object is not found or the id is null
-   */
   @Override
   public Assignment findById(String id) {
     return Optional.ofNullable(id)
@@ -105,12 +87,6 @@ public class AssignmentServiceImpl implements AssignmentService {
     return newAssignment;
   }
 
-  /**
-   * Used to create new Assignment Data in Repository With / Without file
-   *
-   * @param assignment (Assignment Object)
-   * @return Saved Assignment Object
-   */
   @Override
   public Assignment createAssignment(Assignment assignment) {
     return Optional.ofNullable(assignment)
@@ -127,12 +103,6 @@ public class AssignmentServiceImpl implements AssignmentService {
     return value;
   }
 
-  /**
-   * Used to store Multipart File by using FileService which sent with Assignment object
-   *
-   * @param assignment (Assignment Object)
-   * @return Assignment with / without the saved file
-   */
   private Assignment storeAssignmentFile(Assignment assignment) {
     return Optional.ofNullable(assignment)
             .map(Assignment::getFile)
@@ -146,12 +116,6 @@ public class AssignmentServiceImpl implements AssignmentService {
             .orElse(assignment);
   }
 
-  /**
-   * Used to update existed Assignment in Repository with Assignment Object request and / no Multipart File
-   *
-   * @param request (Assignment Object)
-   * @return Saved Assignment Object
-   */
   @Override
   public Assignment updateAssignment(Assignment request) {
     return Optional.ofNullable(request)
@@ -205,11 +169,6 @@ public class AssignmentServiceImpl implements AssignmentService {
     roomService.deleteRoomById(id);
   }
 
-  /**
-   * Used to delete existing Assignment From Repository With passed id
-   *
-   * @param id (String)
-   */
   @Override
   public void deleteById(String id) {
     Optional.ofNullable(id)

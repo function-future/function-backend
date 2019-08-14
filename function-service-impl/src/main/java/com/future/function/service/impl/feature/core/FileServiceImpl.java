@@ -52,14 +52,6 @@ public class FileServiceImpl implements FileService {
     this.userService = userService;
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @param fileFolderId Id of file/folder to be retrieved.
-   * @param parentId     Id of parent of file/folder to be retrieved.
-   *
-   * @return {@code FileV2} - The file/folder object found in database.
-   */
   @Override
   public FileV2 getFileOrFolder(String fileFolderId, String parentId) {
 
@@ -68,15 +60,6 @@ public class FileServiceImpl implements FileService {
       .orElseThrow(() -> new NotFoundException("Get File/Folder Not Found"));
   }
   
-  /**
-   * {@inheritDoc}
-   *
-   * @param parentId Id of parent of files/folders to be retrieved.
-   * @param pageable Pageable object for paging data.
-   *
-   * @return {@code Page<FileV2>} - Page of files/folders found in
-   * database.
-   */
   @Override
   public Pair<List<FileV2>, Page<FileV2>> getFilesAndFolders(String parentId,
                                                         Pageable pageable) {
@@ -91,15 +74,6 @@ public class FileServiceImpl implements FileService {
       .orElseGet(() -> Pair.of(paths, PageHelper.empty(pageable)));
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @param objectName Name of file, to be stored as object's name.
-   * @param fileName   Original name of file.
-   * @param bytes      Byte array of file content.
-   *
-   * @return {@code FileV2} - The file/folder object of the saved data.
-   */
   @Override
   public FileV2 createFileOrFolder(
     Session session, String parentId, String objectName, String fileName,
@@ -189,18 +163,6 @@ public class FileServiceImpl implements FileService {
       .build();
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @param session        Current user's session.
-   * @param fileOrFolderId Id of file/folder to-be-updated.
-   * @param parentId       Id of parent of file/folder.
-   * @param objectName     Name of file, to be stored as object's name.
-   * @param fileName       Original name of file.
-   * @param bytes          Byte array of file content.
-   *
-   * @return {@code FileV2} - The file/folder object of the saved data.
-   */
   @Override
   public FileV2 updateFileOrFolder(
     Session session, String fileOrFolderId, String parentId, String objectName,
@@ -271,13 +233,6 @@ public class FileServiceImpl implements FileService {
     return fileRepositoryV2.save(pair.getSecond());
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @param session      Current user's session.
-   * @param parentId     Id of parent of file/folder.
-   * @param fileFolderId Id of file/folder to be deleted.
-   */
   @Override
   public void deleteFileOrFolder(
     Session session, String parentId, String fileFolderId

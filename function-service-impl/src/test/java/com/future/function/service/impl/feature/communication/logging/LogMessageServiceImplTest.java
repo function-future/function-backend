@@ -21,12 +21,10 @@ import org.springframework.data.domain.Pageable;
 import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
-/**
- * Author : Ricky Kennedy
- * Created At : 17:49 28/07/2019
- */
 @RunWith(MockitoJUnitRunner.class)
 public class LogMessageServiceImplTest {
 

@@ -10,9 +10,6 @@ import org.hibernate.validator.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.util.List;
 
-/**
- * Model representation for course web request.
- */
 @Data
 @Builder
 @NoArgsConstructor

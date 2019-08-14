@@ -14,22 +14,10 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
-/**
- * Controller advice class for exception handling purposes.
- */
 @Slf4j
 @RestControllerAdvice
 public class ExceptionController {
 
-  /**
-   * Handles {@link com.future.function.common.exception.BadRequestException}
-   * exception thrown from service.
-   *
-   * @param e Exception that is thrown.
-   *
-   * @return {@code ErrorResponse} - Response showing which fields causing
-   * errors.
-   */
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   @ExceptionHandler(BadRequestException.class)
   public ErrorResponse badRequestException(BadRequestException e) {
@@ -40,15 +28,6 @@ public class ExceptionController {
       HttpStatus.BAD_REQUEST, e.getConstraintViolations());
   }
 
-  /**
-   * Handles {@link com.future.function.common.exception.UnauthorizedException}
-   * exception thrown from service.
-   *
-   * @param e Exception that is thrown.
-   *
-   * @return {@link com.future.function.web.model.response.base.BaseResponse}
-   * - Response showing 'unauthorized' message.
-   */
   @ResponseStatus(HttpStatus.UNAUTHORIZED)
   @ExceptionHandler(UnauthorizedException.class)
   public BaseResponse unauthorizedException(UnauthorizedException e) {
@@ -58,15 +37,6 @@ public class ExceptionController {
     return ResponseHelper.toBaseResponse(HttpStatus.UNAUTHORIZED);
   }
 
-  /**
-   * Handles {@link com.future.function.common.exception.ForbiddenException}
-   * exception thrown from service.
-   *
-   * @param e Exception that is thrown.
-   *
-   * @return {@link com.future.function.web.model.response.base.BaseResponse}
-   * - Response showing 'forbidden' message.
-   */
   @ResponseStatus(HttpStatus.FORBIDDEN)
   @ExceptionHandler(ForbiddenException.class)
   public BaseResponse forbiddenException(ForbiddenException e) {
@@ -76,16 +46,6 @@ public class ExceptionController {
     return ResponseHelper.toBaseResponse(HttpStatus.FORBIDDEN);
   }
 
-  /**
-   * Handles {@link com.future.function.common.exception.NotFoundException}
-   * or {@link NoHandlerFoundException} exception thrown from
-   * controller/service.
-   *
-   * @param e Exception that is thrown.
-   *
-   * @return {@link com.future.function.web.model.response.base.BaseResponse}
-   * - Response showing 'not found' message.
-   */
   @ResponseStatus(HttpStatus.NOT_FOUND)
   @ExceptionHandler({ NotFoundException.class, NoHandlerFoundException.class })
   public BaseResponse notFoundException(Exception e) {
@@ -95,15 +55,6 @@ public class ExceptionController {
     return ResponseHelper.toBaseResponse(HttpStatus.NOT_FOUND);
   }
 
-  /**
-   * Handles {@link UnsupportedOperationException} exception thrown from
-   * service.
-   *
-   * @param e Exception that is thrown.
-   *
-   * @return {@link com.future.function.web.model.response.base.BaseResponse}
-   * - Response showing 'unsupported operation' message.
-   */
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   @ExceptionHandler(UnsupportedOperationException.class)
   public BaseResponse unsupportedOperationException(
@@ -115,14 +66,6 @@ public class ExceptionController {
     return ResponseHelper.toBaseResponse(HttpStatus.BAD_REQUEST);
   }
 
-  /**
-   * Handles any {@link Throwable} exception thrown from controller/service.
-   *
-   * @param e Exception that is thrown.
-   *
-   * @return {@link com.future.function.web.model.response.base.BaseResponse}
-   * - Response showing 'exception' message.
-   */
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   @ExceptionHandler(Throwable.class)
   public BaseResponse genericException(

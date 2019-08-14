@@ -37,10 +37,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * Author: priagung.satyagama
- * Created At: 1:55 PM 6/12/2019
- */
 @RestController
 @RequestMapping(value = "/api/communication/chatrooms")
 @WithAnyRole(roles = {

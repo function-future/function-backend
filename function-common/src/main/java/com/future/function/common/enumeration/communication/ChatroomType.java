@@ -1,13 +1,8 @@
 package com.future.function.common.enumeration.communication;
 
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-/**
- * Author: PriagungSatyagama
- * Created At: 21:52 30/05/2019
- */
 public enum ChatroomType {
   PUBLIC,
   PRIVATE,

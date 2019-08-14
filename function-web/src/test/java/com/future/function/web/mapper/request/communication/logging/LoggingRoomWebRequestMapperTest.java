@@ -12,12 +12,9 @@ import org.mockito.runners.MockitoJUnitRunner;
 import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-/**
- * Author : Ricky Kennedy
- * Created At : 23:07 28/07/2019
- */
 @RunWith(MockitoJUnitRunner.class)
 public class LoggingRoomWebRequestMapperTest {
 

@@ -27,10 +27,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
-/**
- * Author : Ricky Kennedy
- * Created At : 0:19 28/07/2019
- */
 @RestController
 @RequestMapping(value= "/api/communication/logging-rooms")
 public class LoggingRoomController {

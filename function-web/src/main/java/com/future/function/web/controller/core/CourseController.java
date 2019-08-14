@@ -17,9 +17,6 @@ import com.future.function.web.model.response.feature.core.CourseWebResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-/**
- * Controller class for course APIs.
- */
 @RestController
 @RequestMapping(value = "/api/core/courses")
 @WithAnyRole(roles = { Role.ADMIN, Role.JUDGE, Role.MENTOR })

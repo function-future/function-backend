@@ -20,10 +20,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-/**
- * Service implementation class for activity blog logic operations
- * implementation.
- */
 @Service
 public class ActivityBlogServiceImpl implements ActivityBlogService {
 
@@ -43,13 +39,6 @@ public class ActivityBlogServiceImpl implements ActivityBlogService {
     this.userService = userService;
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @param activityBlogId Id of activity blog to be retrieved.
-   *
-   * @return {@code ActivityBlog} - The activity blog object found in database.
-   */
   @Override
   public ActivityBlog getActivityBlog(String activityBlogId) {
 
@@ -58,17 +47,6 @@ public class ActivityBlogServiceImpl implements ActivityBlogService {
       .orElseThrow(() -> new NotFoundException("Get Activity Blog Not Found"));
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @param userId   Id of selected user, so that all blogs from this user can
-   *                 be retrieved.
-   * @param search   Search query to be searched from database.
-   * @param pageable Pageable object for paging data.
-   *
-   * @return {@code Page<ActivityBlog>} - Page of activity blogs found in
-   * database.
-   */
   @Override
   public Page<ActivityBlog> getActivityBlogs(
     String userId, String search, Pageable pageable
@@ -79,13 +57,6 @@ public class ActivityBlogServiceImpl implements ActivityBlogService {
       .orElseGet(() -> PageHelper.empty(pageable));
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @param activityBlog Activity blog data of new activity blog.
-   *
-   * @return {@code ActivityBlog} - The activity blog object of the saved data.
-   */
   @Override
   public ActivityBlog createActivityBlog(ActivityBlog activityBlog) {
 
@@ -97,13 +68,6 @@ public class ActivityBlogServiceImpl implements ActivityBlogService {
         () -> new UnsupportedOperationException("Create Activity Blog Failed"));
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @param activityBlog Activity blog data of new activity blog.
-   *
-   * @return {@code ActivityBlog} - The activity blog object of the saved data.
-   */
   @Override
   public ActivityBlog updateActivityBlog(String userId, Role role, ActivityBlog activityBlog) {
 
@@ -130,12 +94,6 @@ public class ActivityBlogServiceImpl implements ActivityBlogService {
 
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @param userId          Id of current user.
-   * @param activityBlogId Id of activity blog to be deleted.
-   */
   @Override
   public void deleteActivityBlog(String userId,
                                  Role role, String activityBlogId) {

@@ -29,9 +29,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Collections;
 
-import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -95,7 +95,7 @@ public class StickyNoteControllerTest extends TestHelper {
   public void testGivenCallToStickyNoteApiByGettingStickyNoteReturnDataResponseOfStickyNote()
     throws Exception {
     
-    given(stickyNoteService.getStickyNote(PAGEABLE)).willReturn(
+    when(stickyNoteService.getStickyNote(PAGEABLE)).thenReturn(
       STICKY_NOTE_PAGE);
     
     mockMvc.perform(get("/api/core/sticky-notes"))
@@ -113,10 +113,10 @@ public class StickyNoteControllerTest extends TestHelper {
     
     super.setCookie(Role.ADMIN);
     
-    given(
-      stickyNoteRequestMapper.toStickyNote(STICKY_NOTE_WEB_REQUEST)).willReturn(
+    when(
+      stickyNoteRequestMapper.toStickyNote(STICKY_NOTE_WEB_REQUEST)).thenReturn(
       STICKY_NOTE);
-    given(stickyNoteService.createStickyNote(STICKY_NOTE)).willReturn(
+    when(stickyNoteService.createStickyNote(STICKY_NOTE)).thenReturn(
       STICKY_NOTE);
     
     mockMvc.perform(post("/api/core/sticky-notes").cookie(cookies)

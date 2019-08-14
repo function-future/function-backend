@@ -13,9 +13,6 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-/**
- * Entity representation for shared course.
- */
 @Data
 @Builder
 @NoArgsConstructor

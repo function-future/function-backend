@@ -8,7 +8,6 @@ import com.future.function.service.api.feature.communication.ChatroomService;
 import com.future.function.service.api.feature.communication.MessageService;
 import com.future.function.service.api.feature.core.UserService;
 import com.future.function.service.impl.helper.PageHelper;
-import com.future.function.session.model.Session;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -18,10 +17,6 @@ import org.springframework.stereotype.Service;
 import java.util.Date;
 import java.util.Optional;
 
-/**
- * Author: PriagungSatyagama
- * Created At: 17:06 04/06/2019
- */
 @Service
 public class MessageServiceImpl implements MessageService {
 

@@ -26,13 +26,8 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
-/**
- * Author: RickyKennedy
- * Created At: 8:33 PM 7/23/2019
- */
 @RunWith(MockitoJUnitRunner.class)
 public class QuestionnaireServiceImplTest {
 
