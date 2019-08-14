@@ -15,7 +15,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper = true)
 @Data
 @Builder
 @AllArgsConstructor

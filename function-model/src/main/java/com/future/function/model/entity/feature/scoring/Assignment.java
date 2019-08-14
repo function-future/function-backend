@@ -17,14 +17,11 @@ import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.UUID;
 
-/**
- * Entity representation for assignments.
- */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper = true)
 @Document(collection = DocumentName.ASSIGNMENT)
 public class Assignment extends BaseEntity {
 
