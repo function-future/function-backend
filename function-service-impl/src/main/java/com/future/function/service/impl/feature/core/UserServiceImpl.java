@@ -198,6 +198,7 @@ public class UserServiceImpl implements UserService {
 
     Optional.ofNullable(userId)
       .map(userRepository::findOne)
+      .map(scoringMediatorService::deleteQuizAndAssignmentsByStudent)
       .ifPresent(this::markDeleted);
   }
 
