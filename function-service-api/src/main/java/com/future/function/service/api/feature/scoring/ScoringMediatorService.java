@@ -6,4 +6,6 @@ public interface ScoringMediatorService {
 
   User createQuizAndAssignmentsByStudent(User user);
 
+  User deleteQuizAndAssignmentsByStudent(User user);
+
 }

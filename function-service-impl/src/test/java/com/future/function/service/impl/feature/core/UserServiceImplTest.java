@@ -484,6 +484,9 @@ public class UserServiceImplTest {
 
     when(userRepository.findOne(STUDENT_ID)).thenReturn(userStudent);
 
+    when(scoringMediatorService.deleteQuizAndAssignmentsByStudent(
+      userStudent)).thenReturn(userStudent);
+
     User deletedUserStudent = new User();
     BeanUtils.copyProperties(userStudent, deletedUserStudent);
     deletedUserStudent.setDeleted(true);
@@ -500,6 +503,8 @@ public class UserServiceImplTest {
     verify(resourceService).markFilesUsed(FILE_IDS, false);
     verify(resourceService).getFile(PICTURE_ID);
     verify(userRepository).save(markedDeletedUserStudent);
+    verify(scoringMediatorService).deleteQuizAndAssignmentsByStudent(
+      userStudent);
     verifyZeroInteractions(batchService, encoder);
   }
 
@@ -509,6 +514,9 @@ public class UserServiceImplTest {
     userMentor.setPictureV2(PICTURE);
 
     when(userRepository.findOne(MENTOR_ID)).thenReturn(userMentor);
+    when(scoringMediatorService.deleteQuizAndAssignmentsByStudent(
+      userMentor)).thenReturn(userMentor);
+
 
     User deletedUserMentor = new User();
     BeanUtils.copyProperties(userMentor, deletedUserMentor);
@@ -525,6 +533,8 @@ public class UserServiceImplTest {
     verify(resourceService).markFilesUsed(FILE_IDS, false);
     verify(resourceService).getFile(PICTURE_ID);
     verify(userRepository).save(markedDeletedUserMentor);
+    verify(scoringMediatorService).deleteQuizAndAssignmentsByStudent(
+      userMentor);
     verifyZeroInteractions(batchService, encoder);
   }
 
