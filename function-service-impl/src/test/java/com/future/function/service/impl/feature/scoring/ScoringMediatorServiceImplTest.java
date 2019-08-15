@@ -72,13 +72,19 @@ public class ScoringMediatorServiceImplTest {
 
   private static final String ROOM_ID = "room-id";
 
-    private Quiz quiz;
-    private User user;
-    private Room room;
-    private Batch batch;
-    private Pageable pageable;
-    private StudentQuiz studentQuiz;
-    private Assignment assignment;
+  private Quiz quiz;
+
+  private User user;
+
+  private Room room;
+
+  private Batch batch;
+
+  private Pageable pageable;
+
+  private StudentQuiz studentQuiz;
+
+  private Assignment assignment;
 
   @Mock
   private QuizService quizService;
@@ -130,25 +136,29 @@ public class ScoringMediatorServiceImplTest {
       .batch(batch)
       .build();
 
-    studentQuiz = StudentQuiz
-        .builder()
-        .id(STUDENT_QUIZ_ID)
-        .build();
+    studentQuiz = StudentQuiz.builder()
+      .id(STUDENT_QUIZ_ID)
+      .build();
 
-    room = Room
-        .builder()
-        .id(ROOM_ID)
-        .build();
+    room = Room.builder()
+      .id(ROOM_ID)
+      .build();
 
     pageable = new PageRequest(PAGE, SIZE);
 
-    when(quizService.findAllByBatchCodeAndPageable(BATCH_CODE, pageable))
-        .thenReturn(new PageImpl<>(Collections.singletonList(quiz), pageable, 1));
-    when(assignmentService.findAllByBatchCodeAndPageable(BATCH_CODE, pageable))
-        .thenReturn(new PageImpl<>(Collections.singletonList(assignment), pageable, 1));
-    when(studentQuizService.findAllByStudentId(USER_ID, pageable, USER_ID))
-        .thenReturn(new PageImpl<>(Collections.singletonList(studentQuiz), pageable, 1));
-    when(roomService.findAllByStudentId(USER_ID)).thenReturn(Collections.singletonList(room));
+    when(quizService.findAllByBatchCodeAndPageable(BATCH_CODE,
+                                                   pageable
+    )).thenReturn(new PageImpl<>(Collections.singletonList(quiz), pageable, 1));
+    when(assignmentService.findAllByBatchCodeAndPageable(BATCH_CODE,
+                                                         pageable
+    )).thenReturn(
+      new PageImpl<>(Collections.singletonList(assignment), pageable, 1));
+    when(studentQuizService.findAllByStudentId(USER_ID, pageable,
+                                               USER_ID
+    )).thenReturn(
+      new PageImpl<>(Collections.singletonList(studentQuiz), pageable, 1));
+    when(roomService.findAllByStudentId(USER_ID)).thenReturn(
+      Collections.singletonList(room));
   }
 
   @After
@@ -195,14 +205,16 @@ public class ScoringMediatorServiceImplTest {
     verify(roomService).createRoomForUserAndSave(user, assignment);
   }
 
-    @Test
-    public void deleteQuizAndAssignmentsByStudent() {
-        User actual = mediatorService.deleteQuizAndAssignmentsByStudent(user);
-        assertThat(actual.getId()).isEqualTo(USER_ID);
-        assertThat(actual.getName()).isEqualTo(USERNAME);
-        verify(studentQuizService).findAllByStudentId(USER_ID, pageable, USER_ID);
-        verify(studentQuizService).deleteById(STUDENT_QUIZ_ID);
-        verify(roomService).findAllByStudentId(USER_ID);
-        verify(roomService).deleteRoomById(ROOM_ID);
-    }
+  @Test
+  public void deleteQuizAndAssignmentsByStudent() {
+
+    User actual = mediatorService.deleteQuizAndAssignmentsByStudent(user);
+    assertThat(actual.getId()).isEqualTo(USER_ID);
+    assertThat(actual.getName()).isEqualTo(USERNAME);
+    verify(studentQuizService).findAllByStudentId(USER_ID, pageable, USER_ID);
+    verify(studentQuizService).deleteById(STUDENT_QUIZ_ID);
+    verify(roomService).findAllByStudentId(USER_ID);
+    verify(roomService).deleteRoomById(ROOM_ID);
+  }
+
 }
