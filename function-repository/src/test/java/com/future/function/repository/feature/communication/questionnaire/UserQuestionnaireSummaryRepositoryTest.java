@@ -25,7 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(classes = TestApplication.class)
 public class UserQuestionnaireSummaryRepositoryTest {
 
-  private static final Pageable PAGEABLE = new PageRequest(0,10);
+  private static final Pageable PAGEABLE = new PageRequest(0, 10);
 
   private static final String ID_1 = "id_1";
 
@@ -39,23 +39,23 @@ public class UserQuestionnaireSummaryRepositoryTest {
 
   private static final String ID_MENTOR = "id_mentor";
 
-  private User user1 = User.builder()
-          .id(ID_USER_1)
-          .build();
-
-  private User user2 = User.builder()
-          .id(ID_USER_2)
-          .build();
-
-  private User mentor = User.builder()
-          .id(ID_MENTOR)
-          .build();
-
   private static final String BATCH_ID = "batch_id";
 
+  private User user1 = User.builder()
+    .id(ID_USER_1)
+    .build();
+
+  private User user2 = User.builder()
+    .id(ID_USER_2)
+    .build();
+
+  private User mentor = User.builder()
+    .id(ID_MENTOR)
+    .build();
+
   private Batch batch = Batch.builder()
-          .id(BATCH_ID)
-          .build();
+    .id(BATCH_ID)
+    .build();
 
   @Autowired
   private UserQuestionnaireSummaryRepository userQuestionnaireSummaryRepository;
@@ -65,25 +65,26 @@ public class UserQuestionnaireSummaryRepositoryTest {
 
   @Before
   public void SetUp() {
+
     UserQuestionnaireSummary uQS1 = UserQuestionnaireSummary.builder()
-            .id(ID_1)
-            .appraisee(user1)
-            .batch(batch)
-            .role(Role.STUDENT)
-            .build();
+      .id(ID_1)
+      .appraisee(user1)
+      .batch(batch)
+      .role(Role.STUDENT)
+      .build();
 
     UserQuestionnaireSummary uQS2 = UserQuestionnaireSummary.builder()
-            .id(ID_2)
-            .appraisee(user2)
-            .batch(batch)
-            .role(Role.STUDENT)
-            .build();
+      .id(ID_2)
+      .appraisee(user2)
+      .batch(batch)
+      .role(Role.STUDENT)
+      .build();
 
     UserQuestionnaireSummary mentorSummary = UserQuestionnaireSummary.builder()
-            .id(ID_3)
-            .appraisee(mentor)
-            .role(Role.MENTOR)
-            .build();
+      .id(ID_3)
+      .appraisee(mentor)
+      .role(Role.MENTOR)
+      .build();
 
     userRepository.save(user1);
     userRepository.save(user2);
@@ -95,44 +96,65 @@ public class UserQuestionnaireSummaryRepositoryTest {
 
   @After
   public void TearDown() {
+
     userQuestionnaireSummaryRepository.deleteAll();
     userRepository.deleteAll();
   }
 
   @Test
   public void testByFindingAllUserQuestionnaireSummaryReturnedPagedUserQuestionnaireSummary() {
-    Page<UserQuestionnaireSummary> userQuestionnaireSummaries = userQuestionnaireSummaryRepository.findAllByDeletedFalse(PAGEABLE);
+
+    Page<UserQuestionnaireSummary> userQuestionnaireSummaries =
+      userQuestionnaireSummaryRepository.findAllByDeletedFalse(PAGEABLE);
 
     assertThat(userQuestionnaireSummaries.getTotalElements()).isEqualTo(3);
-    assertThat(userQuestionnaireSummaries.getContent().get(0).getId()).isEqualTo(ID_1);
-    assertThat(userQuestionnaireSummaries.getContent().get(1).getId()).isEqualTo(ID_2);
-    assertThat(userQuestionnaireSummaries.getContent().get(2).getId()).isEqualTo(ID_3);
+    assertThat(userQuestionnaireSummaries.getContent()
+                 .get(0)
+                 .getId()).isEqualTo(ID_1);
+    assertThat(userQuestionnaireSummaries.getContent()
+                 .get(1)
+                 .getId()).isEqualTo(ID_2);
+    assertThat(userQuestionnaireSummaries.getContent()
+                 .get(2)
+                 .getId()).isEqualTo(ID_3);
   }
 
   @Test
   public void testGivenApraiseeByFindingUserQuestionnaireSummaryReturnUserQuestionnaireSummary() {
-    Optional<UserQuestionnaireSummary> userQuestionnaireSummary1 = userQuestionnaireSummaryRepository.findFirstByAppraiseeAndDeletedFalse(user1);
-    Optional<UserQuestionnaireSummary> userQuestionnaireSummary2 = userQuestionnaireSummaryRepository.findFirstByAppraiseeAndDeletedFalse(user2);
 
-    assertThat(userQuestionnaireSummary1.get().getAppraisee().getId()).isEqualTo(ID_USER_1);
-    assertThat(userQuestionnaireSummary2.get().getAppraisee().getId()).isEqualTo(ID_USER_2);
+    Optional<UserQuestionnaireSummary> userQuestionnaireSummary1 =
+      userQuestionnaireSummaryRepository.findFirstByAppraiseeAndDeletedFalse(
+        user1);
+    Optional<UserQuestionnaireSummary> userQuestionnaireSummary2 =
+      userQuestionnaireSummaryRepository.findFirstByAppraiseeAndDeletedFalse(
+        user2);
+
+    assertThat(userQuestionnaireSummary1.get()
+                 .getAppraisee()
+                 .getId()).isEqualTo(ID_USER_1);
+    assertThat(userQuestionnaireSummary2.get()
+                 .getAppraisee()
+                 .getId()).isEqualTo(ID_USER_2);
   }
 
   @Test
   public void testGivenRoleAndBatchByFindingAllUserQuestionnaireSummaryReturnedPagedUserQuestionnaireSummary() {
+
     Page<UserQuestionnaireSummary> userQuestionnaireSummaries =
-      userQuestionnaireSummaryRepository
-        .findAllByRoleOrRoleAndBatchAndDeletedFalse(Role.MENTOR, Role.STUDENT, batch, PAGEABLE);
+      userQuestionnaireSummaryRepository.findAllByRoleOrRoleAndBatchAndDeletedFalse(
+        Role.MENTOR, Role.STUDENT, batch, PAGEABLE);
 
     assertThat(userQuestionnaireSummaries.getTotalElements()).isEqualTo(3);
   }
 
   @Test
   public void testGivenRoleByFindingAllUserQuestionnaireSummaryReturnedPagedUserQuestionnaireSummary() {
+
     Page<UserQuestionnaireSummary> userQuestionnaireSummaries =
-      userQuestionnaireSummaryRepository
-        .findAllByRoleAndDeletedFalse(Role.MENTOR, PAGEABLE);
+      userQuestionnaireSummaryRepository.findAllByRoleAndDeletedFalse(
+        Role.MENTOR, PAGEABLE);
 
     assertThat(userQuestionnaireSummaries.getTotalElements()).isEqualTo(1);
   }
+
 }

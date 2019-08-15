@@ -34,6 +34,7 @@ public class LoggingRoom extends BaseEntity {
   private String description;
 
   @Field(FieldName.LoggingRoom.MEMBERS)
-  @DBRef(lazy= true)
+  @DBRef(lazy = true)
   private List<User> members;
+
 }

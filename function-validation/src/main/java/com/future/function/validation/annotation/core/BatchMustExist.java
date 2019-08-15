@@ -15,13 +15,13 @@ import java.lang.annotation.Target;
 @Target({ ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface BatchMustExist {
-  
+
   String message() default "BatchMustExist";
-  
+
   Class<?>[] groups() default {};
-  
+
   Class<? extends Payload>[] payload() default {};
-  
+
   String field() default "batch";
-  
+
 }

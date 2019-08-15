@@ -21,24 +21,24 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @EqualsAndHashCode(callSuper = true)
 @Document(collection = DocumentName.DISCUSSION)
 public class Discussion extends BaseEntity {
-  
+
   @Id
   private String id;
-  
+
   @Field(FieldName.Discussion.DESCRIPTION)
   private String description;
-  
+
   @Field(FieldName.Discussion.USER)
   @DBRef(lazy = true)
   private User user;
-  
+
   @Field(FieldName.Discussion.COURSE_ID)
   private String courseId;
-  
+
   @Field(FieldName.Discussion.BATCH_ID)
   private String batchId;
-  
+
   @Transient
   private String batchCode;
-  
+
 }

@@ -22,36 +22,36 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import(TestSecurityConfiguration.class)
 @WebMvcTest(value = { ExceptionController.class, BadController.class })
 public class ExceptionControllerTest extends TestHelper {
-  
+
   private static final BaseResponse BAD_REQUEST_RESPONSE =
     ResponseHelper.toBaseResponse(HttpStatus.BAD_REQUEST);
-  
+
   private static final BaseResponse UNAUTHORIZED_RESPONSE =
     ResponseHelper.toBaseResponse(HttpStatus.UNAUTHORIZED);
-  
+
   private static final BaseResponse FORBIDDEN_RESPONSE =
     ResponseHelper.toBaseResponse(HttpStatus.FORBIDDEN);
-  
+
   private static final BaseResponse NOT_FOUND_RESPONSE =
     ResponseHelper.toBaseResponse(HttpStatus.NOT_FOUND);
-  
+
   private static final BaseResponse INTERNAL_SERVER_ERROR_RESPONSE =
     ResponseHelper.toBaseResponse(HttpStatus.INTERNAL_SERVER_ERROR);
-  
+
   @Override
   @Before
   public void setUp() {
-    
+
     super.setUp();
   }
-  
+
   @After
   public void tearDown() {}
-  
+
   @Test
   public void givenBadRequestExceptionRaisedByExceptionHandlingReturnErrorResponse()
     throws Exception {
-    
+
     mockMvc.perform(get("/bad-request"))
       .andExpect(status().is4xxClientError())
       .andExpect(content().json(
@@ -63,11 +63,11 @@ public class ExceptionControllerTest extends TestHelper {
         baseResponseJacksonTester.write(BAD_REQUEST_RESPONSE)
           .getJson()));
   }
-  
+
   @Test
   public void givenUnauthorizedExceptionRaisedByExceptionHandlingReturnErrorResponse()
     throws Exception {
-    
+
     mockMvc.perform(get("/unauthorized"))
       .andExpect(status().is4xxClientError())
       .andExpect(content().json(
@@ -79,11 +79,11 @@ public class ExceptionControllerTest extends TestHelper {
         baseResponseJacksonTester.write(UNAUTHORIZED_RESPONSE)
           .getJson()));
   }
-  
+
   @Test
   public void givenForbiddenExceptionRaisedByExceptionHandlingReturnErrorResponse()
     throws Exception {
-    
+
     mockMvc.perform(get("/forbidden"))
       .andExpect(status().is4xxClientError())
       .andExpect(content().json(
@@ -95,11 +95,11 @@ public class ExceptionControllerTest extends TestHelper {
         baseResponseJacksonTester.write(FORBIDDEN_RESPONSE)
           .getJson()));
   }
-  
+
   @Test
   public void givenNotFoundExceptionRaisedByExceptionHandlingReturnErrorResponse()
     throws Exception {
-    
+
     mockMvc.perform(get("/not-found"))
       .andExpect(status().is4xxClientError())
       .andExpect(content().json(
@@ -116,11 +116,11 @@ public class ExceptionControllerTest extends TestHelper {
         baseResponseJacksonTester.write(NOT_FOUND_RESPONSE)
           .getJson()));
   }
-  
+
   @Test
   public void givenUnsupportedOperationExceptionRaisedByExceptionHandlingReturnErrorResponse()
     throws Exception {
-    
+
     mockMvc.perform(get("/unsupported-operation"))
       .andExpect(status().isBadRequest())
       .andExpect(content().json(
@@ -132,16 +132,16 @@ public class ExceptionControllerTest extends TestHelper {
         baseResponseJacksonTester.write(BAD_REQUEST_RESPONSE)
           .getJson()));
   }
-  
+
   @Test
   public void givenThrowableRaisedByExceptionHandlingReturnErrorResponse()
     throws Exception {
-    
+
     mockMvc.perform(get("/throwable"))
       .andExpect(status().isInternalServerError())
       .andExpect(content().json(
         baseResponseJacksonTester.write(INTERNAL_SERVER_ERROR_RESPONSE)
           .getJson()));
   }
-  
+
 }

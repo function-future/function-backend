@@ -52,21 +52,26 @@ public class MyQuestionnaireServiceImplTest {
 
   private static final String QUESTIONNAIRE_ID_1 = "questionnaireId1";
 
-  private static final String QUESTIONNAIRE_RESPONSE_ID_1 = "questionnaireResponseId1";
+  private static final String QUESTIONNAIRE_RESPONSE_ID_1 =
+    "questionnaireResponseId1";
 
-  private static final String QUESTIONNAIRE_RESPONSE_SUMMARY_ID_1 = "questionnaireResponseSummaryId1";
+  private static final String QUESTIONNAIRE_RESPONSE_SUMMARY_ID_1 =
+    "questionnaireResponseSummaryId1";
 
-  private static final String QUESTIONNAIRE_PARTICIPANT_ID_1 = "questionnaireParticipantId1";
+  private static final String QUESTIONNAIRE_PARTICIPANT_ID_1 =
+    "questionnaireParticipantId1";
 
   private static final String QUESTION_ID_1 = "questionId1";
 
   private static final String QUESTION_RESPONSE_ID_1 = "questionResponseId1";
 
-  private static final String QUESTION_RESPONSE_SUMMARY_ID_1 = "questionResponseSummaryId1";
+  private static final String QUESTION_RESPONSE_SUMMARY_ID_1 =
+    "questionResponseSummaryId1";
 
   private static final float SCORE = (float) 5.0;
 
-  private static final String USER_QUESTIONNAIRE_SUMMARY_ID_1 = "userQuestionnaireSummaryId1";
+  private static final String USER_QUESTIONNAIRE_SUMMARY_ID_1 =
+    "userQuestionnaireSummaryId1";
 
   private QuestionnaireParticipant questionnaireParticipant1;
 
@@ -105,7 +110,8 @@ public class MyQuestionnaireServiceImplTest {
   private QuestionnaireResponseRepository questionnaireResponseRepository;
 
   @Mock
-  private QuestionnaireResponseSummaryRepository questionnaireResponseSummaryRepository;
+  private QuestionnaireResponseSummaryRepository
+    questionnaireResponseSummaryRepository;
 
   @Mock
   private UserQuestionnaireSummaryRepository userQuestionnaireSummaryRepository;
@@ -118,6 +124,7 @@ public class MyQuestionnaireServiceImplTest {
 
   @Before
   public void setUp() {
+
     user1 = User.builder()
       .id(USER_ID_1)
       .build();
@@ -184,140 +191,164 @@ public class MyQuestionnaireServiceImplTest {
 
   @After
   public void tearDown() {
-    verifyNoMoreInteractions(
-      questionnaireParticipantRepository,
-      questionQuestionnaireRepository,
-      questionResponseRepository,
-      questionnaireResponseRepository,
-      questionnaireResponseSummaryRepository,
-      userQuestionnaireSummaryRepository,
-      questionResponseSummaryRepository
+
+    verifyNoMoreInteractions(questionnaireParticipantRepository,
+                             questionQuestionnaireRepository,
+                             questionResponseRepository,
+                             questionnaireResponseRepository,
+                             questionnaireResponseSummaryRepository,
+                             userQuestionnaireSummaryRepository,
+                             questionResponseSummaryRepository
     );
   }
 
   @Test
   public void getQuestionnairesByMemberLoginAsAppraiser() {
-    when(questionnaireParticipantRepository
-      .findAllByMemberAndParticipantTypeAndDeletedFalseOrderByCreatedAtDesc(
-        user1, ParticipantType.APPRAISER, PAGEABLE))
-      .thenReturn(new PageImpl<>(Collections.singletonList(questionnaireParticipant1), PAGEABLE, 1));
+
+    when(
+      questionnaireParticipantRepository.findAllByMemberAndParticipantTypeAndDeletedFalseOrderByCreatedAtDesc(
+        user1, ParticipantType.APPRAISER, PAGEABLE)).thenReturn(
+      new PageImpl<>(Collections.singletonList(questionnaireParticipant1),
+                     PAGEABLE, 1
+      ));
 
     Page<Questionnaire> questionnairePage =
-      myQuestionnaireService.getQuestionnairesByMemberLoginAsAppraiser(user1, PAGEABLE);
+      myQuestionnaireService.getQuestionnairesByMemberLoginAsAppraiser(
+        user1, PAGEABLE);
 
     assertThat(questionnairePage.getTotalElements()).isEqualTo(1);
-    assertThat(questionnairePage.getContent().get(0).getId()).isEqualTo(QUESTIONNAIRE_ID_1);
+    assertThat(questionnairePage.getContent()
+                 .get(0)
+                 .getId()).isEqualTo(QUESTIONNAIRE_ID_1);
 
-    verify(questionnaireParticipantRepository)
-      .findAllByMemberAndParticipantTypeAndDeletedFalseOrderByCreatedAtDesc(
-        user1, ParticipantType.APPRAISER, PAGEABLE);
+    verify(
+      questionnaireParticipantRepository).findAllByMemberAndParticipantTypeAndDeletedFalseOrderByCreatedAtDesc(
+      user1, ParticipantType.APPRAISER, PAGEABLE);
   }
 
   @Test
   public void getListAppraisedByQuestionnaireAndMemberLoginAsAppraiser() {
-    when(questionnaireParticipantRepository
-      .findAllByQuestionnaireAndParticipantTypeAndDeletedFalse(
-        questionnaire1, ParticipantType.APPRAISEE, PAGEABLE))
-      .thenReturn(new PageImpl<>(Collections.singletonList(questionnaireParticipant1), PAGEABLE, 1));
 
-    when(questionnaireResponseRepository
-      .findByQuestionnaireAndAppraiseeAndAppraiserAndDeletedFalse(questionnaire1, user1, memberLoggedIn))
-      .thenReturn(Optional.empty());
+    when(
+      questionnaireParticipantRepository.findAllByQuestionnaireAndParticipantTypeAndDeletedFalse(
+        questionnaire1, ParticipantType.APPRAISEE, PAGEABLE)).thenReturn(
+      new PageImpl<>(Collections.singletonList(questionnaireParticipant1),
+                     PAGEABLE, 1
+      ));
+
+    when(
+      questionnaireResponseRepository.findByQuestionnaireAndAppraiseeAndAppraiserAndDeletedFalse(
+        questionnaire1, user1, memberLoggedIn)).thenReturn(Optional.empty());
 
     List<QuestionnaireParticipant> questionnaireParticipants =
-      myQuestionnaireService.getListAppraisedByQuestionnaireAndMemberLoginAsAppraiser(questionnaire1, memberLoggedIn);
+      myQuestionnaireService.getListAppraisedByQuestionnaireAndMemberLoginAsAppraiser(
+        questionnaire1, memberLoggedIn);
 
     assertThat(questionnaireParticipants.size()).isEqualTo(1);
 
-    verify(questionnaireParticipantRepository)
-      .findAllByQuestionnaireAndParticipantTypeAndDeletedFalse(
-        questionnaire1, ParticipantType.APPRAISEE, PAGEABLE);
+    verify(
+      questionnaireParticipantRepository).findAllByQuestionnaireAndParticipantTypeAndDeletedFalse(
+      questionnaire1, ParticipantType.APPRAISEE, PAGEABLE);
 
-    verify(questionnaireResponseRepository)
-      .findByQuestionnaireAndAppraiseeAndAppraiserAndDeletedFalse(questionnaire1, user1, memberLoggedIn);
+    verify(
+      questionnaireResponseRepository).findByQuestionnaireAndAppraiseeAndAppraiserAndDeletedFalse(
+      questionnaire1, user1, memberLoggedIn);
   }
 
   @Test
   public void getQuestionnaireParticipantById() {
-    when(questionnaireParticipantRepository.findOne(QUESTIONNAIRE_PARTICIPANT_ID_1))
-      .thenReturn(questionnaireParticipant1);
 
-    QuestionnaireParticipant questionnaireParticipant=
-      myQuestionnaireService.getQuestionnaireParticipantById(QUESTIONNAIRE_PARTICIPANT_ID_1);
+    when(questionnaireParticipantRepository.findOne(
+      QUESTIONNAIRE_PARTICIPANT_ID_1)).thenReturn(questionnaireParticipant1);
 
-    assertThat(questionnaireParticipant.getId()).isEqualTo(QUESTIONNAIRE_PARTICIPANT_ID_1);
+    QuestionnaireParticipant questionnaireParticipant =
+      myQuestionnaireService.getQuestionnaireParticipantById(
+        QUESTIONNAIRE_PARTICIPANT_ID_1);
 
-    verify(questionnaireParticipantRepository).findOne(QUESTIONNAIRE_PARTICIPANT_ID_1);
+    assertThat(questionnaireParticipant.getId()).isEqualTo(
+      QUESTIONNAIRE_PARTICIPANT_ID_1);
+
+    verify(questionnaireParticipantRepository).findOne(
+      QUESTIONNAIRE_PARTICIPANT_ID_1);
   }
 
   @Test
   public void getQuestionsFromQuestionnaire() {
 
-    when(questionQuestionnaireRepository.findAllByQuestionnaire(questionnaire1))
-      .thenReturn(Arrays.asList(question1));
+    when(questionQuestionnaireRepository.findAllByQuestionnaire(
+      questionnaire1)).thenReturn(Arrays.asList(question1));
 
     List<QuestionQuestionnaire> questions =
       myQuestionnaireService.getQuestionsFromQuestionnaire(questionnaire1);
 
     assertThat(questions.size()).isEqualTo(1);
-    assertThat(questions.get(0).getId()).isEqualTo(QUESTION_ID_1);
+    assertThat(questions.get(0)
+                 .getId()).isEqualTo(QUESTION_ID_1);
 
-    verify(questionQuestionnaireRepository).findAllByQuestionnaire(questionnaire1);
+    verify(questionQuestionnaireRepository).findAllByQuestionnaire(
+      questionnaire1);
   }
 
   @Test
   public void createQuestionnaireResponseToAppraiseeFromMemberLoginAsAppraiser() {
 
-    when(questionResponseRepository.save(questionResponse1)).thenReturn(questionResponse1);
+    when(questionResponseRepository.save(questionResponse1)).thenReturn(
+      questionResponse1);
 
-    when(questionResponseSummaryRepository
-      .findByAppraiseeAndQuestionQuestionnaireAndDeletedFalse(user1, question1))
-      .thenReturn(Optional.of(questionResponseSummary1));
+    when(
+      questionResponseSummaryRepository.findByAppraiseeAndQuestionQuestionnaireAndDeletedFalse(
+        user1, question1)).thenReturn(Optional.of(questionResponseSummary1));
 
-    when(questionnaireResponseSummaryRepository
-      .findByAppraiseeAndQuestionnaireAndDeletedFalse(user1, questionnaire1))
-      .thenReturn(Optional.of(questionnaireResponseSummary));
+    when(
+      questionnaireResponseSummaryRepository.findByAppraiseeAndQuestionnaireAndDeletedFalse(
+        user1, questionnaire1)).thenReturn(
+      Optional.of(questionnaireResponseSummary));
 
-    when(userQuestionnaireSummaryRepository
-      .findFirstByAppraiseeAndDeletedFalse(user1)).thenReturn(Optional.of(userQuestionnaireSummary));
+    when(userQuestionnaireSummaryRepository.findFirstByAppraiseeAndDeletedFalse(
+      user1)).thenReturn(Optional.of(userQuestionnaireSummary));
 
-    when(questionResponseSummaryRepository.save(questionResponseSummary1))
-      .thenReturn(questionResponseSummary1);
+    when(questionResponseSummaryRepository.save(
+      questionResponseSummary1)).thenReturn(questionResponseSummary1);
 
-    when(questionnaireResponseRepository.save(any(QuestionnaireResponse.class)))
-      .thenReturn(questionnaireResponse1);
+    when(questionnaireResponseRepository.save(
+      any(QuestionnaireResponse.class))).thenReturn(questionnaireResponse1);
 
-    when(questionnaireResponseSummaryRepository.save(questionnaireResponseSummary))
-      .thenReturn(questionnaireResponseSummary);
+    when(questionnaireResponseSummaryRepository.save(
+      questionnaireResponseSummary)).thenReturn(questionnaireResponseSummary);
 
-    when(userQuestionnaireSummaryRepository.save(userQuestionnaireSummary)).thenReturn(userQuestionnaireSummary);
+    when(userQuestionnaireSummaryRepository.save(
+      userQuestionnaireSummary)).thenReturn(userQuestionnaireSummary);
 
     QuestionnaireResponse questionnaireResponse =
       myQuestionnaireService.createQuestionnaireResponseToAppraiseeFromMemberLoginAsAppraiser(
-        questionnaire1,
-        Arrays.asList(questionResponse1),
-        memberLoggedIn,
+        questionnaire1, Arrays.asList(questionResponse1), memberLoggedIn,
         user1
       );
 
-    assertThat(questionnaireResponse.getId()).isEqualTo(QUESTIONNAIRE_RESPONSE_ID_1);
+    assertThat(questionnaireResponse.getId()).isEqualTo(
+      QUESTIONNAIRE_RESPONSE_ID_1);
 
     verify(questionResponseRepository).save(questionResponse1);
 
-    verify(questionResponseSummaryRepository)
-      .findByAppraiseeAndQuestionQuestionnaireAndDeletedFalse(user1, question1);
+    verify(
+      questionResponseSummaryRepository).findByAppraiseeAndQuestionQuestionnaireAndDeletedFalse(
+      user1, question1);
 
-    verify(questionnaireResponseSummaryRepository)
-      .findByAppraiseeAndQuestionnaireAndDeletedFalse(user1, questionnaire1);
+    verify(
+      questionnaireResponseSummaryRepository).findByAppraiseeAndQuestionnaireAndDeletedFalse(
+      user1, questionnaire1);
 
-    verify(userQuestionnaireSummaryRepository)
-      .findFirstByAppraiseeAndDeletedFalse(user1);
+    verify(
+      userQuestionnaireSummaryRepository).findFirstByAppraiseeAndDeletedFalse(
+      user1);
 
     verify(questionResponseSummaryRepository).save(questionResponseSummary1);
 
-    verify(questionnaireResponseRepository).save(any(QuestionnaireResponse.class));
+    verify(questionnaireResponseRepository).save(
+      any(QuestionnaireResponse.class));
 
-    verify(questionnaireResponseSummaryRepository).save(questionnaireResponseSummary);
+    verify(questionnaireResponseSummaryRepository).save(
+      questionnaireResponseSummary);
 
     verify(userQuestionnaireSummaryRepository).save(userQuestionnaireSummary);
   }
@@ -325,50 +356,54 @@ public class MyQuestionnaireServiceImplTest {
   @Test
   public void createQuestionnaireResponseToAppraiseeFromMemberLoginAsAppraiserForFirstTime() {
 
-    when(questionResponseRepository.save(questionResponse1)).thenReturn(questionResponse1);
+    when(questionResponseRepository.save(questionResponse1)).thenReturn(
+      questionResponse1);
 
-    when(questionResponseSummaryRepository
-      .findByAppraiseeAndQuestionQuestionnaireAndDeletedFalse(user1, question1))
-      .thenReturn(Optional.empty());
+    when(
+      questionResponseSummaryRepository.findByAppraiseeAndQuestionQuestionnaireAndDeletedFalse(
+        user1, question1)).thenReturn(Optional.empty());
 
-    when(questionnaireResponseSummaryRepository
-      .findByAppraiseeAndQuestionnaireAndDeletedFalse(user1, questionnaire1))
-      .thenReturn(Optional.empty());
+    when(
+      questionnaireResponseSummaryRepository.findByAppraiseeAndQuestionnaireAndDeletedFalse(
+        user1, questionnaire1)).thenReturn(Optional.empty());
 
-    when(userQuestionnaireSummaryRepository
-      .findFirstByAppraiseeAndDeletedFalse(user1)).thenReturn(Optional.empty());
+    when(userQuestionnaireSummaryRepository.findFirstByAppraiseeAndDeletedFalse(
+      user1)).thenReturn(Optional.empty());
 
-    when(questionResponseSummaryRepository.save(questionResponseSummary1))
-      .thenReturn(questionResponseSummary1);
+    when(questionResponseSummaryRepository.save(
+      questionResponseSummary1)).thenReturn(questionResponseSummary1);
 
-    when(questionnaireResponseRepository.save(any(QuestionnaireResponse.class)))
-      .thenReturn(questionnaireResponse1);
+    when(questionnaireResponseRepository.save(
+      any(QuestionnaireResponse.class))).thenReturn(questionnaireResponse1);
 
-    when(questionnaireResponseSummaryRepository.save(questionnaireResponseSummary))
-      .thenReturn(questionnaireResponseSummary);
+    when(questionnaireResponseSummaryRepository.save(
+      questionnaireResponseSummary)).thenReturn(questionnaireResponseSummary);
 
-    when(userQuestionnaireSummaryRepository.save(userQuestionnaireSummary)).thenReturn(userQuestionnaireSummary);
+    when(userQuestionnaireSummaryRepository.save(
+      userQuestionnaireSummary)).thenReturn(userQuestionnaireSummary);
 
     QuestionnaireResponse questionnaireResponse =
       myQuestionnaireService.createQuestionnaireResponseToAppraiseeFromMemberLoginAsAppraiser(
-        questionnaire1,
-        Arrays.asList(questionResponse1),
-        memberLoggedIn,
+        questionnaire1, Arrays.asList(questionResponse1), memberLoggedIn,
         user1
       );
 
-    assertThat(questionnaireResponse.getId()).isEqualTo(QUESTIONNAIRE_RESPONSE_ID_1);
+    assertThat(questionnaireResponse.getId()).isEqualTo(
+      QUESTIONNAIRE_RESPONSE_ID_1);
 
     verify(questionResponseRepository).save(questionResponse1);
 
-    verify(questionResponseSummaryRepository)
-      .findByAppraiseeAndQuestionQuestionnaireAndDeletedFalse(user1, question1);
+    verify(
+      questionResponseSummaryRepository).findByAppraiseeAndQuestionQuestionnaireAndDeletedFalse(
+      user1, question1);
 
-    verify(questionnaireResponseSummaryRepository)
-      .findByAppraiseeAndQuestionnaireAndDeletedFalse(user1, questionnaire1);
+    verify(
+      questionnaireResponseSummaryRepository).findByAppraiseeAndQuestionnaireAndDeletedFalse(
+      user1, questionnaire1);
 
-    verify(userQuestionnaireSummaryRepository)
-      .findFirstByAppraiseeAndDeletedFalse(user1);
+    verify(
+      userQuestionnaireSummaryRepository).findFirstByAppraiseeAndDeletedFalse(
+      user1);
 
     questionResponseSummary1.setId(null);
     questionResponseSummary1.setScoreSummary(answerUpdated);
@@ -378,14 +413,16 @@ public class MyQuestionnaireServiceImplTest {
 
     verify(questionResponseSummaryRepository).save(questionResponseSummary1);
 
-    verify(questionnaireResponseRepository).save(any(QuestionnaireResponse.class));
+    verify(questionnaireResponseRepository).save(
+      any(QuestionnaireResponse.class));
 
     questionnaireResponseSummary.setId(null);
     questionnaireResponseSummary.setQuestionnaire(questionnaire1);
     questionnaireResponseSummary.setAppraisee(user1);
     questionnaireResponseSummary.setScoreSummary(answerUpdated);
 
-    verify(questionnaireResponseSummaryRepository).save(questionnaireResponseSummary);
+    verify(questionnaireResponseSummaryRepository).save(
+      questionnaireResponseSummary);
 
     userQuestionnaireSummary.setId(null);
     userQuestionnaireSummary.setAppraisee(user1);
@@ -394,4 +431,5 @@ public class MyQuestionnaireServiceImplTest {
 
     verify(userQuestionnaireSummaryRepository).save(userQuestionnaireSummary);
   }
+
 }

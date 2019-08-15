@@ -16,40 +16,45 @@ import java.util.List;
 @Component
 public class ChatroomRequestMapper {
 
-    private final RequestValidator validator;
+  private final RequestValidator validator;
 
-    @Autowired
-    private ChatroomRequestMapper(RequestValidator validator) {
-        this.validator = validator;
+  @Autowired
+  private ChatroomRequestMapper(RequestValidator validator) {
+
+    this.validator = validator;
+  }
+
+  public Chatroom toChatroom(ChatroomRequest request, String chatroomId) {
+
+    return toValidatedChatroom(request, chatroomId);
+  }
+
+  private Chatroom toValidatedChatroom(
+    ChatroomRequest request, String chatroomId
+  ) {
+
+    validator.validate(request);
+
+    List<User> members = new ArrayList<>();
+    request.getMembers()
+      .forEach(userId -> {
+        User member = User.builder()
+          .id(userId)
+          .build();
+        members.add(member);
+      });
+
+    Chatroom chatroom = Chatroom.builder()
+      .title(request.getName())
+      .type(request.getMembers()
+              .size() > 2 ? ChatroomType.GROUP : ChatroomType.PRIVATE)
+      .members(members)
+      .build();
+
+    if (chatroomId != null) {
+      chatroom.setId(chatroomId);
     }
-
-    public Chatroom toChatroom(ChatroomRequest request, String chatroomId) {
-        return toValidatedChatroom(request, chatroomId);
-    }
-
-    private Chatroom toValidatedChatroom(ChatroomRequest request, String chatroomId) {
-        validator.validate(request);
-
-        List<User> members = new ArrayList<>();
-        request.getMembers().forEach(userId -> {
-            User member = User.builder()
-                    .id(userId)
-                    .build();
-            members.add(member);
-        });
-
-        Chatroom chatroom = Chatroom.builder()
-                .title(request.getName())
-                .type(request.getMembers().size() > 2 ?
-                        ChatroomType.GROUP : ChatroomType.PRIVATE)
-                .members(members)
-                .build();
-
-        if (chatroomId != null) {
-            chatroom.setId(chatroomId);
-        }
-        return chatroom;
-    }
-
+    return chatroom;
+  }
 
 }

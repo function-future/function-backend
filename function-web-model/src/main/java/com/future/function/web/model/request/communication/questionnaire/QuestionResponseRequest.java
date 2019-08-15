@@ -23,6 +23,8 @@ public class QuestionResponseRequest {
   private Float score;
 
   @NotBlank(message = "NotBlank")
-  @Size(message = "CommentSize", max = 200)
+  @Size(message = "CommentSize",
+        max = 200)
   private String comment;
+
 }

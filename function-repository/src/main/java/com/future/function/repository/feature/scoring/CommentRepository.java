@@ -9,8 +9,10 @@ import java.util.List;
 
 public interface CommentRepository extends MongoRepository<Comment, String> {
 
-    Page<Comment> findAllByRoomIdOrderByCreatedAtDesc(String roomId, Pageable pageable);
+  Page<Comment> findAllByRoomIdOrderByCreatedAtDesc(
+    String roomId, Pageable pageable
+  );
 
-    List<Comment> findAllByRoomIdOrderByCreatedAtDesc(String roomId);
+  List<Comment> findAllByRoomIdOrderByCreatedAtDesc(String roomId);
 
 }

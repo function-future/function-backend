@@ -46,99 +46,100 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import(TestSecurityConfiguration.class)
 @WebMvcTest(value = BatchController.class)
 public class BatchControllerTest extends TestHelper {
-  
+
   private static final String FIRST_BATCH_ID = "id-1";
-  
+
   private static final String FIRST_BATCH_CODE = "1";
-  
+
   private static final String FIRST_BATCH_NAME = "name-1";
-  
+
   private static final String SECOND_BATCH_ID = "id-2";
-  
+
   private static final String SECOND_BATCH_CODE = "2";
-  
+
   private static final String SECOND_BATCH_NAME = "name-2";
-  
+
   private static final Batch FIRST_BATCH = Batch.builder()
     .id(FIRST_BATCH_ID)
     .name(FIRST_BATCH_NAME)
     .code(FIRST_BATCH_CODE)
     .build();
-  
+
   private static final Batch SECOND_BATCH = Batch.builder()
     .id(SECOND_BATCH_ID)
     .name(SECOND_BATCH_NAME)
     .code(SECOND_BATCH_CODE)
     .build();
-  
-  private BatchWebRequest batchWebRequest;
-  
+
   private static final Pageable PAGEABLE = new PageRequest(0, 10);
-  
+
   private static final Page<Batch> BATCH_PAGE = new PageImpl<>(
     Arrays.asList(FIRST_BATCH, SECOND_BATCH), PAGEABLE, 2);
-  
+
   private static final PagingResponse<BatchWebResponse> BATCHES_DATA_RESPONSE =
     BatchResponseMapper.toBatchesPagingResponse(BATCH_PAGE);
-  
+
   private static final DataResponse<BatchWebResponse> RETRIEVED_DATA_RESPONSE =
     BatchResponseMapper.toBatchDataResponse(FIRST_BATCH);
-  
+
   private static final DataResponse<BatchWebResponse> CREATED_DATA_RESPONSE =
     BatchResponseMapper.toBatchDataResponse(HttpStatus.CREATED, FIRST_BATCH);
-  
+
   private static final BaseResponse OK_BASE_RESPONSE =
     ResponseHelper.toBaseResponse(HttpStatus.OK);
-  
+
+  private BatchWebRequest batchWebRequest;
+
   private JacksonTester<BatchWebRequest> batchWebRequestJacksonTester;
-  
+
   @MockBean
   private BatchService batchService;
-  
+
   @MockBean
   private BatchRequestMapper batchRequestMapper;
-  
+
   @Override
   @Before
   public void setUp() {
-    
+
     super.setUp();
     super.setCookie(Role.ADMIN);
   }
-  
+
   @After
   public void tearDown() {
-    
+
     verifyNoMoreInteractions(batchService, batchRequestMapper);
   }
-  
+
   @Test
   public void testGivenCallToBatchesApiByFindingBatchesFromBatchServiceReturnListOfBatchNumbers()
     throws Exception {
-    
-    when(batchService.getBatches(ADMIN_SESSION, PAGEABLE)).thenReturn(BATCH_PAGE);
-    
+
+    when(batchService.getBatches(ADMIN_SESSION, PAGEABLE)).thenReturn(
+      BATCH_PAGE);
+
     mockMvc.perform(get("/api/core/batches").cookie(cookies))
       .andExpect(status().isOk())
       .andExpect(content().json(
         pagingResponseJacksonTester.write(BATCHES_DATA_RESPONSE)
           .getJson()));
-    
+
     verify(batchService).getBatches(ADMIN_SESSION, PAGEABLE);
   }
-  
+
   @Test
   public void testGivenCallToBatchesApiByCreatingBatchReturnNewBatchResponse()
     throws Exception {
-    
+
     batchWebRequest = BatchWebRequest.builder()
       .name(FIRST_BATCH_NAME)
       .code(FIRST_BATCH_CODE)
       .build();
-    
+
     when(batchRequestMapper.toBatch(batchWebRequest)).thenReturn(FIRST_BATCH);
     when(batchService.createBatch(FIRST_BATCH)).thenReturn(FIRST_BATCH);
-    
+
     mockMvc.perform(post("/api/core/batches").cookie(cookies)
                       .contentType(MediaType.APPLICATION_JSON)
                       .content(
@@ -148,42 +149,42 @@ public class BatchControllerTest extends TestHelper {
       .andExpect(content().json(
         dataResponseJacksonTester.write(CREATED_DATA_RESPONSE)
           .getJson()));
-    
+
     verify(batchRequestMapper).toBatch(batchWebRequest);
     verify(batchService).createBatch(FIRST_BATCH);
   }
-  
+
   @Test
   public void testGivenCallToBatchesApiByGettingBatchReturnDataResponseObject()
     throws Exception {
-    
+
     when(batchService.getBatchById(FIRST_BATCH_ID)).thenReturn(FIRST_BATCH);
-    
+
     mockMvc.perform(get("/api/core/batches/" + FIRST_BATCH_ID).cookie(cookies))
       .andExpect(status().isOk())
       .andExpect(content().json(
         dataResponseJacksonTester.write(RETRIEVED_DATA_RESPONSE)
           .getJson()));
-    
+
     verify(batchService).getBatchById(FIRST_BATCH_ID);
     verifyZeroInteractions(batchRequestMapper);
   }
-  
+
   @Test
   public void testGivenCallToBatchesApiByUpdatingBatchReturnDataResponseObject()
     throws Exception {
-    
+
     batchWebRequest = BatchWebRequest.builder()
       .id(FIRST_BATCH_ID)
       .name(FIRST_BATCH_NAME)
       .code(FIRST_BATCH_CODE)
       .build();
-    
+
     when(
       batchRequestMapper.toBatch(FIRST_BATCH_ID, batchWebRequest)).thenReturn(
       FIRST_BATCH);
     when(batchService.updateBatch(FIRST_BATCH)).thenReturn(FIRST_BATCH);
-    
+
     mockMvc.perform(put("/api/core/batches/" + FIRST_BATCH_ID).cookie(cookies)
                       .contentType(MediaType.APPLICATION_JSON)
                       .content(
@@ -193,24 +194,24 @@ public class BatchControllerTest extends TestHelper {
       .andExpect(content().json(
         dataResponseJacksonTester.write(RETRIEVED_DATA_RESPONSE)
           .getJson()));
-    
+
     verify(batchRequestMapper).toBatch(FIRST_BATCH_ID, batchWebRequest);
     verify(batchService).updateBatch(FIRST_BATCH);
   }
-  
+
   @Test
   public void testGivenCallToBatchesApiByDeletingBatchReturnBaseResponseObject()
     throws Exception {
-    
+
     mockMvc.perform(
       delete("/api/core/batches/" + FIRST_BATCH_ID).cookie(cookies))
       .andExpect(status().isOk())
       .andExpect(content().json(
         baseResponseJacksonTester.write(OK_BASE_RESPONSE)
           .getJson()));
-    
+
     verify(batchService).deleteBatch(FIRST_BATCH_ID);
     verifyZeroInteractions(batchRequestMapper);
   }
-  
+
 }

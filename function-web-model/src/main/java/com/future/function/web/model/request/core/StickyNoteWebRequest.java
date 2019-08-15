@@ -11,11 +11,11 @@ import org.hibernate.validator.constraints.NotBlank;
 @NoArgsConstructor
 @AllArgsConstructor
 public class StickyNoteWebRequest {
-  
+
   @NotBlank(message = "NotBlank")
   private String title;
-  
+
   @NotBlank(message = "NotBlank")
   private String description;
-  
+
 }

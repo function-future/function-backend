@@ -16,43 +16,43 @@ import static org.assertj.core.api.Assertions.assertThat;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = TestApplication.class)
 public class FileMongoEventListenerTest {
-  
+
   @Autowired
   private FileRepositoryV2 fileRepository;
-  
+
   @Before
   public void setUp() {}
-  
+
   @After
   public void tearDown() {
-    
+
     fileRepository.deleteAll();
   }
-  
+
   @Test
   public void testGivenFileNotMarkedFolderSaveOperationByListeningToBeforeConversionEventToUpdateFileVersionReturnSuccessfulUpdate() {
-    
+
     String id = "id";
     String filePath = "file-path";
     String fileUrl = "file-url";
-    
+
     FileV2 file = FileV2.builder()
       .id(id)
       .filePath(filePath)
       .fileUrl(fileUrl)
       .build();
-    
+
     fileRepository.save(file);
     fileRepository.save(file);
     fileRepository.save(file);
-    
+
     FileV2 foundFile = fileRepository.findOne(id);
-    
+
     assertThat(foundFile.getId()).isEqualTo(id);
     assertThat(foundFile.getFilePath()).isEqualTo(filePath);
     assertThat(foundFile.getFileUrl()).isEqualTo(fileUrl);
     assertThat(foundFile.getVersion()).isEqualTo(2);
-    
+
     assertThat(foundFile.getVersions()).isNotEmpty();
     assertThat(foundFile.getVersions()
                  .get(1L)
@@ -73,57 +73,57 @@ public class FileMongoEventListenerTest {
                  .get(2L)
                  .getPath()).isEqualTo(filePath);
   }
-  
+
   @Test
   public void testGivenFileMarkedAsResourceSaveOperationByListeningToBeforeConversionEventToUpdateFileVersionReturnSuccessfulUpdate() {
-    
+
     String id = "id";
     String filePath = "file-path";
     String fileUrl = "file-url";
-    
+
     FileV2 file = FileV2.builder()
       .id(id)
       .filePath(filePath)
       .fileUrl(fileUrl)
       .asResource(true)
       .build();
-    
+
     fileRepository.save(file);
-    
+
     FileV2 foundFile = fileRepository.findOne(id);
-    
+
     assertThat(foundFile.getId()).isEqualTo(id);
     assertThat(foundFile.getFilePath()).isEqualTo(filePath);
     assertThat(foundFile.getFileUrl()).isEqualTo(fileUrl);
     assertThat(foundFile.getVersion()).isEqualTo(0);
-    
+
     assertThat(foundFile.getVersions()).isEmpty();
   }
-  
+
   @Test
   public void testGivenFileV2MarkedFolderSaveOperationByListeningToBeforeConversionEventToUpdateFileVersionReturnSuccessfulUpdate() {
-    
+
     String id = "id";
     String filePath = "file-path";
     String fileUrl = "file-url";
-    
+
     FileV2 file = FileV2.builder()
       .id(id)
       .filePath(filePath)
       .fileUrl(fileUrl)
       .markFolder(true)
       .build();
-    
+
     fileRepository.save(file);
-    
+
     FileV2 foundFile = fileRepository.findOne(id);
-    
+
     assertThat(foundFile.getId()).isEqualTo(id);
     assertThat(foundFile.getFilePath()).isEqualTo(filePath);
     assertThat(foundFile.getFileUrl()).isEqualTo(fileUrl);
     assertThat(foundFile.getVersion()).isEqualTo(0);
-    
+
     assertThat(foundFile.getVersions()).isEmpty();
   }
-  
+
 }

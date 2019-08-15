@@ -35,49 +35,67 @@ public class NotificationController {
   private final NotificationRequestMapper notificationRequestMapper;
 
   @Autowired
-  public NotificationController(NotificationService notificationService, NotificationRequestMapper notificationRequestMapper) {
+  public NotificationController(
+    NotificationService notificationService,
+    NotificationRequestMapper notificationRequestMapper
+  ) {
+
     this.notificationService = notificationService;
     this.notificationRequestMapper = notificationRequestMapper;
   }
 
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   public PagingResponse<NotificationResponse> getNotifications(
-          @WithAnyRole(roles = {Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT})
-          Session session,
-          @RequestParam(defaultValue = "1", required = false)
-          int page,
-          @RequestParam(defaultValue = "10", required = false)
-          int size
+    @WithAnyRole(roles = { Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT })
+      Session session,
+    @RequestParam(defaultValue = "1",
+                  required = false)
+      int page,
+    @RequestParam(defaultValue = "10",
+                  required = false)
+      int size
   ) {
+
     return NotificationResponseMapper.toPagingNotificationResponse(
-            notificationService.getNotifications(session, PageHelper.toPageable(page, size)));
+      notificationService.getNotifications(session,
+                                           PageHelper.toPageable(page, size)
+      ));
   }
 
-  @GetMapping(value = "/_unseen_total", produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping(value = "/_unseen_total",
+              produces = MediaType.APPLICATION_JSON_VALUE)
   public DataResponse<NotificationTotalUnseenResponse> getTotalUnseen(
-          @WithAnyRole(roles = {Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT})
-          Session session
+    @WithAnyRole(roles = { Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT })
+      Session session
   ) {
+
     return NotificationResponseMapper.toNotificationTotalUnseenResponse(
-            notificationService.getTotalUnseenNotifications(session));
+      notificationService.getTotalUnseenNotifications(session));
   }
 
-  @PostMapping(
-          produces = MediaType.APPLICATION_JSON_VALUE,
-          consumes = MediaType.APPLICATION_JSON_VALUE)
+  @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE,
+               consumes = MediaType.APPLICATION_JSON_VALUE)
   public DataResponse<NotificationResponse> createNotification(
-          @WithAnyRole(roles = Role.ADMIN) Session session,
-          @RequestBody NotificationRequest data) {
+    @WithAnyRole(roles = Role.ADMIN)
+      Session session,
+    @RequestBody
+      NotificationRequest data
+  ) {
+
     return NotificationResponseMapper.toSingleNotificationResponse(
-            notificationService.createNotification(notificationRequestMapper.toNotification(data)));
+      notificationService.createNotification(
+        notificationRequestMapper.toNotification(data)));
   }
 
-  @PutMapping(value = "/{notificationId:.+}/_read", produces = MediaType.APPLICATION_JSON_VALUE)
+  @PutMapping(value = "/{notificationId:.+}/_read",
+              produces = MediaType.APPLICATION_JSON_VALUE)
   public BaseResponse readNotification(
-          @WithAnyRole(roles = {Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT})
-          Session session,
-          @PathVariable String notificationId
+    @WithAnyRole(roles = { Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT })
+      Session session,
+    @PathVariable
+      String notificationId
   ) {
+
     notificationService.updateSeenNotification(notificationId);
     return ResponseHelper.toBaseResponse(HttpStatus.OK);
   }

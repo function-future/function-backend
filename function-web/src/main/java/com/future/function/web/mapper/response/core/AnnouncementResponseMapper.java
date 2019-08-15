@@ -17,28 +17,28 @@ import java.util.stream.Collectors;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class AnnouncementResponseMapper {
-  
+
   public static DataResponse<AnnouncementWebResponse> toAnnouncementDataResponse(
     Announcement announcement, String urlPrefix
   ) {
-    
+
     return toAnnouncementDataResponse(HttpStatus.OK, announcement, urlPrefix);
   }
-  
+
   public static DataResponse<AnnouncementWebResponse> toAnnouncementDataResponse(
     HttpStatus httpStatus, Announcement announcement, String urlPrefix
   ) {
-    
+
     return ResponseHelper.toDataResponse(httpStatus,
                                          buildAnnouncementWebResponse(
                                            announcement, urlPrefix)
     );
   }
-  
+
   private static AnnouncementWebResponse buildAnnouncementWebResponse(
     Announcement announcement, String urlPrefix
   ) {
-    
+
     return AnnouncementWebResponse.builder()
       .id(announcement.getId())
       .title(announcement.getTitle())
@@ -49,22 +49,22 @@ public class AnnouncementResponseMapper {
       .updatedAt(announcement.getUpdatedAt())
       .build();
   }
-  
+
   public static PagingResponse<AnnouncementWebResponse> toAnnouncementsPagingResponse(
     Page<Announcement> data, String urlPrefix
   ) {
-    
+
     return ResponseHelper.toPagingResponse(HttpStatus.OK,
                                            toAnnouncementWebResponseList(data,
                                                                          urlPrefix
                                            ), PageHelper.toPaging(data)
     );
   }
-  
+
   private static List<AnnouncementWebResponse> toAnnouncementWebResponseList(
     Page<Announcement> data, String urlPrefix
   ) {
-    
+
     return data.getContent()
       .stream()
       .map(
@@ -72,5 +72,5 @@ public class AnnouncementResponseMapper {
           announcement, urlPrefix))
       .collect(Collectors.toList());
   }
-  
+
 }

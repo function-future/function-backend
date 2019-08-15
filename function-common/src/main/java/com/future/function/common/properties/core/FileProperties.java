@@ -31,4 +31,5 @@ public class FileProperties {
   private long schedulerActivePeriod = 86400000L;
 
   private long minimumFileCreatedPeriod = 21600000L;
+
 }

@@ -4,6 +4,8 @@ import com.future.function.model.vo.scoring.StudentSummaryVO;
 
 public interface SummaryService {
 
-    StudentSummaryVO findAllPointSummaryByStudentId(String studentId, String userId);
+  StudentSummaryVO findAllPointSummaryByStudentId(
+    String studentId, String userId
+  );
 
 }

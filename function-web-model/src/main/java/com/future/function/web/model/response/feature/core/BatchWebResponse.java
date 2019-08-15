@@ -11,12 +11,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BatchWebResponse {
-  
+
   private String id;
-  
+
   @JsonInclude(value = JsonInclude.Include.NON_NULL)
   private String name;
-  
+
   private String code;
-  
+
 }

@@ -33,7 +33,7 @@ public class ResourceController {
   private final ResourceService resourceService;
 
   private final ResourceRequestMapper resourceRequestMapper;
-  
+
   private final FileProperties fileProperties;
 
   public ResourceController(

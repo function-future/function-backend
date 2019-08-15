@@ -15,13 +15,13 @@ import java.lang.annotation.Target;
 @Target({ ElementType.TYPE, ElementType.TYPE_USE })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface EmailMustBeUnique {
-  
+
   String message() default "EmailMustBeUnique";
-  
+
   Class<?>[] groups() default {};
-  
+
   Class<? extends Payload>[] payload() default {};
-  
+
   String field() default "email";
-  
+
 }

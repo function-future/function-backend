@@ -24,10 +24,14 @@ import org.springframework.web.bind.annotation.*;
 public class QuizController {
 
   private QuizService quizService;
+
   private QuizRequestMapper quizRequestMapper;
 
   @Autowired
-  public QuizController(QuizService quizService, QuizRequestMapper quizRequestMapper) {
+  public QuizController(
+    QuizService quizService, QuizRequestMapper quizRequestMapper
+  ) {
+
     this.quizService = quizService;
     this.quizRequestMapper = quizRequestMapper;
   }
@@ -35,57 +39,104 @@ public class QuizController {
   @ResponseStatus(value = HttpStatus.OK)
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   public PagingResponse<QuizWebResponse> getAllQuiz(
-          @PathVariable String batchCode,
-          @RequestParam(defaultValue = "1") int page,
-          @RequestParam(defaultValue = "10") int size,
-          @WithAnyRole(roles = {Role.ADMIN, Role.JUDGE, Role.MENTOR}) Session session
+    @PathVariable
+      String batchCode,
+    @RequestParam(defaultValue = "1")
+      int page,
+    @RequestParam(defaultValue = "10")
+      int size,
+    @WithAnyRole(roles = { Role.ADMIN, Role.JUDGE, Role.MENTOR })
+      Session session
   ) {
-    return QuizResponseMapper
-        .toQuizWebPagingResponse(
-            quizService.findAllByBatchCodeAndPageable(batchCode, PageHelper.toPageable(page, size)));
+
+    return QuizResponseMapper.toQuizWebPagingResponse(
+      quizService.findAllByBatchCodeAndPageable(batchCode,
+                                                PageHelper.toPageable(page,
+                                                                      size
+                                                )
+      ));
   }
 
   @ResponseStatus(value = HttpStatus.OK)
-  @GetMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-  public DataResponse<QuizWebResponse> getQuizById(@PathVariable String id,
-      @WithAnyRole(roles = {Role.ADMIN, Role.JUDGE, Role.MENTOR}) Session session) {
+  @GetMapping(path = "/{id}",
+              produces = MediaType.APPLICATION_JSON_VALUE)
+  public DataResponse<QuizWebResponse> getQuizById(
+    @PathVariable
+      String id,
+    @WithAnyRole(roles = { Role.ADMIN, Role.JUDGE, Role.MENTOR })
+      Session session
+  ) {
+
     return QuizResponseMapper.toQuizWebDataResponse(quizService.findById(id));
   }
 
   @ResponseStatus(HttpStatus.CREATED)
-  @PostMapping(value = "/copy", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-  public DataResponse<QuizWebResponse> copyQuiz(@RequestBody CopyQuizWebRequest request,
-      @WithAnyRole(roles = Role.ADMIN) Session session) {
+  @PostMapping(value = "/copy",
+               consumes = MediaType.APPLICATION_JSON_VALUE,
+               produces = MediaType.APPLICATION_JSON_VALUE)
+  public DataResponse<QuizWebResponse> copyQuiz(
+    @RequestBody
+      CopyQuizWebRequest request,
+    @WithAnyRole(roles = Role.ADMIN)
+      Session session
+  ) {
+
     request = quizRequestMapper.validateCopyQuizWebRequest(request);
-    return QuizResponseMapper
-        .toQuizWebDataResponse(
-            HttpStatus.CREATED,
-                quizService.copyQuizWithTargetBatchCode(request.getBatchCode(),
-                        quizService.findById(request.getQuizId())));
+    return QuizResponseMapper.toQuizWebDataResponse(HttpStatus.CREATED,
+                                                    quizService.copyQuizWithTargetBatchCode(
+                                                      request.getBatchCode(),
+                                                      quizService.findById(
+                                                        request.getQuizId())
+                                                    )
+    );
   }
 
   @ResponseStatus(value = HttpStatus.CREATED)
-  @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-  public DataResponse<QuizWebResponse> createQuiz(@PathVariable("batchCode") String batchCode,
-                                                  @RequestBody QuizWebRequest quizWebRequest,
-                                                  @WithAnyRole(roles = Role.ADMIN) Session session) {
-    return QuizResponseMapper
-            .toQuizWebDataResponse(HttpStatus.CREATED, quizService.createQuiz(quizRequestMapper.toQuiz(quizWebRequest,
-                    batchCode)));
+  @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE,
+               produces = MediaType.APPLICATION_JSON_VALUE)
+  public DataResponse<QuizWebResponse> createQuiz(
+    @PathVariable("batchCode")
+      String batchCode,
+    @RequestBody
+      QuizWebRequest quizWebRequest,
+    @WithAnyRole(roles = Role.ADMIN)
+      Session session
+  ) {
+
+    return QuizResponseMapper.toQuizWebDataResponse(
+      HttpStatus.CREATED, quizService.createQuiz(quizRequestMapper.toQuiz(
+        quizWebRequest, batchCode)));
   }
 
   @ResponseStatus(value = HttpStatus.OK)
-  @PutMapping(path = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-  public DataResponse<QuizWebResponse> updateQuiz(@PathVariable("batchCode") String batchCode,
-                                                  @PathVariable("id") String id, @RequestBody QuizWebRequest request,
-                                                  @WithAnyRole(roles = Role.ADMIN) Session session) {
-    return QuizResponseMapper.toQuizWebDataResponse(quizService.updateQuiz(quizRequestMapper.toQuiz(id, request,
-            batchCode)));
+  @PutMapping(path = "/{id}",
+              consumes = MediaType.APPLICATION_JSON_VALUE,
+              produces = MediaType.APPLICATION_JSON_VALUE)
+  public DataResponse<QuizWebResponse> updateQuiz(
+    @PathVariable("batchCode")
+      String batchCode,
+    @PathVariable("id")
+      String id,
+    @RequestBody
+      QuizWebRequest request,
+    @WithAnyRole(roles = Role.ADMIN)
+      Session session
+  ) {
+
+    return QuizResponseMapper.toQuizWebDataResponse(
+      quizService.updateQuiz(quizRequestMapper.toQuiz(id, request, batchCode)));
   }
 
   @ResponseStatus(value = HttpStatus.OK)
-  @DeleteMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-  public BaseResponse deleteQuizById(@PathVariable String id, @WithAnyRole(roles = Role.ADMIN) Session session) {
+  @DeleteMapping(path = "/{id}",
+                 produces = MediaType.APPLICATION_JSON_VALUE)
+  public BaseResponse deleteQuizById(
+    @PathVariable
+      String id,
+    @WithAnyRole(roles = Role.ADMIN)
+      Session session
+  ) {
+
     quizService.deleteById(id);
     return ResponseHelper.toBaseResponse(HttpStatus.OK);
   }

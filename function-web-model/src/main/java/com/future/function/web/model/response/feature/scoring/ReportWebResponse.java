@@ -16,12 +16,18 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ReportWebResponse {
 
-    private String id;
-    private String name;
-    private String description;
-    private String batchCode;
-    private int studentCount;
-    private long uploadedDate;
-    private List<UserWebResponse> students;
+  private String id;
+
+  private String name;
+
+  private String description;
+
+  private String batchCode;
+
+  private int studentCount;
+
+  private long uploadedDate;
+
+  private List<UserWebResponse> students;
 
 }

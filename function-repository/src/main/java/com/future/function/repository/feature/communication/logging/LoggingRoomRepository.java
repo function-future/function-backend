@@ -6,14 +6,23 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-public interface LoggingRoomRepository extends MongoRepository<LoggingRoom, String> {
+public interface LoggingRoomRepository
+  extends MongoRepository<LoggingRoom, String> {
 
-    Page<LoggingRoom> findAllByDeletedFalseOrderByCreatedAtDesc(Pageable pageable);
+  Page<LoggingRoom> findAllByDeletedFalseOrderByCreatedAtDesc(
+    Pageable pageable
+  );
 
-    Page<LoggingRoom> findAllByTitleContainingIgnoreCaseAndDeletedFalseOrderByCreatedAtDesc(String keyword, Pageable pageable);
+  Page<LoggingRoom> findAllByTitleContainingIgnoreCaseAndDeletedFalseOrderByCreatedAtDesc(
+    String keyword, Pageable pageable
+  );
 
-    Page<LoggingRoom> findAllByMembersAndDeletedFalseOrderByCreatedAtDesc(User member, Pageable pageable);
+  Page<LoggingRoom> findAllByMembersAndDeletedFalseOrderByCreatedAtDesc(
+    User member, Pageable pageable
+  );
 
-    Page<LoggingRoom> findAllByTitleContainingIgnoreCaseAndMembersAndDeletedFalseOrderByCreatedAtDesc(String keyword, User member, Pageable pageable);
+  Page<LoggingRoom> findAllByTitleContainingIgnoreCaseAndMembersAndDeletedFalseOrderByCreatedAtDesc(
+    String keyword, User member, Pageable pageable
+  );
 
 }

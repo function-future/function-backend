@@ -6,7 +6,8 @@ import org.springframework.data.domain.Pageable;
 
 public interface LogMessageService {
 
-    Page<LogMessage> getLogMessagesByTopic (String topicId, Pageable pageable);
+  Page<LogMessage> getLogMessagesByTopic(String topicId, Pageable pageable);
 
-    LogMessage createLogMessage (LogMessage logMessage);
+  LogMessage createLogMessage(LogMessage logMessage);
+
 }

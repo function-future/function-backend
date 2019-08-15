@@ -29,6 +29,8 @@ public class AssignmentWebRequest {
   private Long deadline;
 
   @FileMustExist
-  @Size(max = 1, message = "Size")
+  @Size(max = 1,
+        message = "Size")
   private List<String> files;
+
 }

@@ -25,27 +25,34 @@ public class ReminderRepositoryTest {
 
   @Before
   public void setUp() {
+
     Reminder reminder = Reminder.builder()
-            .title(TITLE)
-            .build();
+      .title(TITLE)
+      .build();
 
     reminderRepository.save(reminder);
   }
 
   @After
   public void tearDown() {
+
     reminderRepository.deleteAll();
   }
 
   @Test
   public void testGivenKeywordAndPagingByFindingAllReminderReturnPaging() {
-    Page<Reminder> reminders = reminderRepository.findAllByTitleContainingIgnoreCaseOrderByUpdatedAtDesc(
-            "test",
-            new PageRequest(0, 10)
-    );
 
-    Assertions.assertThat(reminders.getContent().size()).isEqualTo(1);
-    Assertions.assertThat(reminders.getContent().get(0).getTitle()).isEqualTo(TITLE);
+    Page<Reminder> reminders =
+      reminderRepository.findAllByTitleContainingIgnoreCaseOrderByUpdatedAtDesc(
+        "test", new PageRequest(0, 10));
+
+    Assertions.assertThat(reminders.getContent()
+                            .size())
+      .isEqualTo(1);
+    Assertions.assertThat(reminders.getContent()
+                            .get(0)
+                            .getTitle())
+      .isEqualTo(TITLE);
   }
 
 }

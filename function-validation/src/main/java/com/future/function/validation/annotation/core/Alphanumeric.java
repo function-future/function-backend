@@ -15,11 +15,11 @@ import java.lang.annotation.Target;
 @Target({ ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Alphanumeric {
-  
+
   String message() default "Alphanumeric";
-  
+
   Class<?>[] groups() default {};
-  
+
   Class<? extends Payload>[] payload() default {};
-  
+
 }

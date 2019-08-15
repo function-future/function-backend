@@ -20,14 +20,14 @@ import java.util.Map;
 @AllArgsConstructor
 @Document(collection = DocumentName.MENU)
 public class Menu {
-  
+
   @Id
   private String id;
-  
+
   @Field(FieldName.Menu.ROLE)
   private Role role;
-  
+
   @Field(FieldName.Menu.SECTIONS)
   private Map<String, Object> sections = new HashMap<>();
-  
+
 }

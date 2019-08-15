@@ -13,7 +13,9 @@ public interface QuestionnaireService {
 
   Page<Questionnaire> getAllQuestionnaires(Pageable pageable);
 
-  Page<Questionnaire> getQuestionnairesWithKeyword(String keyword, Pageable pageable);
+  Page<Questionnaire> getQuestionnairesWithKeyword(
+    String keyword, Pageable pageable
+  );
 
   Questionnaire getQuestionnaire(String questionnaireId);
 
@@ -25,30 +27,50 @@ public interface QuestionnaireService {
 
   // Questionnaire Questions
   // '/api/communication.questionnaires/{questionnaireId}/questions
-  List<QuestionQuestionnaire> getQuestionsByIdQuestionnaire(String questionnaireId);
+  List<QuestionQuestionnaire> getQuestionsByIdQuestionnaire(
+    String questionnaireId
+  );
 
-  QuestionQuestionnaire getQuestionQuestionnaire(String questionQuestionnaireId);
+  QuestionQuestionnaire getQuestionQuestionnaire(
+    String questionQuestionnaireId
+  );
 
-  QuestionQuestionnaire createQuestionQuestionnaire(QuestionQuestionnaire questionQuestionnaire);
+  QuestionQuestionnaire createQuestionQuestionnaire(
+    QuestionQuestionnaire questionQuestionnaire
+  );
 
-  QuestionQuestionnaire updateQuestionQuestionnaire(QuestionQuestionnaire questionQuestionnaire);
+  QuestionQuestionnaire updateQuestionQuestionnaire(
+    QuestionQuestionnaire questionQuestionnaire
+  );
 
   void deleteQuestionQuestionnaire(String questionquestionnaireId);
 
   //Questionnaire Appraiser
 
-  Page<QuestionnaireParticipant> getQuestionnaireAppraiser(Questionnaire questionnaire,Pageable pageable);
+  Page<QuestionnaireParticipant> getQuestionnaireAppraiser(
+    Questionnaire questionnaire, Pageable pageable
+  );
 
-  QuestionnaireParticipant addQuestionnaireAppraiserToQuestionnaire(String questionnaireId, String appraiserId);
+  QuestionnaireParticipant addQuestionnaireAppraiserToQuestionnaire(
+    String questionnaireId, String appraiserId
+  );
 
-  void deleteQuestionnaireAppraiserFromQuestionnaire(String questionnaireParticipantId);
+  void deleteQuestionnaireAppraiserFromQuestionnaire(
+    String questionnaireParticipantId
+  );
 
   //Questionnaire Appraisee
 
-  Page<QuestionnaireParticipant> getQuestionnaireAppraisee(Questionnaire questionnaire, Pageable pageable);
+  Page<QuestionnaireParticipant> getQuestionnaireAppraisee(
+    Questionnaire questionnaire, Pageable pageable
+  );
 
-  QuestionnaireParticipant addQuestionnaireAppraiseeToQuestionnaire(String questionnaireId, String appraiseeId);
+  QuestionnaireParticipant addQuestionnaireAppraiseeToQuestionnaire(
+    String questionnaireId, String appraiseeId
+  );
 
-  void deleteQuestionnaireAppraiseeFromQuestionnaire(String questionnaireParticipantId);
+  void deleteQuestionnaireAppraiseeFromQuestionnaire(
+    String questionnaireParticipantId
+  );
 
 }

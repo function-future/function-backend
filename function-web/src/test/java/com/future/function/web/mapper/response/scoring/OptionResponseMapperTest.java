@@ -18,43 +18,55 @@ public class OptionResponseMapperTest {
   private static final String OPTION_LABEL = "option-label";
 
   private Option option;
+
   private OptionWebResponse optionWebResponse;
 
   @Before
   public void setUp() throws Exception {
-    option = Option
-        .builder()
-        .label(OPTION_LABEL)
-        .build();
 
-    optionWebResponse = OptionWebResponse
-        .builder()
-        .label(OPTION_LABEL)
-        .build();
+    option = Option.builder()
+      .label(OPTION_LABEL)
+      .build();
+
+    optionWebResponse = OptionWebResponse.builder()
+      .label(OPTION_LABEL)
+      .build();
   }
 
   @After
   public void tearDown() throws Exception {
+
   }
 
   @Test
   public void toOptionWebResponse() {
-    DataResponse<OptionWebResponse> actual = OptionResponseMapper.toOptionWebResponse(option);
 
-    assertThat(actual.getData().getLabel()).isEqualTo(optionWebResponse.getLabel());
+    DataResponse<OptionWebResponse> actual =
+      OptionResponseMapper.toOptionWebResponse(option);
+
+    assertThat(actual.getData()
+                 .getLabel()).isEqualTo(optionWebResponse.getLabel());
     assertThat(actual.getCode()).isEqualTo(200);
   }
 
   @Test
   public void toOptionWebResponseCreated() {
-    DataResponse<OptionWebResponse> actual = OptionResponseMapper.toOptionWebResponse(HttpStatus.CREATED, option);
-    assertThat(actual.getData().getLabel()).isEqualTo(optionWebResponse.getLabel());
+
+    DataResponse<OptionWebResponse> actual =
+      OptionResponseMapper.toOptionWebResponse(HttpStatus.CREATED, option);
+    assertThat(actual.getData()
+                 .getLabel()).isEqualTo(optionWebResponse.getLabel());
     assertThat(actual.getCode()).isEqualTo(201);
   }
 
   @Test
   public void toListOfOptionWebResponse() {
-    List<OptionWebResponse> actual = OptionResponseMapper.toListOfOptionWebResponse(Collections.singletonList(option));
-    assertThat(actual.get(0).getLabel()).isEqualTo(optionWebResponse.getLabel());
+
+    List<OptionWebResponse> actual =
+      OptionResponseMapper.toListOfOptionWebResponse(
+        Collections.singletonList(option));
+    assertThat(actual.get(0)
+                 .getLabel()).isEqualTo(optionWebResponse.getLabel());
   }
+
 }

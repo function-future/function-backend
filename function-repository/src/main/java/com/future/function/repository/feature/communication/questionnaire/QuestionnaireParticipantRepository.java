@@ -11,16 +11,28 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import java.util.List;
 import java.util.Optional;
 
-public interface QuestionnaireParticipantRepository extends MongoRepository<QuestionnaireParticipant, String> {
-  Page<QuestionnaireParticipant> findAllByMemberAndParticipantTypeAndDeletedFalseOrderByCreatedAtDesc(User member, ParticipantType participantType, Pageable pageable);
+public interface QuestionnaireParticipantRepository
+  extends MongoRepository<QuestionnaireParticipant, String> {
 
-  Page<QuestionnaireParticipant> findAllByQuestionnaireAndDeletedFalse(Questionnaire questionnaire, Pageable pageable);
+  Page<QuestionnaireParticipant> findAllByMemberAndParticipantTypeAndDeletedFalseOrderByCreatedAtDesc(
+    User member, ParticipantType participantType, Pageable pageable
+  );
 
-  List<QuestionnaireParticipant> findAllByQuestionnaireAndDeletedFalse(Questionnaire questionnaire);
+  Page<QuestionnaireParticipant> findAllByQuestionnaireAndDeletedFalse(
+    Questionnaire questionnaire, Pageable pageable
+  );
 
-  Page<QuestionnaireParticipant> findAllByQuestionnaireAndParticipantTypeAndDeletedFalse(Questionnaire questionnaire, ParticipantType participantType, Pageable pageable);
+  List<QuestionnaireParticipant> findAllByQuestionnaireAndDeletedFalse(
+    Questionnaire questionnaire
+  );
 
-  Optional<QuestionnaireParticipant> findByQuestionnaireAndMemberAndParticipantTypeAndDeletedFalse(Questionnaire questionnaire,User member, ParticipantType participantType);
+  Page<QuestionnaireParticipant> findAllByQuestionnaireAndParticipantTypeAndDeletedFalse(
+    Questionnaire questionnaire, ParticipantType participantType,
+    Pageable pageable
+  );
 
+  Optional<QuestionnaireParticipant> findByQuestionnaireAndMemberAndParticipantTypeAndDeletedFalse(
+    Questionnaire questionnaire, User member, ParticipantType participantType
+  );
 
 }

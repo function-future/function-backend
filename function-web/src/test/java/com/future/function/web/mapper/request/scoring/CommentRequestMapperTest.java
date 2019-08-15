@@ -13,16 +13,21 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CommentRequestMapperTest {
 
   private static final String ROOM_ID = "room-id";
+
   private static final String COMMENT = "text";
 
   private CommentWebRequest commentWebRequest;
+
   private Comment comment;
+
   private Room room;
 
   @InjectMocks
@@ -34,9 +39,15 @@ public class CommentRequestMapperTest {
   @Before
   public void setUp() throws Exception {
 
-      commentWebRequest = CommentWebRequest.builder().comment(COMMENT).build();
-    room = Room.builder().id(ROOM_ID).build();
-      comment = Comment.builder().room(room).build();
+    commentWebRequest = CommentWebRequest.builder()
+      .comment(COMMENT)
+      .build();
+    room = Room.builder()
+      .id(ROOM_ID)
+      .build();
+    comment = Comment.builder()
+      .room(room)
+      .build();
 
     when(validator.validate(commentWebRequest)).thenReturn(commentWebRequest);
 
@@ -44,13 +55,17 @@ public class CommentRequestMapperTest {
 
   @After
   public void tearDown() throws Exception {
+
     verifyNoMoreInteractions(validator);
   }
 
   @Test
   public void toCommentFromRequestWithRoomId() {
-    Comment actual = commentRequestMapper.toCommentFromRequestWithRoomId(commentWebRequest, ROOM_ID);
+
+    Comment actual = commentRequestMapper.toCommentFromRequestWithRoomId(
+      commentWebRequest, ROOM_ID);
     assertThat(actual.getRoom()).isEqualTo(room);
     verify(validator).validate(commentWebRequest);
   }
+
 }

@@ -29,13 +29,25 @@ import static org.mockito.Mockito.when;
 public class LogMessageServiceImplTest {
 
   private static final Pageable PAGEABLE = new PageRequest(0, 10);
+
   private static final String TOPIC_ID = "topicId";
+
   private static final String LOG_MESSAGE_ID_1 = "logMessageId1";
+
   private static final String LOG_MESSAGE_ID_2 = "logMessageId2";
-  private static final Topic TOPIC = Topic.builder().id(TOPIC_ID).build();
+
+  private static final Topic TOPIC = Topic.builder()
+    .id(TOPIC_ID)
+    .build();
+
   private static final String SENDER_ID = "senderId";
-  private static final User SENDER = User.builder().id(SENDER_ID).build();
+
+  private static final User SENDER = User.builder()
+    .id(SENDER_ID)
+    .build();
+
   private LogMessage logMessage1;
+
   private LogMessage logMessage2;
 
   @Mock
@@ -52,51 +64,57 @@ public class LogMessageServiceImplTest {
 
   @Before
   public void setUp() {
-    logMessage1 =
-      LogMessage.builder()
-        .id(LOG_MESSAGE_ID_1)
-        .topic(TOPIC)
-        .sender(SENDER)
-        .build();
+
+    logMessage1 = LogMessage.builder()
+      .id(LOG_MESSAGE_ID_1)
+      .topic(TOPIC)
+      .sender(SENDER)
+      .build();
     logMessage1.setCreatedAt(1L);
 
-    logMessage2 =
-      LogMessage.builder()
-        .id(LOG_MESSAGE_ID_2)
-        .topic(TOPIC)
-        .build();
+    logMessage2 = LogMessage.builder()
+      .id(LOG_MESSAGE_ID_2)
+      .topic(TOPIC)
+      .build();
     logMessage2.setCreatedAt(2L);
 
   }
 
   @After
   public void tearDown() {
-    verifyNoMoreInteractions(
-      userService,
-      topicService,
-      logMessageRepository
-    );
+
+    verifyNoMoreInteractions(userService, topicService, logMessageRepository);
   }
 
   @Test
   public void getLogMessagesByTopic() {
-    when(topicService.getTopic(TOPIC_ID))
-      .thenReturn(TOPIC);
-    when(logMessageRepository.findAllByTopicOrderByCreatedAtDesc(TOPIC,PAGEABLE))
-      .thenReturn(new PageImpl<>(Arrays.asList(logMessage2, logMessage1), PAGEABLE, 2));
 
-    Page<LogMessage> results = logMessageService.getLogMessagesByTopic(TOPIC_ID, PAGEABLE);
+    when(topicService.getTopic(TOPIC_ID)).thenReturn(TOPIC);
+    when(logMessageRepository.findAllByTopicOrderByCreatedAtDesc(TOPIC,
+                                                                 PAGEABLE
+    )).thenReturn(
+      new PageImpl<>(Arrays.asList(logMessage2, logMessage1), PAGEABLE, 2));
+
+    Page<LogMessage> results = logMessageService.getLogMessagesByTopic(
+      TOPIC_ID, PAGEABLE);
 
     assertThat(results).isNotNull();
-    assertThat(results.getContent().get(0).getId()).isEqualTo(LOG_MESSAGE_ID_2);
-    assertThat(results.getContent().get(1).getId()).isEqualTo(LOG_MESSAGE_ID_1);
+    assertThat(results.getContent()
+                 .get(0)
+                 .getId()).isEqualTo(LOG_MESSAGE_ID_2);
+    assertThat(results.getContent()
+                 .get(1)
+                 .getId()).isEqualTo(LOG_MESSAGE_ID_1);
 
     verify(topicService).getTopic(TOPIC_ID);
-    verify(logMessageRepository).findAllByTopicOrderByCreatedAtDesc(TOPIC,PAGEABLE);
+    verify(logMessageRepository).findAllByTopicOrderByCreatedAtDesc(TOPIC,
+                                                                    PAGEABLE
+    );
   }
 
   @Test
   public void createLogMessage() {
+
     when(userService.getUser(SENDER_ID)).thenReturn(SENDER);
     when(topicService.getTopic(TOPIC_ID)).thenReturn(TOPIC);
     when(logMessageRepository.save(logMessage1)).thenReturn(logMessage1);
@@ -110,4 +128,5 @@ public class LogMessageServiceImplTest {
     verify(topicService).getTopic(TOPIC_ID);
     verify(logMessageRepository).save(logMessage1);
   }
+
 }

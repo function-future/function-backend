@@ -25,47 +25,47 @@ import java.util.List;
 @Repository
 public class ActivityBlogRepositoryImpl
   implements ActivityBlogRepositoryCustom {
-  
+
   private final MongoTemplate mongoTemplate;
-  
+
   @Autowired
   public ActivityBlogRepositoryImpl(MongoTemplate mongoTemplate) {
-    
+
     this.mongoTemplate = mongoTemplate;
   }
-  
+
   @Override
   public Page<ActivityBlog> findAll(
     String userId, String search, Pageable pageable
   ) {
-    
+
     Criteria criteria = this.buildCriteria(userId, search);
     MatchOperation matchOperation = Aggregation.match(criteria);
-    
+
     SortOperation sortOperation = Aggregation.sort(
       new Sort(Sort.Direction.DESC, FieldName.BaseEntity.UPDATED_AT));
-    
+
     SkipOperation skipOperation = new SkipOperation(pageable.getOffset());
-    
+
     LimitOperation limitOperation = Aggregation.limit(pageable.getPageSize());
-    
+
     Aggregation dataAggregation = Aggregation.newAggregation(
       sortOperation, matchOperation, skipOperation, limitOperation);
-    
+
     List<ActivityBlog> foundActivityBlogs = mongoTemplate.aggregate(
       dataAggregation, DocumentName.ACTIVITY_BLOG, ActivityBlog.class)
       .getMappedResults();
-    
+
     long size = mongoTemplate.count(
       Query.query(criteria), DocumentName.ACTIVITY_BLOG);
-    
+
     return new PageImpl<>(foundActivityBlogs, pageable, size);
   }
-  
+
   private Criteria buildCriteria(String userId, String search) {
-    
+
     Criteria criteria;
-    
+
     if (StringUtils.isEmpty(userId)) {
       criteria = this.buildTitleAndDescriptionCriteria(search);
     } else {
@@ -74,23 +74,23 @@ public class ActivityBlogRepositoryImpl
         .is(new ObjectId(userId))
         .andOperator(this.buildTitleAndDescriptionCriteria(search));
     }
-    
+
     return criteria;
   }
-  
+
   private Criteria buildTitleAndDescriptionCriteria(String search) {
-    
+
     String regex = ".*" + search + ".*";
-    
+
     return this.buildRegexCriteria(FieldName.ActivityBlog.TITLE, regex)
       .orOperator(
         this.buildRegexCriteria(FieldName.ActivityBlog.DESCRIPTION, regex));
   }
-  
+
   private Criteria buildRegexCriteria(String fieldName, String regex) {
-    
+
     return Criteria.where(fieldName)
       .regex(regex, "i");
   }
-  
+
 }

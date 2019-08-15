@@ -11,34 +11,34 @@ import java.util.Set;
 
 public class CourseMustBeDistinctValidator
   implements ConstraintValidator<CourseMustBeDistinct, List<String>> {
-  
+
   @Override
   public void initialize(CourseMustBeDistinct constraintAnnotation) {
     // No initialization needed.
   }
-  
+
   @Override
   public boolean isValid(
     List<String> courseIds, ConstraintValidatorContext context
   ) {
-    
+
     return courseIds != null && this.isCourseIdsDistinct(courseIds);
   }
-  
+
   private boolean isCourseIdsDistinct(List<String> courseIds) {
-    
+
     return Optional.ofNullable(courseIds)
       .filter(ids -> !ids.isEmpty())
       .map(this::toSetOfCourseIds)
       .filter(set -> set.size() == courseIds.size())
       .isPresent();
   }
-  
+
   private Set<String> toSetOfCourseIds(List<String> courseIds) {
-    
+
     return Optional.of(courseIds)
       .map(HashSet::new)
       .orElseGet(HashSet::new);
   }
-  
+
 }

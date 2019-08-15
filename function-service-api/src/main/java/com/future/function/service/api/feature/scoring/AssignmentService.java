@@ -7,13 +7,17 @@ import org.springframework.data.domain.Pageable;
 
 public interface AssignmentService {
 
-  Page<Assignment> findAllByBatchCodeAndPageable(String batchCode, Pageable pageable);
+  Page<Assignment> findAllByBatchCodeAndPageable(
+    String batchCode, Pageable pageable
+  );
 
   Assignment findById(String id);
 
   Page<Room> findAllRoomsByAssignmentId(String assignmentId, Pageable pageable);
 
-    Page<Room> findAllRoomsByStudentId(String studentId, Pageable pageable, String userId);
+  Page<Room> findAllRoomsByStudentId(
+    String studentId, Pageable pageable, String userId
+  );
 
   Room findRoomById(String id, String studentId);
 

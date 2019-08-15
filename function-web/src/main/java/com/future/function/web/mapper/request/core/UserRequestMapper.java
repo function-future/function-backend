@@ -15,26 +15,26 @@ import java.util.Optional;
 @Slf4j
 @Component
 public class UserRequestMapper {
-  
+
   private final RequestValidator validator;
-  
+
   @Autowired
   private UserRequestMapper(RequestValidator validator) {
-    
+
     this.validator = validator;
   }
-  
+
   public User toUser(UserWebRequest request) {
-    
+
     return toValidatedUser(null, request);
   }
-  
+
   private User toValidatedUser(String userId, UserWebRequest request) {
-    
+
     request.setId(userId);
-    
+
     validator.validate(request);
-    
+
     User user = User.builder()
       .role(Role.toRole(request.getRole()))
       .email(request.getEmail()
@@ -46,16 +46,16 @@ public class UserRequestMapper {
       .batch(toBatch(request))
       .university(getUniversity(request))
       .build();
-    
+
     if (userId != null) {
       user.setId(userId);
     }
-    
+
     return user;
   }
-  
+
   private FileV2 getFileV2(UserWebRequest request) {
-    
+
     return Optional.of(request)
       .map(UserWebRequest::getAvatar)
       .filter(avatarSingleList -> !avatarSingleList.isEmpty())
@@ -63,23 +63,23 @@ public class UserRequestMapper {
       .map(this::buildFileV2)
       .orElse(null);
   }
-  
+
   private FileV2 buildFileV2(String fileId) {
-    
+
     return FileV2.builder()
       .id(fileId)
       .build();
   }
-  
+
   private String getUniversity(UserWebRequest request) {
-    
+
     return Optional.of(request)
       .map(UserWebRequest::getUniversity)
       .orElse(null);
   }
-  
+
   private Batch toBatch(UserWebRequest request) {
-    
+
     return Optional.of(request)
       .map(UserWebRequest::getBatch)
       .map(batchNumber -> Batch.builder()
@@ -87,10 +87,10 @@ public class UserRequestMapper {
         .build())
       .orElse(null);
   }
-  
+
   public User toUser(String userId, UserWebRequest request) {
-    
+
     return toValidatedUser(userId, request);
   }
-  
+
 }

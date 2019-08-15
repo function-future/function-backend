@@ -18,29 +18,41 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/scoring/batches/{batchCode}/assignments/{assignmentId}/students/{studentId}/rooms")
+@RequestMapping("/api/scoring/batches/{batchCode}/assignments/{assignmentId" +
+                "}/students/{studentId}/rooms")
 public class StudentRoomController {
 
-    private AssignmentService assignmentService;
-    
-    private final FileProperties fileProperties;
+  private final FileProperties fileProperties;
 
-    @Autowired
-    public StudentRoomController(
-      AssignmentService assignmentService, FileProperties fileProperties
-    ) {
-        this.assignmentService = assignmentService;
-        this.fileProperties = fileProperties;
-    }
+  private AssignmentService assignmentService;
 
-    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public PagingResponse<RoomWebResponse> findAllRoomsByStudentId(@PathVariable String studentId,
-                                                                   @RequestParam(defaultValue = "1") int page,
-                                                                   @RequestParam(defaultValue = "10") int size,
-        @WithAnyRole(roles = {Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT}) Session session) {
-        return RoomResponseMapper.toPagingRoomWebResponse(
-                assignmentService.findAllRoomsByStudentId(studentId,
-                                                          PageHelper.toPageable(page, size), session.getUserId()), fileProperties.getUrlPrefix());
-    }
+  @Autowired
+  public StudentRoomController(
+    AssignmentService assignmentService, FileProperties fileProperties
+  ) {
+
+    this.assignmentService = assignmentService;
+    this.fileProperties = fileProperties;
+  }
+
+  @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+  public PagingResponse<RoomWebResponse> findAllRoomsByStudentId(
+    @PathVariable
+      String studentId,
+    @RequestParam(defaultValue = "1")
+      int page,
+    @RequestParam(defaultValue = "10")
+      int size,
+    @WithAnyRole(roles = { Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT })
+      Session session
+  ) {
+
+    return RoomResponseMapper.toPagingRoomWebResponse(
+      assignmentService.findAllRoomsByStudentId(studentId,
+                                                PageHelper.toPageable(page,
+                                                                      size
+                                                ), session.getUserId()
+      ), fileProperties.getUrlPrefix());
+  }
 
 }

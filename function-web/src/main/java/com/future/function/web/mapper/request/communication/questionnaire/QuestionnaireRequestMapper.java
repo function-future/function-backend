@@ -16,14 +16,21 @@ public class QuestionnaireRequestMapper {
 
   @Autowired
   public QuestionnaireRequestMapper(RequestValidator validator) {
+
     this.validator = validator;
   }
 
-  public Questionnaire toQuestionnaire(QuestionnaireRequest questionnaireRequest, String questionnaireId){
+  public Questionnaire toQuestionnaire(
+    QuestionnaireRequest questionnaireRequest, String questionnaireId
+  ) {
+
     return toValidateQuestionnaire(questionnaireRequest, questionnaireId);
   }
 
-  private Questionnaire toValidateQuestionnaire(QuestionnaireRequest questionnaireRequest, String questionnaireId) {
+  private Questionnaire toValidateQuestionnaire(
+    QuestionnaireRequest questionnaireRequest, String questionnaireId
+  ) {
+
     validator.validate(questionnaireRequest);
 
     return Questionnaire.builder()
@@ -34,6 +41,5 @@ public class QuestionnaireRequestMapper {
       .dueDate(questionnaireRequest.getDueDate())
       .build();
   }
-
 
 }

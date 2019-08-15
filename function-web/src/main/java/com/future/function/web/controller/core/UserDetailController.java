@@ -33,7 +33,7 @@ public class UserDetailController {
   private final UserDetailService userDetailService;
 
   private final UserDetailRequestMapper userDetailRequestMapper;
-  
+
   private final FileProperties fileProperties;
 
   @Autowired
@@ -47,7 +47,7 @@ public class UserDetailController {
     this.userDetailRequestMapper = userDetailRequestMapper;
     this.fileProperties = fileProperties;
   }
-  
+
   @ResponseStatus(HttpStatus.OK)
   @PutMapping("/profile/picture")
   public DataResponse<UserWebResponse> changeProfilePicture(
@@ -56,11 +56,12 @@ public class UserDetailController {
     @RequestBody
       ChangeProfilePictureWebRequest request
   ) {
-  
+
     return UserResponseMapper.toUserDataResponse(
       userDetailService.changeProfilePicture(
         userDetailRequestMapper.toUser(request, session.getEmail())),
-      fileProperties.getUrlPrefix());
+      fileProperties.getUrlPrefix()
+    );
   }
 
   @ResponseStatus(HttpStatus.OK)

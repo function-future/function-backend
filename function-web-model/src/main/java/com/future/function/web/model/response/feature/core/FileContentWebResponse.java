@@ -15,24 +15,24 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 public class FileContentWebResponse {
-  
+
   private String id;
-  
+
   @JsonInclude(value = JsonInclude.Include.NON_EMPTY)
   private String type;
-  
+
   @JsonInclude(value = JsonInclude.Include.NON_EMPTY)
   private String name;
-  
+
   @JsonInclude(value = JsonInclude.Include.NON_EMPTY)
   private Object file;
-  
+
   @JsonInclude(value = JsonInclude.Include.NON_EMPTY)
   private Map<Long, VersionWebResponse> versions;
-  
+
   @JsonInclude(value = JsonInclude.Include.NON_NULL)
   private String parentId;
-  
+
   private AuthorWebResponse author;
-  
+
 }

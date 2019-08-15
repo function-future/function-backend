@@ -18,65 +18,63 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CourseMustBeDistinctValidatorTest {
-  
+
   @Mock
   private CourseMustBeDistinct annotation;
-  
+
   @InjectMocks
   private CourseMustBeDistinctValidator validator;
-  
+
   @Before
   public void setUp() {
-    
+
     validator.initialize(annotation);
   }
-  
+
   @After
   public void tearDown() {
-    
+
     verifyNoMoreInteractions(annotation);
   }
-  
+
   @Test
   public void testGivenDistinctCourseIdsByValidatingCourseMustBeDistinctReturnTrue() {
-    
+
     String courseId1 = "course-id-1";
     String courseId2 = "course-id-2";
-  
+
     assertThat(
       validator.isValid(Arrays.asList(courseId1, courseId2), null)).isTrue();
-    
+
     verifyZeroInteractions(annotation);
   }
-  
+
   @Test
   public void testGivenIndistinctCourseIdsByValidatingCourseMustBeDistinctReturnFalse() {
-  
+
     String courseId1 = "course-id-1";
     String courseId2 = "course-id-1";
-  
+
     assertThat(
       validator.isValid(Arrays.asList(courseId1, courseId2), null)).isFalse();
-  
+
     verifyZeroInteractions(annotation);
   }
-  
+
   @Test
   public void testGivenNullCourseIdsByValidatingCourseMustBeDistinctReturnFalse() {
-  
-    assertThat(
-      validator.isValid(null, null)).isFalse();
-  
+
+    assertThat(validator.isValid(null, null)).isFalse();
+
     verifyZeroInteractions(annotation);
   }
-  
+
   @Test
   public void testGivenEmptyCourseIdsByValidatingCourseMustBeDistinctReturnFalse() {
-  
-    assertThat(
-      validator.isValid(Collections.emptyList(), null)).isFalse();
-  
+
+    assertThat(validator.isValid(Collections.emptyList(), null)).isFalse();
+
     verifyZeroInteractions(annotation);
   }
-  
+
 }

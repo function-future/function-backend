@@ -10,11 +10,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Paging {
-  
+
   private long page;
-  
+
   private long size;
-  
+
   private long totalRecords;
-  
+
 }

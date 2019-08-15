@@ -43,11 +43,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class QuestionnaireResultsControllerTest extends TestHelper {
 
   private static final String URL_PREFIX = "urlPrefix";
-  private static final String BATCH_ID = "batchId";
-  private static final String BATCH_CODE = "batchCode";
-  private static final String BATCH_NAME = "batchName";
 
-  private final Pageable PAGEABLE = new PageRequest(0, 10);
+  private static final String BATCH_ID = "batchId";
+
+  private static final String BATCH_CODE = "batchCode";
+
+  private static final String BATCH_NAME = "batchName";
 
   private static final String USER_SUMMARY_ID_1 = "userSummaryId1";
 
@@ -59,12 +60,6 @@ public class QuestionnaireResultsControllerTest extends TestHelper {
 
   private static final String UNIVERSITY = "itb";
 
-  private final Batch BATCH = Batch.builder()
-    .id(BATCH_ID)
-    .code(BATCH_CODE)
-    .name(BATCH_NAME)
-    .build();
-
   private static final Answer SCORE = Answer.builder()
     .minimum(0)
     .maximum(6)
@@ -74,8 +69,12 @@ public class QuestionnaireResultsControllerTest extends TestHelper {
   private static final User MEMBER_1 = User.builder()
     .id(MEMBER_ID_1)
     .name(MEMBER_NAME_1)
-    .pictureV2(FileV2.builder().thumbnailUrl(THUMBNAIL_URL).build())
-    .batch(Batch.builder().id(BATCH_ID).build())
+    .pictureV2(FileV2.builder()
+                 .thumbnailUrl(THUMBNAIL_URL)
+                 .build())
+    .batch(Batch.builder()
+             .id(BATCH_ID)
+             .build())
     .role(Role.STUDENT)
     .university(UNIVERSITY)
     .build();
@@ -87,8 +86,16 @@ public class QuestionnaireResultsControllerTest extends TestHelper {
       .scoreSummary(SCORE)
       .build();
 
-  private final Page<UserQuestionnaireSummary> USER_QUESTIONNAIRE_SUMMARY_PAGE
-    = new PageImpl<>(Arrays.asList(USER_SUMMARY_1), PAGEABLE, 1);
+  private final Pageable PAGEABLE = new PageRequest(0, 10);
+
+  private final Batch BATCH = Batch.builder()
+    .id(BATCH_ID)
+    .code(BATCH_CODE)
+    .name(BATCH_NAME)
+    .build();
+
+  private final Page<UserQuestionnaireSummary> USER_QUESTIONNAIRE_SUMMARY_PAGE =
+    new PageImpl<>(Arrays.asList(USER_SUMMARY_1), PAGEABLE, 1);
 
   @MockBean
   private QuestionnaireResultService questionnaireResultService;
@@ -102,6 +109,7 @@ public class QuestionnaireResultsControllerTest extends TestHelper {
   @Override
   @Before
   public void setUp() {
+
     super.setUp();
     super.setCookie(Role.ADMIN);
   }
@@ -109,48 +117,57 @@ public class QuestionnaireResultsControllerTest extends TestHelper {
 
   @After
   public void tearDown() throws Exception {
-    verifyNoMoreInteractions(
-      questionnaireResultService,
-      batchService);
+
+    verifyNoMoreInteractions(questionnaireResultService, batchService);
   }
 
   @Test
-  public void getUserSummary() throws Exception  {
+  public void getUserSummary() throws Exception {
+
     when(batchService.getBatchByCode(BATCH_CODE)).thenReturn(BATCH);
-    when(questionnaireResultService.getAppraisalsQuestionnaireSummaryByBatch(BATCH, PAGEABLE))
-      .thenReturn(USER_QUESTIONNAIRE_SUMMARY_PAGE);
+    when(
+      questionnaireResultService.getAppraisalsQuestionnaireSummaryByBatch(BATCH,
+                                                                          PAGEABLE
+      )).thenReturn(USER_QUESTIONNAIRE_SUMMARY_PAGE);
     when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
 
     PagingResponse<UserSummaryResponse> response =
-      QuestionnaireResultsResponseMapper.toPagingUserSummaryResponse(USER_QUESTIONNAIRE_SUMMARY_PAGE, URL_PREFIX);
-    mockMvc.perform(get("/api/communication/questionnaire-results")
-      .cookie(cookies).param("batchCode", BATCH_CODE))
+      QuestionnaireResultsResponseMapper.toPagingUserSummaryResponse(
+        USER_QUESTIONNAIRE_SUMMARY_PAGE, URL_PREFIX);
+    mockMvc.perform(get("/api/communication/questionnaire-results").cookie(
+      cookies)
+                      .param("batchCode", BATCH_CODE))
       .andExpect(status().isOk())
-      .andExpect(content().json(pagingResponseJacksonTester.write(response).getJson()));
+      .andExpect(content().json(pagingResponseJacksonTester.write(response)
+                                  .getJson()));
 
     verify(fileProperties).getUrlPrefix();
     verify(batchService).getBatchByCode(BATCH_CODE);
-    verify(questionnaireResultService).getAppraisalsQuestionnaireSummaryByBatch(BATCH, PAGEABLE);
+    verify(questionnaireResultService).getAppraisalsQuestionnaireSummaryByBatch(
+      BATCH, PAGEABLE);
   }
 
   @Test
   public void getUserSummaryById() throws Exception {
-    when(questionnaireResultService.getAppraisalsQuestionnaireSummaryById(USER_SUMMARY_ID_1))
-      .thenReturn(USER_SUMMARY_1);
+
+    when(questionnaireResultService.getAppraisalsQuestionnaireSummaryById(
+      USER_SUMMARY_ID_1)).thenReturn(USER_SUMMARY_1);
     when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
 
     DataResponse<UserSummaryResponse> response =
-      QuestionnaireResultsResponseMapper
-        .toDataResponseUserSummaryResponse(USER_SUMMARY_1, URL_PREFIX);
+      QuestionnaireResultsResponseMapper.toDataResponseUserSummaryResponse(
+        USER_SUMMARY_1, URL_PREFIX);
 
-    mockMvc.perform(
-      get("/api/communication/questionnaire-results/"+
-            BATCH_CODE+"/user-summary-response/"+USER_SUMMARY_ID_1)
-      .cookie(cookies))
+    mockMvc.perform(get(
+      "/api/communication/questionnaire-results/" + BATCH_CODE +
+      "/user-summary-response/" + USER_SUMMARY_ID_1).cookie(cookies))
       .andExpect(status().isOk())
-      .andExpect(content().json(dataResponseJacksonTester.write(response).getJson()));
+      .andExpect(content().json(dataResponseJacksonTester.write(response)
+                                  .getJson()));
 
     verify(fileProperties).getUrlPrefix();
-    verify(questionnaireResultService).getAppraisalsQuestionnaireSummaryById(USER_SUMMARY_ID_1);
+    verify(questionnaireResultService).getAppraisalsQuestionnaireSummaryById(
+      USER_SUMMARY_ID_1);
   }
+
 }

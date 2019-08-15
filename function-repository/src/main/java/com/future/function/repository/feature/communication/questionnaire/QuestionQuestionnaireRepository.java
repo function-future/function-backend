@@ -7,7 +7,10 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import java.util.List;
 
 public interface QuestionQuestionnaireRepository
-        extends MongoRepository<QuestionQuestionnaire, String> {
+  extends MongoRepository<QuestionQuestionnaire, String> {
 
-  List<QuestionQuestionnaire> findAllByQuestionnaire(Questionnaire questionnaire);
+  List<QuestionQuestionnaire> findAllByQuestionnaire(
+    Questionnaire questionnaire
+  );
+
 }

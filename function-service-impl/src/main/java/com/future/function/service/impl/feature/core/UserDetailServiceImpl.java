@@ -12,53 +12,53 @@ import java.util.Map;
 
 @Service
 public class UserDetailServiceImpl implements UserDetailService {
-  
+
   private final UserService userService;
-  
+
   private final MenuService menuService;
-  
+
   private final AccessService accessService;
-  
+
   public UserDetailServiceImpl(
     UserService userService, MenuService menuService,
     AccessService accessService
   ) {
-    
+
     this.userService = userService;
     this.menuService = menuService;
     this.accessService = accessService;
   }
-  
+
   @Override
   public User changeProfilePicture(User user) {
-    
+
     return userService.changeProfilePicture(user);
   }
-  
+
   @Override
   public User getUserByEmail(String email) {
-    
+
     return userService.getUserByEmail(email);
   }
-  
+
   @Override
   public void changeUserPassword(
     String email, String oldPassword, String newPassword
   ) {
-    
+
     userService.changeUserPassword(email, oldPassword, newPassword);
   }
-  
+
   @Override
   public Map<String, Object> getSectionsByRole(Role role) {
-    
+
     return menuService.getSectionsByRole(role);
   }
-  
+
   @Override
   public Map<String, Object> getComponentsByUrlAndRole(String url, Role role) {
-    
+
     return accessService.getComponentsByUrlAndRole(url, role);
   }
-  
+
 }

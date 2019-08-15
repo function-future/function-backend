@@ -10,13 +10,18 @@ import java.util.Optional;
 
 public interface RoomRepository extends MongoRepository<Room, String> {
 
-  Page<Room> findAllByAssignmentIdAndDeletedFalse(String assignmentId, Pageable page);
+  Page<Room> findAllByAssignmentIdAndDeletedFalse(
+    String assignmentId, Pageable page
+  );
 
   List<Room> findAllByAssignmentIdAndDeletedFalse(String assignmentId);
 
-  Page<Room> findAllByStudentIdAndDeletedFalse(String studentId, Pageable pageable);
+  Page<Room> findAllByStudentIdAndDeletedFalse(
+    String studentId, Pageable pageable
+  );
 
-    List<Room> findAllByStudentIdAndDeletedFalse(String studentId);
+  List<Room> findAllByStudentIdAndDeletedFalse(String studentId);
 
   Optional<Room> findByIdAndDeletedFalse(String id);
+
 }

@@ -11,6 +11,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class NotificationTotalUnseenResponse {
 
-    private Integer total;
+  private Integer total;
 
 }

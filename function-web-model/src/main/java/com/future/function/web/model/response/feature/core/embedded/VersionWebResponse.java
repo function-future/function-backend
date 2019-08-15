@@ -10,9 +10,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class VersionWebResponse {
-  
+
   private Long timestamp;
-  
+
   private String url;
-  
+
 }

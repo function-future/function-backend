@@ -15,9 +15,11 @@ import java.lang.annotation.Target;
 @Target({ ElementType.TYPE, ElementType.FIELD })
 @Constraint(validatedBy = TitleValidator.class)
 public @interface Title {
+
   String message() default "QuestionnaireTitle";
 
   Class<?>[] groups() default {};
 
   Class<? extends Payload>[] payload() default {};
+
 }

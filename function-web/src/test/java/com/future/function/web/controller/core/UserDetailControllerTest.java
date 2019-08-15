@@ -46,7 +46,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class UserDetailControllerTest extends TestHelper {
 
   private static final String AVATAR_ID = "avatar-id";
-  
+
   private static final User USER = User.builder()
     .id("id")
     .role(Role.MENTOR)
@@ -66,11 +66,11 @@ public class UserDetailControllerTest extends TestHelper {
 
   private static final ChangePasswordWebRequest CHANGE_PASSWORD_WEB_REQUEST =
     new ChangePasswordWebRequest(OLD_PASSWORD, NEW_PASSWORD);
-  
+
   private static final ChangeProfilePictureWebRequest
     CHANGE_PROFILE_PICTURE_WEB_REQUEST = new ChangeProfilePictureWebRequest(
     Collections.singletonList(AVATAR_ID));
-  
+
   private static final String URL_PREFIX = "url-prefix";
 
   private static final DataResponse<UserWebResponse> DATA_RESPONSE =
@@ -95,7 +95,7 @@ public class UserDetailControllerTest extends TestHelper {
 
   @MockBean
   private UserDetailRequestMapper userDetailRequestMapper;
-  
+
   @MockBean
   private FileProperties fileProperties;
 
@@ -112,21 +112,21 @@ public class UserDetailControllerTest extends TestHelper {
     verifyNoMoreInteractions(
       userDetailService, userDetailRequestMapper, fileProperties);
   }
-  
+
   @Test
   public void testGivenApiCallByChangingProfilePictureReturnDataResponse()
     throws Exception {
-    
+
     super.setCookie(Role.MENTOR);
-    
+
     when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
-  
+
     when(userDetailRequestMapper.toUser(CHANGE_PROFILE_PICTURE_WEB_REQUEST,
                                         MENTOR_EMAIL
     )).thenReturn(USER);
-  
+
     when(userDetailService.changeProfilePicture(USER)).thenReturn(USER);
-  
+
     mockMvc.perform(put("/api/core/user/profile/picture").cookie(cookies)
                       .contentType(MediaType.APPLICATION_JSON)
                       .content(
@@ -136,10 +136,11 @@ public class UserDetailControllerTest extends TestHelper {
       .andExpect(status().isOk())
       .andExpect(content().json(dataResponseJacksonTester.write(DATA_RESPONSE)
                                   .getJson()));
-  
+
     verify(fileProperties).getUrlPrefix();
     verify(userDetailRequestMapper).toUser(CHANGE_PROFILE_PICTURE_WEB_REQUEST,
-                                           MENTOR_EMAIL);
+                                           MENTOR_EMAIL
+    );
     verify(userDetailService).changeProfilePicture(USER);
   }
 
@@ -148,7 +149,7 @@ public class UserDetailControllerTest extends TestHelper {
     throws Exception {
 
     super.setCookie(Role.MENTOR);
-  
+
     when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
 
     when(userDetailService.getUserByEmail(MENTOR_EMAIL)).thenReturn(USER);
@@ -245,7 +246,8 @@ public class UserDetailControllerTest extends TestHelper {
 
     String url = "url";
     Map<String, Object> accessList = Collections.singletonMap("key", true);
-    when(userDetailService.getComponentsByUrlAndRole(url, Role.JUDGE)).thenReturn(
+    when(
+      userDetailService.getComponentsByUrlAndRole(url, Role.JUDGE)).thenReturn(
       accessList);
 
     mockMvc.perform(get("/api/core/user/access-list").cookie(cookies)

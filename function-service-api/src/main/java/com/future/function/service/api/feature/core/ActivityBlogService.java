@@ -15,8 +15,9 @@ public interface ActivityBlogService {
 
   ActivityBlog createActivityBlog(ActivityBlog activityBlog);
 
-  ActivityBlog updateActivityBlog(String userId, Role role,
-                                  ActivityBlog activityBlog);
+  ActivityBlog updateActivityBlog(
+    String userId, Role role, ActivityBlog activityBlog
+  );
 
   void deleteActivityBlog(String userId, Role role, String activityBlogId);
 

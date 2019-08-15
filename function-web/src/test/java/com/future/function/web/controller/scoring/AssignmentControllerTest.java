@@ -33,10 +33,20 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -46,20 +56,34 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class AssignmentControllerTest extends TestHelper {
 
   private static final String ASSIGNMENT_TITLE = "assignment-title";
+
   private static final String ASSIGNMENT_DESCRIPTION = "assignment-description";
+
   private static final long ASSIGNMENT_DEADLINE = new Date().getTime();
+
   private static final String BATCH_CODE = "3";
+
   private static final String ASSIGNMENT_FILE_PATH = "assignment-file-path";
+
   private static final String URL_PREFIX = "url-prefix";
-  private static String ASSIGNMENT_ID = UUID.randomUUID().toString();
+
+  private static String ASSIGNMENT_ID = UUID.randomUUID()
+    .toString();
+
   private Pageable pageable;
+
   private Assignment assignment;
+
   private AssignmentWebRequest assignmentWebRequest;
+
   private CopyAssignmentWebRequest copyAssignmentWebRequest;
+
   private List<Assignment> assignmentList;
+
   private Page<Assignment> assignmentPage;
 
   private DataResponse<AssignmentWebResponse> DATA_RESPONSE;
+
   private DataResponse<AssignmentWebResponse> CREATED_DATA_RESPONSE;
 
   private PagingResponse<AssignmentWebResponse> PAGING_RESPONSE;
@@ -68,7 +92,8 @@ public class AssignmentControllerTest extends TestHelper {
 
   private JacksonTester<AssignmentWebRequest> assignmentWebRequestJacksonTester;
 
-  private JacksonTester<CopyAssignmentWebRequest> copyAssignmentWebRequestJacksonTester;
+  private JacksonTester<CopyAssignmentWebRequest>
+    copyAssignmentWebRequestJacksonTester;
 
   @MockBean
   private AssignmentService assignmentService;
@@ -81,32 +106,36 @@ public class AssignmentControllerTest extends TestHelper {
 
   @Before
   public void setUp() {
+
     super.setUp();
     super.setCookie(Role.ADMIN);
-    assignment = Assignment
-            .builder()
-            .id(ASSIGNMENT_ID)
-            .title(ASSIGNMENT_TITLE)
-            .description(ASSIGNMENT_DESCRIPTION)
-            .deadline(ASSIGNMENT_DEADLINE)
-            .file(FileV2.builder().id("file-id").fileUrl(ASSIGNMENT_FILE_PATH).build())
-            .batch(Batch.builder().code(BATCH_CODE).build())
-            .build();
+    assignment = Assignment.builder()
+      .id(ASSIGNMENT_ID)
+      .title(ASSIGNMENT_TITLE)
+      .description(ASSIGNMENT_DESCRIPTION)
+      .deadline(ASSIGNMENT_DEADLINE)
+      .file(FileV2.builder()
+              .id("file-id")
+              .fileUrl(ASSIGNMENT_FILE_PATH)
+              .build())
+      .batch(Batch.builder()
+               .code(BATCH_CODE)
+               .build())
+      .build();
 
     assignment.setCreatedAt(ASSIGNMENT_DEADLINE);
 
     assignmentWebRequest = AssignmentWebRequest.builder()
-        .deadline(ASSIGNMENT_DEADLINE)
-        .description(ASSIGNMENT_DESCRIPTION)
-        .title(ASSIGNMENT_TITLE)
-        .files(Collections.singletonList("file-id"))
+      .deadline(ASSIGNMENT_DEADLINE)
+      .description(ASSIGNMENT_DESCRIPTION)
+      .title(ASSIGNMENT_TITLE)
+      .files(Collections.singletonList("file-id"))
       .build();
 
-    copyAssignmentWebRequest = CopyAssignmentWebRequest
-        .builder()
-            .batchCode("BATCH-3")
-        .assignmentId(ASSIGNMENT_ID)
-        .build();
+    copyAssignmentWebRequest = CopyAssignmentWebRequest.builder()
+      .batchCode("BATCH-3")
+      .assignmentId(ASSIGNMENT_ID)
+      .build();
 
     assignmentList = new ArrayList<>();
     assignmentList.add(assignment);
@@ -117,65 +146,71 @@ public class AssignmentControllerTest extends TestHelper {
 
     ASSIGNMENT_ID = assignment.getId();
 
-    DATA_RESPONSE = AssignmentResponseMapper
-            .toAssignmentDataResponse(this.assignment, URL_PREFIX);
+    DATA_RESPONSE = AssignmentResponseMapper.toAssignmentDataResponse(
+      this.assignment, URL_PREFIX);
 
-    CREATED_DATA_RESPONSE = AssignmentResponseMapper
-            .toAssignmentDataResponse(HttpStatus.CREATED, this.assignment, URL_PREFIX);
+    CREATED_DATA_RESPONSE = AssignmentResponseMapper.toAssignmentDataResponse(
+      HttpStatus.CREATED, this.assignment, URL_PREFIX);
 
-    PAGING_RESPONSE = AssignmentResponseMapper
-            .toAssignmentsPagingResponse(assignmentPage, URL_PREFIX);
+    PAGING_RESPONSE = AssignmentResponseMapper.toAssignmentsPagingResponse(
+      assignmentPage, URL_PREFIX);
 
     BASE_RESPONSE = ResponseHelper.toBaseResponse(HttpStatus.OK);
 
     when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
-    when(assignmentService.findAllByBatchCodeAndPageable(BATCH_CODE, pageable))
-            .thenReturn(assignmentPage);
-    when(assignmentService.copyAssignment(ASSIGNMENT_ID, "BATCH-3")).thenReturn(assignment);
-    when(assignmentService.createAssignment(assignment))
-            .thenReturn(assignment);
-    when(assignmentService.updateAssignment(assignment))
-            .thenReturn(assignment);
-    when(assignmentService.findById(ASSIGNMENT_ID))
-            .thenReturn(assignment);
-      when(assignmentRequestMapper.toAssignment(assignmentWebRequest, BATCH_CODE))
-            .thenReturn(assignment);
-      when(assignmentRequestMapper.validateCopyAssignmentWebRequest(copyAssignmentWebRequest)).thenReturn(copyAssignmentWebRequest);
-      when(assignmentRequestMapper.toAssignmentWithId(ASSIGNMENT_ID, assignmentWebRequest, BATCH_CODE))
-            .thenReturn(assignment);
+    when(assignmentService.findAllByBatchCodeAndPageable(BATCH_CODE,
+                                                         pageable
+    )).thenReturn(assignmentPage);
+    when(assignmentService.copyAssignment(ASSIGNMENT_ID, "BATCH-3")).thenReturn(
+      assignment);
+    when(assignmentService.createAssignment(assignment)).thenReturn(assignment);
+    when(assignmentService.updateAssignment(assignment)).thenReturn(assignment);
+    when(assignmentService.findById(ASSIGNMENT_ID)).thenReturn(assignment);
+    when(assignmentRequestMapper.toAssignment(assignmentWebRequest,
+                                              BATCH_CODE
+    )).thenReturn(assignment);
+    when(assignmentRequestMapper.validateCopyAssignmentWebRequest(
+      copyAssignmentWebRequest)).thenReturn(copyAssignmentWebRequest);
+    when(assignmentRequestMapper.toAssignmentWithId(ASSIGNMENT_ID,
+                                                    assignmentWebRequest,
+                                                    BATCH_CODE
+    )).thenReturn(assignment);
   }
 
   @After
   public void tearDown() throws Exception {
+
     verifyNoMoreInteractions(assignmentService);
     verifyNoMoreInteractions(assignmentRequestMapper);
   }
 
   @Test
   public void testCopyAssignmentByCopyAssignmentWebRequest() throws Exception {
-    mockMvc.perform(
-        post("/api/scoring/batches/" + BATCH_CODE + "/assignments/copy")
-            .cookie(cookies)
-        .contentType(MediaType.APPLICATION_JSON_VALUE)
-        .content(copyAssignmentWebRequestJacksonTester.write(copyAssignmentWebRequest).getJson()))
-        .andExpect(status().isCreated())
-        .andExpect(content().json(
-            dataResponseJacksonTester.write(CREATED_DATA_RESPONSE)
-            .getJson()));
+
+    mockMvc.perform(post(
+      "/api/scoring/batches/" + BATCH_CODE + "/assignments/copy").cookie(
+      cookies)
+                      .contentType(MediaType.APPLICATION_JSON_VALUE)
+                      .content(copyAssignmentWebRequestJacksonTester.write(
+                        copyAssignmentWebRequest)
+                                 .getJson()))
+      .andExpect(status().isCreated())
+      .andExpect(content().json(
+        dataResponseJacksonTester.write(CREATED_DATA_RESPONSE)
+          .getJson()));
     verify(assignmentService).copyAssignment(ASSIGNMENT_ID, "BATCH-3");
-    verify(assignmentRequestMapper).validateCopyAssignmentWebRequest(copyAssignmentWebRequest);
+    verify(assignmentRequestMapper).validateCopyAssignmentWebRequest(
+      copyAssignmentWebRequest);
   }
 
   @Test
   public void testFindAssignmentByIdDataResponseAssignment() throws Exception {
 
-    mockMvc.perform(
-        get("/api/scoring/batches/" + BATCH_CODE + "/assignments/" + ASSIGNMENT_ID)
-            .cookie(cookies))
-            .andExpect(status().isOk())
-            .andExpect(content().json(
-                    dataResponseJacksonTester.write(DATA_RESPONSE)
-                            .getJson()));
+    mockMvc.perform(get("/api/scoring/batches/" + BATCH_CODE + "/assignments/" +
+                        ASSIGNMENT_ID).cookie(cookies))
+      .andExpect(status().isOk())
+      .andExpect(content().json(dataResponseJacksonTester.write(DATA_RESPONSE)
+                                  .getJson()));
 
     verify(assignmentService).findById(ASSIGNMENT_ID);
     verifyZeroInteractions(assignmentRequestMapper);
@@ -184,13 +219,13 @@ public class AssignmentControllerTest extends TestHelper {
 
   @Test
   public void testDeleteAssignmentByIdBaseResponseOk() throws Exception {
-    mockMvc.perform(
-        delete("/api/scoring/batches/" + BATCH_CODE + "/assignments/" + ASSIGNMENT_ID)
-            .cookie(cookies))
-            .andExpect(status().isOk())
-            .andExpect(content().json(
-                    baseResponseJacksonTester.write(BASE_RESPONSE)
-                            .getJson()));
+
+    mockMvc.perform(delete(
+      "/api/scoring/batches/" + BATCH_CODE + "/assignments/" +
+      ASSIGNMENT_ID).cookie(cookies))
+      .andExpect(status().isOk())
+      .andExpect(content().json(baseResponseJacksonTester.write(BASE_RESPONSE)
+                                  .getJson()));
 
     verify(assignmentService).deleteById(ASSIGNMENT_ID);
     verifyZeroInteractions(assignmentRequestMapper);
@@ -198,63 +233,72 @@ public class AssignmentControllerTest extends TestHelper {
 
   @Test
   public void testCreateAssignment() throws Exception {
-    mockMvc.perform(
-            post("/api/scoring/batches/" + BATCH_CODE + "/assignments")
-                .cookie(cookies)
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-                    .content(assignmentWebRequestJacksonTester.write(assignmentWebRequest).getJson()))
-            .andExpect(status().isCreated())
-            .andExpect(content().json(
-                dataResponseJacksonTester.write(CREATED_DATA_RESPONSE)
-                .getJson()));
+
+    mockMvc.perform(post(
+      "/api/scoring/batches/" + BATCH_CODE + "/assignments").cookie(cookies)
+                      .contentType(MediaType.APPLICATION_JSON_VALUE)
+                      .content(assignmentWebRequestJacksonTester.write(
+                        assignmentWebRequest)
+                                 .getJson()))
+      .andExpect(status().isCreated())
+      .andExpect(content().json(
+        dataResponseJacksonTester.write(CREATED_DATA_RESPONSE)
+          .getJson()));
 
     verify(assignmentService).createAssignment(assignment);
-      verify(assignmentRequestMapper).toAssignment(assignmentWebRequest, BATCH_CODE);
+    verify(assignmentRequestMapper).toAssignment(
+      assignmentWebRequest, BATCH_CODE);
   }
 
   @Test
   public void testUpdateAssignmentWithRequest() throws Exception {
-    mockMvc.perform(
-            put("/api/scoring/batches/" + BATCH_CODE + "/assignments/" + ASSIGNMENT_ID)
-                .cookie(cookies)
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-                    .content(assignmentWebRequestJacksonTester.write(assignmentWebRequest).getJson()))
-            .andExpect(status().isOk())
-            .andExpect(content().json(
-                    dataResponseJacksonTester.write(DATA_RESPONSE)
-                            .getJson()));
+
+    mockMvc.perform(put("/api/scoring/batches/" + BATCH_CODE + "/assignments/" +
+                        ASSIGNMENT_ID).cookie(cookies)
+                      .contentType(MediaType.APPLICATION_JSON_VALUE)
+                      .content(assignmentWebRequestJacksonTester.write(
+                        assignmentWebRequest)
+                                 .getJson()))
+      .andExpect(status().isOk())
+      .andExpect(content().json(dataResponseJacksonTester.write(DATA_RESPONSE)
+                                  .getJson()));
 
     verify(assignmentService).updateAssignment(assignment);
-      verify(assignmentRequestMapper).toAssignmentWithId(ASSIGNMENT_ID, assignmentWebRequest, BATCH_CODE);
+    verify(assignmentRequestMapper).toAssignmentWithId(
+      ASSIGNMENT_ID, assignmentWebRequest, BATCH_CODE);
   }
 
   @Test
   public void testFindAllAssignmentWithNoPagingParameters() throws Exception {
-    mockMvc.perform(
-        get("/api/scoring/batches/" + BATCH_CODE + "/assignments")
-            .cookie(cookies))
-            .andExpect(status().isOk())
-            .andExpect(content().json(
-                    pagingResponseJacksonTester.write(PAGING_RESPONSE)
-                            .getJson()));
 
-    verify(assignmentService).findAllByBatchCodeAndPageable(BATCH_CODE, pageable);
+    mockMvc.perform(
+      get("/api/scoring/batches/" + BATCH_CODE + "/assignments").cookie(
+        cookies))
+      .andExpect(status().isOk())
+      .andExpect(content().json(
+        pagingResponseJacksonTester.write(PAGING_RESPONSE)
+          .getJson()));
+
+    verify(assignmentService).findAllByBatchCodeAndPageable(
+      BATCH_CODE, pageable);
     verifyZeroInteractions(assignmentRequestMapper);
   }
 
   @Test
   public void testFindAllAssignmentWithPagingParameters() throws Exception {
-    mockMvc.perform(
-            get("/api/scoring/batches/" + BATCH_CODE + "/assignments")
-                .cookie(cookies)
-                .param("page", "1")
-                .param("size", "10"))
-            .andExpect(status().isOk())
-            .andExpect(content().json(
-                    pagingResponseJacksonTester.write(PAGING_RESPONSE)
-                            .getJson()));
 
-    verify(assignmentService).findAllByBatchCodeAndPageable(BATCH_CODE, pageable);
+    mockMvc.perform(get(
+      "/api/scoring/batches/" + BATCH_CODE + "/assignments").cookie(cookies)
+                      .param("page", "1")
+                      .param("size", "10"))
+      .andExpect(status().isOk())
+      .andExpect(content().json(
+        pagingResponseJacksonTester.write(PAGING_RESPONSE)
+          .getJson()));
+
+    verify(assignmentService).findAllByBatchCodeAndPageable(
+      BATCH_CODE, pageable);
     verifyZeroInteractions(assignmentRequestMapper);
   }
+
 }

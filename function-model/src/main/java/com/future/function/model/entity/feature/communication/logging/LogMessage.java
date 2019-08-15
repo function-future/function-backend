@@ -20,20 +20,20 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @Document(collection = DocumentName.LOG_MESSAGE)
-public class LogMessage extends BaseEntity{
+public class LogMessage extends BaseEntity {
 
-    @Id
-    private String id;
+  @Id
+  private String id;
 
-    @Field(FieldName.LogMessage.SENDER)
-    @DBRef(lazy = true)
-    private User sender;
+  @Field(FieldName.LogMessage.SENDER)
+  @DBRef(lazy = true)
+  private User sender;
 
-    @Field(FieldName.LogMessage.TEXT)
-    private String text;
+  @Field(FieldName.LogMessage.TEXT)
+  private String text;
 
-    @Field(FieldName.LogMessage.TOPIC)
-    @DBRef(lazy = true)
-    private Topic topic;
+  @Field(FieldName.LogMessage.TOPIC)
+  @DBRef(lazy = true)
+  private Topic topic;
 
 }

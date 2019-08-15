@@ -30,99 +30,129 @@ public class MyQuestionnaireResponseMapper {
   private static final String NO_BATCH = "No-Batch";
 
   public static DataResponse<List<AppraiseeResponse>> toDataResponseAppraiseeResponseList(
-    List<QuestionnaireParticipant> data,
-    String urlPrefix
+    List<QuestionnaireParticipant> data, String urlPrefix
   ) {
-    return ResponseHelper.toDataResponse(
-            HttpStatus.OK,
-            toAppraiseeResponseList(data, urlPrefix)
+
+    return ResponseHelper.toDataResponse(HttpStatus.OK,
+                                         toAppraiseeResponseList(data,
+                                                                 urlPrefix
+                                         )
     );
   }
 
-  private static List<AppraiseeResponse> toAppraiseeResponseList(List<QuestionnaireParticipant> data, String urlPrefix) {
+  private static List<AppraiseeResponse> toAppraiseeResponseList(
+    List<QuestionnaireParticipant> data, String urlPrefix
+  ) {
+
     return data.stream()
-            .map(questionnaireParticipant -> toAppraiseeResponse(questionnaireParticipant, urlPrefix))
-            .collect(Collectors.toList());
+      .map(questionnaireParticipant -> toAppraiseeResponse(
+        questionnaireParticipant, urlPrefix))
+      .collect(Collectors.toList());
   }
 
   public static AppraiseeResponse toAppraiseeResponse(
-    QuestionnaireParticipant questionnaireParticipant,
-    String urlPrefix
+    QuestionnaireParticipant questionnaireParticipant, String urlPrefix
   ) {
+
     return AppraiseeResponse.builder()
-            .id(questionnaireParticipant.getMember().getId())
-            .name(questionnaireParticipant.getMember().getName())
-            .avatar(getThumnailUrl(questionnaireParticipant.getMember(), urlPrefix))
-            .batch(toBatchResponse(questionnaireParticipant.getMember().getBatch(), questionnaireParticipant.getMember().getRole()))
-            .role(questionnaireParticipant.getMember().getRole().toString())
-            .university(questionnaireParticipant.getMember().getUniversity())
-            .build();
+      .id(questionnaireParticipant.getMember()
+            .getId())
+      .name(questionnaireParticipant.getMember()
+              .getName())
+      .avatar(getThumnailUrl(questionnaireParticipant.getMember(), urlPrefix))
+      .batch(toBatchResponse(
+        questionnaireParticipant.getMember()
+          .getBatch(), questionnaireParticipant.getMember()
+          .getRole()))
+      .role(questionnaireParticipant.getMember()
+              .getRole()
+              .toString())
+      .university(questionnaireParticipant.getMember()
+                    .getUniversity())
+      .build();
   }
 
   private static BatchWebResponse toBatchResponse(Batch batch, Role role) {
-    if (role.toString().equals("STUDENT")) {
+
+    if (role.toString()
+      .equals("STUDENT")) {
       return BatchWebResponse.builder()
-              .id(batch.getId())
-              .name(batch.getName())
-              .code(batch.getCode())
-              .build();
+        .id(batch.getId())
+        .name(batch.getName())
+        .code(batch.getCode())
+        .build();
     }
     return BatchWebResponse.builder()
-            .id(NO_BATCH)
-            .name(NO_BATCH)
-            .code(NO_BATCH)
-            .build();
+      .id(NO_BATCH)
+      .name(NO_BATCH)
+      .code(NO_BATCH)
+      .build();
 
-  }
-
-  public static DataResponse<AppraisalDataResponse> toDataResponseQuestionnaireSummaryDescriptionResponse(
-    Questionnaire questionnaire, User user, String urlPrefix
-  ) {
-    return ResponseHelper.toDataResponse(
-            HttpStatus.OK,
-            toQuestionnaireSummaryDescriptionResponse(questionnaire, user, urlPrefix)
-    );
-  }
-
-  private static AppraisalDataResponse toQuestionnaireSummaryDescriptionResponse(
-    Questionnaire questionnaire, User user, String urlPrefix
-  ) {
-    return AppraisalDataResponse.builder()
-            .questionnaireDetail(toQuestionnaireDetailResponse(questionnaire))
-            .appraisee(toAppraiseeResponse(user, urlPrefix))
-            .build();
-  }
-
-  private static QuestionnaireDetailResponse toQuestionnaireDetailResponse(Questionnaire questionnaire) {
-    return QuestionnaireDetailResponse.builder()
-            .id(questionnaire.getId())
-            .title(questionnaire.getTitle())
-            .description(questionnaire.getDescription())
-            .startDate(questionnaire.getStartDate())
-            .dueDate(questionnaire.getDueDate())
-            .build();
-  }
-
-  private static AppraiseeResponse toAppraiseeResponse(User appraisee, String urlPrefix) {
-    return AppraiseeResponse.builder()
-            .id(appraisee.getId())
-            .name(appraisee.getName())
-            .avatar(getThumnailUrl(appraisee, urlPrefix))
-            .role(appraisee.getRole().toString())
-            .batch(toBatchResponse(appraisee.getBatch(), appraisee.getRole()))
-            .university(appraisee.getUniversity())
-            .build();
-  }
-
-  public static DataResponse<List<QuestionQuestionnaireResponse>> toDataResponseQuestionQuestionnaireResponseList(List<QuestionQuestionnaire> data) {
-    return ResponseHelper.toDataResponse(HttpStatus.OK, toQuestionQuestionnaireResponseList(data));
   }
 
   private static String getThumnailUrl(User user, String urlPrefix) {
+
     return Optional.ofNullable(user)
       .map(User::getPictureV2)
       .map(FileV2::getThumbnailUrl)
       .map(urlPrefix::concat)
       .orElse(null);
   }
+
+  public static DataResponse<AppraisalDataResponse> toDataResponseQuestionnaireSummaryDescriptionResponse(
+    Questionnaire questionnaire, User user, String urlPrefix
+  ) {
+
+    return ResponseHelper.toDataResponse(HttpStatus.OK,
+                                         toQuestionnaireSummaryDescriptionResponse(
+                                           questionnaire, user, urlPrefix)
+    );
+  }
+
+  private static AppraisalDataResponse toQuestionnaireSummaryDescriptionResponse(
+    Questionnaire questionnaire, User user, String urlPrefix
+  ) {
+
+    return AppraisalDataResponse.builder()
+      .questionnaireDetail(toQuestionnaireDetailResponse(questionnaire))
+      .appraisee(toAppraiseeResponse(user, urlPrefix))
+      .build();
+  }
+
+  private static QuestionnaireDetailResponse toQuestionnaireDetailResponse(
+    Questionnaire questionnaire
+  ) {
+
+    return QuestionnaireDetailResponse.builder()
+      .id(questionnaire.getId())
+      .title(questionnaire.getTitle())
+      .description(questionnaire.getDescription())
+      .startDate(questionnaire.getStartDate())
+      .dueDate(questionnaire.getDueDate())
+      .build();
+  }
+
+  private static AppraiseeResponse toAppraiseeResponse(
+    User appraisee, String urlPrefix
+  ) {
+
+    return AppraiseeResponse.builder()
+      .id(appraisee.getId())
+      .name(appraisee.getName())
+      .avatar(getThumnailUrl(appraisee, urlPrefix))
+      .role(appraisee.getRole()
+              .toString())
+      .batch(toBatchResponse(appraisee.getBatch(), appraisee.getRole()))
+      .university(appraisee.getUniversity())
+      .build();
+  }
+
+  public static DataResponse<List<QuestionQuestionnaireResponse>> toDataResponseQuestionQuestionnaireResponseList(
+    List<QuestionQuestionnaire> data
+  ) {
+
+    return ResponseHelper.toDataResponse(
+      HttpStatus.OK, toQuestionQuestionnaireResponseList(data));
+  }
+
 }

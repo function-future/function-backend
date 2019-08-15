@@ -8,30 +8,30 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class StickyNoteRequestMapper {
-  
+
   private final RequestValidator validator;
-  
+
   @Autowired
   public StickyNoteRequestMapper(
     RequestValidator validator
   ) {
-    
+
     this.validator = validator;
   }
-  
+
   public StickyNote toStickyNote(StickyNoteWebRequest request) {
-  
+
     return toValidatedStickyNote(request);
   }
-  
+
   private StickyNote toValidatedStickyNote(StickyNoteWebRequest request) {
-    
+
     validator.validate(request);
-    
+
     return StickyNote.builder()
       .title(request.getTitle())
       .description(request.getDescription())
       .build();
   }
-  
+
 }

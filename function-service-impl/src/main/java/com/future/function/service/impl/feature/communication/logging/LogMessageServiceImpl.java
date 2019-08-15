@@ -14,6 +14,7 @@ import java.util.Optional;
 
 @Service
 public class LogMessageServiceImpl implements LogMessageService {
+
   private final LogMessageRepository logMessageRepository;
 
   private final TopicService topicService;
@@ -21,37 +22,46 @@ public class LogMessageServiceImpl implements LogMessageService {
   private final UserService userService;
 
   @Autowired
-  public LogMessageServiceImpl(LogMessageRepository logMessageRepository, TopicService topicService, UserService userService) {
+  public LogMessageServiceImpl(
+    LogMessageRepository logMessageRepository, TopicService topicService,
+    UserService userService
+  ) {
+
     this.logMessageRepository = logMessageRepository;
     this.topicService = topicService;
     this.userService = userService;
   }
 
   @Override
-  public Page<LogMessage> getLogMessagesByTopic(String topicId, Pageable pageable) {
+  public Page<LogMessage> getLogMessagesByTopic(
+    String topicId, Pageable pageable
+  ) {
+
     return logMessageRepository.findAllByTopicOrderByCreatedAtDesc(
-      topicService.getTopic(topicId),
-      pageable
-    );
+      topicService.getTopic(topicId), pageable);
   }
 
   @Override
   public LogMessage createLogMessage(LogMessage logMessage) {
+
     return Optional.of(logMessage)
-            .map(this::setSender)
-            .map(this::setTopic)
-            .map(logMessageRepository::save)
-            .orElseThrow(UnsupportedOperationException::new);
+      .map(this::setSender)
+      .map(this::setTopic)
+      .map(logMessageRepository::save)
+      .orElseThrow(UnsupportedOperationException::new);
   }
 
   private LogMessage setTopic(LogMessage logMessage) {
-    logMessage.setTopic(topicService.getTopic(
-      logMessage.getTopic().getId()));
+
+    logMessage.setTopic(topicService.getTopic(logMessage.getTopic()
+                                                .getId()));
     return logMessage;
   }
 
   private LogMessage setSender(LogMessage logMessage) {
-    logMessage.setSender(userService.getUser(logMessage.getSender().getId()));
+
+    logMessage.setSender(userService.getUser(logMessage.getSender()
+                                               .getId()));
     return logMessage;
   }
 

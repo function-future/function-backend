@@ -8,7 +8,9 @@ public interface ChatroomService {
 
   Page<Chatroom> getChatrooms(String type, String userId, Pageable pageable);
 
-  Page<Chatroom> getChatroomsWithKeyword(String keyword, String userId, Pageable pageable);
+  Page<Chatroom> getChatroomsWithKeyword(
+    String keyword, String userId, Pageable pageable
+  );
 
   Chatroom getChatroom(String chatroomId, String userId);
 

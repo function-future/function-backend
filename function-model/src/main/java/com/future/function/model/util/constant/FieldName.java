@@ -158,6 +158,7 @@ public interface FieldName {
     public static final String SCORE_SUMMARY = "scoreSummary";
 
     public static final String COUNTER = "counter";
+
   }
 
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -172,6 +173,7 @@ public interface FieldName {
     public static final String SCORE_SUMMARY = "scoreSummary";
 
     public static final String DETAILS = "details";
+
   }
 
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -184,6 +186,7 @@ public interface FieldName {
     public static final String SCORE_SUMMARY = "scoreSummary";
 
     public static final String COUNTER = "counter";
+
   }
 
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -194,10 +197,11 @@ public interface FieldName {
     public static final String MEMBER = "member";
 
     public static final String TYPE = "type";
+
   }
 
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
-  abstract class UserQuestionnairesSummary{
+  abstract class UserQuestionnairesSummary {
 
     public static final String APPRAISEE = "appraisee";
 
@@ -211,8 +215,7 @@ public interface FieldName {
 
   }
 
-
-
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
   abstract class Chatroom {
 
     public static final String MEMBERS = "members";
@@ -246,7 +249,6 @@ public interface FieldName {
     public static final String CHATROOM = "chatroom";
 
   }
-
 
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
   abstract class Course {
@@ -370,20 +372,20 @@ public interface FieldName {
 
   }
 
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    abstract class Assignment {
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  abstract class Assignment {
 
-      public static final String TITLE = "title";
+    public static final String TITLE = "title";
 
-      public static final String DESCRIPTION = "description";
+    public static final String DESCRIPTION = "description";
 
-      public static final String DEADLINE = "deadline";
+    public static final String DEADLINE = "deadline";
 
-      public static final String FILE = "file";
+    public static final String FILE = "file";
 
-      public static final String BATCH = "batch";
+    public static final String BATCH = "batch";
 
-    }
+  }
 
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
   abstract class Room {
@@ -406,7 +408,6 @@ public interface FieldName {
     public static final String ROOM = "room";
 
   }
-
 
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
   abstract class Report {

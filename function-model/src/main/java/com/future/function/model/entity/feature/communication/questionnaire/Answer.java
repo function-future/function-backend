@@ -18,4 +18,5 @@ public class Answer {
   private float maximum;
 
   private float average;
+
 }

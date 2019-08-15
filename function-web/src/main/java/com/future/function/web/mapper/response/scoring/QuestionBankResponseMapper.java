@@ -17,32 +17,43 @@ import java.util.stream.Collectors;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class QuestionBankResponseMapper {
 
-  public static DataResponse<QuestionBankWebResponse> toQuestionBankWebResponse(QuestionBank questionBank) {
-    return ResponseHelper.toDataResponse(HttpStatus.OK, buildQuestionBankWebResponse(questionBank));
+  public static DataResponse<QuestionBankWebResponse> toQuestionBankWebResponse(
+    QuestionBank questionBank
+  ) {
+
+    return ResponseHelper.toDataResponse(
+      HttpStatus.OK, buildQuestionBankWebResponse(questionBank));
   }
 
-  public static DataResponse<QuestionBankWebResponse> toQuestionBankWebResponse(HttpStatus httpStatus, QuestionBank request) {
-    return ResponseHelper.toDataResponse(httpStatus, buildQuestionBankWebResponse(request));
-  }
+  private static QuestionBankWebResponse buildQuestionBankWebResponse(
+    QuestionBank questionBank
+  ) {
 
-  private static QuestionBankWebResponse buildQuestionBankWebResponse(QuestionBank questionBank) {
     QuestionBankWebResponse response = new QuestionBankWebResponse();
     BeanUtils.copyProperties(questionBank, response);
     return response;
   }
 
-  public static PagingResponse<QuestionBankWebResponse> toPagingQuestionBankWebResponse(Page<QuestionBank> questionBankPage) {
-    return ResponseHelper
-        .toPagingResponse(
-            HttpStatus.OK,
-            questionBankPage
-                .getContent()
-                .stream()
-                .map(QuestionBankResponseMapper::buildQuestionBankWebResponse)
-                .collect(Collectors.toList()),
-            PageHelper
-                .toPaging(questionBankPage)
-        );
+  public static DataResponse<QuestionBankWebResponse> toQuestionBankWebResponse(
+    HttpStatus httpStatus, QuestionBank request
+  ) {
+
+    return ResponseHelper.toDataResponse(
+      httpStatus, buildQuestionBankWebResponse(request));
+  }
+
+  public static PagingResponse<QuestionBankWebResponse> toPagingQuestionBankWebResponse(
+    Page<QuestionBank> questionBankPage
+  ) {
+
+    return ResponseHelper.toPagingResponse(HttpStatus.OK,
+                                           questionBankPage.getContent()
+                                             .stream()
+                                             .map(
+                                               QuestionBankResponseMapper::buildQuestionBankWebResponse)
+                                             .collect(Collectors.toList()),
+                                           PageHelper.toPaging(questionBankPage)
+    );
   }
 
 }

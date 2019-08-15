@@ -7,22 +7,22 @@ import com.future.function.model.entity.feature.core.FileV2;
 import java.util.List;
 
 public interface ResourceService {
-  
+
   FileV2 storeAndSaveFile(
     String objectName, String fileName, byte[] bytes, FileOrigin fileOrigin
   );
-  
+
   FileV2 storeFile(
     String fileId, String parentId, String objectName, String fileName,
     byte[] bytes, FileOrigin fileOrigin
   );
-  
+
   FileV2 getFile(String fileId);
-  
+
   boolean markFilesUsed(List<String> fileIds, boolean used);
-  
+
   byte[] getFileAsByteArray(
     Role role, String fileName, FileOrigin fileOrigin, Long version
   );
-  
+
 }

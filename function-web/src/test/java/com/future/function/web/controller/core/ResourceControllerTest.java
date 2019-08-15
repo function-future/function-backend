@@ -54,7 +54,7 @@ public class ResourceControllerTest extends TestHelper {
   private static final String ID = "id";
 
   private static final String FILE_URL = "file-url";
-  
+
   private static final String URL_PREFIX = "url-prefix/";
 
   private static final FileV2 FILE_V2_NULL_THUMBNAIL = FileV2.builder()
@@ -66,14 +66,15 @@ public class ResourceControllerTest extends TestHelper {
 
   private static final DataResponse<FileContentWebResponse>
     CREATED_DATA_RESPONSE_NULL_THUMBNAIL =
-    ResourceResponseMapper.toResourceDataResponse(FILE_V2_NULL_THUMBNAIL, URL_PREFIX);
+    ResourceResponseMapper.toResourceDataResponse(
+      FILE_V2_NULL_THUMBNAIL, URL_PREFIX);
 
   @MockBean
   private ResourceService resourceService;
 
   @MockBean
   private ResourceRequestMapper resourceRequestMapper;
-  
+
   @MockBean
   private FileProperties fileProperties;
 
@@ -87,15 +88,16 @@ public class ResourceControllerTest extends TestHelper {
   @After
   public void tearDown() {
 
-    verifyNoMoreInteractions(resourceService, resourceRequestMapper, fileProperties);
+    verifyNoMoreInteractions(
+      resourceService, resourceRequestMapper, fileProperties);
   }
 
   @Test
   public void testGivenApiCallByStoringFileReturnDataResponseObject()
     throws Exception {
-    
+
     super.setCookie(Role.MENTOR);
-    
+
     when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
 
     Pair<String, byte[]> pair = Pair.of(NAME, BYTES);
@@ -133,8 +135,7 @@ public class ResourceControllerTest extends TestHelper {
                                             FileOrigin.ANNOUNCEMENT, null
     )).thenReturn(BYTES);
 
-    mockMvc.perform(
-      get("/api/core/resources/" + ORIGIN + "/" + ORIGINAL_NAME))
+    mockMvc.perform(get("/api/core/resources/" + ORIGIN + "/" + ORIGINAL_NAME))
       .andExpect(status().isOk())
       .andExpect(header().string(HttpHeaders.CONTENT_DISPOSITION,
                                  "attachment; filename=\"" + ORIGINAL_NAME +

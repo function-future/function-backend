@@ -20,55 +20,88 @@ import java.util.stream.Collectors;
 public class QuestionnaireResponseMapper {
 
   public static PagingResponse<QuestionnaireDetailResponse> toPagingQuestionnaireDetailResponse(
-          Page<Questionnaire> data
+    Page<Questionnaire> data
   ) {
-    return ResponseHelper.toPagingResponse(HttpStatus.OK, toQuestionnaireDetailResponseList(data), PageHelper.toPaging(data));
+
+    return ResponseHelper.toPagingResponse(HttpStatus.OK,
+                                           toQuestionnaireDetailResponseList(
+                                             data), PageHelper.toPaging(data)
+    );
   }
 
-  private static List<QuestionnaireDetailResponse> toQuestionnaireDetailResponseList(Page<Questionnaire> data){
+  private static List<QuestionnaireDetailResponse> toQuestionnaireDetailResponseList(
+    Page<Questionnaire> data
+  ) {
+
     return data.getContent()
-            .stream()
-            .map(QuestionnaireResponseMapper::toQuestionnaireDetailResponse)
-            .collect(Collectors.toList());
+      .stream()
+      .map(QuestionnaireResponseMapper::toQuestionnaireDetailResponse)
+      .collect(Collectors.toList());
   }
 
-  private static QuestionnaireDetailResponse toQuestionnaireDetailResponse(Questionnaire questionnaire){
+  private static QuestionnaireDetailResponse toQuestionnaireDetailResponse(
+    Questionnaire questionnaire
+  ) {
+
     return QuestionnaireDetailResponse.builder()
-            .id(questionnaire.getId())
-            .title(questionnaire.getTitle())
-            .description(questionnaire.getDescription())
-            .startDate(questionnaire.getStartDate())
-            .dueDate(questionnaire.getDueDate())
-            .build();
+      .id(questionnaire.getId())
+      .title(questionnaire.getTitle())
+      .description(questionnaire.getDescription())
+      .startDate(questionnaire.getStartDate())
+      .dueDate(questionnaire.getDueDate())
+      .build();
   }
 
-  public static DataResponse<QuestionnaireDetailResponse> toDataResponseQuestionnaireDetailResponse(Questionnaire questionnaire, HttpStatus httpStatus) {
+  public static DataResponse<QuestionnaireDetailResponse> toDataResponseQuestionnaireDetailResponse(
+    Questionnaire questionnaire, HttpStatus httpStatus
+  ) {
 
-    return ResponseHelper.toDataResponse(httpStatus,toQuestionnaireDetailResponse(questionnaire));
+    return ResponseHelper.toDataResponse(httpStatus,
+                                         toQuestionnaireDetailResponse(
+                                           questionnaire)
+    );
   }
 
   public static PagingResponse<QuestionnaireSimpleSummaryResponse> toPagingQuestionnaireSimpleSummaryResponse(
-          Page<QuestionnaireResponseSummary> data,
-          HttpStatus httpStatus) {
-    return ResponseHelper.toPagingResponse(httpStatus, toQuestionnaireSimpleSummaryResponseList(data), PageHelper.toPaging(data));
+    Page<QuestionnaireResponseSummary> data, HttpStatus httpStatus
+  ) {
+
+    return ResponseHelper.toPagingResponse(httpStatus,
+                                           toQuestionnaireSimpleSummaryResponseList(
+                                             data), PageHelper.toPaging(data)
+    );
   }
 
-  private static List<QuestionnaireSimpleSummaryResponse> toQuestionnaireSimpleSummaryResponseList(Page<QuestionnaireResponseSummary> data) {
+  private static List<QuestionnaireSimpleSummaryResponse> toQuestionnaireSimpleSummaryResponseList(
+    Page<QuestionnaireResponseSummary> data
+  ) {
+
     return data.getContent()
-            .stream()
-            .map(QuestionnaireResponseMapper::toQuestionnaireSimpleSummaryResponse)
-            .collect(Collectors.toList());
+      .stream()
+      .map(QuestionnaireResponseMapper::toQuestionnaireSimpleSummaryResponse)
+      .collect(Collectors.toList());
   }
 
-  private static QuestionnaireSimpleSummaryResponse toQuestionnaireSimpleSummaryResponse(QuestionnaireResponseSummary questionnaireResponseSummary) {
+  private static QuestionnaireSimpleSummaryResponse toQuestionnaireSimpleSummaryResponse(
+    QuestionnaireResponseSummary questionnaireResponseSummary
+  ) {
+
     return QuestionnaireSimpleSummaryResponse.builder()
-            .id(questionnaireResponseSummary.getId())
-            .title(questionnaireResponseSummary.getQuestionnaire().getTitle())
-            .description(questionnaireResponseSummary.getQuestionnaire().getDescription())
-            .status(questionnaireResponseSummary.getQuestionnaire().getDueDate() < System.currentTimeMillis() ? "FINISHED" : "ON_GOING")
-            .startDate(questionnaireResponseSummary.getQuestionnaire().getStartDate())
-            .dueDate(questionnaireResponseSummary.getQuestionnaire().getDueDate())
-            .score(questionnaireResponseSummary.getScoreSummary().getAverage())
-            .build();
+      .id(questionnaireResponseSummary.getId())
+      .title(questionnaireResponseSummary.getQuestionnaire()
+               .getTitle())
+      .description(questionnaireResponseSummary.getQuestionnaire()
+                     .getDescription())
+      .status(questionnaireResponseSummary.getQuestionnaire()
+                .getDueDate() < System.currentTimeMillis() ? "FINISHED"
+                                                           : "ON_GOING")
+      .startDate(questionnaireResponseSummary.getQuestionnaire()
+                   .getStartDate())
+      .dueDate(questionnaireResponseSummary.getQuestionnaire()
+                 .getDueDate())
+      .score(questionnaireResponseSummary.getScoreSummary()
+               .getAverage())
+      .build();
   }
+
 }

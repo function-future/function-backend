@@ -18,34 +18,58 @@ import java.util.stream.Collectors;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class NotificationResponseMapper {
 
-  public static PagingResponse<NotificationResponse> toPagingNotificationResponse(Page<Notification> notifications) {
+  public static PagingResponse<NotificationResponse> toPagingNotificationResponse(
+    Page<Notification> notifications
+  ) {
+
     return ResponseHelper.toPagingResponse(HttpStatus.OK,
-            toListNotificationResponse(notifications), PageHelper.toPaging(notifications));
+                                           toListNotificationResponse(
+                                             notifications),
+                                           PageHelper.toPaging(notifications)
+    );
   }
 
-  public static DataResponse<NotificationResponse> toSingleNotificationResponse(Notification notification) {
-    return ResponseHelper.toDataResponse(HttpStatus.OK, toNotificationResponse(notification));
+  private static List<NotificationResponse> toListNotificationResponse(
+    Page<Notification> notifications
+  ) {
+
+    return notifications.getContent()
+      .stream()
+      .map(NotificationResponseMapper::toNotificationResponse)
+      .collect(Collectors.toList());
   }
 
-  public static DataResponse<NotificationTotalUnseenResponse> toNotificationTotalUnseenResponse(Integer total) {
-    return ResponseHelper.toDataResponse(HttpStatus.OK,
-            NotificationTotalUnseenResponse.builder().total(total).build());
-  }
+  private static NotificationResponse toNotificationResponse(
+    Notification notification
+  ) {
 
-  private static List<NotificationResponse> toListNotificationResponse(Page<Notification> notifications) {
-    return notifications.getContent().stream()
-            .map(NotificationResponseMapper::toNotificationResponse)
-            .collect(Collectors.toList());
-  }
-
-  private static NotificationResponse toNotificationResponse(Notification notification) {
     return NotificationResponse.builder()
-            .id(notification.getId())
-            .createdAt(notification.getCreatedAt())
-            .description(notification.getContent())
-            .targetUser(notification.getMember().getId())
-            .title(notification.getTitle())
-            .build();
+      .id(notification.getId())
+      .createdAt(notification.getCreatedAt())
+      .description(notification.getContent())
+      .targetUser(notification.getMember()
+                    .getId())
+      .title(notification.getTitle())
+      .build();
+  }
+
+  public static DataResponse<NotificationResponse> toSingleNotificationResponse(
+    Notification notification
+  ) {
+
+    return ResponseHelper.toDataResponse(
+      HttpStatus.OK, toNotificationResponse(notification));
+  }
+
+  public static DataResponse<NotificationTotalUnseenResponse> toNotificationTotalUnseenResponse(
+    Integer total
+  ) {
+
+    return ResponseHelper.toDataResponse(HttpStatus.OK,
+                                         NotificationTotalUnseenResponse.builder()
+                                           .total(total)
+                                           .build()
+    );
   }
 
 }

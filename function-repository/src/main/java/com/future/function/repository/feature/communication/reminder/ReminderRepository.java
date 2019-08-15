@@ -7,6 +7,8 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 public interface ReminderRepository extends MongoRepository<Reminder, String> {
 
-  Page<Reminder> findAllByTitleContainingIgnoreCaseOrderByUpdatedAtDesc(String title, Pageable pageable);
+  Page<Reminder> findAllByTitleContainingIgnoreCaseOrderByUpdatedAtDesc(
+    String title, Pageable pageable
+  );
 
 }

@@ -42,10 +42,12 @@ public class QuestionnaireRequestMapperTest {
 
   @Test
   public void toQuestionnaire() {
-    when(validator.validate(QUESTIONNAIRE_REQUEST)).thenReturn(QUESTIONNAIRE_REQUEST);
 
-    Questionnaire data =
-      questionnaireRequestMapper.toQuestionnaire(QUESTIONNAIRE_REQUEST, QUESTIONNAIRE_ID_1);
+    when(validator.validate(QUESTIONNAIRE_REQUEST)).thenReturn(
+      QUESTIONNAIRE_REQUEST);
+
+    Questionnaire data = questionnaireRequestMapper.toQuestionnaire(
+      QUESTIONNAIRE_REQUEST, QUESTIONNAIRE_ID_1);
 
     assertThat(data.getId()).isEqualTo(QUESTIONNAIRE_ID_1);
     assertThat(data.getTitle()).isEqualTo(REQUEST_TITLE);
@@ -56,4 +58,5 @@ public class QuestionnaireRequestMapperTest {
 
     verify(validator).validate(QUESTIONNAIRE_REQUEST);
   }
+
 }

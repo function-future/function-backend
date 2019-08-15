@@ -29,21 +29,25 @@ public class ReminderRequestMapperTest {
 
   @After
   public void tearDown() {
+
     verifyNoMoreInteractions(requestValidator);
   }
 
   @Test
   public void testGivenNotificationRequestByCallingToNotificationReturnNotification() {
+
     ReminderRequest request = ReminderRequest.builder()
-            .repeatDays(Collections.singletonList(DayOfWeek.FRIDAY.name()))
-            .members(Collections.singletonList("userId"))
-            .build();
+      .repeatDays(Collections.singletonList(DayOfWeek.FRIDAY.name()))
+      .members(Collections.singletonList("userId"))
+      .build();
     when(requestValidator.validate(request)).thenReturn(request);
 
     Reminder reminder = reminderRequestMapper.toReminder(request, "reminderId");
 
     assertThat(reminder.getId()).isEqualTo("reminderId");
-    assertThat(reminder.getMembers().get(0).getId()).isEqualTo("userId");
+    assertThat(reminder.getMembers()
+                 .get(0)
+                 .getId()).isEqualTo("userId");
     verify(requestValidator).validate(request);
 
   }

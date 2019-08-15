@@ -10,21 +10,21 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 public interface FileRepositoryV2 extends MongoRepository<FileV2, String> {
-  
+
   Optional<FileV2> findByIdAndAsResource(String id, boolean asResource);
-  
+
   Page<FileV2> findAllByParentIdAndAsResourceFalseAndDeletedFalseOrderByMarkFolderDesc(
     String parentId, Pageable pageable
   );
-  
+
   List<FileV2> findAllByParentIdAndDeletedFalse(String parentId);
-  
+
   Optional<FileV2> findByIdAndParentIdAndDeletedFalse(
     String id, String parentId
   );
 
   Stream<FileV2> findAllByUsedFalse();
-  
+
   Optional<FileV2> findByIdAndDeletedFalse(String id);
-  
+
 }

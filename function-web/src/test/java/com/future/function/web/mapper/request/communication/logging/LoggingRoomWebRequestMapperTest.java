@@ -26,7 +26,7 @@ public class LoggingRoomWebRequestMapperTest {
 
   private static final String LOGGING_ROOM_ID = "loggingRoomId";
 
-  private static final LoggingRoomWebRequest LOGGING_ROOM_REQUEST=
+  private static final LoggingRoomWebRequest LOGGING_ROOM_REQUEST =
     LoggingRoomWebRequest.builder()
       .title(TITLE)
       .description(DESCRIPTION)
@@ -41,15 +41,16 @@ public class LoggingRoomWebRequestMapperTest {
 
   @Test
   public void toLoggingRoom() {
-    when(validator.validate(LOGGING_ROOM_REQUEST))
-      .thenReturn(LOGGING_ROOM_REQUEST);
+
+    when(validator.validate(LOGGING_ROOM_REQUEST)).thenReturn(
+      LOGGING_ROOM_REQUEST);
 
     LoggingRoom data = loggingRoomRequestMapper.toLoggingRoom(
-      LOGGING_ROOM_REQUEST, LOGGING_ROOM_ID
-    );
+      LOGGING_ROOM_REQUEST, LOGGING_ROOM_ID);
 
     assertThat(data.getId()).isEqualTo(LOGGING_ROOM_ID);
 
     verify(validator).validate(LOGGING_ROOM_REQUEST);
   }
+
 }

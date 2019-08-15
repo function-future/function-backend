@@ -14,11 +14,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class Dummy extends BaseEntity {
-  
+
   private String id;
-  
+
   private User user;
-  
+
   private String anotherField;
-  
+
 }

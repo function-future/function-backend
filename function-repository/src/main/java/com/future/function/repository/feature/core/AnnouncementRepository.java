@@ -7,7 +7,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 public interface AnnouncementRepository
   extends MongoRepository<Announcement, String> {
-  
+
   Page<Announcement> findAllByOrderByUpdatedAtDesc(Pageable pageable);
-  
+
 }

@@ -8,7 +8,6 @@ import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.base.paging.Paging;
 import com.future.function.web.model.response.feature.core.UserWebResponse;
-import java.util.Collections;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,6 +20,7 @@ import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -61,7 +61,9 @@ public class UserResponseMapperTest {
     .university(UNIVERSITY)
     .build();
 
-  private static final Pair<User, Integer> STUDENT_AND_FINAL_POINT_PAIR = Pair.of(STUDENT, 100);
+  private static final Pair<User, Integer> STUDENT_AND_FINAL_POINT_PAIR =
+    Pair.of(STUDENT, 100);
+
   private static final String URL_PREFIX = "url-prefix";
 
   private static final UserWebResponse STUDENT_WEB_RESPONSE =
@@ -125,8 +127,9 @@ public class UserResponseMapperTest {
     USERS, PAGEABLE, USERS.size());
 
 
-  private static final Page<Pair<User, Integer>> STUDENT_AND_FINAL_POINT_PAIR_PAGE =
-      new PageImpl<>(Collections.singletonList(STUDENT_AND_FINAL_POINT_PAIR), PAGEABLE, 1);
+  private static final Page<Pair<User, Integer>>
+    STUDENT_AND_FINAL_POINT_PAIR_PAGE = new PageImpl<>(
+    Collections.singletonList(STUDENT_AND_FINAL_POINT_PAIR), PAGEABLE, 1);
 
   private static final Paging PAGING = Paging.builder()
     .page(1)
@@ -135,10 +138,10 @@ public class UserResponseMapperTest {
     .build();
 
   private static final Paging STUDENT_AND_FINAL_POINT_PAGING = Paging.builder()
-      .page(1)
-      .size(2)
-      .totalRecords(1)
-      .build();
+    .page(1)
+    .size(2)
+    .totalRecords(1)
+    .build();
 
   private static final PagingResponse<UserWebResponse> PAGING_RESPONSE =
     PagingResponse.<UserWebResponse>builder().code(200)
@@ -147,12 +150,13 @@ public class UserResponseMapperTest {
       .paging(PAGING)
       .build();
 
-  private static final PagingResponse<UserWebResponse> STUDENT_AND_FINAL_POINT_PAGING_RESPONSE =
-      PagingResponse.<UserWebResponse>builder().code(200)
-          .status("OK")
-          .data(USER_WEB_RESPONSES)
-          .paging(STUDENT_AND_FINAL_POINT_PAGING)
-          .build();
+  private static final PagingResponse<UserWebResponse>
+    STUDENT_AND_FINAL_POINT_PAGING_RESPONSE =
+    PagingResponse.<UserWebResponse>builder().code(200)
+      .status("OK")
+      .data(USER_WEB_RESPONSES)
+      .paging(STUDENT_AND_FINAL_POINT_PAGING)
+      .build();
 
   @Before
   public void setUp() {}
@@ -164,7 +168,8 @@ public class UserResponseMapperTest {
   public void testGivenUserDataByMappingToDataResponseReturnDataResponseObject() {
 
     DataResponse<UserWebResponse> createdStudentDataResponse =
-      UserResponseMapper.toUserDataResponse(HttpStatus.CREATED, STUDENT, URL_PREFIX);
+      UserResponseMapper.toUserDataResponse(
+        HttpStatus.CREATED, STUDENT, URL_PREFIX);
 
     assertThat(createdStudentDataResponse).isNotNull();
     assertThat(createdStudentDataResponse).isEqualTo(
@@ -195,12 +200,16 @@ public class UserResponseMapperTest {
     BeanUtils.copyProperties(STUDENT_WEB_RESPONSE, response);
     response.setFinalPoint(100);
 
-    STUDENT_AND_FINAL_POINT_PAGING_RESPONSE.setData(Collections.singletonList(response));
+    STUDENT_AND_FINAL_POINT_PAGING_RESPONSE.setData(
+      Collections.singletonList(response));
 
     PagingResponse<UserWebResponse> pagingResponse =
-        UserResponseMapper.toUsersPagingResponseWithFinalPoint(STUDENT_AND_FINAL_POINT_PAIR_PAGE, URL_PREFIX);
+      UserResponseMapper.toUsersPagingResponseWithFinalPoint(
+        STUDENT_AND_FINAL_POINT_PAIR_PAGE, URL_PREFIX);
 
     assertThat(pagingResponse).isNotNull();
-    assertThat(pagingResponse).isEqualTo(STUDENT_AND_FINAL_POINT_PAGING_RESPONSE);
+    assertThat(pagingResponse).isEqualTo(
+      STUDENT_AND_FINAL_POINT_PAGING_RESPONSE);
   }
+
 }

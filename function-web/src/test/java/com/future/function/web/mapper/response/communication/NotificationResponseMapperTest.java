@@ -18,36 +18,61 @@ import java.util.Arrays;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
-
 @RunWith(MockitoJUnitRunner.class)
 public class NotificationResponseMapperTest {
 
-  private static final User USER = User.builder().id("userId").build();
+  private static final User USER = User.builder()
+    .id("userId")
+    .build();
+
   private static final String NOTIFICATION_ID_1 = "notificationId1";
+
   private static final String NOTIFICATION_ID_2 = "notificationId2";
-  private static final Notification NOTIFICATION_1 = Notification.builder().member(USER).id(NOTIFICATION_ID_1).build();
-  private static final Notification NOTIFICATION_2 = Notification.builder().member(USER).id(NOTIFICATION_ID_2).build();
+
+  private static final Notification NOTIFICATION_1 = Notification.builder()
+    .member(USER)
+    .id(NOTIFICATION_ID_1)
+    .build();
+
+  private static final Notification NOTIFICATION_2 = Notification.builder()
+    .member(USER)
+    .id(NOTIFICATION_ID_2)
+    .build();
 
   @Test
   public void testGivenPageNotificationsByCallingToPagingNotificationReturnPagingResponse() {
+
     Page<Notification> notificationPage = new PageImpl<>(
-            Arrays.asList(NOTIFICATION_1, NOTIFICATION_2), PageHelper.toPageable(1, 10), 2);
-    PagingResponse<NotificationResponse> responses = NotificationResponseMapper.toPagingNotificationResponse(notificationPage);
-    assertThat(responses.getData().get(0).getId()).isEqualTo(NOTIFICATION_1.getId());
-    assertThat(responses.getData().get(1).getId()).isEqualTo(NOTIFICATION_2.getId());
+      Arrays.asList(NOTIFICATION_1, NOTIFICATION_2),
+      PageHelper.toPageable(1, 10), 2
+    );
+    PagingResponse<NotificationResponse> responses =
+      NotificationResponseMapper.toPagingNotificationResponse(notificationPage);
+    assertThat(responses.getData()
+                 .get(0)
+                 .getId()).isEqualTo(NOTIFICATION_1.getId());
+    assertThat(responses.getData()
+                 .get(1)
+                 .getId()).isEqualTo(NOTIFICATION_2.getId());
   }
 
   @Test
   public void testGivenNotificationByCallingToSingleNotificationReturnDataResponse() {
-    DataResponse<NotificationResponse> response = NotificationResponseMapper.toSingleNotificationResponse(NOTIFICATION_1);
-    assertThat(response.getData().getId()).isEqualTo(NOTIFICATION_ID_1);
+
+    DataResponse<NotificationResponse> response =
+      NotificationResponseMapper.toSingleNotificationResponse(NOTIFICATION_1);
+    assertThat(response.getData()
+                 .getId()).isEqualTo(NOTIFICATION_ID_1);
   }
 
   @Test
   public void testGivenIntegerByCallingToNotificationTotalUnseenResponseReturnDataResponse() {
+
     int total = 1;
-    DataResponse<NotificationTotalUnseenResponse> response = NotificationResponseMapper.toNotificationTotalUnseenResponse(total);
-    assertThat(response.getData().getTotal()).isEqualTo(total);
+    DataResponse<NotificationTotalUnseenResponse> response =
+      NotificationResponseMapper.toNotificationTotalUnseenResponse(total);
+    assertThat(response.getData()
+                 .getTotal()).isEqualTo(total);
     assertThat(response.getCode()).isEqualTo(200);
   }
 
