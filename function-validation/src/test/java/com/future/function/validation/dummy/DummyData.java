@@ -1,11 +1,12 @@
 package com.future.function.validation.dummy;
 
-import javax.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.NotBlank;
+
+import javax.validation.constraints.Min;
 
 @Data
 @Builder
@@ -14,7 +15,7 @@ import org.hibernate.validator.constraints.NotBlank;
 public class DummyData {
 
   @Min(value = 10,
-          message = "Min")
+       message = "Min")
   private int number;
 
   @NotBlank(message = "NotBlank")

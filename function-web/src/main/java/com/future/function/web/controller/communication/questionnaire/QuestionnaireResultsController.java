@@ -32,7 +32,12 @@ public class QuestionnaireResultsController {
   private final BatchService batchService;
 
   @Autowired
-  public QuestionnaireResultsController(FileProperties fileProperties, QuestionnaireResultService questionnaireResultService, BatchService batchService) {
+  public QuestionnaireResultsController(
+    FileProperties fileProperties,
+    QuestionnaireResultService questionnaireResultService,
+    BatchService batchService
+  ) {
+
     this.fileProperties = fileProperties;
     this.questionnaireResultService = questionnaireResultService;
     this.batchService = batchService;
@@ -41,29 +46,36 @@ public class QuestionnaireResultsController {
   @ResponseStatus(HttpStatus.OK)
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   public PagingResponse<UserSummaryResponse> getUserSummary(
-    @RequestParam String batchCode,
-    @RequestParam(required = false, defaultValue = "1") int page,
-    @RequestParam(required = false, defaultValue = "10") int size
+    @RequestParam
+      String batchCode,
+    @RequestParam(required = false,
+                  defaultValue = "1")
+      int page,
+    @RequestParam(required = false,
+                  defaultValue = "10")
+      int size
   ) {
-      return QuestionnaireResultsResponseMapper.toPagingUserSummaryResponse(
-        questionnaireResultService.getAppraisalsQuestionnaireSummaryByBatch(
-          batchService.getBatchByCode(batchCode),
-          PageHelper.toPageable(page, size)
-        ),
-        fileProperties.getUrlPrefix()
-      );
+
+    return QuestionnaireResultsResponseMapper.toPagingUserSummaryResponse(
+      questionnaireResultService.getAppraisalsQuestionnaireSummaryByBatch(
+        batchService.getBatchByCode(batchCode),
+        PageHelper.toPageable(page, size)
+      ), fileProperties.getUrlPrefix());
   }
 
   @ResponseStatus(HttpStatus.OK)
-  @GetMapping(value="/{batchCode}/user-summary-response/{userSummaryId}",
-          produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping(value = "/{batchCode}/user-summary-response/{userSummaryId}",
+              produces = MediaType.APPLICATION_JSON_VALUE)
   public DataResponse<UserSummaryResponse> getUserSummaryById(
-          @PathVariable String batchCode,
-          @PathVariable String userSummaryId
+    @PathVariable
+      String batchCode,
+    @PathVariable
+      String userSummaryId
   ) {
+
     return QuestionnaireResultsResponseMapper.toDataResponseUserSummaryResponse(
-            questionnaireResultService.getAppraisalsQuestionnaireSummaryById(userSummaryId),
-            fileProperties.getUrlPrefix()
-    );
+      questionnaireResultService.getAppraisalsQuestionnaireSummaryById(
+        userSummaryId), fileProperties.getUrlPrefix());
   }
+
 }

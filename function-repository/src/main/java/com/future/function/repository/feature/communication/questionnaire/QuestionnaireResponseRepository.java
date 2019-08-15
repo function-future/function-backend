@@ -8,9 +8,15 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import java.util.List;
 import java.util.Optional;
 
-public interface QuestionnaireResponseRepository extends MongoRepository<QuestionnaireResponse,String> {
+public interface QuestionnaireResponseRepository
+  extends MongoRepository<QuestionnaireResponse, String> {
 
-  List<QuestionnaireResponse> findAllByQuestionnaireAndAppraiseeAndDeletedFalse(Questionnaire questionnaire, User appraisee);
+  List<QuestionnaireResponse> findAllByQuestionnaireAndAppraiseeAndDeletedFalse(
+    Questionnaire questionnaire, User appraisee
+  );
 
-  Optional<QuestionnaireResponse> findByQuestionnaireAndAppraiseeAndAppraiserAndDeletedFalse(Questionnaire questionnaire, User appraisee, User appraiser);
+  Optional<QuestionnaireResponse> findByQuestionnaireAndAppraiseeAndAppraiserAndDeletedFalse(
+    Questionnaire questionnaire, User appraisee, User appraiser
+  );
+
 }

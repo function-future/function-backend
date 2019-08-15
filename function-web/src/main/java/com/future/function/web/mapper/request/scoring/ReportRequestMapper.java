@@ -6,15 +6,12 @@ import com.future.function.model.entity.feature.core.User;
 import com.future.function.model.entity.feature.scoring.Report;
 import com.future.function.validation.RequestValidator;
 import com.future.function.web.model.request.scoring.ReportWebRequest;
-import java.util.List;
-import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 public class ReportRequestMapper {
@@ -23,34 +20,46 @@ public class ReportRequestMapper {
 
   @Autowired
   public ReportRequestMapper(RequestValidator validator) {
+
     this.validator = validator;
   }
 
   public Report toReport(ReportWebRequest request, String batchCode) {
+
     return toValidatedReport(request, batchCode);
   }
 
-  public Report toReport(ReportWebRequest request, String id, String batchCode) {
+  private Report toValidatedReport(ReportWebRequest request, String batchCode) {
+
+    return Optional.ofNullable(request)
+      .map(validator::validate)
+      .map(value -> Report.builder()
+        .title(value.getName())
+        .description(value.getDescription())
+        .batch(Batch.builder()
+                 .code(batchCode)
+                 .build())
+        .students(buildStudentsFromStudentIds(value.getStudents()))
+        .build())
+      .orElseThrow(() -> new BadRequestException("Bad Request"));
+  }
+
+  private List<User> buildStudentsFromStudentIds(List<String> studentIds) {
+
+    return studentIds.stream()
+      .map(id -> User.builder()
+        .id(id)
+        .build())
+      .collect(Collectors.toList());
+  }
+
+  public Report toReport(
+    ReportWebRequest request, String id, String batchCode
+  ) {
+
     Report report = toValidatedReport(request, batchCode);
     report.setId(id);
     return report;
   }
 
-  private Report toValidatedReport(ReportWebRequest request, String batchCode) {
-    return Optional.ofNullable(request)
-        .map(validator::validate)
-        .map(value -> Report.builder()
-            .title(value.getName())
-            .description(value.getDescription())
-            .batch(Batch.builder().code(batchCode).build())
-            .students(buildStudentsFromStudentIds(value.getStudents()))
-            .build())
-        .orElseThrow(() -> new BadRequestException("Bad Request"));
-  }
-
-  private List<User> buildStudentsFromStudentIds(List<String> studentIds) {
-    return studentIds.stream()
-        .map(id -> User.builder().id(id).build())
-        .collect(Collectors.toList());
-  }
 }

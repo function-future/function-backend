@@ -11,4 +11,5 @@ public interface OptionRepository extends MongoRepository<Option, String> {
   Optional<Option> findByIdAndDeletedFalse(String id);
 
   List<Option> findAllByQuestionId(String questionId);
+
 }

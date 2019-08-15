@@ -18,22 +18,22 @@ import java.util.stream.Collectors;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ActivityBlogResponseMapper {
-  
+
   public static PagingResponse<ActivityBlogWebResponse> toActivityBlogPagingResponse(
     Page<ActivityBlog> activityBlogs, String urlPrefix
   ) {
-    
+
     return ResponseHelper.toPagingResponse(HttpStatus.OK,
                                            ActivityBlogResponseMapper.toActivityBlogWebResponseList(
                                              activityBlogs, urlPrefix),
                                            PageHelper.toPaging(activityBlogs)
     );
   }
-  
+
   private static List<ActivityBlogWebResponse> toActivityBlogWebResponseList(
     Page<ActivityBlog> activityBlogs, String urlPrefix
   ) {
-    
+
     return activityBlogs.getContent()
       .stream()
       .map(
@@ -41,29 +41,11 @@ public final class ActivityBlogResponseMapper {
           activityBlog, urlPrefix))
       .collect(Collectors.toList());
   }
-  
-  public static DataResponse<ActivityBlogWebResponse> toActivityBlogDataResponse(
-    ActivityBlog activityBlog, String urlPrefix
-  ) {
-    
-    return ActivityBlogResponseMapper.toActivityBlogDataResponse(
-      HttpStatus.OK, activityBlog, urlPrefix);
-  }
-  
-  public static DataResponse<ActivityBlogWebResponse> toActivityBlogDataResponse(
-    HttpStatus httpStatus, ActivityBlog activityBlog, String urlPrefix
-  ) {
-    
-    return ResponseHelper.toDataResponse(httpStatus,
-                                         ActivityBlogResponseMapper.buildActivityBlogWebResponse(
-                                           activityBlog, urlPrefix)
-    );
-  }
-  
+
   private static ActivityBlogWebResponse buildActivityBlogWebResponse(
     ActivityBlog activityBlog, String urlPrefix
   ) {
-    
+
     return ActivityBlogWebResponse.builder()
       .id(activityBlog.getId())
       .title(activityBlog.getTitle())
@@ -75,5 +57,23 @@ public final class ActivityBlogResponseMapper {
         AuthorWebResponseMapper.buildAuthorWebResponse(activityBlog.getUser()))
       .build();
   }
-  
+
+  public static DataResponse<ActivityBlogWebResponse> toActivityBlogDataResponse(
+    ActivityBlog activityBlog, String urlPrefix
+  ) {
+
+    return ActivityBlogResponseMapper.toActivityBlogDataResponse(
+      HttpStatus.OK, activityBlog, urlPrefix);
+  }
+
+  public static DataResponse<ActivityBlogWebResponse> toActivityBlogDataResponse(
+    HttpStatus httpStatus, ActivityBlog activityBlog, String urlPrefix
+  ) {
+
+    return ResponseHelper.toDataResponse(httpStatus,
+                                         ActivityBlogResponseMapper.buildActivityBlogWebResponse(
+                                           activityBlog, urlPrefix)
+    );
+  }
+
 }

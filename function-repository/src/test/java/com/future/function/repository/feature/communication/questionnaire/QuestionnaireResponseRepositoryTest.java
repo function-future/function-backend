@@ -30,25 +30,25 @@ public class QuestionnaireResponseRepositoryTest {
 
   private static final String QUESTIONNAIRE_ID = "questionnaire_id";
 
-  private User appraisee = User.builder()
-          .id(ID_USER_1)
-          .build();
-
-  private Questionnaire questionnaire = Questionnaire.builder()
-          .id(QUESTIONNAIRE_ID)
-          .build();
-
   private static final String QUESTION_RESPONSE_ID1 = "question_response_id1";
 
   private static final String QUESTION_RESPONSE_ID2 = "question_response_id2";
 
+  private User appraisee = User.builder()
+    .id(ID_USER_1)
+    .build();
+
+  private Questionnaire questionnaire = Questionnaire.builder()
+    .id(QUESTIONNAIRE_ID)
+    .build();
+
   private QuestionResponse questionResponse1 = QuestionResponse.builder()
-          .id(QUESTION_RESPONSE_ID1)
-          .build();
+    .id(QUESTION_RESPONSE_ID1)
+    .build();
 
   private QuestionResponse questionResponse2 = QuestionResponse.builder()
-          .id(QUESTION_RESPONSE_ID2)
-          .build();
+    .id(QUESTION_RESPONSE_ID2)
+    .build();
 
   private List<QuestionResponse> questionResponses = new ArrayList<>();
 
@@ -63,6 +63,7 @@ public class QuestionnaireResponseRepositoryTest {
 
   @Before
   public void SetUp() {
+
     questionResponseRepository.save(questionResponse1);
     questionResponseRepository.save(questionResponse2);
     questionnaireRepository.save(questionnaire);
@@ -70,19 +71,21 @@ public class QuestionnaireResponseRepositoryTest {
     questionResponses.add(questionResponse1);
     questionResponses.add(questionResponse2);
 
-    QuestionnaireResponse questionnaireResponse = QuestionnaireResponse.builder()
-            .id(ID_1)
-            .questionnaire(questionnaire)
-            .appraisee(appraisee)
-            .details(questionResponses)
-            .build();
+    QuestionnaireResponse questionnaireResponse =
+      QuestionnaireResponse.builder()
+        .id(ID_1)
+        .questionnaire(questionnaire)
+        .appraisee(appraisee)
+        .details(questionResponses)
+        .build();
 
-    QuestionnaireResponse questionnaireResponse2 = QuestionnaireResponse.builder()
-            .id(ID_2)
-            .questionnaire(questionnaire)
-            .appraisee(appraisee)
-            .details(questionResponses)
-            .build();
+    QuestionnaireResponse questionnaireResponse2 =
+      QuestionnaireResponse.builder()
+        .id(ID_2)
+        .questionnaire(questionnaire)
+        .appraisee(appraisee)
+        .details(questionResponses)
+        .build();
 
     questionnaireResponse2.setDeleted(true);
     questionnaireResponseRepository.save(questionnaireResponse);
@@ -91,6 +94,7 @@ public class QuestionnaireResponseRepositoryTest {
 
   @After
   public void TearDown() {
+
     questionnaireResponseRepository.deleteAll();
     questionnaireRepository.deleteAll();
     questionResponseRepository.deleteAll();
@@ -98,13 +102,20 @@ public class QuestionnaireResponseRepositoryTest {
 
   @Test
   public void testGivenQuestionnaireAndAppraiseeByFindingAllQuestionnaireResponseReturnListQuestionnaireResponse() {
+
     List<QuestionnaireResponse> questionnaireResponses =
-            questionnaireResponseRepository.findAllByQuestionnaireAndAppraiseeAndDeletedFalse(questionnaire, appraisee);
+      questionnaireResponseRepository.findAllByQuestionnaireAndAppraiseeAndDeletedFalse(
+        questionnaire, appraisee);
 
     assertThat(questionnaireResponses.size()).isEqualTo(1);
-    assertThat(questionnaireResponses.get(0).getId()).isEqualTo(ID_1);
-    assertThat(questionnaireResponses.get(0).getDetails().size()).isEqualTo(2);
-//    assertThat(questionnaireResponses.get(1).getId()).isEqualTo(ID_2);
-//    assertThat(questionnaireResponses.get(1).getDetails().size()).isEqualTo(2);
+    assertThat(questionnaireResponses.get(0)
+                 .getId()).isEqualTo(ID_1);
+    assertThat(questionnaireResponses.get(0)
+                 .getDetails()
+                 .size()).isEqualTo(2);
+    //    assertThat(questionnaireResponses.get(1).getId()).isEqualTo(ID_2);
+    //    assertThat(questionnaireResponses.get(1).getDetails().size())
+    //    .isEqualTo(2);
   }
+
 }

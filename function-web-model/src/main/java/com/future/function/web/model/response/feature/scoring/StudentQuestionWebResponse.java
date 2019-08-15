@@ -14,7 +14,9 @@ import java.util.List;
 public class StudentQuestionWebResponse {
 
   private int number;
+
   private String text;
+
   private List<OptionWebResponse> options;
 
 }

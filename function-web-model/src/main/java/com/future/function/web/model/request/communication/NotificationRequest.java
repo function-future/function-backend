@@ -18,10 +18,13 @@ public class NotificationRequest {
   private String targetUser;
 
   @NotNull(message = "Title must not null")
-  @Length(min = 1, max = 30, message = "Title length must between 1 and 30")
+  @Length(min = 1,
+          max = 30,
+          message = "Title length must between 1 and 30")
   private String title;
 
-  @Length(max = 140, message = "Description length must less than equal 140")
+  @Length(max = 140,
+          message = "Description length must less than equal 140")
   private String description;
 
 }

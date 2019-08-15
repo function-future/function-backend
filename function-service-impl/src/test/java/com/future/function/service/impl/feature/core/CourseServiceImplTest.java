@@ -26,33 +26,33 @@ import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CourseServiceImplTest {
-  
+
   private static final String ID = "id";
-  
+
   private static final String TITLE = "title";
-  
+
   private static final String DESCRIPTION = "description";
-  
+
   private static final String FILE_ID = "file-id";
-  
+
   private static final FileV2 FILE_V2 = FileV2.builder()
     .id(FILE_ID)
     .build();
-  
+
   private Course course;
-  
+
   @Mock
   private CourseRepository courseRepository;
-  
+
   @Mock
   private ResourceService resourceService;
-  
+
   @InjectMocks
   private CourseServiceImpl courseService;
-  
+
   @Before
   public void setUp() {
-    
+
     course = Course.builder()
       .id(ID)
       .title(TITLE)
@@ -60,24 +60,24 @@ public class CourseServiceImplTest {
       .file(FILE_V2)
       .build();
   }
-  
+
   @After
   public void tearDown() {
-    
+
     verifyNoMoreInteractions(courseRepository, resourceService);
   }
-  
+
   @Test
   public void testGivenCourseByCreatingCourseReturnCreatedCourse() {
-    
+
     when(courseRepository.save(course)).thenReturn(course);
     when(resourceService.getFile(FILE_ID)).thenReturn(FILE_V2);
     when(courseRepository.findOne(ID)).thenReturn(course);
-    
+
     Course createdCourse = courseService.createCourse(course);
-    
+
     assertThat(createdCourse).isEqualTo(course);
-    
+
     verify(courseRepository).save(course);
     verify(resourceService).markFilesUsed(
       Collections.singletonList(FILE_ID), true);
@@ -85,38 +85,38 @@ public class CourseServiceImplTest {
     verify(courseRepository).findOne(ID);
     verifyZeroInteractions(resourceService);
   }
-  
+
   @Test
   public void testGivenInvalidCourseByCreatingCourseReturnUnsupportedOperationException() {
-    
+
     when(resourceService.getFile(FILE_ID)).thenReturn(FILE_V2);
     when(courseRepository.save(course)).thenReturn(null);
-    
+
     catchException(() -> courseService.createCourse(course));
-    
+
     assertThat(caughtException().getClass()).isEqualTo(
       UnsupportedOperationException.class);
     assertThat(caughtException().getMessage()).isEqualTo(
       "Create Course Failed");
-    
+
     verify(courseRepository).save(course);
     verify(resourceService).markFilesUsed(
       Collections.singletonList(FILE_ID), true);
     verify(resourceService).getFile(FILE_ID);
     verifyZeroInteractions(resourceService);
   }
-  
+
   @Test
   public void testGivenCourseByUpdatingCourseReturnUpdatedCourse() {
-    
+
     when(courseRepository.findOne(ID)).thenReturn(course);
     when(resourceService.getFile(FILE_ID)).thenReturn(FILE_V2);
     when(courseRepository.save(course)).thenReturn(course);
-    
+
     Course updatedCourse = courseService.updateCourse(course);
-    
+
     assertThat(updatedCourse).isEqualTo(course);
-    
+
     verify(courseRepository).findOne(ID);
     verify(resourceService).markFilesUsed(
       Collections.singletonList(FILE_ID), false);
@@ -125,63 +125,63 @@ public class CourseServiceImplTest {
     verify(resourceService, times(2)).getFile(FILE_ID);
     verify(courseRepository).save(course);
   }
-  
+
   @Test
   public void testGivenCourseIdByGettingCourseReturnCourseObject() {
-    
+
     when(courseRepository.findOne(ID)).thenReturn(course);
-    
+
     Course retrievedCourse = courseService.getCourse(ID);
-    
+
     assertThat(retrievedCourse).isEqualTo(course);
-    
+
     verify(courseRepository).findOne(ID);
     verifyZeroInteractions(resourceService);
   }
-  
+
   @Test
   public void testGivenNonExistingCourseIdByGettingCourseReturnNotFoundException() {
-    
+
     when(courseRepository.findOne(ID)).thenReturn(null);
-    
+
     catchException(() -> courseService.getCourse(ID));
-    
+
     assertThat(caughtException().getClass()).isEqualTo(NotFoundException.class);
     assertThat(caughtException().getMessage()).isEqualTo(
       "Get Course Not Found");
-    
+
     verify(courseRepository).findOne(ID);
     verifyZeroInteractions(resourceService);
   }
-  
+
   @Test
   public void testGivenPageableByGettingCoursesReturnPageOfCourse() {
-    
+
     Pageable pageable = new PageRequest(0, 5);
     Page<Course> coursePage = PageHelper.toPage(
       Collections.singletonList(course), pageable);
     when(courseRepository.findAll(pageable)).thenReturn(coursePage);
-    
+
     Page<Course> retrievedCourses = courseService.getCourses(pageable);
-    
+
     assertThat(retrievedCourses).isEqualTo(coursePage);
-    
+
     verify(courseRepository).findAll(pageable);
     verifyZeroInteractions(resourceService);
   }
-  
+
   @Test
   public void testGivenCourseIdByDeletingCourseReturnSuccessfulDeletion() {
-    
+
     when(courseRepository.findOne(ID)).thenReturn(course);
-    
+
     courseService.deleteCourse(ID);
-    
+
     verify(courseRepository).findOne(ID);
     verify(resourceService).markFilesUsed(
       Collections.singletonList(FILE_ID), false);
     verify(resourceService).getFile(FILE_ID);
     verify(courseRepository).delete(course);
   }
-  
+
 }

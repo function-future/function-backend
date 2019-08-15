@@ -21,83 +21,86 @@ import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class UniqueBatchCodeValidatorTest {
-  
+
   private static final String ID = "id";
-  
+
   private static final String CODE = "code";
-  
+
   @Mock
   private UniqueBatchCode annotation;
-  
+
   @Mock
   private BatchData batchData;
-  
+
   @Mock
   private BatchRepository batchRepository;
-  
+
   @InjectMocks
   private UniqueBatchCodeValidator validator;
-  
+
   @Before
   public void setUp() {
-    
+
     validator.initialize(annotation);
   }
-  
+
   @After
   public void tearDown() {
-    
+
     verifyNoMoreInteractions(annotation, batchData, batchRepository);
   }
-  
+
   @Test
   public void testGivenNullIdAndNewCodeByValidatingUniqueBatchCodeReturnTrue() {
-    
+
     when(batchData.getCode()).thenReturn(CODE);
-    when(batchRepository.findByCodeAndDeletedFalse(CODE)).thenReturn(Optional.empty());
-    
+    when(batchRepository.findByCodeAndDeletedFalse(CODE)).thenReturn(
+      Optional.empty());
+
     assertThat(validator.isValid(batchData, null)).isTrue();
-    
+
     verify(batchData).getCode();
     verify(batchRepository).findByCodeAndDeletedFalse(CODE);
   }
-  
+
   @Test
   public void testGivenBatchIdAndExistingCodeByValidatingUniqueBatchCodeReturnTrue() {
-    
+
     when(batchData.getId()).thenReturn(ID);
     when(batchData.getCode()).thenReturn(CODE);
-    
+
     Batch batch = Batch.builder()
       .id(ID)
       .code(CODE)
       .build();
-    when(batchRepository.findByCodeAndDeletedFalse(CODE)).thenReturn(Optional.of(batch));
-    
+    when(batchRepository.findByCodeAndDeletedFalse(CODE)).thenReturn(
+      Optional.of(batch));
+
     assertThat(validator.isValid(batchData, null)).isTrue();
-    
+
     verify(batchData).getId();
     verify(batchData).getCode();
     verify(batchRepository).findByCodeAndDeletedFalse(CODE);
   }
-  
+
   @Test
   public void testGivenDifferentBatchIdAndExistingCodeByValidatingUniqueBatchCodeReturnTrue() {
-    
+
     when(batchData.getId()).thenReturn(ID + "-1");
     when(batchData.getCode()).thenReturn(CODE);
-    
+
     Batch batch = Batch.builder()
       .id(ID)
       .code(CODE)
       .build();
-    when(batchRepository.findByCodeAndDeletedFalse(CODE)).thenReturn(Optional.of(batch));
-    
+    when(batchRepository.findByCodeAndDeletedFalse(CODE)).thenReturn(
+      Optional.of(batch));
+
     assertThat(validator.isValid(batchData, null)).isFalse();
-    
+
     verify(batchData).getId();
     verify(batchData).getCode();
     verify(batchRepository).findByCodeAndDeletedFalse(CODE);
   }
-  
+
 }

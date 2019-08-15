@@ -47,79 +47,80 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import(TestSecurityConfiguration.class)
 @WebMvcTest(value = CourseController.class)
 public class CourseControllerTest extends TestHelper {
-  
+
   private static final BaseResponse OK_BASE_RESPONSE =
     ResponseHelper.toBaseResponse(HttpStatus.OK);
-  
+
   private static final String ID = "id";
-  
+
   private static final String TITLE = "title";
-  
+
   private static final String DESCRIPTION = "description";
-  
+
   private static final Course COURSE = Course.builder()
     .id(ID)
     .title(TITLE)
     .description(DESCRIPTION)
     .build();
-  
+
   private static final CourseWebRequest COURSE_WEB_REQUEST =
     CourseWebRequest.builder()
       .title(TITLE)
       .description(DESCRIPTION)
       .build();
-  
+
   private static final Pageable PAGEABLE = new PageRequest(0, 5);
-  
+
   private static final Page<Course> COURSE_PAGE = new PageImpl<>(
     Collections.singletonList(COURSE), PAGEABLE, 1);
-  
+
   private static final String URL_PREFIX = "url-prefix";
-  
+
   private static final PagingResponse<CourseWebResponse> PAGING_RESPONSE =
     CourseResponseMapper.toCoursesPagingResponse(COURSE_PAGE, URL_PREFIX);
-  
+
   private static final DataResponse<CourseWebResponse>
     RETRIEVED_COURSE_WEB_RESPONSE = CourseResponseMapper.toCourseDataResponse(
     COURSE, URL_PREFIX);
-  
+
   private static final DataResponse<CourseWebResponse>
     CREATED_COURSE_WEB_RESPONSE = CourseResponseMapper.toCourseDataResponse(
     HttpStatus.CREATED, COURSE, URL_PREFIX);
-  
+
   private JacksonTester<CourseWebRequest> courseWebRequestJacksonTester;
-  
+
   @MockBean
   private CourseService courseService;
-  
+
   @MockBean
   private CourseRequestMapper courseRequestMapper;
-  
+
   @MockBean
   private FileProperties fileProperties;
-  
+
   @Override
   @Before
   public void setUp() {
-    
+
     super.setUp();
     super.setCookie(Role.JUDGE);
   }
-  
+
   @After
   public void tearDown() {
-    
-    verifyNoMoreInteractions(courseService, courseRequestMapper, fileProperties);
+
+    verifyNoMoreInteractions(
+      courseService, courseRequestMapper, fileProperties);
   }
-  
+
   @Test
   public void testGivenApiCallByCreatingCourseReturnDataResponseObject()
     throws Exception {
-    
+
     when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
     when(courseRequestMapper.toCourse(COURSE_WEB_REQUEST)).thenReturn(COURSE);
     when(courseService.createCourse(COURSE)).thenReturn(COURSE);
-    
+
     mockMvc.perform(post("/api/core/courses").cookie(cookies)
                       .contentType(MediaType.APPLICATION_JSON)
                       .content(
@@ -129,21 +130,21 @@ public class CourseControllerTest extends TestHelper {
       .andExpect(content().json(
         dataResponseJacksonTester.write(CREATED_COURSE_WEB_RESPONSE)
           .getJson()));
-    
+
     verify(fileProperties).getUrlPrefix();
     verify(courseRequestMapper).toCourse(COURSE_WEB_REQUEST);
     verify(courseService).createCourse(COURSE);
   }
-  
+
   @Test
   public void testGivenApiCallAndCourseIdByUpdatingCourseReturnDataResponseObject()
     throws Exception {
-  
+
     when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
     when(courseRequestMapper.toCourse(ID, COURSE_WEB_REQUEST)).thenReturn(
       COURSE);
     when(courseService.updateCourse(COURSE)).thenReturn(COURSE);
-    
+
     mockMvc.perform(put("/api/core/courses/" + ID).cookie(cookies)
                       .contentType(MediaType.APPLICATION_JSON)
                       .content(
@@ -153,33 +154,33 @@ public class CourseControllerTest extends TestHelper {
       .andExpect(content().json(
         dataResponseJacksonTester.write(RETRIEVED_COURSE_WEB_RESPONSE)
           .getJson()));
-    
+
     verify(fileProperties).getUrlPrefix();
     verify(courseRequestMapper).toCourse(ID, COURSE_WEB_REQUEST);
     verify(courseService).updateCourse(COURSE);
   }
-  
+
   @Test
   public void testGivenApiCallAndCourseIdByDeletingCourseReturnBaseResponseObject()
     throws Exception {
-    
+
     mockMvc.perform(delete("/api/core/courses/" + ID).cookie(cookies))
       .andExpect(status().isOk())
       .andExpect(content().json(
         baseResponseJacksonTester.write(OK_BASE_RESPONSE)
           .getJson()));
-    
+
     verify(courseService).deleteCourse(ID);
     verifyZeroInteractions(courseRequestMapper, fileProperties);
   }
-  
+
   @Test
   public void testGivenApiCallByGettingCourseReturnDataResponseObject()
     throws Exception {
-  
+
     when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
     when(courseService.getCourses(PAGEABLE)).thenReturn(COURSE_PAGE);
-    
+
     mockMvc.perform(get("/api/core/courses").cookie(cookies)
                       .param("page", "1")
                       .param("size", "5"))
@@ -187,28 +188,28 @@ public class CourseControllerTest extends TestHelper {
       .andExpect(content().json(
         pagingResponseJacksonTester.write(PAGING_RESPONSE)
           .getJson()));
-    
+
     verify(fileProperties).getUrlPrefix();
     verify(courseService).getCourses(PAGEABLE);
     verifyZeroInteractions(courseRequestMapper);
   }
-  
+
   @Test
   public void testGivenApiCallAndCourseIdByGettingCourseReturnDataResponseObject()
     throws Exception {
-  
+
     when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
     when(courseService.getCourse(ID)).thenReturn(COURSE);
-    
+
     mockMvc.perform(get("/api/core/courses/" + ID).cookie(cookies))
       .andExpect(status().isOk())
       .andExpect(content().json(
         dataResponseJacksonTester.write(RETRIEVED_COURSE_WEB_RESPONSE)
           .getJson()));
-    
+
     verify(fileProperties).getUrlPrefix();
     verify(courseService).getCourse(ID);
     verifyZeroInteractions(courseRequestMapper);
   }
-  
+
 }

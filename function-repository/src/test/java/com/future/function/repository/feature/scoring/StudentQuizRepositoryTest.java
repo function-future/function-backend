@@ -23,18 +23,25 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class StudentQuizRepositoryTest {
 
   private static final String QUIZ_ID = "quiz-id";
+
   private static final String QUIZ_TEXT = "quiz-label";
 
   private static final String USER_ID = "student-id";
+
   private static final String USER_NAME = "user-name";
 
   private static final String STUDENT_QUIZ_ID = "student-quiz-id";
+
   private static final boolean DONE = true;
+
   private static final int TRIALS = 3;
 
   private StudentQuiz studentQuiz;
+
   private Quiz quiz;
+
   private User student;
+
   private Pageable pageable;
 
   @Autowired
@@ -42,26 +49,24 @@ public class StudentQuizRepositoryTest {
 
   @Before
   public void setUp() throws Exception {
-    quiz = Quiz
-        .builder()
-        .id(QUIZ_ID)
-        .title(QUIZ_TEXT)
-        .build();
 
-    student = User
-        .builder()
-        .id(USER_ID)
-        .name(USER_NAME)
-        .build();
+    quiz = Quiz.builder()
+      .id(QUIZ_ID)
+      .title(QUIZ_TEXT)
+      .build();
 
-    studentQuiz = StudentQuiz
-        .builder()
-        .id(STUDENT_QUIZ_ID)
-        .quiz(quiz)
-        .student(student)
-        .trials(TRIALS)
-        .done(DONE)
-        .build();
+    student = User.builder()
+      .id(USER_ID)
+      .name(USER_NAME)
+      .build();
+
+    studentQuiz = StudentQuiz.builder()
+      .id(STUDENT_QUIZ_ID)
+      .quiz(quiz)
+      .student(student)
+      .trials(TRIALS)
+      .done(DONE)
+      .build();
 
 
     pageable = new PageRequest(0, 10);
@@ -71,30 +76,42 @@ public class StudentQuizRepositoryTest {
 
   @After
   public void tearDown() throws Exception {
+
     repository.deleteAll();
   }
 
   @Test
   public void testFindByIdAndDeletedFalse() {
-    Optional<StudentQuiz> actual = repository.findByIdAndDeletedFalse(STUDENT_QUIZ_ID);
+
+    Optional<StudentQuiz> actual = repository.findByIdAndDeletedFalse(
+      STUDENT_QUIZ_ID);
 
     assertThat(actual.isPresent()).isTrue();
-    assertThat(actual.get().getTrials()).isEqualTo(studentQuiz.getTrials());
+    assertThat(actual.get()
+                 .getTrials()).isEqualTo(studentQuiz.getTrials());
   }
 
   @Test
   public void testFindAllByStudentIdAndPageable() {
-    Page<StudentQuiz> actual = repository.findAllByStudentIdAndDeletedFalse(USER_ID, pageable);
+
+    Page<StudentQuiz> actual = repository.findAllByStudentIdAndDeletedFalse(
+      USER_ID, pageable);
 
     assertThat(actual.getContent()).isNotEmpty();
     assertThat(actual.getTotalElements()).isEqualTo(1);
-    assertThat(actual.getContent().get(0).getQuiz()).isEqualTo(studentQuiz.getQuiz());
+    assertThat(actual.getContent()
+                 .get(0)
+                 .getQuiz()).isEqualTo(studentQuiz.getQuiz());
   }
 
   @Test
   public void testFindByStudentIdAndQuizId() {
-    Optional<StudentQuiz> actual = repository.findByStudentIdAndQuizIdAndDeletedFalse(USER_ID, QUIZ_ID);
 
-    assertThat(actual.get().getTrials()).isEqualTo(studentQuiz.getTrials());
+    Optional<StudentQuiz> actual =
+      repository.findByStudentIdAndQuizIdAndDeletedFalse(USER_ID, QUIZ_ID);
+
+    assertThat(actual.get()
+                 .getTrials()).isEqualTo(studentQuiz.getTrials());
   }
+
 }

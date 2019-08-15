@@ -12,21 +12,21 @@ import java.util.Optional;
 
 @Service
 public class MenuServiceImpl implements MenuService {
-  
+
   private final MenuRepository menuRepository;
-  
+
   public MenuServiceImpl(MenuRepository menuRepository) {
-    
+
     this.menuRepository = menuRepository;
   }
-  
+
   @Override
   public Map<String, Object> getSectionsByRole(Role role) {
-    
+
     return Optional.ofNullable(role)
       .flatMap(menuRepository::findByRole)
       .map(Menu::getSections)
       .orElseGet(Collections::emptyMap);
   }
-  
+
 }

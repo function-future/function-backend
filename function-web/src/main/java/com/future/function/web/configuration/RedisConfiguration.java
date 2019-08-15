@@ -12,33 +12,33 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Configuration
 public class RedisConfiguration {
-  
+
   @Bean
   public JedisConnectionFactory jedisConnectionFactory(
     RedisProperties redisProperties
   ) {
-    
+
     JedisConnectionFactory connectionFactory = new JedisConnectionFactory();
-    
+
     connectionFactory.setHostName(redisProperties.getHost());
     connectionFactory.setPort(redisProperties.getPort());
     connectionFactory.setPassword(redisProperties.getPassword());
-    
+
     return connectionFactory;
   }
-  
+
   @Bean
   public RedisTemplate<String, Session> redisTemplate(
     JedisConnectionFactory jedisConnectionFactory, ObjectMapper objectMapper
   ) {
-    
+
     RedisTemplate<String, Session> redisTemplate = new RedisTemplate<>();
-    
+
     redisTemplate.setConnectionFactory(jedisConnectionFactory);
     redisTemplate.setKeySerializer(new StringRedisSerializer());
     redisTemplate.setValueSerializer(new JsonSerializer(objectMapper));
-    
+
     return redisTemplate;
   }
-  
+
 }

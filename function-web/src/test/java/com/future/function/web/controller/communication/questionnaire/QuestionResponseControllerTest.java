@@ -47,7 +47,8 @@ public class QuestionResponseControllerTest extends TestHelper {
 
   private static final String QUESTIONNAIRE_TITLE = "questionnaireTitle";
 
-  private static final String QUESTIONNAIRE_DESCRIPTION = "questionnaireDescription";
+  private static final String QUESTIONNAIRE_DESCRIPTION =
+    "questionnaireDescription";
 
   private static final Long START_DATE = Long.valueOf(0);
 
@@ -57,7 +58,8 @@ public class QuestionResponseControllerTest extends TestHelper {
 
   private static final String QUESTION_DESCRIPTION = "questionDescription";
 
-  private static final String QUESTION_RESPONSE_SUMMARY_ID = "questionQuestionnaireSummaryResponseid1";
+  private static final String QUESTION_RESPONSE_SUMMARY_ID =
+    "questionQuestionnaireSummaryResponseid1";
 
   private static final String THUMBNAIL_URL = "thumbnail";
 
@@ -80,8 +82,12 @@ public class QuestionResponseControllerTest extends TestHelper {
   private static final User MEMBER_1 = User.builder()
     .id(MEMBER_ID_1)
     .name(MEMBER_NAME_1)
-    .pictureV2(FileV2.builder().thumbnailUrl(THUMBNAIL_URL).build())
-    .batch(Batch.builder().id(BATCH_ID).build())
+    .pictureV2(FileV2.builder()
+                 .thumbnailUrl(THUMBNAIL_URL)
+                 .build())
+    .batch(Batch.builder()
+             .id(BATCH_ID)
+             .build())
     .role(Role.STUDENT)
     .university(UNIVERSITY)
     .build();
@@ -120,7 +126,8 @@ public class QuestionResponseControllerTest extends TestHelper {
       .build();
 
   @MockBean
-  private QuestionnaireResponseSummaryService questionnaireResponseSummaryService;
+  private QuestionnaireResponseSummaryService
+    questionnaireResponseSummaryService;
 
   @MockBean
   private FileProperties fileProperties;
@@ -128,61 +135,61 @@ public class QuestionResponseControllerTest extends TestHelper {
   @Override
   @Before
   public void setUp() {
+
     super.setUp();
     super.setCookie(Role.ADMIN);
   }
+
   @After
   public void tearDown() throws Exception {
-    verifyNoMoreInteractions(questionnaireResponseSummaryService, fileProperties );
+
+    verifyNoMoreInteractions(
+      questionnaireResponseSummaryService, fileProperties);
   }
 
   @Test
   public void getQuestionQuestionnaireSummaryResponse() throws Exception {
-    when(questionnaireResponseSummaryService
-      .getQuestionResponseSummaryById(QUESTION_RESPONSE_SUMMARY_ID))
-        .thenReturn(QUESTION_RESPONSE_SUMMARY);
+
+    when(questionnaireResponseSummaryService.getQuestionResponseSummaryById(
+      QUESTION_RESPONSE_SUMMARY_ID)).thenReturn(QUESTION_RESPONSE_SUMMARY);
 
     DataResponse<QuestionQuestionnaireSummaryResponse> response =
-      QuestionnaireResponseSummaryResponseMapper
-        .toDataResponseQuestionQuestionnaireSummaryResponse(QUESTION_RESPONSE_SUMMARY);
+      QuestionnaireResponseSummaryResponseMapper.toDataResponseQuestionQuestionnaireSummaryResponse(
+        QUESTION_RESPONSE_SUMMARY);
 
-    mockMvc.perform(
-      get("/api/communication/question-response/"
-          +QUESTION_RESPONSE_SUMMARY_ID
-      )
-      .cookie(cookies))
+    mockMvc.perform(get("/api/communication/question-response/" +
+                        QUESTION_RESPONSE_SUMMARY_ID).cookie(cookies))
       .andExpect(status().isOk())
-      .andExpect(content().json(dataResponseJacksonTester.write(response).getJson()));
+      .andExpect(content().json(dataResponseJacksonTester.write(response)
+                                  .getJson()));
 
-    verify(questionnaireResponseSummaryService)
-      .getQuestionResponseSummaryById(QUESTION_RESPONSE_SUMMARY_ID);
+    verify(questionnaireResponseSummaryService).getQuestionResponseSummaryById(
+      QUESTION_RESPONSE_SUMMARY_ID);
   }
 
   @Test
   public void getQuestionnaireAnswerDetailSummary() throws Exception {
 
-    when(questionnaireResponseSummaryService
-      .getQuestionResponseByQuestionResponseSummaryId(QUESTION_RESPONSE_SUMMARY_ID))
-        .thenReturn(Arrays.asList(QUESTION_RESPONSE));
+    when(
+      questionnaireResponseSummaryService.getQuestionResponseByQuestionResponseSummaryId(
+        QUESTION_RESPONSE_SUMMARY_ID)).thenReturn(
+      Arrays.asList(QUESTION_RESPONSE));
     when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
     DataResponse<List<QuestionAnswerResponse>> response =
-      QuestionnaireResponseSummaryResponseMapper
-        .toDataResponseQuestionAnswerDetailResponse(
-          Arrays.asList(QUESTION_RESPONSE),
-          URL_PREFIX
-        );
+      QuestionnaireResponseSummaryResponseMapper.toDataResponseQuestionAnswerDetailResponse(
+        Arrays.asList(QUESTION_RESPONSE), URL_PREFIX);
 
-    mockMvc.perform(
-      get("/api/communication/question-response/"
-        +QUESTION_RESPONSE_SUMMARY_ID
-        +"/responses"
-      )
-        .cookie(cookies))
+    mockMvc.perform(get(
+      "/api/communication/question-response/" + QUESTION_RESPONSE_SUMMARY_ID +
+      "/responses").cookie(cookies))
       .andExpect(status().isOk())
-      .andExpect(content().json(dataResponseJacksonTester.write(response).getJson()));
+      .andExpect(content().json(dataResponseJacksonTester.write(response)
+                                  .getJson()));
 
     verify(fileProperties).getUrlPrefix();
-    verify(questionnaireResponseSummaryService)
-      .getQuestionResponseByQuestionResponseSummaryId(QUESTION_RESPONSE_SUMMARY_ID);
+    verify(
+      questionnaireResponseSummaryService).getQuestionResponseByQuestionResponseSummaryId(
+      QUESTION_RESPONSE_SUMMARY_ID);
   }
+
 }

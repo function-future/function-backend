@@ -14,7 +14,7 @@ public class BadRequestException extends ConstraintViolationException {
   }
 
   public <T> BadRequestException(
-          String message, Set<ConstraintViolation<T>> violations
+    String message, Set<ConstraintViolation<T>> violations
   ) {
 
     super(message, violations);

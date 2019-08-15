@@ -22,64 +22,88 @@ import java.util.stream.Collectors;
 public class QuestionnaireParticipantResponseMapper {
 
   public static PagingResponse<QuestionnaireParticipantDescriptionResponse> toPagingParticipantDescriptionResponse(
-          Page<QuestionnaireParticipant> data,
-          String urlPrefix
-  ){
-    return ResponseHelper.toPagingResponse(HttpStatus.OK, toParticipantDescriptionResposneList(data, urlPrefix), PageHelper.toPaging(data));
+    Page<QuestionnaireParticipant> data, String urlPrefix
+  ) {
+
+    return ResponseHelper.toPagingResponse(HttpStatus.OK,
+                                           toParticipantDescriptionResposneList(
+                                             data, urlPrefix),
+                                           PageHelper.toPaging(data)
+    );
   }
 
   private static List<QuestionnaireParticipantDescriptionResponse> toParticipantDescriptionResposneList(
     Page<QuestionnaireParticipant> data, String urlPrefix
-  ){
+  ) {
+
     return data.getContent()
-            .stream()
-            .map((questionnaireParticipant) -> toParticipantDescriptionResposne(questionnaireParticipant, urlPrefix))
-            .collect(Collectors.toList());
+      .stream()
+      .map((questionnaireParticipant) -> toParticipantDescriptionResposne(
+        questionnaireParticipant, urlPrefix))
+      .collect(Collectors.toList());
   }
 
   private static QuestionnaireParticipantDescriptionResponse toParticipantDescriptionResposne(
-    QuestionnaireParticipant questionnaireParticipant,
-    String urlPrefix
+    QuestionnaireParticipant questionnaireParticipant, String urlPrefix
   ) {
+
     return QuestionnaireParticipantDescriptionResponse.builder()
-            .id(questionnaireParticipant.getMember().getId())
-            .participantId(questionnaireParticipant.getId())
-            .name(questionnaireParticipant.getMember().getName())
-            .university(questionnaireParticipant.getMember().getUniversity())
-            .role(questionnaireParticipant.getMember().getRole().toString())
-            .batch(cekRole(questionnaireParticipant.getMember()))
-            .avatar(getThumnailUrl(questionnaireParticipant.getMember(), urlPrefix))
-            .build();
-  }
-
-  public static DataResponse<QuestionnaireParticipantResponse> toDataResponseQuestionnaireParticipantResponse(
-          QuestionnaireParticipant questionnaireParticipant,
-          HttpStatus httpStatus
-  ) {
-    return ResponseHelper.toDataResponse(httpStatus, toQuestionnaireParticipantResponse(questionnaireParticipant));
-  }
-
-  private static QuestionnaireParticipantResponse toQuestionnaireParticipantResponse(QuestionnaireParticipant questionnaireParticipant){
-    return QuestionnaireParticipantResponse.builder()
-            .id(questionnaireParticipant.getId())
-            .questionnaireId(questionnaireParticipant.getQuestionnaire().getId())
-            .memberId(questionnaireParticipant.getMember().getId())
-            .participantType(questionnaireParticipant.getParticipantType().toString())
-            .build();
+      .id(questionnaireParticipant.getMember()
+            .getId())
+      .participantId(questionnaireParticipant.getId())
+      .name(questionnaireParticipant.getMember()
+              .getName())
+      .university(questionnaireParticipant.getMember()
+                    .getUniversity())
+      .role(questionnaireParticipant.getMember()
+              .getRole()
+              .toString())
+      .batch(cekRole(questionnaireParticipant.getMember()))
+      .avatar(getThumnailUrl(questionnaireParticipant.getMember(), urlPrefix))
+      .build();
   }
 
   private static String cekRole(User user) {
-    if (user.getRole().toString().equals("MENTOR")) {
+
+    if (user.getRole()
+      .toString()
+      .equals("MENTOR")) {
       return "No Batch";
     }
-    return user.getBatch().getCode();
+    return user.getBatch()
+      .getCode();
   }
 
   private static String getThumnailUrl(User user, String urlPrefix) {
+
     return Optional.ofNullable(user)
       .map(User::getPictureV2)
       .map(FileV2::getThumbnailUrl)
       .map(urlPrefix::concat)
       .orElse(null);
   }
+
+  public static DataResponse<QuestionnaireParticipantResponse> toDataResponseQuestionnaireParticipantResponse(
+    QuestionnaireParticipant questionnaireParticipant, HttpStatus httpStatus
+  ) {
+
+    return ResponseHelper.toDataResponse(
+      httpStatus, toQuestionnaireParticipantResponse(questionnaireParticipant));
+  }
+
+  private static QuestionnaireParticipantResponse toQuestionnaireParticipantResponse(
+    QuestionnaireParticipant questionnaireParticipant
+  ) {
+
+    return QuestionnaireParticipantResponse.builder()
+      .id(questionnaireParticipant.getId())
+      .questionnaireId(questionnaireParticipant.getQuestionnaire()
+                         .getId())
+      .memberId(questionnaireParticipant.getMember()
+                  .getId())
+      .participantType(questionnaireParticipant.getParticipantType()
+                         .toString())
+      .build();
+  }
+
 }

@@ -22,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(classes = TestApplication.class)
 public class QuestionnaireResponseSummaryRepositoryTest {
 
-  private static final Pageable PAGEABLE = new PageRequest(0,10);
+  private static final Pageable PAGEABLE = new PageRequest(0, 10);
 
   private static final String ID_1 = "id_1";
 
@@ -35,19 +35,20 @@ public class QuestionnaireResponseSummaryRepositoryTest {
   private static final String QUESTIONNAIRE_ID2 = "questionnaire_id2";
 
   private User appraisee = User.builder()
-          .id(ID_USER_1)
-          .build();
+    .id(ID_USER_1)
+    .build();
 
   private Questionnaire questionnaire = Questionnaire.builder()
-          .id(QUESTIONNAIRE_ID)
-          .build();
+    .id(QUESTIONNAIRE_ID)
+    .build();
 
   private Questionnaire questionnaire2 = Questionnaire.builder()
-          .id(QUESTIONNAIRE_ID2)
-          .build();
+    .id(QUESTIONNAIRE_ID2)
+    .build();
 
   @Autowired
-  private QuestionnaireResponseSummaryRepository questionnaireResponseSummaryRepository;
+  private QuestionnaireResponseSummaryRepository
+    questionnaireResponseSummaryRepository;
 
   @Autowired
   private QuestionnaireRepository questionnaireRepository;
@@ -57,23 +58,24 @@ public class QuestionnaireResponseSummaryRepositoryTest {
 
   @Before
   public void SetUp() {
+
     userRepository.save(appraisee);
     questionnaireRepository.save(questionnaire);
     questionnaireRepository.save(questionnaire2);
 
     QuestionnaireResponseSummary questionnaireResponseSummary =
-            QuestionnaireResponseSummary.builder()
-                    .id(ID_1)
-                    .questionnaire(questionnaire)
-                    .appraisee(appraisee)
-                    .build();
+      QuestionnaireResponseSummary.builder()
+        .id(ID_1)
+        .questionnaire(questionnaire)
+        .appraisee(appraisee)
+        .build();
 
     QuestionnaireResponseSummary questionnaireResponseSummary2 =
-            QuestionnaireResponseSummary.builder()
-                    .id(ID_2)
-                    .questionnaire(questionnaire2)
-                    .appraisee(appraisee)
-                    .build();
+      QuestionnaireResponseSummary.builder()
+        .id(ID_2)
+        .questionnaire(questionnaire2)
+        .appraisee(appraisee)
+        .build();
 
     questionnaireResponseSummary2.setDeleted(true);
     questionnaireResponseSummaryRepository.save(questionnaireResponseSummary);
@@ -82,6 +84,7 @@ public class QuestionnaireResponseSummaryRepositoryTest {
 
   @After
   public void TearDown() {
+
     userRepository.deleteAll();
     questionnaireRepository.deleteAll();
     questionnaireResponseSummaryRepository.deleteAll();
@@ -89,14 +92,24 @@ public class QuestionnaireResponseSummaryRepositoryTest {
 
   @Test
   public void testGivenAppraiseeByFindingAllQuesitonnaireResponseSummaryReturnPagedQuestionnaireResponseSummary() {
+
     Page<QuestionnaireResponseSummary> questionnaireResponseSummaries =
-            questionnaireResponseSummaryRepository.findAllByAppraiseeAndDeletedFalse(appraisee, PAGEABLE);
+      questionnaireResponseSummaryRepository.findAllByAppraiseeAndDeletedFalse(
+        appraisee, PAGEABLE);
 
     assertThat(questionnaireResponseSummaries.getTotalElements()).isEqualTo(1);
-    assertThat(questionnaireResponseSummaries.getContent().get(0).getId()).isEqualTo(ID_1);
-    assertThat(questionnaireResponseSummaries.getContent().get(0).getQuestionnaire().getId()).isEqualTo(QUESTIONNAIRE_ID);
-//    assertThat(questionnaireResponseSummaries.getContent().get(1).getId()).isEqualTo(ID_2);
-//    assertThat(questionnaireResponseSummaries.getContent().get(1).getQuestionnaire().getId()).isEqualTo(QUESTIONNAIRE_ID2);
+    assertThat(questionnaireResponseSummaries.getContent()
+                 .get(0)
+                 .getId()).isEqualTo(ID_1);
+    assertThat(questionnaireResponseSummaries.getContent()
+                 .get(0)
+                 .getQuestionnaire()
+                 .getId()).isEqualTo(QUESTIONNAIRE_ID);
+    //    assertThat(questionnaireResponseSummaries.getContent().get(1).getId
+    //    ()).isEqualTo(ID_2);
+    //    assertThat(questionnaireResponseSummaries.getContent().get(1)
+    //    .getQuestionnaire().getId()).isEqualTo(QUESTIONNAIRE_ID2);
 
   }
+
 }

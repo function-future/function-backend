@@ -11,17 +11,17 @@ import java.io.IOException;
 @Slf4j
 @Component
 public class WebRequestMapper {
-  
+
   private final ObjectMapper objectMapper;
-  
+
   @Autowired
   public WebRequestMapper(ObjectMapper objectMapper) {
-    
+
     this.objectMapper = objectMapper;
   }
-  
+
   public <T> T toWebRequestObject(String json, Class<T> type) {
-    
+
     T request;
     try {
       request = objectMapper.readValue(json, type);
@@ -31,5 +31,5 @@ public class WebRequestMapper {
     }
     return request;
   }
-  
+
 }

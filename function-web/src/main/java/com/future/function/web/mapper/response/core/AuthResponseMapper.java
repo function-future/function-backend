@@ -14,8 +14,9 @@ import java.util.Optional;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class AuthResponseMapper {
 
-  public static DataResponse<AuthWebResponse> toAuthDataResponse(User user,
-                                                                 String urlPrefix) {
+  public static DataResponse<AuthWebResponse> toAuthDataResponse(
+    User user, String urlPrefix
+  ) {
 
     return ResponseHelper.toDataResponse(HttpStatus.OK,
                                          AuthResponseMapper.buildAuthWebResponse(
@@ -33,7 +34,8 @@ public final class AuthResponseMapper {
       .email(user.getEmail())
       .role(user.getRole()
               .name())
-      .avatar(AuthResponseMapper.getThumbnailUrl(user.getPictureV2(), urlPrefix))
+      .avatar(
+        AuthResponseMapper.getThumbnailUrl(user.getPictureV2(), urlPrefix))
       .build();
   }
 

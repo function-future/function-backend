@@ -28,4 +28,5 @@ public class ReminderResponse {
   private Integer memberCount;
 
   private String time;
+
 }

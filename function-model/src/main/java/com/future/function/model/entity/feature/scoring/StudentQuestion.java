@@ -25,7 +25,8 @@ public class StudentQuestion extends BaseEntity {
 
   @Id
   @Builder.Default
-  private String id = UUID.randomUUID().toString();
+  private String id = UUID.randomUUID()
+    .toString();
 
   @DBRef(lazy = true)
   @Field(value = FieldName.StudentQuestion.STUDENT_QUIZ_DETAIL)
@@ -44,4 +45,5 @@ public class StudentQuestion extends BaseEntity {
 
   @Field(value = FieldName.StudentQuestion.CORRECT)
   private boolean correct;
+
 }

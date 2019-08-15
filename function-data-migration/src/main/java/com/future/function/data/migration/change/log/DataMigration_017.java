@@ -12,20 +12,20 @@ import static com.future.function.data.migration.constant.IndexName.USER_ROLE_NA
 
 @ChangeLog(order = "017")
 public class DataMigration_017 {
-  
+
   @ChangeSet(author = "jonathan",
              id = "changeIndexForGettingUsers",
              order = "0001")
   public void changeIndexForGettingUsers(MongoDatabase mongoDatabase) {
-    
+
     mongoDatabase.getCollection(DocumentName.USER)
       .dropIndex(USER_ROLE_DELETED.name());
-    
+
     mongoDatabase.getCollection(DocumentName.USER)
       .createIndex(
         Indexes.ascending(USER_ROLE_NAME_DELETED.getFields()),
         new IndexOptions().name(USER_ROLE_NAME_DELETED.name())
       );
   }
-  
+
 }

@@ -17,22 +17,29 @@ public class LoggingRoomRequestMapper {
 
   @Autowired
   public LoggingRoomRequestMapper(RequestValidator validator) {
+
     this.validator = validator;
   }
 
-  public LoggingRoom toLoggingRoom(LoggingRoomWebRequest loggingRoomWebRequest, String loggingRoomId){
+  public LoggingRoom toLoggingRoom(
+    LoggingRoomWebRequest loggingRoomWebRequest, String loggingRoomId
+  ) {
+
     return toValidatedLoggingRoom(loggingRoomWebRequest, loggingRoomId);
   }
 
-  public LoggingRoom toValidatedLoggingRoom(LoggingRoomWebRequest loggingRoomWebRequest, String loggingRoomId){
+  public LoggingRoom toValidatedLoggingRoom(
+    LoggingRoomWebRequest loggingRoomWebRequest, String loggingRoomId
+  ) {
+
     this.validator.validate(loggingRoomWebRequest);
     LoggingRoom loggingRoom = LoggingRoom.builder()
-            .title(loggingRoomWebRequest.getTitle())
-            .description(loggingRoomWebRequest.getDescription())
-            .members(toListUserHelper(loggingRoomWebRequest.getMembers()))
-            .build();
+      .title(loggingRoomWebRequest.getTitle())
+      .description(loggingRoomWebRequest.getDescription())
+      .members(toListUserHelper(loggingRoomWebRequest.getMembers()))
+      .build();
 
-    if(loggingRoomId != null) {
+    if (loggingRoomId != null) {
       loggingRoom.setId(loggingRoomId);
     }
 
@@ -40,8 +47,12 @@ public class LoggingRoomRequestMapper {
   }
 
   public List<User> toListUserHelper(List<String> members) {
+
     return members.stream()
-            .map(member -> User.builder().id(member).build())
-            .collect(Collectors.toList());
+      .map(member -> User.builder()
+        .id(member)
+        .build())
+      .collect(Collectors.toList());
   }
+
 }

@@ -15,41 +15,44 @@ import java.util.Optional;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ResourceResponseMapper {
-  
+
   public static DataResponse<FileContentWebResponse> toResourceDataResponse(
     FileV2 fileV2, String urlPrefix
   ) {
-  
+
     FileContentWebResponse resourceWebResponse = buildFileWebResponse(fileV2,
-                                                                      urlPrefix);
-    
+                                                                      urlPrefix
+    );
+
     return ResponseHelper.toDataResponse(HttpStatus.CREATED,
                                          resourceWebResponse
     );
   }
-  
-  public static FileContentWebResponse buildFileWebResponse(FileV2 fileV2, String urlPrefix) {
-    
+
+  public static FileContentWebResponse buildFileWebResponse(
+    FileV2 fileV2, String urlPrefix
+  ) {
+
     return FileContentWebResponse.builder()
       .id(fileV2.getId())
       .name(fileV2.getName())
       .file(ResourceResponseMapper.toUrlMap(fileV2, urlPrefix))
       .build();
   }
-  
+
   private static Map<String, String> toUrlMap(
     FileV2 fileV2, String urlPrefix
   ) {
-    
+
     Map<String, String> map = new HashMap<>();
-    
+
     map.put(FieldName.FULL, urlPrefix + fileV2.getFileUrl());
     Optional.of(fileV2)
       .map(FileV2::getThumbnailUrl)
       .map(urlPrefix::concat)
       .ifPresent(url -> map.put(FieldName.THUMBNAIL, url));
-    
+
     return map;
   }
-  
+
 }

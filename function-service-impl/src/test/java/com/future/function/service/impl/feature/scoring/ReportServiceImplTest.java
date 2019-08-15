@@ -11,8 +11,6 @@ import com.future.function.repository.feature.scoring.ReportRepository;
 import com.future.function.service.api.feature.core.BatchService;
 import com.future.function.service.api.feature.core.UserService;
 import com.future.function.service.api.feature.scoring.ReportDetailService;
-import java.util.Collection;
-import java.util.List;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,254 +23,326 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Optional;
 import org.springframework.data.util.Pair;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 import static com.googlecode.catchexception.CatchException.catchException;
 import static com.googlecode.catchexception.CatchException.caughtException;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ReportServiceImplTest {
 
-    private static final String REPORT_ID = "report-id";
-    private static final String REPORT_DETAIL_ID = "report-detail-id";
-    private static final String USER_ID = "user-id";
-    private static final String STUDENT_NAME = "user-name";
-    private static final String TITLE = "title";
-    private static final String DESCRIPTION = "description";
-    private static final String BATCH_CODE = "batch-code";
-    private static final Integer POINT = 100;
-    private static final Integer FINAL_POINT = 100;
+  private static final String REPORT_ID = "report-id";
 
-    private Report report;
-    private Pageable pageable;
-    private Pair pair;
-    private Page<Report> reportPage;
-    private Page<Pair<User, Integer>> pairPage;
-    private ReportDetail reportDetail;
-    private StudentSummaryVO studentSummaryVO;
-    private User student;
-    private Batch batch;
+  private static final String REPORT_DETAIL_ID = "report-detail-id";
 
-    @InjectMocks
-    private ReportServiceImpl reportService;
+  private static final String USER_ID = "user-id";
 
-    @Mock
-    private ReportDetailService reportDetailService;
+  private static final String STUDENT_NAME = "user-name";
 
-    @Mock
-    private ReportRepository reportRepository;
+  private static final String TITLE = "title";
 
-    @Mock
-    private UserService userService;
+  private static final String DESCRIPTION = "description";
 
-    @Mock
-    private BatchService batchService;
+  private static final String BATCH_CODE = "batch-code";
+
+  private static final Integer POINT = 100;
+
+  private static final Integer FINAL_POINT = 100;
+
+  private Report report;
+
+  private Pageable pageable;
+
+  private Pair pair;
+
+  private Page<Report> reportPage;
+
+  private Page<Pair<User, Integer>> pairPage;
+
+  private ReportDetail reportDetail;
+
+  private StudentSummaryVO studentSummaryVO;
+
+  private User student;
+
+  private Batch batch;
+
+  @InjectMocks
+  private ReportServiceImpl reportService;
+
+  @Mock
+  private ReportDetailService reportDetailService;
+
+  @Mock
+  private ReportRepository reportRepository;
+
+  @Mock
+  private UserService userService;
+
+  @Mock
+  private BatchService batchService;
 
 
-    @Before
-    public void setUp() throws Exception {
+  @Before
+  public void setUp() throws Exception {
 
-        batch = Batch.builder().code(BATCH_CODE).build();
+    batch = Batch.builder()
+      .code(BATCH_CODE)
+      .build();
 
-        report = Report.builder()
-                .id(REPORT_ID)
-                .title(TITLE)
-                .description(DESCRIPTION)
-                .batch(batch)
-                .build();
+    report = Report.builder()
+      .id(REPORT_ID)
+      .title(TITLE)
+      .description(DESCRIPTION)
+      .batch(batch)
+      .build();
 
-        student = User.builder()
-                .id(USER_ID)
-                .role(Role.STUDENT)
-                .build();
+    student = User.builder()
+      .id(USER_ID)
+      .role(Role.STUDENT)
+      .build();
 
-        reportDetail = ReportDetail.builder()
-                .id(REPORT_DETAIL_ID)
-                .report(report)
-                .user(student)
-                .point(POINT)
-                .build();
+    reportDetail = ReportDetail.builder()
+      .id(REPORT_DETAIL_ID)
+      .report(report)
+      .user(student)
+      .point(POINT)
+      .build();
 
-        studentSummaryVO = StudentSummaryVO
-            .builder()
-            .studentName(STUDENT_NAME)
-            .point(POINT)
-            .build();
+    studentSummaryVO = StudentSummaryVO.builder()
+      .studentName(STUDENT_NAME)
+      .point(POINT)
+      .build();
 
-        pageable = new PageRequest(0, 10);
+    pageable = new PageRequest(0, 10);
 
-        pair = Pair.of(student, 100);
+    pair = Pair.of(student, 100);
 
-        reportPage = new PageImpl<>(Collections.singletonList(report), pageable, 1);
+    reportPage = new PageImpl<>(Collections.singletonList(report), pageable, 1);
 
-        pairPage = new PageImpl<>(Collections.singletonList(pair), pageable, 1);
+    pairPage = new PageImpl<>(Collections.singletonList(pair), pageable, 1);
 
-        when(reportRepository.findAll(pageable)).thenReturn(reportPage);
-        when(reportRepository.findAllByBatchAndDeletedFalse(batch, pageable))
-                .thenReturn(reportPage);
-        when(reportRepository.findByIdAndDeletedFalse(REPORT_ID)).thenReturn(Optional.of(report));
-        when(reportRepository.save(report)).thenReturn(report);
-        when(userService.getUser(USER_ID)).thenReturn(student);
-        when(userService.getStudentsWithinBatch(BATCH_CODE, pageable))
-            .thenReturn(new PageImpl<>(Collections.singletonList(student), pageable, 1));
-        when(reportDetailService.findAllDetailByReportId(REPORT_ID)).thenReturn(Collections.singletonList(reportDetail));
-        when(reportDetailService.findByStudentId(USER_ID, USER_ID)).thenReturn(reportDetail);
-        when(reportDetailService.createReportDetailByReport(report, student)).thenReturn(report);
-        when(reportDetailService.findAllSummaryByReportId(REPORT_ID, USER_ID)).thenReturn(Collections.singletonList(studentSummaryVO));
-        when(reportDetailService.giveScoreToEachStudentInDetail(report, Collections.singletonList(reportDetail)))
-            .thenReturn(Collections.singletonList(reportDetail));
-        when(batchService.getBatchByCode(BATCH_CODE)).thenReturn(batch);
-    }
+    when(reportRepository.findAll(pageable)).thenReturn(reportPage);
+    when(reportRepository.findAllByBatchAndDeletedFalse(batch,
+                                                        pageable
+    )).thenReturn(reportPage);
+    when(reportRepository.findByIdAndDeletedFalse(REPORT_ID)).thenReturn(
+      Optional.of(report));
+    when(reportRepository.save(report)).thenReturn(report);
+    when(userService.getUser(USER_ID)).thenReturn(student);
+    when(userService.getStudentsWithinBatch(BATCH_CODE, pageable)).thenReturn(
+      new PageImpl<>(Collections.singletonList(student), pageable, 1));
+    when(reportDetailService.findAllDetailByReportId(REPORT_ID)).thenReturn(
+      Collections.singletonList(reportDetail));
+    when(reportDetailService.findByStudentId(USER_ID, USER_ID)).thenReturn(
+      reportDetail);
+    when(reportDetailService.createReportDetailByReport(report,
+                                                        student
+    )).thenReturn(report);
+    when(reportDetailService.findAllSummaryByReportId(REPORT_ID,
+                                                      USER_ID
+    )).thenReturn(Collections.singletonList(studentSummaryVO));
+    when(reportDetailService.giveScoreToEachStudentInDetail(report,
+                                                            Collections.singletonList(
+                                                              reportDetail)
+    )).thenReturn(Collections.singletonList(reportDetail));
+    when(batchService.getBatchByCode(BATCH_CODE)).thenReturn(batch);
+  }
 
-    @After
-    public void tearDown() throws Exception {
-        verifyNoMoreInteractions(reportDetailService, reportRepository, batchService);
-    }
+  @After
+  public void tearDown() throws Exception {
 
-    @Test
-    public void findAllReport() {
-        User admin = User.builder().id(USER_ID).role(Role.ADMIN).build();
-        when(userService.getUser(USER_ID)).thenReturn(admin);
-        Page<Report> actual = reportService.findAllReport(BATCH_CODE, pageable);
-        assertThat(actual).isEqualTo(reportPage);
-        verify(reportRepository).findAllByBatchAndDeletedFalse(batch, pageable);
-        verify(batchService).getBatchByCode(BATCH_CODE);
-        verify(reportDetailService).findAllDetailByReportId(REPORT_ID);
-    }
+    verifyNoMoreInteractions(
+      reportDetailService, reportRepository, batchService);
+  }
 
-    @Test
-    public void findAllReportJudge() {
-        User judge = User.builder().id(USER_ID).role(Role.JUDGE).build();
-        when(userService.getUser(USER_ID)).thenReturn(judge);
-        Page<Report> actual = reportService.findAllReport(BATCH_CODE, pageable);
-        assertThat(actual).isEqualTo(reportPage);
-        verify(reportRepository).findAllByBatchAndDeletedFalse(batch, pageable);
-        verify(batchService).getBatchByCode(BATCH_CODE);
-        verify(reportDetailService).findAllDetailByReportId(REPORT_ID);
-    }
+  @Test
+  public void findAllReport() {
 
-    @Test
-    public void findAllStudentsAndFinalPointByBatch() {
-        Page<Pair<User, Integer>> actual = reportService.findAllStudentsAndFinalPointByBatch(BATCH_CODE, pageable);
-        assertThat(actual.getContent()).isEqualTo(Collections.singletonList(pair));
-        verify(userService).getStudentsWithinBatch(BATCH_CODE, pageable);
-        verify(reportDetailService).findByStudentId(USER_ID, USER_ID);
-    }
+    User admin = User.builder()
+      .id(USER_ID)
+      .role(Role.ADMIN)
+      .build();
+    when(userService.getUser(USER_ID)).thenReturn(admin);
+    Page<Report> actual = reportService.findAllReport(BATCH_CODE, pageable);
+    assertThat(actual).isEqualTo(reportPage);
+    verify(reportRepository).findAllByBatchAndDeletedFalse(batch, pageable);
+    verify(batchService).getBatchByCode(BATCH_CODE);
+    verify(reportDetailService).findAllDetailByReportId(REPORT_ID);
+  }
 
-    @Test
-    public void findAllStudentsAndFinalPointByBatchAndReportDetailNull() {
-        when(reportDetailService.findByStudentId(USER_ID, USER_ID)).thenReturn(null);
-        pair = Pair.of(student, 0);
-        Page<Pair<User, Integer>> actual = reportService.findAllStudentsAndFinalPointByBatch(BATCH_CODE, pageable);
-        assertThat(actual.getContent()).isEqualTo(Collections.singletonList(pair));
-        verify(userService).getStudentsWithinBatch(BATCH_CODE, pageable);
-        verify(reportDetailService).findByStudentId(USER_ID, USER_ID);
-    }
+  @Test
+  public void findAllReportJudge() {
 
-    @Test
-    public void findById() {
-        Report actual = reportService.findById(REPORT_ID);
-        assertThat(actual).isEqualTo(report);
-        verify(reportRepository).findByIdAndDeletedFalse(REPORT_ID);
-        verify(reportDetailService).findAllDetailByReportId(REPORT_ID);
-    }
+    User judge = User.builder()
+      .id(USER_ID)
+      .role(Role.JUDGE)
+      .build();
+    when(userService.getUser(USER_ID)).thenReturn(judge);
+    Page<Report> actual = reportService.findAllReport(BATCH_CODE, pageable);
+    assertThat(actual).isEqualTo(reportPage);
+    verify(reportRepository).findAllByBatchAndDeletedFalse(batch, pageable);
+    verify(batchService).getBatchByCode(BATCH_CODE);
+    verify(reportDetailService).findAllDetailByReportId(REPORT_ID);
+  }
 
-    @Test
-    public void findByIdNullId() {
-        catchException(() -> reportService.findById(null));
-        assertThat(caughtException().getClass()).isEqualTo(NotFoundException.class);
-    }
+  @Test
+  public void findAllStudentsAndFinalPointByBatch() {
 
-    @Test
-    public void createReport() {
-        report.setStudents(Collections.singletonList(student));
-        Report actual = reportService.createReport(report);
-        report.setStudents(null);
-        assertThat(actual).isEqualTo(report);
-        verify(reportRepository).save(report);
-        verify(reportDetailService).createReportDetailByReport(report, student);
-        verify(batchService).getBatchByCode(BATCH_CODE);
-    }
+    Page<Pair<User, Integer>> actual =
+      reportService.findAllStudentsAndFinalPointByBatch(BATCH_CODE, pageable);
+    assertThat(actual.getContent()).isEqualTo(Collections.singletonList(pair));
+    verify(userService).getStudentsWithinBatch(BATCH_CODE, pageable);
+    verify(reportDetailService).findByStudentId(USER_ID, USER_ID);
+  }
 
-    @Test
-    public void createReportThrowException() {
-        report.setStudents(null);
-        catchException(() -> reportService.createReport(report));
-        assertThat(caughtException().getClass()).isEqualTo(UnsupportedOperationException.class);
-        verify(batchService).getBatchByCode(BATCH_CODE);
-    }
+  @Test
+  public void findAllStudentsAndFinalPointByBatchAndReportDetailNull() {
 
-    @Test
-    public void updateReport() {
-        report.setStudents(Collections.singletonList(student));
-        reportDetail.setUser(student);
-        Report actual = reportService.updateReport(report);
-        assertThat(actual).isEqualTo(actual);
-        verify(reportRepository).findByIdAndDeletedFalse(REPORT_ID);
-        verify(reportRepository).save(report);
-        verify(reportDetailService, times(2)).findAllDetailByReportId(REPORT_ID);
-    }
+    when(reportDetailService.findByStudentId(USER_ID, USER_ID)).thenReturn(
+      null);
+    pair = Pair.of(student, 0);
+    Page<Pair<User, Integer>> actual =
+      reportService.findAllStudentsAndFinalPointByBatch(BATCH_CODE, pageable);
+    assertThat(actual.getContent()).isEqualTo(Collections.singletonList(pair));
+    verify(userService).getStudentsWithinBatch(BATCH_CODE, pageable);
+    verify(reportDetailService).findByStudentId(USER_ID, USER_ID);
+  }
 
-    @Test
-    public void updateReportDifferentStudent() {
-        String id = "another-student";
-        User anotherStudent = User.builder().id(id).role(Role.STUDENT).build();
-        when(userService.getUser(id)).thenReturn(anotherStudent);
-        when(reportDetailService.createReportDetailByReport(report, anotherStudent)).thenReturn(report);
-        report.setStudents(Collections.singletonList(anotherStudent));
-        reportDetail.setUser(student);
-        Report actual = reportService.updateReport(report);
-        assertThat(actual).isEqualTo(actual);
-        verify(reportRepository).findByIdAndDeletedFalse(REPORT_ID);
-        verify(reportRepository).save(report);
-        verify(reportDetailService, times(2)).findAllDetailByReportId(REPORT_ID);
-        verify(reportDetailService).createReportDetailByReport(report, anotherStudent);
-        verify(reportDetailService).deleteAllByReportId(REPORT_ID);
-    }
+  @Test
+  public void findById() {
 
-    @Test
-    public void deleteById() {
-        reportService.deleteById(REPORT_ID);
-        verify(reportRepository).findByIdAndDeletedFalse(REPORT_ID);
-        verify(reportDetailService).deleteAllByReportId(REPORT_ID);
-        Report deletedReport = new Report();
-        BeanUtils.copyProperties(report, deletedReport);
-        deletedReport.setDeleted(true);
-        verify(reportRepository).save(deletedReport);
-    }
+    Report actual = reportService.findById(REPORT_ID);
+    assertThat(actual).isEqualTo(report);
+    verify(reportRepository).findByIdAndDeletedFalse(REPORT_ID);
+    verify(reportDetailService).findAllDetailByReportId(REPORT_ID);
+  }
 
-    @Test
-    public void findAllSummaryByReportId() {
-        List<StudentSummaryVO> actual = reportService.findAllSummaryByReportId(REPORT_ID, USER_ID);
-        assertThat(actual.size()).isEqualTo(1);
-        assertThat(actual.get(0).getPoint()).isEqualTo(POINT);
-        assertThat(actual.get(0).getStudentName()).isEqualTo(STUDENT_NAME);
-        verify(reportDetailService).findAllSummaryByReportId(REPORT_ID, USER_ID);
-    }
+  @Test
+  public void findByIdNullId() {
 
-    @Test
-    public void giveScoreToReportStudentsTest() {
-        reportDetail.setPoint(POINT);
-        List<ReportDetail> actual = reportService.giveScoreToReportStudents(REPORT_ID, Collections.singletonList(reportDetail));
-        assertThat(actual.get(0).getPoint()).isEqualTo(POINT);
-        assertThat(actual.size()).isEqualTo(1);
-        verify(reportRepository).findByIdAndDeletedFalse(REPORT_ID);
-        verify(reportDetailService).giveScoreToEachStudentInDetail(report, Collections.singletonList(reportDetail));
-    }
+    catchException(() -> reportService.findById(null));
+    assertThat(caughtException().getClass()).isEqualTo(NotFoundException.class);
+  }
 
-    @Test
-    public void giveScoreToReportStudentsTestReportNotFound() {
-        when(reportRepository.findByIdAndDeletedFalse(REPORT_ID)).thenReturn(Optional.empty());
-        catchException(() -> reportService.giveScoreToReportStudents(REPORT_ID, Collections.singletonList(reportDetail)));
-        assertThat(caughtException().getClass()).isEqualTo(UnsupportedOperationException.class);
-        verify(reportRepository).findByIdAndDeletedFalse(REPORT_ID);
-    }
+  @Test
+  public void createReport() {
+
+    report.setStudents(Collections.singletonList(student));
+    Report actual = reportService.createReport(report);
+    report.setStudents(null);
+    assertThat(actual).isEqualTo(report);
+    verify(reportRepository).save(report);
+    verify(reportDetailService).createReportDetailByReport(report, student);
+    verify(batchService).getBatchByCode(BATCH_CODE);
+  }
+
+  @Test
+  public void createReportThrowException() {
+
+    report.setStudents(null);
+    catchException(() -> reportService.createReport(report));
+    assertThat(caughtException().getClass()).isEqualTo(
+      UnsupportedOperationException.class);
+    verify(batchService).getBatchByCode(BATCH_CODE);
+  }
+
+  @Test
+  public void updateReport() {
+
+    report.setStudents(Collections.singletonList(student));
+    reportDetail.setUser(student);
+    Report actual = reportService.updateReport(report);
+    assertThat(actual).isEqualTo(actual);
+    verify(reportRepository).findByIdAndDeletedFalse(REPORT_ID);
+    verify(reportRepository).save(report);
+    verify(reportDetailService, times(2)).findAllDetailByReportId(REPORT_ID);
+  }
+
+  @Test
+  public void updateReportDifferentStudent() {
+
+    String id = "another-student";
+    User anotherStudent = User.builder()
+      .id(id)
+      .role(Role.STUDENT)
+      .build();
+    when(userService.getUser(id)).thenReturn(anotherStudent);
+    when(reportDetailService.createReportDetailByReport(report,
+                                                        anotherStudent
+    )).thenReturn(report);
+    report.setStudents(Collections.singletonList(anotherStudent));
+    reportDetail.setUser(student);
+    Report actual = reportService.updateReport(report);
+    assertThat(actual).isEqualTo(actual);
+    verify(reportRepository).findByIdAndDeletedFalse(REPORT_ID);
+    verify(reportRepository).save(report);
+    verify(reportDetailService, times(2)).findAllDetailByReportId(REPORT_ID);
+    verify(reportDetailService).createReportDetailByReport(
+      report, anotherStudent);
+    verify(reportDetailService).deleteAllByReportId(REPORT_ID);
+  }
+
+  @Test
+  public void deleteById() {
+
+    reportService.deleteById(REPORT_ID);
+    verify(reportRepository).findByIdAndDeletedFalse(REPORT_ID);
+    verify(reportDetailService).deleteAllByReportId(REPORT_ID);
+    Report deletedReport = new Report();
+    BeanUtils.copyProperties(report, deletedReport);
+    deletedReport.setDeleted(true);
+    verify(reportRepository).save(deletedReport);
+  }
+
+  @Test
+  public void findAllSummaryByReportId() {
+
+    List<StudentSummaryVO> actual = reportService.findAllSummaryByReportId(
+      REPORT_ID, USER_ID);
+    assertThat(actual.size()).isEqualTo(1);
+    assertThat(actual.get(0)
+                 .getPoint()).isEqualTo(POINT);
+    assertThat(actual.get(0)
+                 .getStudentName()).isEqualTo(STUDENT_NAME);
+    verify(reportDetailService).findAllSummaryByReportId(REPORT_ID, USER_ID);
+  }
+
+  @Test
+  public void giveScoreToReportStudentsTest() {
+
+    reportDetail.setPoint(POINT);
+    List<ReportDetail> actual = reportService.giveScoreToReportStudents(
+      REPORT_ID, Collections.singletonList(reportDetail));
+    assertThat(actual.get(0)
+                 .getPoint()).isEqualTo(POINT);
+    assertThat(actual.size()).isEqualTo(1);
+    verify(reportRepository).findByIdAndDeletedFalse(REPORT_ID);
+    verify(reportDetailService).giveScoreToEachStudentInDetail(
+      report, Collections.singletonList(reportDetail));
+  }
+
+  @Test
+  public void giveScoreToReportStudentsTestReportNotFound() {
+
+    when(reportRepository.findByIdAndDeletedFalse(REPORT_ID)).thenReturn(
+      Optional.empty());
+    catchException(() -> reportService.giveScoreToReportStudents(REPORT_ID,
+                                                                 Collections.singletonList(
+                                                                   reportDetail)
+    ));
+    assertThat(caughtException().getClass()).isEqualTo(
+      UnsupportedOperationException.class);
+    verify(reportRepository).findByIdAndDeletedFalse(REPORT_ID);
+  }
+
 }

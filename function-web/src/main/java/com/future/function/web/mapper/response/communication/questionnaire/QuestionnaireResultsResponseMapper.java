@@ -26,66 +26,85 @@ public class QuestionnaireResultsResponseMapper {
   private static final String NO_BATCH = "No Batch";
 
   public static PagingResponse<UserSummaryResponse> toPagingUserSummaryResponse(
-    Page<UserQuestionnaireSummary> data,
-    String urlPrefix
+    Page<UserQuestionnaireSummary> data, String urlPrefix
   ) {
-    return ResponseHelper.toPagingResponse(HttpStatus.OK, toUserSummaryResponseList(data, urlPrefix), PageHelper.toPaging(data));
+
+    return ResponseHelper.toPagingResponse(HttpStatus.OK,
+                                           toUserSummaryResponseList(data,
+                                                                     urlPrefix
+                                           ), PageHelper.toPaging(data)
+    );
   }
 
-  public static DataResponse<UserSummaryResponse> toDataResponseUserSummaryResponse(
-          UserQuestionnaireSummary data,
-          String urlPrefix
+  private static List<UserSummaryResponse> toUserSummaryResponseList(
+    Page<UserQuestionnaireSummary> data, String urlPrefix
   ) {
-    return ResponseHelper.toDataResponse(HttpStatus.OK, toUserSummaryResponse(data, urlPrefix));
-  }
 
-  private static List<UserSummaryResponse> toUserSummaryResponseList(Page<UserQuestionnaireSummary> data, String urlPrefix) {
     return data.getContent()
-            .stream()
-            .map((userSummary) -> toUserSummaryResponse(userSummary, urlPrefix))
-            .collect(Collectors.toList());
+      .stream()
+      .map((userSummary) -> toUserSummaryResponse(userSummary, urlPrefix))
+      .collect(Collectors.toList());
   }
 
-  private static UserSummaryResponse toUserSummaryResponse(UserQuestionnaireSummary userSummary, String urlPrefix) {
+  private static UserSummaryResponse toUserSummaryResponse(
+    UserQuestionnaireSummary userSummary, String urlPrefix
+  ) {
+
     return UserSummaryResponse.builder()
-            .id(userSummary.getId())
-            .member(toMemberResponse(userSummary.getAppraisee(), urlPrefix))
-            .rating(userSummary.getScoreSummary().getAverage())
-            .build();
+      .id(userSummary.getId())
+      .member(toMemberResponse(userSummary.getAppraisee(), urlPrefix))
+      .rating(userSummary.getScoreSummary()
+                .getAverage())
+      .build();
   }
 
-  private static MemberResponse toMemberResponse(User appraisee, String urlPrefix) {
+  private static MemberResponse toMemberResponse(
+    User appraisee, String urlPrefix
+  ) {
+
     return MemberResponse.builder()
-            .id(appraisee.getId())
-            .role(appraisee.getRole().toString())
-            .name(appraisee.getName())
-            .avatar(getThumnailUrl(appraisee, urlPrefix))
-            .batch(toBatchResponse(appraisee.getBatch()))
-            .university(appraisee.getUniversity())
-            .build();
+      .id(appraisee.getId())
+      .role(appraisee.getRole()
+              .toString())
+      .name(appraisee.getName())
+      .avatar(getThumnailUrl(appraisee, urlPrefix))
+      .batch(toBatchResponse(appraisee.getBatch()))
+      .university(appraisee.getUniversity())
+      .build();
   }
 
   private static BatchWebResponse toBatchResponse(Batch batch) {
-    if(batch == null) {
+
+    if (batch == null) {
       return BatchWebResponse.builder()
-              .id(NO_BATCH)
-              .name(NO_BATCH)
-              .code(NO_BATCH)
-              .build();
+        .id(NO_BATCH)
+        .name(NO_BATCH)
+        .code(NO_BATCH)
+        .build();
     }
     return BatchWebResponse.builder()
-            .id(batch.getId())
-            .name(batch.getName())
-            .code(batch.getCode())
-            .build();
+      .id(batch.getId())
+      .name(batch.getName())
+      .code(batch.getCode())
+      .build();
 
   }
 
   private static String getThumnailUrl(User user, String urlPrefix) {
+
     return Optional.ofNullable(user)
       .map(User::getPictureV2)
       .map(FileV2::getThumbnailUrl)
       .map(urlPrefix::concat)
       .orElse(null);
   }
+
+  public static DataResponse<UserSummaryResponse> toDataResponseUserSummaryResponse(
+    UserQuestionnaireSummary data, String urlPrefix
+  ) {
+
+    return ResponseHelper.toDataResponse(
+      HttpStatus.OK, toUserSummaryResponse(data, urlPrefix));
+  }
+
 }

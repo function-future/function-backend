@@ -62,25 +62,28 @@ public class ChatroomServiceImplTest {
 
   private static final String USER_NAME_2 = "Satyagama";
 
-  private static final Session SESSION = Session.builder().userId(USER_ID_1).build();
+  private static final Session SESSION = Session.builder()
+    .userId(USER_ID_1)
+    .build();
 
-  private static final Session SESSION_2 = Session.builder().userId(USER_ID_3).build();
-
+  private static final Session SESSION_2 = Session.builder()
+    .userId(USER_ID_3)
+    .build();
 
 
   private static final User MEMBER_1 = User.builder()
-          .id(USER_ID_1)
-          .name(USER_NAME_1)
-          .build();
+    .id(USER_ID_1)
+    .name(USER_NAME_1)
+    .build();
 
   private static final User MEMBER_2 = User.builder()
-          .id(USER_ID_2)
-          .name(USER_NAME_2)
-          .build();
+    .id(USER_ID_2)
+    .name(USER_NAME_2)
+    .build();
 
   private static final User MEMBER_3 = User.builder()
-          .id(USER_ID_3)
-          .build();
+    .id(USER_ID_3)
+    .build();
 
   private Chatroom chatroom;
 
@@ -95,16 +98,18 @@ public class ChatroomServiceImplTest {
 
   @Before
   public void setUp() {
+
     chatroom = Chatroom.builder()
-            .title(TITLE_GROUP)
-            .id(CHATROOM_ID)
-            .type(TYPE)
-            .members(Arrays.asList(MEMBER_1, MEMBER_2))
-            .build();
+      .title(TITLE_GROUP)
+      .id(CHATROOM_ID)
+      .type(TYPE)
+      .members(Arrays.asList(MEMBER_1, MEMBER_2))
+      .build();
   }
 
   @After
   public void tearDown() {
+
     verifyNoMoreInteractions(userService, chatroomRepository);
   }
 
@@ -112,50 +117,92 @@ public class ChatroomServiceImplTest {
   public void testGivenTypeAndMemberByGettingChatroomByTypeAndMemberReturnPagedChatrooms() {
 
     when(userService.getUser(USER_ID_1)).thenReturn(MEMBER_1);
-    when(chatroomRepository.findAllByTypeAndMembersOrderByUpdatedAtDesc(TYPE, MEMBER_1, PAGEABLE))
-            .thenReturn(new PageImpl<>(Collections.singletonList(chatroom), PAGEABLE, 1));
+    when(chatroomRepository.findAllByTypeAndMembersOrderByUpdatedAtDesc(TYPE,
+                                                                        MEMBER_1,
+                                                                        PAGEABLE
+    )).thenReturn(
+      new PageImpl<>(Collections.singletonList(chatroom), PAGEABLE, 1));
 
-    Page<Chatroom> chatroomPage = chatroomService.getChatrooms(TYPE.name(), USER_ID_1, PAGEABLE);
+    Page<Chatroom> chatroomPage = chatroomService.getChatrooms(
+      TYPE.name(), USER_ID_1, PAGEABLE);
 
     assertThat(chatroomPage.getTotalElements()).isEqualTo(1);
-    assertThat(chatroomPage.getContent().get(0).getId()).isEqualTo(CHATROOM_ID);
-    assertThat(chatroomPage.getContent().get(0).getTitle()).isEqualTo(TITLE_GROUP);
-    assertThat(chatroomPage.getContent().get(0).getType()).isEqualTo(TYPE);
-    assertThat(chatroomPage.getContent().get(0).getMembers().size()).isEqualTo(2);
-    assertThat(chatroomPage.getContent().get(0).getMembers().contains(MEMBER_1)).isTrue();
-    assertThat(chatroomPage.getContent().get(0).getMembers().contains(MEMBER_2)).isTrue();
+    assertThat(chatroomPage.getContent()
+                 .get(0)
+                 .getId()).isEqualTo(CHATROOM_ID);
+    assertThat(chatroomPage.getContent()
+                 .get(0)
+                 .getTitle()).isEqualTo(TITLE_GROUP);
+    assertThat(chatroomPage.getContent()
+                 .get(0)
+                 .getType()).isEqualTo(TYPE);
+    assertThat(chatroomPage.getContent()
+                 .get(0)
+                 .getMembers()
+                 .size()).isEqualTo(2);
+    assertThat(chatroomPage.getContent()
+                 .get(0)
+                 .getMembers()
+                 .contains(MEMBER_1)).isTrue();
+    assertThat(chatroomPage.getContent()
+                 .get(0)
+                 .getMembers()
+                 .contains(MEMBER_2)).isTrue();
 
     verify(userService).getUser(USER_ID_1);
-    verify(chatroomRepository).findAllByTypeAndMembersOrderByUpdatedAtDesc(TYPE, MEMBER_1, PAGEABLE);
+    verify(chatroomRepository).findAllByTypeAndMembersOrderByUpdatedAtDesc(
+      TYPE, MEMBER_1, PAGEABLE);
   }
 
   @Test
   public void testGivenKeywordAndMemberByGettingChatroomByKeywordAndMemberReturnPagedChatrooms() {
-    when(userService.getUser(USER_ID_1)).thenReturn(MEMBER_1);
-    when(chatroomRepository.findAllByTitleContainingIgnoreCaseAndMembersOrderByUpdatedAtDesc(KEYWORD, MEMBER_1, PAGEABLE))
-            .thenReturn(new PageImpl<>(Collections.singletonList(chatroom), PAGEABLE, 1));
 
-    Page<Chatroom> chatroomPage = chatroomService.getChatroomsWithKeyword(KEYWORD, USER_ID_1, PAGEABLE);
+    when(userService.getUser(USER_ID_1)).thenReturn(MEMBER_1);
+    when(
+      chatroomRepository.findAllByTitleContainingIgnoreCaseAndMembersOrderByUpdatedAtDesc(
+        KEYWORD, MEMBER_1, PAGEABLE)).thenReturn(
+      new PageImpl<>(Collections.singletonList(chatroom), PAGEABLE, 1));
+
+    Page<Chatroom> chatroomPage = chatroomService.getChatroomsWithKeyword(
+      KEYWORD, USER_ID_1, PAGEABLE);
 
     assertThat(chatroomPage.getTotalElements()).isEqualTo(1);
-    assertThat(chatroomPage.getContent().get(0).getId()).isEqualTo(CHATROOM_ID);
-    assertThat(chatroomPage.getContent().get(0).getTitle()).isEqualTo(TITLE_GROUP);
-    assertThat(chatroomPage.getContent().get(0).getType()).isEqualTo(TYPE);
-    assertThat(chatroomPage.getContent().get(0).getMembers().size()).isEqualTo(2);
-    assertThat(chatroomPage.getContent().get(0).getMembers().contains(MEMBER_1)).isTrue();
-    assertThat(chatroomPage.getContent().get(0).getMembers().contains(MEMBER_2)).isTrue();
+    assertThat(chatroomPage.getContent()
+                 .get(0)
+                 .getId()).isEqualTo(CHATROOM_ID);
+    assertThat(chatroomPage.getContent()
+                 .get(0)
+                 .getTitle()).isEqualTo(TITLE_GROUP);
+    assertThat(chatroomPage.getContent()
+                 .get(0)
+                 .getType()).isEqualTo(TYPE);
+    assertThat(chatroomPage.getContent()
+                 .get(0)
+                 .getMembers()
+                 .size()).isEqualTo(2);
+    assertThat(chatroomPage.getContent()
+                 .get(0)
+                 .getMembers()
+                 .contains(MEMBER_1)).isTrue();
+    assertThat(chatroomPage.getContent()
+                 .get(0)
+                 .getMembers()
+                 .contains(MEMBER_2)).isTrue();
 
     verify(userService).getUser(USER_ID_1);
-    verify(chatroomRepository).findAllByTitleContainingIgnoreCaseAndMembersOrderByUpdatedAtDesc(
-            KEYWORD, MEMBER_1, PAGEABLE);
+    verify(
+      chatroomRepository).findAllByTitleContainingIgnoreCaseAndMembersOrderByUpdatedAtDesc(
+      KEYWORD, MEMBER_1, PAGEABLE);
   }
 
   @Test
   public void testGivenChatroomIdByGettingChatroomByIdReturnChatroom() {
+
     when(chatroomRepository.findOne(CHATROOM_ID)).thenReturn(chatroom);
     when(userService.getUser(USER_ID_1)).thenReturn(MEMBER_1);
 
-    Chatroom chatroomResult = chatroomService.getChatroom(CHATROOM_ID, SESSION.getUserId());
+    Chatroom chatroomResult = chatroomService.getChatroom(
+      CHATROOM_ID, SESSION.getUserId());
 
     assertThat(chatroomResult).isNotNull();
     assertThat(chatroomResult.getId()).isEqualTo(CHATROOM_ID);
@@ -168,25 +215,32 @@ public class ChatroomServiceImplTest {
 
   @Test
   public void testGivenChatroomIdByGettingChatroomByIdReturnNotFoundException() {
+
     when(chatroomRepository.findOne(CHATROOM_ID_FAKE)).thenReturn(null);
 
-    catchException(() -> chatroomService.getChatroom(CHATROOM_ID_FAKE, SESSION.getUserId()));
+    catchException(
+      () -> chatroomService.getChatroom(CHATROOM_ID_FAKE, SESSION.getUserId()));
 
     assertThat(caughtException().getClass()).isEqualTo(NotFoundException.class);
-    assertThat(caughtException().getMessage()).isEqualTo("Get Chatroom Not Found");
+    assertThat(caughtException().getMessage()).isEqualTo(
+      "Get Chatroom Not Found");
 
     verify(chatroomRepository).findOne(CHATROOM_ID_FAKE);
   }
 
   @Test
   public void testGivenChatroomIdByGettingChatroomByIdReturnForbiddenException() {
+
     when(chatroomRepository.findOne(CHATROOM_ID)).thenReturn(chatroom);
     when(userService.getUser(USER_ID_3)).thenReturn(MEMBER_3);
 
-    catchException(() -> chatroomService.getChatroom(CHATROOM_ID, SESSION_2.getUserId()));
+    catchException(
+      () -> chatroomService.getChatroom(CHATROOM_ID, SESSION_2.getUserId()));
 
-    assertThat(caughtException().getClass()).isEqualTo(ForbiddenException.class);
-    assertThat(caughtException().getMessage()).isEqualTo("Chatroom did not belong to this user");
+    assertThat(caughtException().getClass()).isEqualTo(
+      ForbiddenException.class);
+    assertThat(caughtException().getMessage()).isEqualTo(
+      "Chatroom did not belong to this user");
 
     verify(chatroomRepository).findOne(CHATROOM_ID);
     verify(userService).getUser(USER_ID_3);
@@ -194,6 +248,7 @@ public class ChatroomServiceImplTest {
 
   @Test
   public void testGivenChatroomByCreatingChatroomReturnChatroom() {
+
     when(userService.getUser(USER_ID_1)).thenReturn(MEMBER_1);
     when(userService.getUser(USER_ID_2)).thenReturn(MEMBER_2);
     when(chatroomRepository.save(chatroom)).thenReturn(chatroom);
@@ -212,10 +267,12 @@ public class ChatroomServiceImplTest {
 
   @Test
   public void testGivenChatroomByCreatingPrivateChatroomReturnExistingChatroom() {
+
     when(userService.getUser(USER_ID_1)).thenReturn(MEMBER_1);
     when(userService.getUser(USER_ID_2)).thenReturn(MEMBER_2);
     when(chatroomRepository.save(chatroom)).thenReturn(chatroom);
-    when(chatroomRepository.findAllByMembersContaining(Arrays.asList(MEMBER_1, MEMBER_2))).thenReturn(new ArrayList<>());
+    when(chatroomRepository.findAllByMembersContaining(
+      Arrays.asList(MEMBER_1, MEMBER_2))).thenReturn(new ArrayList<>());
 
     chatroom.setType(ChatroomType.PRIVATE);
 
@@ -228,11 +285,13 @@ public class ChatroomServiceImplTest {
     verify(userService, times(2)).getUser(USER_ID_1);
     verify(userService, times(2)).getUser(USER_ID_2);
     verify(chatroomRepository).save(chatroom);
-    verify(chatroomRepository).findAllByMembersContaining(Arrays.asList(MEMBER_1, MEMBER_2));
+    verify(chatroomRepository).findAllByMembersContaining(
+      Arrays.asList(MEMBER_1, MEMBER_2));
   }
 
   @Test
   public void testGivenChatroomByUpdatingChatroomReturnUpdatedChatroom() {
+
     Chatroom newChatroom = new Chatroom();
     BeanUtils.copyProperties(chatroom, newChatroom);
     newChatroom.setTitle(UPDATED_TITLE_GROUP);
@@ -243,7 +302,8 @@ public class ChatroomServiceImplTest {
     when(userService.getUser(USER_ID_1)).thenReturn(MEMBER_1);
     when(userService.getUser(USER_ID_2)).thenReturn(MEMBER_2);
 
-    Chatroom chatroomResult = chatroomService.updateChatroom(newChatroom, SESSION.getUserId());
+    Chatroom chatroomResult = chatroomService.updateChatroom(
+      newChatroom, SESSION.getUserId());
 
     assertThat(chatroomResult).isNotNull();
     assertThat(chatroomResult.getId()).isEqualTo(CHATROOM_ID);

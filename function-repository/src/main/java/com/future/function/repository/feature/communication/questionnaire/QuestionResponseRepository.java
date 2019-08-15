@@ -7,8 +7,11 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;
 
-public interface QuestionResponseRepository extends MongoRepository<QuestionResponse, String> {
+public interface QuestionResponseRepository
+  extends MongoRepository<QuestionResponse, String> {
 
-  List<QuestionResponse> findAllByQuestionQuestionnaireAndAppraiseeAndDeletedFalse(QuestionQuestionnaire question, User apraisee);
+  List<QuestionResponse> findAllByQuestionQuestionnaireAndAppraiseeAndDeletedFalse(
+    QuestionQuestionnaire question, User apraisee
+  );
 
 }

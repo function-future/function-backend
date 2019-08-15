@@ -12,28 +12,28 @@ import java.util.Optional;
 
 @Component
 public class FileDeleteScheduler {
-  
+
   private final FileRepositoryV2 fileRepository;
-  
+
   private final FileProperties fileProperties;
-  
+
   public FileDeleteScheduler(
     FileRepositoryV2 fileRepository, FileProperties fileProperties
   ) {
-    
+
     this.fileRepository = fileRepository;
     this.fileProperties = fileProperties;
   }
-  
+
   @Scheduled(fixedDelayString = "#{@fileProperties.schedulerActivePeriod}")
   public void deleteFileOnSchedule() {
-    
+
     fileRepository.findAllByUsedFalse()
       .forEachOrdered(this::deleteFileRecursivelyAndFromDatabase);
   }
-  
+
   private void deleteFileRecursivelyAndFromDatabase(FileV2 fileV2) {
-    
+
     Optional.ofNullable(fileV2)
       .filter(this::isCreatedAndUnusedMoreThanDefinedPeriod)
       .ifPresent(file -> {
@@ -41,28 +41,28 @@ public class FileDeleteScheduler {
         fileRepository.delete(file);
       });
   }
-  
+
   private void deleteFileFromSystemIfNotFolder(FileV2 fileV2) {
-    
+
     Optional.of(fileV2)
       .filter(file -> !file.isMarkFolder())
       .ifPresent(file -> FileSystemUtils.deleteRecursively(
         new File(this.getContainingFolderPath(file))));
   }
-  
-  private boolean isCreatedAndUnusedMoreThanDefinedPeriod(FileV2 fileV2) {
-    
-    long createdAt = fileV2.getCreatedAt();
-    long timeDiff = Math.abs(createdAt - System.currentTimeMillis());
-    
-    return timeDiff >= fileProperties.getMinimumFileCreatedPeriod();
-  }
-  
+
   private String getContainingFolderPath(FileV2 fileV2) {
-    
+
     String filePath = fileV2.getFilePath();
-    
+
     return filePath.substring(0, filePath.lastIndexOf(File.separator));
   }
-  
+
+  private boolean isCreatedAndUnusedMoreThanDefinedPeriod(FileV2 fileV2) {
+
+    long createdAt = fileV2.getCreatedAt();
+    long timeDiff = Math.abs(createdAt - System.currentTimeMillis());
+
+    return timeDiff >= fileProperties.getMinimumFileCreatedPeriod();
+  }
+
 }

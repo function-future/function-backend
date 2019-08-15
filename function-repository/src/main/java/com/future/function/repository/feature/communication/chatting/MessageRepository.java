@@ -9,11 +9,17 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 public interface MessageRepository extends MongoRepository<Message, String> {
 
-  Page<Message> findAllByChatroomOrderByCreatedAtDesc(Chatroom chatroom, Pageable pageable);
+  Page<Message> findAllByChatroomOrderByCreatedAtDesc(
+    Chatroom chatroom, Pageable pageable
+  );
 
-  Page<Message> findAllByChatroomAndIdGreaterThanOrderByCreatedAtDesc(Chatroom chatroom, ObjectId messageId, Pageable pageable);
+  Page<Message> findAllByChatroomAndIdGreaterThanOrderByCreatedAtDesc(
+    Chatroom chatroom, ObjectId messageId, Pageable pageable
+  );
 
-  Page<Message> findAllByChatroomAndIdLessThanOrderByCreatedAtDesc(Chatroom chatroom, ObjectId messageId, Pageable pageable);
+  Page<Message> findAllByChatroomAndIdLessThanOrderByCreatedAtDesc(
+    Chatroom chatroom, ObjectId messageId, Pageable pageable
+  );
 
   Message findFirstByChatroomOrderByCreatedAtDesc(Chatroom chatroom);
 

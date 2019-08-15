@@ -7,12 +7,15 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;
 
-public interface MessageStatusRepository extends MongoRepository<MessageStatus, String> {
+public interface MessageStatusRepository
+  extends MongoRepository<MessageStatus, String> {
 
   List<MessageStatus> findAllByChatroomAndMemberAndSeenIsFalseOrderByCreatedAtDesc(
-          Chatroom chatroom, User member);
+    Chatroom chatroom, User member
+  );
 
   List<MessageStatus> findAllByChatroomAndMemberAndCreatedAtLessThanEqualAndSeenIsFalseOrderByCreatedAtDesc(
-          Chatroom chatroom, User member, Long timestamp);
+    Chatroom chatroom, User member, Long timestamp
+  );
 
 }

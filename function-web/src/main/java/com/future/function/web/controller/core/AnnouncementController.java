@@ -21,25 +21,25 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping(value = "/api/core/announcements")
 public class AnnouncementController {
-  
+
   private final AnnouncementService announcementService;
-  
+
   private final AnnouncementRequestMapper announcementRequestMapper;
-  
+
   private final FileProperties fileProperties;
-  
+
   @Autowired
   public AnnouncementController(
     AnnouncementService announcementService,
     AnnouncementRequestMapper announcementRequestMapper,
     FileProperties fileProperties
   ) {
-    
+
     this.announcementService = announcementService;
     this.announcementRequestMapper = announcementRequestMapper;
     this.fileProperties = fileProperties;
   }
-  
+
   @ResponseStatus(HttpStatus.OK)
   @GetMapping
   public PagingResponse<AnnouncementWebResponse> getAnnouncements(
@@ -48,25 +48,26 @@ public class AnnouncementController {
     @RequestParam(defaultValue = "4")
       int size
   ) {
-    
+
     return AnnouncementResponseMapper.toAnnouncementsPagingResponse(
       announcementService.getAnnouncements(PageHelper.toPageable(page, size)),
-      fileProperties.getUrlPrefix());
+      fileProperties.getUrlPrefix()
+    );
   }
-  
+
   @ResponseStatus(HttpStatus.OK)
   @GetMapping(value = "/{announcementId}")
   public DataResponse<AnnouncementWebResponse> getAnnouncement(
     @PathVariable
       String announcementId
   ) {
-    
+
     return AnnouncementResponseMapper.toAnnouncementDataResponse(
       announcementService.getAnnouncement(announcementId),
       fileProperties.getUrlPrefix()
     );
   }
-  
+
   @ResponseStatus(HttpStatus.CREATED)
   @PostMapping
   public DataResponse<AnnouncementWebResponse> createAnnouncement(
@@ -75,14 +76,14 @@ public class AnnouncementController {
     @RequestBody
       AnnouncementWebRequest request
   ) {
-    
+
     return AnnouncementResponseMapper.toAnnouncementDataResponse(
       HttpStatus.CREATED, announcementService.createAnnouncement(
         announcementRequestMapper.toAnnouncement(request)),
       fileProperties.getUrlPrefix()
     );
   }
-  
+
   @ResponseStatus(HttpStatus.OK)
   @PutMapping(value = "/{announcementId}")
   public DataResponse<AnnouncementWebResponse> updateAnnouncement(
@@ -93,13 +94,13 @@ public class AnnouncementController {
     @RequestBody
       AnnouncementWebRequest request
   ) {
-    
+
     return AnnouncementResponseMapper.toAnnouncementDataResponse(
       HttpStatus.OK, announcementService.updateAnnouncement(
         announcementRequestMapper.toAnnouncement(
           announcementId, request)), fileProperties.getUrlPrefix());
   }
-  
+
   @ResponseStatus(HttpStatus.OK)
   @DeleteMapping(value = "/{announcementId}")
   public BaseResponse deleteAnnouncement(
@@ -108,9 +109,9 @@ public class AnnouncementController {
     @PathVariable
       String announcementId
   ) {
-    
+
     announcementService.deleteAnnouncement(announcementId);
     return ResponseHelper.toBaseResponse(HttpStatus.OK);
   }
-  
+
 }

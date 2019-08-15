@@ -37,16 +37,17 @@ public class DataMigration_001 {
     admin.setDeleted(false);
 
     mongoTemplate.insert(admin, DocumentName.USER);
-    
-    User savedAdmin =
-      mongoTemplate.findOne(Query.query(Criteria.where("email").is(ADMIN_EMAIL)),
-                       User.class);
-  
+
+    User savedAdmin = mongoTemplate.findOne(Query.query(Criteria.where("email")
+                                                          .is(ADMIN_EMAIL)),
+                                            User.class
+    );
+
     savedAdmin.setCreatedAt(System.currentTimeMillis());
     savedAdmin.setCreatedBy(savedAdmin.getId());
     savedAdmin.setUpdatedAt(System.currentTimeMillis());
     savedAdmin.setUpdatedBy(savedAdmin.getId());
-    
+
     mongoTemplate.save(savedAdmin);
   }
 

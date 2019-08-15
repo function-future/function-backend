@@ -8,7 +8,9 @@ public interface MessageStatusService {
 
   List<MessageStatus> getUnseenMessageStatus(String chatroomId, String userId);
 
-  List<MessageStatus> getUnseenMessageStatusBeforeTimestamp(String chatroomId, String userId, Long timestamp);
+  List<MessageStatus> getUnseenMessageStatusBeforeTimestamp(
+    String chatroomId, String userId, Long timestamp
+  );
 
   boolean getSeenStatus(String chatroomId, String userId);
 

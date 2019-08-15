@@ -17,26 +17,33 @@ public class ReminderRequestMapper {
 
   @Autowired
   public ReminderRequestMapper(RequestValidator validator) {
+
     this.validator = validator;
   }
 
   public Reminder toReminder(ReminderRequest request, String reminderId) {
+
     validator.validate(request);
 
     return Reminder.builder()
-            .id(reminderId)
-            .content(request.getDescription())
-            .title(request.getTitle())
-            .isRepeatedMonthly(request.getIsRepeatedMonthly())
-            .days(request.getRepeatDays() != null ? request.getRepeatDays().stream()
-                    .map(DayOfWeek::valueOf)
-                    .collect(Collectors.toList()) : null)
-            .monthlyDate(request.getMonthlyDate())
-            .hour(request.getHour())
-            .minute(request.getMinute())
-            .members(request.getMembers().stream()
-                    .map(member -> User.builder().id(member).build())
-                    .collect(Collectors.toList()))
-            .build();
+      .id(reminderId)
+      .content(request.getDescription())
+      .title(request.getTitle())
+      .isRepeatedMonthly(request.getIsRepeatedMonthly())
+      .days(request.getRepeatDays() != null ? request.getRepeatDays()
+        .stream()
+        .map(DayOfWeek::valueOf)
+        .collect(Collectors.toList()) : null)
+      .monthlyDate(request.getMonthlyDate())
+      .hour(request.getHour())
+      .minute(request.getMinute())
+      .members(request.getMembers()
+                 .stream()
+                 .map(member -> User.builder()
+                   .id(member)
+                   .build())
+                 .collect(Collectors.toList()))
+      .build();
   }
+
 }

@@ -225,8 +225,8 @@ public class ActivityBlogControllerTest extends TestHelper {
                                                   REQUEST
     )).thenReturn(activityBlog);
     when(activityBlogService.updateActivityBlog(STUDENT_ID, Role.STUDENT,
-                                                activityBlog)).thenReturn(
-      activityBlog);
+                                                activityBlog
+    )).thenReturn(activityBlog);
 
     mockMvc.perform(put("/api/core/activity-blogs/" + ID).cookie(cookies)
                       .contentType(MediaType.APPLICATION_JSON)
@@ -240,7 +240,8 @@ public class ActivityBlogControllerTest extends TestHelper {
 
     verify(activityBlogRequestMapper).toActivityBlog(
       STUDENT_EMAIL, ID, REQUEST);
-    verify(activityBlogService).updateActivityBlog(STUDENT_ID, Role.STUDENT, activityBlog);
+    verify(activityBlogService).updateActivityBlog(
+      STUDENT_ID, Role.STUDENT, activityBlog);
     verify(fileProperties).getUrlPrefix();
   }
 
@@ -257,7 +258,8 @@ public class ActivityBlogControllerTest extends TestHelper {
           .getJson()));
 
     verify(activityBlogService).deleteActivityBlog(STUDENT_ID, Role.STUDENT,
-                                                   ID);
+                                                   ID
+    );
     verifyZeroInteractions(activityBlogRequestMapper, fileProperties);
   }
 

@@ -20,4 +20,5 @@ public class QuestionnaireDetailResponse {
   private Long startDate;
 
   private Long dueDate;
+
 }

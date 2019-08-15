@@ -14,41 +14,41 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 @RunWith(MockitoJUnitRunner.class)
 public class NoSpaceValidatorTest {
-  
+
   @Mock
   private NoSpace annotation;
-  
+
   @InjectMocks
   private NoSpaceValidator validator;
-  
+
   @Before
   public void setUp() {
-    
+
     validator.initialize(annotation);
   }
-  
+
   @After
   public void tearDown() {
-    
+
     verifyNoMoreInteractions(annotation);
   }
-  
+
   @Test
   public void testGivenNullValueByValidatingNoSpaceInStringReturnFalse() {
-  
+
     assertThat(validator.isValid(null, null)).isFalse();
   }
-  
+
   @Test
   public void testGivenStringWithSpaceByValidatingNoSpaceInStringReturnFalse() {
-  
+
     assertThat(validator.isValid("Space ", null)).isFalse();
   }
-  
+
   @Test
   public void testGivenStringWithNoSpaceByValidatingNoSpaceInStringReturnTrue() {
-  
+
     assertThat(validator.isValid("NoSpace", null)).isTrue();
   }
-  
+
 }

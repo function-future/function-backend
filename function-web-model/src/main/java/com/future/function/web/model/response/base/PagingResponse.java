@@ -16,7 +16,7 @@ public class PagingResponse<T> extends BaseResponse {
   private Paging paging;
 
   public PagingResponse() {}
-  
+
   @Builder
   private PagingResponse(int code, String status, List<T> data, Paging paging) {
 

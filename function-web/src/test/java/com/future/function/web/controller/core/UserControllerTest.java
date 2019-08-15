@@ -93,14 +93,20 @@ public class UserControllerTest extends TestHelper {
 
   private static final DataResponse<UserWebResponse> RETRIEVED_DATA_RESPONSE =
     UserResponseMapper.toUserDataResponse(STUDENT, URL_PREFIX);
+
   private static final DataResponse<UserWebResponse> CREATED_DATA_RESPONSE =
-    UserResponseMapper.toUserDataResponse(HttpStatus.CREATED, STUDENT, URL_PREFIX);
+    UserResponseMapper.toUserDataResponse(
+      HttpStatus.CREATED, STUDENT, URL_PREFIX);
+
   private static final List<User> STUDENTS_LIST = Arrays.asList(
     STUDENT, STUDENT, STUDENT);
 
   private static final PagingResponse<UserWebResponse> PAGING_RESPONSE =
     UserResponseMapper.toUsersPagingResponse(
-      new PageImpl<>(STUDENTS_LIST, PAGEABLE, STUDENTS_LIST.size()), URL_PREFIX);
+      new PageImpl<>(STUDENTS_LIST, PAGEABLE, STUDENTS_LIST.size()),
+      URL_PREFIX
+    );
+
   private static final BaseResponse BASE_RESPONSE =
     ResponseHelper.toBaseResponse(HttpStatus.OK);
 
@@ -111,7 +117,8 @@ public class UserControllerTest extends TestHelper {
 
   @MockBean
   private UserRequestMapper userRequestMapper;
-@MockBean
+
+  @MockBean
   private FileProperties fileProperties;
 
   @Override
@@ -148,7 +155,8 @@ public class UserControllerTest extends TestHelper {
     verify(userService).getUsers(Role.STUDENT, "", PAGEABLE);
     verifyZeroInteractions(userRequestMapper);
   }
-  
+
+  @Test
   public void testGivenEmailFromPathVariableByDeletingUserByEmailReturnBaseResponseOK()
     throws Exception {
 
@@ -281,17 +289,19 @@ public class UserControllerTest extends TestHelper {
       .build();
 
     List<User> users = Collections.singletonList(student);
-    when(userService.getUsersByNameContainsIgnoreCase(NAME, PAGEABLE)).thenReturn(new PageImpl<>(users, PAGEABLE
-      , users.size()));
+    when(
+      userService.getUsersByNameContainsIgnoreCase(NAME, PAGEABLE)).thenReturn(
+      new PageImpl<>(users, PAGEABLE, users.size()));
 
     PagingResponse<UserWebResponse> pagingResponse =
-      UserResponseMapper.toUsersPagingResponse(new PageImpl<>(users, PAGEABLE
-        , users.size()), URL_PREFIX);
+      UserResponseMapper.toUsersPagingResponse(
+        new PageImpl<>(users, PAGEABLE, users.size()), URL_PREFIX);
     mockMvc.perform(get("/api/core/users/_search").cookie(cookies)
                       .param("name", NAME))
       .andExpect(status().isOk())
-      .andExpect(content().json(pagingResponseJacksonTester.write(pagingResponse)
-                                  .getJson()));
+      .andExpect(content().json(
+        pagingResponseJacksonTester.write(pagingResponse)
+          .getJson()));
     verify(fileProperties).getUrlPrefix();
     verify(userService).getUsersByNameContainsIgnoreCase(NAME, PAGEABLE);
     verifyZeroInteractions(userRequestMapper);

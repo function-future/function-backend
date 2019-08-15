@@ -22,37 +22,49 @@ public class QuizRequestMapper {
 
   @Autowired
   public QuizRequestMapper(RequestValidator validator) {
+
     this.validator = validator;
   }
 
   public Quiz toQuiz(String id, QuizWebRequest request, String batchCode) {
-      Quiz quiz = toValidatedQuiz(request, batchCode);
-      quiz.setId(id);
-      return quiz;
+
+    Quiz quiz = toValidatedQuiz(request, batchCode);
+    quiz.setId(id);
+    return quiz;
   }
 
-  public CopyQuizWebRequest validateCopyQuizWebRequest(CopyQuizWebRequest request) {
+  private Quiz toValidatedQuiz(QuizWebRequest request, String batchCode) {
+
+    request = validator.validate(request);
+    Quiz quiz = new Quiz();
+    BeanUtils.copyProperties(request, quiz);
+    Batch batch = Batch.builder()
+      .code(batchCode)
+      .build();
+    quiz.setBatch(batch);
+    quiz.setQuestionBanks(buildQuestionBanks(request.getQuestionBanks()));
+    return quiz;
+  }
+
+  private List<QuestionBank> buildQuestionBanks(List<String> questionBankIds) {
+
+    return questionBankIds.stream()
+      .map(id -> QuestionBank.builder()
+        .id(id)
+        .build())
+      .collect(Collectors.toList());
+  }
+
+  public CopyQuizWebRequest validateCopyQuizWebRequest(
+    CopyQuizWebRequest request
+  ) {
+
     return validator.validate(request);
   }
 
   public Quiz toQuiz(QuizWebRequest request, String batchCode) {
-      return toValidatedQuiz(request, batchCode);
+
+    return toValidatedQuiz(request, batchCode);
   }
 
-  private Quiz toValidatedQuiz(QuizWebRequest request, String batchCode) {
-      request = validator.validate(request);
-      Quiz quiz = new Quiz();
-      BeanUtils.copyProperties(request, quiz);
-      Batch batch = Batch.builder().code(batchCode).build();
-      quiz.setBatch(batch);
-      quiz.setQuestionBanks(buildQuestionBanks(request.getQuestionBanks()));
-      return quiz;
-  }
-
-  private List<QuestionBank> buildQuestionBanks(List<String> questionBankIds) {
-    return questionBankIds
-        .stream()
-        .map(id -> QuestionBank.builder().id(id).build())
-        .collect(Collectors.toList());
-  }
 }

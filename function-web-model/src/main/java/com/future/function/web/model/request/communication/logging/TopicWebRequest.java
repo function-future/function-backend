@@ -12,6 +12,9 @@ import org.hibernate.validator.constraints.Length;
 @AllArgsConstructor
 public class TopicWebRequest {
 
-  @Length(min = 1, max = 50, message = "Length")
+  @Length(min = 1,
+          max = 50,
+          message = "Length")
   private String title;
+
 }

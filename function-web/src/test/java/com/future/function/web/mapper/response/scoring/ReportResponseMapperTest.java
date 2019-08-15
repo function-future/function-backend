@@ -27,64 +27,91 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ReportResponseMapperTest {
 
   private static final String ID = "id";
+
   private static final String NAME = "final-judge";
+
   private static final String DESCRIPTION = "final description";
-    private static final String BATCH_CODE = "batch-code";
+
+  private static final String BATCH_CODE = "batch-code";
+
   private static final String STUDENT_ID = "student-id";
+
   private static final String STUDENT_NAME = "student-name";
+
   private static final String STUDENT_PHONE = "student-phone";
+
   private static final String STUDENT_AVATAR = "student-avatar";
+
   private static final String STUDENT_AVATAR_ID = "student-avatar-id";
+
   private static final String STUDENT_ADDRESS = "student-address";
+
   private static final String STUDENT_EMAIL = "student-email";
+
   private static final String STUDENT_UNIVERSITY = "student-university";
+
   private static final Long CREATED_AT = new Date().getTime();
+
   private static final String URL_PREFIX = "url-prefix/";
 
   private Report report;
-    private Batch batch;
+
+  private Batch batch;
+
   private ReportWebResponse response;
+
   private Pageable pageable;
+
   private Page<Report> reportPage;
+
   private User user;
+
   private UserWebResponse userWebResponse;
 
   @Before
   public void setUp() throws Exception {
 
-      batch = Batch.builder().code(BATCH_CODE).build();
+    batch = Batch.builder()
+      .code(BATCH_CODE)
+      .build();
 
-      userWebResponse = UserWebResponse.builder()
-          .id(STUDENT_ID)
-          .name(STUDENT_NAME)
-          .role(Role.STUDENT.name())
-          .address(STUDENT_ADDRESS)
-          .phone(STUDENT_PHONE)
-          .avatar(URL_PREFIX + STUDENT_AVATAR)
-          .avatarId(STUDENT_AVATAR_ID)
-          .batch(BatchWebResponse.builder().code(BATCH_CODE).build())
-          .email(STUDENT_EMAIL)
-          .university(STUDENT_UNIVERSITY).build();
+    userWebResponse = UserWebResponse.builder()
+      .id(STUDENT_ID)
+      .name(STUDENT_NAME)
+      .role(Role.STUDENT.name())
+      .address(STUDENT_ADDRESS)
+      .phone(STUDENT_PHONE)
+      .avatar(URL_PREFIX + STUDENT_AVATAR)
+      .avatarId(STUDENT_AVATAR_ID)
+      .batch(BatchWebResponse.builder()
+               .code(BATCH_CODE)
+               .build())
+      .email(STUDENT_EMAIL)
+      .university(STUDENT_UNIVERSITY)
+      .build();
 
-      user = User.builder()
-          .id(STUDENT_ID)
-          .name(STUDENT_NAME)
-          .role(Role.STUDENT)
-          .address(STUDENT_ADDRESS)
-          .phone(STUDENT_PHONE)
-              .pictureV2(FileV2.builder().id(STUDENT_AVATAR_ID).fileUrl(STUDENT_AVATAR).build())
-          .batch(batch)
-          .email(STUDENT_EMAIL)
-          .university(STUDENT_UNIVERSITY).build();
+    user = User.builder()
+      .id(STUDENT_ID)
+      .name(STUDENT_NAME)
+      .role(Role.STUDENT)
+      .address(STUDENT_ADDRESS)
+      .phone(STUDENT_PHONE)
+      .pictureV2(FileV2.builder()
+                   .id(STUDENT_AVATAR_ID)
+                   .fileUrl(STUDENT_AVATAR)
+                   .build())
+      .batch(batch)
+      .email(STUDENT_EMAIL)
+      .university(STUDENT_UNIVERSITY)
+      .build();
 
-    report = Report
-        .builder()
-            .id(ID)
-        .title(NAME)
-            .batch(batch)
-        .description(DESCRIPTION)
-        .students(Collections.singletonList(user))
-        .build();
+    report = Report.builder()
+      .id(ID)
+      .title(NAME)
+      .batch(batch)
+      .description(DESCRIPTION)
+      .students(Collections.singletonList(user))
+      .build();
 
     report.setCreatedAt(CREATED_AT);
 
@@ -95,40 +122,65 @@ public class ReportResponseMapperTest {
 
   @After
   public void tearDown() throws Exception {
+
   }
 
   @Test
   public void toDataReportWebResponse() {
+
     DataResponse<ReportWebResponse> actual =
       ReportResponseMapper.toDataReportWebResponse(report, URL_PREFIX);
-    assertThat(actual.getData().getId()).isEqualTo(ID);
-    assertThat(actual.getData().getName()).isEqualTo(NAME);
-    assertThat(actual.getData().getDescription()).isEqualTo(DESCRIPTION);
-      assertThat(actual.getData().getBatchCode()).isEqualTo(BATCH_CODE);
-    assertThat(actual.getData().getStudentCount()).isEqualTo(1);
+    assertThat(actual.getData()
+                 .getId()).isEqualTo(ID);
+    assertThat(actual.getData()
+                 .getName()).isEqualTo(NAME);
+    assertThat(actual.getData()
+                 .getDescription()).isEqualTo(DESCRIPTION);
+    assertThat(actual.getData()
+                 .getBatchCode()).isEqualTo(BATCH_CODE);
+    assertThat(actual.getData()
+                 .getStudentCount()).isEqualTo(1);
   }
 
   @Test
   public void toDataReportWebResponseCreated() {
+
     DataResponse<ReportWebResponse> actual =
-      ReportResponseMapper.toDataReportWebResponse(HttpStatus.CREATED, report
-        , URL_PREFIX);
-    assertThat(actual.getData().getId()).isEqualTo(ID);
-    assertThat(actual.getData().getName()).isEqualTo(NAME);
-    assertThat(actual.getData().getDescription()).isEqualTo(DESCRIPTION);
-      assertThat(actual.getData().getBatchCode()).isEqualTo(BATCH_CODE);
-    assertThat(actual.getData().getStudentCount()).isEqualTo(1);
+      ReportResponseMapper.toDataReportWebResponse(HttpStatus.CREATED, report,
+                                                   URL_PREFIX
+      );
+    assertThat(actual.getData()
+                 .getId()).isEqualTo(ID);
+    assertThat(actual.getData()
+                 .getName()).isEqualTo(NAME);
+    assertThat(actual.getData()
+                 .getDescription()).isEqualTo(DESCRIPTION);
+    assertThat(actual.getData()
+                 .getBatchCode()).isEqualTo(BATCH_CODE);
+    assertThat(actual.getData()
+                 .getStudentCount()).isEqualTo(1);
     assertThat(actual.getCode()).isEqualTo(201);
   }
 
   @Test
   public void toPagingReportWebResponse() {
+
     PagingResponse<ReportWebResponse> actual =
       ReportResponseMapper.toPagingReportWebResponse(reportPage, URL_PREFIX);
-    assertThat(actual.getData().get(0).getName()).isEqualTo(NAME);
-    assertThat(actual.getData().get(0).getDescription()).isEqualTo(DESCRIPTION);
-      assertThat(actual.getData().get(0).getBatchCode()).isEqualTo(BATCH_CODE);
-    assertThat(actual.getData().get(0).getStudentCount()).isEqualTo(1);
-    assertThat(actual.getPaging().getTotalRecords()).isEqualTo(1);
+    assertThat(actual.getData()
+                 .get(0)
+                 .getName()).isEqualTo(NAME);
+    assertThat(actual.getData()
+                 .get(0)
+                 .getDescription()).isEqualTo(DESCRIPTION);
+    assertThat(actual.getData()
+                 .get(0)
+                 .getBatchCode()).isEqualTo(BATCH_CODE);
+    assertThat(actual.getData()
+                 .get(0)
+                 .getStudentCount()).isEqualTo(1);
+    assertThat(actual.getPaging()
+                 .getTotalRecords()).isEqualTo(1);
   }
+
 }

@@ -10,15 +10,15 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CourseWebResponse {
-  
+
   private String id;
-  
+
   private String title;
-  
+
   private String description;
-  
+
   private String material;
-  
+
   private String materialId;
-  
+
 }

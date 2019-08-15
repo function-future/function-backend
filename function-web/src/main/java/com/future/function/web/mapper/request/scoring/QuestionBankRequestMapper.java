@@ -17,27 +17,34 @@ public class QuestionBankRequestMapper {
 
   @Autowired
   public QuestionBankRequestMapper(RequestValidator validator) {
+
     this.validator = validator;
   }
 
   public QuestionBank toQuestionBank(QuestionBankWebRequest request) {
+
     return toValidatedQuestionBank(request);
   }
 
-  public QuestionBank toQuestionBank(String id, QuestionBankWebRequest request) {
+  private QuestionBank toValidatedQuestionBank(QuestionBankWebRequest request) {
+
+    return Optional.ofNullable(request)
+      .map(validator::validate)
+      .map(val -> {
+        QuestionBank questionBank = new QuestionBank();
+        BeanUtils.copyProperties(request, questionBank);
+        return questionBank;
+      })
+      .orElseThrow(() -> new BadRequestException("Bad Request"));
+  }
+
+  public QuestionBank toQuestionBank(
+    String id, QuestionBankWebRequest request
+  ) {
+
     QuestionBank response = toValidatedQuestionBank(request);
     response.setId(id);
     return response;
   }
 
-  private QuestionBank toValidatedQuestionBank(QuestionBankWebRequest request) {
-    return Optional.ofNullable(request)
-        .map(validator::validate)
-        .map(val -> {
-          QuestionBank questionBank = new QuestionBank();
-          BeanUtils.copyProperties(request, questionBank);
-          return questionBank;
-        })
-        .orElseThrow(() -> new BadRequestException("Bad Request"));
-  }
 }

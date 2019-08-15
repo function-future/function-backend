@@ -22,24 +22,24 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping(value = "/api/core/users")
 public class UserController {
-  
+
   private final FileProperties fileProperties;
-  
+
   private UserRequestMapper userRequestMapper;
-  
+
   private UserService userService;
-  
+
   @Autowired
   public UserController(
     UserService userService, UserRequestMapper userRequestMapper,
     FileProperties fileProperties
   ) {
-    
+
     this.userService = userService;
     this.userRequestMapper = userRequestMapper;
     this.fileProperties = fileProperties;
   }
-  
+
   @ResponseStatus(HttpStatus.CREATED)
   @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE,
                produces = MediaType.APPLICATION_JSON_VALUE)
@@ -49,7 +49,7 @@ public class UserController {
     @RequestBody
       UserWebRequest data
   ) {
-    
+
     return UserResponseMapper.toUserDataResponse(HttpStatus.CREATED,
                                                  userService.createUser(
                                                    userRequestMapper.toUser(
@@ -57,7 +57,7 @@ public class UserController {
                                                  fileProperties.getUrlPrefix()
     );
   }
-  
+
   @ResponseStatus(HttpStatus.OK)
   @DeleteMapping(value = "/{userId:.+}",
                  produces = MediaType.APPLICATION_JSON_VALUE)
@@ -67,11 +67,11 @@ public class UserController {
     @PathVariable
       String userId
   ) {
-    
+
     userService.deleteUser(userId);
     return ResponseHelper.toBaseResponse(HttpStatus.OK);
   }
-  
+
   @ResponseStatus(HttpStatus.OK)
   @GetMapping(value = "/{userId:.+}",
               produces = MediaType.APPLICATION_JSON_VALUE)
@@ -81,11 +81,11 @@ public class UserController {
     @PathVariable
       String userId
   ) {
-    
+
     return UserResponseMapper.toUserDataResponse(
       userService.getUser(userId), fileProperties.getUrlPrefix());
   }
-  
+
   @ResponseStatus(HttpStatus.OK)
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   public PagingResponse<UserWebResponse> getUsers(
@@ -100,11 +100,10 @@ public class UserController {
     @RequestParam(defaultValue = "10")
       int size
   ) {
-    
-    return UserResponseMapper.toUsersPagingResponse(
-      userService.getUsers(
-        Role.toRole(role), name, PageHelper.toPageable(page, size)),
-      fileProperties.getUrlPrefix()
+
+    return UserResponseMapper.toUsersPagingResponse(userService.getUsers(
+      Role.toRole(role), name, PageHelper.toPageable(page, size)),
+                                                    fileProperties.getUrlPrefix()
     );
   }
 
@@ -120,13 +119,13 @@ public class UserController {
     @RequestBody
       UserWebRequest data
   ) {
-    
+
     return UserResponseMapper.toUserDataResponse(
       userService.updateUser(userRequestMapper.toUser(userId, data)),
       fileProperties.getUrlPrefix()
     );
   }
-  
+
   @ResponseStatus(HttpStatus.OK)
   @GetMapping(value = "/_search")
   public PagingResponse<UserWebResponse> getUsersByName(
@@ -141,7 +140,7 @@ public class UserController {
                   defaultValue = "10")
       int size
   ) {
-    
+
     return UserResponseMapper.toUsersPagingResponse(
       userService.getUsersByNameContainsIgnoreCase(name,
                                                    PageHelper.toPageable(page,
@@ -149,5 +148,5 @@ public class UserController {
                                                    )
       ), fileProperties.getUrlPrefix());
   }
-  
+
 }

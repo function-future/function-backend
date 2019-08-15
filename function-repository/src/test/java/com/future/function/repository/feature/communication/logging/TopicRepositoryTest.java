@@ -20,17 +20,23 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class TopicRepositoryTest {
 
   private static final String LOGGING_ROOM_ID = "loggingRoomId";
+
   private static final PageRequest PAGEABLE = new PageRequest(0, 2);
-  private static final LoggingRoom LOGGING_ROOM =
-    LoggingRoom.builder().id(LOGGING_ROOM_ID).build();
+
+  private static final LoggingRoom LOGGING_ROOM = LoggingRoom.builder()
+    .id(LOGGING_ROOM_ID)
+    .build();
+
   private static final String TOPIC_ID_1 = "topicId1";
+
   private static final String TOPIC_ID_2 = "topicId2";
 
   @Autowired
   private TopicRepository topicRepository;
 
   @Before
-  public void setUp () {
+  public void setUp() {
+
     Topic topic1 = Topic.builder()
       .id(TOPIC_ID_1)
       .loggingRoom(LOGGING_ROOM)
@@ -46,18 +52,25 @@ public class TopicRepositoryTest {
   }
 
   @After
-  public void tearDown () {
+  public void tearDown() {
+
     topicRepository.deleteAll();
   }
 
   @Test
-  public void testByGivenLoggingRoomfindAllByLoggingRoomAndDeletedFalse () {
-    Page<Topic> results = topicRepository.findAllByLoggingRoomAndDeletedFalse(LOGGING_ROOM, PAGEABLE);
+  public void testByGivenLoggingRoomfindAllByLoggingRoomAndDeletedFalse() {
+
+    Page<Topic> results = topicRepository.findAllByLoggingRoomAndDeletedFalse(
+      LOGGING_ROOM, PAGEABLE);
 
 
     assertThat(results).isNotNull();
-    assertThat(results.getContent().get(0).getId()).isEqualTo(TOPIC_ID_1);
-    assertThat(results.getContent().get(1).getId()).isEqualTo(TOPIC_ID_2);
+    assertThat(results.getContent()
+                 .get(0)
+                 .getId()).isEqualTo(TOPIC_ID_1);
+    assertThat(results.getContent()
+                 .get(1)
+                 .getId()).isEqualTo(TOPIC_ID_2);
   }
 
 }

@@ -10,24 +10,30 @@ import org.springframework.stereotype.Component;
 @Component
 public class CommentRequestMapper {
 
-    private RequestValidator validator;
+  private RequestValidator validator;
 
-    @Autowired
-    public CommentRequestMapper(RequestValidator validator) {
-        this.validator = validator;
-    }
+  @Autowired
+  public CommentRequestMapper(RequestValidator validator) {
 
-    public Comment toCommentFromRequestWithRoomId(CommentWebRequest request, String roomId) {
-        return toValidatedComment(request, roomId);
-    }
+    this.validator = validator;
+  }
 
-    private Comment toValidatedComment(CommentWebRequest request, String roomId) {
-        request = validator.validate(request);
-        return Comment
-                .builder()
-                .room(Room.builder().id(roomId).build())
-                .text(request.getComment())
-                .build();
-    }
+  public Comment toCommentFromRequestWithRoomId(
+    CommentWebRequest request, String roomId
+  ) {
+
+    return toValidatedComment(request, roomId);
+  }
+
+  private Comment toValidatedComment(CommentWebRequest request, String roomId) {
+
+    request = validator.validate(request);
+    return Comment.builder()
+      .room(Room.builder()
+              .id(roomId)
+              .build())
+      .text(request.getComment())
+      .build();
+  }
 
 }

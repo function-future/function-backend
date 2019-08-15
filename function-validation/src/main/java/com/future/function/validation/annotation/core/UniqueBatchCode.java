@@ -15,13 +15,13 @@ import java.lang.annotation.Target;
 @Target({ ElementType.TYPE, ElementType.TYPE_USE })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface UniqueBatchCode {
-  
+
   String message() default "UniqueBatchCode";
-  
+
   Class<?>[] groups() default {};
-  
+
   Class<? extends Payload>[] payload() default {};
-  
+
   String field() default "code";
-  
+
 }

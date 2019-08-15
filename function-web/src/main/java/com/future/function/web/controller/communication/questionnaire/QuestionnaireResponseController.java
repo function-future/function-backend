@@ -30,15 +30,22 @@ import java.util.List;
 @WithAnyRole(roles = { Role.ADMIN })
 public class QuestionnaireResponseController {
 
-  private final QuestionnaireResponseSummaryService questionnaireResponseSummaryService;
+  private final QuestionnaireResponseSummaryService
+    questionnaireResponseSummaryService;
 
   private final QuestionnaireResultService questionnaireResultService;
 
   private final FileProperties fileProperties;
 
   @Autowired
-  public QuestionnaireResponseController(QuestionnaireResponseSummaryService questionnaireResponseSummaryService, QuestionnaireResultService questionnaireResultService, FileProperties fileProperties) {
-    this.questionnaireResponseSummaryService = questionnaireResponseSummaryService;
+  public QuestionnaireResponseController(
+    QuestionnaireResponseSummaryService questionnaireResponseSummaryService,
+    QuestionnaireResultService questionnaireResultService,
+    FileProperties fileProperties
+  ) {
+
+    this.questionnaireResponseSummaryService =
+      questionnaireResponseSummaryService;
     this.questionnaireResultService = questionnaireResultService;
     this.fileProperties = fileProperties;
   }
@@ -46,40 +53,55 @@ public class QuestionnaireResponseController {
   @ResponseStatus(HttpStatus.OK)
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   public PagingResponse<QuestionnaireSimpleSummaryResponse> getQuestionnairesSimpleSummary(
-          @RequestParam String userSummaryId,
-          @RequestParam(required = false, defaultValue = "1") int page,
-          @RequestParam(required = false, defaultValue = "10") int size
-  ){
+    @RequestParam
+      String userSummaryId,
+    @RequestParam(required = false,
+                  defaultValue = "1")
+      int page,
+    @RequestParam(required = false,
+                  defaultValue = "10")
+      int size
+  ) {
+
     return QuestionnaireResponseMapper.toPagingQuestionnaireSimpleSummaryResponse(
-            questionnaireResponseSummaryService.getQuestionnairesSummariesBasedOnAppraisee(
-                    questionnaireResultService.getAppraisalsQuestionnaireSummaryById(userSummaryId).getAppraisee(), PageHelper.toPageable(page, size)),
-            HttpStatus.OK
-    );
+      questionnaireResponseSummaryService.getQuestionnairesSummariesBasedOnAppraisee(
+        questionnaireResultService.getAppraisalsQuestionnaireSummaryById(
+          userSummaryId)
+          .getAppraisee(), PageHelper.toPageable(page, size)), HttpStatus.OK);
   }
 
 
   @ResponseStatus(HttpStatus.OK)
-  @GetMapping( value = "/{questionnaireResponseSummaryId}",
-    produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping(value = "/{questionnaireResponseSummaryId}",
+              produces = MediaType.APPLICATION_JSON_VALUE)
   public DataResponse<QuestionnaireSummaryDescriptionResponse> getQuestionnaireSummaryDetail(
-    @PathVariable String questionnaireResponseSummaryId
-  ){
+    @PathVariable
+      String questionnaireResponseSummaryId
+  ) {
+
     return QuestionnaireResponseSummaryResponseMapper.toDataResponseQuestionnaireDataSummaryDescription(
-      questionnaireResponseSummaryService.getQuestionnaireResponseSummaryById(questionnaireResponseSummaryId),
-      fileProperties.getUrlPrefix()
-    );
+      questionnaireResponseSummaryService.getQuestionnaireResponseSummaryById(
+        questionnaireResponseSummaryId), fileProperties.getUrlPrefix());
   }
 
   @ResponseStatus(HttpStatus.OK)
-  @GetMapping( value = "/{questionnaireResponseSummaryId}/questions/{userSummaryId}",
-    produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping(value = "/{questionnaireResponseSummaryId}/questions" +
+                      "/{userSummaryId}",
+              produces = MediaType.APPLICATION_JSON_VALUE)
   public DataResponse<List<QuestionQuestionnaireSummaryResponse>> getQuestionSummaryResponse(
-    @PathVariable String questionnaireResponseSummaryId,
-    @PathVariable String userSummaryId
-  ){
+    @PathVariable
+      String questionnaireResponseSummaryId,
+    @PathVariable
+      String userSummaryId
+  ) {
+
     return QuestionnaireResponseSummaryResponseMapper.toDataResponseQuestionQuestionnaireSummaryResponseList(
-      questionnaireResponseSummaryService.getQuestionsDetailsFromQuestionnaireResponseSummaryIdAndAppraisee(questionnaireResponseSummaryId,
-              questionnaireResultService.getAppraisalsQuestionnaireSummaryById(userSummaryId).getAppraisee())
-    );
+      questionnaireResponseSummaryService.getQuestionsDetailsFromQuestionnaireResponseSummaryIdAndAppraisee(
+        questionnaireResponseSummaryId,
+        questionnaireResultService.getAppraisalsQuestionnaireSummaryById(
+          userSummaryId)
+          .getAppraisee()
+      ));
   }
+
 }

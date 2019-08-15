@@ -20,20 +20,20 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping(value = "/api/core/batches")
 public class BatchController {
-  
+
   private final BatchService batchService;
-  
+
   private final BatchRequestMapper batchRequestMapper;
-  
+
   @Autowired
   public BatchController(
     BatchService batchService, BatchRequestMapper batchRequestMapper
   ) {
-    
+
     this.batchService = batchService;
     this.batchRequestMapper = batchRequestMapper;
   }
-  
+
   @ResponseStatus(HttpStatus.OK)
   @GetMapping
   public PagingResponse<BatchWebResponse> getBatches(
@@ -46,11 +46,11 @@ public class BatchController {
                   defaultValue = "10")
       int size
   ) {
-    
+
     return BatchResponseMapper.toBatchesPagingResponse(
       batchService.getBatches(session, PageHelper.toPageable(page, size)));
   }
-  
+
   @ResponseStatus(HttpStatus.CREATED)
   @PostMapping
   public DataResponse<BatchWebResponse> createBatch(
@@ -59,13 +59,13 @@ public class BatchController {
     @RequestBody
       BatchWebRequest data
   ) {
-    
+
     return BatchResponseMapper.toBatchDataResponse(
       HttpStatus.CREATED,
       batchService.createBatch(batchRequestMapper.toBatch(data))
     );
   }
-  
+
   @ResponseStatus(HttpStatus.OK)
   @GetMapping(value = "/{batchId}")
   public DataResponse<BatchWebResponse> getBatch(
@@ -74,11 +74,11 @@ public class BatchController {
     @PathVariable
       String batchId
   ) {
-    
+
     return BatchResponseMapper.toBatchDataResponse(
       batchService.getBatchById(batchId));
   }
-  
+
   @ResponseStatus(HttpStatus.OK)
   @PutMapping(value = "/{batchId}")
   public DataResponse<BatchWebResponse> updateBatch(
@@ -89,12 +89,12 @@ public class BatchController {
     @RequestBody
       BatchWebRequest data
   ) {
-    
+
     data.setId(batchId);
     return BatchResponseMapper.toBatchDataResponse(
       batchService.updateBatch(batchRequestMapper.toBatch(batchId, data)));
   }
-  
+
   @ResponseStatus(HttpStatus.OK)
   @DeleteMapping(value = "/{batchId}")
   public BaseResponse deleteBatch(
@@ -103,9 +103,9 @@ public class BatchController {
     @PathVariable
       String batchId
   ) {
-    
+
     batchService.deleteBatch(batchId);
     return ResponseHelper.toBaseResponse(HttpStatus.OK);
   }
-  
+
 }

@@ -19,17 +19,17 @@ import java.util.Map;
 @AllArgsConstructor
 @Document(collection = DocumentName.ACCESS)
 public class Access {
-  
+
   @Id
   private String id;
-  
+
   @Field(FieldName.Access.URL_REGEX)
   private String urlRegex;
-  
+
   @Field(FieldName.Access.ROLE)
   private Role role;
-  
+
   @Field(FieldName.Access.COMPONENTS)
   private Map<String, Object> components;
-  
+
 }

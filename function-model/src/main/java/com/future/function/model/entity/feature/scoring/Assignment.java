@@ -27,7 +27,8 @@ public class Assignment extends BaseEntity {
 
   @Id
   @Builder.Default
-  private String id = UUID.randomUUID().toString();
+  private String id = UUID.randomUUID()
+    .toString();
 
   @Field(FieldName.Assignment.TITLE)
   private String title;

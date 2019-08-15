@@ -10,13 +10,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class StickyNoteWebResponse {
-  
+
   private String id;
-  
+
   private String title;
-  
+
   private String description;
-  
+
   private Long updatedAt;
-  
+
 }

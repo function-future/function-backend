@@ -21,19 +21,19 @@ import java.util.UUID;
 @EqualsAndHashCode(callSuper = true)
 @Document(collection = DocumentName.COURSE)
 public class Course extends BaseEntity {
-  
+
   @Id
   @Builder.Default
   private String id = UUID.randomUUID()
     .toString();
-  
+
   @Field(FieldName.Course.TITLE)
   private String title;
-  
+
   @Field(FieldName.Course.DESCRIPTION)
   private String description;
-  
+
   @Field(FieldName.Course.FILE)
   private FileV2 file;
-  
+
 }

@@ -37,28 +37,28 @@ import java.util.List;
 @RequestMapping("/api/core/files")
 @WithAnyRole(roles = { Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT })
 public class FileController {
-  
+
   private final FileService fileService;
-  
+
   private final MultipartFileRequestMapper multipartFileRequestMapper;
-  
+
   private final FileRequestMapper fileRequestMapper;
-  
+
   private final FileProperties fileProperties;
-  
+
   @Autowired
   public FileController(
     FileService fileService,
     MultipartFileRequestMapper multipartFileRequestMapper,
     FileRequestMapper fileRequestMapper, FileProperties fileProperties
   ) {
-    
+
     this.fileService = fileService;
     this.multipartFileRequestMapper = multipartFileRequestMapper;
     this.fileRequestMapper = fileRequestMapper;
     this.fileProperties = fileProperties;
   }
-  
+
   @ResponseStatus(HttpStatus.OK)
   @GetMapping(value = "/{parentId}")
   public DataPageResponse<FileWebResponse<List<FileContentWebResponse>>> getFilesAndFolders(
@@ -70,13 +70,13 @@ public class FileController {
     @RequestParam(defaultValue = "10")
       int size
   ) {
-    
+
     return FileResponseMapper.toMultipleFileDataResponse(
       fileService.getFilesAndFolders(parentId,
                                      PageHelper.toPageable(page, size)
       ), fileProperties.getUrlPrefix());
   }
-  
+
   @ResponseStatus(HttpStatus.OK)
   @GetMapping(value = "/{parentId}/{fileOrFolderId}")
   public DataResponse<FileWebResponse<FileContentWebResponse>> getFileOrFolder(
@@ -86,13 +86,13 @@ public class FileController {
     @PathVariable
       String fileOrFolderId
   ) {
-    
+
     return FileResponseMapper.toSingleFileDataResponse(
       fileService.getFileOrFolder(fileOrFolderId, parentId),
       fileProperties.getUrlPrefix()
     );
   }
-  
+
   @ResponseStatus(HttpStatus.CREATED)
   @PostMapping(value = "/{parentId}",
                consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
@@ -106,21 +106,24 @@ public class FileController {
     @RequestParam
       String data
   ) {
-    
+
     Pair<String, byte[]> pair =
       multipartFileRequestMapper.toStringAndByteArrayPair(file);
-    
+
     FileWebRequest request = fileRequestMapper.toFileWebRequest(
       data, pair.getSecond());
-    
-    return FileResponseMapper.toSingleFileDataResponse(
-      HttpStatus.CREATED,
-      fileService.createFileOrFolder(session, parentId, request.getName(),
-                                     pair.getFirst(), pair.getSecond()
-      ), fileProperties.getUrlPrefix()
+
+    return FileResponseMapper.toSingleFileDataResponse(HttpStatus.CREATED,
+                                                       fileService.createFileOrFolder(
+                                                         session, parentId,
+                                                         request.getName(),
+                                                         pair.getFirst(),
+                                                         pair.getSecond()
+                                                       ),
+                                                       fileProperties.getUrlPrefix()
     );
   }
-  
+
   @ResponseStatus(HttpStatus.OK)
   @PutMapping(value = "/{parentId}/{fileOrFolderId}",
               consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
@@ -136,20 +139,20 @@ public class FileController {
     @RequestParam
       String data
   ) {
-    
+
     Pair<String, byte[]> pair =
       multipartFileRequestMapper.toStringAndByteArrayPair(file);
-    
+
     FileWebRequest request = fileRequestMapper.toFileWebRequest(
       fileOrFolderId, data, pair.getSecond());
-    
+
     return FileResponseMapper.toSingleFileDataResponse(
       fileService.updateFileOrFolder(session, fileOrFolderId, parentId,
                                      request.getName(), pair.getFirst(),
                                      pair.getSecond()
       ), fileProperties.getUrlPrefix());
   }
-  
+
   @ResponseStatus(HttpStatus.OK)
   @DeleteMapping("/{parentId}/{fileOrFolderId}")
   public BaseResponse deleteFileOrFolder(
@@ -159,9 +162,9 @@ public class FileController {
     @PathVariable
       String fileOrFolderId
   ) {
-    
+
     fileService.deleteFileOrFolder(session, parentId, fileOrFolderId);
     return ResponseHelper.toBaseResponse(HttpStatus.OK);
   }
-  
+
 }

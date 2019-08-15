@@ -36,41 +36,42 @@ public class ChatroomRepositoryTest {
   private static final Pageable PAGEABLE = new PageRequest(0, 10);
 
   private static final User member1 = User.builder()
-          .name("member1")
-          .id("id1")
-          .build();
+    .name("member1")
+    .id("id1")
+    .build();
 
   private static final User member2 = User.builder()
-          .name("member2")
-          .id("id2")
-          .build();
+    .name("member2")
+    .id("id2")
+    .build();
 
   @Autowired
   private ChatroomRepository chatroomRepository;
 
   @Before
   public void setUp() {
+
     Chatroom chatroom1 = Chatroom.builder()
-            .members(Arrays.asList(member1, member2))
-            .title(TITLE_1)
-            .type(ChatroomType.GROUP)
-            .build();
+      .members(Arrays.asList(member1, member2))
+      .title(TITLE_1)
+      .type(ChatroomType.GROUP)
+      .build();
     chatroom1.setCreatedAt(5L);
     chatroom1.setUpdatedAt(5L);
 
     Chatroom chatroom2 = Chatroom.builder()
-            .members(Collections.singletonList(member1))
-            .title(TITLE_2)
-            .type(ChatroomType.GROUP)
-            .build();
+      .members(Collections.singletonList(member1))
+      .title(TITLE_2)
+      .type(ChatroomType.GROUP)
+      .build();
     chatroom2.setCreatedAt(10L);
     chatroom2.setUpdatedAt(10L);
 
     Chatroom chatroom3 = Chatroom.builder()
-            .members(Arrays.asList(member1, member2))
-            .title(TITLE_3)
-            .type(ChatroomType.PRIVATE)
-            .build();
+      .members(Arrays.asList(member1, member2))
+      .title(TITLE_3)
+      .type(ChatroomType.PRIVATE)
+      .build();
     chatroom3.setCreatedAt(15L);
     chatroom3.setUpdatedAt(15L);
 
@@ -81,26 +82,40 @@ public class ChatroomRepositoryTest {
 
   @After
   public void tearDown() {
+
     chatroomRepository.deleteAll();
   }
 
   @Test
   public void testGivenTypeAndMemberByFindingAllChatroomReturnPagedChatrooms() {
-    Page<Chatroom> chatrooms = chatroomRepository
-            .findAllByTypeAndMembersOrderByUpdatedAtDesc(ChatroomType.GROUP, member1, PAGEABLE);
+
+    Page<Chatroom> chatrooms =
+      chatroomRepository.findAllByTypeAndMembersOrderByUpdatedAtDesc(
+        ChatroomType.GROUP, member1, PAGEABLE);
 
     assertThat(chatrooms.getTotalElements()).isEqualTo(2);
-    assertThat(chatrooms.getContent().get(0).getTitle()).isEqualTo(TITLE_2);
-    assertThat(chatrooms.getContent().get(1).getTitle()).isEqualTo(TITLE_1);
+    assertThat(chatrooms.getContent()
+                 .get(0)
+                 .getTitle()).isEqualTo(TITLE_2);
+    assertThat(chatrooms.getContent()
+                 .get(1)
+                 .getTitle()).isEqualTo(TITLE_1);
   }
 
   @Test
   public void testGivenTypeAndMemberAndKeywordByFindingAllChatroomReturnPagedChatrooms() {
-    Page<Chatroom> chatrooms = chatroomRepository.findAllByTitleContainingIgnoreCaseAndMembersOrderByUpdatedAtDesc(KEYWORD, member1, PAGEABLE);
+
+    Page<Chatroom> chatrooms =
+      chatroomRepository.findAllByTitleContainingIgnoreCaseAndMembersOrderByUpdatedAtDesc(
+        KEYWORD, member1, PAGEABLE);
 
     assertThat(chatrooms.getTotalElements()).isEqualTo(2);
-    assertThat(chatrooms.getContent().get(0).getTitle()).isEqualTo(TITLE_3);
-    assertThat(chatrooms.getContent().get(1).getTitle()).isEqualTo(TITLE_1);
+    assertThat(chatrooms.getContent()
+                 .get(0)
+                 .getTitle()).isEqualTo(TITLE_3);
+    assertThat(chatrooms.getContent()
+                 .get(1)
+                 .getTitle()).isEqualTo(TITLE_1);
   }
 
 }

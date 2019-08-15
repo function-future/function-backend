@@ -14,66 +14,66 @@ import org.springframework.test.web.servlet.MockMvc;
 import javax.servlet.http.Cookie;
 
 public abstract class TestHelper {
-  
+
   protected static final String STUDENT_ID = "student-id";
-  
+
   protected static final String BATCH_ID = "batch-id";
-  
-  protected static final String MENTOR_ID= "mentor-id";
-  
-  protected static final String JUDGE_ID= "judge-id";
-  
+
+  protected static final String MENTOR_ID = "mentor-id";
+
+  protected static final String JUDGE_ID = "judge-id";
+
   protected static final String ADMIN_ID = "admin-id";
-  
+
   protected static final String STUDENT_EMAIL = "student@student.com";
-  
+
   protected static final String MENTOR_EMAIL = "mentor@mentor.com";
-  
+
   protected static final String JUDGE_EMAIL = "judge@judge.com";
-  
+
   protected static final String ADMIN_EMAIL = "admin@admin.com";
-  
+
   protected static final String STUDENT_SESSION_ID = "session-id-student";
-  
+
   protected static final String MENTOR_SESSION_ID = "session-id-mentor";
-  
+
   protected static final String JUDGE_SESSION_ID = "session-id-judge";
-  
+
   protected static final String ADMIN_SESSION_ID = "session-id-admin";
-  
+
   protected static final Session STUDENT_SESSION = new Session(
     STUDENT_SESSION_ID, STUDENT_ID, BATCH_ID, STUDENT_EMAIL, Role.STUDENT);
-  
+
   protected static final Session MENTOR_SESSION = new Session(
     MENTOR_SESSION_ID, MENTOR_ID, null, MENTOR_EMAIL, Role.MENTOR);
-  
+
   protected static final Session JUDGE_SESSION = new Session(
     JUDGE_SESSION_ID, JUDGE_ID, null, JUDGE_EMAIL, Role.JUDGE);
-  
+
   protected static final Session ADMIN_SESSION = new Session(
     ADMIN_SESSION_ID, ADMIN_ID, null, ADMIN_EMAIL, Role.ADMIN);
-  
+
   protected Cookie[] cookies;
-  
+
   protected JacksonTester<BaseResponse> baseResponseJacksonTester;
-  
+
   protected JacksonTester<DataResponse> dataResponseJacksonTester;
-  
+
   protected JacksonTester<PagingResponse> pagingResponseJacksonTester;
-  
+
   @Autowired
   protected MockMvc mockMvc;
-  
+
   @Before
   protected void setUp() {
-    
+
     JacksonTester.initFields(this, new ObjectMapper());
   }
-  
+
   protected void setCookie(Role role) {
-    
+
     Cookie cookie = new Cookie("Function-Session", "");
-    
+
     switch (role) {
       case STUDENT:
         cookie.setValue(STUDENT_SESSION_ID);
@@ -90,8 +90,8 @@ public abstract class TestHelper {
       default:
         return;
     }
-    
+
     this.cookies = new Cookie[] { cookie };
   }
-  
+
 }

@@ -20,9 +20,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class OptionRepositoryTest {
 
   private static final String OPTION_LABEL = "option";
+
   private static final String QUESTION_ID = "id";
 
   private Question question;
+
   private Option option;
 
   @Autowired
@@ -30,19 +32,27 @@ public class OptionRepositoryTest {
 
   @Before
   public void setUp() throws Exception {
-    option = Option.builder().label(OPTION_LABEL).correct(true).build();
-    question = Question.builder().id(QUESTION_ID).build();
+
+    option = Option.builder()
+      .label(OPTION_LABEL)
+      .correct(true)
+      .build();
+    question = Question.builder()
+      .id(QUESTION_ID)
+      .build();
     option.setQuestion(question);
     optionRepository.save(option);
   }
 
   @After
   public void tearDown() throws Exception {
+
     optionRepository.deleteAll();
   }
 
   @Test
   public void findByIdAndDeletedFalse() {
+
     String id = option.getId();
 
     Optional<Option> actual = optionRepository.findByIdAndDeletedFalse(id);
@@ -52,8 +62,11 @@ public class OptionRepositoryTest {
 
   @Test
   public void findAllByQuestionId() {
+
     List<Option> optionList = optionRepository.findAllByQuestionId(QUESTION_ID);
     assertThat(optionList.size()).isEqualTo(1);
-    assertThat(optionList.get(0).getLabel()).isEqualTo(option.getLabel());
+    assertThat(optionList.get(0)
+                 .getLabel()).isEqualTo(option.getLabel());
   }
+
 }

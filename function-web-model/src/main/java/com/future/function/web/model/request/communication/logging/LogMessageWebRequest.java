@@ -14,4 +14,5 @@ public class LogMessageWebRequest {
 
   @NotBlank(message = "NotBlank")
   private String text;
+
 }

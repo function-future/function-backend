@@ -16,31 +16,31 @@ import java.util.stream.Collectors;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class StickyNoteResponseMapper {
-  
+
   public static PagingResponse<StickyNoteWebResponse> toStickyNotePagingResponse(
     Page<StickyNote> data
   ) {
-    
+
     return ResponseHelper.toPagingResponse(HttpStatus.OK,
                                            toStickyNoteWebResponseList(data),
                                            PageHelper.toPaging(data)
     );
   }
-  
+
   private static List<StickyNoteWebResponse> toStickyNoteWebResponseList(
     Page<StickyNote> data
   ) {
-    
+
     return data.getContent()
       .stream()
       .map(StickyNoteResponseMapper::buildStickyNoteWebResponse)
       .collect(Collectors.toList());
   }
-  
+
   private static StickyNoteWebResponse buildStickyNoteWebResponse(
     StickyNote stickyNote
   ) {
-    
+
     return StickyNoteWebResponse.builder()
       .id(stickyNote.getId())
       .title(stickyNote.getTitle())
@@ -48,16 +48,16 @@ public class StickyNoteResponseMapper {
       .updatedAt(stickyNote.getUpdatedAt())
       .build();
   }
-  
+
   public static DataResponse<StickyNoteWebResponse> toStickyNoteDataResponse(
     HttpStatus httpStatus, StickyNote stickyNote
   ) {
-    
+
     return DataResponse.<StickyNoteWebResponse>builder().code(
       httpStatus.value())
       .status(ResponseHelper.toProperStatusFormat(httpStatus.getReasonPhrase()))
       .data(buildStickyNoteWebResponse(stickyNote))
       .build();
   }
-  
+
 }

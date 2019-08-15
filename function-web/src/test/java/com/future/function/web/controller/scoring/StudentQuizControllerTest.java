@@ -41,20 +41,33 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class StudentQuizControllerTest extends TestHelper {
 
   private static final String QUIZ_ID = "quiz-id";
+
   private static final String QUIZ_TITLE = "quiz-title";
+
   private static final int QUIZ_TRIALS = 3;
+
   private static final String BATCH_CODE = "1";
+
   private static final String STUDENT_ID = "student-id";
+
   private static final String STUDENT_NAME = "student-name";
+
   private static final String STUDENT_QUIZ_ID = "student-quiz-id";
 
   private StudentQuiz studentQuiz;
+
   private Quiz quiz;
+
   private Batch batch;
+
   private User user;
+
   private StudentQuizWebResponse webResponse;
+
   private QuizWebResponse quizWebResponse;
+
   private Pageable pageable;
+
   private Page<StudentQuiz> studentQuizPage;
 
   private DataResponse<StudentQuizWebResponse> dataResponse;
@@ -70,92 +83,90 @@ public class StudentQuizControllerTest extends TestHelper {
     super.setUp();
     super.setCookie(Role.ADMIN);
 
-    batch = Batch
-        .builder()
-        .code(BATCH_CODE)
-        .build();
+    batch = Batch.builder()
+      .code(BATCH_CODE)
+      .build();
 
     user = User.builder()
-        .id(STUDENT_ID)
-        .name(STUDENT_NAME)
-        .batch(batch)
-        .build();
+      .id(STUDENT_ID)
+      .name(STUDENT_NAME)
+      .batch(batch)
+      .build();
 
     quiz = Quiz.builder()
-        .id(QUIZ_ID)
-        .trials(QUIZ_TRIALS)
-        .batch(batch)
-        .build();
+      .id(QUIZ_ID)
+      .trials(QUIZ_TRIALS)
+      .batch(batch)
+      .build();
 
-    studentQuiz = StudentQuiz
-        .builder()
-        .student(user)
-        .quiz(quiz)
-        .id(STUDENT_QUIZ_ID)
-        .trials(QUIZ_TRIALS)
-        .done(false)
-        .build();
+    studentQuiz = StudentQuiz.builder()
+      .student(user)
+      .quiz(quiz)
+      .id(STUDENT_QUIZ_ID)
+      .trials(QUIZ_TRIALS)
+      .done(false)
+      .build();
 
-    quizWebResponse = QuizWebResponse
-        .builder()
-        .id(QUIZ_ID)
-        .title(QUIZ_TITLE)
-        .trials(QUIZ_TRIALS)
-        .batchCode(BATCH_CODE)
-        .build();
+    quizWebResponse = QuizWebResponse.builder()
+      .id(QUIZ_ID)
+      .title(QUIZ_TITLE)
+      .trials(QUIZ_TRIALS)
+      .batchCode(BATCH_CODE)
+      .build();
 
-    webResponse = StudentQuizWebResponse
-        .builder()
-        .id(STUDENT_QUIZ_ID)
-        .quiz(quizWebResponse)
-        .build();
+    webResponse = StudentQuizWebResponse.builder()
+      .id(STUDENT_QUIZ_ID)
+      .quiz(quizWebResponse)
+      .build();
 
     pageable = new PageRequest(0, 10);
 
-    studentQuizPage = new PageImpl<>(Collections.singletonList(studentQuiz), pageable, 1);
+    studentQuizPage = new PageImpl<>(
+      Collections.singletonList(studentQuiz), pageable, 1);
 
-    dataResponse = StudentQuizResponseMapper
-        .toStudentQuizWebResponse(studentQuiz);
+    dataResponse = StudentQuizResponseMapper.toStudentQuizWebResponse(
+      studentQuiz);
 
-    pagingResponse = StudentQuizResponseMapper
-        .toPagingStudentQuizWebResponse(studentQuizPage);
+    pagingResponse = StudentQuizResponseMapper.toPagingStudentQuizWebResponse(
+      studentQuizPage);
 
-    when(studentQuizService.findAllByStudentId(STUDENT_ID, pageable, ADMIN_ID))
-        .thenReturn(studentQuizPage);
-    when(studentQuizService.findById(STUDENT_QUIZ_ID, ADMIN_ID))
-        .thenReturn(studentQuiz);
+    when(studentQuizService.findAllByStudentId(STUDENT_ID, pageable,
+                                               ADMIN_ID
+    )).thenReturn(studentQuizPage);
+    when(studentQuizService.findById(STUDENT_QUIZ_ID, ADMIN_ID)).thenReturn(
+      studentQuiz);
   }
 
   @After
   public void tearDown() throws Exception {
+
     verifyNoMoreInteractions(studentQuizService);
   }
 
   @Test
   public void getAllStudentQuiz() throws Exception {
-    mockMvc.perform(
-        get("/api/scoring/students/" + STUDENT_ID + "/quizzes")
-            .cookie(cookies)
-            .param("page", "1")
-            .param("size", "10"))
-        .andExpect(status().isOk())
-        .andExpect(content().json(
-            pagingResponseJacksonTester.write(
-                pagingResponse).getJson()
-        ));
-    verify(studentQuizService).findAllByStudentId(STUDENT_ID, pageable, ADMIN_ID);
+
+    mockMvc.perform(get(
+      "/api/scoring/students/" + STUDENT_ID + "/quizzes").cookie(cookies)
+                      .param("page", "1")
+                      .param("size", "10"))
+      .andExpect(status().isOk())
+      .andExpect(content().json(
+        pagingResponseJacksonTester.write(pagingResponse)
+          .getJson()));
+    verify(studentQuizService).findAllByStudentId(
+      STUDENT_ID, pageable, ADMIN_ID);
   }
 
   @Test
   public void getStudentQuizById() throws Exception {
-    mockMvc.perform(
-        get("/api/scoring/students/" + STUDENT_ID + "/quizzes/" + STUDENT_QUIZ_ID)
-            .cookie(cookies))
-        .andExpect(status().isOk())
-        .andExpect(content().json(
-            dataResponseJacksonTester.write(
-                dataResponse).getJson()
-        ));
+
+    mockMvc.perform(get("/api/scoring/students/" + STUDENT_ID + "/quizzes/" +
+                        STUDENT_QUIZ_ID).cookie(cookies))
+      .andExpect(status().isOk())
+      .andExpect(content().json(dataResponseJacksonTester.write(dataResponse)
+                                  .getJson()));
     verify(studentQuizService).findById(STUDENT_QUIZ_ID, ADMIN_ID);
   }
+
 }

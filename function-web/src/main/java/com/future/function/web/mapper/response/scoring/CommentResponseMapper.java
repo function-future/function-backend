@@ -18,34 +18,52 @@ import java.util.stream.Collectors;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class CommentResponseMapper {
 
-  public static PagingResponse<CommentWebResponse> toPagingCommentWebResponse(Page<Comment> commentPage) {
-    return ResponseHelper.toPagingResponse(HttpStatus.OK, CommentResponseMapper.toListCommentWebResponse(commentPage.getContent()),
-        PageHelper.toPaging(commentPage));
+  public static PagingResponse<CommentWebResponse> toPagingCommentWebResponse(
+    Page<Comment> commentPage
+  ) {
+
+    return ResponseHelper.toPagingResponse(HttpStatus.OK,
+                                           CommentResponseMapper.toListCommentWebResponse(
+                                             commentPage.getContent()),
+                                           PageHelper.toPaging(commentPage)
+    );
   }
 
-  private static List<CommentWebResponse> toListCommentWebResponse(List<Comment> commentList) {
-    return commentList
-        .stream()
-        .map(CommentResponseMapper::buildCommentWebResponse)
-        .collect(Collectors.toList());
-  }
+  private static List<CommentWebResponse> toListCommentWebResponse(
+    List<Comment> commentList
+  ) {
 
-  public static DataResponse<CommentWebResponse> toDataCommentWebResponse(HttpStatus httpStatus, Comment comment) {
-    return ResponseHelper.toDataResponse(httpStatus, buildCommentWebResponse(comment));
+    return commentList.stream()
+      .map(CommentResponseMapper::buildCommentWebResponse)
+      .collect(Collectors.toList());
   }
 
   private static CommentWebResponse buildCommentWebResponse(Comment comment) {
-    return CommentWebResponse
-        .builder()
-        .comment(comment.getText())
-        .createdAt(comment.getCreatedAt())
-        .author(buildAuthorWebResponse(comment))
-        .id(comment.getId())
-        .build();
+
+    return CommentWebResponse.builder()
+      .comment(comment.getText())
+      .createdAt(comment.getCreatedAt())
+      .author(buildAuthorWebResponse(comment))
+      .id(comment.getId())
+      .build();
   }
 
   private static AuthorWebResponse buildAuthorWebResponse(Comment comment) {
-    return AuthorWebResponse.builder().id(comment.getAuthor().getId()).name(comment.getAuthor().getName()).build();
+
+    return AuthorWebResponse.builder()
+      .id(comment.getAuthor()
+            .getId())
+      .name(comment.getAuthor()
+              .getName())
+      .build();
+  }
+
+  public static DataResponse<CommentWebResponse> toDataCommentWebResponse(
+    HttpStatus httpStatus, Comment comment
+  ) {
+
+    return ResponseHelper.toDataResponse(
+      httpStatus, buildCommentWebResponse(comment));
   }
 
 }

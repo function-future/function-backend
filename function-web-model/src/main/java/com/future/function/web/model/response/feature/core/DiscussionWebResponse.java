@@ -11,13 +11,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DiscussionWebResponse {
-  
+
   private String id;
-  
+
   private String comment;
 
   private AuthorWebResponse author;
-  
+
   private Long createdAt;
-  
+
 }

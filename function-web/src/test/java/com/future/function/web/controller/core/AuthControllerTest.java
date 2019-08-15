@@ -43,7 +43,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import(TestSecurityConfiguration.class)
 @WebMvcTest(value = AuthController.class)
 public class AuthControllerTest extends TestHelper {
-  
+
   private static final User USER = User.builder()
     .id("id")
     .role(Role.MENTOR)
@@ -55,51 +55,51 @@ public class AuthControllerTest extends TestHelper {
                  .thumbnailUrl("thumbnail-url")
                  .build())
     .build();
-  
+
   private static final String PASSWORD = "password";
-  
+
   private static final AuthWebRequest AUTH_WEB_REQUEST = new AuthWebRequest(
     MENTOR_EMAIL, PASSWORD);
-  
+
   private static final String URL_PREFIX = "url-prefix";
-  
+
   private static final DataResponse<AuthWebResponse> DATA_RESPONSE =
     AuthResponseMapper.toAuthDataResponse(USER, URL_PREFIX);
-  
+
   private static final BaseResponse OK_BASE_RESPONSE =
     ResponseHelper.toBaseResponse(HttpStatus.OK);
-  
+
   private JacksonTester<AuthWebRequest> authWebRequestJacksonTester;
-  
+
   @MockBean
   private AuthService authService;
-  
+
   @MockBean
   private FileProperties fileProperties;
-  
+
   @Override
   @Before
   public void setUp() {
-    
+
     super.setUp();
   }
-  
+
   @After
   public void tearDown() {
-    
+
     verifyNoMoreInteractions(authService, fileProperties);
   }
-  
+
   @Test
   public void testGivenApiCallByLoggingUserInReturnDataResponse()
     throws Exception {
-    
+
     when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
-    
+
     when(authService.login(eq(MENTOR_EMAIL), eq(PASSWORD),
                            any(HttpServletResponse.class)
     )).thenReturn(USER);
-    
+
     mockMvc.perform(post("/api/core/auth").contentType(
       MediaType.APPLICATION_JSON)
                       .content(
@@ -108,50 +108,50 @@ public class AuthControllerTest extends TestHelper {
       .andExpect(status().isOk())
       .andExpect(content().json(dataResponseJacksonTester.write(DATA_RESPONSE)
                                   .getJson()));
-    
+
     verify(fileProperties).getUrlPrefix();
     verify(authService).login(
       eq(MENTOR_EMAIL), eq(PASSWORD), any(HttpServletResponse.class));
   }
-  
+
   @Test
   public void testGivenApiCallAndCookieByGettingLoginStatusReturnDataResponse()
     throws Exception {
-    
+
     super.setCookie(Role.MENTOR);
-  
+
     when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
-    
+
     when(authService.getLoginStatus(eq(MENTOR_SESSION_ID),
                                     any(HttpServletResponse.class)
     )).thenReturn(USER);
-    
+
     mockMvc.perform(get("/api/core/auth").cookie(cookies))
       .andExpect(status().isOk())
       .andExpect(content().json(dataResponseJacksonTester.write(DATA_RESPONSE)
                                   .getJson()));
-    
+
     verify(fileProperties).getUrlPrefix();
     verify(authService).getLoginStatus(eq(MENTOR_SESSION_ID),
                                        any(HttpServletResponse.class)
     );
   }
-  
+
   @Test
   public void testGivenApiCallAndCookieByLoggingUserOutReturnBaseResponse()
     throws Exception {
-    
+
     super.setCookie(Role.MENTOR);
-    
+
     mockMvc.perform(delete("/api/core/auth").cookie(cookies))
       .andExpect(status().isOk())
       .andExpect(content().json(
         baseResponseJacksonTester.write(OK_BASE_RESPONSE)
           .getJson()));
-    
+
     verify(authService).logout(
       eq(MENTOR_SESSION_ID), any(HttpServletResponse.class));
     verifyZeroInteractions(fileProperties);
   }
-  
+
 }

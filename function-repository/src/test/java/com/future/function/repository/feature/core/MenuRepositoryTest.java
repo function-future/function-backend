@@ -19,31 +19,31 @@ import static org.assertj.core.api.Assertions.assertThat;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = TestApplication.class)
 public class MenuRepositoryTest {
-  
+
   @Autowired
   private MenuRepository menuRepository;
-  
+
   @Before
   public void setUp() {
-    
+
     Menu menu = Menu.builder()
       .role(Role.JUDGE)
       .sections(Collections.singletonMap("key", true))
       .build();
     menuRepository.save(menu);
   }
-  
+
   @After
   public void tearDown() {
-    
+
     menuRepository.deleteAll();
   }
-  
+
   @Test
   public void testGivenRoleByFindingMenuByRoleReturnMenu() {
-    
+
     assertThat(menuRepository.findByRole(Role.JUDGE)).isNotEqualTo(
       Optional.empty());
   }
-  
+
 }

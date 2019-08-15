@@ -6,16 +6,18 @@ import org.springframework.data.domain.Pageable;
 
 public interface LoggingRoomService {
 
-    Page<LoggingRoom> getLoggingRoomsByMember(String memberId, Pageable pageable);
+  Page<LoggingRoom> getLoggingRoomsByMember(String memberId, Pageable pageable);
 
-    Page<LoggingRoom> getLoggingRoomsByMemberWithKeyword(String keyword, String memberId, Pageable pageable);
+  Page<LoggingRoom> getLoggingRoomsByMemberWithKeyword(
+    String keyword, String memberId, Pageable pageable
+  );
 
-    LoggingRoom getLoggingRoom (String loggingRoomId);
+  LoggingRoom getLoggingRoom(String loggingRoomId);
 
-    LoggingRoom createLoggingRoom (LoggingRoom loggingRoom);
+  LoggingRoom createLoggingRoom(LoggingRoom loggingRoom);
 
-    LoggingRoom updateLoggingRoom (LoggingRoom loggingRoom);
+  LoggingRoom updateLoggingRoom(LoggingRoom loggingRoom);
 
-    void deleteLoggingRoom (String loggingRoomId);
+  void deleteLoggingRoom(String loggingRoomId);
 
 }

@@ -13,7 +13,6 @@ import com.future.function.service.api.feature.scoring.RoomService;
 import com.future.function.service.api.feature.scoring.StudentQuizService;
 import com.future.function.service.api.feature.scoring.SummaryService;
 import com.future.function.service.impl.helper.AuthorizationHelper;
-import java.util.stream.IntStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
@@ -25,87 +24,131 @@ import java.util.Optional;
 @Service
 public class SummaryServiceImpl implements SummaryService {
 
-    private RoomService roomService;
-    private StudentQuizService studentQuizService;
-    private UserService userService;
+  private RoomService roomService;
 
-    @Autowired
-    public SummaryServiceImpl(RoomService roomService, StudentQuizService studentQuizService, UserService userService) {
-        this.roomService = roomService;
-        this.studentQuizService = studentQuizService;
-        this.userService = userService;
-    }
+  private StudentQuizService studentQuizService;
 
-    @Override
-    public StudentSummaryVO findAllPointSummaryByStudentId(String studentId, String userId) {
-        return Optional.ofNullable(userId)
-                .map(userService::getUser)
-                .filter(user -> AuthorizationHelper.isUserAuthorizedForAccess(user, studentId,
-                    AuthorizationHelper.getScoringAllowedRoles()))
-                .map(ignored -> studentId)
-                .map(userService::getUser)
-                .map(this::getAllSummaryFromAssignmentAndQuiz)
-                .map(this::mapToStudentSummaryDTO)
-                .orElseThrow(() -> new NotFoundException("Failed at #findAllPointSummaryByStudentId #SummaryService"));
-    }
+  private UserService userService;
 
-    private StudentSummaryVO mapToStudentSummaryDTO(Pair<User, List<SummaryVO>> pair) {
-        return StudentSummaryVO.builder()
-                .studentId(pair.getFirst().getId())
-                .studentName(pair.getFirst().getName())
-                .batchCode(pair.getFirst().getBatch().getCode())
-                .university(pair.getFirst().getUniversity())
-                .avatar(getNullableUserPicture(pair.getFirst()))
-                .scores(pair.getSecond())
-                .totalPoint(getTotalPointFromSummaryVOList(pair.getSecond()))
-                .build();
-    }
+  @Autowired
+  public SummaryServiceImpl(
+    RoomService roomService, StudentQuizService studentQuizService,
+    UserService userService
+  ) {
 
-    private Integer getTotalPointFromSummaryVOList(List<SummaryVO> summaryVOList) {
-        return summaryVOList
-            .stream()
-            .map(SummaryVO::getPoint)
-            .reduce(0, Integer::sum);
-    }
+    this.roomService = roomService;
+    this.studentQuizService = studentQuizService;
+    this.userService = userService;
+  }
 
-    private String getNullableUserPicture(User user) {
-        return Optional.ofNullable(user)
-            .map(User::getPictureV2)
-            .map(FileV2::getFileUrl)
-            .orElseGet(String::new);
-    }
+  @Override
+  public StudentSummaryVO findAllPointSummaryByStudentId(
+    String studentId, String userId
+  ) {
 
-    private Pair<User, List<SummaryVO>> getAllSummaryFromAssignmentAndQuiz(User user) {
-        return Optional.of(new ArrayList<SummaryVO>())
-            .map(summaryList -> getStudentRooms(user, summaryList))
-            .map(summaryList -> getStudentQuizzes(user, summaryList))
-            .map(summaryList -> Pair.of(user, summaryList))
-            .orElseGet(() -> Pair.of(user, new ArrayList<>()));
-    }
+    return Optional.ofNullable(userId)
+      .map(userService::getUser)
+      .filter(
+        user -> AuthorizationHelper.isUserAuthorizedForAccess(user, studentId,
+                                                              AuthorizationHelper.getScoringAllowedRoles()
+        ))
+      .map(ignored -> studentId)
+      .map(userService::getUser)
+      .map(this::getAllSummaryFromAssignmentAndQuiz)
+      .map(this::mapToStudentSummaryDTO)
+      .orElseThrow(() -> new NotFoundException(
+        "Failed at #findAllPointSummaryByStudentId #SummaryService"));
+  }
 
-    private List<SummaryVO> getStudentQuizzes(User user, List<SummaryVO> resultList) {
-        studentQuizService.findAllQuizByStudentId(user.getId()).stream().map(this::mapQuizToSummaryDTO).forEach(resultList::add);
-        return resultList;
-    }
+  private StudentSummaryVO mapToStudentSummaryDTO(
+    Pair<User, List<SummaryVO>> pair
+  ) {
 
-    private List<SummaryVO> getStudentRooms(User user, List<SummaryVO> resultList) {
-        roomService.findAllByStudentId(user.getId()).stream().map(this::mapRoomToSummaryDTO).forEach(resultList::add);
-        return resultList;
-    }
+    return StudentSummaryVO.builder()
+      .studentId(pair.getFirst()
+                   .getId())
+      .studentName(pair.getFirst()
+                     .getName())
+      .batchCode(pair.getFirst()
+                   .getBatch()
+                   .getCode())
+      .university(pair.getFirst()
+                    .getUniversity())
+      .avatar(getNullableUserPicture(pair.getFirst()))
+      .scores(pair.getSecond())
+      .totalPoint(getTotalPointFromSummaryVOList(pair.getSecond()))
+      .build();
+  }
 
-    private SummaryVO mapRoomToSummaryDTO(Room room) {
-        return SummaryVO.builder()
-                .title(room.getAssignment().getTitle())
-                .point(room.getPoint())
-                .type(ScoringType.ASSIGNMENT.getType())
-                .build();
-    }
+  private Integer getTotalPointFromSummaryVOList(
+    List<SummaryVO> summaryVOList
+  ) {
 
-    private SummaryVO mapQuizToSummaryDTO(StudentQuizDetail studentQuizDetail) {
-        return SummaryVO.builder()
-                .title(studentQuizDetail.getStudentQuiz().getQuiz().getTitle())
-                .point(studentQuizDetail.getPoint())
-                .type(ScoringType.QUIZ.getType())
-                .build();
-    }
+    return summaryVOList.stream()
+      .map(SummaryVO::getPoint)
+      .reduce(0, Integer::sum);
+  }
+
+  private String getNullableUserPicture(User user) {
+
+    return Optional.ofNullable(user)
+      .map(User::getPictureV2)
+      .map(FileV2::getFileUrl)
+      .orElseGet(String::new);
+  }
+
+  private Pair<User, List<SummaryVO>> getAllSummaryFromAssignmentAndQuiz(
+    User user
+  ) {
+
+    return Optional.of(new ArrayList<SummaryVO>())
+      .map(summaryList -> getStudentRooms(user, summaryList))
+      .map(summaryList -> getStudentQuizzes(user, summaryList))
+      .map(summaryList -> Pair.of(user, summaryList))
+      .orElseGet(() -> Pair.of(user, new ArrayList<>()));
+  }
+
+  private List<SummaryVO> getStudentQuizzes(
+    User user, List<SummaryVO> resultList
+  ) {
+
+    studentQuizService.findAllQuizByStudentId(user.getId())
+      .stream()
+      .map(this::mapQuizToSummaryDTO)
+      .forEach(resultList::add);
+    return resultList;
+  }
+
+  private SummaryVO mapQuizToSummaryDTO(StudentQuizDetail studentQuizDetail) {
+
+    return SummaryVO.builder()
+      .title(studentQuizDetail.getStudentQuiz()
+               .getQuiz()
+               .getTitle())
+      .point(studentQuizDetail.getPoint())
+      .type(ScoringType.QUIZ.getType())
+      .build();
+  }
+
+  private List<SummaryVO> getStudentRooms(
+    User user, List<SummaryVO> resultList
+  ) {
+
+    roomService.findAllByStudentId(user.getId())
+      .stream()
+      .map(this::mapRoomToSummaryDTO)
+      .forEach(resultList::add);
+    return resultList;
+  }
+
+  private SummaryVO mapRoomToSummaryDTO(Room room) {
+
+    return SummaryVO.builder()
+      .title(room.getAssignment()
+               .getTitle())
+      .point(room.getPoint())
+      .type(ScoringType.ASSIGNMENT.getType())
+      .build();
+  }
+
 }

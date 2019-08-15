@@ -18,23 +18,36 @@ import java.util.Collections;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class QuizRequestMapperTest {
 
-  private String QUIZ_ID = UUID.randomUUID().toString();
+  private static final String BATCH_CODE = "batch-code";
+
+  private String QUIZ_ID = UUID.randomUUID()
+    .toString();
+
   private String QUIZ_TITLE = "quiz-title";
+
   private String QUIZ_DESCRIPTION = "quiz-description";
+
   private long DATE = 0;
+
   private long TIME_LIMIT = 0;
+
   private int TRIALS = 0;
+
   private int QUESTION_COUNT = 0;
+
   private String QUESTION_BANK_ID = "question-bank-id";
-    private static final String BATCH_CODE = "batch-code";
 
   private Quiz quiz;
+
   private QuestionBank questionBank;
+
   private QuizWebRequest request;
 
   @InjectMocks
@@ -46,23 +59,21 @@ public class QuizRequestMapperTest {
   @Before
   public void setUp() throws Exception {
 
-    questionBank = QuestionBank
-        .builder()
-        .id(QUESTION_BANK_ID)
-        .build();
+    questionBank = QuestionBank.builder()
+      .id(QUESTION_BANK_ID)
+      .build();
 
-    quiz = Quiz
-        .builder()
-        .id(QUIZ_ID)
-        .title(QUIZ_TITLE)
-        .description(QUIZ_DESCRIPTION)
-        .startDate(DATE)
-        .endDate(DATE)
-        .timeLimit(TIME_LIMIT)
-        .trials(TRIALS)
-        .questionCount(QUESTION_COUNT)
-        .questionBanks(Collections.singletonList(questionBank))
-        .build();
+    quiz = Quiz.builder()
+      .id(QUIZ_ID)
+      .title(QUIZ_TITLE)
+      .description(QUIZ_DESCRIPTION)
+      .startDate(DATE)
+      .endDate(DATE)
+      .timeLimit(TIME_LIMIT)
+      .trials(TRIALS)
+      .questionCount(QUESTION_COUNT)
+      .questionBanks(Collections.singletonList(questionBank))
+      .build();
 
     request = new QuizWebRequest();
     BeanUtils.copyProperties(quiz, request);
@@ -73,35 +84,40 @@ public class QuizRequestMapperTest {
 
   @After
   public void tearDown() throws Exception {
+
     verifyNoMoreInteractions(validator);
   }
 
   @Test
   public void testToQuizWithQuizWebRequest() {
+
     quiz.setId(null);
-      Quiz actual = requestMapper.toQuiz(request, BATCH_CODE);
+    Quiz actual = requestMapper.toQuiz(request, BATCH_CODE);
     assertThat(actual.getTitle()).isEqualTo(quiz.getTitle());
     verify(validator).validate(request);
   }
 
   @Test
   public void testToQuizWithIdAndQuizWebRequest() {
-      Quiz actual = requestMapper.toQuiz(QUIZ_ID, request, BATCH_CODE);
+
+    Quiz actual = requestMapper.toQuiz(QUIZ_ID, request, BATCH_CODE);
     assertThat(actual.getTitle()).isEqualTo(quiz.getTitle());
     verify(validator).validate(request);
   }
 
   @Test
   public void testValidateCopyQuizWebRequest() {
-    CopyQuizWebRequest request = CopyQuizWebRequest
-        .builder()
-        .quizId(QUIZ_ID)
-        .batchCode("3")
-        .build();
+
+    CopyQuizWebRequest request = CopyQuizWebRequest.builder()
+      .quizId(QUIZ_ID)
+      .batchCode("3")
+      .build();
     when(validator.validate(request)).thenReturn(request);
-    CopyQuizWebRequest actual = requestMapper.validateCopyQuizWebRequest(request);
+    CopyQuizWebRequest actual = requestMapper.validateCopyQuizWebRequest(
+      request);
     assertThat(actual.getQuizId()).isEqualTo(QUIZ_ID);
-      assertThat(actual.getBatchCode()).isEqualTo("3");
+    assertThat(actual.getBatchCode()).isEqualTo("3");
     verify(validator).validate(request);
   }
+
 }

@@ -69,13 +69,19 @@ public class ActivityBlogServiceImpl implements ActivityBlogService {
   }
 
   @Override
-  public ActivityBlog updateActivityBlog(String userId, Role role, ActivityBlog activityBlog) {
+  public ActivityBlog updateActivityBlog(
+    String userId, Role role, ActivityBlog activityBlog
+  ) {
 
     return Optional.of(activityBlog)
       .map(ActivityBlog::getId)
       .map(activityBlogRepository::findOne)
-      .filter(foundActivityBlog -> AuthorizationHelper.isAuthorizedForEdit(
-        userId, role, foundActivityBlog, Role.ADMIN))
+      .filter(
+        foundActivityBlog -> AuthorizationHelper.isAuthorizedForEdit(userId,
+                                                                     role,
+                                                                     foundActivityBlog,
+                                                                     Role.ADMIN
+        ))
       .map(this::deleteActivityBlogFiles)
       .map(
         foundActivityBlog -> this.setFileV2s(foundActivityBlog, activityBlog))
@@ -95,15 +101,17 @@ public class ActivityBlogServiceImpl implements ActivityBlogService {
   }
 
   @Override
-  public void deleteActivityBlog(String userId,
-                                 Role role, String activityBlogId) {
+  public void deleteActivityBlog(
+    String userId, Role role, String activityBlogId
+  ) {
 
     Optional.ofNullable(activityBlogId)
       .map(activityBlogRepository::findOne)
       .filter(
         foundActivityBlog -> AuthorizationHelper.isAuthorizedForEdit(userId,
                                                                      role,
-                                                                     foundActivityBlog,Role.ADMIN
+                                                                     foundActivityBlog,
+                                                                     Role.ADMIN
         ))
       .ifPresent(activityBlog -> {
         this.deleteActivityBlogFiles(activityBlog);

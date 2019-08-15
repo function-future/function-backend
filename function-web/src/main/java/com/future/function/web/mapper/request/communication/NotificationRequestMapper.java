@@ -14,16 +14,21 @@ public class NotificationRequestMapper {
 
   @Autowired
   public NotificationRequestMapper(RequestValidator validator) {
+
     this.validator = validator;
   }
 
   public Notification toNotification(NotificationRequest request) {
+
     validator.validate(request);
 
     return Notification.builder()
-            .content(request.getDescription())
-            .title(request.getTitle())
-            .member(User.builder().id(request.getTargetUser()).build())
-            .build();
+      .content(request.getDescription())
+      .title(request.getTitle())
+      .member(User.builder()
+                .id(request.getTargetUser())
+                .build())
+      .build();
   }
+
 }

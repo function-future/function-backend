@@ -16,18 +16,18 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AnnouncementWebRequest {
-  
+
   @NotBlank(message = "NotBlank")
   private String title;
-  
+
   @Size(max = 70,
         message = "Size")
   private String summary;
-  
+
   @NotNull(message = "NotNull")
   private String description;
-  
+
   @FileMustExist
   private List<String> files;
-  
+
 }

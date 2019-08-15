@@ -18,17 +18,17 @@ public class AnnouncementWebResponse {
   private String id;
 
   private String title;
-  
+
   @JsonInclude(value = JsonInclude.Include.NON_NULL)
   private String summary;
-  
+
   private String description;
-  
+
   private List<EmbeddedFileWebResponse> files;
-  
+
   @JsonInclude(value = JsonInclude.Include.NON_NULL)
   private String announcementFileUrl;
-  
+
   private Long updatedAt;
-  
+
 }

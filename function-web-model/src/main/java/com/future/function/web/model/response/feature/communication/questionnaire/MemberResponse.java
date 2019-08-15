@@ -23,4 +23,5 @@ public class MemberResponse {
   private BatchWebResponse batch;
 
   private String university;
+
 }

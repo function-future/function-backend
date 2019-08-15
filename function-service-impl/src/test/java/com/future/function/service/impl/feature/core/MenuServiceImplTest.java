@@ -23,50 +23,50 @@ import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class MenuServiceImplTest {
-  
+
   private static final String ID = "id";
-  
+
   private static final Map<String, Object> SECTIONS = Collections.singletonMap(
     "key", true);
-  
+
   private static final Menu MENU = new Menu(ID, Role.MENTOR, SECTIONS);
-  
+
   @Mock
   private MenuRepository menuRepository;
-  
+
   @InjectMocks
   private MenuServiceImpl menuService;
-  
+
   @Before
   public void setUp() {}
-  
+
   @After
   public void tearDown() {
-    
+
     verifyNoMoreInteractions(menuRepository);
   }
-  
+
   @Test
   public void testGivenRoleByGettingMenuSectionsByRoleReturnMap() {
-    
+
     when(menuRepository.findByRole(Role.MENTOR)).thenReturn(Optional.of(MENU));
-    
+
     Map<String, Object> foundMap = menuService.getSectionsByRole(Role.MENTOR);
-    
+
     assertThat(foundMap).isNotEmpty();
     assertThat(foundMap).isEqualTo(SECTIONS);
-    
+
     verify(menuRepository).findByRole(Role.MENTOR);
   }
-  
+
   @Test
   public void testGivenInvalidRoleByGettingMenuSectionsByRoleReturnEmptyMap() {
-    
+
     Map<String, Object> foundMap = menuService.getSectionsByRole(null);
-    
+
     assertThat(foundMap).isEmpty();
-    
+
     verifyZeroInteractions(menuRepository);
   }
-  
+
 }

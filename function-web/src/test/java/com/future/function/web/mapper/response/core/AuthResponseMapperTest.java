@@ -33,7 +33,7 @@ public class AuthResponseMapperTest {
                    .fileUrl("/file-url")
                    .build())
       .build();
-  
+
     String urlPrefix = "url-prefix";
 
     AuthWebResponse authWebResponse = AuthWebResponse.builder()

@@ -19,25 +19,25 @@ import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DiscussionRequestMapperTest {
-  
+
   @Mock
   private RequestValidator validator;
-  
+
   @InjectMocks
   private DiscussionRequestMapper discussionRequestMapper;
-  
+
   @Before
   public void setUp() {}
-  
+
   @After
   public void tearDown() {
-    
+
     verifyNoMoreInteractions(validator);
   }
-  
+
   @Test
   public void testGivenWebRequestAndParametersByParsingToDiscussionClassReturnDiscussionObject() {
-    
+
     String comment = "text";
     DiscussionWebRequest discussionWebRequest = DiscussionWebRequest.builder()
       .comment(comment)
@@ -45,10 +45,10 @@ public class DiscussionRequestMapperTest {
     String email = "email@email.com";
     String courseId = "course-id";
     String batchCode = "batch-code";
-    
+
     when(validator.validate(discussionWebRequest)).thenReturn(
       discussionWebRequest);
-    
+
     Discussion expectedDiscussion = Discussion.builder()
       .courseId(courseId)
       .batchCode(batchCode)
@@ -57,14 +57,14 @@ public class DiscussionRequestMapperTest {
               .email(email)
               .build())
       .build();
-    
+
     Discussion discussion = discussionRequestMapper.toDiscussion(
       discussionWebRequest, email, courseId, batchCode);
-    
+
     assertThat(discussion).isNotNull();
     assertThat(discussion).isEqualTo(expectedDiscussion);
-    
+
     verify(validator).validate(discussionWebRequest);
   }
-  
+
 }
