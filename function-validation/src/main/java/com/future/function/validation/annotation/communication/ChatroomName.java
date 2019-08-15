@@ -4,24 +4,18 @@ import com.future.function.validation.validator.communication.ChatroomNameValida
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
-import java.lang.annotation.*;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-/**
- * Author: PriagungSatyagama
- * Created At: 15:01 04/06/2019
- */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.TYPE, ElementType.FIELD })
 @Constraint(validatedBy = ChatroomNameValidator.class)
 public @interface ChatroomName {
 
-  /**
-   * Default message returned when a String field does not fulfill the
-   * required values.
-   *
-   * @return {@code String} - The name of this annotation.
-   */
   String message() default "ChatroomName";
 
   Class<?>[] groups() default {};

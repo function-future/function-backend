@@ -17,34 +17,49 @@ import java.util.stream.Collectors;
 @Component
 public class ReportDetailRequestMapper {
 
-    private RequestValidator validator;
+  private RequestValidator validator;
 
-    @Autowired
-    public ReportDetailRequestMapper(RequestValidator validator) {
-        this.validator = validator;
-    }
+  @Autowired
+  public ReportDetailRequestMapper(RequestValidator validator) {
 
-    public List<ReportDetail> toReportDetailList(ReportDetailScoreWebRequest request, String reportId) {
-        return Optional.ofNullable(request)
-                .map(validator::validate)
-                .map(value -> toValidatedReportDetailList(value, reportId))
-                .orElseThrow(() -> new BadRequestException("Failed mapping at #toReportDetailList"));
-    }
+    this.validator = validator;
+  }
 
-    private List<ReportDetail> toValidatedReportDetailList(ReportDetailScoreWebRequest request, String reportId) {
-        return request.getScores().stream()
-                .map(this::buildReportDetail)
-                .map(detail -> {
-                    detail.setReport(Report.builder().id(reportId).build());
-                    return detail;
-                })
-                .collect(Collectors.toList());
-    }
+  public List<ReportDetail> toReportDetailList(
+    ReportDetailScoreWebRequest request, String reportId
+  ) {
 
-    private ReportDetail buildReportDetail(ScoreStudentWebRequest request) {
-        return ReportDetail.builder()
-                .user(User.builder().id(request.getStudentId()).build())
-                .point(request.getScore())
-                .build();
-    }
+    return Optional.ofNullable(request)
+      .map(validator::validate)
+      .map(value -> toValidatedReportDetailList(value, reportId))
+      .orElseThrow(
+        () -> new BadRequestException("Failed mapping at #toReportDetailList"));
+  }
+
+  private List<ReportDetail> toValidatedReportDetailList(
+    ReportDetailScoreWebRequest request, String reportId
+  ) {
+
+    return request.getScores()
+      .stream()
+      .map(this::buildReportDetail)
+      .map(detail -> {
+        detail.setReport(Report.builder()
+                           .id(reportId)
+                           .build());
+        return detail;
+      })
+      .collect(Collectors.toList());
+  }
+
+  private ReportDetail buildReportDetail(ScoreStudentWebRequest request) {
+
+    return ReportDetail.builder()
+      .user(User.builder()
+              .id(request.getStudentId())
+              .build())
+      .point(request.getScore())
+      .build();
+  }
+
 }

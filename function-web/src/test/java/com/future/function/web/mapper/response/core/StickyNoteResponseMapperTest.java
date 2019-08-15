@@ -19,44 +19,44 @@ import java.util.Collections;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class StickyNoteResponseMapperTest {
-  
+
   private static final String TITLE = "title";
-  
+
   private static final String DESCRIPTION = "description";
-  
+
   private static final Long UPDATED_AT = 1L;
-  
+
   private StickyNote stickyNote;
-  
+
   private StickyNoteWebResponse stickyNoteWebResponse;
-  
+
   private Page<StickyNote> stickyNotePage;
-  
+
   private DataResponse<StickyNoteWebResponse> createdDataResponse;
-  
+
   private PagingResponse<StickyNoteWebResponse> retrievedPagingResponse;
-  
+
   @Before
   public void setUp() {
-    
+
     stickyNote = StickyNote.builder()
       .title(TITLE)
       .description(DESCRIPTION)
       .build();
     stickyNote.setUpdatedAt(UPDATED_AT);
-    
+
     stickyNoteWebResponse = StickyNoteWebResponse.builder()
       .title(TITLE)
       .description(DESCRIPTION)
       .updatedAt(UPDATED_AT)
       .build();
-    
+
     createdDataResponse = DataResponse.<StickyNoteWebResponse>builder().code(
       201)
       .status("CREATED")
       .data(stickyNoteWebResponse)
       .build();
-    
+
     stickyNotePage = new PageImpl<>(
       Collections.singletonList(stickyNote), new PageRequest(0, 1), 1);
     retrievedPagingResponse =
@@ -66,29 +66,29 @@ public class StickyNoteResponseMapperTest {
         .paging(PageHelper.toPaging(stickyNotePage))
         .build();
   }
-  
+
   @After
   public void tearDown() {}
-  
+
   @Test
   public void testGivenStickyNoteDataByMappingToDataResponseReturnDataResponseObject() {
-    
+
     DataResponse<StickyNoteWebResponse> createdDataResponse =
       StickyNoteResponseMapper.toStickyNoteDataResponse(
         HttpStatus.CREATED, stickyNote);
-    
+
     assertThat(createdDataResponse).isNotNull();
     assertThat(createdDataResponse).isEqualTo(this.createdDataResponse);
   }
-  
+
   @Test
   public void testGivenStickyNotePageByMappingToPagingResponseReturnPagingResponseObject() {
-    
+
     PagingResponse<StickyNoteWebResponse> retrievedPagingResponse =
       StickyNoteResponseMapper.toStickyNotePagingResponse(stickyNotePage);
-    
+
     assertThat(retrievedPagingResponse).isNotNull();
     assertThat(retrievedPagingResponse).isEqualTo(this.retrievedPagingResponse);
   }
-  
+
 }

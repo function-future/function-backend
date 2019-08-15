@@ -8,14 +8,14 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 @SuppressWarnings("squid:S00101")
 @ChangeLog(order = "000")
 public class DataMigration_000 {
-  
+
   // Create collections.
-  
+
   @ChangeSet(author = "jonathan",
              id = "createCollections",
              order = "0001")
   public void createCollections(MongoTemplate mongoTemplate) {
-    
+
     mongoTemplate.createCollection(DocumentName.BATCH);
     mongoTemplate.createCollection(DocumentName.FILE);
     mongoTemplate.createCollection(DocumentName.USER);
@@ -53,5 +53,5 @@ public class DataMigration_000 {
     mongoTemplate.createCollection(DocumentName.REPORT);
     mongoTemplate.createCollection(DocumentName.REPORT_DETAIL);
   }
-  
+
 }

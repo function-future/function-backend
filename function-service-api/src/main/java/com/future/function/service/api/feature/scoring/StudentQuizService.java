@@ -13,19 +13,25 @@ import java.util.List;
 
 public interface StudentQuizService {
 
-  Page<StudentQuiz> findAllByStudentId(String studentId, Pageable pageable, String userId);
+  Page<StudentQuiz> findAllByStudentId(
+    String studentId, Pageable pageable, String userId
+  );
 
-    List<StudentQuizDetail> findAllQuizByStudentId(String studentId);
+  List<StudentQuizDetail> findAllQuizByStudentId(String studentId);
 
   StudentQuiz findById(String id, String userId);
 
-  List<StudentQuestion> findAllUnansweredQuestionByStudentQuizId(String studentQuizId, String userId);
+  List<StudentQuestion> findAllUnansweredQuestionByStudentQuizId(
+    String studentQuizId, String userId
+  );
 
-    Quiz updateQuizTrials(Quiz quiz);
+  Quiz updateQuizTrials(Quiz quiz);
 
-    StudentQuizDetail answerQuestionsByStudentQuizId(String studentQuizId, String userId, List<StudentQuestion> answers);
+  StudentQuizDetail answerQuestionsByStudentQuizId(
+    String studentQuizId, String userId, List<StudentQuestion> answers
+  );
 
-    StudentQuiz createStudentQuizAndSave(User user, Quiz quiz);
+  StudentQuiz createStudentQuizAndSave(User user, Quiz quiz);
 
   Quiz createStudentQuizByBatchCode(String batchCode, Quiz quiz);
 
@@ -34,4 +40,5 @@ public interface StudentQuizService {
   void deleteById(String id);
 
   void deleteByBatchCodeAndQuiz(Quiz quiz);
+
 }

@@ -20,19 +20,30 @@ import org.springframework.web.bind.annotation.RestController;
 public class SummaryController {
 
   private SummaryService summaryService;
+
   private FileProperties fileProperties;
 
   @Autowired
-  public SummaryController(SummaryService summaryService, FileProperties fileProperties) {
+  public SummaryController(
+    SummaryService summaryService, FileProperties fileProperties
+  ) {
+
     this.summaryService = summaryService;
     this.fileProperties = fileProperties;
   }
 
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-  public DataResponse<ReportDetailWebResponse> findAllSummaryByStudentId(@PathVariable String studentId,
-      @WithAnyRole(roles = {Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT}) Session session) {
+  public DataResponse<ReportDetailWebResponse> findAllSummaryByStudentId(
+    @PathVariable
+      String studentId,
+    @WithAnyRole(roles = { Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT })
+      Session session
+  ) {
+
     return ReportDetailResponseMapper.toDataReportDetailWebResponse(
-        summaryService.findAllPointSummaryByStudentId(studentId, session.getUserId()), fileProperties.getUrlPrefix());
+      summaryService.findAllPointSummaryByStudentId(studentId,
+                                                    session.getUserId()
+      ), fileProperties.getUrlPrefix());
   }
 
 }

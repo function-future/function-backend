@@ -12,21 +12,21 @@ import java.util.Optional;
 
 @Service
 public class AccessServiceImpl implements AccessService {
-  
+
   private final AccessRepository accessRepository;
-  
+
   public AccessServiceImpl(AccessRepository accessRepository) {
-    
+
     this.accessRepository = accessRepository;
   }
-  
+
   @Override
   public Map<String, Object> getComponentsByUrlAndRole(String url, Role role) {
-    
+
     return Optional.ofNullable(role)
       .flatMap(r -> accessRepository.findByUrlAndRole(url, r))
       .map(Access::getComponents)
       .orElseGet(Collections::emptyMap);
   }
-  
+
 }

@@ -13,27 +13,28 @@ import java.util.Optional;
 
 public class EmailMustBeUniqueValidator
   implements ConstraintValidator<EmailMustBeUnique, UserData> {
-  
+
   @Autowired
   private UserRepository userRepository;
-  
+
   @Override
   public void initialize(EmailMustBeUnique constraintAnnotation) {
     // No initialization needed.
   }
-  
+
   @Override
   public boolean isValid(UserData data, ConstraintValidatorContext context) {
-    
+
     String email = Optional.ofNullable(data.getEmail())
       .orElse("");
-    
+
     return Optional.of(data)
       .filter(userData -> Objects.nonNull(userData.getId()))
       .flatMap(ignored -> userRepository.findByEmailAndDeletedFalse(email))
       .map(User::getId)
       .map(foundUserId -> foundUserId.equals(data.getId()))
-      .orElseGet(() -> !userRepository.findByEmailAndDeletedFalse(email).isPresent());
+      .orElseGet(() -> !userRepository.findByEmailAndDeletedFalse(email)
+        .isPresent());
   }
-  
+
 }

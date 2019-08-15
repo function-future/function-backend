@@ -18,7 +18,9 @@ public class DataMigration_014 {
   @ChangeSet(author = "jonathan",
              id = "updateActivityBlogIndexesContainingDescription",
              order = "0001")
-  public void updateActivityBlogCollectionIndexesContainingDescription(MongoDatabase mongoDatabase) {
+  public void updateActivityBlogCollectionIndexesContainingDescription(
+    MongoDatabase mongoDatabase
+  ) {
 
     mongoDatabase.getCollection(DocumentName.ACTIVITY_BLOG)
       .dropIndex(ACTIVITY_BLOG_TITLE_DESCRIPTION.name());

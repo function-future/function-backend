@@ -11,9 +11,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class QuestionAnswerResponse {
 
-    private String name;
+  private String name;
 
-    private String avatar;
+  private String avatar;
 
-    private Float score;
+  private Float score;
+
 }

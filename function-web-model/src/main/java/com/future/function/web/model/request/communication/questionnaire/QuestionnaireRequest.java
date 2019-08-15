@@ -18,7 +18,8 @@ public class QuestionnaireRequest {
   @Title(message = "InvalidTitle")
   private String title;
 
-  @Size(max = 50, message = "Size")
+  @Size(max = 50,
+        message = "Size")
   private String desc;
 
   @NotNull(message = "StartDate")
@@ -26,6 +27,5 @@ public class QuestionnaireRequest {
 
   @NotNull(message = "DueDate")
   private Long dueDate;
-
 
 }

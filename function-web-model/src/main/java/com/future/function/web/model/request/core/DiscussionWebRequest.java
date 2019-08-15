@@ -6,16 +6,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.NotBlank;
 
-/**
- * Model representation for discussion web request.
- */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class DiscussionWebRequest {
-  
+
   @NotBlank(message = "NotBlank")
   private String comment;
-  
+
 }

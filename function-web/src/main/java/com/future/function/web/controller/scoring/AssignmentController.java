@@ -20,107 +20,133 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
-/**
- * Controller class used to serve and received data from the Web in manipulation of Assignment Entity
- */
 @RestController
 @RequestMapping(value = "/api/scoring/batches/{batchCode}/assignments")
 public class AssignmentController {
 
   private AssignmentService assignmentService;
+
   private AssignmentRequestMapper assignmentRequestMapper;
+
   private FileProperties fileProperties;
 
   @Autowired
-  public AssignmentController(AssignmentService assignmentService, AssignmentRequestMapper assignmentRequestMapper, FileProperties fileProperties) {
+  public AssignmentController(
+    AssignmentService assignmentService,
+    AssignmentRequestMapper assignmentRequestMapper,
+    FileProperties fileProperties
+  ) {
+
     this.assignmentService = assignmentService;
     this.assignmentRequestMapper = assignmentRequestMapper;
     this.fileProperties = fileProperties;
   }
 
-  /**
-   * Used to retrieve List of Assignment with Paging, Filtering, And Search Keyword
-   *
-   * @param page (Int)
-   * @param size (Int)
-   * @return PagingResponse<AssignmentWebResponse> contains List of Assignment and the Paging Information
-   */
   @ResponseStatus(value = HttpStatus.OK)
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   public PagingResponse<AssignmentWebResponse> findAllAssignment(
-          @PathVariable String batchCode,
-          @RequestParam(defaultValue = "1") int page,
-          @RequestParam(defaultValue = "10") int size,
-          @WithAnyRole(roles = {Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT}) Session session) {
-    return AssignmentResponseMapper
-        .toAssignmentsPagingResponse(
-            assignmentService.findAllByBatchCodeAndPageable(batchCode, PageHelper.toPageable(page, size)), fileProperties.getUrlPrefix());
+    @PathVariable
+      String batchCode,
+    @RequestParam(defaultValue = "1")
+      int page,
+    @RequestParam(defaultValue = "10")
+      int size,
+    @WithAnyRole(roles = { Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT })
+      Session session
+  ) {
+
+    return AssignmentResponseMapper.toAssignmentsPagingResponse(
+      assignmentService.findAllByBatchCodeAndPageable(batchCode,
+                                                      PageHelper.toPageable(
+                                                        page, size)
+      ), fileProperties.getUrlPrefix());
   }
 
-  /**
-   * Used to retrieve specific Assignment Object By Passing the Assignment Id In PathVariable
-   *
-   * @param id (String)
-   * @return DataResponse<AssignmentWebResponse> contains the specific Assignment Object
-   */
   @ResponseStatus(value = HttpStatus.OK)
-  @GetMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-  public DataResponse<AssignmentWebResponse> findAssignmentById(@PathVariable String id,
-      @WithAnyRole(roles = {Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT})Session session) {
-    return AssignmentResponseMapper.toAssignmentDataResponse(assignmentService.findById(id), fileProperties.getUrlPrefix());
-  }
+  @GetMapping(path = "/{id}",
+              produces = MediaType.APPLICATION_JSON_VALUE)
+  public DataResponse<AssignmentWebResponse> findAssignmentById(
+    @PathVariable
+      String id,
+    @WithAnyRole(roles = { Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT })
+      Session session
+  ) {
 
-  /**
-   * Used to create new {@code Assignment) by passing the JSON containing Assignment Attributes and Uploaded File
-   *
-   * @param data (JSON)
-   * @param file (MultipartFile) (Not Required)
-   * @return DataResponse<AssignmentWebResponse> containing created Assignment
-   */
-  @ResponseStatus(value = HttpStatus.CREATED)
-  @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-  public DataResponse<AssignmentWebResponse> createAssignment(@PathVariable String batchCode,
-                                                              @RequestBody AssignmentWebRequest data,
-                                                              @WithAnyRole(roles = Role.ADMIN) Session session) {
-    return AssignmentResponseMapper
-        .toAssignmentDataResponse(HttpStatus.CREATED, assignmentService
-                .createAssignment(assignmentRequestMapper.toAssignment(data, batchCode)), fileProperties.getUrlPrefix());
+    return AssignmentResponseMapper.toAssignmentDataResponse(
+      assignmentService.findById(id), fileProperties.getUrlPrefix());
   }
 
   @ResponseStatus(value = HttpStatus.CREATED)
-  @PostMapping(path = "/copy", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-  public DataResponse<AssignmentWebResponse> copyAssignment(@RequestBody CopyAssignmentWebRequest request,
-    @WithAnyRole(roles = Role.ADMIN) Session session) {
+  @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE,
+               produces = MediaType.APPLICATION_JSON_VALUE)
+  public DataResponse<AssignmentWebResponse> createAssignment(
+    @PathVariable
+      String batchCode,
+    @RequestBody
+      AssignmentWebRequest data,
+    @WithAnyRole(roles = Role.ADMIN)
+      Session session
+  ) {
+
+    return AssignmentResponseMapper.toAssignmentDataResponse(
+      HttpStatus.CREATED, assignmentService.createAssignment(
+        assignmentRequestMapper.toAssignment(
+          data, batchCode)), fileProperties.getUrlPrefix());
+  }
+
+  @ResponseStatus(value = HttpStatus.CREATED)
+  @PostMapping(path = "/copy",
+               consumes = MediaType.APPLICATION_JSON_VALUE,
+               produces = MediaType.APPLICATION_JSON_VALUE)
+  public DataResponse<AssignmentWebResponse> copyAssignment(
+    @RequestBody
+      CopyAssignmentWebRequest request,
+    @WithAnyRole(roles = Role.ADMIN)
+      Session session
+  ) {
+
     request = assignmentRequestMapper.validateCopyAssignmentWebRequest(request);
-    return AssignmentResponseMapper
-        .toAssignmentDataResponse(HttpStatus.CREATED, assignmentService
-                .copyAssignment(request.getAssignmentId(), request.getBatchCode()), fileProperties.getUrlPrefix());
+    return AssignmentResponseMapper.toAssignmentDataResponse(HttpStatus.CREATED,
+                                                             assignmentService.copyAssignment(
+                                                               request.getAssignmentId(),
+                                                               request.getBatchCode()
+                                                             ),
+                                                             fileProperties.getUrlPrefix()
+    );
   }
 
-  /**
-   * Used to update existing Assignment By Passing the id, JSON containing Assignment attributes, and Uploaded File
-   *
-   * @param data (JSON)
-   * @return DataResponse<AssignmentWebResponse> containing updated Assignment
-   */
   @ResponseStatus(value = HttpStatus.OK)
-  @PutMapping(path = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-  public DataResponse<AssignmentWebResponse> updateAssignment(@PathVariable String batchCode, @PathVariable String id,
-                                                              @RequestBody AssignmentWebRequest data,
-                                                              @WithAnyRole(roles = Role.ADMIN) Session session) {
-    return AssignmentResponseMapper.toAssignmentDataResponse(assignmentService
-            .updateAssignment(assignmentRequestMapper.toAssignmentWithId(id, data, batchCode)), fileProperties.getUrlPrefix());
+  @PutMapping(path = "/{id}",
+              consumes = MediaType.APPLICATION_JSON_VALUE,
+              produces = MediaType.APPLICATION_JSON_VALUE)
+  public DataResponse<AssignmentWebResponse> updateAssignment(
+    @PathVariable
+      String batchCode,
+    @PathVariable
+      String id,
+    @RequestBody
+      AssignmentWebRequest data,
+    @WithAnyRole(roles = Role.ADMIN)
+      Session session
+  ) {
+
+    return AssignmentResponseMapper.toAssignmentDataResponse(
+      assignmentService.updateAssignment(
+        assignmentRequestMapper.toAssignmentWithId(id, data, batchCode)),
+      fileProperties.getUrlPrefix()
+    );
   }
 
-  /**
-   * Used to delete specific Assignment by Passing Assignment Id in PathVariable
-   *
-   * @param id (JSON)
-   * @return BaseResponse with status OK
-   */
   @ResponseStatus(value = HttpStatus.OK)
-  @DeleteMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-  public BaseResponse deleteAssignmentById(@PathVariable String id, @WithAnyRole(roles = Role.ADMIN) Session session) {
+  @DeleteMapping(path = "/{id}",
+                 produces = MediaType.APPLICATION_JSON_VALUE)
+  public BaseResponse deleteAssignmentById(
+    @PathVariable
+      String id,
+    @WithAnyRole(roles = Role.ADMIN)
+      Session session
+  ) {
+
     assignmentService.deleteById(id);
     return ResponseHelper.toBaseResponse(HttpStatus.OK);
   }

@@ -11,12 +11,10 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
-/**
- * Author: PriagungSatyagama
- * Created At: 0:12 11/07/2019
- */
 @RunWith(MockitoJUnitRunner.class)
 public class NotificationRequestMapperTest {
 
@@ -28,16 +26,20 @@ public class NotificationRequestMapperTest {
 
   @After
   public void tearDown() {
+
     verifyNoMoreInteractions(requestValidator);
   }
 
   @Test
   public void testGivenNotificationRequestByCallingToNotificationReturnNotification() {
+
     NotificationRequest request = NotificationRequest.builder()
-            .title("title").build();
+      .title("title")
+      .build();
     when(requestValidator.validate(request)).thenReturn(request);
 
-    Notification notification = notificationRequestMapper.toNotification(request);
+    Notification notification = notificationRequestMapper.toNotification(
+      request);
 
     assertThat(notification.getTitle()).isEqualTo("title");
     verify(requestValidator).validate(request);

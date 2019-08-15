@@ -26,21 +26,18 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-/**
- * Controller class for course APIs.
- */
 @RestController
 @RequestMapping(value = "/api/core/batches/{batchCode}/courses")
 public class SharedCourseController {
-  
+
   private final SharedCourseService sharedCourseService;
-  
+
   private final SharedCourseRequestMapper sharedCourseRequestMapper;
-  
+
   private final DiscussionRequestMapper discussionRequestMapper;
-  
+
   private final FileProperties fileProperties;
-  
+
   @Autowired
   public SharedCourseController(
     SharedCourseService sharedCourseService,
@@ -48,13 +45,13 @@ public class SharedCourseController {
     DiscussionRequestMapper discussionRequestMapper,
     FileProperties fileProperties
   ) {
-    
+
     this.sharedCourseService = sharedCourseService;
     this.sharedCourseRequestMapper = sharedCourseRequestMapper;
     this.discussionRequestMapper = discussionRequestMapper;
     this.fileProperties = fileProperties;
   }
-  
+
   @ResponseStatus(HttpStatus.OK)
   @GetMapping
   public PagingResponse<CourseWebResponse> getCoursesForBatch(
@@ -67,7 +64,7 @@ public class SharedCourseController {
     @PathVariable
       String batchCode
   ) {
-    
+
     return CourseResponseMapper.toCoursesPagingResponse(
       sharedCourseService.getCoursesByBatchCode(batchCode,
                                                 PageHelper.toPageable(page,
@@ -75,7 +72,7 @@ public class SharedCourseController {
                                                 )
       ), fileProperties.getUrlPrefix());
   }
-  
+
   @ResponseStatus(HttpStatus.OK)
   @GetMapping(value = "/{courseId}")
   public DataResponse<CourseWebResponse> getCourseForBatch(
@@ -86,12 +83,13 @@ public class SharedCourseController {
     @PathVariable
       String batchCode
   ) {
-    
+
     return CourseResponseMapper.toCourseDataResponse(
       sharedCourseService.getCourseByIdAndBatchCode(courseId, batchCode),
-      fileProperties.getUrlPrefix());
+      fileProperties.getUrlPrefix()
+    );
   }
-  
+
   @ResponseStatus(HttpStatus.OK)
   @DeleteMapping(value = "/{courseId}")
   public BaseResponse deleteCourseForBatch(
@@ -102,11 +100,11 @@ public class SharedCourseController {
     @PathVariable
       String batchCode
   ) {
-    
+
     sharedCourseService.deleteCourseByIdAndBatchCode(courseId, batchCode);
     return ResponseHelper.toBaseResponse(HttpStatus.OK);
   }
-  
+
   @ResponseStatus(HttpStatus.CREATED)
   @PostMapping
   public DataResponse<List<CourseWebResponse>> createCourseForBatch(
@@ -117,18 +115,18 @@ public class SharedCourseController {
     @RequestBody
       SharedCourseWebRequest request
   ) {
-    
+
     request.setTargetBatch(batchCode);
     Pair<List<String>, String> courseIdsAndOriginBatchPair =
       sharedCourseRequestMapper.toCourseIdsAndOriginBatchCodePair(request);
-    
+
     return CourseResponseMapper.toCoursesDataResponse(
       sharedCourseService.createCourseForBatch(
         courseIdsAndOriginBatchPair.getFirst(),
         courseIdsAndOriginBatchPair.getSecond(), batchCode
       ), fileProperties.getUrlPrefix());
   }
-  
+
   @ResponseStatus(HttpStatus.OK)
   @PutMapping("/{courseId}")
   public DataResponse<CourseWebResponse> updateCourseForBatch(
@@ -141,14 +139,14 @@ public class SharedCourseController {
     @RequestBody
       CourseWebRequest request
   ) {
-    
+
     return CourseResponseMapper.toCourseDataResponse(
       sharedCourseService.updateCourseForBatch(courseId, batchCode,
                                                sharedCourseRequestMapper.toCourse(
                                                  courseId, request)
       ), fileProperties.getUrlPrefix());
   }
-  
+
   @ResponseStatus(HttpStatus.OK)
   @GetMapping("/{courseId}/discussions")
   public PagingResponse<DiscussionWebResponse> getDiscussions(
@@ -163,14 +161,14 @@ public class SharedCourseController {
     @RequestParam(defaultValue = "4")
       int size
   ) {
-  
+
     return DiscussionResponseMapper.toDiscussionPagingResponse(
       sharedCourseService.getDiscussions(session.getEmail(), courseId,
                                          batchCode,
                                          PageHelper.toPageable(page, size)
       ));
   }
-  
+
   @ResponseStatus(HttpStatus.CREATED)
   @PostMapping("/{courseId}/discussions")
   public DataResponse<DiscussionWebResponse> createDiscussion(
@@ -183,12 +181,12 @@ public class SharedCourseController {
     @RequestBody
       DiscussionWebRequest request
   ) {
-    
+
     return DiscussionResponseMapper.toDiscussionDataResponse(
       sharedCourseService.createDiscussion(
         discussionRequestMapper.toDiscussion(request, session.getEmail(),
                                              courseId, batchCode
         )));
   }
-  
+
 }

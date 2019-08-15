@@ -9,16 +9,25 @@ import java.util.List;
 
 public interface StudentQuestionService {
 
-  List<StudentQuestion> findAllByStudentQuizDetailId(String studentQuizDetailId);
+  List<StudentQuestion> findAllByStudentQuizDetailId(
+    String studentQuizDetailId
+  );
 
-    List<Question> findAllRandomQuestionsFromMultipleQuestionBank(List<QuestionBank> questionBanks, int questionCount);
+  List<Question> findAllRandomQuestionsFromMultipleQuestionBank(
+    List<QuestionBank> questionBanks, int questionCount
+  );
 
-  List<StudentQuestion> createStudentQuestionsFromQuestionList(List<Question> questionList, StudentQuizDetail studentQuizDetail);
+  List<StudentQuestion> createStudentQuestionsFromQuestionList(
+    List<Question> questionList, StudentQuizDetail studentQuizDetail
+  );
 
-    Integer postAnswerForAllStudentQuestion(List<StudentQuestion> answers, String studentQuizDetailId);
+  Integer postAnswerForAllStudentQuestion(
+    List<StudentQuestion> answers, String studentQuizDetailId
+  );
 
-  List<StudentQuestion> createStudentQuestionsByStudentQuizDetail(StudentQuizDetail studentQuizDetail,
-      List<StudentQuestion> studentQuestions);
+  List<StudentQuestion> createStudentQuestionsByStudentQuizDetail(
+    StudentQuizDetail studentQuizDetail, List<StudentQuestion> studentQuestions
+  );
 
   void deleteAllByStudentQuizDetailId(String studentQuizDetailId);
 

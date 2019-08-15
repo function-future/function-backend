@@ -28,55 +28,102 @@ public class QuestionController {
   private QuestionRequestMapper questionRequestMapper;
 
   @Autowired
-  public QuestionController(QuestionService questionService, QuestionRequestMapper questionRequestMapper) {
+  public QuestionController(
+    QuestionService questionService, QuestionRequestMapper questionRequestMapper
+  ) {
+
     this.questionService = questionService;
     this.questionRequestMapper = questionRequestMapper;
   }
 
   @ResponseStatus(HttpStatus.OK)
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-  public PagingResponse<QuestionWebResponse> getAllQuestionForQuestionBank(@PathVariable String questionBankId,
-                                                                           @RequestParam(defaultValue = "1") int page,
-                                                                           @RequestParam(defaultValue = "10") int size,
-                                                                           @WithAnyRole(roles = Role.ADMIN) Session session) {
-    return QuestionResponseMapper
-        .toQuestionPagingResponse(
-            questionService.findAllByQuestionBankId(questionBankId, PageHelper.toPageable(page, size)));
+  public PagingResponse<QuestionWebResponse> getAllQuestionForQuestionBank(
+    @PathVariable
+      String questionBankId,
+    @RequestParam(defaultValue = "1")
+      int page,
+    @RequestParam(defaultValue = "10")
+      int size,
+    @WithAnyRole(roles = Role.ADMIN)
+      Session session
+  ) {
+
+    return QuestionResponseMapper.toQuestionPagingResponse(
+      questionService.findAllByQuestionBankId(questionBankId,
+                                              PageHelper.toPageable(page, size)
+      ));
   }
 
   @ResponseStatus(HttpStatus.OK)
-  @GetMapping(path = "/{questionId}", produces = MediaType.APPLICATION_JSON_VALUE)
-  public DataResponse<QuestionWebResponse> getQuestionDetailById(@PathVariable String questionId,
-      @WithAnyRole(roles = Role.ADMIN) Session session) {
-    return QuestionResponseMapper.toQuestionWebResponse(questionService.findById(questionId));
+  @GetMapping(path = "/{questionId}",
+              produces = MediaType.APPLICATION_JSON_VALUE)
+  public DataResponse<QuestionWebResponse> getQuestionDetailById(
+    @PathVariable
+      String questionId,
+    @WithAnyRole(roles = Role.ADMIN)
+      Session session
+  ) {
+
+    return QuestionResponseMapper.toQuestionWebResponse(
+      questionService.findById(questionId));
   }
 
   @ResponseStatus(HttpStatus.CREATED)
-  @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-  public DataResponse<QuestionWebResponse> createQuestionForQuestionBank(@PathVariable String questionBankId,
-      @RequestBody QuestionWebRequest request, @WithAnyRole(roles = Role.ADMIN) Session session) {
-    return QuestionResponseMapper
-        .toQuestionWebResponse(
-            HttpStatus.CREATED,
-            questionService.createQuestion(questionRequestMapper.toQuestion(request), questionBankId));
+  @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE,
+               produces = MediaType.APPLICATION_JSON_VALUE)
+  public DataResponse<QuestionWebResponse> createQuestionForQuestionBank(
+    @PathVariable
+      String questionBankId,
+    @RequestBody
+      QuestionWebRequest request,
+    @WithAnyRole(roles = Role.ADMIN)
+      Session session
+  ) {
+
+    return QuestionResponseMapper.toQuestionWebResponse(HttpStatus.CREATED,
+                                                        questionService.createQuestion(
+                                                          questionRequestMapper.toQuestion(
+                                                            request),
+                                                          questionBankId
+                                                        )
+    );
   }
 
   @ResponseStatus(HttpStatus.OK)
-  @PutMapping(path = "/{questionId}", consumes = MediaType.APPLICATION_JSON_VALUE,
-      produces = MediaType.APPLICATION_JSON_VALUE)
-  public DataResponse<QuestionWebResponse> updateQuestionForQuestionBank(@PathVariable String questionBankId,
-      @PathVariable String questionId,
-      @RequestBody QuestionWebRequest request, @WithAnyRole(roles = Role.ADMIN) Session session) {
-    return QuestionResponseMapper
-        .toQuestionWebResponse(
-            HttpStatus.OK,
-            questionService.updateQuestion(questionRequestMapper.toQuestion(request, questionId), questionBankId));
+  @PutMapping(path = "/{questionId}",
+              consumes = MediaType.APPLICATION_JSON_VALUE,
+              produces = MediaType.APPLICATION_JSON_VALUE)
+  public DataResponse<QuestionWebResponse> updateQuestionForQuestionBank(
+    @PathVariable
+      String questionBankId,
+    @PathVariable
+      String questionId,
+    @RequestBody
+      QuestionWebRequest request,
+    @WithAnyRole(roles = Role.ADMIN)
+      Session session
+  ) {
+
+    return QuestionResponseMapper.toQuestionWebResponse(HttpStatus.OK,
+                                                        questionService.updateQuestion(
+                                                          questionRequestMapper.toQuestion(
+                                                            request,
+                                                            questionId
+                                                          ), questionBankId)
+    );
   }
 
   @ResponseStatus(HttpStatus.OK)
-  @DeleteMapping(path = "/{questionId}", produces = MediaType.APPLICATION_JSON_VALUE)
-  public BaseResponse deleteQuestionFromQuestionBank(@PathVariable String questionId,
-      @WithAnyRole(roles = Role.ADMIN) Session session) {
+  @DeleteMapping(path = "/{questionId}",
+                 produces = MediaType.APPLICATION_JSON_VALUE)
+  public BaseResponse deleteQuestionFromQuestionBank(
+    @PathVariable
+      String questionId,
+    @WithAnyRole(roles = Role.ADMIN)
+      Session session
+  ) {
+
     questionService.deleteById(questionId);
     return ResponseHelper.toBaseResponse(HttpStatus.OK);
   }

@@ -24,70 +24,70 @@ import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class StickyNoteServiceImplTest {
-  
+
   private static final String TITLE = "title";
-  
+
   private static final String DESCRIPTION = "description";
-  
+
   private static final Pageable PAGEABLE = new PageRequest(0, 1);
-  
+
   private StickyNote stickyNote;
-  
+
   @Mock
   private StickyNoteRepository stickyNoteRepository;
-  
+
   @InjectMocks
   private StickyNoteServiceImpl stickyNoteService;
-  
+
   @Before
   public void setUp() {
-    
+
     stickyNote = StickyNote.builder()
       .title(TITLE)
       .description(DESCRIPTION)
       .build();
   }
-  
+
   @After
   public void tearDown() {
-    
+
     verifyNoMoreInteractions(stickyNoteRepository);
   }
-  
+
   @Test
   public void testGivenMethodCallToGetStickyNoteByGettingStickyNoteReturnStickyNoteObject() {
-    
+
     Page<StickyNote> stickyNotePage = PageHelper.toPage(
       Collections.singletonList(stickyNote), PAGEABLE);
     when(stickyNoteRepository.findAllByIdIsNotNullOrderByUpdatedAtDesc(
       PAGEABLE)).thenReturn(stickyNotePage);
-    
+
     Page<StickyNote> foundStickyNotePage = stickyNoteService.getStickyNote(
       PAGEABLE);
-    
+
     assertThat(foundStickyNotePage).isNotNull();
     assertThat(foundStickyNotePage).isEqualTo(stickyNotePage);
-    
+
     verify(stickyNoteRepository).findAllByIdIsNotNullOrderByUpdatedAtDesc(
       PAGEABLE);
   }
-  
+
   @Test
   public void testGivenMethodToCreateStickyNoteByCreatingStickyNoteReturnNewStickyNoteObject() {
-    
+
     when(stickyNoteRepository.save(stickyNote)).thenReturn(stickyNote);
     when(
       stickyNoteRepository.findFirstByIdIsNotNullOrderByUpdatedAtDesc()).thenReturn(
       Optional.of(stickyNote));
-    
+
     StickyNote createdStickyNote = stickyNoteService.createStickyNote(
       stickyNote);
-    
+
     assertThat(createdStickyNote).isNotNull();
     assertThat(createdStickyNote).isEqualTo(stickyNote);
-    
+
     verify(stickyNoteRepository).save(stickyNote);
     verify(stickyNoteRepository).findFirstByIdIsNotNullOrderByUpdatedAtDesc();
   }
-  
+
 }

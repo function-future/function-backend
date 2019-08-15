@@ -11,8 +11,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class SummaryVO {
 
-    private String title;
-    private Integer point;
-    private String type;
+  private String title;
+
+  private Integer point;
+
+  private String type;
 
 }

@@ -11,23 +11,23 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class EmbeddedFileWebResponse {
-  
+
   private String id;
-  
+
   private File file;
-  
+
   @Data
   @Builder
   @NoArgsConstructor
   @AllArgsConstructor
   public static class File {
-    
+
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String full;
-    
+
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String thumbnail;
-    
+
   }
-  
+
 }

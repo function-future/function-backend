@@ -28,86 +28,86 @@ import java.util.stream.Collectors;
 
 @Service
 public class SharedCourseServiceImpl implements SharedCourseService {
-  
+
   private final SharedCourseRepository sharedCourseRepository;
-  
+
   private final BatchService batchService;
-  
+
   private final ResourceService resourceService;
-  
+
   private final CourseService courseService;
-  
+
   private final DiscussionService discussionService;
-  
+
   @Autowired
   public SharedCourseServiceImpl(
     SharedCourseRepository sharedCourseRepository, BatchService batchService,
     ResourceService resourceService, CourseService courseService,
     DiscussionService discussionService
   ) {
-    
+
     this.sharedCourseRepository = sharedCourseRepository;
     this.batchService = batchService;
     this.resourceService = resourceService;
     this.courseService = courseService;
     this.discussionService = discussionService;
   }
-  
+
   @Override
   public Course getCourseByIdAndBatchCode(String courseId, String batchCode) {
-    
+
     return this.getBatch(batchCode)
       .flatMap(
         batch -> sharedCourseRepository.findByIdAndBatch(courseId, batch))
       .map(this::setCourseId)
       .orElseThrow(() -> new NotFoundException("Get Course Not Found"));
   }
-  
+
   private Course setCourseId(SharedCourse sharedCourse) {
-  
+
     Course course = sharedCourse.getCourse();
     course.setId(sharedCourse.getId());
-    
+
     return course;
   }
-  
+
   private Optional<Batch> getBatch(String batchCode) {
-    
+
     return Optional.ofNullable(batchCode)
       .map(batchService::getBatchByCode);
   }
-  
+
   @Override
   public Page<Course> getCoursesByBatchCode(
     String batchCode, Pageable pageable
   ) {
-    
+
     return this.getBatch(batchCode)
       .map(batch -> sharedCourseRepository.findAllByBatch(batch, pageable))
       .map(sharedCourses -> this.toCoursePage(sharedCourses, pageable))
       .orElseGet(() -> PageHelper.empty(pageable));
   }
-  
+
   private Page<Course> toCoursePage(
     Page<SharedCourse> sharedCourses, Pageable pageable
   ) {
-    
+
     List<Course> courses = toCourseList(sharedCourses);
-    
+
     return PageHelper.toPage(courses, pageable);
   }
-  
+
   private List<Course> toCourseList(Page<SharedCourse> sharedCourses) {
-    
+
     return sharedCourses.getContent()
       .stream()
       .map(this::setCourseId)
       .collect(Collectors.toList());
   }
-  
+
   @Override
   public void deleteCourseByIdAndBatchCode(String courseId, String batchCode) {
-    
+
     this.getBatch(batchCode)
       .flatMap(
         batch -> sharedCourseRepository.findByIdAndBatch(courseId, batch))
@@ -117,16 +117,16 @@ public class SharedCourseServiceImpl implements SharedCourseService {
         sharedCourseRepository.delete(sharedCourse);
       });
   }
-  
+
   private void deleteDiscussionsForSharedCourse(SharedCourse sharedCourse) {
-    
+
     discussionService.deleteDiscussions(
       sharedCourse.getId(), sharedCourse.getBatch()
         .getCode());
   }
-  
+
   private void markCourseFilesUnused(SharedCourse sharedCourse) {
-    
+
     Optional.of(sharedCourse)
       .map(SharedCourse::getCourse)
       .map(Course::getFile)
@@ -134,12 +134,12 @@ public class SharedCourseServiceImpl implements SharedCourseService {
       .map(Collections::singletonList)
       .ifPresent(fileIds -> resourceService.markFilesUsed(fileIds, false));
   }
-  
+
   @Override
   public List<Course> createCourseForBatch(
     List<String> courseIds, String originBatchCode, String targetBatchCode
   ) {
-    
+
     return Optional.ofNullable(originBatchCode)
       .filter(code -> !StringUtils.isEmpty(code))
       .map(code -> this.createCourseForBatchFromAnotherBatch(courseIds,
@@ -150,13 +150,13 @@ public class SharedCourseServiceImpl implements SharedCourseService {
                                                                targetBatchCode
       ));
   }
-  
+
   private List<Course> createCourseForBatchFromAnotherBatch(
     List<String> courseIds, String originBatchCode, String targetBatchCode
   ) {
-    
+
     Batch originBatch = batchService.getBatchByCode(originBatchCode);
-    
+
     return sharedCourseRepository.findAllByBatch(originBatch)
       .map(SharedCourse::getCourse)
       .filter(course -> courseIds.contains(course.getId()))
@@ -166,19 +166,19 @@ public class SharedCourseServiceImpl implements SharedCourseService {
       .map(this::setCourseId)
       .collect(Collectors.toList());
   }
-  
+
   private SharedCourse buildSharedCourse(Course course, Batch batch) {
-    
+
     return SharedCourse.builder()
       .course(course)
       .batch(batch)
       .build();
   }
-  
+
   private List<Course> createCourseForBatchFromMasterData(
     List<String> courseIds, String batchCode
   ) {
-    
+
     return courseIds.stream()
       .map(courseService::getCourse)
       .map(course -> Pair.of(course, batchService.getBatchByCode(batchCode)))
@@ -188,12 +188,12 @@ public class SharedCourseServiceImpl implements SharedCourseService {
       .map(this::setCourseId)
       .collect(Collectors.toList());
   }
-  
+
   @Override
   public Course updateCourseForBatch(
     String courseId, String batchCode, Course course
   ) {
-    
+
     return this.getBatch(batchCode)
       .flatMap(
         batch -> sharedCourseRepository.findByIdAndBatch(courseId, batch))
@@ -204,34 +204,34 @@ public class SharedCourseServiceImpl implements SharedCourseService {
       .map(this::setCourseId)
       .orElse(course);
   }
-  
+
   @Override
   public Page<Discussion> getDiscussions(
     String email, String courseId, String batchCode, Pageable pageable
   ) {
-  
+
     Optional.of(email)
       .ifPresent(
         ignored -> this.getCourseByIdAndBatchCode(courseId, batchCode));
-    
+
     return discussionService.getDiscussions(
       email, courseId, batchCode, pageable);
   }
-  
+
   @Override
   public Discussion createDiscussion(Discussion discussion) {
-  
+
     Optional.of(discussion)
       .ifPresent(
         d -> this.getCourseByIdAndBatchCode(d.getCourseId(), d.getBatchCode()));
-    
+
     return discussionService.createDiscussion(discussion);
   }
-  
+
   private SharedCourse copyPropertiesAndSaveSharedCourse(
     SharedCourse sharedCourse, Course course
   ) {
-    
+
     Optional.ofNullable(course)
       .map(Course::getFile)
       .map(FileV2::getId)
@@ -239,14 +239,14 @@ public class SharedCourseServiceImpl implements SharedCourseService {
         resourceService.markFilesUsed(Collections.singletonList(fileId), true);
         course.setFile(resourceService.getFile(fileId));
       });
-    
+
     CopyHelper.copyProperties(course, sharedCourse.getCourse());
-    
+
     return sharedCourseRepository.save(sharedCourse);
   }
-  
+
   private SharedCourse deleteCourseFile(SharedCourse sharedCourse) {
-    
+
     return Optional.of(sharedCourse)
       .map(SharedCourse::getCourse)
       .map(Course::getFile)
@@ -256,5 +256,5 @@ public class SharedCourseServiceImpl implements SharedCourseService {
       .map(ignored -> sharedCourse)
       .orElse(sharedCourse);
   }
-  
+
 }

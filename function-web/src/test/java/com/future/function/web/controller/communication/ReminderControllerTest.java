@@ -25,136 +25,180 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
-/**
- * Author: priagung.satyagama
- * Created At: 10:00 AM 7/11/2019
- */
 @RunWith(SpringRunner.class)
 @Import(TestSecurityConfiguration.class)
 @WebMvcTest(ReminderController.class)
 public class ReminderControllerTest extends TestHelper {
 
-    private static final String REMINDER_ID = "reminderId";
-    private static final String USER_ID = "userId";
-    private static final String URL_PREFIX = "localhost:8080";
-    private static final User USER = User.builder().id(USER_ID).build();
-    private static final Reminder REMINDER = Reminder.builder()
-            .isRepeatedMonthly(true)
-            .id(REMINDER_ID)
-            .hour(10)
-            .minute(10)
-            .members(new ArrayList<>())
-            .build();
-    private static final Pageable PAGEABLE = PageHelper.toPageable(1, 10);
-    private static final PageImpl<Reminder> REMINDER_PAGE = new PageImpl<>(Collections.singletonList(REMINDER),
-            PAGEABLE, 1);
-    private static final ReminderRequest REMINDER_REQUEST = ReminderRequest.builder().build();
+  private static final String REMINDER_ID = "reminderId";
 
-    private JacksonTester<ReminderRequest> reminderRequestJacksonTester;
+  private static final String USER_ID = "userId";
 
-    @MockBean
-    private ReminderService reminderService;
+  private static final String URL_PREFIX = "localhost:8080";
 
-    @MockBean
-    private ReminderRequestMapper reminderRequestMapper;
+  private static final User USER = User.builder()
+    .id(USER_ID)
+    .build();
 
-    @MockBean
-    private FileProperties fileProperties;
+  private static final Reminder REMINDER = Reminder.builder()
+    .isRepeatedMonthly(true)
+    .id(REMINDER_ID)
+    .hour(10)
+    .minute(10)
+    .members(new ArrayList<>())
+    .build();
 
-    @Override
-    @Before
-    public void setUp() {
-        super.setUp();
-        super.setCookie(Role.ADMIN);
-    }
+  private static final Pageable PAGEABLE = PageHelper.toPageable(1, 10);
 
-    @After
-    public void tearDown() {
-        verifyNoMoreInteractions(reminderRequestMapper, reminderService);
-    }
+  private static final PageImpl<Reminder> REMINDER_PAGE = new PageImpl<>(
+    Collections.singletonList(REMINDER), PAGEABLE, 1);
 
-    @Test
-    public void testGivenCallToGetRemindersReturnPagingResponse() throws Exception {
-        when(reminderService.getAllPagedReminder(PAGEABLE, "")).thenReturn(REMINDER_PAGE);
-        PagingResponse<ReminderResponse> response = ReminderResponseMapper.toPagingReminderResponse(REMINDER_PAGE);
-        mockMvc.perform(get("/api/communication/reminders").cookie(cookies))
-                .andExpect(status().isOk())
-                .andExpect(content().json(pagingResponseJacksonTester.write(response).getJson()));
-        verify(reminderService).getAllPagedReminder(PAGEABLE, "");
-    }
+  private static final ReminderRequest REMINDER_REQUEST =
+    ReminderRequest.builder()
+      .build();
 
-    @Test
-    public void testGivenReminderIdToGetReminderByIdReturnDataResponse() throws Exception {
-        when(reminderService.getReminder(REMINDER_ID)).thenReturn(REMINDER);
-        when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
+  private JacksonTester<ReminderRequest> reminderRequestJacksonTester;
 
-        DataResponse<ReminderDetailResponse> response = ReminderResponseMapper.toSingleReminderDataResponse(REMINDER, URL_PREFIX);
-        mockMvc.perform(get("/api/communication/reminders/" + REMINDER_ID).cookie(cookies))
-                .andExpect(status().isOk())
-                .andExpect(content().json(dataResponseJacksonTester.write(response).getJson()));
-        verify(reminderService).getReminder(REMINDER_ID);
-        verify(fileProperties).getUrlPrefix();
+  @MockBean
+  private ReminderService reminderService;
 
-    }
+  @MockBean
+  private ReminderRequestMapper reminderRequestMapper;
 
-    @Test
-    public void testGivenReminderRequestToCreateReminderReturnDataResponse() throws Exception {
-        when(reminderService.createReminder(REMINDER)).thenReturn(REMINDER);
-        when(reminderRequestMapper.toReminder(REMINDER_REQUEST, null)).thenReturn(REMINDER);
-        when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
+  @MockBean
+  private FileProperties fileProperties;
 
-        DataResponse<ReminderDetailResponse> response = ReminderResponseMapper.toSingleReminderDataResponse(REMINDER, URL_PREFIX);
-        mockMvc.perform(post("/api/communication/reminders")
-                .cookie(cookies).contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(reminderRequestJacksonTester.write(REMINDER_REQUEST).getJson()))
-                .andExpect(status().isOk())
-                .andExpect(content().json(dataResponseJacksonTester.write(response).getJson()));
-        verify(reminderService).createReminder(REMINDER);
-        verify(reminderRequestMapper).toReminder(REMINDER_REQUEST, null);
-        verify(fileProperties).getUrlPrefix();
-    }
+  @Override
+  @Before
+  public void setUp() {
 
-    @Test
-    public void testGivenReminderRequestToUpdateReminderReturnDataResponse() throws Exception {
-        when(reminderService.updateReminder(REMINDER)).thenReturn(REMINDER);
-        when(reminderRequestMapper.toReminder(REMINDER_REQUEST, REMINDER_ID)).thenReturn(REMINDER);
-        when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
-        DataResponse<ReminderDetailResponse> response = ReminderResponseMapper.toSingleReminderDataResponse(REMINDER, URL_PREFIX);
-        mockMvc.perform(put("/api/communication/reminders/" + REMINDER_ID)
-                .cookie(cookies).contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(reminderRequestJacksonTester.write(REMINDER_REQUEST).getJson()))
-                .andExpect(status().isOk())
-                .andExpect(content().json(dataResponseJacksonTester.write(response).getJson()));
-        verify(reminderService).updateReminder(REMINDER);
-        verify(reminderRequestMapper).toReminder(REMINDER_REQUEST, REMINDER_ID);
-        verify(fileProperties).getUrlPrefix();
-    }
+    super.setUp();
+    super.setCookie(Role.ADMIN);
+  }
 
-    @Test
-    public void testGivenReminderIdToDeleteReminderReturnBaseResponse() throws Exception {
-        doNothing().when(reminderService).deleteReminder(REMINDER_ID);
-        BaseResponse response = ResponseHelper.toBaseResponse(HttpStatus.OK);
-        mockMvc.perform(delete("/api/communication/reminders/" + REMINDER_ID).cookie(cookies))
-                .andExpect(status().isOk())
-                .andExpect(content().json(baseResponseJacksonTester.write(response).getJson()));
-        verify(reminderService).deleteReminder(REMINDER_ID);
-    }
+  @After
+  public void tearDown() {
+
+    verifyNoMoreInteractions(reminderRequestMapper, reminderService);
+  }
+
+  @Test
+  public void testGivenCallToGetRemindersReturnPagingResponse()
+    throws Exception {
+
+    when(reminderService.getAllPagedReminder(PAGEABLE, "")).thenReturn(
+      REMINDER_PAGE);
+    PagingResponse<ReminderResponse> response =
+      ReminderResponseMapper.toPagingReminderResponse(REMINDER_PAGE);
+    mockMvc.perform(get("/api/communication/reminders").cookie(cookies))
+      .andExpect(status().isOk())
+      .andExpect(content().json(pagingResponseJacksonTester.write(response)
+                                  .getJson()));
+    verify(reminderService).getAllPagedReminder(PAGEABLE, "");
+  }
+
+  @Test
+  public void testGivenReminderIdToGetReminderByIdReturnDataResponse()
+    throws Exception {
+
+    when(reminderService.getReminder(REMINDER_ID)).thenReturn(REMINDER);
+    when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
+
+    DataResponse<ReminderDetailResponse> response =
+      ReminderResponseMapper.toSingleReminderDataResponse(REMINDER, URL_PREFIX);
+    mockMvc.perform(
+      get("/api/communication/reminders/" + REMINDER_ID).cookie(cookies))
+      .andExpect(status().isOk())
+      .andExpect(content().json(dataResponseJacksonTester.write(response)
+                                  .getJson()));
+    verify(reminderService).getReminder(REMINDER_ID);
+    verify(fileProperties).getUrlPrefix();
+
+  }
+
+  @Test
+  public void testGivenReminderRequestToCreateReminderReturnDataResponse()
+    throws Exception {
+
+    when(reminderService.createReminder(REMINDER)).thenReturn(REMINDER);
+    when(reminderRequestMapper.toReminder(REMINDER_REQUEST, null)).thenReturn(
+      REMINDER);
+    when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
+
+    DataResponse<ReminderDetailResponse> response =
+      ReminderResponseMapper.toSingleReminderDataResponse(REMINDER, URL_PREFIX);
+    mockMvc.perform(post("/api/communication/reminders").cookie(cookies)
+                      .contentType(MediaType.APPLICATION_JSON_VALUE)
+                      .content(
+                        reminderRequestJacksonTester.write(REMINDER_REQUEST)
+                          .getJson()))
+      .andExpect(status().isOk())
+      .andExpect(content().json(dataResponseJacksonTester.write(response)
+                                  .getJson()));
+    verify(reminderService).createReminder(REMINDER);
+    verify(reminderRequestMapper).toReminder(REMINDER_REQUEST, null);
+    verify(fileProperties).getUrlPrefix();
+  }
+
+  @Test
+  public void testGivenReminderRequestToUpdateReminderReturnDataResponse()
+    throws Exception {
+
+    when(reminderService.updateReminder(REMINDER)).thenReturn(REMINDER);
+    when(reminderRequestMapper.toReminder(REMINDER_REQUEST,
+                                          REMINDER_ID
+    )).thenReturn(REMINDER);
+    when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
+    DataResponse<ReminderDetailResponse> response =
+      ReminderResponseMapper.toSingleReminderDataResponse(REMINDER, URL_PREFIX);
+    mockMvc.perform(put("/api/communication/reminders/" + REMINDER_ID).cookie(
+      cookies)
+                      .contentType(MediaType.APPLICATION_JSON_VALUE)
+                      .content(
+                        reminderRequestJacksonTester.write(REMINDER_REQUEST)
+                          .getJson()))
+      .andExpect(status().isOk())
+      .andExpect(content().json(dataResponseJacksonTester.write(response)
+                                  .getJson()));
+    verify(reminderService).updateReminder(REMINDER);
+    verify(reminderRequestMapper).toReminder(REMINDER_REQUEST, REMINDER_ID);
+    verify(fileProperties).getUrlPrefix();
+  }
+
+  @Test
+  public void testGivenReminderIdToDeleteReminderReturnBaseResponse()
+    throws Exception {
+
+    doNothing().when(reminderService)
+      .deleteReminder(REMINDER_ID);
+    BaseResponse response = ResponseHelper.toBaseResponse(HttpStatus.OK);
+    mockMvc.perform(
+      delete("/api/communication/reminders/" + REMINDER_ID).cookie(cookies))
+      .andExpect(status().isOk())
+      .andExpect(content().json(baseResponseJacksonTester.write(response)
+                                  .getJson()));
+    verify(reminderService).deleteReminder(REMINDER_ID);
+  }
+
 }

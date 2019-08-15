@@ -17,96 +17,97 @@ import com.future.function.web.model.response.feature.core.CourseWebResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-/**
- * Controller class for course APIs.
- */
 @RestController
 @RequestMapping(value = "/api/core/courses")
 @WithAnyRole(roles = { Role.ADMIN, Role.JUDGE, Role.MENTOR })
 public class CourseController {
-  
+
   private final CourseService courseService;
-  
+
   private final CourseRequestMapper courseRequestMapper;
-  
+
   private final FileProperties fileProperties;
-  
+
   public CourseController(
     CourseService courseService, CourseRequestMapper courseRequestMapper,
     FileProperties fileProperties
   ) {
-    
+
     this.courseService = courseService;
     this.courseRequestMapper = courseRequestMapper;
     this.fileProperties = fileProperties;
   }
-  
+
   @ResponseStatus(HttpStatus.OK)
   @GetMapping
   public PagingResponse<CourseWebResponse> getCourses(
-      Session session,
+    Session session,
     @RequestParam(defaultValue = "1")
       int page,
     @RequestParam(defaultValue = "5")
       int size
   ) {
-    
+
     return CourseResponseMapper.toCoursesPagingResponse(
       courseService.getCourses(PageHelper.toPageable(page, size)),
-      fileProperties.getUrlPrefix());
+      fileProperties.getUrlPrefix()
+    );
   }
-  
+
   @ResponseStatus(HttpStatus.OK)
   @GetMapping(value = "/{courseId}")
   public DataResponse<CourseWebResponse> getCourse(
-      Session session,
+    Session session,
     @PathVariable
       String courseId
   ) {
-    
+
     return CourseResponseMapper.toCourseDataResponse(
       courseService.getCourse(courseId), fileProperties.getUrlPrefix());
   }
-  
+
   @ResponseStatus(HttpStatus.CREATED)
   @PostMapping
   public DataResponse<CourseWebResponse> createCourse(
-      Session session,
+    Session session,
     @RequestBody
       CourseWebRequest request
   ) {
-    
+
     return CourseResponseMapper.toCourseDataResponse(
       HttpStatus.CREATED,
       courseService.createCourse(courseRequestMapper.toCourse(request)),
       fileProperties.getUrlPrefix()
     );
   }
-  
+
   @ResponseStatus(HttpStatus.OK)
   @PutMapping("/{courseId}")
   public DataResponse<CourseWebResponse> updateCourse(
-      Session session,
+    Session session,
     @PathVariable
       String courseId,
     @RequestBody
       CourseWebRequest request
   ) {
-    
-    return CourseResponseMapper.toCourseDataResponse(courseService.updateCourse(
-      courseRequestMapper.toCourse(courseId, request)), fileProperties.getUrlPrefix());
+
+    return CourseResponseMapper.toCourseDataResponse(
+      courseService.updateCourse(
+        courseRequestMapper.toCourse(courseId, request)),
+      fileProperties.getUrlPrefix()
+    );
   }
-  
+
   @ResponseStatus(HttpStatus.OK)
   @DeleteMapping("/{courseId}")
   public BaseResponse deleteCourse(
-      Session session,
+    Session session,
     @PathVariable
       String courseId
   ) {
-    
+
     courseService.deleteCourse(courseId);
     return ResponseHelper.toBaseResponse(HttpStatus.OK);
   }
-  
+
 }

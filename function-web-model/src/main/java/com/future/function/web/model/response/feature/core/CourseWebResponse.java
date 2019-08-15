@@ -5,23 +5,20 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * Model representation for course web response.
- */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class CourseWebResponse {
-  
+
   private String id;
-  
+
   private String title;
-  
+
   private String description;
-  
+
   private String material;
-  
+
   private String materialId;
-  
+
 }

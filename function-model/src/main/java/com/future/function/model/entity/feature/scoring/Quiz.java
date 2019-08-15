@@ -27,7 +27,8 @@ public class Quiz extends BaseEntity {
 
   @Id
   @Builder.Default
-  private String id = UUID.randomUUID().toString();
+  private String id = UUID.randomUUID()
+    .toString();
 
   @Field(value = FieldName.Quiz.TITLE)
   private String title;
@@ -57,4 +58,5 @@ public class Quiz extends BaseEntity {
   @DBRef
   @Field(value = FieldName.Quiz.BATCH)
   private Batch batch;
+
 }

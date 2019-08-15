@@ -5,10 +5,13 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.Optional;
 
-public interface StudentQuizDetailRepository extends MongoRepository<StudentQuizDetail, String> {
+public interface StudentQuizDetailRepository
+  extends MongoRepository<StudentQuizDetail, String> {
 
   Optional<StudentQuizDetail> findByIdAndDeletedFalse(String id);
 
-  Optional<StudentQuizDetail> findTopByStudentQuizIdAndDeletedFalseOrderByCreatedAtDesc(String studentQuizId);
+  Optional<StudentQuizDetail> findTopByStudentQuizIdAndDeletedFalseOrderByCreatedAtDesc(
+    String studentQuizId
+  );
 
 }

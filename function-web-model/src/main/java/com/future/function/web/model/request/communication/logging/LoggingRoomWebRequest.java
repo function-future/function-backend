@@ -10,21 +10,21 @@ import org.hibernate.validator.constraints.NotEmpty;
 
 import java.util.List;
 
-/**
- * Author : Ricky Kennedy
- * Created At : 23:12 27/07/2019
- */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class LoggingRoomWebRequest {
+
   @Title(message = "Invalid Title")
   private String title;
 
-  @Length(min = 1, max = 200, message = "Length")
+  @Length(min = 1,
+          max = 200,
+          message = "Length")
   private String description;
 
   @NotEmpty(message = "NotEmpty")
   private List<String> members;
+
 }

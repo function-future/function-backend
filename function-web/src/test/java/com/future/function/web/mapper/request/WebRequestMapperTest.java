@@ -22,57 +22,57 @@ import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class WebRequestMapperTest {
-  
+
   private static final String VALID_JSON = "{\"code\":1,\"email\":\"email\"}";
-  
+
   private static final String INVALID_JSON = "{}";
-  
+
   private static final DummyData DUMMY_DATA = new DummyData(1, "email");
-  
+
   @Mock
   private ObjectMapper objectMapper;
-  
+
   @InjectMocks
   private WebRequestMapper requestMapper;
-  
+
   @Before
   public void setUp() {}
-  
+
   @After
   public void tearDown() {
-    
+
     verifyNoMoreInteractions(objectMapper);
   }
-  
+
   @Test
   public void testGivenValidJsonByParsingToDummyDataClassReturnDummyDataObject()
     throws Exception {
-    
+
     when(objectMapper.readValue(VALID_JSON, DummyData.class)).thenReturn(
       DUMMY_DATA);
-    
+
     assertThat(
       requestMapper.toWebRequestObject(VALID_JSON, DummyData.class)).isEqualTo(
       DUMMY_DATA);
-    
+
     verify(objectMapper).readValue(VALID_JSON, DummyData.class);
   }
-  
+
   @Test
   public void testGivenInvalidJsonByParsingToDummyDataClassReturnBadRequestException()
     throws Exception {
-    
+
     when(objectMapper.readValue(INVALID_JSON, DummyData.class)).thenThrow(
       new IOException());
-    
+
     catchException(
       () -> requestMapper.toWebRequestObject(INVALID_JSON, DummyData.class));
-    
+
     assertThat(caughtException().getClass()).isEqualTo(
       BadRequestException.class);
     assertThat(caughtException().getMessage()).isEqualTo("Bad Request");
-    
+
     verify(objectMapper).readValue(INVALID_JSON, DummyData.class);
   }
-  
+
 }

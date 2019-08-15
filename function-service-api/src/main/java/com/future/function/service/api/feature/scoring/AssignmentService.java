@@ -1,23 +1,23 @@
 package com.future.function.service.api.feature.scoring;
 
-import com.future.function.model.entity.feature.core.User;
 import com.future.function.model.entity.feature.scoring.Assignment;
 import com.future.function.model.entity.feature.scoring.Room;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-/**
- * Interface to act as Assignment Service API
- */
 public interface AssignmentService {
 
-  Page<Assignment> findAllByBatchCodeAndPageable(String batchCode, Pageable pageable);
+  Page<Assignment> findAllByBatchCodeAndPageable(
+    String batchCode, Pageable pageable
+  );
 
   Assignment findById(String id);
 
   Page<Room> findAllRoomsByAssignmentId(String assignmentId, Pageable pageable);
 
-    Page<Room> findAllRoomsByStudentId(String studentId, Pageable pageable, String userId);
+  Page<Room> findAllRoomsByStudentId(
+    String studentId, Pageable pageable, String userId
+  );
 
   Room findRoomById(String id, String studentId);
 

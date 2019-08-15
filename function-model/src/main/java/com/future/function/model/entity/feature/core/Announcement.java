@@ -15,9 +15,6 @@ import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.List;
 
-/**
- * Entity representation for announcements.
- */
 @Data
 @Builder
 @NoArgsConstructor

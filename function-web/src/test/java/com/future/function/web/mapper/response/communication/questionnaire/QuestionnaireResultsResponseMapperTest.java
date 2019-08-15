@@ -18,12 +18,7 @@ import org.springframework.data.domain.PageImpl;
 import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
 
-/**
- * Author: ricky.kennedy
- * Created At: 2:08 PM 7/25/2019
- */
 public class QuestionnaireResultsResponseMapperTest {
 
   private static final String URL_PREFIX = "urlPrefix";
@@ -57,8 +52,12 @@ public class QuestionnaireResultsResponseMapperTest {
   private static final User MEMBER_1 = User.builder()
     .id(MEMBER_ID_1)
     .name(MEMBER_NAME_1)
-    .pictureV2(FileV2.builder().thumbnailUrl(THUMBNAIL_URL).build())
-    .batch(Batch.builder().id(BATCH_ID).build())
+    .pictureV2(FileV2.builder()
+                 .thumbnailUrl(THUMBNAIL_URL)
+                 .build())
+    .batch(Batch.builder()
+             .id(BATCH_ID)
+             .build())
     .role(Role.STUDENT)
     .university(UNIVERSITY)
     .build();
@@ -66,7 +65,9 @@ public class QuestionnaireResultsResponseMapperTest {
   private static final User MEMBER_2 = User.builder()
     .id(MEMBER_ID_2)
     .name(MEMBER_NAME_2)
-    .pictureV2(FileV2.builder().thumbnailUrl(THUMBNAIL_URL).build())
+    .pictureV2(FileV2.builder()
+                 .thumbnailUrl(THUMBNAIL_URL)
+                 .build())
     .role(Role.MENTOR)
     .build();
 
@@ -86,42 +87,64 @@ public class QuestionnaireResultsResponseMapperTest {
 
   @Before
   public void setUp() {
+
   }
 
   @After
   public void tearDown() {
+
   }
 
   @Test
   public void toPagingUserSummaryResponse() {
+
     PagingResponse<UserSummaryResponse> data =
       QuestionnaireResultsResponseMapper.toPagingUserSummaryResponse(
-        new PageImpl<>(Arrays.asList(USER_SUMMARY_1, USER_SUMMARY_2), PageHelper.toPageable(1, 2), 2),
-        URL_PREFIX
-    );
+        new PageImpl<>(
+          Arrays.asList(USER_SUMMARY_1, USER_SUMMARY_2),
+          PageHelper.toPageable(1, 2), 2
+        ), URL_PREFIX);
 
     assertThat(data).isNotNull();
     assertThat(data.getCode()).isEqualTo(200);
-    assertThat(data.getData().get(0).getId()).isEqualTo(USER_SUMMARY_ID_1);
-    assertThat(data.getData().get(0).getMember().getId()).isEqualTo(MEMBER_ID_1);
-    assertThat(data.getData().get(0).getRating()).isEqualTo(SCORE.getAverage());
-    assertThat(data.getData().get(1).getId()).isEqualTo(USER_SUMMARY_ID_2);
-    assertThat(data.getData().get(1).getMember().getId()).isEqualTo(MEMBER_ID_2);
-    assertThat(data.getData().get(1).getRating()).isEqualTo(SCORE.getAverage());
+    assertThat(data.getData()
+                 .get(0)
+                 .getId()).isEqualTo(USER_SUMMARY_ID_1);
+    assertThat(data.getData()
+                 .get(0)
+                 .getMember()
+                 .getId()).isEqualTo(MEMBER_ID_1);
+    assertThat(data.getData()
+                 .get(0)
+                 .getRating()).isEqualTo(SCORE.getAverage());
+    assertThat(data.getData()
+                 .get(1)
+                 .getId()).isEqualTo(USER_SUMMARY_ID_2);
+    assertThat(data.getData()
+                 .get(1)
+                 .getMember()
+                 .getId()).isEqualTo(MEMBER_ID_2);
+    assertThat(data.getData()
+                 .get(1)
+                 .getRating()).isEqualTo(SCORE.getAverage());
   }
 
   @Test
   public void toDataResponseUserSummaryResponse() {
+
     DataResponse<UserSummaryResponse> data =
       QuestionnaireResultsResponseMapper.toDataResponseUserSummaryResponse(
-        USER_SUMMARY_1,
-        URL_PREFIX
-      );
+        USER_SUMMARY_1, URL_PREFIX);
 
     assertThat(data).isNotNull();
     assertThat(data.getCode()).isEqualTo(200);
-    assertThat(data.getData().getId()).isEqualTo(USER_SUMMARY_ID_1);
-    assertThat(data.getData().getMember().getId()).isEqualTo(MEMBER_ID_1);
-    assertThat(data.getData().getRating()).isEqualTo(SCORE.getAverage());
+    assertThat(data.getData()
+                 .getId()).isEqualTo(USER_SUMMARY_ID_1);
+    assertThat(data.getData()
+                 .getMember()
+                 .getId()).isEqualTo(MEMBER_ID_1);
+    assertThat(data.getData()
+                 .getRating()).isEqualTo(SCORE.getAverage());
   }
+
 }

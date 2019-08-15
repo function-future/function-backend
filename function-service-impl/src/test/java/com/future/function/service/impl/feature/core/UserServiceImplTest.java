@@ -95,8 +95,8 @@ public class UserServiceImplTest {
   @Mock
   private ResourceService resourceService;
 
-    @Mock
-    private ScoringMediatorService scoringMediatorService;
+  @Mock
+  private ScoringMediatorService scoringMediatorService;
 
   @Mock
   private BCryptPasswordEncoder encoder;
@@ -135,8 +135,9 @@ public class UserServiceImplTest {
   @After
   public void tearDown() {
 
-    verifyNoMoreInteractions(
-            batchService, userRepository, resourceService, scoringMediatorService, encoder);
+    verifyNoMoreInteractions(batchService, userRepository, resourceService,
+                             scoringMediatorService, encoder
+    );
   }
 
   @Test
@@ -219,32 +220,35 @@ public class UserServiceImplTest {
   public void testGivenBatchCodeAndRoleStudentByGettingUsersWithinBatchReturnStudentsPage() {
 
     User additionalUser = User.builder()
-        .role(Role.STUDENT)
-        .email(EMAIL_STUDENT)
-        .name(NAME_STUDENT)
-        .password(PASSWORD)
-        .phone(PHONE)
-        .address(ADDRESS)
-        .pictureV2(PICTURE)
-        .batch(BATCH)
-        .university(UNIVERSITY)
-        .build();
+      .role(Role.STUDENT)
+      .email(EMAIL_STUDENT)
+      .name(NAME_STUDENT)
+      .password(PASSWORD)
+      .phone(PHONE)
+      .address(ADDRESS)
+      .pictureV2(PICTURE)
+      .batch(BATCH)
+      .university(UNIVERSITY)
+      .build();
     additionalUser.setDeleted(false);
 
     List<User> studentsList = Arrays.asList(userStudent, additionalUser);
 
-    when(userRepository.findAllByBatchAndRoleAndDeletedFalse(BATCH, Role.STUDENT, PAGEABLE)).thenReturn(
-        PageHelper.toPage(studentsList, PAGEABLE));
+    when(
+      userRepository.findAllByBatchAndRoleAndDeletedFalse(BATCH, Role.STUDENT,
+                                                          PAGEABLE
+      )).thenReturn(PageHelper.toPage(studentsList, PAGEABLE));
 
     when(batchService.getBatchByCode(NUMBER)).thenReturn(BATCH);
 
     Page<User> foundUserStudentsPage = userService.getStudentsWithinBatch(
-        NUMBER, PAGEABLE);
+      NUMBER, PAGEABLE);
 
     assertThat(foundUserStudentsPage).isNotNull();
     assertThat(foundUserStudentsPage.getContent()).isEqualTo(studentsList);
 
-    verify(userRepository).findAllByBatchAndRoleAndDeletedFalse(BATCH, Role.STUDENT, PAGEABLE);
+    verify(userRepository).findAllByBatchAndRoleAndDeletedFalse(
+      BATCH, Role.STUDENT, PAGEABLE);
     verify(batchService).getBatchByCode(NUMBER);
     verifyZeroInteractions(resourceService, encoder);
   }
@@ -253,12 +257,13 @@ public class UserServiceImplTest {
   public void testGivenNullBatchCodeAndRoleStudentByGettingUsersWithinBatchReturnStudentsPage() {
 
     Page<User> foundUserStudentsPage = userService.getStudentsWithinBatch(
-        null, PAGEABLE);
+      null, PAGEABLE);
 
     assertThat(foundUserStudentsPage).isNotNull();
     assertThat(foundUserStudentsPage.getTotalElements()).isEqualTo(0);
 
-    verifyZeroInteractions(userRepository, batchService, resourceService, encoder);
+    verifyZeroInteractions(
+      userRepository, batchService, resourceService, encoder);
   }
 
   @Test
@@ -307,7 +312,8 @@ public class UserServiceImplTest {
                            .replace(" ", "") + "functionapp";
     when(encoder.encode(rawPassword)).thenReturn(PASSWORD);
     when(userRepository.save(userStudent)).thenReturn(userStudent);
-      when(scoringMediatorService.createQuizAndAssignmentsByStudent(userStudent)).thenReturn(userStudent);
+    when(scoringMediatorService.createQuizAndAssignmentsByStudent(
+      userStudent)).thenReturn(userStudent);
 
     User createdUserStudent = userService.createUser(userStudent);
 
@@ -320,7 +326,8 @@ public class UserServiceImplTest {
     verify(batchService).getBatchByCode(NUMBER);
     verify(resourceService).markFilesUsed(FILE_IDS, true);
     verify(resourceService).getFile(PICTURE_ID);
-      verify(scoringMediatorService).createQuizAndAssignmentsByStudent(userStudent);
+    verify(scoringMediatorService).createQuizAndAssignmentsByStudent(
+      userStudent);
     verify(encoder).encode(rawPassword);
     verify(userRepository).save(userStudent);
   }
@@ -364,7 +371,8 @@ public class UserServiceImplTest {
                            .replace(" ", "") + "functionapp";
     when(encoder.encode(PASSWORD)).thenReturn(PASSWORD);
     when(userRepository.save(userMentor)).thenReturn(userMentor);
-      when(scoringMediatorService.createQuizAndAssignmentsByStudent(userMentor)).thenReturn(userMentor);
+    when(scoringMediatorService.createQuizAndAssignmentsByStudent(
+      userMentor)).thenReturn(userMentor);
 
     User createdUserMentor = userService.createUser(userMentor);
 
@@ -374,7 +382,8 @@ public class UserServiceImplTest {
 
     verify(resourceService).markFilesUsed(FILE_IDS, true);
     verify(resourceService).getFile(PICTURE_ID);
-      verify(scoringMediatorService).createQuizAndAssignmentsByStudent(userMentor);
+    verify(scoringMediatorService).createQuizAndAssignmentsByStudent(
+      userMentor);
     verify(encoder).encode(rawPassword);
     verify(userRepository).save(userMentor);
     verifyZeroInteractions(batchService);
@@ -386,10 +395,10 @@ public class UserServiceImplTest {
     String rawPassword = userMentor.getName()
                            .toLowerCase()
                            .replace(" ", "") + "functionapp";
-    when(encoder.encode(rawPassword)).thenReturn(
-      PASSWORD);
+    when(encoder.encode(rawPassword)).thenReturn(PASSWORD);
     when(userRepository.save(userMentor)).thenReturn(userMentor);
-      when(scoringMediatorService.createQuizAndAssignmentsByStudent(userMentor)).thenReturn(userMentor);
+    when(scoringMediatorService.createQuizAndAssignmentsByStudent(
+      userMentor)).thenReturn(userMentor);
 
     User createdUserMentor = userService.createUser(userMentor);
 
@@ -398,7 +407,8 @@ public class UserServiceImplTest {
 
     verify(encoder).encode(rawPassword);
     verify(userRepository).save(userMentor);
-      verify(scoringMediatorService).createQuizAndAssignmentsByStudent(userMentor);
+    verify(scoringMediatorService).createQuizAndAssignmentsByStudent(
+      userMentor);
     verifyZeroInteractions(batchService, resourceService);
   }
 
@@ -528,8 +538,9 @@ public class UserServiceImplTest {
   public void testGivenBatchCodeByGettingStudentsByBatchCodeReturnListOfStudents() {
 
     when(batchService.getBatchByCode(NUMBER)).thenReturn(BATCH);
-    when(userRepository.findAllByRoleAndBatchAndDeletedFalse(Role.STUDENT, BATCH)).thenReturn(
-      Collections.singletonList(userStudent));
+    when(userRepository.findAllByRoleAndBatchAndDeletedFalse(Role.STUDENT,
+                                                             BATCH
+    )).thenReturn(Collections.singletonList(userStudent));
 
     List<User> foundStudents = userService.getStudentsByBatchCode(NUMBER);
 
@@ -539,7 +550,8 @@ public class UserServiceImplTest {
     assertThat(foundStudents.get(0)).isEqualTo(userStudent);
 
     verify(batchService).getBatchByCode(NUMBER);
-    verify(userRepository).findAllByRoleAndBatchAndDeletedFalse(Role.STUDENT, BATCH);
+    verify(userRepository).findAllByRoleAndBatchAndDeletedFalse(
+      Role.STUDENT, BATCH);
     verifyZeroInteractions(resourceService, encoder);
   }
 
@@ -573,8 +585,9 @@ public class UserServiceImplTest {
   public void testGivenBatchCodeWithNoStudentRegisteredForThatCodeByGettingStudentsByBatchCodeReturnEmptyList() {
 
     when(batchService.getBatchByCode(NUMBER)).thenReturn(BATCH);
-    when(userRepository.findAllByRoleAndBatchAndDeletedFalse(Role.STUDENT, BATCH)).thenReturn(
-      Collections.emptyList());
+    when(userRepository.findAllByRoleAndBatchAndDeletedFalse(Role.STUDENT,
+                                                             BATCH
+    )).thenReturn(Collections.emptyList());
 
     List<User> foundStudents = userService.getStudentsByBatchCode(NUMBER);
 
@@ -582,7 +595,8 @@ public class UserServiceImplTest {
     assertThat(foundStudents).isEmpty();
 
     verify(batchService).getBatchByCode(NUMBER);
-    verify(userRepository).findAllByRoleAndBatchAndDeletedFalse(Role.STUDENT, BATCH);
+    verify(userRepository).findAllByRoleAndBatchAndDeletedFalse(
+      Role.STUDENT, BATCH);
     verifyZeroInteractions(resourceService, encoder);
   }
 
@@ -604,7 +618,8 @@ public class UserServiceImplTest {
   @Test
   public void testGivenNonExistingEmailByGettingUserByEmailReturnNotFoundException() {
 
-    when(userRepository.findByEmailAndDeletedFalse(EMAIL_MENTOR)).thenReturn(Optional.empty());
+    when(userRepository.findByEmailAndDeletedFalse(EMAIL_MENTOR)).thenReturn(
+      Optional.empty());
 
     catchException(() -> userService.getUserByEmail(EMAIL_MENTOR));
 
@@ -708,9 +723,9 @@ public class UserServiceImplTest {
 
     String namePart = "AM";
     List<User> users = Arrays.asList(userStudent, userMentor);
-    when(userRepository.findAllByNameContainsIgnoreCaseAndDeletedFalse(
-      namePart, PAGEABLE)).thenReturn(new PageImpl<>(
-      users, PAGEABLE, users.size()));
+    when(userRepository.findAllByNameContainsIgnoreCaseAndDeletedFalse(namePart,
+                                                                       PAGEABLE
+    )).thenReturn(new PageImpl<>(users, PAGEABLE, users.size()));
 
     Page<User> retrievedUsers = userService.getUsersByNameContainsIgnoreCase(
       namePart, PAGEABLE);

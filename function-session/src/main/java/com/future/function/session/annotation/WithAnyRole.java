@@ -10,9 +10,9 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(value = { ElementType.TYPE, ElementType.METHOD, ElementType.PARAMETER })
 public @interface WithAnyRole {
-  
+
   Role[] roles() default {};
-  
+
   boolean noUnauthorized() default false;
-  
+
 }

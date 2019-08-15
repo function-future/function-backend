@@ -12,7 +12,10 @@ public interface QuestionRepository extends MongoRepository<Question, String> {
 
   Optional<Question> findByIdAndDeletedFalse(String id);
 
-  Page<Question> findAllByQuestionBankIdAndDeletedFalse(String questionBankId, Pageable pageable);
+  Page<Question> findAllByQuestionBankIdAndDeletedFalse(
+    String questionBankId, Pageable pageable
+  );
 
   List<Question> findAllByQuestionBankIdAndDeletedFalse(String questionBankId);
+
 }

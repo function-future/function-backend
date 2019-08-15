@@ -18,40 +18,40 @@ import static org.assertj.core.api.Assertions.assertThat;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = TestApplication.class)
 public class DiscussionRepositoryTest {
-  
+
   private static final Pageable PAGEABLE = new PageRequest(0, 10);
-  
+
   private static final String COURSE_ID = "course-id";
-  
+
   private static final String BATCH_ID = "batch-id";
-  
+
   @Autowired
   private DiscussionRepository discussionRepository;
-  
+
   @Before
   public void setUp() {
-    
+
     Discussion discussion = Discussion.builder()
       .courseId(COURSE_ID)
       .batchId(BATCH_ID)
       .build();
-    
+
     discussionRepository.save(discussion);
   }
-  
+
   @After
   public void tearDown() {
-    
+
     discussionRepository.deleteAll();
   }
-  
+
   @Test
   public void testGivenMethodCallByFindingDiscussionsByCourseIdAndBatchIdReturnPageOfDiscussion() {
-    
+
     Page<Discussion> discussions =
       discussionRepository.findAllByCourseIdAndBatchIdOrderByCreatedAtDesc(
         COURSE_ID, BATCH_ID, PAGEABLE);
-    
+
     assertThat(discussions).isNotNull();
     assertThat(discussions.getContent()).isNotEmpty();
     assertThat(discussions.getContent()
@@ -61,21 +61,21 @@ public class DiscussionRepositoryTest {
                  .get(0)
                  .getBatchId()).isEqualTo(BATCH_ID);
   }
-  
+
   @Test
   public void testGivenMethodCallByDeletingDiscussionsByCourseIdAndBatchIdReturnSuccessfulDeletion() {
-    
+
     assertThat(
       discussionRepository.findAllByCourseIdAndBatchIdOrderByCreatedAtDesc(
         COURSE_ID, BATCH_ID, PAGEABLE)
         .getContent()).isNotEmpty();
-    
+
     discussionRepository.deleteAllByCourseIdAndBatchId(COURSE_ID, BATCH_ID);
-  
+
     assertThat(
       discussionRepository.findAllByCourseIdAndBatchIdOrderByCreatedAtDesc(
         COURSE_ID, BATCH_ID, PAGEABLE)
         .getContent()).isEmpty();
   }
-  
+
 }

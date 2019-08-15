@@ -4,11 +4,11 @@ import com.future.function.common.enumeration.core.Role;
 import com.future.function.common.exception.ForbiddenException;
 import com.future.function.model.entity.base.BaseEntity;
 import com.future.function.model.entity.feature.core.User;
-import java.util.ArrayList;
-import java.util.Arrays;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.Arrays;
 
 import static com.googlecode.catchexception.CatchException.catchException;
 import static com.googlecode.catchexception.CatchException.caughtException;
@@ -82,30 +82,52 @@ public class AuthorizationHelperTest {
 
   @Test
   public void testGivenUserAndObjectIdAndRoleAndAllowedRolesReturnTrue() {
-    User user = User.builder().id("id").role(Role.STUDENT).build();
-    assertThat(AuthorizationHelper.isUserAuthorizedForAccess(user, "id", AuthorizationHelper.getScoringAllowedRoles()))
-        .isTrue();
+
+    User user = User.builder()
+      .id("id")
+      .role(Role.STUDENT)
+      .build();
+    assertThat(AuthorizationHelper.isUserAuthorizedForAccess(user, "id",
+                                                             AuthorizationHelper.getScoringAllowedRoles()
+    )).isTrue();
   }
 
   @Test
   public void testGivenUserAndObjectIdNotEqualAndRoleAndAllowedRolesThrowForbiddenException() {
-    User user = User.builder().id("id").role(Role.STUDENT).build();
-    catchException(() -> AuthorizationHelper.isUserAuthorizedForAccess(user, "abc",  AuthorizationHelper
-        .getScoringAllowedRoles()));
-    assertThat(caughtException().getClass()).isEqualTo(ForbiddenException.class);
+
+    User user = User.builder()
+      .id("id")
+      .role(Role.STUDENT)
+      .build();
+    catchException(
+      () -> AuthorizationHelper.isUserAuthorizedForAccess(user, "abc",
+                                                          AuthorizationHelper.getScoringAllowedRoles()
+      ));
+    assertThat(caughtException().getClass()).isEqualTo(
+      ForbiddenException.class);
   }
 
   @Test
   public void testGivenUserAndObjectIdAndRoleAndAllowedRolesNotContainThrowForbiddenException() {
-    User user = User.builder().id("id").role(Role.STUDENT).build();
-    catchException(() -> AuthorizationHelper.isUserAuthorizedForAccess(user, "judgeId", Role.JUDGE));
-    assertThat(caughtException().getClass()).isEqualTo(ForbiddenException.class);
+
+    User user = User.builder()
+      .id("id")
+      .role(Role.STUDENT)
+      .build();
+    catchException(
+      () -> AuthorizationHelper.isUserAuthorizedForAccess(user, "judgeId",
+                                                          Role.JUDGE
+      ));
+    assertThat(caughtException().getClass()).isEqualTo(
+      ForbiddenException.class);
   }
 
   @Test
   public void testGetScoringAllowedRoles() {
+
     Role[] roles = AuthorizationHelper.getScoringAllowedRoles();
-    assertThat(Arrays.asList(roles)).isEqualTo(Arrays.asList(Role.ADMIN, Role.JUDGE, Role.MENTOR));
+    assertThat(Arrays.asList(roles)).isEqualTo(
+      Arrays.asList(Role.ADMIN, Role.JUDGE, Role.MENTOR));
   }
 
   @Test

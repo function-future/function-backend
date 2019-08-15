@@ -36,67 +36,67 @@ public class ErrorHelperTest {
     .batch("1")
     .university("university")
     .build();
-  
+
   private static ValidatorFactory validatorFactory;
-  
+
   private static Validator validator;
-  
+
   @BeforeClass
   public static void setUpClass() {
-    
+
     validatorFactory = Validation.buildDefaultValidatorFactory();
     validator = validatorFactory.getValidator();
   }
-  
+
   @AfterClass
   public static void tearDownClass() {
-    
+
     validatorFactory.close();
   }
-  
+
   @Before
   public void setUp() {}
-  
+
   @After
   public void tearDown() {}
-  
+
   @Test
   public void testGivenSetOfConstraintViolationsByMappingErrorsReturnMapOfErrors() {
-  
+
     catchException(() -> throwConstraintViolationException(DUMMY_DATA));
-  
+
     Set<ConstraintViolation<?>> violations = caughtException(
       ConstraintViolationException.class).getConstraintViolations();
     Map<String, List<String>> errors = ErrorHelper.toErrors(violations);
-  
+
     assertThat(errors).isNotEmpty();
     assertThat(errors.keySet()
                  .size()).isEqualTo(2);
     assertThat(errors.get("number")).isEqualTo(
       Collections.singletonList("Min"));
     assertThat(errors.get("email")).contains("NotBlank", "Email");
-    
+
   }
-  
+
   private void throwConstraintViolationException(Object object) {
-    
+
     throw new ConstraintViolationException(validator.validate(object));
   }
-  
+
   @Test
   public void testGivenSetOfConstraintViolationsWithNotBlankPropertyPathByMappingErrorsReturnMapOfErrorsWithGettingFieldValue() {
-  
+
     catchException(() -> throwConstraintViolationException(DUMMY_DATA_USER));
-  
+
     Set<ConstraintViolation<?>> violations = caughtException(
       ConstraintViolationException.class).getConstraintViolations();
     Map<String, List<String>> errors = ErrorHelper.toErrors(violations);
-  
+
     assertThat(errors).isNotEmpty();
     assertThat(errors.keySet()
                  .size()).isEqualTo(1);
     assertThat(errors.get("role")).isEqualTo(
       Collections.singletonList("OnlyStudentCanHaveBatchAndUniversity"));
   }
-  
+
 }

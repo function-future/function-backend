@@ -15,51 +15,51 @@ import java.util.stream.Collectors;
 
 @Component
 public class ActivityBlogRequestMapper {
-  
+
   private final RequestValidator validator;
-  
+
   @Autowired
   public ActivityBlogRequestMapper(RequestValidator validator) {
-    
+
     this.validator = validator;
   }
-  
+
   public ActivityBlog toActivityBlog(
     String email, ActivityBlogWebRequest request
   ) {
-    
+
     return this.toActivityBlog(email, null, request);
   }
-  
+
   public ActivityBlog toActivityBlog(
     String email, String activityBlogId, ActivityBlogWebRequest request
   ) {
-    
+
     return this.toValidatedActivityBlog(email, activityBlogId, request);
   }
-  
+
   private ActivityBlog toValidatedActivityBlog(
     String email, String activityBlogId, ActivityBlogWebRequest request
   ) {
-    
+
     validator.validate(request);
-    
+
     ActivityBlog activityBlog = ActivityBlog.builder()
       .title(request.getTitle())
       .description(request.getDescription())
       .files(this.getFileV2s(request))
       .user(this.buildUser(email))
       .build();
-    
+
     if (activityBlogId != null) {
       activityBlog.setId(activityBlogId);
     }
-    
+
     return activityBlog;
   }
-  
+
   private List<FileV2> getFileV2s(ActivityBlogWebRequest request) {
-    
+
     return Optional.of(request)
       .map(ActivityBlogWebRequest::getFiles)
       .orElseGet(Collections::emptyList)
@@ -67,19 +67,19 @@ public class ActivityBlogRequestMapper {
       .map(this::buildFileV2)
       .collect(Collectors.toList());
   }
-  
-  private User buildUser(String email) {
-    
-    return User.builder()
-      .email(email)
-      .build();
-  }
-  
+
   private FileV2 buildFileV2(String id) {
-    
+
     return FileV2.builder()
       .id(id)
       .build();
   }
-  
+
+  private User buildUser(String email) {
+
+    return User.builder()
+      .email(email)
+      .build();
+  }
+
 }

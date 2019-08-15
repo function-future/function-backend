@@ -19,12 +19,7 @@ import org.springframework.http.HttpStatus;
 import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
 
-/**
- * Author: ricky.kennedy
- * Created At: 1:41 PM 7/25/2019
- */
 public class QuestionnaireParticipantResponseMapperTest {
 
   private static final String URL_PREFIX = "urlPrefix";
@@ -43,15 +38,18 @@ public class QuestionnaireParticipantResponseMapperTest {
 
   private static final String UNIVERSITY = "itb";
 
-  private static final String QUESTIONNAIRE_PARTICIPANT_ID = "questionniareParticipantId";
+  private static final String QUESTIONNAIRE_PARTICIPANT_ID =
+    "questionniareParticipantId";
 
-  private static final String QUESTIONNAIRE_PARTICIPANT_ID_2 = "questionniareParticipantId2";
+  private static final String QUESTIONNAIRE_PARTICIPANT_ID_2 =
+    "questionniareParticipantId2";
 
   private static final String QUESTIONNAIRE_ID_1 = "questionnaireId1";
 
   private static final String QUESTIONNAIRE_TITLE = "questionnaireTitle";
 
-  private static final String QUESTIONNAIRE_DESCRIPTION = "questionnaireDescription";
+  private static final String QUESTIONNAIRE_DESCRIPTION =
+    "questionnaireDescription";
 
   private static final Long START_DATE = Long.valueOf(0);
 
@@ -60,8 +58,12 @@ public class QuestionnaireParticipantResponseMapperTest {
   private static final User MEMBER_1 = User.builder()
     .id(MEMBER_ID_1)
     .name(MEMBER_NAME_1)
-    .pictureV2(FileV2.builder().thumbnailUrl(THUMBNAIL_URL).build())
-    .batch(Batch.builder().id(BATCH_ID).build())
+    .pictureV2(FileV2.builder()
+                 .thumbnailUrl(THUMBNAIL_URL)
+                 .build())
+    .batch(Batch.builder()
+             .id(BATCH_ID)
+             .build())
     .role(Role.STUDENT)
     .university(UNIVERSITY)
     .build();
@@ -69,7 +71,9 @@ public class QuestionnaireParticipantResponseMapperTest {
   private static final User MEMBER_2 = User.builder()
     .id(MEMBER_ID_2)
     .name(MEMBER_NAME_2)
-    .pictureV2(FileV2.builder().thumbnailUrl(THUMBNAIL_URL).build())
+    .pictureV2(FileV2.builder()
+                 .thumbnailUrl(THUMBNAIL_URL)
+                 .build())
     .role(Role.MENTOR)
     .build();
 
@@ -99,36 +103,49 @@ public class QuestionnaireParticipantResponseMapperTest {
 
   @Test
   public void toPagingParticipantDescriptionResponse() {
+
     PagingResponse<QuestionnaireParticipantDescriptionResponse> data =
       QuestionnaireParticipantResponseMapper.toPagingParticipantDescriptionResponse(
-        new PageImpl<>(Arrays.asList(QUESTIONNAIRE_PARTICIPANT, QUESTIONNAIRE_PARTICIPANT_2),
+        new PageImpl<>(
+          Arrays.asList(QUESTIONNAIRE_PARTICIPANT, QUESTIONNAIRE_PARTICIPANT_2),
           PageHelper.toPageable(1, 2), 2
-        ),
-        URL_PREFIX
-      );
+        ), URL_PREFIX);
 
     assertThat(data).isNotNull();
     assertThat(data.getCode()).isEqualTo(200);
-    assertThat(data.getData().get(0).getId()).isEqualTo(MEMBER_ID_1);
-    assertThat(data.getData().get(0).getParticipantId()).isEqualTo(QUESTIONNAIRE_PARTICIPANT_ID);
-    assertThat(data.getData().get(1).getId()).isEqualTo(MEMBER_ID_2);
-    assertThat(data.getData().get(1).getParticipantId()).isEqualTo(QUESTIONNAIRE_PARTICIPANT_ID_2);
+    assertThat(data.getData()
+                 .get(0)
+                 .getId()).isEqualTo(MEMBER_ID_1);
+    assertThat(data.getData()
+                 .get(0)
+                 .getParticipantId()).isEqualTo(QUESTIONNAIRE_PARTICIPANT_ID);
+    assertThat(data.getData()
+                 .get(1)
+                 .getId()).isEqualTo(MEMBER_ID_2);
+    assertThat(data.getData()
+                 .get(1)
+                 .getParticipantId()).isEqualTo(QUESTIONNAIRE_PARTICIPANT_ID_2);
   }
 
   @Test
   public void toDataResponseQuestionnaireParticipantResponse() {
+
     DataResponse<QuestionnaireParticipantResponse> data =
       QuestionnaireParticipantResponseMapper.toDataResponseQuestionnaireParticipantResponse(
-        QUESTIONNAIRE_PARTICIPANT,
-        HttpStatus.OK
-      );
+        QUESTIONNAIRE_PARTICIPANT, HttpStatus.OK);
 
     assertThat(data).isNotNull();
     assertThat(data.getCode()).isEqualTo(200);
-    assertThat(data.getData().getId()).isEqualTo(QUESTIONNAIRE_PARTICIPANT_ID);
-    assertThat(data.getData().getQuestionnaireId()).isEqualTo(QUESTIONNAIRE_ID_1);
-    assertThat(data.getData().getMemberId()).isEqualTo(MEMBER_ID_1);
-    assertThat(data.getData().getParticipantType()).isEqualTo(ParticipantType.APPRAISER.toString());
+    assertThat(data.getData()
+                 .getId()).isEqualTo(QUESTIONNAIRE_PARTICIPANT_ID);
+    assertThat(data.getData()
+                 .getQuestionnaireId()).isEqualTo(QUESTIONNAIRE_ID_1);
+    assertThat(data.getData()
+                 .getMemberId()).isEqualTo(MEMBER_ID_1);
+    assertThat(data.getData()
+                 .getParticipantType()).isEqualTo(
+      ParticipantType.APPRAISER.toString());
 
   }
+
 }

@@ -3,11 +3,15 @@ package com.future.function.service.impl.feature.scoring;
 import com.future.function.common.enumeration.core.Role;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.User;
+import com.future.function.service.api.feature.scoring.AssignmentService;
+import com.future.function.service.api.feature.scoring.QuizService;
+import com.future.function.service.api.feature.scoring.RoomService;
+import com.future.function.service.api.feature.scoring.ScoringMediatorService;
+import com.future.function.service.api.feature.scoring.StudentQuizService;
 import com.future.function.model.entity.feature.scoring.Assignment;
 import com.future.function.model.entity.feature.scoring.Quiz;
 import com.future.function.model.entity.feature.scoring.Room;
 import com.future.function.model.entity.feature.scoring.StudentQuiz;
-import com.future.function.service.api.feature.scoring.*;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,19 +28,20 @@ import java.util.Optional;
 @Slf4j
 public class ScoringMediatorServiceImpl implements ScoringMediatorService {
 
-    private static final Pageable MAX_PAGEABLE = new PageRequest(0, Integer.MAX_VALUE);
+  private static final Pageable MAX_PAGEABLE = new PageRequest(
+    0, Integer.MAX_VALUE);
 
-    @Autowired
-    private QuizService quizService;
+  @Autowired
+  private QuizService quizService;
 
-    @Autowired
-    private StudentQuizService studentQuizService;
+  @Autowired
+  private StudentQuizService studentQuizService;
 
-    @Autowired
-    private AssignmentService assignmentService;
+  @Autowired
+  private AssignmentService assignmentService;
 
-    @Autowired
-    private RoomService roomService;
+  @Autowired
+  private RoomService roomService;
 
     @Override
     public User createQuizAndAssignmentsByStudent(User user) {

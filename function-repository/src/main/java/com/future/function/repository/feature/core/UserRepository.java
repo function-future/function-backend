@@ -10,55 +10,20 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Repository class for user database operations.
- */
 public interface UserRepository extends MongoRepository<User, String> {
 
-  /**
-   * Finds specific user by email.
-   *
-   * @param email Email of user to be found.
-   *
-   * @return {@code Optional<User>} - Optional of user found, if any exists;
-   * otherwise return {@link java.util.Optional#empty()}
-   */
   Optional<User> findByEmailAndDeletedFalse(String email);
-  
+
   Page<User> findAllByRoleAndNameContainsIgnoreCaseAndDeletedFalse(
     Role role, String name, Pageable pageable
   );
 
-  /**
-   * Finds users by batch, role and page data
-   * ({@link org.springframework.data.domain.Pageable}).
-   *
-   * @param batch    Batch of the users.
-   * @param role     Enum of available roles.
-   * @param pageable Pageable object for paging data.
-   *
-   * @return {@code Page<User>} - Page of users found in database.
-   */
-  Page<User> findAllByBatchAndRoleAndDeletedFalse(Batch batch, Role role, Pageable pageable);
+  Page<User> findAllByBatchAndRoleAndDeletedFalse(
+    Batch batch, Role role, Pageable pageable
+  );
 
-  /**
-   * Finds users by role and batch data.
-   *
-   * @param role  Enum of available roles.
-   * @param batch Batch object obtained from batchCode.
-   *
-   * @return {@code List<User>} - List of users (students) found in database.
-   */
   List<User> findAllByRoleAndBatchAndDeletedFalse(Role role, Batch batch);
 
-  /**
-   * Finds user by name containing search query and matches search query
-   * case-insensitively.
-   *
-   * @param name Search query of name of user.
-   *
-   * @return {@code List<User>} - List or users found in database.
-   */
   Page<User> findAllByNameContainsIgnoreCaseAndDeletedFalse(
     String name, Pageable pageable
   );

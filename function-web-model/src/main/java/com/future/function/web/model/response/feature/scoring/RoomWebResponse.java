@@ -13,8 +13,11 @@ import lombok.NoArgsConstructor;
 public class RoomWebResponse {
 
   private String id;
+
   private UserWebResponse student;
+
   private AssignmentWebResponse assignment;
+
   private Integer point;
 
 }

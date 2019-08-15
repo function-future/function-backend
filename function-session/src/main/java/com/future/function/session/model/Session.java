@@ -14,17 +14,17 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Session implements Serializable {
-  
+
   @Builder.Default
   private String id = UUID.randomUUID()
     .toString();
-  
+
   private String userId;
-  
+
   private String batchId;
-  
+
   private String email;
-  
+
   private Role role;
-  
+
 }

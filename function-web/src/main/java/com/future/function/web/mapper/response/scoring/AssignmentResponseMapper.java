@@ -6,83 +6,71 @@ import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.feature.scoring.AssignmentWebResponse;
-import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 
+import java.util.Optional;
 import java.util.stream.Collectors;
 
-/**
- * Static class to map Assignment into a proper DataResponse / PagingResponse of AssignmentWebResponse
- */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class AssignmentResponseMapper {
 
-  /**
-   * used to convert assignment into a proper DataResponse of AssignmentWebResponse
-   *
-   * @param assignment
-   * @return DataResponse<AssignmentWebResponse>
-   */
-  public static DataResponse<AssignmentWebResponse> toAssignmentDataResponse(Assignment assignment, String urlPrefix) {
-    return ResponseHelper.toDataResponse(HttpStatus.OK, buildAssignmentWebResponse(assignment, urlPrefix));
+  public static DataResponse<AssignmentWebResponse> toAssignmentDataResponse(
+    Assignment assignment, String urlPrefix
+  ) {
+
+    return ResponseHelper.toDataResponse(
+      HttpStatus.OK, buildAssignmentWebResponse(assignment, urlPrefix));
   }
 
-  /**
-   * used to convert assignment into a DataResponse of Assignment Web Response with specific HttpStatus
-   *
-   * @param httpStatus
-   * @param assignment
-   * @return DataResponse<AssignmentWebResponse> with specific HttpStatus
-   */
-  public static DataResponse<AssignmentWebResponse> toAssignmentDataResponse(HttpStatus httpStatus, Assignment assignment, String urlPrefix) {
-    return ResponseHelper.toDataResponse(httpStatus, buildAssignmentWebResponse(assignment, urlPrefix));
-  }
+  private static AssignmentWebResponse buildAssignmentWebResponse(
+    Assignment assignment, String urlPrefix
+  ) {
 
-  /**
-   * used to convert assignment into a proper AssignmentWebResponse
-   *
-   * @param assignment
-   * @return AsssignmentWebResponse
-   */
-  private static AssignmentWebResponse buildAssignmentWebResponse(Assignment assignment, String urlPrefix) {
     AssignmentWebResponse response = new AssignmentWebResponse();
     BeanUtils.copyProperties(assignment, response);
-    response.setBatchCode(assignment.getBatch().getCode());
+    response.setBatchCode(assignment.getBatch()
+                            .getCode());
     response.setUploadedDate(assignment.getCreatedAt());
     response = setNullableFile(response, assignment, urlPrefix);
     return response;
   }
 
-  private static AssignmentWebResponse setNullableFile(AssignmentWebResponse response, Assignment assignment, String urlPrefix) {
+  private static AssignmentWebResponse setNullableFile(
+    AssignmentWebResponse response, Assignment assignment, String urlPrefix
+  ) {
+
     return Optional.ofNullable(assignment)
-        .map(Assignment::getFile)
-        .map(file -> {
-          response.setFileId(file.getId());
-          response.setFile(urlPrefix.concat(file.getFileUrl()));
-          return response;
-        })
-        .orElse(response);
+      .map(Assignment::getFile)
+      .map(file -> {
+        response.setFileId(file.getId());
+        response.setFile(urlPrefix.concat(file.getFileUrl()));
+        return response;
+      })
+      .orElse(response);
   }
 
-  /**
-   * used to convert page of assignment into a proper PagingResponse of AssignmentWebResponse
-   *
-   * @param data (Page<Assignment>)
-   * @return PagingResponse<AssignmentWebResponse>
-   */
-  public static PagingResponse<AssignmentWebResponse> toAssignmentsPagingResponse(Page<Assignment> data, String urlPrefix) {
+  public static DataResponse<AssignmentWebResponse> toAssignmentDataResponse(
+    HttpStatus httpStatus, Assignment assignment, String urlPrefix
+  ) {
+
+    return ResponseHelper.toDataResponse(
+      httpStatus, buildAssignmentWebResponse(assignment, urlPrefix));
+  }
+
+  public static PagingResponse<AssignmentWebResponse> toAssignmentsPagingResponse(
+    Page<Assignment> data, String urlPrefix
+  ) {
+
     return ResponseHelper.toPagingResponse(
-        HttpStatus.OK,
-        data
-            .getContent()
-            .stream()
-            .map(assignment -> AssignmentResponseMapper.buildAssignmentWebResponse(assignment, urlPrefix))
-            .collect(Collectors.toList()),
-        PageHelper.toPaging(data));
+      HttpStatus.OK, data.getContent()
+        .stream()
+        .map(assignment -> AssignmentResponseMapper.buildAssignmentWebResponse(
+          assignment, urlPrefix))
+        .collect(Collectors.toList()), PageHelper.toPaging(data));
   }
 
 }

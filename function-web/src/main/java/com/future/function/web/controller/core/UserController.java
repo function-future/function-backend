@@ -19,40 +19,27 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
-/**
- * Controller class for user APIs.
- */
 @RestController
 @RequestMapping(value = "/api/core/users")
 public class UserController {
-  
+
   private final FileProperties fileProperties;
-  
+
   private UserRequestMapper userRequestMapper;
-  
+
   private UserService userService;
-  
+
   @Autowired
   public UserController(
     UserService userService, UserRequestMapper userRequestMapper,
     FileProperties fileProperties
   ) {
-    
+
     this.userService = userService;
     this.userRequestMapper = userRequestMapper;
     this.fileProperties = fileProperties;
   }
-  
-  /**
-   * Creates new user in database.
-   *
-   * @param data Data of new user in JSON format.
-   *
-   * @return {@code DataResponse<UserWebResponse>} - The created user data,
-   * wrapped in
-   * {@link com.future.function.web.model.response.base.DataResponse} and
-   * {@link com.future.function.web.model.response.feature.core.UserWebResponse}
-   */
+
   @ResponseStatus(HttpStatus.CREATED)
   @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE,
                produces = MediaType.APPLICATION_JSON_VALUE)
@@ -62,7 +49,7 @@ public class UserController {
     @RequestBody
       UserWebRequest data
   ) {
-    
+
     return UserResponseMapper.toUserDataResponse(HttpStatus.CREATED,
                                                  userService.createUser(
                                                    userRequestMapper.toUser(
@@ -70,14 +57,7 @@ public class UserController {
                                                  fileProperties.getUrlPrefix()
     );
   }
-  
-  /**
-   * Deletes user from database.
-   *
-   * @param userId Id of to be deleted user.
-   *
-   * @return {@code BaseResponse} - Indicating successful deletion.
-   */
+
   @ResponseStatus(HttpStatus.OK)
   @DeleteMapping(value = "/{userId:.+}",
                  produces = MediaType.APPLICATION_JSON_VALUE)
@@ -87,21 +67,11 @@ public class UserController {
     @PathVariable
       String userId
   ) {
-    
+
     userService.deleteUser(userId);
     return ResponseHelper.toBaseResponse(HttpStatus.OK);
   }
-  
-  /**
-   * Retrieves a user based on given parameter.
-   *
-   * @param userId Id of user to be retrieved.
-   *
-   * @return {@code DataResponse<UserWebResponse>} - The retrieved user data,
-   * wrapped in
-   * {@link com.future.function.web.model.response.base.DataResponse} and
-   * {@link com.future.function.web.model.response.feature.core.UserWebResponse}
-   */
+
   @ResponseStatus(HttpStatus.OK)
   @GetMapping(value = "/{userId:.+}",
               produces = MediaType.APPLICATION_JSON_VALUE)
@@ -111,22 +81,11 @@ public class UserController {
     @PathVariable
       String userId
   ) {
-    
+
     return UserResponseMapper.toUserDataResponse(
       userService.getUser(userId), fileProperties.getUrlPrefix());
   }
-  
-  /**
-   * Retrieves users based on given parameters.
-   *
-   * @param role Specified role for data to be retrieved.
-   * @param page Current page of data.
-   *
-   * @return {@code PagingResponse<UserWebResponse>} - The retrieved users data,
-   * wrapped in
-   * {@link com.future.function.web.model.response.base.PagingResponse} and
-   * {@link com.future.function.web.model.response.feature.core.UserWebResponse}
-   */
+
   @ResponseStatus(HttpStatus.OK)
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   public PagingResponse<UserWebResponse> getUsers(
@@ -141,25 +100,13 @@ public class UserController {
     @RequestParam(defaultValue = "10")
       int size
   ) {
-    
-    return UserResponseMapper.toUsersPagingResponse(
-      userService.getUsers(
-        Role.toRole(role), name, PageHelper.toPageable(page, size)),
-      fileProperties.getUrlPrefix()
+
+    return UserResponseMapper.toUsersPagingResponse(userService.getUsers(
+      Role.toRole(role), name, PageHelper.toPageable(page, size)),
+                                                    fileProperties.getUrlPrefix()
     );
   }
 
-  /**
-   * Updates existing user in database.
-   *
-   * @param userId Id of to-be-updated user.
-   * @param data   Data of existing user in JSON format.
-   *
-   * @return {@code DataResponse<UserWebResponse>} - The updated user data,
-   * wrapped in
-   * {@link com.future.function.web.model.response.base.DataResponse} and
-   * {@link com.future.function.web.model.response.feature.core.UserWebResponse}
-   */
   @ResponseStatus(HttpStatus.OK)
   @PutMapping(value = "/{userId:.+}",
               consumes = MediaType.APPLICATION_JSON_VALUE,
@@ -172,13 +119,13 @@ public class UserController {
     @RequestBody
       UserWebRequest data
   ) {
-    
+
     return UserResponseMapper.toUserDataResponse(
       userService.updateUser(userRequestMapper.toUser(userId, data)),
       fileProperties.getUrlPrefix()
     );
   }
-  
+
   @ResponseStatus(HttpStatus.OK)
   @GetMapping(value = "/_search")
   public PagingResponse<UserWebResponse> getUsersByName(
@@ -193,7 +140,7 @@ public class UserController {
                   defaultValue = "10")
       int size
   ) {
-    
+
     return UserResponseMapper.toUsersPagingResponse(
       userService.getUsersByNameContainsIgnoreCase(name,
                                                    PageHelper.toPageable(page,
@@ -201,5 +148,5 @@ public class UserController {
                                                    )
       ), fileProperties.getUrlPrefix());
   }
-  
+
 }

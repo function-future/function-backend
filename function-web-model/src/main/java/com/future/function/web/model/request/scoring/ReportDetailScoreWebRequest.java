@@ -14,7 +14,8 @@ import java.util.List;
 @AllArgsConstructor
 public class ReportDetailScoreWebRequest {
 
-    @Size(message = "Size", min = 1)
-    private List<ScoreStudentWebRequest> scores;
+  @Size(message = "Size",
+        min = 1)
+  private List<ScoreStudentWebRequest> scores;
 
 }

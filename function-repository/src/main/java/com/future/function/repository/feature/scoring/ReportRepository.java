@@ -10,8 +10,8 @@ import java.util.Optional;
 
 public interface ReportRepository extends MongoRepository<Report, String> {
 
-    Optional<Report> findByIdAndDeletedFalse(String id);
+  Optional<Report> findByIdAndDeletedFalse(String id);
 
-    Page<Report> findAllByBatchAndDeletedFalse(Batch batch, Pageable pageable);
+  Page<Report> findAllByBatchAndDeletedFalse(Batch batch, Pageable pageable);
 
 }

@@ -15,11 +15,11 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ChangeProfilePictureWebRequest {
-  
+
   @Size(max = 1,
         message = "Size")
   @FileMustExist
   @FileMustBeImage
   private List<String> avatar;
-  
+
 }

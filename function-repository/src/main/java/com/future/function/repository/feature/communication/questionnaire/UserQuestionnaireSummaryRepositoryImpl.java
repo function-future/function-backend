@@ -17,50 +17,52 @@ import java.util.stream.Collectors;
 @Repository
 public class UserQuestionnaireSummaryRepositoryImpl
   implements UserQuestionnaireSummaryRepositoryCustom {
-  
+
   private final MongoTemplate mongoTemplate;
 
   @Autowired
   public UserQuestionnaireSummaryRepositoryImpl(MongoTemplate mongoTemplate) {
-    
+
     this.mongoTemplate = mongoTemplate;
   }
-  
+
   @Override
   public List<UserQuestionnaireSummary> findAllByUserName(String name) {
-    
+
     List<String> userIds = this.getUserIds(name);
-    
+
     return mongoTemplate.findAll(UserQuestionnaireSummary.class)
       .stream()
       .filter(summary -> this.isUserIdInUserIds(userIds, summary))
       .collect(Collectors.toList());
   }
-  
+
   private boolean isUserIdInUserIds(
     List<String> userIds, UserQuestionnaireSummary summaryUser
   ) {
-    return userIds.contains(summaryUser.getAppraisee().getId());
+
+    return userIds.contains(summaryUser.getAppraisee()
+                              .getId());
   }
 
-  
+
   private List<String> getUserIds(String name) {
-    
+
     return mongoTemplate.find(getQuery(name), User.class)
       .stream()
       .map(User::getId)
       .collect(Collectors.toList());
   }
-  
+
   private Query getQuery(String name) {
-    
+
     return Query.query(getRegex(name));
   }
-  
+
   private Criteria getRegex(String name) {
-    
+
     return Criteria.where(FieldName.User.NAME)
       .regex(String.format("*%s*", name));
   }
-  
+
 }

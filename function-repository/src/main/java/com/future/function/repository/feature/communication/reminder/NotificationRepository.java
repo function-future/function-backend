@@ -8,13 +8,12 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;
 
-/**
- * Author: PriagungSatyagama
- * Created At: 14:43 06/07/2019
- */
-public interface NotificationRepository extends MongoRepository<Notification, String> {
+public interface NotificationRepository
+  extends MongoRepository<Notification, String> {
 
-  Page<Notification> findAllByMemberOrderByCreatedAtDesc(User member, Pageable pageable);
+  Page<Notification> findAllByMemberOrderByCreatedAtDesc(
+    User member, Pageable pageable
+  );
 
   List<Notification> findAllByMemberAndSeen(User Member, Boolean seen);
 

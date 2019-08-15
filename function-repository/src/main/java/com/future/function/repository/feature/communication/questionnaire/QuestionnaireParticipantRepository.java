@@ -11,34 +11,28 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import java.util.List;
 import java.util.Optional;
 
-public interface QuestionnaireParticipantRepository extends MongoRepository<QuestionnaireParticipant, String> {
-  /**
-   * Find all questionnaire by member and participant type
-   *
-   * @param member member of questionnaire participant to be search
-   * @param participantType participant type of questionnaire participant to be search
-   * @param pageable pageable object for paging
-   *
-   * @return {@code page<QuestionnaireParticipant>} - all questionnaire participant filtered by the query
-   */
+public interface QuestionnaireParticipantRepository
+  extends MongoRepository<QuestionnaireParticipant, String> {
 
-  Page<QuestionnaireParticipant> findAllByMemberAndParticipantTypeAndDeletedFalseOrderByCreatedAtDesc(User member, ParticipantType participantType, Pageable pageable);
+  Page<QuestionnaireParticipant> findAllByMemberAndParticipantTypeAndDeletedFalseOrderByCreatedAtDesc(
+    User member, ParticipantType participantType, Pageable pageable
+  );
 
-  /**
-   * Find all questionnaire participant by questionnaire
-   *
-   * @param questionnaire questionnaire of questionnaire participant to be searched
-   * @param pageable pageable object for paging
-   *
-   * @return {@code List<QuestionnaireParticipant>} - all questionnaire participant filtered by the query
-   */
-  Page<QuestionnaireParticipant> findAllByQuestionnaireAndDeletedFalse(Questionnaire questionnaire, Pageable pageable);
+  Page<QuestionnaireParticipant> findAllByQuestionnaireAndDeletedFalse(
+    Questionnaire questionnaire, Pageable pageable
+  );
 
-  List<QuestionnaireParticipant> findAllByQuestionnaireAndDeletedFalse(Questionnaire questionnaire);
+  List<QuestionnaireParticipant> findAllByQuestionnaireAndDeletedFalse(
+    Questionnaire questionnaire
+  );
 
-  Page<QuestionnaireParticipant> findAllByQuestionnaireAndParticipantTypeAndDeletedFalse(Questionnaire questionnaire, ParticipantType participantType, Pageable pageable);
+  Page<QuestionnaireParticipant> findAllByQuestionnaireAndParticipantTypeAndDeletedFalse(
+    Questionnaire questionnaire, ParticipantType participantType,
+    Pageable pageable
+  );
 
-  Optional<QuestionnaireParticipant> findByQuestionnaireAndMemberAndParticipantTypeAndDeletedFalse(Questionnaire questionnaire,User member, ParticipantType participantType);
-
+  Optional<QuestionnaireParticipant> findByQuestionnaireAndMemberAndParticipantTypeAndDeletedFalse(
+    Questionnaire questionnaire, User member, ParticipantType participantType
+  );
 
 }

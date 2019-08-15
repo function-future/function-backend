@@ -15,15 +15,11 @@ import java.lang.annotation.Target;
 @Target({ ElementType.TYPE, ElementType.FIELD })
 @Constraint(validatedBy = TitleValidator.class)
 public @interface Title {
-  /**
-   * Default message returned when a String field does not fulfill the
-   * required values.
-   *
-   * @return {@code String} - The name of this annotation.
-   */
+
   String message() default "QuestionnaireTitle";
 
   Class<?>[] groups() default {};
 
   Class<? extends Payload>[] payload() default {};
+
 }

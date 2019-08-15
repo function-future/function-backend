@@ -4,9 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * Model representation for base response.
- */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

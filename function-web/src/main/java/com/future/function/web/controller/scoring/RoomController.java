@@ -27,59 +27,90 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/scoring/batches/{batchCode}/assignments/{assignmentId}/rooms")
+@RequestMapping(
+  "/api/scoring/batches/{batchCode}/assignments/{assignmentId" + "}/rooms")
 public class RoomController {
 
-    private AssignmentService assignmentService;
-    
-    private final FileProperties fileProperties;
+  private final FileProperties fileProperties;
 
-    @Autowired
-    public RoomController(
-      AssignmentService assignmentService, FileProperties fileProperties
-    ) {
-        this.assignmentService = assignmentService;
-        this.fileProperties = fileProperties;
-    }
+  private AssignmentService assignmentService;
 
-    @ResponseStatus(HttpStatus.OK)
-    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public PagingResponse<RoomWebResponse> findAllRoomsByAssignmentId(@PathVariable String assignmentId,
-                                                                      @RequestParam(defaultValue = "1") int page,
-                                                                      @RequestParam(defaultValue = "10") int size,
-        @WithAnyRole(roles = {Role.ADMIN, Role.JUDGE, Role.MENTOR}) Session session) {
-        return RoomResponseMapper
-                .toPagingRoomWebResponse(assignmentService
-                        .findAllRoomsByAssignmentId(assignmentId,
-                                                    PageHelper.toPageable(page, size)), fileProperties.getUrlPrefix());
-    }
+  @Autowired
+  public RoomController(
+    AssignmentService assignmentService, FileProperties fileProperties
+  ) {
 
-    @ResponseStatus(HttpStatus.OK)
-    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public DataResponse<RoomWebResponse> findRoomById(@PathVariable String id,
-        @WithAnyRole(roles = {Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT}) Session session) {
-        return RoomResponseMapper
-            .toDataRoomWebResponse(assignmentService.findRoomById(id,
-                                                                  session.getUserId()), fileProperties.getUrlPrefix());
-    }
+    this.assignmentService = assignmentService;
+    this.fileProperties = fileProperties;
+  }
 
-    @ResponseStatus(HttpStatus.OK)
-    @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public DataResponse<RoomWebResponse> updateRoomScore(@PathVariable String id,
-                                                         @RequestBody RoomPointWebRequest request,
-                                                         @WithAnyRole(roles = Role.MENTOR) Session session) {
-        return RoomResponseMapper
-                .toDataRoomWebResponse(assignmentService
-                    .giveScoreToRoomByRoomId(id, session.getUserId(),
-                                             request.getPoint()),
-                                       fileProperties.getUrlPrefix());
-    }
+  @ResponseStatus(HttpStatus.OK)
+  @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+  public PagingResponse<RoomWebResponse> findAllRoomsByAssignmentId(
+    @PathVariable
+      String assignmentId,
+    @RequestParam(defaultValue = "1")
+      int page,
+    @RequestParam(defaultValue = "10")
+      int size,
+    @WithAnyRole(roles = { Role.ADMIN, Role.JUDGE, Role.MENTOR })
+      Session session
+  ) {
 
-    @ResponseStatus(HttpStatus.OK)
-    @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public BaseResponse deleteRoomById(@PathVariable String id, @WithAnyRole(roles = Role.ADMIN) Session session) {
-        assignmentService.deleteRoomById(id);
-        return ResponseHelper.toBaseResponse(HttpStatus.OK);
-    }
+    return RoomResponseMapper.toPagingRoomWebResponse(
+      assignmentService.findAllRoomsByAssignmentId(assignmentId,
+                                                   PageHelper.toPageable(page,
+                                                                         size
+                                                   )
+      ), fileProperties.getUrlPrefix());
+  }
+
+  @ResponseStatus(HttpStatus.OK)
+  @GetMapping(value = "/{id}",
+              produces = MediaType.APPLICATION_JSON_VALUE)
+  public DataResponse<RoomWebResponse> findRoomById(
+    @PathVariable
+      String id,
+    @WithAnyRole(roles = { Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT })
+      Session session
+  ) {
+
+    return RoomResponseMapper.toDataRoomWebResponse(
+      assignmentService.findRoomById(id, session.getUserId()),
+      fileProperties.getUrlPrefix()
+    );
+  }
+
+  @ResponseStatus(HttpStatus.OK)
+  @PutMapping(value = "/{id}",
+              produces = MediaType.APPLICATION_JSON_VALUE)
+  public DataResponse<RoomWebResponse> updateRoomScore(
+    @PathVariable
+      String id,
+    @RequestBody
+      RoomPointWebRequest request,
+    @WithAnyRole(roles = Role.MENTOR)
+      Session session
+  ) {
+
+    return RoomResponseMapper.toDataRoomWebResponse(
+      assignmentService.giveScoreToRoomByRoomId(id, session.getUserId(),
+                                                request.getPoint()
+      ), fileProperties.getUrlPrefix());
+  }
+
+  @ResponseStatus(HttpStatus.OK)
+  @DeleteMapping(value = "/{id}",
+                 produces = MediaType.APPLICATION_JSON_VALUE)
+  public BaseResponse deleteRoomById(
+    @PathVariable
+      String id,
+    @WithAnyRole(roles = Role.ADMIN)
+      Session session
+  ) {
+
+    assignmentService.deleteRoomById(id);
+    return ResponseHelper.toBaseResponse(HttpStatus.OK);
+  }
 
 }

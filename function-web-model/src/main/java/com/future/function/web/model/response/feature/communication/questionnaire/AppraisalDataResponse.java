@@ -14,4 +14,5 @@ public class AppraisalDataResponse {
   private QuestionnaireDetailResponse questionnaireDetail;
 
   private AppraiseeResponse appraisee;
+
 }

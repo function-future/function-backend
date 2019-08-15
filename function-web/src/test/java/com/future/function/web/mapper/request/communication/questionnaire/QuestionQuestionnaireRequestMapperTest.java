@@ -17,10 +17,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
-/**
- * Author: ricky.kennedy
- * Created At: 3:06 PM 7/25/2019
- */
 @RunWith(MockitoJUnitRunner.class)
 public class QuestionQuestionnaireRequestMapperTest {
 
@@ -28,15 +24,18 @@ public class QuestionQuestionnaireRequestMapperTest {
 
   private static final String QUESTIONNAIRE_TITLE = "questionnaireTitle";
 
-  private static final String QUESTIONNAIRE_DESCRIPTION = "questionnaireDescription";
+  private static final String QUESTIONNAIRE_DESCRIPTION =
+    "questionnaireDescription";
 
   private static final Long START_DATE = Long.valueOf(0);
 
   private static final Long DUE_DATE = Long.valueOf(1);
 
-  private static final String QUESTION_QUESTIONNAIRE_ID = "quesitonQuestionnaireId1";
+  private static final String QUESTION_QUESTIONNAIRE_ID =
+    "quesitonQuestionnaireId1";
 
-  private static final String QUESTION_QUESTIONNAIRE_DESCRIPTION = "questionQuestionnaireDescription";
+  private static final String QUESTION_QUESTIONNAIRE_DESCRIPTION =
+    "questionQuestionnaireDescription";
 
   private static final Questionnaire QUESTIONNAIRE = Questionnaire.builder()
     .id(QUESTIONNAIRE_ID_1)
@@ -46,10 +45,10 @@ public class QuestionQuestionnaireRequestMapperTest {
     .dueDate(DUE_DATE)
     .build();
 
-  private static final QuestionQuestionnaireRequest QUESTION_QUESTIONNAIRE_REQUEST =
-    QuestionQuestionnaireRequest.builder()
-      .description(QUESTION_QUESTIONNAIRE_DESCRIPTION)
-      .build();
+  private static final QuestionQuestionnaireRequest
+    QUESTION_QUESTIONNAIRE_REQUEST = QuestionQuestionnaireRequest.builder()
+    .description(QUESTION_QUESTIONNAIRE_DESCRIPTION)
+    .build();
 
   @Mock
   private RequestValidator validator;
@@ -59,33 +58,32 @@ public class QuestionQuestionnaireRequestMapperTest {
 
   @After
   public void tearDown() {
+
     verifyNoMoreInteractions(validator);
   }
 
   @Test
   public void toQuestionQuestionnaire() {
-    when(validator.validate(QUESTION_QUESTIONNAIRE_REQUEST)).thenReturn(QUESTION_QUESTIONNAIRE_REQUEST);
+
+    when(validator.validate(QUESTION_QUESTIONNAIRE_REQUEST)).thenReturn(
+      QUESTION_QUESTIONNAIRE_REQUEST);
 
     QuestionQuestionnaire data =
       questionQuestionnaireRequestMapper.toQuestionQuestionnaire(
-        QUESTION_QUESTIONNAIRE_REQUEST,
-        null,
-        QUESTIONNAIRE
-      );
+        QUESTION_QUESTIONNAIRE_REQUEST, null, QUESTIONNAIRE);
 
-    assertThat(data.getQuestionnaire().getId()).isEqualTo(QUESTIONNAIRE_ID_1);
-    assertThat(data.getDescription()).isEqualTo(QUESTION_QUESTIONNAIRE_DESCRIPTION);
+    assertThat(data.getQuestionnaire()
+                 .getId()).isEqualTo(QUESTIONNAIRE_ID_1);
+    assertThat(data.getDescription()).isEqualTo(
+      QUESTION_QUESTIONNAIRE_DESCRIPTION);
 
-    data =
-      questionQuestionnaireRequestMapper.toQuestionQuestionnaire(
-        QUESTION_QUESTIONNAIRE_REQUEST,
-        QUESTION_QUESTIONNAIRE_ID,
-        QUESTIONNAIRE
-      );
+    data = questionQuestionnaireRequestMapper.toQuestionQuestionnaire(
+      QUESTION_QUESTIONNAIRE_REQUEST, QUESTION_QUESTIONNAIRE_ID, QUESTIONNAIRE);
 
     assertThat(data.getId()).isEqualTo(QUESTION_QUESTIONNAIRE_ID);
 
     verify(validator, times(2)).validate(QUESTION_QUESTIONNAIRE_REQUEST);
 
   }
+
 }

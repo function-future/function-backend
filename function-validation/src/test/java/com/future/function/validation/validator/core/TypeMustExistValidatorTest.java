@@ -15,41 +15,41 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 
 @RunWith(MockitoJUnitRunner.class)
 public class TypeMustExistValidatorTest {
-  
+
   @Mock
   private TypeMustExist annotation;
-  
+
   @InjectMocks
   private TypeMustExistValidator validator;
-  
+
   @Before
   public void setUp() {
-    
+
     validator.initialize(annotation);
   }
-  
+
   @After
   public void tearDown() {
-    
+
     verifyNoMoreInteractions(annotation);
   }
-  
+
   @Test
   public void testGivenValidFileTypeByValidatingTypeMustBeValidFromFileWebRequestReturnTrue() {
-    
+
     assertThat(validator.isValid("FILE", null)).isTrue();
     assertThat(validator.isValid("FOLDER", null)).isTrue();
-    
+
     verifyZeroInteractions(annotation);
   }
-  
+
   @Test
   public void testGivenInvalidFileTypeByValidatingTypeMustBeValidFromFileWebRequestReturnTrue() {
-    
+
     assertThat(validator.isValid("SAMPLE", null)).isFalse();
     assertThat(validator.isValid(null, null)).isFalse();
-    
+
     verifyZeroInteractions(annotation);
   }
-  
+
 }

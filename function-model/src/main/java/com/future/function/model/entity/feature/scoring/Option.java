@@ -25,7 +25,8 @@ public class Option extends BaseEntity {
 
   @Id
   @Builder.Default
-  private String id = UUID.randomUUID().toString();
+  private String id = UUID.randomUUID()
+    .toString();
 
   @Field(FieldName.Option.LABEL)
   private String label;
@@ -36,4 +37,5 @@ public class Option extends BaseEntity {
   @DBRef(lazy = true)
   @Field(FieldName.Option.QUESTION)
   private Question question;
+
 }

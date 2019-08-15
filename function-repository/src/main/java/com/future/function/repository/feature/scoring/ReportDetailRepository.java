@@ -6,10 +6,11 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import java.util.List;
 import java.util.Optional;
 
-public interface ReportDetailRepository extends MongoRepository<ReportDetail, String> {
+public interface ReportDetailRepository
+  extends MongoRepository<ReportDetail, String> {
 
-    List<ReportDetail> findAllByReportIdAndDeletedFalse(String reportId);
+  List<ReportDetail> findAllByReportIdAndDeletedFalse(String reportId);
 
-    Optional<ReportDetail> findByUserIdAndDeletedFalse(String studentId);
+  Optional<ReportDetail> findByUserIdAndDeletedFalse(String studentId);
 
 }

@@ -118,8 +118,7 @@ public class DiscussionServiceImplTest {
   @After
   public void tearDown() {
 
-    verifyNoMoreInteractions(
-      discussionRepository, userService, batchService);
+    verifyNoMoreInteractions(discussionRepository, userService, batchService);
   }
 
   @Test
@@ -218,16 +217,17 @@ public class DiscussionServiceImplTest {
     verify(userService).getUserByEmail(EMAIL);
     verifyZeroInteractions(discussionRepository);
   }
-  
+
   @Test
   public void testGivenCourseIdAndBatchCodeByDeletingDiscussionsReturnSuccessfulDeletion() {
-    
+
     when(batchService.getBatchByCode(BATCH_CODE)).thenReturn(BATCH);
-  
+
     discussionService.deleteDiscussions(COURSE_ID, BATCH_CODE);
-    
+
     verify(batchService).getBatchByCode(BATCH_CODE);
-    verify(discussionRepository).deleteAllByCourseIdAndBatchId(COURSE_ID, BATCH_ID);
+    verify(discussionRepository).deleteAllByCourseIdAndBatchId(
+      COURSE_ID, BATCH_ID);
   }
 
 }

@@ -11,26 +11,23 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.List;
 
-/**
- * Model representation for announcement web request.
- */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class AnnouncementWebRequest {
-  
+
   @NotBlank(message = "NotBlank")
   private String title;
-  
+
   @Size(max = 70,
         message = "Size")
   private String summary;
-  
+
   @NotNull(message = "NotNull")
   private String description;
-  
+
   @FileMustExist
   private List<String> files;
-  
+
 }

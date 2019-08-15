@@ -18,52 +18,28 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-/**
- * Mapper class for user web response.
- */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UserResponseMapper {
-  
-  /**
-   * Converts a user data to {@code UserWebResponse}, wrapped in {@code
-   * DataResponse}.
-   *
-   * @param user User data to be converted to response.
-   *
-   * @return {@code DataResponse<UserWebResponse>} - The converted user data,
-   * wrapped in
-   * {@link com.future.function.web.model.response.base.DataResponse} and
-   * {@link com.future.function.web.model.response.feature.core.UserWebResponse}
-   */
-  public static DataResponse<UserWebResponse> toUserDataResponse(User user,
-                                                                 String urlPrefix) {
-    
+
+  public static DataResponse<UserWebResponse> toUserDataResponse(
+    User user, String urlPrefix
+  ) {
+
     return toUserDataResponse(HttpStatus.OK, user, urlPrefix);
   }
-  
-  /**
-   * Converts a user data to {@code UserWebResponse} given {@code HttpStatus},
-   * wrapped in {@code DataResponse}.
-   *
-   * @param httpStatus Http status to be shown in the response.
-   * @param user       User data to be converted to response.
-   *
-   * @return {@code DataResponse<UserWebResponse>} - The converted user data,
-   * wrapped in
-   * {@link com.future.function.web.model.response.base.DataResponse} and
-   * {@link com.future.function.web.model.response.feature.core.UserWebResponse}
-   */
+
   public static DataResponse<UserWebResponse> toUserDataResponse(
     HttpStatus httpStatus, User user, String urlPrefix
   ) {
-    
+
     return ResponseHelper.toDataResponse(
       httpStatus, buildUserWebResponse(user, urlPrefix));
   }
-  
-  private static UserWebResponse buildUserWebResponse(User user,
-                                                      String urlPrefix) {
-    
+
+  private static UserWebResponse buildUserWebResponse(
+    User user, String urlPrefix
+  ) {
+
     return UserWebResponse.builder()
       .id(user.getId())
       .role(user.getRole()
@@ -78,73 +54,70 @@ public class UserResponseMapper {
       .university(user.getUniversity())
       .build();
   }
-  
+
   private static String getFileId(User user) {
-    
+
     return Optional.ofNullable(user.getPictureV2())
       .map(FileV2::getId)
       .orElse(null);
   }
-  
+
   private static BatchWebResponse getBatch(User user) {
-    
+
     return Optional.ofNullable(user.getBatch())
       .map(BatchResponseMapper::toBatchWebResponse)
       .orElse(null);
   }
-  
+
   private static String getFileUrl(FileV2 fileV2, String urlPrefix) {
-    
+
     return Optional.ofNullable(fileV2)
       .map(FileV2::getFileUrl)
       .map(urlPrefix::concat)
       .orElse(null);
   }
-  
-  /**
-   * Converts users data to {@code UserWebResponse} given {@code HttpStatus},
-   * wrapped in {@code PagingResponse}.
-   *
-   * @param data Users data to be converted to response.
-   *
-   * @return {@code PagingResponse<UserWebResponse} - The converted user data,
-   * wrapped in
-   * {@link com.future.function.web.model.response.base.PagingResponse} and
-   * {@link com.future.function.web.model.response.feature.core.UserWebResponse}
-   */
+
   public static PagingResponse<UserWebResponse> toUsersPagingResponse(
     Page<User> data, String urlPrefix
   ) {
-    
-    return ResponseHelper.toPagingResponse(
-      HttpStatus.OK, toUserWebResponseList(data.getContent(), urlPrefix),
-      PageHelper.toPaging(data));
+
+    return ResponseHelper.toPagingResponse(HttpStatus.OK, toUserWebResponseList(
+      data.getContent(), urlPrefix), PageHelper.toPaging(data));
   }
 
   public static List<UserWebResponse> toUserWebResponseList(
     List<User> data, String urlPrefix
   ) {
-    
-    return data
-      .stream()
+
+    return data.stream()
       .map(user -> buildUserWebResponse(user, urlPrefix))
       .collect(Collectors.toList());
   }
-  
+
   public static PagingResponse<UserWebResponse> toUsersPagingResponseWithFinalPoint(
-      Page<Pair<User, Integer>> pairPage, String urlPrefix) {
-    return ResponseHelper.toPagingResponse(HttpStatus.OK, buildUserWebResponseAndSetFinalPoint(pairPage, urlPrefix), PageHelper.toPaging(pairPage));
+    Page<Pair<User, Integer>> pairPage, String urlPrefix
+  ) {
+
+    return ResponseHelper.toPagingResponse(HttpStatus.OK,
+                                           buildUserWebResponseAndSetFinalPoint(
+                                             pairPage, urlPrefix),
+                                           PageHelper.toPaging(pairPage)
+    );
   }
 
-  private static List<UserWebResponse> buildUserWebResponseAndSetFinalPoint(Page<Pair<User, Integer>> pairPage, String urlPrefix) {
+  private static List<UserWebResponse> buildUserWebResponseAndSetFinalPoint(
+    Page<Pair<User, Integer>> pairPage, String urlPrefix
+  ) {
+
     return pairPage.getContent()
-        .stream()
-        .map(pair -> {
-          UserWebResponse response = buildUserWebResponse(pair.getFirst(), urlPrefix);
-          response.setFinalPoint(pair.getSecond());
-          return response;
-        })
-        .collect(Collectors.toList());
+      .stream()
+      .map(pair -> {
+        UserWebResponse response = buildUserWebResponse(
+          pair.getFirst(), urlPrefix);
+        response.setFinalPoint(pair.getSecond());
+        return response;
+      })
+      .collect(Collectors.toList());
   }
 
 }

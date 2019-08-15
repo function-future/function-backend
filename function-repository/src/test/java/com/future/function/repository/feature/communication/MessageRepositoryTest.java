@@ -18,10 +18,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-/**
- * Author: PriagungSatyagama
- * Created At: 13:24 01/06/2019
- */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = TestApplication.class)
 public class MessageRepositoryTest {
@@ -35,38 +31,39 @@ public class MessageRepositoryTest {
   private static final Pageable PAGEABLE = new PageRequest(0, 10);
 
   private static final Chatroom chatroom1 = Chatroom.builder()
-          .id("id1")
-          .type(ChatroomType.GROUP)
-          .title("chatroom1")
-          .build();
+    .id("id1")
+    .type(ChatroomType.GROUP)
+    .title("chatroom1")
+    .build();
 
   private static final Chatroom chatroom2 = Chatroom.builder()
-          .id("id2")
-          .type(ChatroomType.GROUP)
-          .title("chatroom2")
-          .build();
+    .id("id2")
+    .type(ChatroomType.GROUP)
+    .title("chatroom2")
+    .build();
 
   @Autowired
   private MessageRepository messageRepository;
 
   @Before
   public void setUp() {
+
     Message message1 = Message.builder()
-            .chatroom(chatroom1)
-            .text(TEXT_1)
-            .build();
+      .chatroom(chatroom1)
+      .text(TEXT_1)
+      .build();
     message1.setCreatedAt(10L);
 
     Message message2 = Message.builder()
-            .chatroom(chatroom1)
-            .text(TEXT_2)
-            .build();
+      .chatroom(chatroom1)
+      .text(TEXT_2)
+      .build();
     message2.setCreatedAt(15L);
 
     Message message3 = Message.builder()
-            .chatroom(chatroom2)
-            .text(TEXT_3)
-            .build();
+      .chatroom(chatroom2)
+      .text(TEXT_3)
+      .build();
     message3.setCreatedAt(20L);
 
     messageRepository.save(message1);
@@ -76,21 +73,31 @@ public class MessageRepositoryTest {
 
   @After
   public void tearDown() {
+
     messageRepository.deleteAll();
   }
 
   @Test
   public void testGivenChatroomByFindingAllMessageReturnPagedMessages() {
-    Page<Message> messages = messageRepository.findAllByChatroomOrderByCreatedAtDesc(chatroom1, PAGEABLE);
+
+    Page<Message> messages =
+      messageRepository.findAllByChatroomOrderByCreatedAtDesc(
+        chatroom1, PAGEABLE);
 
     assertThat(messages.getTotalElements()).isEqualTo(2);
-    assertThat(messages.getContent().get(0).getText()).isEqualTo(TEXT_2);
-    assertThat(messages.getContent().get(1).getText()).isEqualTo(TEXT_1);
+    assertThat(messages.getContent()
+                 .get(0)
+                 .getText()).isEqualTo(TEXT_2);
+    assertThat(messages.getContent()
+                 .get(1)
+                 .getText()).isEqualTo(TEXT_1);
   }
 
   @Test
   public void testGivenChatroomByFindingLatestMessageReturnMessage() {
-    Message message = messageRepository.findFirstByChatroomOrderByCreatedAtDesc(chatroom1);
+
+    Message message = messageRepository.findFirstByChatroomOrderByCreatedAtDesc(
+      chatroom1);
 
     assertThat(message).isNotNull();
     assertThat(message.getText()).isEqualTo(TEXT_2);

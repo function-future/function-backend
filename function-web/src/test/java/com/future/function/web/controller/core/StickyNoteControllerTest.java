@@ -29,9 +29,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Collections;
 
-import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -41,84 +41,84 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import(TestSecurityConfiguration.class)
 @WebMvcTest(value = StickyNoteController.class)
 public class StickyNoteControllerTest extends TestHelper {
-  
+
   private static final String TITLE = "title";
-  
+
   private static final String DESCRIPTION = "description";
-  
+
   private static final StickyNote STICKY_NOTE = StickyNote.builder()
     .title(TITLE)
     .description(DESCRIPTION)
     .build();
-  
+
   private static final StickyNoteWebRequest STICKY_NOTE_WEB_REQUEST =
     StickyNoteWebRequest.builder()
       .title(TITLE)
       .description(DESCRIPTION)
       .build();
-  
+
   private static final Pageable PAGEABLE = new PageRequest(0, 1);
-  
+
   private static final Page<StickyNote> STICKY_NOTE_PAGE = new PageImpl<>(
     Collections.singletonList(STICKY_NOTE), PAGEABLE, 1);
-  
+
   private static final PagingResponse<StickyNoteWebResponse>
     RETRIEVED_PAGING_RESPONSE =
     StickyNoteResponseMapper.toStickyNotePagingResponse(STICKY_NOTE_PAGE);
-  
+
   private static final DataResponse<StickyNoteWebResponse>
     CREATED_DATA_RESPONSE = StickyNoteResponseMapper.toStickyNoteDataResponse(
     HttpStatus.CREATED, STICKY_NOTE);
-  
+
   private JacksonTester<StickyNoteWebRequest> stickyNoteWebRequestJacksonTester;
-  
+
   @MockBean
   private StickyNoteService stickyNoteService;
-  
+
   @MockBean
   private StickyNoteRequestMapper stickyNoteRequestMapper;
-  
+
   @Override
   @Before
   public void setUp() {
-    
+
     super.setUp();
   }
-  
+
   @After
   public void tearDown() {
-    
+
     verifyNoMoreInteractions(stickyNoteService, stickyNoteRequestMapper);
   }
-  
+
   @Test
   public void testGivenCallToStickyNoteApiByGettingStickyNoteReturnDataResponseOfStickyNote()
     throws Exception {
-    
-    given(stickyNoteService.getStickyNote(PAGEABLE)).willReturn(
+
+    when(stickyNoteService.getStickyNote(PAGEABLE)).thenReturn(
       STICKY_NOTE_PAGE);
-    
+
     mockMvc.perform(get("/api/core/sticky-notes"))
       .andExpect(status().isOk())
       .andExpect(content().json(
         pagingResponseJacksonTester.write(RETRIEVED_PAGING_RESPONSE)
           .getJson()));
-    
+
     verify(stickyNoteService).getStickyNote(PAGEABLE);
   }
-  
+
   @Test
   public void testGivenCallToStickyNoteApiByCreatingStickyNoteReturnDataResponseOfStickyNote()
     throws Exception {
-    
+
     super.setCookie(Role.ADMIN);
-    
-    given(
-      stickyNoteRequestMapper.toStickyNote(STICKY_NOTE_WEB_REQUEST)).willReturn(
+
+    when(
+      stickyNoteRequestMapper.toStickyNote(STICKY_NOTE_WEB_REQUEST)).thenReturn(
       STICKY_NOTE);
-    given(stickyNoteService.createStickyNote(STICKY_NOTE)).willReturn(
+    when(stickyNoteService.createStickyNote(STICKY_NOTE)).thenReturn(
       STICKY_NOTE);
-    
+
     mockMvc.perform(post("/api/core/sticky-notes").cookie(cookies)
                       .contentType(MediaType.APPLICATION_JSON_VALUE)
                       .content(stickyNoteWebRequestJacksonTester.write(
@@ -128,9 +128,9 @@ public class StickyNoteControllerTest extends TestHelper {
       .andExpect(content().json(
         dataResponseJacksonTester.write(CREATED_DATA_RESPONSE)
           .getJson()));
-    
+
     verify(stickyNoteRequestMapper).toStickyNote(STICKY_NOTE_WEB_REQUEST);
     verify(stickyNoteService).createStickyNote(STICKY_NOTE);
   }
-  
+
 }

@@ -12,11 +12,18 @@ public interface StudentQuizDetailService {
 
   List<StudentQuestion> findAllQuestionsByStudentQuizId(String studentQuizId);
 
-  List<StudentQuestion> findAllUnansweredQuestionsByStudentQuizId(String studentQuizId);
+  List<StudentQuestion> findAllUnansweredQuestionsByStudentQuizId(
+    String studentQuizId
+  );
 
-  StudentQuizDetail answerStudentQuiz(String studentQuizId, List<StudentQuestion> answers);
+  StudentQuizDetail answerStudentQuiz(
+    String studentQuizId, List<StudentQuestion> answers
+  );
 
-  StudentQuizDetail createStudentQuizDetail(StudentQuiz studentQuiz, List<StudentQuestion> questions);
+  StudentQuizDetail createStudentQuizDetail(
+    StudentQuiz studentQuiz, List<StudentQuestion> questions
+  );
 
   void deleteByStudentQuiz(StudentQuiz studentQuiz);
+
 }

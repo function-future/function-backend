@@ -16,55 +16,31 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-/**
- * Mapper class for course web response.
- */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class CourseResponseMapper {
-  
-  /**
-   * Converts a course data to {@code CourseWebResponse}, wrapped in {@code
-   * DataResponse}.
-   *
-   * @param course Course data to be converted to response.
-   *
-   * @return {@code DataResponse<CourseWebResponse>} - The converted course
-   * data, wrapped in
-   * {@link com.future.function.web.model.response.base.DataResponse} and
-   * {@link CourseWebResponse}
-   */
+
   public static DataResponse<CourseWebResponse> toCourseDataResponse(
     Course course, String urlPrefix
   ) {
-    
+
     return toCourseDataResponse(HttpStatus.OK, course, urlPrefix);
   }
-  
-  /**
-   * Converts a course data to {@code CourseWebResponse} given {@code
-   * HttpStatus}, wrapped in {@code DataResponse}.
-   *
-   * @param httpStatus Http status to be shown in the response.
-   * @param course     Course data to be converted to response.
-   *
-   * @return {@code DataResponse<CourseWebResponse>} - The converted course
-   * data, wrapped in
-   * {@link com.future.function.web.model.response.base.DataResponse} and
-   * {@link CourseWebResponse}
-   */
+
   public static DataResponse<CourseWebResponse> toCourseDataResponse(
     HttpStatus httpStatus, Course course, String urlPrefix
   ) {
-    
+
     return ResponseHelper.toDataResponse(httpStatus,
-                                         buildNormalCourseWebResponseV2(course, urlPrefix)
+                                         buildNormalCourseWebResponseV2(course,
+                                                                        urlPrefix
+                                         )
     );
   }
-  
+
   private static CourseWebResponse buildNormalCourseWebResponseV2(
     Course course, String urlPrefix
   ) {
-    
+
     return CourseWebResponse.builder()
       .id(course.getId())
       .title(course.getTitle())
@@ -73,26 +49,43 @@ public final class CourseResponseMapper {
       .materialId(CourseResponseMapper.getFileId(course))
       .build();
   }
-  
+
   private static String getFileId(Course course) {
-    
+
     return Optional.ofNullable(course.getFile())
       .map(FileV2::getId)
       .orElse(null);
   }
-  
+
   private static String getFileUrl(Course course, String urlPrefix) {
-    
+
     return Optional.ofNullable(course.getFile())
       .map(FileV2::getFileUrl)
       .map(urlPrefix::concat)
       .orElse(null);
   }
-  
+
+  public static DataResponse<List<CourseWebResponse>> toCoursesDataResponse(
+    List<Course> courses, String urlPrefix
+  ) {
+
+    return ResponseHelper.toDataResponse(
+      HttpStatus.CREATED, toCourseWebResponseV2List(courses, urlPrefix));
+  }
+
+  private static List<CourseWebResponse> toCourseWebResponseV2List(
+    List<Course> data, String urlPrefix
+  ) {
+
+    return data.stream()
+      .map(course -> buildThumbnailCourseWebResponseV2(course, urlPrefix))
+      .collect(Collectors.toList());
+  }
+
   private static CourseWebResponse buildThumbnailCourseWebResponseV2(
     Course course, String urlPrefix
   ) {
-    
+
     return CourseWebResponse.builder()
       .id(course.getId())
       .title(course.getTitle())
@@ -100,78 +93,40 @@ public final class CourseResponseMapper {
       .material(CourseResponseMapper.getMaterial(course, urlPrefix))
       .build();
   }
-  
+
   private static String getMaterial(Course course, String urlPrefix) {
-    
-    return Optional.ofNullable(CourseResponseMapper.getThumbnailUrl(course,
-                                                                    urlPrefix))
+
+    return Optional.ofNullable(
+      CourseResponseMapper.getThumbnailUrl(course, urlPrefix))
       .orElseGet(() -> CourseResponseMapper.getFileUrl(course, urlPrefix));
   }
-  
+
   private static String getThumbnailUrl(
     Course course, String urlPrefix
   ) {
-    
+
     return Optional.ofNullable(course.getFile())
       .map(FileV2::getThumbnailUrl)
       .map(urlPrefix::concat)
       .orElse(null);
   }
-  
-  /**
-   * Converts courses data to {@code List<CourseWebResponse>}, wrapped in {@code
-   * DataResponse}.
-   *
-   * @param courses Course data to be converted to response.
-   *
-   * @return {@code DataResponse<List<CourseWebResponse>>} - The converted
-   * course data, wrapped in
-   * {@link com.future.function.web.model.response.base.DataResponse} and
-   * {@link List} and {@link CourseWebResponse}.
-   */
-  public static DataResponse<List<CourseWebResponse>> toCoursesDataResponse(
-    List<Course> courses, String urlPrefix
-  ) {
-    
-    return ResponseHelper.toDataResponse(
-      HttpStatus.CREATED, toCourseWebResponseV2List(courses, urlPrefix));
-  }
-  
-  private static List<CourseWebResponse> toCourseWebResponseV2List(
-    List<Course> data, String urlPrefix
-  ) {
-    
-    return data.stream()
-      .map(course -> buildThumbnailCourseWebResponseV2(course, urlPrefix))
-      .collect(Collectors.toList());
-  }
-  
-  /**
-   * Converts courses data to {@code CourseWebResponse} given {@code
-   * HttpStatus}, wrapped in {@code PagingResponse}.
-   *
-   * @param data Courses data to be converted to response.
-   *
-   * @return {@code PagingResponse<CourseWebResponse} - The converted course
-   * data, wrapped in
-   * {@link com.future.function.web.model.response.base.PagingResponse} and
-   * {@link CourseWebResponse}
-   */
+
   public static PagingResponse<CourseWebResponse> toCoursesPagingResponse(
     Page<Course> data, String urlPrefix
   ) {
-    
+
     return ResponseHelper.toPagingResponse(HttpStatus.OK,
-                                           toCourseWebResponseV2List(data, urlPrefix),
-                                           PageHelper.toPaging(data)
+                                           toCourseWebResponseV2List(data,
+                                                                     urlPrefix
+                                           ), PageHelper.toPaging(data)
     );
   }
-  
+
   private static List<CourseWebResponse> toCourseWebResponseV2List(
     Page<Course> data, String urlPrefix
   ) {
-    
+
     return toCourseWebResponseV2List(data.getContent(), urlPrefix);
   }
-  
+
 }

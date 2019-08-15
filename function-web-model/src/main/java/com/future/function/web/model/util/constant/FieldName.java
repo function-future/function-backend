@@ -5,9 +5,9 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public abstract class FieldName {
-  
+
   public static final String FULL = "full";
-  
+
   public static final String THUMBNAIL = "thumbnail";
-  
+
 }

@@ -3,7 +3,10 @@ package com.future.function.web.controller.communication.questionnaire;
 import com.future.function.common.enumeration.communication.ParticipantType;
 import com.future.function.common.enumeration.core.Role;
 import com.future.function.common.properties.core.FileProperties;
-import com.future.function.model.entity.feature.communication.questionnaire.*;
+import com.future.function.model.entity.feature.communication.questionnaire.QuestionQuestionnaire;
+import com.future.function.model.entity.feature.communication.questionnaire.QuestionResponse;
+import com.future.function.model.entity.feature.communication.questionnaire.Questionnaire;
+import com.future.function.model.entity.feature.communication.questionnaire.QuestionnaireParticipant;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.User;
@@ -42,16 +45,15 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-/**
- * Author: ricky.kennedy
- * Created At: 4:12 PM 7/25/2019
- */
 @RunWith(SpringRunner.class)
 @Import(TestSecurityConfiguration.class)
 @WebMvcTest(MyQuestionnaireController.class)
@@ -61,7 +63,9 @@ public class MyQuestionnaireControllerTest extends TestHelper {
 
   private static final String USER_ID = "userId";
 
-  private static final User USER = User.builder().id(USER_ID).build();
+  private static final User USER = User.builder()
+    .id(USER_ID)
+    .build();
 
   private static final Pageable PAGEABLE = PageHelper.toPageable(1, 10);
 
@@ -69,15 +73,18 @@ public class MyQuestionnaireControllerTest extends TestHelper {
 
   private static final String QUESTIONNAIRE_TITLE = "questionnaireTitle";
 
-  private static final String QUESTIONNAIRE_DESCRIPTION = "questionnaireDescription";
+  private static final String QUESTIONNAIRE_DESCRIPTION =
+    "questionnaireDescription";
 
   private static final Long START_DATE = Long.valueOf(0);
 
   private static final Long DUE_DATE = Long.valueOf(1);
 
-  private static final String QUESTIONNAIRE_PARTICIPANT_ID = "questionniareParticipantId";
+  private static final String QUESTIONNAIRE_PARTICIPANT_ID =
+    "questionniareParticipantId";
 
-  private static final String QUESTIONNAIRE_PARTICIPANT_ID_2 = "questionniareParticipantId2";
+  private static final String QUESTIONNAIRE_PARTICIPANT_ID_2 =
+    "questionniareParticipantId2";
 
   private static final String THUMBNAIL_URL = "thumbnail";
 
@@ -115,8 +122,12 @@ public class MyQuestionnaireControllerTest extends TestHelper {
   private static final User MEMBER_1 = User.builder()
     .id(MEMBER_ID_1)
     .name(MEMBER_NAME_1)
-    .pictureV2(FileV2.builder().thumbnailUrl(THUMBNAIL_URL).build())
-    .batch(Batch.builder().id(BATCH_ID).build())
+    .pictureV2(FileV2.builder()
+                 .thumbnailUrl(THUMBNAIL_URL)
+                 .build())
+    .batch(Batch.builder()
+             .id(BATCH_ID)
+             .build())
     .role(Role.STUDENT)
     .university(UNIVERSITY)
     .build();
@@ -124,7 +135,9 @@ public class MyQuestionnaireControllerTest extends TestHelper {
   private static final User MEMBER_2 = User.builder()
     .id(MEMBER_ID_2)
     .name(MEMBER_NAME_2)
-    .pictureV2(FileV2.builder().thumbnailUrl(THUMBNAIL_URL).build())
+    .pictureV2(FileV2.builder()
+                 .thumbnailUrl(THUMBNAIL_URL)
+                 .build())
     .role(Role.MENTOR)
     .build();
 
@@ -163,11 +176,10 @@ public class MyQuestionnaireControllerTest extends TestHelper {
       .id(QUESTION_RESPONSE_ID)
       .build();
 
-  private final QuestionnaireResponseRequest QUESTIONNAIRE_RESPONSE_WEB_REQUEST =
-    QuestionnaireResponseRequest.builder()
-      .responses(Arrays.asList(QUESTION_RESPONSE_REQUEST))
-      .build();
-
+  private final QuestionnaireResponseRequest
+    QUESTIONNAIRE_RESPONSE_WEB_REQUEST = QuestionnaireResponseRequest.builder()
+    .responses(Arrays.asList(QUESTION_RESPONSE_REQUEST))
+    .build();
 
 
   @MockBean
@@ -185,82 +197,97 @@ public class MyQuestionnaireControllerTest extends TestHelper {
   @MockBean
   private FileProperties fileProperties;
 
-  private JacksonTester<QuestionnaireResponseRequest> questionnaireResponseRequestJaksonTester;
+  private JacksonTester<QuestionnaireResponseRequest>
+    questionnaireResponseRequestJaksonTester;
 
   @Override
   @Before
   public void setUp() {
+
     super.setUp();
     super.setCookie(Role.STUDENT);
   }
 
   @After
   public void tearDown() {
-    verifyNoMoreInteractions(
-      myQuestionnaireService,
-      questionnaireService,
-      userService,
-      myQuestionnaireRequestMapper,
-      fileProperties
+
+    verifyNoMoreInteractions(myQuestionnaireService, questionnaireService,
+                             userService, myQuestionnaireRequestMapper,
+                             fileProperties
     );
   }
 
   @Test
   public void getMyQuestionnaires() throws Exception {
+
     when(userService.getUser(any(String.class))).thenReturn(USER);
-    when(myQuestionnaireService
-      .getQuestionnairesByMemberLoginAsAppraiser(USER, PAGEABLE))
-      .thenReturn(QUESTIONNAIRE_PAGE);
+    when(myQuestionnaireService.getQuestionnairesByMemberLoginAsAppraiser(USER,
+                                                                          PAGEABLE
+    )).thenReturn(QUESTIONNAIRE_PAGE);
     PagingResponse<QuestionnaireDetailResponse> response =
-      QuestionnaireResponseMapper.toPagingQuestionnaireDetailResponse(QUESTIONNAIRE_PAGE);
+      QuestionnaireResponseMapper.toPagingQuestionnaireDetailResponse(
+        QUESTIONNAIRE_PAGE);
 
     mockMvc.perform(get("/api/communication/my-questionnaires").cookie(cookies))
       .andExpect(status().isOk())
-      .andExpect(content().json(pagingResponseJacksonTester.write(response).getJson()));
+      .andExpect(content().json(pagingResponseJacksonTester.write(response)
+                                  .getJson()));
 
     verify(userService).getUser(any(String.class));
-    verify(myQuestionnaireService)
-      .getQuestionnairesByMemberLoginAsAppraiser(USER, PAGEABLE);
+    verify(myQuestionnaireService).getQuestionnairesByMemberLoginAsAppraiser(
+      USER, PAGEABLE);
   }
 
   @Test
-  public void getListAprraisees() throws Exception  {
+  public void getListAprraisees() throws Exception {
 
     when(userService.getUser(any(String.class))).thenReturn(USER);
-    when(questionnaireService.getQuestionnaire(QUESTIONNAIRE_ID_1)).thenReturn(QUESTIONNAIRE);
-    when(myQuestionnaireService.getListAppraisedByQuestionnaireAndMemberLoginAsAppraiser(QUESTIONNAIRE, USER))
-      .thenReturn(Arrays.asList(QUESTIONNAIRE_PARTICIPANT, QUESTIONNAIRE_PARTICIPANT_2));
+    when(questionnaireService.getQuestionnaire(QUESTIONNAIRE_ID_1)).thenReturn(
+      QUESTIONNAIRE);
+    when(
+      myQuestionnaireService.getListAppraisedByQuestionnaireAndMemberLoginAsAppraiser(
+        QUESTIONNAIRE, USER)).thenReturn(
+      Arrays.asList(QUESTIONNAIRE_PARTICIPANT, QUESTIONNAIRE_PARTICIPANT_2));
     when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
 
-    DataResponse<List<AppraiseeResponse>> response =  MyQuestionnaireResponseMapper.toDataResponseAppraiseeResponseList(
-      Arrays.asList(QUESTIONNAIRE_PARTICIPANT, QUESTIONNAIRE_PARTICIPANT_2),
-      URL_PREFIX
-    );
+    DataResponse<List<AppraiseeResponse>> response =
+      MyQuestionnaireResponseMapper.toDataResponseAppraiseeResponseList(
+        Arrays.asList(QUESTIONNAIRE_PARTICIPANT, QUESTIONNAIRE_PARTICIPANT_2),
+        URL_PREFIX
+      );
 
-    mockMvc.perform(get("/api/communication/my-questionnaires/"+QUESTIONNAIRE_ID_1+"/appraisees").cookie(cookies))
+    mockMvc.perform(get(
+      "/api/communication/my-questionnaires/" + QUESTIONNAIRE_ID_1 +
+      "/appraisees").cookie(cookies))
       .andExpect(status().isOk())
-      .andExpect(content().json(dataResponseJacksonTester.write(response).getJson()));
+      .andExpect(content().json(dataResponseJacksonTester.write(response)
+                                  .getJson()));
 
     verify(userService).getUser(any(String.class));
     verify(questionnaireService).getQuestionnaire(QUESTIONNAIRE_ID_1);
-    verify(myQuestionnaireService).getListAppraisedByQuestionnaireAndMemberLoginAsAppraiser(QUESTIONNAIRE, USER);
+    verify(
+      myQuestionnaireService).getListAppraisedByQuestionnaireAndMemberLoginAsAppraiser(
+      QUESTIONNAIRE, USER);
     verify(fileProperties).getUrlPrefix();
   }
 
   @Test
-  public void getQuestionnaireData() throws Exception  {
+  public void getQuestionnaireData() throws Exception {
+
     when(userService.getUser(MEMBER_ID_1)).thenReturn(MEMBER_1);
-    when(questionnaireService.getQuestionnaire(QUESTIONNAIRE_ID_1)).thenReturn(QUESTIONNAIRE);
+    when(questionnaireService.getQuestionnaire(QUESTIONNAIRE_ID_1)).thenReturn(
+      QUESTIONNAIRE);
     when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
     DataResponse<AppraisalDataResponse> response =
       MyQuestionnaireResponseMapper.toDataResponseQuestionnaireSummaryDescriptionResponse(
-        QUESTIONNAIRE, MEMBER_1,
-        URL_PREFIX
-      );
+        QUESTIONNAIRE, MEMBER_1, URL_PREFIX);
 
-    mockMvc.perform(get("/api/communication/my-questionnaires/"+QUESTIONNAIRE_ID_1+"/appraisees/"+MEMBER_ID_1).cookie(cookies))
+    mockMvc.perform(get(
+      "/api/communication/my-questionnaires/" + QUESTIONNAIRE_ID_1 +
+      "/appraisees/" + MEMBER_ID_1).cookie(cookies))
       .andExpect(status().isOk())
-      .andExpect(content().json(dataResponseJacksonTester.write(response).getJson()));
+      .andExpect(content().json(dataResponseJacksonTester.write(response)
+                                  .getJson()));
 
 
     verify(fileProperties).getUrlPrefix();
@@ -270,23 +297,23 @@ public class MyQuestionnaireControllerTest extends TestHelper {
   }
 
   @Test
-  public void getQuestion() throws Exception  {
+  public void getQuestion() throws Exception {
 
-    when(questionnaireService.getQuestionnaire(QUESTIONNAIRE_ID_1)).thenReturn(QUESTIONNAIRE);
-    when(myQuestionnaireService.getQuestionsFromQuestionnaire(QUESTIONNAIRE))
-      .thenReturn(Arrays.asList(QUESTION_QUESTIONNAIRE));
+    when(questionnaireService.getQuestionnaire(QUESTIONNAIRE_ID_1)).thenReturn(
+      QUESTIONNAIRE);
+    when(myQuestionnaireService.getQuestionsFromQuestionnaire(
+      QUESTIONNAIRE)).thenReturn(Arrays.asList(QUESTION_QUESTIONNAIRE));
 
     DataResponse<List<QuestionQuestionnaireResponse>> response =
       MyQuestionnaireResponseMapper.toDataResponseQuestionQuestionnaireResponseList(
         Arrays.asList(QUESTION_QUESTIONNAIRE));
 
-    mockMvc.perform(get("/api/communication/my-questionnaires/"
-                          +QUESTIONNAIRE_ID_1
-                          +"/appraisees/"
-                          +MEMBER_ID_1
-                          +"/questions").cookie(cookies))
+    mockMvc.perform(get(
+      "/api/communication/my-questionnaires/" + QUESTIONNAIRE_ID_1 +
+      "/appraisees/" + MEMBER_ID_1 + "/questions").cookie(cookies))
       .andExpect(status().isOk())
-      .andExpect(content().json(dataResponseJacksonTester.write(response).getJson()));
+      .andExpect(content().json(dataResponseJacksonTester.write(response)
+                                  .getJson()));
 
 
     verify(questionnaireService).getQuestionnaire(QUESTIONNAIRE_ID_1);
@@ -296,39 +323,36 @@ public class MyQuestionnaireControllerTest extends TestHelper {
 
   @Test
   public void addQuestionnaireResponse() throws Exception {
-    when(userService.getUser(any(String.class))).thenReturn(MEMBER_1);
-    when(questionnaireService.getQuestionnaire(QUESTIONNAIRE_ID_1)).thenReturn(QUESTIONNAIRE);
-    when(myQuestionnaireRequestMapper.toListQuestionResponse(
-      Arrays.asList(QUESTION_RESPONSE_REQUEST),MEMBER_1, MEMBER_1))
-      .thenReturn(Arrays.asList(QUESTION_RESPONSE));
 
-    when(myQuestionnaireService
-      .createQuestionnaireResponseToAppraiseeFromMemberLoginAsAppraiser(
-        QUESTIONNAIRE,
-        Arrays.asList(QUESTION_RESPONSE),
-        MEMBER_1,
+    when(userService.getUser(any(String.class))).thenReturn(MEMBER_1);
+    when(questionnaireService.getQuestionnaire(QUESTIONNAIRE_ID_1)).thenReturn(
+      QUESTIONNAIRE);
+    when(myQuestionnaireRequestMapper.toListQuestionResponse(
+      Arrays.asList(QUESTION_RESPONSE_REQUEST), MEMBER_1, MEMBER_1)).thenReturn(
+      Arrays.asList(QUESTION_RESPONSE));
+
+    when(
+      myQuestionnaireService.createQuestionnaireResponseToAppraiseeFromMemberLoginAsAppraiser(
+        QUESTIONNAIRE, Arrays.asList(QUESTION_RESPONSE), MEMBER_1,
         MEMBER_1
       )).thenReturn(null);
 
-    mockMvc.perform(post("/api/communication/my-questionnaires/"
-      +QUESTIONNAIRE_ID_1
-      +"/appraisees/"
-      +MEMBER_ID_1
-      +"/questions").cookie(cookies)
-      .contentType(MediaType.APPLICATION_JSON_VALUE)
-      .content(questionnaireResponseRequestJaksonTester.write(QUESTIONNAIRE_RESPONSE_WEB_REQUEST).getJson()))
+    mockMvc.perform(post(
+      "/api/communication/my-questionnaires/" + QUESTIONNAIRE_ID_1 +
+      "/appraisees/" + MEMBER_ID_1 + "/questions").cookie(cookies)
+                      .contentType(MediaType.APPLICATION_JSON_VALUE)
+                      .content(questionnaireResponseRequestJaksonTester.write(
+                        QUESTIONNAIRE_RESPONSE_WEB_REQUEST)
+                                 .getJson()))
       .andExpect(status().isCreated());
 
     verify(questionnaireService).getQuestionnaire(QUESTIONNAIRE_ID_1);
-    verify(userService,times(4)).getUser(any(String.class));
-    verify(myQuestionnaireService)
-      .createQuestionnaireResponseToAppraiseeFromMemberLoginAsAppraiser(
-        QUESTIONNAIRE,
-        Arrays.asList(QUESTION_RESPONSE),
-        MEMBER_1,
-        MEMBER_1
-      );
+    verify(userService, times(4)).getUser(any(String.class));
+    verify(
+      myQuestionnaireService).createQuestionnaireResponseToAppraiseeFromMemberLoginAsAppraiser(
+      QUESTIONNAIRE, Arrays.asList(QUESTION_RESPONSE), MEMBER_1, MEMBER_1);
     verify(myQuestionnaireRequestMapper).toListQuestionResponse(
-      Arrays.asList(QUESTION_RESPONSE_REQUEST),MEMBER_1, MEMBER_1);
+      Arrays.asList(QUESTION_RESPONSE_REQUEST), MEMBER_1, MEMBER_1);
   }
+
 }

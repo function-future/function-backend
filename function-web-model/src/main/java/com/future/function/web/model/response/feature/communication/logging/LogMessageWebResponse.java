@@ -5,10 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * Author : Ricky Kennedy
- * Created At : 23:09 27/07/2019
- */
 @Data
 @Builder
 @NoArgsConstructor
@@ -24,4 +20,5 @@ public class LogMessageWebResponse {
   private String senderName;
 
   private String senderAvatar;
+
 }
