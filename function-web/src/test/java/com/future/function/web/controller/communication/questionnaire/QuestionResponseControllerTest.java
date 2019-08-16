@@ -1,7 +1,12 @@
 package com.future.function.web.controller.communication.questionnaire;
 
 import com.future.function.common.enumeration.core.Role;
-import com.future.function.model.entity.feature.communication.questionnaire.*;
+import com.future.function.common.properties.core.FileProperties;
+import com.future.function.model.entity.feature.communication.questionnaire.Answer;
+import com.future.function.model.entity.feature.communication.questionnaire.QuestionQuestionnaire;
+import com.future.function.model.entity.feature.communication.questionnaire.QuestionResponse;
+import com.future.function.model.entity.feature.communication.questionnaire.QuestionResponseSummary;
+import com.future.function.model.entity.feature.communication.questionnaire.Questionnaire;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.User;
@@ -21,29 +26,29 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit4.SpringRunner;
 
-
 import java.util.Arrays;
 import java.util.List;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-/**
- * Author: RickyKennedy
- * Created At:10:33 PM 7/25/2019
- */
 @RunWith(SpringRunner.class)
 @Import(TestSecurityConfiguration.class)
 @WebMvcTest(QuestionResponseController.class)
 public class QuestionResponseControllerTest extends TestHelper {
 
+  private static final String URL_PREFIX = "urlPrefix";
+
   private static final String QUESTIONNAIRE_ID_1 = "questionnaireId1";
 
   private static final String QUESTIONNAIRE_TITLE = "questionnaireTitle";
 
-  private static final String QUESTIONNAIRE_DESCRIPTION = "questionnaireDescription";
+  private static final String QUESTIONNAIRE_DESCRIPTION =
+    "questionnaireDescription";
 
   private static final Long START_DATE = Long.valueOf(0);
 
@@ -53,7 +58,8 @@ public class QuestionResponseControllerTest extends TestHelper {
 
   private static final String QUESTION_DESCRIPTION = "questionDescription";
 
-  private static final String QUESTION_RESPONSE_SUMMARY_ID = "questionQuestionnaireSummaryResponseid1";
+  private static final String QUESTION_RESPONSE_SUMMARY_ID =
+    "questionQuestionnaireSummaryResponseid1";
 
   private static final String THUMBNAIL_URL = "thumbnail";
 
@@ -76,8 +82,12 @@ public class QuestionResponseControllerTest extends TestHelper {
   private static final User MEMBER_1 = User.builder()
     .id(MEMBER_ID_1)
     .name(MEMBER_NAME_1)
-    .pictureV2(FileV2.builder().thumbnailUrl(THUMBNAIL_URL).build())
-    .batch(Batch.builder().id(BATCH_ID).build())
+    .pictureV2(FileV2.builder()
+                 .thumbnailUrl(THUMBNAIL_URL)
+                 .build())
+    .batch(Batch.builder()
+             .id(BATCH_ID)
+             .build())
     .role(Role.STUDENT)
     .university(UNIVERSITY)
     .build();
@@ -116,65 +126,70 @@ public class QuestionResponseControllerTest extends TestHelper {
       .build();
 
   @MockBean
-  private QuestionnaireResponseSummaryService questionnaireResponseSummaryService;
+  private QuestionnaireResponseSummaryService
+    questionnaireResponseSummaryService;
+
+  @MockBean
+  private FileProperties fileProperties;
 
   @Override
   @Before
   public void setUp() {
+
     super.setUp();
     super.setCookie(Role.ADMIN);
   }
+
   @After
   public void tearDown() throws Exception {
-    verifyNoMoreInteractions(questionnaireResponseSummaryService );
+
+    verifyNoMoreInteractions(
+      questionnaireResponseSummaryService, fileProperties);
   }
 
   @Test
   public void getQuestionQuestionnaireSummaryResponse() throws Exception {
-    when(questionnaireResponseSummaryService
-      .getQuestionResponseSummaryById(QUESTION_RESPONSE_SUMMARY_ID))
-        .thenReturn(QUESTION_RESPONSE_SUMMARY);
+
+    when(questionnaireResponseSummaryService.getQuestionResponseSummaryById(
+      QUESTION_RESPONSE_SUMMARY_ID)).thenReturn(QUESTION_RESPONSE_SUMMARY);
 
     DataResponse<QuestionQuestionnaireSummaryResponse> response =
-      QuestionnaireResponseSummaryResponseMapper
-        .toDataResponseQuestionQuestionnaireSummaryResponse(QUESTION_RESPONSE_SUMMARY);
+      QuestionnaireResponseSummaryResponseMapper.toDataResponseQuestionQuestionnaireSummaryResponse(
+        QUESTION_RESPONSE_SUMMARY);
 
-    mockMvc.perform(
-      get("/api/communication/question-response/"
-          +QUESTION_RESPONSE_SUMMARY_ID
-      )
-      .cookie(cookies))
+    mockMvc.perform(get("/api/communication/question-response/" +
+                        QUESTION_RESPONSE_SUMMARY_ID).cookie(cookies))
       .andExpect(status().isOk())
-      .andExpect(content().json(dataResponseJacksonTester.write(response).getJson()));
+      .andExpect(content().json(dataResponseJacksonTester.write(response)
+                                  .getJson()));
 
-    verify(questionnaireResponseSummaryService)
-      .getQuestionResponseSummaryById(QUESTION_RESPONSE_SUMMARY_ID);
+    verify(questionnaireResponseSummaryService).getQuestionResponseSummaryById(
+      QUESTION_RESPONSE_SUMMARY_ID);
   }
 
   @Test
   public void getQuestionnaireAnswerDetailSummary() throws Exception {
 
-    when(questionnaireResponseSummaryService
-      .getQuestionResponseByQuestionResponseSummaryId(QUESTION_RESPONSE_SUMMARY_ID))
-        .thenReturn(Arrays.asList(QUESTION_RESPONSE));
-
+    when(
+      questionnaireResponseSummaryService.getQuestionResponseByQuestionResponseSummaryId(
+        QUESTION_RESPONSE_SUMMARY_ID)).thenReturn(
+      Arrays.asList(QUESTION_RESPONSE));
+    when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
     DataResponse<List<QuestionAnswerResponse>> response =
-      QuestionnaireResponseSummaryResponseMapper
-        .toDataResponseQuestionAnswerDetailResponse(
-          Arrays.asList(QUESTION_RESPONSE)
-        );
+      QuestionnaireResponseSummaryResponseMapper.toDataResponseQuestionAnswerDetailResponse(
+        Arrays.asList(QUESTION_RESPONSE), URL_PREFIX);
 
-    mockMvc.perform(
-      get("/api/communication/question-response/"
-        +QUESTION_RESPONSE_SUMMARY_ID
-        +"/responses"
-      )
-        .cookie(cookies))
+    mockMvc.perform(get(
+      "/api/communication/question-response/" + QUESTION_RESPONSE_SUMMARY_ID +
+      "/responses").cookie(cookies))
       .andExpect(status().isOk())
-      .andExpect(content().json(dataResponseJacksonTester.write(response).getJson()));
+      .andExpect(content().json(dataResponseJacksonTester.write(response)
+                                  .getJson()));
 
-
-    verify(questionnaireResponseSummaryService)
-      .getQuestionResponseByQuestionResponseSummaryId(QUESTION_RESPONSE_SUMMARY_ID);
+    verify(fileProperties).getUrlPrefix();
+    verify(
+      questionnaireResponseSummaryService).getQuestionResponseByQuestionResponseSummaryId(
+      QUESTION_RESPONSE_SUMMARY_ID);
   }
+
 }

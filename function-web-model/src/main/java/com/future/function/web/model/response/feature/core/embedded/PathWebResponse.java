@@ -10,9 +10,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PathWebResponse {
-  
+
   private String id;
-  
+
   private String name;
-  
+
 }

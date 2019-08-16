@@ -14,9 +14,6 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-/**
- * Entity representation for users.
- */
 @Data
 @Builder
 @NoArgsConstructor
@@ -24,37 +21,37 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @EqualsAndHashCode(callSuper = true)
 @Document(collection = DocumentName.USER)
 public class User extends BaseEntity {
-  
+
   @Id
   private String id;
-  
+
   @Field(FieldName.User.EMAIL)
   private String email;
-  
+
   @Field(FieldName.User.NAME)
   private String name;
-  
+
   @Field(FieldName.User.PASS)
   private String password;
-  
+
   @Field(FieldName.User.ROLE)
   private Role role;
-  
+
   @Field(FieldName.User.PICTURE)
   @DBRef(lazy = true)
   private FileV2 pictureV2;
-  
+
   @Field(FieldName.User.PHONE)
   private String phone;
-  
+
   @Field(FieldName.User.ADDRESS)
   private String address;
-  
+
   @Field(FieldName.User.BATCH)
   @DBRef(lazy = true)
   private Batch batch;
-  
+
   @Field(FieldName.User.UNIVERSITY)
   private String university;
-  
+
 }

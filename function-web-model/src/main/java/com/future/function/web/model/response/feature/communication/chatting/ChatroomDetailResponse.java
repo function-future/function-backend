@@ -8,10 +8,6 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-/**
- * Author: PriagungSatyagama
- * Created At: 15:28 01/06/2019
- */
 @Data
 @Builder
 @NoArgsConstructor

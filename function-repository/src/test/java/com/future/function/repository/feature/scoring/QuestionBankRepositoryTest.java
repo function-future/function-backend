@@ -18,31 +18,37 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class QuestionBankRepositoryTest {
 
   private static final String QUESTIONBANK_ID = "random-id";
-  private static final String QUESTIONBANK_DESCRIPTION = "questionbank-description";
+
+  private static final String QUESTIONBANK_DESCRIPTION =
+    "questionbank-description";
 
   @Autowired
   private QuestionBankRepository repository;
 
   @Before
   public void setUp() throws Exception {
+
   }
 
   @After
   public void tearDown() throws Exception {
+
     repository.deleteAll();
   }
 
   @Test
   public void testFindQuestionBankByIdAndDeletedFalse() {
-    QuestionBank questionBank = QuestionBank
-        .builder()
-        .id(QUESTIONBANK_ID)
-        .description(QUESTIONBANK_DESCRIPTION)
-        .build();
+
+    QuestionBank questionBank = QuestionBank.builder()
+      .id(QUESTIONBANK_ID)
+      .description(QUESTIONBANK_DESCRIPTION)
+      .build();
     repository.save(questionBank);
 
-    Optional<QuestionBank> actual = repository.findByIdAndDeletedFalse(QUESTIONBANK_ID);
+    Optional<QuestionBank> actual = repository.findByIdAndDeletedFalse(
+      QUESTIONBANK_ID);
     assertThat(actual.isPresent()).isTrue();
     assertThat(actual.get()).isEqualTo(questionBank);
   }
+
 }

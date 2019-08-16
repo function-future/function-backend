@@ -1,6 +1,6 @@
 package com.future.function.web.model.request.communication.questionnaire;
 
-import com.future.function.validation.annotation.communication.QuestionnaireTitle;
+import com.future.function.validation.annotation.communication.Title;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,10 +15,11 @@ import javax.validation.constraints.Size;
 @AllArgsConstructor
 public class QuestionnaireRequest {
 
-  @QuestionnaireTitle(message = "InvalidTitle")
+  @Title(message = "InvalidTitle")
   private String title;
 
-  @Size(max = 50, message = "Size")
+  @Size(max = 50,
+        message = "Size")
   private String desc;
 
   @NotNull(message = "StartDate")
@@ -26,6 +27,5 @@ public class QuestionnaireRequest {
 
   @NotNull(message = "DueDate")
   private Long dueDate;
-
 
 }

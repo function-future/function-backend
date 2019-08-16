@@ -9,13 +9,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.UUID;
 
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper = true)
 @Data
 @Builder
 @NoArgsConstructor
@@ -23,18 +24,20 @@ import java.util.UUID;
 @Document(collection = DocumentName.ROOM)
 public class Room extends BaseEntity {
 
-    @Builder.Default
-    private String id = UUID.randomUUID().toString();
+  @Id
+  @Builder.Default
+  private String id = UUID.randomUUID()
+    .toString();
 
-    @DBRef(lazy = true)
-    @Field(FieldName.Room.STUDENT)
-    private User student;
+  @DBRef(lazy = true)
+  @Field(FieldName.Room.STUDENT)
+  private User student;
 
-    @DBRef(lazy = true)
-    @Field(FieldName.Room.ASSIGNMENT)
-    private Assignment assignment;
+  @DBRef(lazy = true)
+  @Field(FieldName.Room.ASSIGNMENT)
+  private Assignment assignment;
 
-    @Field(FieldName.Room.POINT)
-    private Integer point;
+  @Field(FieldName.Room.POINT)
+  private Integer point;
 
 }

@@ -5,7 +5,9 @@ HOST: http://function.apiblueprint.org/
 
 + Parameters
     + page (optional,number) - Indicating number of page in request
-    + role (string) - Selected role to be viewed, options are (case-sensitive): [admin, mentor, judge, student]
+    + size (optional,number) - Indicating size of page in request
+    + role (string) - Selected role to be viewed, options are (case-sensitive): [ADMIN, MENTOR, JUDGE, STUDENT]
+    + name (optional,string) - Query for users with specific role containing name
 
 ### Get Users [GET]
 
@@ -372,7 +374,7 @@ Accessible for admin only. Delete a user, if valid session; otherwise 401 respon
             "status": "FORBIDDEN"
         }
 
-## Core - User Detail [/api/core/users/search{?name}]
+## Core - User Detail [/api/core/users/_search{?name}]
 
 + Parameters
     + name (optional,string) - Part of name to be searched; default value is 

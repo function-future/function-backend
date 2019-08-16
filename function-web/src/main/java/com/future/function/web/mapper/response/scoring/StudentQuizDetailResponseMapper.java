@@ -19,46 +19,61 @@ import java.util.stream.Collectors;
 public final class StudentQuizDetailResponseMapper {
 
   public static DataResponse<StudentQuizDetailWebResponse> toStudentQuizDetailWebResponse(
-      StudentQuizDetail studentQuizDetail) {
-    return ResponseHelper.toDataResponse(HttpStatus.OK, buildStudentQuizDetailWebResponse(studentQuizDetail));
+    StudentQuizDetail studentQuizDetail
+  ) {
+
+    return ResponseHelper.toDataResponse(HttpStatus.OK,
+                                         buildStudentQuizDetailWebResponse(
+                                           studentQuizDetail)
+    );
   }
 
-  private static StudentQuizDetailWebResponse buildStudentQuizDetailWebResponse(StudentQuizDetail studentQuizDetail) {
-    return StudentQuizDetailWebResponse
-        .builder()
-        .point(studentQuizDetail.getPoint())
-        .build();
+  private static StudentQuizDetailWebResponse buildStudentQuizDetailWebResponse(
+    StudentQuizDetail studentQuizDetail
+  ) {
+
+    return StudentQuizDetailWebResponse.builder()
+      .point(studentQuizDetail.getPoint())
+      .trials(studentQuizDetail.getStudentQuiz()
+                .getTrials())
+      .build();
   }
 
-  public static PagingResponse<StudentQuestionWebResponse> toStudentQuestionWebResponses(List<StudentQuestion> studentQuestions) {
-    List<StudentQuestionWebResponse> responseList = studentQuestions
-        .stream()
-        .map(StudentQuizDetailResponseMapper::toStudentQuestionWebResponse)
-        .collect(Collectors.toList());
+  public static PagingResponse<StudentQuestionWebResponse> toStudentQuestionWebResponses(
+    List<StudentQuestion> studentQuestions
+  ) {
+
+    List<StudentQuestionWebResponse> responseList = studentQuestions.stream()
+      .map(StudentQuizDetailResponseMapper::toStudentQuestionWebResponse)
+      .collect(Collectors.toList());
     return ResponseHelper.toPagingResponse(HttpStatus.OK, responseList, null);
   }
 
-  private static List<OptionWebResponse> removeCorrectField(List<OptionWebResponse> options) {
-    return options
-        .stream()
-        .map(option -> {
-          option.setCorrect(null);
-          return option;
-        })
-        .collect(Collectors.toList());
+  private static StudentQuestionWebResponse toStudentQuestionWebResponse(
+    StudentQuestion studentQuestion
+  ) {
+
+    return StudentQuestionWebResponse.builder()
+      .text(studentQuestion.getQuestion()
+              .getLabel())
+      .number(studentQuestion.getNumber())
+      .options(StudentQuizDetailResponseMapper.removeCorrectField(
+        OptionResponseMapper.toListOfOptionWebResponse(
+          studentQuestion.getQuestion()
+            .getOptions())))
+      .build();
   }
 
-  private static StudentQuestionWebResponse toStudentQuestionWebResponse(StudentQuestion studentQuestion) {
-    return StudentQuestionWebResponse
-        .builder()
-        .text(studentQuestion.getQuestion().getLabel())
-        .number(studentQuestion.getNumber())
-        .options(StudentQuizDetailResponseMapper
-            .removeCorrectField(OptionResponseMapper
-                .toListOfOptionWebResponse(studentQuestion
-                    .getQuestion()
-                    .getOptions())))
-        .build();
+  private static List<OptionWebResponse> removeCorrectField(
+    List<OptionWebResponse> options
+  ) {
+
+    return options.stream()
+      .map(option -> {
+        option.setCorrect(null);
+        return option;
+      })
+      .collect(Collectors.toList());
   }
 
 }

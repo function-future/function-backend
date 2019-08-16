@@ -99,27 +99,10 @@ public class UserRepositoryTest {
   }
 
   @Test
-  public void testGivenRoleAndPageableByFindingUsersByRoleAndPageableReturnPageOfUsers() {
-
-    Page<User> foundUsersPage1 = userRepository.findAllByRoleAndDeletedFalse(
-      Role.ADMIN, new PageRequest(0, 5));
-
-    assertThat(foundUsersPage1).isNotNull();
-    assertThat(foundUsersPage1.getContent()).isNotEmpty();
-    assertThat(foundUsersPage1.getNumberOfElements()).isEqualTo(1);
-
-    Page<User> foundUsersPage2 = userRepository.findAllByRoleAndDeletedFalse(
-      Role.JUDGE, new PageRequest(0, 5));
-
-    assertThat(foundUsersPage2).isNotNull();
-    assertThat(foundUsersPage2.getContent()).isEmpty();
-    assertThat(foundUsersPage2.getNumberOfElements()).isEqualTo(0);
-  }
-
-  @Test
   public void testGivenBatchAndRoleAndPageableByFindingUsersByRoleAndPageableReturnPageOfUsers() {
 
-    Page<User> foundUsersPage = userRepository.findAllByBatchAndRoleAndDeletedFalse(
+    Page<User> foundUsersPage =
+      userRepository.findAllByBatchAndRoleAndDeletedFalse(
         BATCH, Role.STUDENT, new PageRequest(0, 5));
 
     assertThat(foundUsersPage).isNotNull();
@@ -145,6 +128,18 @@ public class UserRepositoryTest {
                                                                     new PageRequest(
                                                                       0, 10)
       );
+
+    assertThat(foundUsers.getContent()).isNotEmpty();
+    assertThat(foundUsers.getContent()).isEqualTo(
+      Collections.singletonList(user1));
+  }
+
+  @Test
+  public void testGivenRoleAndNameByFindingUsersByRoleAndNameContainsIgnoreCaseReturnPageOfUsers() {
+
+    Page<User> foundUsers =
+      userRepository.findAllByRoleAndNameContainsIgnoreCaseAndDeletedFalse(
+        Role.ADMIN, "E-1", new PageRequest(0, 10));
 
     assertThat(foundUsers.getContent()).isNotEmpty();
     assertThat(foundUsers.getContent()).isEqualTo(

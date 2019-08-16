@@ -1,6 +1,7 @@
 package com.future.function.web.controller.core;
 
 import com.future.function.common.enumeration.core.Role;
+import com.future.function.common.properties.core.FileProperties;
 import com.future.function.service.api.feature.core.UserDetailService;
 import com.future.function.session.annotation.WithAnyRole;
 import com.future.function.session.model.Session;
@@ -33,16 +34,20 @@ public class UserDetailController {
 
   private final UserDetailRequestMapper userDetailRequestMapper;
 
+  private final FileProperties fileProperties;
+
   @Autowired
   public UserDetailController(
     UserDetailService userDetailService,
-    UserDetailRequestMapper userDetailRequestMapper
+    UserDetailRequestMapper userDetailRequestMapper,
+    FileProperties fileProperties
   ) {
 
     this.userDetailService = userDetailService;
     this.userDetailRequestMapper = userDetailRequestMapper;
+    this.fileProperties = fileProperties;
   }
-  
+
   @ResponseStatus(HttpStatus.OK)
   @PutMapping("/profile/picture")
   public DataResponse<UserWebResponse> changeProfilePicture(
@@ -51,10 +56,12 @@ public class UserDetailController {
     @RequestBody
       ChangeProfilePictureWebRequest request
   ) {
-  
+
     return UserResponseMapper.toUserDataResponse(
       userDetailService.changeProfilePicture(
-        userDetailRequestMapper.toUser(request, session.getEmail())));
+        userDetailRequestMapper.toUser(request, session.getEmail())),
+      fileProperties.getUrlPrefix()
+    );
   }
 
   @ResponseStatus(HttpStatus.OK)
@@ -65,7 +72,9 @@ public class UserDetailController {
   ) {
 
     return UserResponseMapper.toUserDataResponse(
-      userDetailService.getUserByEmail(session.getEmail()));
+      userDetailService.getUserByEmail(session.getEmail()),
+      fileProperties.getUrlPrefix()
+    );
   }
 
   @ResponseStatus(HttpStatus.OK)

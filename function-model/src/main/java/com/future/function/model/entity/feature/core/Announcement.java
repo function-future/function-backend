@@ -15,9 +15,6 @@ import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.List;
 
-/**
- * Entity representation for announcements.
- */
 @Data
 @Builder
 @NoArgsConstructor
@@ -25,21 +22,21 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @Document(collection = DocumentName.ANNOUNCEMENT)
 public class Announcement extends BaseEntity {
-  
+
   @Id
   private String id;
-  
+
   @Field(FieldName.Announcement.TITLE)
   private String title;
-  
+
   @Field(FieldName.Announcement.SUMMARY)
   private String summary;
-  
+
   @Field(FieldName.Announcement.DESCRIPTION)
   private String description;
-  
+
   @DBRef
-  @Field(FieldName.Announcement.FILE)
+  @Field(FieldName.Announcement.FILES)
   private List<FileV2> fileV2s;
-  
+
 }

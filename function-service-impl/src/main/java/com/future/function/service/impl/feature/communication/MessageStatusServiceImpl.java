@@ -15,10 +15,6 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Author: PriagungSatyagama
- * Created At: 19:27 04/06/2019
- */
 @Service
 public class MessageStatusServiceImpl implements MessageStatusService {
 
@@ -32,10 +28,10 @@ public class MessageStatusServiceImpl implements MessageStatusService {
 
   @Autowired
   public MessageStatusServiceImpl(
-          UserService userService,
-          MessageStatusRepository messageStatusRepository,
-          ChatroomService chatroomService,
-          MessageService messageService) {
+    UserService userService, MessageStatusRepository messageStatusRepository,
+    ChatroomService chatroomService, MessageService messageService
+  ) {
+
     this.userService = userService;
     this.chatroomService = chatroomService;
     this.messageStatusRepository = messageStatusRepository;
@@ -43,75 +39,102 @@ public class MessageStatusServiceImpl implements MessageStatusService {
   }
 
   @Override
-  public List<MessageStatus> getUnseenMessageStatus(String chatroomId, String userId) {
+  public List<MessageStatus> getUnseenMessageStatus(
+    String chatroomId, String userId
+  ) {
+
     User user = userService.getUser(userId);
-    Chatroom chatroom = chatroomService.getChatroom(chatroomId);
-    return messageStatusRepository.findAllByChatroomAndMemberAndSeenIsFalseOrderByCreatedAtDesc(chatroom, user);
+    Chatroom chatroom = chatroomService.getChatroom(chatroomId, userId);
+    return messageStatusRepository.findAllByChatroomAndMemberAndSeenIsFalseOrderByCreatedAtDesc(
+      chatroom, user);
   }
 
   @Override
-  public List<MessageStatus> getUnseenMessageStatusBeforeTimestamp(String chatroomId, String userId, Long timestamp) {
+  public List<MessageStatus> getUnseenMessageStatusBeforeTimestamp(
+    String chatroomId, String userId, Long timestamp
+  ) {
+
     User user = userService.getUser(userId);
-    Chatroom chatroom = chatroomService.getChatroom(chatroomId);
+    Chatroom chatroom = chatroomService.getChatroom(chatroomId, userId);
     return messageStatusRepository.findAllByChatroomAndMemberAndCreatedAtLessThanEqualAndSeenIsFalseOrderByCreatedAtDesc(
-            chatroom, user, timestamp);
+      chatroom, user, timestamp);
   }
 
   @Override
   public boolean getSeenStatus(String chatroomId, String userId) {
-    return this.getUnseenMessageStatus(chatroomId, userId).size() == 0;
+
+    return this.getUnseenMessageStatus(chatroomId, userId)
+             .size() == 0;
   }
 
   @Override
-  public MessageStatus createMessageStatus(MessageStatus messageStatus) {
+  public MessageStatus createMessageStatus(
+    MessageStatus messageStatus, String userId
+  ) {
+
     return Optional.of(messageStatus)
-            .map(this::setChatroom)
-            .map(this::setMember)
-            .map(this::setMessage)
-            .map(messageStatusRepository::save)
-            .orElseThrow(UnsupportedOperationException::new);
+      .map(msgStatus -> this.setChatroom(msgStatus, userId))
+      .map(this::setMember)
+      .map(this::setMessage)
+      .map(messageStatusRepository::save)
+      .orElseThrow(UnsupportedOperationException::new);
   }
 
   @Override
-  public void updateSeenStatus(String chatroomId, String messageId, String userId) {
+  public void updateSeenStatus(
+    String chatroomId, String messageId, String userId
+  ) {
+
     Long timestamp = Optional.of(messageId)
-            .map(messageService::getMessage)
-            .map(Message::getCreatedAt)
-            .orElse(0L);
-    this.getUnseenMessageStatus(chatroomId, userId).forEach(messageStatus -> {
-      if (messageStatus.getMessage().getCreatedAt() <= timestamp) {
-        messageStatus.setSeen(true);
-        this.updateMessageStatus(messageStatus);
-      }
-    });
+      .map(messageService::getMessage)
+      .map(Message::getCreatedAt)
+      .orElse(0L);
+    this.getUnseenMessageStatus(chatroomId, userId)
+      .forEach(messageStatus -> {
+        if (messageStatus.getMessage()
+              .getCreatedAt() <= timestamp) {
+          messageStatus.setSeen(true);
+          this.updateMessageStatus(messageStatus, userId);
+        }
+      });
   }
 
   @Override
-  public MessageStatus updateMessageStatus(MessageStatus messageStatus) {
+  public MessageStatus updateMessageStatus(
+    MessageStatus messageStatus, String userId
+  ) {
+
     return Optional.of(messageStatus)
-            .map(this::setMember)
-            .map(this::setMessage)
-            .map(this::setChatroom)
-            .map(messageStatusRepository::save)
-            .orElse(messageStatus);
+      .map(this::setMember)
+      .map(this::setMessage)
+      .map(msgStatus -> this.setChatroom(msgStatus, userId))
+      .map(messageStatusRepository::save)
+      .orElse(messageStatus);
   }
 
   private MessageStatus setMember(MessageStatus messageStatus) {
-    messageStatus.setMember(userService.getUser(messageStatus.getMember().getId()));
+
+    messageStatus.setMember(userService.getUser(messageStatus.getMember()
+                                                  .getId()));
     return messageStatus;
   }
 
   private MessageStatus setMessage(MessageStatus messageStatus) {
-    messageStatus.setMessage(
-            messageService.getMessage(messageStatus.getMessage().getId()));
+
+    messageStatus.setMessage(messageService.getMessage(
+      messageStatus.getMessage()
+        .getId()));
     return messageStatus;
   }
 
-  private MessageStatus setChatroom(MessageStatus messageStatus) {
+  private MessageStatus setChatroom(
+    MessageStatus messageStatus, String userId
+  ) {
+
     messageStatus.setChatroom(chatroomService.getChatroom(
-            messageStatus.getChatroom().getId()));
+      messageStatus.getChatroom()
+        .getId(), userId));
     return messageStatus;
   }
-
 
 }

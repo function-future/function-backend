@@ -23,23 +23,29 @@ public class QuizWebRequest {
   @NotBlank(message = "NotBlank")
   private String description;
 
-  @Min(value = 1, message = "MinimalOnePositiveNumber")
+  @Min(value = 1,
+       message = "MinimalOnePositiveNumber")
   private Long startDate;
 
-  @Min(value = 1, message = "MinimalOnePositiveNumber")
+  @Min(value = 1,
+       message = "MinimalOnePositiveNumber")
   private Long endDate;
 
-  @Min(value = 1, message = "MinimalOnePositiveNumber")
+  @Min(value = 1,
+       message = "MinimalOnePositiveNumber")
   private Long timeLimit;
 
-  @Min(value = 1, message = "MinimalOnePositiveNumber")
+  @Min(value = 1,
+       message = "MinimalOnePositiveNumber")
   private Integer trials;
 
-  @Min(value = 1, message = "MinimalOnePositiveNumber")
+  @Min(value = 1,
+       message = "MinimalOnePositiveNumber")
   private Integer questionCount;
 
   @NotNull(message = "NotNull")
-  @Size(min = 1, message = "Size")
+  @Size(min = 1,
+        message = "Size")
   private List<String> questionBanks;
 
 }

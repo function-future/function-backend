@@ -17,107 +17,74 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-/**
- * Service implementation class for announcement logic operations
- * implementation.
- */
 @Service
 public class AnnouncementServiceImpl implements AnnouncementService {
-  
+
   private final AnnouncementRepository announcementRepository;
-  
+
   private final ResourceService resourceService;
-  
+
   @Autowired
   public AnnouncementServiceImpl(
     AnnouncementRepository announcementRepository,
     ResourceService resourceService
   ) {
-    
+
     this.announcementRepository = announcementRepository;
     this.resourceService = resourceService;
   }
-  
-  /**
-   * {@inheritDoc}
-   *
-   * @param pageable Pageable object for paging data.
-   *
-   * @return {@code Page<Announcement>} - Page of announcements found in
-   * database.
-   */
+
   @Override
   public Page<Announcement> getAnnouncements(Pageable pageable) {
-    
+
     return announcementRepository.findAllByOrderByUpdatedAtDesc(pageable);
   }
-  
-  /**
-   * {@inheritDoc}
-   *
-   * @param announcementId Id of announcement to be retrieved.
-   *
-   * @return {@code Announcement} - The announcement object found in database.
-   */
+
   @Override
   public Announcement getAnnouncement(String announcementId) {
-    
+
     return Optional.ofNullable(announcementId)
       .map(announcementRepository::findOne)
       .orElseThrow(() -> new NotFoundException("Get Announcement Not Found"));
   }
-  
-  /**
-   * {@inheritDoc}
-   *
-   * @param announcement Announcement data of new announcement.
-   *
-   * @return {@code Announcement} - The announcement object of the saved data.
-   */
+
   @Override
   public Announcement createAnnouncement(Announcement announcement) {
-    
+
     return Optional.of(announcement)
       .map(this::setFileV2s)
       .map(announcementRepository::save)
       .orElse(announcement);
   }
-  
+
   private Announcement setFileV2s(Announcement announcement) {
-    
+
     List<String> fileIds = this.getFileIds(announcement);
-    
+
     List<FileV2> fileV2s = fileIds.stream()
       .map(resourceService::getFile)
       .collect(Collectors.toList());
-    
+
     announcement.setFileV2s(fileV2s);
-    
+
     resourceService.markFilesUsed(fileIds, true);
-    
+
     return announcement;
   }
-  
+
   private List<String> getFileIds(Announcement announcement) {
-    
+
     return announcement.getFileV2s()
       .stream()
       .map(FileV2::getId)
       .collect(Collectors.toList());
   }
-  
-  /**
-   * {@inheritDoc}
-   *
-   * @param announcement Announcement data of new announcement.
-   *
-   * @return {@code Announcement} - The announcement object of the saved data.
-   */
+
   @Override
   public Announcement updateAnnouncement(
     Announcement announcement
   ) {
-    
+
     return Optional.of(announcement)
       .map(Announcement::getId)
       .map(announcementRepository::findOne)
@@ -125,15 +92,10 @@ public class AnnouncementServiceImpl implements AnnouncementService {
         announcement, foundAnnouncement))
       .orElse(announcement);
   }
-  
-  /**
-   * {@inheritDoc}
-   *
-   * @param announcementId Id of announcement to be deleted.
-   */
+
   @Override
   public void deleteAnnouncement(String announcementId) {
-    
+
     Optional.ofNullable(announcementId)
       .map(announcementRepository::findOne)
       .map(foundAnnouncement -> resourceService.markFilesUsed(
@@ -141,20 +103,20 @@ public class AnnouncementServiceImpl implements AnnouncementService {
       .map(ignored -> announcementId)
       .ifPresent(announcementRepository::delete);
   }
-  
+
   private Announcement copyPropertiesAndSaveAnnouncement(
     Announcement announcement, Announcement foundAnnouncement
   ) {
-    
+
     resourceService.markFilesUsed(this.getFileIds(foundAnnouncement), false);
     this.setFileV2s(announcement);
-    
+
     BeanUtils.copyProperties(announcement, foundAnnouncement,
                              FieldName.BaseEntity.CREATED_AT,
                              FieldName.BaseEntity.VERSION
     );
-    
+
     return announcementRepository.save(foundAnnouncement);
   }
-  
+
 }

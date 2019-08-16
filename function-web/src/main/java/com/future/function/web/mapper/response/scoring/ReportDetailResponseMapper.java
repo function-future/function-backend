@@ -18,59 +18,104 @@ import java.util.stream.Collectors;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ReportDetailResponseMapper {
 
-    public static DataResponse<ReportDetailWebResponse> toDataReportDetailWebResponse(StudentSummaryVO summaryDTO) {
-    return ResponseHelper.toDataResponse(HttpStatus.OK, buildReportDetailWebResponse(summaryDTO));
-    }
+  public static DataResponse<ReportDetailWebResponse> toDataReportDetailWebResponse(
+    StudentSummaryVO summaryDTO, String urlPrefix
+  ) {
 
-    public static DataResponse<List<ReportDetailWebResponse>> toDataListReportDetailWebResponseFromReportDetail(
-            HttpStatus httpStatus, List<ReportDetail> reportDetailList) {
-        return ResponseHelper.toDataResponse(httpStatus, buildListFromReportDetailList(reportDetailList));
-    }
+    return ResponseHelper.toDataResponse(
+      HttpStatus.OK, buildReportDetailWebResponse(summaryDTO, urlPrefix));
+  }
 
-    private static ReportDetailWebResponse buildReportDetailWebResponse(StudentSummaryVO summaryDTO) {
-        return ReportDetailWebResponse.builder()
-                .studentId(summaryDTO.getStudentId())
-            .studentName(summaryDTO.getStudentName())
-            .batchCode(summaryDTO.getBatchCode())
-            .university(summaryDTO.getUniversity())
-                .avatar(summaryDTO.getAvatar())
-            .scores(ScoreSummaryResponseMapper.toDataListSummaryResponse(summaryDTO.getScores()).getData())
-                .point(summaryDTO.getPoint())
-                .build();
-    }
+  private static ReportDetailWebResponse buildReportDetailWebResponse(
+    StudentSummaryVO summaryDTO, String urlPrefix
+  ) {
 
-    private static List<ReportDetailWebResponse> buildListOfSummaryDTOs(List<StudentSummaryVO> summaryDTOs) {
+    return ReportDetailWebResponse.builder()
+      .studentId(summaryDTO.getStudentId())
+      .studentName(summaryDTO.getStudentName())
+      .batchCode(summaryDTO.getBatchCode())
+      .university(summaryDTO.getUniversity())
+      .avatar(getNullableAvatar(summaryDTO.getAvatar(), urlPrefix))
+      .scores(ScoreSummaryResponseMapper.toDataListSummaryResponse(
+        summaryDTO.getScores())
+                .getData())
+      .point(summaryDTO.getPoint())
+      .totalPoint(summaryDTO.getTotalPoint())
+      .build();
+  }
+
+  private static String getNullableAvatar(String fileUrl, String urlPrefix) {
+
+    return Optional.ofNullable(fileUrl)
+      .filter(string -> !string.equals(""))
+      .map(urlPrefix::concat)
+      .orElse(null);
+  }
+
+  public static DataResponse<List<ReportDetailWebResponse>> toDataListReportDetailWebResponseFromReportDetail(
+    HttpStatus httpStatus, List<ReportDetail> reportDetailList, String urlPrefix
+  ) {
+
+    return ResponseHelper.toDataResponse(
+      httpStatus, buildListFromReportDetailList(reportDetailList, urlPrefix));
+  }
+
+  private static List<ReportDetailWebResponse> buildListFromReportDetailList(
+    List<ReportDetail> reportDetails, String urlPrefix
+  ) {
+
+    return reportDetails.stream()
+      .map(
+        reportDetail -> ReportDetailResponseMapper.buildReportDetailWebResponse(
+          reportDetail, urlPrefix))
+      .collect(Collectors.toList());
+  }
+
+  private static ReportDetailWebResponse buildReportDetailWebResponse(
+    ReportDetail reportDetail, String urlPrefix
+  ) {
+
+    return ReportDetailWebResponse.builder()
+      .studentId(reportDetail.getUser()
+                   .getId())
+      .studentName(reportDetail.getUser()
+                     .getName())
+      .batchCode(reportDetail.getUser()
+                   .getBatch()
+                   .getCode())
+      .university(reportDetail.getUser()
+                    .getUniversity())
+      .avatar(getNullableUserAvatar(reportDetail.getUser(), urlPrefix))
+      .point(reportDetail.getPoint())
+      .build();
+  }
+
+  private static String getNullableUserAvatar(User user, String urlPrefix) {
+
+    return Optional.ofNullable(user)
+      .map(User::getPictureV2)
+      .map(FileV2::getFileUrl)
+      .map(urlPrefix::concat)
+      .orElse(null);
+  }
+
+  public static DataResponse<List<ReportDetailWebResponse>> toDataListReportDetailWebResponse(
+    List<StudentSummaryVO> summaryDTOs, String urlPrefix
+  ) {
+
+    return ResponseHelper.toDataResponse(
+      HttpStatus.OK, buildListOfSummaryDTOs(summaryDTOs, urlPrefix));
+  }
+
+  private static List<ReportDetailWebResponse> buildListOfSummaryDTOs(
+    List<StudentSummaryVO> summaryDTOs, String urlPrefix
+  ) {
+
     return summaryDTOs.stream()
-        .map(ReportDetailResponseMapper::buildReportDetailWebResponse)
-                .collect(Collectors.toList());
-    }
-
-    private static ReportDetailWebResponse buildReportDetailWebResponse(ReportDetail reportDetail) {
-        return ReportDetailWebResponse.builder()
-                .studentId(reportDetail.getUser().getId())
-                .studentName(reportDetail.getUser().getName())
-                .batchCode(reportDetail.getUser().getBatch().getCode())
-                .university(reportDetail.getUser().getUniversity())
-                .avatar(getNullableUserAvatar(reportDetail.getUser()))
-                .point(reportDetail.getPoint())
-                .build();
-    }
-
-    private static String getNullableUserAvatar(User user) {
-        return Optional.ofNullable(user)
-            .map(User::getPictureV2)
-            .map(FileV2::getFileUrl)
-                .orElse(null);
-    }
-
-    private static List<ReportDetailWebResponse> buildListFromReportDetailList(List<ReportDetail> reportDetails) {
-        return reportDetails.stream()
-                .map(ReportDetailResponseMapper::buildReportDetailWebResponse)
-                .collect(Collectors.toList());
-    }
-
-    public static DataResponse<List<ReportDetailWebResponse>> toDataListReportDetailWebResponse(List<StudentSummaryVO> summaryDTOs) {
-      return ResponseHelper.toDataResponse(HttpStatus.OK, buildListOfSummaryDTOs(summaryDTOs));
-    }
+      .map(
+        summaryDTO -> ReportDetailResponseMapper.buildReportDetailWebResponse(
+          summaryDTO, urlPrefix))
+      .collect(Collectors.toList());
+  }
 
 }

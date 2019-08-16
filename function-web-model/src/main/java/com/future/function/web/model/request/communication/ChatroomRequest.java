@@ -9,10 +9,6 @@ import org.hibernate.validator.constraints.NotEmpty;
 
 import java.util.List;
 
-/**
- * Author: PriagungSatyagama
- * Created At: 15:40 01/06/2019
- */
 @Data
 @Builder
 @NoArgsConstructor

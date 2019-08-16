@@ -13,10 +13,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-/**
- * Author : Ricky Kennedy
- * Created At : 23:00 28/07/2019
- */
 @RunWith(MockitoJUnitRunner.class)
 public class TopicWebRequestMapperTest {
 
@@ -26,10 +22,9 @@ public class TopicWebRequestMapperTest {
 
   private static final String TOPIC_ID = "topicId";
 
-  private static final TopicWebRequest TOPIC_REQUEST =
-    TopicWebRequest.builder()
-      .title(TITLE)
-      .build();
+  private static final TopicWebRequest TOPIC_REQUEST = TopicWebRequest.builder()
+    .title(TITLE)
+    .build();
 
   @Mock
   private RequestValidator validator;
@@ -39,16 +34,18 @@ public class TopicWebRequestMapperTest {
 
   @Test
   public void toTopic() {
-    when(validator.validate(TOPIC_REQUEST))
-      .thenReturn(TOPIC_REQUEST);
 
-    Topic data =
-      topicRequestMapper.toTopic(TOPIC_REQUEST, LOGGING_ROOM_ID, TOPIC_ID);
+    when(validator.validate(TOPIC_REQUEST)).thenReturn(TOPIC_REQUEST);
+
+    Topic data = topicRequestMapper.toTopic(
+      TOPIC_REQUEST, LOGGING_ROOM_ID, TOPIC_ID);
 
     assertThat(data.getId()).isEqualTo(TOPIC_ID);
-    assertThat(data.getLoggingRoom().getId()).isEqualTo(LOGGING_ROOM_ID);
+    assertThat(data.getLoggingRoom()
+                 .getId()).isEqualTo(LOGGING_ROOM_ID);
     assertThat(data.getTitle()).isEqualTo(TITLE);
 
     verify(validator).validate(TOPIC_REQUEST);
   }
+
 }

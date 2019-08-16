@@ -14,28 +14,46 @@ import java.util.stream.Collectors;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class QuestionQuestionnaireResponseMapper {
 
-  public static DataResponse<List<QuestionQuestionnaireResponse>> toDataResponseListQuestionQuestionnaireResponse(List<QuestionQuestionnaire> questionsByIdQuestionnaire, HttpStatus httpStatus) {
+  public static DataResponse<List<QuestionQuestionnaireResponse>> toDataResponseListQuestionQuestionnaireResponse(
+    List<QuestionQuestionnaire> questionsByIdQuestionnaire,
+    HttpStatus httpStatus
+  ) {
 
-    return ResponseHelper.toDataResponse( httpStatus, toQuestionQuestionnaireResponseList(questionsByIdQuestionnaire));
+    return ResponseHelper.toDataResponse(httpStatus,
+                                         toQuestionQuestionnaireResponseList(
+                                           questionsByIdQuestionnaire)
+    );
   }
 
-  public static List<QuestionQuestionnaireResponse> toQuestionQuestionnaireResponseList(List<QuestionQuestionnaire> questionQuestionnaires) {
+  public static List<QuestionQuestionnaireResponse> toQuestionQuestionnaireResponseList(
+    List<QuestionQuestionnaire> questionQuestionnaires
+  ) {
+
     return questionQuestionnaires.stream()
-            .map(questionQuestionnaire ->
-              toQuestionQuestionnaireResponse(questionQuestionnaire)
-            )
-            .collect(Collectors.toList());
+      .map(QuestionQuestionnaireResponseMapper::toQuestionQuestionnaireResponse)
+      .collect(Collectors.toList());
   }
 
-  public static QuestionQuestionnaireResponse toQuestionQuestionnaireResponse(QuestionQuestionnaire questionQuestionnaire) {
-      return new QuestionQuestionnaireResponse().builder()
-            .id(questionQuestionnaire.getId())
-            .questionnaireId(questionQuestionnaire.getQuestionnaire().getId())
-            .description(questionQuestionnaire.getDescription())
-            .build();
+  public static QuestionQuestionnaireResponse toQuestionQuestionnaireResponse(
+    QuestionQuestionnaire questionQuestionnaire
+  ) {
+
+    return QuestionQuestionnaireResponse.builder()
+      .id(questionQuestionnaire.getId())
+      .questionnaireId(questionQuestionnaire.getQuestionnaire()
+                         .getId())
+      .description(questionQuestionnaire.getDescription())
+      .build();
   }
 
-  public static DataResponse<QuestionQuestionnaireResponse> toDataResponseQuestionQuestionnaireResponse(QuestionQuestionnaire questionQuestionnaire, HttpStatus httpStatus) {
-    return ResponseHelper.toDataResponse(httpStatus, toQuestionQuestionnaireResponse(questionQuestionnaire));
+  public static DataResponse<QuestionQuestionnaireResponse> toDataResponseQuestionQuestionnaireResponse(
+    QuestionQuestionnaire questionQuestionnaire, HttpStatus httpStatus
+  ) {
+
+    return ResponseHelper.toDataResponse(httpStatus,
+                                         toQuestionQuestionnaireResponse(
+                                           questionQuestionnaire)
+    );
   }
+
 }

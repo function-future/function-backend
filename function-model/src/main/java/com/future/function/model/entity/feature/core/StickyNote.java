@@ -19,14 +19,14 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @EqualsAndHashCode(callSuper = true)
 @Document(collection = DocumentName.STICKY_NOTE)
 public class StickyNote extends BaseEntity {
-  
+
   @Id
   private String id;
-  
+
   @Field(FieldName.StickyNote.TITLE)
   private String title;
-  
+
   @Field(FieldName.StickyNote.DESCRIPTION)
   private String description;
-  
+
 }

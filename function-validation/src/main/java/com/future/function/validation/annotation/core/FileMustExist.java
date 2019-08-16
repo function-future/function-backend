@@ -15,17 +15,11 @@ import java.lang.annotation.Target;
 @Target({ ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface FileMustExist {
-  
-  /**
-   * Default message returned when a List of String field does not fulfill the
-   * required values.
-   *
-   * @return {@code String} - The name of this annotation.
-   */
+
   String message() default "FileMustExist";
-  
+
   Class<?>[] groups() default {};
-  
+
   Class<? extends Payload>[] payload() default {};
-  
+
 }

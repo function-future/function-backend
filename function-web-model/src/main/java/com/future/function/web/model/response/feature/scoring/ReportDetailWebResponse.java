@@ -15,12 +15,20 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ReportDetailWebResponse {
 
-    private String studentId;
-    private String studentName;
-    private String batchCode;
-    private String university;
-    private String avatar;
-    private List<SummaryWebResponse> scores;
-    private Integer point;
+  private String studentId;
+
+  private String studentName;
+
+  private String batchCode;
+
+  private String university;
+
+  private String avatar;
+
+  private List<SummaryWebResponse> scores;
+
+  private Integer point;
+
+  private Integer totalPoint;
 
 }

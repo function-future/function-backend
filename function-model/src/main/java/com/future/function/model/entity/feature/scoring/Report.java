@@ -5,16 +5,20 @@ import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.model.util.constant.DocumentName;
 import com.future.function.model.util.constant.FieldName;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper = true)
 @Data
 @Builder
 @AllArgsConstructor
@@ -22,19 +26,21 @@ import java.util.UUID;
 @Document(collection = DocumentName.REPORT)
 public class Report extends BaseEntity {
 
-    @Builder.Default
-    private String id = UUID.randomUUID().toString();
+  @Id
+  @Builder.Default
+  private String id = UUID.randomUUID()
+    .toString();
 
-    @Field(FieldName.Report.TITLE)
-    private String title;
+  @Field(FieldName.Report.TITLE)
+  private String title;
 
-    @Field(FieldName.Report.DESCRIPTION)
-    private String description;
+  @Field(FieldName.Report.DESCRIPTION)
+  private String description;
 
-    @DBRef(lazy = true)
-    @Field(FieldName.Report.BATCH)
-    private Batch batch;
+  @DBRef(lazy = true)
+  @Field(FieldName.Report.BATCH)
+  private Batch batch;
 
-    private List<User> students;
+  private List<User> students;
 
 }

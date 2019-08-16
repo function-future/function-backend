@@ -5,15 +5,16 @@ import com.future.function.model.entity.feature.scoring.Assignment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-@Repository
-public interface AssignmentRepository extends MongoRepository<Assignment, String> {
+public interface AssignmentRepository
+  extends MongoRepository<Assignment, String> {
 
   Optional<Assignment> findByIdAndDeletedFalse(String id);
 
-  Page<Assignment> findAllByBatchAndDeletedFalse(Batch batch, Pageable pageable);
+  Page<Assignment> findAllByBatchAndDeletedFalse(
+    Batch batch, Pageable pageable
+  );
 
 }

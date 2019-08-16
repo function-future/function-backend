@@ -22,20 +22,28 @@ import java.util.Optional;
 import static com.googlecode.catchexception.CatchException.catchException;
 import static com.googlecode.catchexception.CatchException.caughtException;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class QuestionBankServiceImplTest {
 
   private static final String QUESTIONBANK_ID = "random-id";
-  private static final String QUESTIONBANK_DESCRIPTION = "questionbank-description";
+
+  private static final String QUESTIONBANK_DESCRIPTION =
+    "questionbank-description";
 
   private static final int PAGE = 0;
+
   private static final int TOTAL = 10;
 
   private Pageable pageable;
+
   private QuestionBank questionBank;
+
   private List<QuestionBank> questionBankList;
+
   private Page<QuestionBank> questionBankPage;
 
   @InjectMocks
@@ -46,11 +54,11 @@ public class QuestionBankServiceImplTest {
 
   @Before
   public void setUp() throws Exception {
-    questionBank = QuestionBank
-        .builder()
-        .id(QUESTIONBANK_ID)
-        .description(QUESTIONBANK_DESCRIPTION)
-        .build();
+
+    questionBank = QuestionBank.builder()
+      .id(QUESTIONBANK_ID)
+      .description(QUESTIONBANK_DESCRIPTION)
+      .build();
 
     pageable = new PageRequest(PAGE, TOTAL);
     questionBankList = Collections.singletonList(questionBank);
@@ -60,14 +68,26 @@ public class QuestionBankServiceImplTest {
 
   @After
   public void tearDown() throws Exception {
+
     verifyNoMoreInteractions(questionBankRepository);
+  }
+
+  @Test
+  public void findAllSuccess() {
+
+    when(questionBankRepository.findAllByDeletedFalse()).thenReturn(
+      Collections.singletonList(questionBank));
+    List<QuestionBank> actual = questionBankService.findAll();
+    assertThat(actual.size()).isEqualTo(1);
+    assertThat(actual.get(0)).isEqualTo(questionBank);
+    verify(questionBankRepository).findAllByDeletedFalse();
   }
 
   @Test
   public void testFindByIdSuccess() {
 
-    when(questionBankRepository.findByIdAndDeletedFalse(QUESTIONBANK_ID))
-        .thenReturn(Optional.of(questionBank));
+    when(questionBankRepository.findByIdAndDeletedFalse(
+      QUESTIONBANK_ID)).thenReturn(Optional.of(questionBank));
 
     QuestionBank actual = questionBankService.findById(QUESTIONBANK_ID);
 
@@ -77,6 +97,7 @@ public class QuestionBankServiceImplTest {
 
   @Test
   public void testFindByIdNullFail() {
+
     catchException(() -> questionBankService.findById(null));
 
     assertThat(caughtException().getClass()).isEqualTo(NotFoundException.class);
@@ -84,7 +105,9 @@ public class QuestionBankServiceImplTest {
 
   @Test
   public void testFindByIdEmptyFail() {
-      when(questionBankRepository.findByIdAndDeletedFalse("")).thenReturn(Optional.empty());
+
+    when(questionBankRepository.findByIdAndDeletedFalse("")).thenReturn(
+      Optional.empty());
     catchException(() -> questionBankService.findById(""));
 
     assertThat(caughtException().getClass()).isEqualTo(NotFoundException.class);
@@ -94,21 +117,21 @@ public class QuestionBankServiceImplTest {
   @Test
   public void testFindAllWithPageableFilterAndSearch() {
 
-    when(questionBankRepository.findAllByDeletedFalse(pageable))
-        .thenReturn(questionBankPage);
+    when(questionBankRepository.findAllByDeletedFalse(pageable)).thenReturn(
+      questionBankPage);
 
     Page<QuestionBank> actual = questionBankService.findAllByPageable(pageable);
 
     assertThat(actual.getContent()).isEqualTo(questionBankList);
-    assertThat(actual.getTotalElements()).isEqualTo(questionBankPage.getTotalElements());
+    assertThat(actual.getTotalElements()).isEqualTo(
+      questionBankPage.getTotalElements());
     verify(questionBankRepository).findAllByDeletedFalse(pageable);
   }
 
   @Test
   public void testCreateQuestionBank() {
 
-    when(questionBankRepository.save(questionBank))
-        .thenReturn(questionBank);
+    when(questionBankRepository.save(questionBank)).thenReturn(questionBank);
 
     QuestionBank actual = questionBankService.createQuestionBank(questionBank);
 
@@ -119,10 +142,9 @@ public class QuestionBankServiceImplTest {
   @Test
   public void testUpdateQuestionBank() {
 
-    when(questionBankRepository.findByIdAndDeletedFalse(QUESTIONBANK_ID))
-        .thenReturn(Optional.of(questionBank));
-    when(questionBankRepository.save(questionBank))
-        .thenReturn(questionBank);
+    when(questionBankRepository.findByIdAndDeletedFalse(
+      QUESTIONBANK_ID)).thenReturn(Optional.of(questionBank));
+    when(questionBankRepository.save(questionBank)).thenReturn(questionBank);
 
     QuestionBank actual = questionBankService.updateQuestionBank(questionBank);
 
@@ -134,11 +156,12 @@ public class QuestionBankServiceImplTest {
   @Test
   public void testDeleteQuestionBank() {
 
-    when(questionBankRepository.findByIdAndDeletedFalse(QUESTIONBANK_ID))
-        .thenReturn(Optional.of(questionBank));
+    when(questionBankRepository.findByIdAndDeletedFalse(
+      QUESTIONBANK_ID)).thenReturn(Optional.of(questionBank));
 
     questionBankService.deleteById(QUESTIONBANK_ID);
     verify(questionBankRepository).findByIdAndDeletedFalse(QUESTIONBANK_ID);
     verify(questionBankRepository).save(questionBank);
   }
+
 }

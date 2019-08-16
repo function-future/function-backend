@@ -10,9 +10,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AuthWebRequest {
-  
+
   private String email;
-  
+
   private String password;
-  
+
 }

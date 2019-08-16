@@ -7,9 +7,6 @@ import lombok.EqualsAndHashCode;
 
 import java.util.List;
 
-/**
- * Model representation for data response with paging.
- */
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class PagingResponse<T> extends BaseResponse {
@@ -19,7 +16,7 @@ public class PagingResponse<T> extends BaseResponse {
   private Paging paging;
 
   public PagingResponse() {}
-  
+
   @Builder
   private PagingResponse(int code, String status, List<T> data, Paging paging) {
 

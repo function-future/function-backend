@@ -21,10 +21,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-/**
- * Author: ricky.kennedy
- * Created At: 3:31 PM 7/25/2019
- */
 @RunWith(MockitoJUnitRunner.class)
 public class MyQuestionnaireRequestMapperTest {
 
@@ -51,8 +47,12 @@ public class MyQuestionnaireRequestMapperTest {
   private static final User MEMBER_1 = User.builder()
     .id(MEMBER_ID_1)
     .name(MEMBER_NAME_1)
-    .pictureV2(FileV2.builder().thumbnailUrl(THUMBNAIL_URL).build())
-    .batch(Batch.builder().id(BATCH_ID).build())
+    .pictureV2(FileV2.builder()
+                 .thumbnailUrl(THUMBNAIL_URL)
+                 .build())
+    .batch(Batch.builder()
+             .id(BATCH_ID)
+             .build())
     .role(Role.STUDENT)
     .university(UNIVERSITY)
     .build();
@@ -60,7 +60,9 @@ public class MyQuestionnaireRequestMapperTest {
   private static final User MEMBER_2 = User.builder()
     .id(MEMBER_ID_2)
     .name(MEMBER_NAME_2)
-    .pictureV2(FileV2.builder().thumbnailUrl(THUMBNAIL_URL).build())
+    .pictureV2(FileV2.builder()
+                 .thumbnailUrl(THUMBNAIL_URL)
+                 .build())
     .role(Role.MENTOR)
     .build();
 
@@ -84,20 +86,26 @@ public class MyQuestionnaireRequestMapperTest {
 
   @Test
   public void toListQuestionResponse() {
-    when(questionnaireService.getQuestionQuestionnaire(QUESTION_ID))
-      .thenReturn(QUESTION);
 
-    List<QuestionResponse> data = myQuestionnaireRequestMapper.toListQuestionResponse(
-      Arrays.asList(QUESTION_RESPONSE_REQUEST),
-      MEMBER_1,
-      MEMBER_2
-    );
+    when(questionnaireService.getQuestionQuestionnaire(QUESTION_ID)).thenReturn(
+      QUESTION);
+
+    List<QuestionResponse> data =
+      myQuestionnaireRequestMapper.toListQuestionResponse(
+        Arrays.asList(QUESTION_RESPONSE_REQUEST), MEMBER_1, MEMBER_2);
 
     assertThat(data.size()).isEqualTo(1);
-    assertThat(data.get(0).getAppraiser().getId()).isEqualTo(MEMBER_ID_1);
-    assertThat(data.get(0).getAppraisee().getId()).isEqualTo(MEMBER_ID_2);
-    assertThat(data.get(0).getQuestion().getId()).isEqualTo(QUESTION_ID);
+    assertThat(data.get(0)
+                 .getAppraiser()
+                 .getId()).isEqualTo(MEMBER_ID_1);
+    assertThat(data.get(0)
+                 .getAppraisee()
+                 .getId()).isEqualTo(MEMBER_ID_2);
+    assertThat(data.get(0)
+                 .getQuestion()
+                 .getId()).isEqualTo(QUESTION_ID);
 
     verify(questionnaireService).getQuestionQuestionnaire(QUESTION_ID);
   }
+
 }

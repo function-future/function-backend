@@ -13,25 +13,25 @@ import java.util.Optional;
 
 public class CourseMustExistValidator
   implements ConstraintValidator<CourseMustExist, List<String>> {
-  
+
   @Autowired
   private CourseRepository courseRepository;
-  
+
   @Override
   public void initialize(CourseMustExist constraintAnnotation) {
     // No initialization needed.
   }
-  
+
   @Override
   public boolean isValid(
     List<String> courseIds, ConstraintValidatorContext context
   ) {
-    
+
     return Optional.ofNullable(courseIds)
       .orElse(Collections.emptyList())
       .stream()
       .map(courseRepository::findOne)
       .allMatch(Objects::nonNull);
   }
-  
+
 }

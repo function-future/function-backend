@@ -11,13 +11,24 @@ import java.util.List;
 
 public interface QuestionnaireResponseSummaryService {
 
-  Page<QuestionnaireResponseSummary> getQuestionnairesSummariesBasedOnAppraisee(User appraisee, Pageable pageable);
+  Page<QuestionnaireResponseSummary> getQuestionnairesSummariesBasedOnAppraisee(
+    User appraisee, Pageable pageable
+  );
 
-  QuestionnaireResponseSummary getQuestionnaireResponseSummaryById(String questionnaireResponseSummaryId);
+  QuestionnaireResponseSummary getQuestionnaireResponseSummaryById(
+    String questionnaireResponseSummaryId
+  );
 
-  List<QuestionResponseSummary> getQuestionsDetailsFromQuestionnaireResponseSummaryIdAndAppraisee(String questionnaireResponseSummaryId,User Appraisee);
+  List<QuestionResponseSummary> getQuestionsDetailsFromQuestionnaireResponseSummaryIdAndAppraisee(
+    String questionnaireResponseSummaryId, User appraisee
+  );
 
-  QuestionResponseSummary getQuestionResponseSummaryById(String questionResponseSummaryId);
+  QuestionResponseSummary getQuestionResponseSummaryById(
+    String questionResponseSummaryId
+  );
 
-  List<QuestionResponse> getQuestionResponseByQuestionResponseSummaryId(String questionResponseSummaryId);
+  List<QuestionResponse> getQuestionResponseByQuestionResponseSummaryId(
+    String questionResponseSummaryId
+  );
+
 }

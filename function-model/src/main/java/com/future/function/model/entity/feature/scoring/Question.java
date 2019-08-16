@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
@@ -15,7 +16,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 import java.util.List;
 import java.util.UUID;
 
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper = true)
 @Data
 @Builder
 @NoArgsConstructor
@@ -23,8 +24,10 @@ import java.util.UUID;
 @Document(collection = DocumentName.QUESTION)
 public class Question extends BaseEntity {
 
+  @Id
   @Builder.Default
-  private String id = UUID.randomUUID().toString();
+  private String id = UUID.randomUUID()
+    .toString();
 
   @Field(FieldName.Question.LABEL)
   private String label;
@@ -34,4 +37,5 @@ public class Question extends BaseEntity {
   private QuestionBank questionBank;
 
   private List<Option> options;
+
 }

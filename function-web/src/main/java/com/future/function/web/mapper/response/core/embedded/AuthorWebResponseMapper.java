@@ -7,13 +7,13 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class AuthorWebResponseMapper {
-  
+
   public static AuthorWebResponse buildAuthorWebResponse(User user) {
-    
+
     return AuthorWebResponse.builder()
       .id(user.getId())
       .name(user.getName())
       .build();
   }
-  
+
 }

@@ -10,24 +10,21 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.NotBlank;
 
-/**
- * Model representation for batch web request.
- */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @UniqueBatchCode
 public class BatchWebRequest implements BatchData {
-  
+
   private String id;
-  
+
   @NotBlank(message = "NotBlank")
   private String name;
-  
+
   @NoSpace
   @Alphanumeric
   @NotBlank(message = "NotBlank")
   private String code;
-  
+
 }

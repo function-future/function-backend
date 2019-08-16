@@ -1,6 +1,7 @@
 package com.future.function.web.controller.core;
 
 import com.future.function.common.enumeration.core.Role;
+import com.future.function.common.properties.core.FileProperties;
 import com.future.function.service.api.feature.core.AuthService;
 import com.future.function.session.annotation.WithAnyRole;
 import com.future.function.session.model.Session;
@@ -25,47 +26,56 @@ import javax.servlet.http.HttpServletResponse;
 @RestController
 @RequestMapping("/api/core/auth")
 public class AuthController {
-  
+
   private final AuthService authService;
-  
+
+  private final FileProperties fileProperties;
+
   @Autowired
-  public AuthController(AuthService authService) {
-    
+  public AuthController(
+    AuthService authService, FileProperties fileProperties
+  ) {
+
     this.authService = authService;
+    this.fileProperties = fileProperties;
   }
-  
+
   @ResponseStatus(HttpStatus.OK)
   @PostMapping
   public DataResponse<AuthWebResponse> login(
     @RequestBody
-      AuthWebRequest request, HttpServletResponse response
+      AuthWebRequest request, HttpServletResponse servletResponse
   ) {
-    
+
     return AuthResponseMapper.toAuthDataResponse(authService.login(
       request.getEmail()
-        .toLowerCase(), request.getPassword(), response));
+        .toLowerCase(), request.getPassword(), servletResponse),
+                                                 fileProperties.getUrlPrefix()
+    );
   }
-  
+
   @ResponseStatus(HttpStatus.OK)
   @GetMapping
   public DataResponse<AuthWebResponse> getLoginStatus(
     @WithAnyRole
       Session session, HttpServletResponse servletResponse
   ) {
-    
+
     return AuthResponseMapper.toAuthDataResponse(
-      authService.getLoginStatus(session.getId(), servletResponse));
+      authService.getLoginStatus(session.getId(), servletResponse),
+      fileProperties.getUrlPrefix()
+    );
   }
-  
+
   @ResponseStatus(HttpStatus.OK)
   @DeleteMapping
   public BaseResponse logout(
     @WithAnyRole(roles = { Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT })
       Session session, HttpServletResponse response
   ) {
-    
+
     authService.logout(session.getId(), response);
     return ResponseHelper.toBaseResponse(HttpStatus.OK);
   }
-  
+
 }

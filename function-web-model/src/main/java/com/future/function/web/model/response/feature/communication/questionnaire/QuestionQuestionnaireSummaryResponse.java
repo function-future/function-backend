@@ -16,4 +16,5 @@ public class QuestionQuestionnaireSummaryResponse {
   private QuestionQuestionnaireResponse question;
 
   private Float score;
+
 }

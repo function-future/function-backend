@@ -9,9 +9,11 @@ import com.future.function.repository.feature.core.UserRepository;
 import com.future.function.service.api.feature.core.BatchService;
 import com.future.function.service.api.feature.core.ResourceService;
 import com.future.function.service.api.feature.core.UserService;
+import com.future.function.service.api.feature.scoring.ScoringMediatorService;
 import com.future.function.service.impl.helper.CopyHelper;
 import com.future.function.service.impl.helper.PageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -21,9 +23,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Service implementation class for user logic operations implementation.
- */
 @Service
 public class UserServiceImpl implements UserService {
 
@@ -33,27 +32,26 @@ public class UserServiceImpl implements UserService {
 
   private final ResourceService resourceService;
 
+  private final ScoringMediatorService scoringMediatorService;
+
   private final BCryptPasswordEncoder encoder;
 
   @Autowired
   public UserServiceImpl(
     BatchService batchService, UserRepository userRepository,
-    ResourceService resourceService, BCryptPasswordEncoder encoder
+    ResourceService resourceService,
+    @Lazy
+      ScoringMediatorService scoringMediatorService,
+    BCryptPasswordEncoder encoder
   ) {
 
     this.batchService = batchService;
     this.userRepository = userRepository;
     this.resourceService = resourceService;
+    this.scoringMediatorService = scoringMediatorService;
     this.encoder = encoder;
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @param userId Id of user to be retrieved.
-   *
-   * @return {@code User} - The user object found in database.
-   */
   @Override
   public User getUser(String userId) {
 
@@ -62,14 +60,6 @@ public class UserServiceImpl implements UserService {
       .orElseThrow(() -> new NotFoundException("Get User Not Found"));
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @param email    Email of user to be retrieved.
-   * @param password Password of user.
-   *
-   * @return {@code User} - The user object found in database.
-   */
   @Override
   public User getUserByEmailAndPassword(String email, String password) {
 
@@ -79,43 +69,27 @@ public class UserServiceImpl implements UserService {
       .orElseThrow(() -> new UnauthorizedException("Invalid Email/Password"));
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @param role     Role enum of to-be-retrieved users
-   * @param pageable Pageable object for paging data
-   *
-   * @return {@code Page<User>} - Page of users found in database.
-   */
   @Override
-  public Page<User> getUsers(Role role, Pageable pageable) {
+  public Page<User> getUsers(Role role, String name, Pageable pageable) {
 
-    return userRepository.findAllByRoleAndDeletedFalse(role, pageable);
+    return userRepository.findAllByRoleAndNameContainsIgnoreCaseAndDeletedFalse(
+      role, name, pageable);
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @param batchCode   Code represents the batch of to-be-retrieved students
-   * @param pageable    Pageable object for paging data
-   *
-   * @return {@code Page<User>} - Page of users found in database.
-   */
   @Override
-  public Page<User> getStudentsWithinBatch(String batchCode, Pageable pageable) {
+  public Page<User> getStudentsWithinBatch(
+    String batchCode, Pageable pageable
+  ) {
+
     return Optional.ofNullable(batchCode)
-        .map(batchService::getBatchByCode)
-        .map(batch -> userRepository.findAllByBatchAndRoleAndDeletedFalse(batch, Role.STUDENT, pageable))
-        .orElseGet(() -> PageHelper.empty(pageable));
+      .map(batchService::getBatchByCode)
+      .map(batch -> userRepository.findAllByBatchAndRoleAndDeletedFalse(batch,
+                                                                        Role.STUDENT,
+                                                                        pageable
+      ))
+      .orElseGet(() -> PageHelper.empty(pageable));
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @param user User data of new user.
-   *
-   * @return {@code User} - The user object of the saved data.
-   */
   @Override
   public User createUser(User user) {
 
@@ -128,17 +102,11 @@ public class UserServiceImpl implements UserService {
       .map(this::setDefaultEncryptedPassword)
       .map(this::setUserPicture)
       .map(userRepository::save)
+      .map(scoringMediatorService::createQuizAndAssignmentsByStudent)
       .orElseThrow(
         () -> new UnsupportedOperationException("Failed Create User"));
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @param user User data of existing user.
-   *
-   * @return {@code User} - The user object of the saved data.
-   */
   @Override
   public User updateUser(User user) {
 
@@ -157,49 +125,29 @@ public class UserServiceImpl implements UserService {
       .orElse(user);
   }
 
-  private String getDefaultPassword(String name) {
-    
-    return Optional.ofNullable(name)
-      .map(String::toLowerCase)
-      .map(n -> n.replace(" ", ""))
-      .map(n -> n.concat("functionapp"))
-      .orElse(null);
-  }
-  
   private User setUserPassword(User user, User foundUser) {
-  
+
     String password = Optional.of(foundUser)
       .filter(u -> !encoder.matches(this.getDefaultPassword(u.getName()),
                                     u.getPassword()
       ))
       .map(User::getPassword)
       .orElseGet(() -> encoder.encode(this.getDefaultPassword(user.getName())));
-    
+
     user.setPassword(password);
-    
+
     return foundUser;
   }
-  
-  /**
-   * {@inheritDoc}
-   *
-   * @param userId Id of user to be deleted.
-   */
+
   @Override
   public void deleteUser(String userId) {
 
     Optional.ofNullable(userId)
       .map(userRepository::findOne)
+      .map(scoringMediatorService::deleteQuizAndAssignmentsByStudent)
       .ifPresent(this::markDeleted);
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @param batchCode Batch code for students.
-   *
-   * @return {@code List<User>} - List of users found in database.
-   */
   @Override
   public List<User> getStudentsByBatchCode(
     String batchCode
@@ -207,7 +155,8 @@ public class UserServiceImpl implements UserService {
 
     return Optional.ofNullable(batchCode)
       .map(batchService::getBatchByCode)
-      .map(batch -> userRepository.findAllByRoleAndBatchAndDeletedFalse(Role.STUDENT, batch))
+      .map(batch -> userRepository.findAllByRoleAndBatchAndDeletedFalse(
+        Role.STUDENT, batch))
       .orElseGet(Collections::emptyList);
   }
 
@@ -231,17 +180,30 @@ public class UserServiceImpl implements UserService {
       .orElseThrow(() -> new UnauthorizedException("Invalid Old Password"));
   }
 
-  private User setEncryptedPassword(User user, String password) {
+  @Override
+  public User changeProfilePicture(User user) {
 
-    user.setPassword(encoder.encode(password));
-    return user;
+    return userRepository.findByEmailAndDeletedFalse(user.getEmail())
+      .map(foundUser -> this.setUserPicture(user, foundUser))
+      .map(userRepository::save)
+      .orElse(user);
   }
 
   @Override
-  public Page<User> getUsersByNameContainsIgnoreCase(String name, Pageable pageable) {
+  public Page<User> getUsersByNameContainsIgnoreCase(
+    String name, Pageable pageable
+  ) {
 
-    return userRepository.findAllByNameContainsIgnoreCaseAndDeletedFalse(name
-      , pageable);
+    return userRepository.findAllByNameContainsIgnoreCaseAndDeletedFalse(name,
+                                                                         pageable
+    );
+  }
+
+  private void markDeleted(User user) {
+
+    user.setDeleted(true);
+    deleteUserPicture(user);
+    userRepository.save(user);
   }
 
   private User setUserPicture(User user, User foundUser) {
@@ -254,24 +216,10 @@ public class UserServiceImpl implements UserService {
       .orElse(foundUser);
   }
 
-  private User markAndSetUserPicture(User user, String fileId, boolean used) {
-
-    resourceService.markFilesUsed(Collections.singletonList(fileId), used);
-    user.setPictureV2(resourceService.getFile(fileId));
-    return user;
-  }
-
   private User copyPropertiesAndSaveUser(User user, User foundUser) {
 
     CopyHelper.copyProperties(user, foundUser);
     return userRepository.save(foundUser);
-  }
-
-  private void markDeleted(User user) {
-
-    user.setDeleted(true);
-    deleteUserPicture(user);
-    userRepository.save(user);
   }
 
   private User deleteUserPicture(User user) {
@@ -292,19 +240,32 @@ public class UserServiceImpl implements UserService {
       .orElse(user);
   }
 
+  private User markAndSetUserPicture(User user, String fileId, boolean used) {
+
+    resourceService.markFilesUsed(Collections.singletonList(fileId), used);
+    user.setPictureV2(resourceService.getFile(fileId));
+    return user;
+  }
+
   private User setDefaultEncryptedPassword(User user) {
 
     return this.setEncryptedPassword(
       user, this.getDefaultPassword(user.getName()));
   }
 
-  @Override
-  public User changeProfilePicture(User user) {
+  private String getDefaultPassword(String name) {
 
-    return userRepository.findByEmailAndDeletedFalse(user.getEmail())
-      .map(foundUser -> this.setUserPicture(user, foundUser))
-      .map(userRepository::save)
-      .orElse(user);
+    return Optional.ofNullable(name)
+      .map(String::toLowerCase)
+      .map(n -> n.replace(" ", ""))
+      .map(n -> n.concat("functionapp"))
+      .orElse(null);
+  }
+
+  private User setEncryptedPassword(User user, String password) {
+
+    user.setPassword(encoder.encode(password));
+    return user;
   }
 
 }

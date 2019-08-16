@@ -2,6 +2,7 @@ package com.future.function.web.controller.core;
 
 import com.future.function.common.enumeration.core.FileOrigin;
 import com.future.function.common.enumeration.core.Role;
+import com.future.function.common.properties.core.FileProperties;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.service.api.feature.core.ResourceService;
 import com.future.function.web.TestHelper;
@@ -54,6 +55,8 @@ public class ResourceControllerTest extends TestHelper {
 
   private static final String FILE_URL = "file-url";
 
+  private static final String URL_PREFIX = "url-prefix/";
+
   private static final FileV2 FILE_V2_NULL_THUMBNAIL = FileV2.builder()
     .id(ID)
     .name(NAME)
@@ -63,13 +66,17 @@ public class ResourceControllerTest extends TestHelper {
 
   private static final DataResponse<FileContentWebResponse>
     CREATED_DATA_RESPONSE_NULL_THUMBNAIL =
-    ResourceResponseMapper.toResourceDataResponse(FILE_V2_NULL_THUMBNAIL);
+    ResourceResponseMapper.toResourceDataResponse(
+      FILE_V2_NULL_THUMBNAIL, URL_PREFIX);
 
   @MockBean
   private ResourceService resourceService;
 
   @MockBean
   private ResourceRequestMapper resourceRequestMapper;
+
+  @MockBean
+  private FileProperties fileProperties;
 
   @Override
   @Before
@@ -81,14 +88,17 @@ public class ResourceControllerTest extends TestHelper {
   @After
   public void tearDown() {
 
-    verifyNoMoreInteractions(resourceService, resourceRequestMapper);
+    verifyNoMoreInteractions(
+      resourceService, resourceRequestMapper, fileProperties);
   }
 
   @Test
   public void testGivenApiCallByStoringFileReturnDataResponseObject()
     throws Exception {
-    
+
     super.setCookie(Role.MENTOR);
+
+    when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
 
     Pair<String, byte[]> pair = Pair.of(NAME, BYTES);
 
@@ -107,6 +117,7 @@ public class ResourceControllerTest extends TestHelper {
         dataResponseJacksonTester.write(CREATED_DATA_RESPONSE_NULL_THUMBNAIL)
           .getJson()));
 
+    verify(fileProperties).getUrlPrefix();
     verify(resourceRequestMapper).toStringAndByteArrayPair(
       any(MultipartFile.class));
     verify(resourceService).storeAndSaveFile(
@@ -124,8 +135,7 @@ public class ResourceControllerTest extends TestHelper {
                                             FileOrigin.ANNOUNCEMENT, null
     )).thenReturn(BYTES);
 
-    mockMvc.perform(
-      get("/api/core/resources/" + ORIGIN + "/" + ORIGINAL_NAME))
+    mockMvc.perform(get("/api/core/resources/" + ORIGIN + "/" + ORIGINAL_NAME))
       .andExpect(status().isOk())
       .andExpect(header().string(HttpHeaders.CONTENT_DISPOSITION,
                                  "attachment; filename=\"" + ORIGINAL_NAME +
@@ -137,7 +147,7 @@ public class ResourceControllerTest extends TestHelper {
       eq(ORIGINAL_NAME), any(HttpServletRequest.class));
     verify(resourceService).getFileAsByteArray(
       Role.UNKNOWN, ORIGINAL_NAME, FileOrigin.ANNOUNCEMENT, null);
-    verifyZeroInteractions(resourceRequestMapper);
+    verifyZeroInteractions(resourceRequestMapper, fileProperties);
   }
 
 }

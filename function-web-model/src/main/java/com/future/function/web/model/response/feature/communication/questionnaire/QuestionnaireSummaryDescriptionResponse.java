@@ -16,4 +16,5 @@ public class QuestionnaireSummaryDescriptionResponse {
   private AppraiseeResponse appraisee;
 
   private Float rating;
+
 }

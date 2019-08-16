@@ -1,6 +1,7 @@
 package com.future.function.web.controller.communication.questionnaire;
 
 import com.future.function.common.enumeration.core.Role;
+import com.future.function.common.properties.core.FileProperties;
 import com.future.function.service.api.feature.communication.questionnaire.MyQuestionnaireService;
 import com.future.function.service.api.feature.communication.questionnaire.QuestionnaireService;
 import com.future.function.service.api.feature.core.UserService;
@@ -46,89 +47,106 @@ public class MyQuestionnaireController {
 
   private final MyQuestionnaireRequestMapper myQuestionnaireRequestMapper;
 
+  private final FileProperties fileProperties;
+
   @Autowired
   public MyQuestionnaireController(
-          MyQuestionnaireService myQuestionnaireService,
-          QuestionnaireService questionnaireService, UserService userService, MyQuestionnaireRequestMapper myQuestionnaireRequestMapper) {
+    MyQuestionnaireService myQuestionnaireService,
+    QuestionnaireService questionnaireService, UserService userService,
+    MyQuestionnaireRequestMapper myQuestionnaireRequestMapper,
+    FileProperties fileProperties
+  ) {
+
     this.myQuestionnaireService = myQuestionnaireService;
     this.questionnaireService = questionnaireService;
     this.userService = userService;
     this.myQuestionnaireRequestMapper = myQuestionnaireRequestMapper;
+    this.fileProperties = fileProperties;
   }
 
   @ResponseStatus(HttpStatus.OK)
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   public PagingResponse<QuestionnaireDetailResponse> getMyQuestionnaires(
-    @RequestParam(required = false, defaultValue = "1") int page,
-    @RequestParam(required = false, defaultValue = "10") int size,
-    Session session
-  )
-  {
-     return QuestionnaireResponseMapper
-              .toPagingQuestionnaireDetailResponse(
-                myQuestionnaireService.getQuestionnairesByMemberLoginAsAppraiser(
-                  userService.getUser(session.getUserId()),
-                  PageHelper.toPageable(page, size)
-                )
-              );
-  }
-
-  @ResponseStatus(HttpStatus.OK)
-  @GetMapping(value = "/{questionnaireId}/appraisees", produces = MediaType.APPLICATION_JSON_VALUE)
-  public DataResponse<List<AppraiseeResponse>> getListAprraisees(
-          @PathVariable String questionnaireId,
-          Session session
-  )
-  {
-    return MyQuestionnaireResponseMapper.toDataResponseAppraiseeResponseList(
-            myQuestionnaireService.getListAppraisedByQuestionnaireAndMemberLoginAsAppraiser(
-              questionnaireService.getQuestionnaire(questionnaireId),
-              userService.getUser(session.getUserId())
-            )
-    );
-  }
-
-  @ResponseStatus(HttpStatus.OK)
-  @GetMapping(value = "/{questionnaireId}/appraisees/{appraiseeId}", produces = MediaType.APPLICATION_JSON_VALUE)
-  public DataResponse<AppraisalDataResponse> getQuestionnaireData(
-     @PathVariable String questionnaireId,
-     @PathVariable String appraiseeId
-  ){
-    return MyQuestionnaireResponseMapper.toDataResponseQuestionnaireSummaryDescriptionResponse(
-            questionnaireService.getQuestionnaire(questionnaireId),
-            userService.getUser(appraiseeId)
-    );
-  }
-
-  @ResponseStatus(HttpStatus.OK)
-  @GetMapping(value = "/{questionnaireId}/appraisees/{appraiseeId}/questions", produces = MediaType.APPLICATION_JSON_VALUE)
-  public DataResponse<List<QuestionQuestionnaireResponse>> getQuestion(
-          @PathVariable String questionnaireId,
-          @PathVariable String appraiseeId
+    @RequestParam(required = false,
+                  defaultValue = "1")
+      int page,
+    @RequestParam(required = false,
+                  defaultValue = "10")
+      int size, Session session
   ) {
-    return MyQuestionnaireResponseMapper.toDataResponseQuestionQuestionnaireResponseList(
-            myQuestionnaireService.getQuestionsFromQuestionnaire(
-                    questionnaireService.getQuestionnaire(questionnaireId)
-            )
+
+    return QuestionnaireResponseMapper.toPagingQuestionnaireDetailResponse(
+      myQuestionnaireService.getQuestionnairesByMemberLoginAsAppraiser(
+        userService.getUser(session.getUserId()),
+        PageHelper.toPageable(page, size)
+      ));
+  }
+
+  @ResponseStatus(HttpStatus.OK)
+  @GetMapping(value = "/{questionnaireId}/appraisees",
+              produces = MediaType.APPLICATION_JSON_VALUE)
+  public DataResponse<List<AppraiseeResponse>> getListAprraisees(
+    @PathVariable
+      String questionnaireId, Session session
+  ) {
+
+    return MyQuestionnaireResponseMapper.toDataResponseAppraiseeResponseList(
+      myQuestionnaireService.getListAppraisedByQuestionnaireAndMemberLoginAsAppraiser(
+        questionnaireService.getQuestionnaire(questionnaireId),
+        userService.getUser(session.getUserId())
+      ), fileProperties.getUrlPrefix());
+  }
+
+  @ResponseStatus(HttpStatus.OK)
+  @GetMapping(value = "/{questionnaireId}/appraisees/{appraiseeId}",
+              produces = MediaType.APPLICATION_JSON_VALUE)
+  public DataResponse<AppraisalDataResponse> getQuestionnaireData(
+    @PathVariable
+      String questionnaireId,
+    @PathVariable
+      String appraiseeId
+  ) {
+
+    return MyQuestionnaireResponseMapper.toDataResponseQuestionnaireSummaryDescriptionResponse(
+      questionnaireService.getQuestionnaire(questionnaireId),
+      userService.getUser(appraiseeId), fileProperties.getUrlPrefix()
     );
+  }
+
+  @ResponseStatus(HttpStatus.OK)
+  @GetMapping(value = "/{questionnaireId}/appraisees/{appraiseeId}/questions",
+              produces = MediaType.APPLICATION_JSON_VALUE)
+  public DataResponse<List<QuestionQuestionnaireResponse>> getQuestion(
+    @PathVariable
+      String questionnaireId,
+    @PathVariable
+      String appraiseeId
+  ) {
+
+    return MyQuestionnaireResponseMapper.toDataResponseQuestionQuestionnaireResponseList(
+      myQuestionnaireService.getQuestionsFromQuestionnaire(
+        questionnaireService.getQuestionnaire(questionnaireId)));
   }
 
   @ResponseStatus(HttpStatus.CREATED)
   @PostMapping(value = "/{questionnaireId}/appraisees/{appraiseeId}/questions",
-                consumes = MediaType.APPLICATION_JSON_VALUE,
-                produces = MediaType.APPLICATION_JSON_VALUE
-  )
+               consumes = MediaType.APPLICATION_JSON_VALUE,
+               produces = MediaType.APPLICATION_JSON_VALUE)
   public BaseResponse addQuestionnaireResponse(
-          @PathVariable String questionnaireId,
-          @PathVariable String appraiseeId,
-          Session session,
-          @RequestBody QuestionnaireResponseRequest responses
-          ) {
+    @PathVariable
+      String questionnaireId,
+    @PathVariable
+      String appraiseeId, Session session,
+    @RequestBody
+      QuestionnaireResponseRequest responses
+  ) {
+
     myQuestionnaireService.createQuestionnaireResponseToAppraiseeFromMemberLoginAsAppraiser(
       questionnaireService.getQuestionnaire(questionnaireId),
-      myQuestionnaireRequestMapper.toListQuestionResponse(responses.getResponses(),userService.getUser(session.getUserId()),
-              userService.getUser(appraiseeId)),
-      userService.getUser(session.getUserId()),
+      myQuestionnaireRequestMapper.toListQuestionResponse(
+        responses.getResponses(), userService.getUser(session.getUserId()),
+        userService.getUser(appraiseeId)
+      ), userService.getUser(session.getUserId()),
       userService.getUser(appraiseeId)
     );
     return ResponseHelper.toBaseResponse(HttpStatus.OK);

@@ -7,21 +7,16 @@ import com.github.mongobee.changeset.ChangeLog;
 import com.github.mongobee.changeset.ChangeSet;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
-
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Author: ricky.kennedy
- * Created At: 9:50 AM 8/5/2019
- */
 @ChangeLog(order = "012")
-public class DataMigration_012{
+public class DataMigration_012 {
 
   @ChangeSet(author = "ricky kennedy",
              id = "loggingRoomAccessListMigration",
              order = "0001")
-  public void insertLoggingRoomAccessList (MongoTemplate mongoTemplate)  {
+  public void insertLoggingRoomAccessList(MongoTemplate mongoTemplate) {
 
     String urlRegex = "^\\/logging-rooms.*$";
 
@@ -91,9 +86,9 @@ public class DataMigration_012{
   }
 
   @ChangeSet(author = "ricky kennedy",
-    id = "editLoggingRoomAccessListMigration",
-    order = "0002")
-  public void editLoggingRoomAccessList (MongoTemplate mongoTemplate)  {
+             id = "editLoggingRoomAccessListMigration",
+             order = "0002")
+  public void editLoggingRoomAccessList(MongoTemplate mongoTemplate) {
 
     String urlRegex = "^\\/logging-rooms\\/.*\\/_edit$";
 
@@ -152,9 +147,9 @@ public class DataMigration_012{
   }
 
   @ChangeSet(author = "ricky kennedy",
-    id = "createLoggingRoomAccessListMigration",
-    order = "0003")
-  public void createLoggingRoomAccessList (MongoTemplate mongoTemplate)  {
+             id = "createLoggingRoomAccessListMigration",
+             order = "0003")
+  public void createLoggingRoomAccessList(MongoTemplate mongoTemplate) {
 
     String urlRegex = "^\\/logging-rooms\\/_create$";
 
@@ -211,4 +206,5 @@ public class DataMigration_012{
 
     mongoTemplate.insert(studentAccess, DocumentName.ACCESS);
   }
+
 }

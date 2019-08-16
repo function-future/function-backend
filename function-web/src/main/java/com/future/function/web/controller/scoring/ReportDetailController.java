@@ -1,7 +1,7 @@
 package com.future.function.web.controller.scoring;
 
 import com.future.function.common.enumeration.core.Role;
-import com.future.function.service.api.feature.scoring.ReportDetailService;
+import com.future.function.common.properties.core.FileProperties;
 import com.future.function.service.api.feature.scoring.ReportService;
 import com.future.function.session.annotation.WithAnyRole;
 import com.future.function.session.model.Session;
@@ -13,42 +13,72 @@ import com.future.function.web.model.response.feature.scoring.ReportDetailWebRes
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/scoring/batches/{batchCode}/judgings/{judgingId}/comparisons")
+@RequestMapping(
+  "/api/scoring/batches/{batchCode}/judgings/{judgingId" + "}/comparisons")
 public class ReportDetailController {
 
-    private ReportService reportService;
+  private ReportService reportService;
 
-    private ReportDetailRequestMapper requestMapper;
+  private ReportDetailRequestMapper requestMapper;
 
-    @Autowired
-    public ReportDetailController(ReportService reportService, ReportDetailRequestMapper requestMapper) {
-        this.reportService = reportService;
-        this.requestMapper = requestMapper;
-    }
+  private FileProperties fileProperties;
 
-    @ResponseStatus(HttpStatus.OK)
-    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public DataResponse<List<ReportDetailWebResponse>> findComparisonByReportId(@PathVariable String judgingId,
-        @WithAnyRole(roles = {Role.ADMIN, Role.JUDGE, Role.MENTOR}) Session session) {
-        return ReportDetailResponseMapper.toDataListReportDetailWebResponse(
-            reportService.findAllSummaryByReportId(judgingId, session.getUserId()));
-    }
+  @Autowired
+  public ReportDetailController(
+    ReportService reportService, ReportDetailRequestMapper requestMapper,
+    FileProperties fileProperties
+  ) {
 
-    @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public DataResponse<List<ReportDetailWebResponse>> giveFinalScoreToStudentsByReportId(@PathVariable String judgingId,
-                                                                                          @RequestBody ReportDetailScoreWebRequest request,
-                                                                                          @WithAnyRole(roles = Role.JUDGE) Session session) {
-        return ReportDetailResponseMapper.toDataListReportDetailWebResponseFromReportDetail(
-                HttpStatus.CREATED,
-            reportService.giveScoreToReportStudents(
-                        judgingId,
-                        requestMapper.toReportDetailList(request, judgingId)));
-    }
+    this.reportService = reportService;
+    this.requestMapper = requestMapper;
+    this.fileProperties = fileProperties;
+  }
+
+  @ResponseStatus(HttpStatus.OK)
+  @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+  public DataResponse<List<ReportDetailWebResponse>> findComparisonByReportId(
+    @PathVariable
+      String judgingId,
+    @WithAnyRole(roles = { Role.ADMIN, Role.JUDGE, Role.MENTOR })
+      Session session
+  ) {
+
+    return ReportDetailResponseMapper.toDataListReportDetailWebResponse(
+      reportService.findAllSummaryByReportId(judgingId, session.getUserId()),
+      fileProperties.getUrlPrefix()
+    );
+  }
+
+  @ResponseStatus(HttpStatus.CREATED)
+  @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE,
+               consumes = MediaType.APPLICATION_JSON_VALUE)
+  public DataResponse<List<ReportDetailWebResponse>> giveFinalScoreToStudentsByReportId(
+    @PathVariable
+      String judgingId,
+    @RequestBody
+      ReportDetailScoreWebRequest request,
+    @WithAnyRole(roles = Role.JUDGE)
+      Session session
+  ) {
+
+    return ReportDetailResponseMapper.toDataListReportDetailWebResponseFromReportDetail(
+      HttpStatus.CREATED, reportService.giveScoreToReportStudents(judgingId,
+                                                                  requestMapper.toReportDetailList(
+                                                                    request,
+                                                                    judgingId
+                                                                  )
+      ), fileProperties.getUrlPrefix());
+  }
 
 }

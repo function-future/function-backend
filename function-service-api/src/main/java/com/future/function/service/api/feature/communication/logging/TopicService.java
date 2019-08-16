@@ -6,14 +6,14 @@ import org.springframework.data.domain.Pageable;
 
 public interface TopicService {
 
-    Page<Topic> getTopicByLoggingRoom (String loggingRoomId, Pageable pageable);
+  Page<Topic> getTopicByLoggingRoom(String loggingRoomId, Pageable pageable);
 
-    Topic getTopic (String topicId);
+  Topic getTopic(String topicId);
 
-    Topic createTopic (Topic topic);
+  Topic createTopic(Topic topic);
 
-    Topic updateTopic (Topic topic);
+  Topic updateTopic(Topic topic);
 
-    void deleteTopic (String topicId);
+  void deleteTopic(String topicId);
 
 }

@@ -5,10 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * Author : Ricky Kennedy
- * Created At : 23:07 27/07/2019
- */
 @Data
 @Builder
 @NoArgsConstructor

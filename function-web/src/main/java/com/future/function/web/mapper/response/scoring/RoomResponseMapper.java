@@ -18,29 +18,52 @@ import java.util.stream.Collectors;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class RoomResponseMapper {
 
-  public static DataResponse<RoomWebResponse> toDataRoomWebResponse(Room room) {
-    return ResponseHelper.toDataResponse(HttpStatus.OK, buildRoomWebResponse(room));
+  public static DataResponse<RoomWebResponse> toDataRoomWebResponse(
+    Room room, String urlPrefix
+  ) {
+
+    return ResponseHelper.toDataResponse(HttpStatus.OK,
+                                         buildRoomWebResponse(room, urlPrefix)
+    );
   }
 
-  public static PagingResponse<RoomWebResponse> toPagingRoomWebResponse(Page<Room> roomPage) {
-    return ResponseHelper.toPagingResponse(HttpStatus.OK, buildRoomWebResponses(roomPage), PageHelper.toPaging(roomPage));
+  private static RoomWebResponse buildRoomWebResponse(
+    Room room, String urlPrefix
+  ) {
+
+    return RoomWebResponse.builder()
+      .assignment(
+        AssignmentResponseMapper.toAssignmentDataResponse(room.getAssignment(),
+                                                          urlPrefix
+        )
+          .getData())
+      .student(
+        UserResponseMapper.toUserDataResponse(room.getStudent(), urlPrefix)
+          .getData())
+      .point(room.getPoint())
+      .id(room.getId())
+      .build();
   }
 
-  private static List<RoomWebResponse> buildRoomWebResponses(Page<Room> roomPage) {
+  public static PagingResponse<RoomWebResponse> toPagingRoomWebResponse(
+    Page<Room> roomPage, String urlPrefix
+  ) {
+
+    return ResponseHelper.toPagingResponse(HttpStatus.OK,
+                                           buildRoomWebResponses(roomPage,
+                                                                 urlPrefix
+                                           ), PageHelper.toPaging(roomPage)
+    );
+  }
+
+  private static List<RoomWebResponse> buildRoomWebResponses(
+    Page<Room> roomPage, String urlPrefix
+  ) {
+
     return roomPage.getContent()
-        .stream()
-        .map(RoomResponseMapper::buildRoomWebResponse)
-        .collect(Collectors.toList());
-  }
-
-  private static RoomWebResponse buildRoomWebResponse(Room room) {
-    return RoomWebResponse
-        .builder()
-        .assignment(AssignmentResponseMapper.toAssignmentDataResponse(room.getAssignment()).getData())
-        .student(UserResponseMapper.toUserDataResponse(room.getStudent()).getData())
-        .point(room.getPoint())
-        .id(room.getId())
-        .build();
+      .stream()
+      .map(room -> buildRoomWebResponse(room, urlPrefix))
+      .collect(Collectors.toList());
   }
 
 }

@@ -16,30 +16,39 @@ public class QuestionQuestionnaireRequestMapper {
 
   @Autowired
   public QuestionQuestionnaireRequestMapper(RequestValidator validator) {
+
     this.validator = validator;
   }
 
-  public QuestionQuestionnaire toQuestionQuestionnaire(QuestionQuestionnaireRequest questionQuestionnaireRequest,String questionQuestionnaireId, Questionnaire questionnaire) {
-    return toValidateQuestionQuestionnaire(questionQuestionnaireRequest,questionQuestionnaireId,questionnaire);
+  public QuestionQuestionnaire toQuestionQuestionnaire(
+    QuestionQuestionnaireRequest questionQuestionnaireRequest,
+    String questionQuestionnaireId, Questionnaire questionnaire
+  ) {
+
+    return toValidateQuestionQuestionnaire(questionQuestionnaireRequest,
+                                           questionQuestionnaireId,
+                                           questionnaire
+    );
   }
 
   private QuestionQuestionnaire toValidateQuestionQuestionnaire(
-          QuestionQuestionnaireRequest questionQuestionnaireRequest,
-          String questionQuestionnaireId,
-          Questionnaire questionnaire
+    QuestionQuestionnaireRequest questionQuestionnaireRequest,
+    String questionQuestionnaireId, Questionnaire questionnaire
   ) {
+
     validator.validate(questionQuestionnaireRequest);
 
     QuestionQuestionnaire questionQuestionnaire =
-            QuestionQuestionnaire.builder()
-                    .description(questionQuestionnaireRequest.getDescription())
-                    .questionnaire(questionnaire)
-                    .build();
+      QuestionQuestionnaire.builder()
+        .description(questionQuestionnaireRequest.getDescription())
+        .questionnaire(questionnaire)
+        .build();
 
-    if(questionQuestionnaireId != null) {
+    if (questionQuestionnaireId != null) {
       questionQuestionnaire.setId(questionQuestionnaireId);
     }
 
     return questionQuestionnaire;
   }
+
 }

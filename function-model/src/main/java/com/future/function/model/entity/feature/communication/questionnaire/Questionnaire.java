@@ -40,4 +40,5 @@ public class Questionnaire extends BaseEntity {
   @Field(FieldName.Questionnaire.AUTHOR)
   @DBRef
   private User author;
+
 }

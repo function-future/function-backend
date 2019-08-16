@@ -30,15 +30,17 @@ public class AuthResponseMapperTest {
       .phone("phone")
       .address("address")
       .pictureV2(FileV2.builder()
-                   .fileUrl("file-url")
+                   .fileUrl("/file-url")
                    .build())
       .build();
+
+    String urlPrefix = "url-prefix";
 
     AuthWebResponse authWebResponse = AuthWebResponse.builder()
       .id("id")
       .name("name")
       .email("email")
-      .avatar("file-url")
+      .avatar(urlPrefix + "/file-url")
       .role(Role.MENTOR.name())
       .build();
 
@@ -49,7 +51,7 @@ public class AuthResponseMapperTest {
         .build();
 
     DataResponse<AuthWebResponse> dataResponse =
-      AuthResponseMapper.toAuthDataResponse(user);
+      AuthResponseMapper.toAuthDataResponse(user, urlPrefix);
 
     assertThat(dataResponse).isEqualTo(expectedDataResponse);
   }

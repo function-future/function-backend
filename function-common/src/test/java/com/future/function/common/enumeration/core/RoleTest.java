@@ -10,10 +10,10 @@ public class RoleTest {
 
   @Before
   public void setUp() {}
-  
+
   @After
   public void tearDown() {}
-  
+
   @Test
   public void testGivenProperRoleStringByConvertingStringToRoleReturnProperRoleAsRole() {
 

@@ -1,6 +1,7 @@
 package com.future.function.web.mapper.response.core.embedded;
 
 import com.future.function.model.entity.feature.core.FileV2;
+import com.future.function.web.mapper.helper.UrlHelper;
 import com.future.function.web.model.response.feature.core.embedded.EmbeddedFileWebResponse;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -12,37 +13,40 @@ import java.util.stream.Collectors;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class EmbeddedFileWebResponseMapper {
-  
+
   public static List<EmbeddedFileWebResponse> toEmbeddedFileWebResponses(
-    List<FileV2> files
+    List<FileV2> files, String urlPrefix
   ) {
-    
+
     return Optional.ofNullable(files)
       .orElseGet(Collections::emptyList)
       .stream()
-      .map(EmbeddedFileWebResponseMapper::buildEmbeddedFileWebResponse)
+      .map(
+        file -> EmbeddedFileWebResponseMapper.buildEmbeddedFileWebResponse(file,
+                                                                           urlPrefix
+        ))
       .collect(Collectors.toList());
   }
-  
+
   private static EmbeddedFileWebResponse buildEmbeddedFileWebResponse(
-    FileV2 fileV2
+    FileV2 fileV2, String urlPrefix
   ) {
-    
+
     return EmbeddedFileWebResponse.builder()
       .id(fileV2.getId())
       .file(EmbeddedFileWebResponseMapper.
-        buildEmbeddedFileWebResponseFile(fileV2))
+        buildEmbeddedFileWebResponseFile(fileV2, urlPrefix))
       .build();
   }
-  
+
   private static EmbeddedFileWebResponse.File buildEmbeddedFileWebResponseFile(
-    FileV2 fileV2
+    FileV2 fileV2, String urlPrefix
   ) {
-    
+
     return EmbeddedFileWebResponse.File.builder()
-      .full(fileV2.getFileUrl())
-      .thumbnail(fileV2.getThumbnailUrl())
+      .full(UrlHelper.toFileUrl(urlPrefix, fileV2.getFileUrl()))
+      .thumbnail(UrlHelper.toFileUrl(urlPrefix, fileV2.getThumbnailUrl()))
       .build();
   }
-  
+
 }

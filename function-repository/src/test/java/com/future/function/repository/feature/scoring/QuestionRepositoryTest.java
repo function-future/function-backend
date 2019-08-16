@@ -41,27 +41,33 @@ public class QuestionRepositoryTest {
 
   @Before
   public void setUp() throws Exception {
-    questionBank = QuestionBank.builder().id(QUESTION_BANK_ID).build();
+
+    questionBank = QuestionBank.builder()
+      .id(QUESTION_BANK_ID)
+      .build();
 
     question = Question.builder()
-        .label(QUESTION_TEXT)
-        .questionBank(questionBank)
-        .build();
+      .label(QUESTION_TEXT)
+      .questionBank(questionBank)
+      .build();
     question.setQuestionBank(questionBank);
     repository.save(question);
 
     pageable = new PageRequest(0, 10);
 
-    questionPage = new PageImpl<>(Collections.singletonList(question), pageable, 1);
+    questionPage = new PageImpl<>(
+      Collections.singletonList(question), pageable, 1);
   }
 
   @After
   public void tearDown() throws Exception {
+
     repository.deleteAll();
   }
 
   @Test
   public void findByIdTest() {
+
     String id = question.getId();
 
     Optional<Question> actual = repository.findByIdAndDeletedFalse(id);
@@ -71,16 +77,24 @@ public class QuestionRepositoryTest {
 
   @Test
   public void findAllByQuestionBankIdPageableTest() {
-    Page<Question> actual = repository.findAllByQuestionBankIdAndDeletedFalse(QUESTION_BANK_ID, pageable);
+
+    Page<Question> actual = repository.findAllByQuestionBankIdAndDeletedFalse(
+      QUESTION_BANK_ID, pageable);
     assertThat(actual.getTotalElements()).isEqualTo(1);
     question.setQuestionBank(null);
-    assertThat(actual.getContent().get(0).getLabel()).isEqualTo(question.getLabel());
+    assertThat(actual.getContent()
+                 .get(0)
+                 .getLabel()).isEqualTo(question.getLabel());
   }
 
   @Test
   public void findAllByQuestionBankIdListTest() {
-    List<Question> actual = repository.findAllByQuestionBankIdAndDeletedFalse(QUESTION_BANK_ID);
+
+    List<Question> actual = repository.findAllByQuestionBankIdAndDeletedFalse(
+      QUESTION_BANK_ID);
     assertThat(actual.size()).isEqualTo(1);
-    assertThat(actual.get(0).getLabel()).isEqualTo(question.getLabel());
+    assertThat(actual.get(0)
+                 .getLabel()).isEqualTo(question.getLabel());
   }
+
 }

@@ -1,6 +1,7 @@
 package com.future.function.web.controller.scoring;
 
 import com.future.function.common.enumeration.core.Role;
+import com.future.function.common.properties.core.FileProperties;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.User;
@@ -29,7 +30,9 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.UUID;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -39,83 +42,117 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(StudentRoomController.class)
 public class StudentRoomControllerTest extends TestHelper {
 
-    private static final String ASSIGNMENT_TITLE = "assignment-title";
-    private static final String ASSIGNMENT_DESCRIPTION = "assignment-description";
-    private static final long ASSIGNMENT_DEADLINE = new Date().getTime();
-    private static final String BATCH_CODE = "3";
-    private static final String ROOM_ID = "room-id";
-    private static final String USER_ID = "user-id";
-    private static final String USER_NAME = "user-name";
-    private static String ASSIGNMENT_ID = UUID.randomUUID().toString();
-    private Pageable pageable;
-    private Assignment assignment;
-    private Room room;
-    private User user;
-    private Page<Room> roomPage;
+  private static final String ASSIGNMENT_TITLE = "assignment-title";
 
-    private PagingResponse<RoomWebResponse> PAGING_RESPONSE;
+  private static final String ASSIGNMENT_DESCRIPTION = "assignment-description";
 
-    @MockBean
-    private AssignmentService assignmentService;
+  private static final long ASSIGNMENT_DEADLINE = new Date().getTime();
 
-    @Before
-    public void setUp() {
-        super.setUp();
-        super.setCookie(Role.ADMIN);
-        assignment = Assignment
-                .builder()
-                .id(ASSIGNMENT_ID)
-                .title(ASSIGNMENT_TITLE)
-                .description(ASSIGNMENT_DESCRIPTION)
-                .deadline(ASSIGNMENT_DEADLINE)
-                .file(FileV2.builder().id("file-id").build())
-                .batch(Batch.builder().code(BATCH_CODE).build())
-                .build();
+  private static final String ASSIGNMENT_FILE_URL = "file-url";
 
-        assignment.setCreatedAt(ASSIGNMENT_DEADLINE);
+  private static final String BATCH_CODE = "3";
 
-        user = User.builder().id(USER_ID)
-                .name(USER_NAME)
-                .address("address")
-                .phone("phone")
-                .email("email")
-                .batch(Batch.builder().code(BATCH_CODE).build())
-                .role(Role.STUDENT)
-                .pictureV2(null)
-                .build();
+  private static final String ROOM_ID = "room-id";
 
-        room = Room.builder()
-                .assignment(assignment)
-                .student(user)
-                .point(0)
-                .build();
+  private static final String USER_ID = "user-id";
 
-        pageable = new PageRequest(0, 10);
+  private static final String USER_NAME = "user-name";
 
-        roomPage = new PageImpl<>(Collections.singletonList(room), pageable, 1);
+  private static final String URL_PREFIX = "url-prefix";
 
-        PAGING_RESPONSE = RoomResponseMapper
-                .toPagingRoomWebResponse(roomPage);
+  private static String ASSIGNMENT_ID = UUID.randomUUID()
+    .toString();
 
-        when(assignmentService.findAllRoomsByStudentId(STUDENT_ID, pageable, ADMIN_ID))
-                .thenReturn(roomPage);
-    }
+  private Pageable pageable;
 
-    @After
-    public void tearDown() throws Exception {
-        verifyNoMoreInteractions(assignmentService);
-    }
+  private Assignment assignment;
 
-    @Test
-    public void findAllRoomsByStudentId() throws Exception {
-        mockMvc.perform(
-                get("/api/scoring/batches/" + BATCH_CODE + "/assignments/" + ASSIGNMENT_ID + "/students/" +
-                        STUDENT_ID + "/rooms")
-                        .cookie(cookies))
-                .andExpect(status().isOk())
-                .andExpect(content().json(
-                        pagingResponseJacksonTester.write(PAGING_RESPONSE)
-                                .getJson()));
-        verify(assignmentService).findAllRoomsByStudentId(STUDENT_ID, pageable, ADMIN_ID);
-    }
+  private Room room;
+
+  private User user;
+
+  private Page<Room> roomPage;
+
+  private PagingResponse<RoomWebResponse> PAGING_RESPONSE;
+
+  @MockBean
+  private AssignmentService assignmentService;
+
+  @MockBean
+  private FileProperties fileProperties;
+
+  @Before
+  public void setUp() {
+
+    super.setUp();
+    super.setCookie(Role.ADMIN);
+    assignment = Assignment.builder()
+      .id(ASSIGNMENT_ID)
+      .title(ASSIGNMENT_TITLE)
+      .description(ASSIGNMENT_DESCRIPTION)
+      .deadline(ASSIGNMENT_DEADLINE)
+      .file(FileV2.builder()
+              .id("file-id")
+              .fileUrl(ASSIGNMENT_FILE_URL)
+              .build())
+      .batch(Batch.builder()
+               .code(BATCH_CODE)
+               .build())
+      .build();
+
+    assignment.setCreatedAt(ASSIGNMENT_DEADLINE);
+
+    user = User.builder()
+      .id(USER_ID)
+      .name(USER_NAME)
+      .address("address")
+      .phone("phone")
+      .email("email")
+      .batch(Batch.builder()
+               .code(BATCH_CODE)
+               .build())
+      .role(Role.STUDENT)
+      .pictureV2(null)
+      .build();
+
+    room = Room.builder()
+      .assignment(assignment)
+      .student(user)
+      .point(0)
+      .build();
+
+    pageable = new PageRequest(0, 10);
+
+    roomPage = new PageImpl<>(Collections.singletonList(room), pageable, 1);
+
+    PAGING_RESPONSE = RoomResponseMapper.toPagingRoomWebResponse(
+      roomPage, URL_PREFIX);
+
+    when(assignmentService.findAllRoomsByStudentId(STUDENT_ID, pageable,
+                                                   ADMIN_ID
+    )).thenReturn(roomPage);
+  }
+
+  @After
+  public void tearDown() throws Exception {
+
+    verifyNoMoreInteractions(assignmentService, fileProperties);
+  }
+
+  @Test
+  public void findAllRoomsByStudentId() throws Exception {
+
+    when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
+    mockMvc.perform(get(
+      "/api/scoring/batches/" + BATCH_CODE + "/assignments/" + ASSIGNMENT_ID +
+      "/students/" + STUDENT_ID + "/rooms").cookie(cookies))
+      .andExpect(status().isOk())
+      .andExpect(content().json(
+        pagingResponseJacksonTester.write(PAGING_RESPONSE)
+          .getJson()));
+    verify(fileProperties).getUrlPrefix();
+    verify(assignmentService).findAllRoomsByStudentId(
+      STUDENT_ID, pageable, ADMIN_ID);
+  }
+
 }

@@ -5,21 +5,18 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * Model representation for sticky note web response.
- */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class StickyNoteWebResponse {
-  
+
   private String id;
-  
+
   private String title;
-  
+
   private String description;
-  
+
   private Long updatedAt;
-  
+
 }

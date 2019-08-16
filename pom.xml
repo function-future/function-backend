@@ -53,8 +53,7 @@
         **/configuration/**,
         **/bean/**,
         **/model/**,
-        **/service/api/**,
-        **/communication/**
+        **/service/api/**
     </sonar.coverage.exclusions>
     <?SORTPOM RESUME?>
     <powermock.version>1.7.4</powermock.version>
@@ -302,7 +301,6 @@
             <exclude>**/bean/**,</exclude>
             <exclude>**/model/**,</exclude>
             <exclude>**/service/api/**</exclude>
-            <exclude>**/communication/**</exclude>
           </excludes>
           <?SORTPOM RESUME?>
         </configuration>

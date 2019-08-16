@@ -8,7 +8,9 @@ import java.util.List;
 
 public interface QuestionService {
 
-  Page<Question> findAllByQuestionBankId(String questionBankId, Pageable pageable);
+  Page<Question> findAllByQuestionBankId(
+    String questionBankId, Pageable pageable
+  );
 
   List<Question> findAllByMultipleQuestionBankId(List<String> questionBankIds);
 

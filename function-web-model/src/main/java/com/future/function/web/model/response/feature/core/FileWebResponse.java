@@ -13,9 +13,9 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class FileWebResponse<T> {
-  
+
   private List<PathWebResponse> paths;
-  
+
   private T content;
-  
+
 }

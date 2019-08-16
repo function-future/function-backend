@@ -13,54 +13,58 @@ import java.util.Map;
 @ChangeLog(order = "013")
 public class DataMigration_013 {
 
-    @ChangeSet(author = "oliver", id = "studentAssignmentListAccessList", order = "0001")
-    public void insertStudentAssignmentListAccessList(MongoTemplate mongoTemplate) {
+  @ChangeSet(author = "oliver",
+             id = "studentAssignmentListAccessList",
+             order = "0001")
+  public void insertStudentAssignmentListAccessList(
+    MongoTemplate mongoTemplate
+  ) {
 
-        String urlRegex = "^\\/assignments(\\/)?$";
+    String urlRegex = "^\\/assignments(\\/)?$";
 
-        Map<String, Object> otherComponents = new HashMap<>();
-        otherComponents.put("add", false);
-        otherComponents.put("delete", false);
-        otherComponents.put("edit", false);
-        otherComponents.put("read", false);
+    Map<String, Object> otherComponents = new HashMap<>();
+    otherComponents.put("add", false);
+    otherComponents.put("delete", false);
+    otherComponents.put("edit", false);
+    otherComponents.put("read", false);
 
-        Map<String, Object> studentComponents = new HashMap<>();
-        studentComponents.put("add", false);
-        studentComponents.put("delete", false);
-        studentComponents.put("edit", false);
-        studentComponents.put("read", true);
+    Map<String, Object> studentComponents = new HashMap<>();
+    studentComponents.put("add", false);
+    studentComponents.put("delete", false);
+    studentComponents.put("edit", false);
+    studentComponents.put("read", true);
 
-        Access adminAccess = Access.builder()
-                .urlRegex(urlRegex)
-                .components(otherComponents)
-                .role(Role.ADMIN)
-                .build();
+    Access adminAccess = Access.builder()
+      .urlRegex(urlRegex)
+      .components(otherComponents)
+      .role(Role.ADMIN)
+      .build();
 
-        mongoTemplate.insert(adminAccess, DocumentName.ACCESS);
+    mongoTemplate.insert(adminAccess, DocumentName.ACCESS);
 
-        Access mentorAccess = Access.builder()
-                .urlRegex(urlRegex)
-                .components(otherComponents)
-                .role(Role.MENTOR)
-                .build();
+    Access mentorAccess = Access.builder()
+      .urlRegex(urlRegex)
+      .components(otherComponents)
+      .role(Role.MENTOR)
+      .build();
 
-        mongoTemplate.insert(mentorAccess, DocumentName.ACCESS);
+    mongoTemplate.insert(mentorAccess, DocumentName.ACCESS);
 
-        Access judgeAccess = Access.builder()
-                .urlRegex(urlRegex)
-                .components(otherComponents)
-                .role(Role.JUDGE)
-                .build();
+    Access judgeAccess = Access.builder()
+      .urlRegex(urlRegex)
+      .components(otherComponents)
+      .role(Role.JUDGE)
+      .build();
 
-        mongoTemplate.insert(judgeAccess, DocumentName.ACCESS);
+    mongoTemplate.insert(judgeAccess, DocumentName.ACCESS);
 
-        Access studentAccess = Access.builder()
-                .urlRegex(urlRegex)
-                .components(studentComponents)
-                .role(Role.STUDENT)
-                .build();
+    Access studentAccess = Access.builder()
+      .urlRegex(urlRegex)
+      .components(studentComponents)
+      .role(Role.STUDENT)
+      .build();
 
-        mongoTemplate.insert(studentAccess, DocumentName.ACCESS);
-    }
+    mongoTemplate.insert(studentAccess, DocumentName.ACCESS);
+  }
 
 }

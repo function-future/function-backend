@@ -13,10 +13,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-/**
- * Author : Ricky Kennedy
- * Created At : 22:49 28/07/2019
- */
 @RunWith(MockitoJUnitRunner.class)
 public class LogMessageWebRequestMapperTest {
 
@@ -39,16 +35,20 @@ public class LogMessageWebRequestMapperTest {
 
   @Test
   public void toLogMessage() {
-    when(validator.validate(LOG_MESSAGE_REQUEST))
-      .thenReturn(LOG_MESSAGE_REQUEST);
 
-    LogMessage result =
-      logMessageRequestMapper.toLogMessage(LOG_MESSAGE_REQUEST, MEMBER_ID, TOPIC_ID);
+    when(validator.validate(LOG_MESSAGE_REQUEST)).thenReturn(
+      LOG_MESSAGE_REQUEST);
 
-    assertThat(result.getTopic().getId()).isEqualTo(TOPIC_ID);
-    assertThat(result.getSender().getId()).isEqualTo(MEMBER_ID);
+    LogMessage result = logMessageRequestMapper.toLogMessage(
+      LOG_MESSAGE_REQUEST, MEMBER_ID, TOPIC_ID);
+
+    assertThat(result.getTopic()
+                 .getId()).isEqualTo(TOPIC_ID);
+    assertThat(result.getSender()
+                 .getId()).isEqualTo(MEMBER_ID);
 
     verify(validator).validate(LOG_MESSAGE_REQUEST);
 
   }
+
 }

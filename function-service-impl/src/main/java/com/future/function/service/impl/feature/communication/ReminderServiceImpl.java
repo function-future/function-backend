@@ -15,10 +15,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-/**
- * Author: PriagungSatyagama
- * Created At: 15:21 06/07/2019
- */
 @Service
 public class ReminderServiceImpl implements ReminderService {
 
@@ -27,62 +23,65 @@ public class ReminderServiceImpl implements ReminderService {
   private final UserService userService;
 
   @Autowired
-  public ReminderServiceImpl(ReminderRepository reminderRepository, UserService userService) {
+  public ReminderServiceImpl(
+    ReminderRepository reminderRepository, UserService userService
+  ) {
+
     this.reminderRepository = reminderRepository;
     this.userService = userService;
   }
 
   @Override
   public List<Reminder> getAllReminder() {
+
     return reminderRepository.findAll();
   }
 
   @Override
   public Page<Reminder> getAllPagedReminder(Pageable pageable, String keyword) {
-    return reminderRepository.findAllByTitleContainingIgnoreCaseOrderByUpdatedAtDesc(keyword, pageable);
+
+    return reminderRepository.findAllByTitleContainingIgnoreCaseOrderByUpdatedAtDesc(
+      keyword, pageable);
   }
 
   @Override
   public Reminder getReminder(String reminderId) {
+
     return Optional.ofNullable(reminderId)
-            .map(reminderRepository::findOne)
-            .orElseThrow(() -> new NotFoundException("Reminder not found"));
+      .map(reminderRepository::findOne)
+      .orElseThrow(() -> new NotFoundException("Reminder not found"));
   }
 
   @Override
   public Reminder createReminder(Reminder reminder) {
+
     return Optional.of(reminder)
-            .map(r -> this.setMembers(r, r.getMembers()))
-            .map(reminderRepository::save)
-            .orElseThrow(UnsupportedOperationException::new);
+      .map(r -> this.setMembers(r, r.getMembers()))
+      .map(reminderRepository::save)
+      .orElseThrow(UnsupportedOperationException::new);
   }
 
   @Override
   public Reminder updateReminder(Reminder reminder) {
+
     return Optional.of(reminder.getId())
-            .map(reminderRepository::findOne)
-            .map(r -> this.setMembers(r, reminder.getMembers()))
-            .map(r -> this.setReminderAttributes(reminder, r))
-            .map(reminderRepository::save)
-            .orElse(reminder);
+      .map(reminderRepository::findOne)
+      .map(r -> this.setMembers(r, reminder.getMembers()))
+      .map(r -> this.setReminderAttributes(reminder, r))
+      .map(reminderRepository::save)
+      .orElse(reminder);
   }
 
   @Override
   public void deleteReminder(String reminderId) {
+
     reminderRepository.delete(reminderId);
   }
 
-  private Reminder setMembers(Reminder reminder, List<User> members) {
-    List<User> membersFromDb = reminder.getMembers().stream()
-            .map(User::getId)
-            .map(userService::getUser)
-            .collect(Collectors.toList());
+  private Reminder setReminderAttributes(
+    Reminder newReminder, Reminder reminderFromDb
+  ) {
 
-    reminder.setMembers(membersFromDb);
-    return reminder;
-  }
-
-  private Reminder setReminderAttributes(Reminder newReminder, Reminder reminderFromDb) {
     reminderFromDb.setContent(newReminder.getContent());
     reminderFromDb.setDays(newReminder.getDays());
     reminderFromDb.setHour(newReminder.getHour());
@@ -92,6 +91,18 @@ public class ReminderServiceImpl implements ReminderService {
     reminderFromDb.setMonthlyDate(newReminder.getMonthlyDate());
     reminderFromDb.setTitle(newReminder.getTitle());
     return reminderFromDb;
+  }
+
+  private Reminder setMembers(Reminder reminder, List<User> members) {
+
+    List<User> membersFromDb = reminder.getMembers()
+      .stream()
+      .map(User::getId)
+      .map(userService::getUser)
+      .collect(Collectors.toList());
+
+    reminder.setMembers(membersFromDb);
+    return reminder;
   }
 
 }

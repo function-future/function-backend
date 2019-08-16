@@ -46,22 +46,34 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class StudentQuestionControllerTest extends TestHelper {
 
   private static final String STUDENT_QUIZ_ID = "student-quiz-id";
+
   private static final String STUDENT_QUIZ_DETAIL_ID = "student-quiz-detail-id";
+
   private static final String STUDENT_QUESTION_ID = "student-question-id";
+
   private static final String QUESTION_ID = "question-id";
+
   private static final String OPTION_ID = "option-id";
 
   private StudentQuiz studentQuiz;
+
   private StudentQuizDetail studentQuizDetail;
+
   private StudentQuestion studentQuestion;
+
   private StudentQuestionWebRequest studentQuestionWebRequest;
+
   private Question question;
+
   private Option option;
 
-  private DataResponse<StudentQuizDetailWebResponse> studentQuizDetailWebResponseDataResponse;
+  private DataResponse<StudentQuizDetailWebResponse>
+    studentQuizDetailWebResponseDataResponse;
+
   private PagingResponse<StudentQuestionWebResponse> pagingResponse;
 
-  private JacksonTester<List<StudentQuestionWebRequest>> webRequestJacksonTester;
+  private JacksonTester<List<StudentQuestionWebRequest>>
+    webRequestJacksonTester;
 
   @Autowired
   private MockMvc mockMvc;
@@ -74,111 +86,118 @@ public class StudentQuestionControllerTest extends TestHelper {
 
   @Before
   public void setUp() {
+
     super.setUp();
     super.setCookie(Role.STUDENT);
 
-    studentQuiz = StudentQuiz
-        .builder()
-        .id(STUDENT_QUIZ_ID)
-        .build();
+    studentQuiz = StudentQuiz.builder()
+      .id(STUDENT_QUIZ_ID)
+      .build();
 
-    studentQuizDetail = StudentQuizDetail
-        .builder()
-        .id(STUDENT_QUIZ_DETAIL_ID)
-        .studentQuiz(studentQuiz)
-        .build();
+    studentQuizDetail = StudentQuizDetail.builder()
+      .id(STUDENT_QUIZ_DETAIL_ID)
+      .studentQuiz(studentQuiz)
+      .build();
 
-    question = Question
-        .builder()
-        .id(QUESTION_ID)
-        .build();
+    question = Question.builder()
+      .id(QUESTION_ID)
+      .build();
 
-    option = Option
-        .builder()
-        .id(OPTION_ID)
-        .question(question)
-        .build();
+    option = Option.builder()
+      .id(OPTION_ID)
+      .question(question)
+      .build();
 
     question.setOptions(Collections.singletonList(option));
 
-    studentQuestion = StudentQuestion
-        .builder()
-        .id(STUDENT_QUESTION_ID)
-        .number(1)
-        .studentQuizDetail(studentQuizDetail)
-        .correct(true)
-        .question(question)
-        .option(option)
-        .build();
+    studentQuestion = StudentQuestion.builder()
+      .id(STUDENT_QUESTION_ID)
+      .number(1)
+      .studentQuizDetail(studentQuizDetail)
+      .correct(true)
+      .question(question)
+      .option(option)
+      .build();
 
-    studentQuestionWebRequest = StudentQuestionWebRequest
-        .builder()
-        .number(1)
-        .optionId(OPTION_ID)
-        .build();
+    studentQuestionWebRequest = StudentQuestionWebRequest.builder()
+      .number(1)
+      .optionId(OPTION_ID)
+      .build();
 
-    studentQuizDetailWebResponseDataResponse = StudentQuizDetailResponseMapper
-        .toStudentQuizDetailWebResponse(studentQuizDetail);
+    studentQuizDetailWebResponseDataResponse =
+      StudentQuizDetailResponseMapper.toStudentQuizDetailWebResponse(
+        studentQuizDetail);
 
-    pagingResponse = StudentQuizDetailResponseMapper
-        .toStudentQuestionWebResponses(Collections.singletonList(studentQuestion));
+    pagingResponse =
+      StudentQuizDetailResponseMapper.toStudentQuestionWebResponses(
+        Collections.singletonList(studentQuestion));
 
-    when(studentQuizService.answerQuestionsByStudentQuizId(STUDENT_QUIZ_ID, STUDENT_ID,
-        Collections.singletonList(studentQuestion)))
-        .thenReturn(studentQuizDetail);
-    when(studentQuizService.findAllQuestionsByStudentQuizId(STUDENT_QUIZ_ID, STUDENT_ID))
-        .thenReturn(Collections.singletonList(studentQuestion));
-    when(studentQuizService.findAllUnansweredQuestionByStudentQuizId(STUDENT_QUIZ_ID, STUDENT_ID))
-        .thenReturn(Collections.singletonList(studentQuestion));
-    when(requestMapper.toStudentQuestionList(Collections.singletonList(studentQuestionWebRequest)))
-        .thenReturn(Collections.singletonList(studentQuestion));
-
+    when(studentQuizService.answerQuestionsByStudentQuizId(STUDENT_QUIZ_ID,
+                                                           STUDENT_ID,
+                                                           Collections.singletonList(
+                                                             studentQuestion)
+    )).thenReturn(studentQuizDetail);
+    when(studentQuizService.findAllUnansweredQuestionByStudentQuizId(
+      STUDENT_QUIZ_ID, STUDENT_ID)).thenReturn(
+      Collections.singletonList(studentQuestion));
+    when(requestMapper.toStudentQuestionList(
+      Collections.singletonList(studentQuestionWebRequest))).thenReturn(
+      Collections.singletonList(studentQuestion));
 
   }
 
   @After
   public void tearDown() throws Exception {
+
     verifyNoMoreInteractions(studentQuizService, requestMapper);
   }
 
   @Test
-  public void findStudentQuestionsByStudentQuizIdAccessedByAdminTest() throws Exception {
+  public void findStudentQuestionsByStudentQuizIdAccessedByAdminTest()
+    throws Exception {
+
     super.setCookie(Role.ADMIN);
-    mockMvc.perform(
-        get("/api/scoring/students/studentId/quizzes/" + STUDENT_QUIZ_ID + "/questions")
-            .cookie(cookies))
-        .andExpect(status().isForbidden());
+    mockMvc.perform(get(
+      "/api/scoring/students/studentId/quizzes/" + STUDENT_QUIZ_ID +
+      "/questions").cookie(cookies))
+      .andExpect(status().isForbidden());
   }
 
   @Test
   public void findUnansweredQuestionsByStudentQuizIdTest() throws Exception {
-    mockMvc.perform(
-        get("/api/scoring/students/studentId/quizzes/" + STUDENT_QUIZ_ID + "/questions")
-            .cookie(cookies))
-        .andExpect(status().isOk())
-        .andExpect(content().json(
-            pagingResponseJacksonTester.write(
-                pagingResponse).getJson()
-        ));
-    verify(studentQuizService).findAllUnansweredQuestionByStudentQuizId(STUDENT_QUIZ_ID, STUDENT_ID);
+
+    mockMvc.perform(get(
+      "/api/scoring/students/studentId/quizzes/" + STUDENT_QUIZ_ID +
+      "/questions").cookie(cookies))
+      .andExpect(status().isOk())
+      .andExpect(content().json(
+        pagingResponseJacksonTester.write(pagingResponse)
+          .getJson()));
+    verify(studentQuizService).findAllUnansweredQuestionByStudentQuizId(
+      STUDENT_QUIZ_ID, STUDENT_ID);
   }
 
   @Test
   public void postAnswersForQuestionsTest() throws Exception {
-    mockMvc.perform(
-        post("/api/scoring/students/studentId/quizzes/" + STUDENT_QUIZ_ID + "/questions")
-            .cookie(cookies)
-            .contentType(MediaType.APPLICATION_JSON_VALUE)
-            .content(webRequestJacksonTester
-                .write(Collections.singletonList(studentQuestionWebRequest))
-                .getJson()))
-        .andExpect(status().isCreated())
-        .andExpect(content().json(
-            dataResponseJacksonTester.write(
-                studentQuizDetailWebResponseDataResponse).getJson()
-        ));
-    verify(studentQuizService).answerQuestionsByStudentQuizId(STUDENT_QUIZ_ID, STUDENT_ID,
-        Collections.singletonList(studentQuestion));
-    verify(requestMapper).toStudentQuestionList(Collections.singletonList(studentQuestionWebRequest));
+
+    mockMvc.perform(post(
+      "/api/scoring/students/studentId/quizzes/" + STUDENT_QUIZ_ID +
+      "/questions").cookie(cookies)
+                      .contentType(MediaType.APPLICATION_JSON_VALUE)
+                      .content(webRequestJacksonTester.write(
+                        Collections.singletonList(studentQuestionWebRequest))
+                                 .getJson()))
+      .andExpect(status().isCreated())
+      .andExpect(content().json(dataResponseJacksonTester.write(
+        studentQuizDetailWebResponseDataResponse)
+                                  .getJson()));
+    verify(studentQuizService).answerQuestionsByStudentQuizId(STUDENT_QUIZ_ID,
+                                                              STUDENT_ID,
+                                                              Collections.singletonList(
+                                                                studentQuestion)
+    );
+    verify(requestMapper).toStudentQuestionList(
+      Collections.singletonList(studentQuestionWebRequest));
   }
+
 }

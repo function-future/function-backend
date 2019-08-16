@@ -21,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(classes = TestApplication.class)
 public class QuestionnaireRepositoryTest {
 
-  private static final Pageable PAGEABLE = new PageRequest(0,10);
+  private static final Pageable PAGEABLE = new PageRequest(0, 10);
 
   private static final String ID_1 = "id_1";
 
@@ -38,19 +38,20 @@ public class QuestionnaireRepositoryTest {
 
   @Before
   public void SetUp() {
+
     Questionnaire questionnaire1 = Questionnaire.builder()
-            .id(ID_1)
-            .title(TITLE_1)
-            .description(DESCRIPTION)
-            .startDate(Long.valueOf(1559966400))
-            .build();
+      .id(ID_1)
+      .title(TITLE_1)
+      .description(DESCRIPTION)
+      .startDate(Long.valueOf(1559966400))
+      .build();
 
     Questionnaire questionnaire2 = Questionnaire.builder()
-            .id(ID_2)
-            .title(TITLE_2)
-            .description(DESCRIPTION)
-            .startDate(Long.valueOf(1559966400))
-            .build();
+      .id(ID_2)
+      .title(TITLE_2)
+      .description(DESCRIPTION)
+      .startDate(Long.valueOf(1559966400))
+      .build();
 
     questionnaireRepository.save(questionnaire1);
 
@@ -60,33 +61,52 @@ public class QuestionnaireRepositoryTest {
 
   @After
   public void tearDown() {
+
     questionnaireRepository.deleteAll();
   }
 
   @Test
   public void testByFindingAllQuestionnaireReturnPagedQuestionnaire() {
-    Page<Questionnaire> questionnaires = questionnaireRepository.findAllByDeletedFalseOrderByCreatedAtDesc(PAGEABLE);
+
+    Page<Questionnaire> questionnaires =
+      questionnaireRepository.findAllByDeletedFalseOrderByCreatedAtDesc(
+        PAGEABLE);
 
     assertThat(questionnaires.getTotalElements()).isEqualTo(1);
-    assertThat(questionnaires.getContent().get(0).getTitle()).isEqualTo(TITLE_1);
-//    assertThat(questionnaires.getContent().get(1).getTitle()).isEqualTo(TITLE_2);
+    assertThat(questionnaires.getContent()
+                 .get(0)
+                 .getTitle()).isEqualTo(TITLE_1);
+    //    assertThat(questionnaires.getContent().get(1).getTitle()).isEqualTo
+    //    (TITLE_2);
   }
 
   @Test
   public void testGivenQuestionnaireIdByFindindQuestionnaireReturnQuestionnaire() {
-    Optional<Questionnaire> questionnaire1 = questionnaireRepository.findById(ID_1);
-    Optional<Questionnaire> questionnaire2 = questionnaireRepository.findById(ID_2);
 
-    assertThat(questionnaire1.get().getId()).isEqualTo(ID_1);
-    assertThat(questionnaire2.get().getId()).isEqualTo(ID_2);
+    Optional<Questionnaire> questionnaire1 = questionnaireRepository.findById(
+      ID_1);
+    Optional<Questionnaire> questionnaire2 = questionnaireRepository.findById(
+      ID_2);
+
+    assertThat(questionnaire1.get()
+                 .getId()).isEqualTo(ID_1);
+    assertThat(questionnaire2.get()
+                 .getId()).isEqualTo(ID_2);
   }
 
   @Test
   public void testGivenTitleSoughtByFindingAllQuestionnaireReturnPagedQuestionnaire() {
-    Page<Questionnaire> questionnaires = questionnaireRepository.findAllByTitleIgnoreCaseContainingAndDeletedFalseOrderByCreatedAtDesc("bc", PAGEABLE);
+
+    Page<Questionnaire> questionnaires =
+      questionnaireRepository.findAllByTitleIgnoreCaseContainingAndDeletedFalseOrderByCreatedAtDesc(
+        "bc", PAGEABLE);
 
     assertThat(questionnaires.getTotalElements()).isEqualTo(1);
-    assertThat(questionnaires.getContent().get(0).getTitle()).isEqualTo(TITLE_1);
-//    assertThat(questionnaires.getContent().get(1).getTitle()).isEqualTo(TITLE_2);
+    assertThat(questionnaires.getContent()
+                 .get(0)
+                 .getTitle()).isEqualTo(TITLE_1);
+    //    assertThat(questionnaires.getContent().get(1).getTitle()).isEqualTo
+    //    (TITLE_2);
   }
+
 }

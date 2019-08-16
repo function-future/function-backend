@@ -14,7 +14,8 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 public class RoomPointWebRequest {
 
-  @Min(value = 0, message = "Min")
+  @Min(value = 0,
+       message = "Min")
   @NotNull(message = "NotNull")
   private Integer point;
 

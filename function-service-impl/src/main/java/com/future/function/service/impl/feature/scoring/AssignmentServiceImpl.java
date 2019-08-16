@@ -23,202 +23,243 @@ import java.util.Collections;
 import java.util.Objects;
 import java.util.Optional;
 
-/**
- * Service class used to manipulate Assignment Entity
- * Used AssignmentRepository and FileService to support manipulation of Assignment Entity
- */
 @Service
 public class AssignmentServiceImpl implements AssignmentService {
 
   private AssignmentRepository assignmentRepository;
+
   private RoomService roomService;
+
   private ResourceService resourceService;
+
   private BatchService batchService;
 
   @Autowired
-  public AssignmentServiceImpl(AssignmentRepository assignmentRepository, RoomService roomService,
-                               ResourceService resourceService, BatchService batchService) {
+  public AssignmentServiceImpl(
+    AssignmentRepository assignmentRepository, RoomService roomService,
+    ResourceService resourceService, BatchService batchService
+  ) {
+
     this.assignmentRepository = assignmentRepository;
     this.roomService = roomService;
     this.resourceService = resourceService;
     this.batchService = batchService;
   }
 
-  /**
-   * Used to find All Assignment Object from Repository With Paging, Filtering, And Search Keyword
-   *
-   * @param pageable (Pageable Object)
-   * @return Page<Assignment>
-   */
   @Override
-  public Page<Assignment> findAllByBatchCodeAndPageable(String batchCode, Pageable pageable) {
+  public Page<Assignment> findAllByBatchCodeAndPageable(
+    String batchCode, Pageable pageable
+  ) {
+
     return Optional.ofNullable(batchCode)
-            .map(batchService::getBatchByCode)
-            .map(batch -> assignmentRepository.findAllByBatchAndDeletedFalse(batch, pageable))
-            .orElseGet(() -> PageHelper.empty(pageable));
+      .map(batchService::getBatchByCode)
+      .map(batch -> assignmentRepository.findAllByBatchAndDeletedFalse(batch,
+                                                                       pageable
+      ))
+      .orElseGet(() -> PageHelper.empty(pageable));
   }
 
-  /**
-   * Used to Find Assignment Object From Repository With Passed Id and Not Deleted
-   *
-   * @param id (String)
-   * @return Assignment Object
-   * @throws NotFoundException if Assignment Object is not found or the id is null
-   */
   @Override
   public Assignment findById(String id) {
+
     return Optional.ofNullable(id)
-            .flatMap(assignmentRepository::findByIdAndDeletedFalse)
-            .orElseThrow(() -> new NotFoundException("#Failed at #findById #AssignmentService"));
+      .flatMap(assignmentRepository::findByIdAndDeletedFalse)
+      .orElseThrow(
+        () -> new NotFoundException("#Failed at #findById #AssignmentService"));
   }
 
   @Override
-  public Page<Room> findAllRoomsByAssignmentId(String assignmentId, Pageable pageable) {
+  public Page<Room> findAllRoomsByAssignmentId(
+    String assignmentId, Pageable pageable
+  ) {
+
     return roomService.findAllRoomsByAssignmentId(assignmentId, pageable);
   }
 
   @Override
-  public Page<Room> findAllRoomsByStudentId(String studentId, Pageable pageable, String userId) {
-      return roomService.findAllByStudentId(studentId, pageable, userId);
+  public Page<Room> findAllRoomsByStudentId(
+    String studentId, Pageable pageable, String userId
+  ) {
+
+    return roomService.findAllByStudentId(studentId, pageable, userId);
   }
 
   @Override
   public Room findRoomById(String id, String userId) {
+
     return roomService.findById(id, userId);
   }
 
   @Override
-  public Assignment copyAssignment(String assignmentId, String targetBatchCode) {
+  public Assignment copyAssignment(
+    String assignmentId, String targetBatchCode
+  ) {
+
     Batch targetBatch = batchService.getBatchByCode(targetBatchCode);
     return Optional.ofNullable(assignmentId)
-            .map(this::findById)
-            .map(assignment -> initializeNewAssignment(targetBatch, assignment))
-            .map(this::createAssignment)
-            .orElseThrow(() -> new UnsupportedOperationException("Failed at #copyAssignment #AssignmentService"));
+      .map(this::findById)
+      .map(assignment -> initializeNewAssignment(targetBatch, assignment))
+      .map(this::createAssignment)
+      .orElseThrow(() -> new UnsupportedOperationException(
+        "Failed at #copyAssignment #AssignmentService"));
   }
 
-  private Assignment initializeNewAssignment(Batch targetBatch, Assignment assignment) {
-    Assignment newAssignment = Assignment.builder().build();
+  private Assignment initializeNewAssignment(
+    Batch targetBatch, Assignment assignment
+  ) {
+
+    Assignment newAssignment = Assignment.builder()
+      .build();
     CopyHelper.copyProperties(assignment, newAssignment);
     newAssignment.setBatch(targetBatch);
     return newAssignment;
   }
 
-  /**
-   * Used to create new Assignment Data in Repository With / Without file
-   *
-   * @param assignment (Assignment Object)
-   * @return Saved Assignment Object
-   */
   @Override
   public Assignment createAssignment(Assignment assignment) {
+
     return Optional.ofNullable(assignment)
-            .map(this::storeAssignmentFile)
-            .map(this::findAndSetAssignmentBatch)
-            .map(assignmentRepository::save)
-            .map(roomService::createRoomsByAssignment)
-            .orElseThrow(() -> new UnsupportedOperationException("Failed at #createAssignment #AssignmentService"));
+      .map(this::storeAssignmentFile)
+      .map(this::findAndSetAssignmentBatch)
+      .map(assignmentRepository::save)
+      .map(roomService::createRoomsByAssignment)
+      .orElseThrow(() -> new UnsupportedOperationException(
+        "Failed at #createAssignment #AssignmentService"));
   }
 
   private Assignment findAndSetAssignmentBatch(Assignment value) {
-    Batch batch = batchService.getBatchByCode(value.getBatch().getCode());
+
+    Batch batch = batchService.getBatchByCode(value.getBatch()
+                                                .getCode());
     value.setBatch(batch);
     return value;
   }
 
-  /**
-   * Used to store Multipart File by using FileService which sent with Assignment object
-   *
-   * @param assignment (Assignment Object)
-   * @return Assignment with / without the saved file
-   */
   private Assignment storeAssignmentFile(Assignment assignment) {
+
     return Optional.ofNullable(assignment)
-            .map(Assignment::getFile)
-            .map(FileV2::getId)
-            .filter(fileId -> resourceService.markFilesUsed(Collections.singletonList(fileId), true))
-            .map(resourceService::getFile)
-            .map(file -> {
-              assignment.setFile(file);
-              return assignment;
-            })
-            .orElse(assignment);
+      .map(Assignment::getFile)
+      .map(FileV2::getId)
+      .filter(fileId -> resourceService.markFilesUsed(
+        Collections.singletonList(fileId), true))
+      .map(resourceService::getFile)
+      .map(file -> {
+        assignment.setFile(file);
+        return assignment;
+      })
+      .orElse(assignment);
   }
 
-  /**
-   * Used to update existed Assignment in Repository with Assignment Object request and / no Multipart File
-   *
-   * @param request (Assignment Object)
-   * @return Saved Assignment Object
-   */
   @Override
   public Assignment updateAssignment(Assignment request) {
+
     return Optional.ofNullable(request)
-            .map(Assignment::getId)
-            .map(this::findById)
-            .map(foundAssignment -> setAssignmentFile(request, foundAssignment))
-            .map(foundAssignment -> copyAssignmentRequestAttributesBasedOnFileExistence(request, foundAssignment))
-            .map(this::storeAssignmentFile)
-            .map(assignmentRepository::save)
-            .orElse(request);
+      .map(Assignment::getId)
+      .map(this::findById)
+      .map(foundAssignment -> setAssignmentFile(request, foundAssignment))
+      .map(
+        foundAssignment -> copyAssignmentRequestAttributesBasedOnFileExistence(
+          request, foundAssignment))
+      .map(this::storeAssignmentFile)
+      .map(assignmentRepository::save)
+      .orElse(request);
   }
 
-  private Assignment copyAssignmentRequestAttributesBasedOnFileExistence(Assignment request, Assignment foundAssignment) {
+  private Assignment copyAssignmentRequestAttributesBasedOnFileExistence(
+    Assignment request, Assignment foundAssignment
+  ) {
+
     if (Objects.isNull(request.getFile())) {
-      CopyHelper.copyProperties(request, foundAssignment, FieldName.Assignment.FILE, FieldName.Assignment.BATCH);
+      CopyHelper.copyProperties(request, foundAssignment,
+                                FieldName.Assignment.FILE,
+                                FieldName.Assignment.BATCH
+      );
     } else {
-      CopyHelper.copyProperties(request, foundAssignment, FieldName.Assignment.BATCH);
+      CopyHelper.copyProperties(
+        request, foundAssignment, FieldName.Assignment.BATCH);
     }
     return foundAssignment;
   }
 
-    private Assignment setAssignmentFile(Assignment request, Assignment foundAssignment) {
+  private Assignment setAssignmentFile(
+    Assignment request, Assignment foundAssignment
+  ) {
+
     return Optional.ofNullable(request)
-        .map(requestedAssignment -> checkAndMarkFileAsNotUsedIfFileInDBExist(requestedAssignment, foundAssignment))
-        .orElse(foundAssignment);
+      .map(requestedAssignment -> checkAndMarkFileAsNotUsedIfFileInDBExist(
+        requestedAssignment, foundAssignment))
+      .orElse(foundAssignment);
   }
 
-  private Assignment checkAndMarkFileAsNotUsedIfFileInDBExist(Assignment request, Assignment foundAssignment) {
-    if(Objects.nonNull(foundAssignment.getFile()) && Objects.isNull(request.getFile())) {
-      resourceService.markFilesUsed(Collections.singletonList(foundAssignment.getFile().getId()), false);
-      foundAssignment.setFile(null);
-    } else if (Objects.nonNull(foundAssignment.getFile()) && !foundAssignment.getFile().getId().equals(request.getFile().getId())) {
-      resourceService.markFilesUsed(Collections.singletonList(foundAssignment.getFile().getId()), false);
+  private Assignment checkAndMarkFileAsNotUsedIfFileInDBExist(
+    Assignment request, Assignment foundAssignment
+  ) {
+
+    if (checkIfRequestedFileNull(request, foundAssignment) ||
+        checkIfFileIdEquals(request, foundAssignment)) {
+      resourceService.markFilesUsed(Collections.singletonList(
+        foundAssignment.getFile()
+          .getId()), false);
       foundAssignment.setFile(null);
     }
     return foundAssignment;
+  }
+
+  private boolean checkIfRequestedFileNull(
+    Assignment request, Assignment foundAssignment
+  ) {
+
+    return Objects.nonNull(foundAssignment.getFile()) && Objects.isNull(
+      request.getFile());
+  }
+
+  private boolean checkIfFileIdEquals(
+    Assignment request, Assignment foundAssignment
+  ) {
+
+    return Objects.nonNull(foundAssignment.getFile()) &&
+           !foundAssignment.getFile()
+             .getId()
+             .equals(request.getFile()
+                       .getId());
   }
 
   @Override
-  public Room giveScoreToRoomByRoomId(String roomId, String userId, Integer point) {
+  public Room giveScoreToRoomByRoomId(
+    String roomId, String userId, Integer point
+  ) {
+
     return roomService.giveScoreToRoomByRoomId(roomId, userId, point);
   }
 
   @Override
   public void deleteRoomById(String id) {
+
     roomService.deleteRoomById(id);
   }
 
-  /**
-   * Used to delete existing Assignment From Repository With passed id
-   *
-   * @param id (String)
-   */
   @Override
   public void deleteById(String id) {
+
     Optional.ofNullable(id)
-            .map(this::findById)
-            .ifPresent(assignment -> {
-              roomService.deleteAllRoomsByAssignmentId(assignment.getId());
-              markAssignmentFileAsNotUsed(assignment);
-              assignment.setDeleted(true);
-              assignmentRepository.save(assignment);
-            });
+      .map(this::findById)
+      .ifPresent(assignment -> {
+        roomService.deleteAllRoomsByAssignmentId(assignment.getId());
+        markAssignmentFileAsNotUsed(assignment);
+        assignment.setDeleted(true);
+        assignmentRepository.save(assignment);
+      });
   }
 
   private void markAssignmentFileAsNotUsed(Assignment assignment) {
-    if (Objects.nonNull(assignment.getFile()) && !StringUtils.isEmpty(assignment.getFile().getId())) {
-      resourceService.markFilesUsed(Collections.singletonList(assignment.getFile().getId()), false);
+
+    if (Objects.nonNull(assignment.getFile()) && !StringUtils.isEmpty(
+      assignment.getFile()
+        .getId())) {
+      resourceService.markFilesUsed(Collections.singletonList(
+        assignment.getFile()
+          .getId()), false);
     }
   }
+
 }

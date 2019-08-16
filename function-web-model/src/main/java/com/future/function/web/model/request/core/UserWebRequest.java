@@ -19,9 +19,6 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.List;
 
-/**
- * Model representation for user web request.
- */
 @Data
 @Builder
 @NoArgsConstructor
@@ -29,35 +26,35 @@ import java.util.List;
 @EmailMustBeUnique
 @OnlyStudentCanHaveBatchAndUniversity
 public class UserWebRequest implements UserData {
-  
+
   private String id;
-  
+
   @NotNull(message = "NotNull")
   private String role;
-  
+
   @Email(message = "Email")
   @NotBlank(message = "NotBlank")
   private String email;
-  
+
   @Name
   @NotBlank(message = "NotBlank")
   private String name;
-  
+
   @Phone
   private String phone;
-  
+
   @NotBlank(message = "NotBlank")
   private String address;
-  
+
   @BatchMustExist
   private String batch;
-  
+
   private String university;
-  
+
   @Size(max = 1,
         message = "Size")
   @FileMustExist
   @FileMustBeImage
   private List<String> avatar;
-  
+
 }

@@ -1,14 +1,14 @@
 package com.future.function.web.controller.communication.questionnaire;
 
 import com.future.function.common.enumeration.core.Role;
-import com.future.function.model.entity.feature.communication.questionnaire.QuestionResponseSummary;
+import com.future.function.common.properties.core.FileProperties;
 import com.future.function.service.api.feature.communication.questionnaire.QuestionnaireResponseSummaryService;
 import com.future.function.session.annotation.WithAnyRole;
 import com.future.function.web.mapper.response.communication.questionnaire.QuestionnaireResponseSummaryResponseMapper;
 import com.future.function.web.model.response.base.DataResponse;
-import com.future.function.web.model.response.feature.communication.questionnaire.QuestionAnswerDetailResponse;
 import com.future.function.web.model.response.feature.communication.questionnaire.QuestionAnswerResponse;
 import com.future.function.web.model.response.feature.communication.questionnaire.QuestionQuestionnaireSummaryResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,29 +23,44 @@ import java.util.List;
 @WithAnyRole(roles = { Role.ADMIN })
 public class QuestionResponseController {
 
-  private final QuestionnaireResponseSummaryService questionnaireResponseSummaryService;
+  private final QuestionnaireResponseSummaryService
+    questionnaireResponseSummaryService;
 
-  public QuestionResponseController(QuestionnaireResponseSummaryService questionnaireResponseSummaryService) {
-    this.questionnaireResponseSummaryService = questionnaireResponseSummaryService;
+  private final FileProperties fileProperties;
+
+  @Autowired
+  public QuestionResponseController(
+    QuestionnaireResponseSummaryService questionnaireResponseSummaryService,
+    FileProperties fileProperties
+  ) {
+
+    this.questionnaireResponseSummaryService =
+      questionnaireResponseSummaryService;
+    this.fileProperties = fileProperties;
   }
 
   @ResponseStatus(HttpStatus.OK)
   @GetMapping(value = "/{questionResponseSummaryId}")
   public DataResponse<QuestionQuestionnaireSummaryResponse> getQuestionQuestionnaireSummaryResponse(
-          @PathVariable String questionResponseSummaryId
+    @PathVariable
+      String questionResponseSummaryId
   ) {
+
     return QuestionnaireResponseSummaryResponseMapper.toDataResponseQuestionQuestionnaireSummaryResponse(
-      questionnaireResponseSummaryService.getQuestionResponseSummaryById(questionResponseSummaryId)
-    );
+      questionnaireResponseSummaryService.getQuestionResponseSummaryById(
+        questionResponseSummaryId));
   }
 
   @ResponseStatus(HttpStatus.OK)
   @GetMapping(value = "/{questionResponseSummaryId}/responses")
   public DataResponse<List<QuestionAnswerResponse>> getQuestionnaireAnswerDetailSummary(
-          @PathVariable String questionResponseSummaryId
+    @PathVariable
+      String questionResponseSummaryId
   ) {
+
     return QuestionnaireResponseSummaryResponseMapper.toDataResponseQuestionAnswerDetailResponse(
-            questionnaireResponseSummaryService.getQuestionResponseByQuestionResponseSummaryId(questionResponseSummaryId)
-    );
+      questionnaireResponseSummaryService.getQuestionResponseByQuestionResponseSummaryId(
+        questionResponseSummaryId), fileProperties.getUrlPrefix());
   }
+
 }

@@ -2,6 +2,7 @@ package com.future.function.web.controller.core;
 
 import com.future.function.common.enumeration.core.FileOrigin;
 import com.future.function.common.enumeration.core.Role;
+import com.future.function.common.properties.core.FileProperties;
 import com.future.function.service.api.feature.core.ResourceService;
 import com.future.function.session.annotation.WithAnyRole;
 import com.future.function.session.model.Session;
@@ -33,12 +34,16 @@ public class ResourceController {
 
   private final ResourceRequestMapper resourceRequestMapper;
 
+  private final FileProperties fileProperties;
+
   public ResourceController(
-    ResourceService resourceService, ResourceRequestMapper resourceRequestMapper
+    ResourceService resourceService,
+    ResourceRequestMapper resourceRequestMapper, FileProperties fileProperties
   ) {
 
     this.resourceService = resourceService;
     this.resourceRequestMapper = resourceRequestMapper;
+    this.fileProperties = fileProperties;
   }
 
   @ResponseStatus(HttpStatus.CREATED)
@@ -59,7 +64,7 @@ public class ResourceController {
     return ResourceResponseMapper.toResourceDataResponse(
       resourceService.storeAndSaveFile(null, pair.getFirst(), pair.getSecond(),
                                        FileOrigin.toFileOrigin(origin)
-      ));
+      ), fileProperties.getUrlPrefix());
   }
 
   @ResponseStatus(HttpStatus.OK)

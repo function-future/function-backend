@@ -28,11 +28,13 @@ import static org.mockito.Mockito.when;
 public class OptionServiceImplTest {
 
   private static final String OPTION_ID = "id";
+
   private static final String OPTION_LABEL = "label";
 
   private static final String QUESTION_ID = "id";
 
   private Question question;
+
   private Option option;
 
   @InjectMocks
@@ -45,27 +47,28 @@ public class OptionServiceImplTest {
   public void setUp() throws Exception {
 
     question = Question.builder()
-        .id(QUESTION_ID)
-        .build();
+      .id(QUESTION_ID)
+      .build();
 
-    option = Option
-        .builder()
-        .id(OPTION_ID)
-        .label(OPTION_LABEL)
-        .correct(true)
-        .question(question)
-        .build();
+    option = Option.builder()
+      .id(OPTION_ID)
+      .label(OPTION_LABEL)
+      .correct(true)
+      .question(question)
+      .build();
   }
 
   @After
   public void tearDown() throws Exception {
+
     verifyNoMoreInteractions(optionRepository);
   }
 
   @Test
   public void getOptionListByQuestionId() {
 
-    when(optionRepository.findAllByQuestionId(QUESTION_ID)).thenReturn(Collections.singletonList(option));
+    when(optionRepository.findAllByQuestionId(QUESTION_ID)).thenReturn(
+      Collections.singletonList(option));
 
     List<Option> actual = optionService.getOptionListByQuestionId(QUESTION_ID);
     assertThat(actual.size()).isEqualTo(1);
@@ -75,6 +78,7 @@ public class OptionServiceImplTest {
 
   @Test
   public void getOptionListByQuestionIdNull() {
+
     List<Option> actual = optionService.getOptionListByQuestionId(null);
     assertThat(actual.size()).isEqualTo(0);
   }
@@ -82,7 +86,8 @@ public class OptionServiceImplTest {
   @Test
   public void findById() {
 
-    when(optionRepository.findByIdAndDeletedFalse(OPTION_ID)).thenReturn(Optional.of(option));
+    when(optionRepository.findByIdAndDeletedFalse(OPTION_ID)).thenReturn(
+      Optional.of(option));
 
     Option actual = optionService.findById(OPTION_ID);
     assertThat(actual).isEqualTo(option);
@@ -91,6 +96,7 @@ public class OptionServiceImplTest {
 
   @Test
   public void findByIdNull() {
+
     catchException(() -> optionService.findById(null));
     assertThat(caughtException().getClass()).isEqualTo(NotFoundException.class);
   }
@@ -108,7 +114,8 @@ public class OptionServiceImplTest {
   @Test
   public void updateOption() {
 
-    when(optionRepository.findByIdAndDeletedFalse(OPTION_ID)).thenReturn(Optional.of(option));
+    when(optionRepository.findByIdAndDeletedFalse(OPTION_ID)).thenReturn(
+      Optional.of(option));
     when(optionRepository.save(option)).thenReturn(option);
 
     Option actual = optionService.updateOption(option);
@@ -121,7 +128,8 @@ public class OptionServiceImplTest {
   @Test
   public void deleteById() {
 
-    when(optionRepository.findByIdAndDeletedFalse(OPTION_ID)).thenReturn(Optional.of(option));
+    when(optionRepository.findByIdAndDeletedFalse(OPTION_ID)).thenReturn(
+      Optional.of(option));
 
     optionService.deleteById(OPTION_ID);
     verify(optionRepository).findByIdAndDeletedFalse(OPTION_ID);
@@ -130,13 +138,10 @@ public class OptionServiceImplTest {
   }
 
   @Test
-  public void deleteByIdNull() {
-    optionService.deleteById(null);
-  }
-
-  @Test
   public void isOptionCorrectTest() {
-    when(optionRepository.findByIdAndDeletedFalse(OPTION_ID)).thenReturn(Optional.of(option));
+
+    when(optionRepository.findByIdAndDeletedFalse(OPTION_ID)).thenReturn(
+      Optional.of(option));
     boolean actual = optionService.isOptionCorrect(option);
     assertThat(actual).isTrue();
     verify(optionRepository).findByIdAndDeletedFalse(OPTION_ID);
@@ -144,12 +149,15 @@ public class OptionServiceImplTest {
 
   @Test
   public void isOptionCorrectTestOptionFromDBFalse() {
+
     Option optionDB = new Option();
     BeanUtils.copyProperties(option, optionDB);
     optionDB.setCorrect(false);
-    when(optionRepository.findByIdAndDeletedFalse(OPTION_ID)).thenReturn(Optional.of(optionDB));
+    when(optionRepository.findByIdAndDeletedFalse(OPTION_ID)).thenReturn(
+      Optional.of(optionDB));
     boolean actual = optionService.isOptionCorrect(option);
     assertThat(actual).isFalse();
     verify(optionRepository).findByIdAndDeletedFalse(OPTION_ID);
   }
+
 }

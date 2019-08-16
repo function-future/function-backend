@@ -1,6 +1,7 @@
 package com.future.function.web.controller.communication.questionnaire;
 
 import com.future.function.common.enumeration.core.Role;
+import com.future.function.common.properties.core.FileProperties;
 import com.future.function.model.entity.feature.communication.questionnaire.Answer;
 import com.future.function.model.entity.feature.communication.questionnaire.QuestionQuestionnaire;
 import com.future.function.model.entity.feature.communication.questionnaire.QuestionResponseSummary;
@@ -38,23 +39,21 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-/**
- * Author: RickyKennedy
- * Created At:11:01 PM 7/25/2019
- */
 @RunWith(SpringRunner.class)
 @Import(TestSecurityConfiguration.class)
 @WebMvcTest(QuestionnaireResponseController.class)
 public class QuestionnaireResponseControllerTest extends TestHelper {
 
-  private static final String BATCH_ID = "batchId";
+  private static final String URL_PREFIX = "urlPrefix";
 
-  private final Pageable PAGEABLE = new PageRequest(0, 10);
+  private static final String BATCH_ID = "batchId";
 
   private static final String USER_SUMMARY_ID_1 = "userSummaryId1";
 
@@ -70,19 +69,22 @@ public class QuestionnaireResponseControllerTest extends TestHelper {
 
   private static final String QUESTIONNAIRE_TITLE = "questionnaireTitle";
 
-  private static final String QUESTIONNAIRE_DESCRIPTION = "questionnaireDescription";
+  private static final String QUESTIONNAIRE_DESCRIPTION =
+    "questionnaireDescription";
 
   private static final Long START_DATE = Long.valueOf(0);
 
   private static final Long DUE_DATE = Long.valueOf(1);
 
-  private static final String QUESTIONNAIRE_RESPONSE_SUMMARY_ID = "questionnaireResponseSummaryId1";
+  private static final String QUESTIONNAIRE_RESPONSE_SUMMARY_ID =
+    "questionnaireResponseSummaryId1";
 
   private static final String QUESTION_ID = "questionId";
 
   private static final String QUESTION_DESCRIPTION = "questionDescription";
 
-  private static final String QUESTION_RESPONSE_SUMMARY_ID = "questionQuestionnaireSummaryResponseid1";
+  private static final String QUESTION_RESPONSE_SUMMARY_ID =
+    "questionQuestionnaireSummaryResponseid1";
 
   private static final Answer SCORE = Answer.builder()
     .minimum(0)
@@ -93,8 +95,12 @@ public class QuestionnaireResponseControllerTest extends TestHelper {
   private static final User MEMBER_1 = User.builder()
     .id(MEMBER_ID_1)
     .name(MEMBER_NAME_1)
-    .pictureV2(FileV2.builder().thumbnailUrl(THUMBNAIL_URL).build())
-    .batch(Batch.builder().id(BATCH_ID).build())
+    .pictureV2(FileV2.builder()
+                 .thumbnailUrl(THUMBNAIL_URL)
+                 .build())
+    .batch(Batch.builder()
+             .id(BATCH_ID)
+             .build())
     .role(Role.STUDENT)
     .university(UNIVERSITY)
     .build();
@@ -106,7 +112,6 @@ public class QuestionnaireResponseControllerTest extends TestHelper {
       .scoreSummary(SCORE)
       .build();
 
-
   private static final Questionnaire QUESTIONNAIRE = Questionnaire.builder()
     .id(QUESTIONNAIRE_ID_1)
     .title(QUESTIONNAIRE_TITLE)
@@ -115,16 +120,13 @@ public class QuestionnaireResponseControllerTest extends TestHelper {
     .dueDate(DUE_DATE)
     .build();
 
-  private static final QuestionnaireResponseSummary QUESTIONNAIRE_RESPONSE_SUMMARY =
-    QuestionnaireResponseSummary.builder()
-      .id(QUESTIONNAIRE_RESPONSE_SUMMARY_ID)
-      .questionnaire(QUESTIONNAIRE)
-      .appraisee(MEMBER_1)
-      .scoreSummary(SCORE)
-      .build();
-
-  private final Page<QuestionnaireResponseSummary> QUESTIONNAIRE_SUMMARY_PAGE
-    = new PageImpl<>(Arrays.asList(QUESTIONNAIRE_RESPONSE_SUMMARY), PAGEABLE, 1);
+  private static final QuestionnaireResponseSummary
+    QUESTIONNAIRE_RESPONSE_SUMMARY = QuestionnaireResponseSummary.builder()
+    .id(QUESTIONNAIRE_RESPONSE_SUMMARY_ID)
+    .questionnaire(QUESTIONNAIRE)
+    .appraisee(MEMBER_1)
+    .scoreSummary(SCORE)
+    .build();
 
   private static final QuestionQuestionnaire QUESTION_QUESTIONNAIRE =
     QuestionQuestionnaire.builder()
@@ -141,112 +143,119 @@ public class QuestionnaireResponseControllerTest extends TestHelper {
       .scoreSummary(SCORE)
       .build();
 
+  private final Pageable PAGEABLE = new PageRequest(0, 10);
+
+  private final Page<QuestionnaireResponseSummary> QUESTIONNAIRE_SUMMARY_PAGE =
+    new PageImpl<>(Arrays.asList(QUESTIONNAIRE_RESPONSE_SUMMARY), PAGEABLE, 1);
 
   @MockBean
-  private QuestionnaireResponseSummaryService questionnaireResponseSummaryService;
+  private QuestionnaireResponseSummaryService
+    questionnaireResponseSummaryService;
 
   @MockBean
   private QuestionnaireResultService questionnaireResultService;
 
+  @MockBean
+  private FileProperties fileProperties;
+
   @Override
   @Before
   public void setUp() {
+
     super.setUp();
     super.setCookie(Role.ADMIN);
   }
 
   @After
   public void tearDown() throws Exception {
-    verifyNoMoreInteractions(
-      questionnaireResponseSummaryService,
-      questionnaireResultService
-      );
+
+    verifyNoMoreInteractions(questionnaireResponseSummaryService,
+                             questionnaireResultService, fileProperties
+    );
   }
 
   @Test
   public void getQuestionnairesSimpleSummary() throws Exception {
-    when(questionnaireResultService.getAppraisalsQuestionnaireSummaryById(USER_SUMMARY_ID_1))
-      .thenReturn(USER_SUMMARY_1);
+
+    when(questionnaireResultService.getAppraisalsQuestionnaireSummaryById(
+      USER_SUMMARY_ID_1)).thenReturn(USER_SUMMARY_1);
     when(
-      questionnaireResponseSummaryService
-        .getQuestionnairesSummariesBasedOnAppraisee(
-          MEMBER_1, PAGEABLE))
-      .thenReturn(QUESTIONNAIRE_SUMMARY_PAGE);
+      questionnaireResponseSummaryService.getQuestionnairesSummariesBasedOnAppraisee(
+        MEMBER_1, PAGEABLE)).thenReturn(QUESTIONNAIRE_SUMMARY_PAGE);
 
     PagingResponse<QuestionnaireSimpleSummaryResponse> response =
       QuestionnaireResponseMapper.toPagingQuestionnaireSimpleSummaryResponse(
         QUESTIONNAIRE_SUMMARY_PAGE, HttpStatus.OK);
 
-    mockMvc.perform(
-      get("/api/communication/questionnaire-response")
-        .cookie(cookies).param("userSummaryId", USER_SUMMARY_ID_1))
+    mockMvc.perform(get("/api/communication/questionnaire-response").cookie(
+      cookies)
+                      .param("userSummaryId", USER_SUMMARY_ID_1))
       .andExpect(status().isOk())
-      .andExpect(content().json(pagingResponseJacksonTester.write(response).getJson()));
+      .andExpect(content().json(pagingResponseJacksonTester.write(response)
+                                  .getJson()));
 
-    verify(questionnaireResponseSummaryService)
-      .getQuestionnairesSummariesBasedOnAppraisee(
-        MEMBER_1, PAGEABLE);
-    verify(questionnaireResultService).getAppraisalsQuestionnaireSummaryById(USER_SUMMARY_ID_1);
+    verify(
+      questionnaireResponseSummaryService).getQuestionnairesSummariesBasedOnAppraisee(
+      MEMBER_1, PAGEABLE);
+    verify(questionnaireResultService).getAppraisalsQuestionnaireSummaryById(
+      USER_SUMMARY_ID_1);
   }
 
   @Test
-  public void getQuestionnaireSummaryDetail()  throws Exception {
+  public void getQuestionnaireSummaryDetail() throws Exception {
+
     when(
-      questionnaireResponseSummaryService
-        .getQuestionnaireResponseSummaryById(QUESTIONNAIRE_RESPONSE_SUMMARY_ID))
-      .thenReturn(QUESTIONNAIRE_RESPONSE_SUMMARY);
+      questionnaireResponseSummaryService.getQuestionnaireResponseSummaryById(
+        QUESTIONNAIRE_RESPONSE_SUMMARY_ID)).thenReturn(
+      QUESTIONNAIRE_RESPONSE_SUMMARY);
+
+    when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
 
     DataResponse<QuestionnaireSummaryDescriptionResponse> response =
-      QuestionnaireResponseSummaryResponseMapper
-        .toDataResponseQuestionnaireDataSummaryDescription(
-          QUESTIONNAIRE_RESPONSE_SUMMARY
-        );
+      QuestionnaireResponseSummaryResponseMapper.toDataResponseQuestionnaireDataSummaryDescription(
+        QUESTIONNAIRE_RESPONSE_SUMMARY, URL_PREFIX);
 
-    mockMvc.perform(
-      get("/api/communication/questionnaire-response/"
-          +QUESTIONNAIRE_RESPONSE_SUMMARY_ID
-      )
-        .cookie(cookies))
+    mockMvc.perform(get("/api/communication/questionnaire-response/" +
+                        QUESTIONNAIRE_RESPONSE_SUMMARY_ID).cookie(cookies))
       .andExpect(status().isOk())
-      .andExpect(content().json(dataResponseJacksonTester.write(response).getJson()));
+      .andExpect(content().json(dataResponseJacksonTester.write(response)
+                                  .getJson()));
 
-    verify(questionnaireResponseSummaryService)
-      .getQuestionnaireResponseSummaryById(QUESTIONNAIRE_RESPONSE_SUMMARY_ID);
+    verify(fileProperties).getUrlPrefix();
+    verify(
+      questionnaireResponseSummaryService).getQuestionnaireResponseSummaryById(
+      QUESTIONNAIRE_RESPONSE_SUMMARY_ID);
   }
 
   @Test
   public void getQuestionSummaryResponse() throws Exception {
-    when(
-      questionnaireResultService
-        .getAppraisalsQuestionnaireSummaryById(USER_SUMMARY_ID_1))
-      .thenReturn(USER_SUMMARY_1);
+
+    when(questionnaireResultService.getAppraisalsQuestionnaireSummaryById(
+      USER_SUMMARY_ID_1)).thenReturn(USER_SUMMARY_1);
 
     when(
-      questionnaireResponseSummaryService
-        .getQuestionsDetailsFromQuestionnaireResponseSummaryIdAndAppraisee(
-          QUESTIONNAIRE_RESPONSE_SUMMARY_ID, MEMBER_1))
-      .thenReturn(Arrays.asList(QUESTION_RESPONSE_SUMMARY));
+      questionnaireResponseSummaryService.getQuestionsDetailsFromQuestionnaireResponseSummaryIdAndAppraisee(
+        QUESTIONNAIRE_RESPONSE_SUMMARY_ID, MEMBER_1)).thenReturn(
+      Arrays.asList(QUESTION_RESPONSE_SUMMARY));
 
     DataResponse<List<QuestionQuestionnaireSummaryResponse>> response =
-      QuestionnaireResponseSummaryResponseMapper
-        .toDataResponseQuestionQuestionnaireSummaryResponseList(Arrays.asList(QUESTION_RESPONSE_SUMMARY));
+      QuestionnaireResponseSummaryResponseMapper.toDataResponseQuestionQuestionnaireSummaryResponseList(
+        Arrays.asList(QUESTION_RESPONSE_SUMMARY));
 
-    mockMvc.perform(
-      get("/api/communication/questionnaire-response/"
-        +QUESTIONNAIRE_RESPONSE_SUMMARY_ID
-        +"/questions/"
-        +USER_SUMMARY_ID_1
-      )
-        .cookie(cookies))
+    mockMvc.perform(get("/api/communication/questionnaire-response/" +
+                        QUESTIONNAIRE_RESPONSE_SUMMARY_ID + "/questions/" +
+                        USER_SUMMARY_ID_1).cookie(cookies))
       .andExpect(status().isOk())
-      .andExpect(content().json(dataResponseJacksonTester.write(response).getJson()));
+      .andExpect(content().json(dataResponseJacksonTester.write(response)
+                                  .getJson()));
 
 
-    verify(questionnaireResponseSummaryService)
-      .getQuestionsDetailsFromQuestionnaireResponseSummaryIdAndAppraisee(
-        QUESTIONNAIRE_RESPONSE_SUMMARY_ID, MEMBER_1);
+    verify(
+      questionnaireResponseSummaryService).getQuestionsDetailsFromQuestionnaireResponseSummaryIdAndAppraisee(
+      QUESTIONNAIRE_RESPONSE_SUMMARY_ID, MEMBER_1);
 
-    verify(questionnaireResultService)
-      .getAppraisalsQuestionnaireSummaryById(USER_SUMMARY_ID_1);
+    verify(questionnaireResultService).getAppraisalsQuestionnaireSummaryById(
+      USER_SUMMARY_ID_1);
   }
+
 }

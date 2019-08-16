@@ -1,6 +1,7 @@
 package com.future.function.web.controller.scoring;
 
 import com.future.function.common.enumeration.core.Role;
+import com.future.function.common.properties.core.FileProperties;
 import com.future.function.service.api.feature.scoring.SummaryService;
 import com.future.function.session.annotation.WithAnyRole;
 import com.future.function.session.model.Session;
@@ -20,16 +21,29 @@ public class SummaryController {
 
   private SummaryService summaryService;
 
+  private FileProperties fileProperties;
+
   @Autowired
-  public SummaryController(SummaryService summaryService) {
+  public SummaryController(
+    SummaryService summaryService, FileProperties fileProperties
+  ) {
+
     this.summaryService = summaryService;
+    this.fileProperties = fileProperties;
   }
 
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-  public DataResponse<ReportDetailWebResponse> findAllSummaryByStudentId(@PathVariable String studentId,
-      @WithAnyRole(roles = {Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT}) Session session) {
+  public DataResponse<ReportDetailWebResponse> findAllSummaryByStudentId(
+    @PathVariable
+      String studentId,
+    @WithAnyRole(roles = { Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT })
+      Session session
+  ) {
+
     return ReportDetailResponseMapper.toDataReportDetailWebResponse(
-        summaryService.findAllPointSummaryByStudentId(studentId, session.getUserId()));
+      summaryService.findAllPointSummaryByStudentId(studentId,
+                                                    session.getUserId()
+      ), fileProperties.getUrlPrefix());
   }
 
 }

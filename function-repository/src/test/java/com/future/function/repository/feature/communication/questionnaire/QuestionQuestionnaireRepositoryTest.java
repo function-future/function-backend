@@ -33,44 +33,43 @@ public class QuestionQuestionnaireRepositoryTest {
 
   private static final String DESCRIPTION = "Lorem Ipsum";
 
-  private static final Questionnaire questionnaire1 =
-          Questionnaire.builder()
-            .id("id_questionnaire_1")
-            .title(TITLE_1)
-            .description(DESCRIPTION)
-            .startDate(Long.valueOf(1559966400))
-            .build();
+  private static final Questionnaire questionnaire1 = Questionnaire.builder()
+    .id("id_questionnaire_1")
+    .title(TITLE_1)
+    .description(DESCRIPTION)
+    .startDate(Long.valueOf(1559966400))
+    .build();
 
-  private static final Questionnaire questionnaire2 =
-          Questionnaire.builder()
-            .id("id_questionnaire_2")
-            .title(TITLE_2)
-            .description(DESCRIPTION)
-            .startDate(Long.valueOf(1559966400))
-            .build();
+  private static final Questionnaire questionnaire2 = Questionnaire.builder()
+    .id("id_questionnaire_2")
+    .title(TITLE_2)
+    .description(DESCRIPTION)
+    .startDate(Long.valueOf(1559966400))
+    .build();
 
   @Autowired
   private QuestionQuestionnaireRepository questionQuestionnaireRepository;
 
   @Before
   public void SetUp() {
+
     QuestionQuestionnaire question1 = QuestionQuestionnaire.builder()
-            .id(ID_1)
-            .questionnaire(questionnaire1)
-            .description(DESCRIPTION + "1")
-            .build();
+      .id(ID_1)
+      .questionnaire(questionnaire1)
+      .description(DESCRIPTION + "1")
+      .build();
 
     QuestionQuestionnaire question2 = QuestionQuestionnaire.builder()
-            .id(ID_2)
-            .questionnaire(questionnaire1)
-            .description(DESCRIPTION + "2")
-            .build();
+      .id(ID_2)
+      .questionnaire(questionnaire1)
+      .description(DESCRIPTION + "2")
+      .build();
 
     QuestionQuestionnaire question3 = QuestionQuestionnaire.builder()
-            .id(ID_3)
-            .questionnaire(questionnaire2)
-            .description(DESCRIPTION + "3")
-            .build();
+      .id(ID_3)
+      .questionnaire(questionnaire2)
+      .description(DESCRIPTION + "3")
+      .build();
 
 
     questionQuestionnaireRepository.save(question1);
@@ -80,20 +79,27 @@ public class QuestionQuestionnaireRepositoryTest {
 
   @After
   public void TearDown() {
+
     questionQuestionnaireRepository.deleteAll();
   }
 
   @Test
   public void testGivenQuestionnaireByFindingAllQuestionsReturnListQuestion() {
-    List<QuestionQuestionnaire> questions1 = questionQuestionnaireRepository.findAllByQuestionnaire(questionnaire1);
-    List<QuestionQuestionnaire> questions2 = questionQuestionnaireRepository.findAllByQuestionnaire(questionnaire2);
+
+    List<QuestionQuestionnaire> questions1 =
+      questionQuestionnaireRepository.findAllByQuestionnaire(questionnaire1);
+    List<QuestionQuestionnaire> questions2 =
+      questionQuestionnaireRepository.findAllByQuestionnaire(questionnaire2);
 
     assertThat(questions1.size()).isEqualTo(2);
-    assertThat(questions1.get(0).getId()).isEqualTo(ID_1);
-    assertThat(questions1.get(1).getId()).isEqualTo(ID_2);
+    assertThat(questions1.get(0)
+                 .getId()).isEqualTo(ID_1);
+    assertThat(questions1.get(1)
+                 .getId()).isEqualTo(ID_2);
 
     assertThat(questions2.size()).isEqualTo(1);
-    assertThat(questions2.get(0).getId()).isEqualTo(ID_3);
+    assertThat(questions2.get(0)
+                 .getId()).isEqualTo(ID_3);
   }
 
 }

@@ -4,14 +4,19 @@ import com.future.function.model.entity.base.BaseEntity;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.model.util.constant.DocumentName;
 import com.future.function.model.util.constant.FieldName;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.UUID;
 
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper = true)
 @Data
 @Builder
 @AllArgsConstructor
@@ -19,18 +24,20 @@ import java.util.UUID;
 @Document(collection = DocumentName.REPORT_DETAIL)
 public class ReportDetail extends BaseEntity {
 
-    @Builder.Default
-    private String id = UUID.randomUUID().toString();
+  @Id
+  @Builder.Default
+  private String id = UUID.randomUUID()
+    .toString();
 
-    @Field(FieldName.ReportDetail.POINT)
-    private int point;
+  @Field(FieldName.ReportDetail.POINT)
+  private int point;
 
-    @DBRef(lazy = true)
-    @Field(FieldName.ReportDetail.USER)
-    private User user;
+  @DBRef(lazy = true)
+  @Field(FieldName.ReportDetail.USER)
+  private User user;
 
-    @DBRef(lazy = true)
-    @Field(FieldName.ReportDetail.REPORT)
-    private Report report;
+  @DBRef(lazy = true)
+  @Field(FieldName.ReportDetail.REPORT)
+  private Report report;
 
 }

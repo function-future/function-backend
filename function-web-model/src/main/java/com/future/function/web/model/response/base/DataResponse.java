@@ -4,9 +4,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-/**
- * Model representation for data response with no paging.
- */
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class DataResponse<T> extends BaseResponse {
@@ -14,7 +11,7 @@ public class DataResponse<T> extends BaseResponse {
   private T data;
 
   public DataResponse() {}
-  
+
   @Builder
   private DataResponse(int code, String status, T data) {
 

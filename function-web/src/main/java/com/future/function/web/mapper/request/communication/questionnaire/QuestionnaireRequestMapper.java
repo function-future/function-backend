@@ -16,26 +16,30 @@ public class QuestionnaireRequestMapper {
 
   @Autowired
   public QuestionnaireRequestMapper(RequestValidator validator) {
+
     this.validator = validator;
   }
 
-  public Questionnaire toQuestionnaire(QuestionnaireRequest questionnaireRequest, String questionnaireId){
+  public Questionnaire toQuestionnaire(
+    QuestionnaireRequest questionnaireRequest, String questionnaireId
+  ) {
+
     return toValidateQuestionnaire(questionnaireRequest, questionnaireId);
   }
 
-  private Questionnaire toValidateQuestionnaire(QuestionnaireRequest questionnaireRequest, String questionnaireId) {
+  private Questionnaire toValidateQuestionnaire(
+    QuestionnaireRequest questionnaireRequest, String questionnaireId
+  ) {
+
     validator.validate(questionnaireRequest);
 
-    Questionnaire newQuestionnaire = Questionnaire.builder()
+    return Questionnaire.builder()
       .id(questionnaireId)
       .title(questionnaireRequest.getTitle())
       .description(questionnaireRequest.getDesc())
       .startDate(questionnaireRequest.getStartDate())
       .dueDate(questionnaireRequest.getDueDate())
       .build();
-
-    return newQuestionnaire;
   }
-
 
 }

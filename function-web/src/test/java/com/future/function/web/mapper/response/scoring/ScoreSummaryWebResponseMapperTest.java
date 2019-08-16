@@ -15,39 +15,57 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class ScoreSummaryWebResponseMapperTest {
 
-    private static final String TITLE = "title";
-    private static final String TYPE = "type";
-    private static final int POINT = 100;
+  private static final String TITLE = "title";
 
-    private SummaryVO summaryVO;
+  private static final String TYPE = "type";
 
-    @Before
-    public void setUp() throws Exception {
-        summaryVO = SummaryVO.builder()
-                .title(TITLE)
-                .type(TYPE)
-                .point(POINT)
-                .build();
-    }
+  private static final int POINT = 100;
 
-    @After
-    public void tearDown() throws Exception {
-    }
+  private SummaryVO summaryVO;
 
-    @Test
-    public void toDataSummaryResponse() {
-        DataResponse<SummaryWebResponse> actual = ScoreSummaryResponseMapper.toDataSummaryResponse(summaryVO);
-        assertThat(actual.getData().getTitle()).isEqualTo(TITLE);
-        assertThat(actual.getData().getType()).isEqualTo(TYPE);
-        assertThat(actual.getData().getPoint()).isEqualTo(POINT);
-    }
+  @Before
+  public void setUp() throws Exception {
 
-    @Test
-    public void toDataListSummaryResponse() {
-      DataResponse<List<SummaryWebResponse>> actual = ScoreSummaryResponseMapper
-              .toDataListSummaryResponse(Collections.singletonList(summaryVO));
-        assertThat(actual.getData().get(0).getTitle()).isEqualTo(TITLE);
-        assertThat(actual.getData().get(0).getType()).isEqualTo(TYPE);
-        assertThat(actual.getData().get(0).getPoint()).isEqualTo(POINT);
-    }
+    summaryVO = SummaryVO.builder()
+      .title(TITLE)
+      .type(TYPE)
+      .point(POINT)
+      .build();
+  }
+
+  @After
+  public void tearDown() throws Exception {
+
+  }
+
+  @Test
+  public void toDataSummaryResponse() {
+
+    DataResponse<SummaryWebResponse> actual =
+      ScoreSummaryResponseMapper.toDataSummaryResponse(summaryVO);
+    assertThat(actual.getData()
+                 .getTitle()).isEqualTo(TITLE);
+    assertThat(actual.getData()
+                 .getType()).isEqualTo(TYPE);
+    assertThat(actual.getData()
+                 .getPoint()).isEqualTo(POINT);
+  }
+
+  @Test
+  public void toDataListSummaryResponse() {
+
+    DataResponse<List<SummaryWebResponse>> actual =
+      ScoreSummaryResponseMapper.toDataListSummaryResponse(
+        Collections.singletonList(summaryVO));
+    assertThat(actual.getData()
+                 .get(0)
+                 .getTitle()).isEqualTo(TITLE);
+    assertThat(actual.getData()
+                 .get(0)
+                 .getType()).isEqualTo(TYPE);
+    assertThat(actual.getData()
+                 .get(0)
+                 .getPoint()).isEqualTo(POINT);
+  }
+
 }

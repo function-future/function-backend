@@ -12,9 +12,6 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-/**
- * Entity representation for batches.
- */
 @Data
 @Builder
 @NoArgsConstructor
@@ -22,14 +19,14 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @EqualsAndHashCode(callSuper = true)
 @Document(collection = DocumentName.BATCH)
 public class Batch extends BaseEntity {
-  
+
   @Id
   private String id;
-  
+
   @Field(FieldName.Batch.NAME)
   private String name;
-  
+
   @Field(FieldName.Batch.CODE)
   private String code;
-  
+
 }

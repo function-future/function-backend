@@ -1,6 +1,7 @@
 package com.future.function.web.controller.scoring;
 
 import com.future.function.common.enumeration.core.Role;
+import com.future.function.common.properties.core.FileProperties;
 import com.future.function.model.vo.scoring.StudentSummaryVO;
 import com.future.function.model.vo.scoring.SummaryVO;
 import com.future.function.service.api.feature.scoring.SummaryService;
@@ -21,7 +22,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Collections;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -32,71 +35,86 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class SummaryControllerTest extends TestHelper {
 
   private static final String TITLE = "title";
+
   private static final String TYPE = "type";
+
   private static final String STUDENT_ID = "student-another-id";
+
   private static final String STUDENT_NAME = "student-name";
+
   private static final String BATCH_CODE = "batch-code";
+
   private static final String UNIVERSITY = "university";
+
   private static final int POINT = 100;
 
-    private SummaryVO summaryVO;
-    private StudentSummaryVO studentSummaryVO;
+  private static final String URL_PREFIX = "url-prefix";
+
+  private static final String AVATAR = "avatar";
+
+  private SummaryVO summaryVO;
+
+  private StudentSummaryVO studentSummaryVO;
+
   private SummaryWebResponse summaryWebResponse;
-  private ReportDetailWebResponse reportDetailWebResponse;
+
   private DataResponse<ReportDetailWebResponse> DATA_RESPONSE;
 
   @MockBean
   private SummaryService summaryService;
 
+  @MockBean
+  private FileProperties fileProperties;
+
   @Before
   public void setUp() {
+
     super.setUp();
     super.setCookie(Role.ADMIN);
 
-      summaryVO = SummaryVO.builder()
-        .title(TITLE)
-        .type(TYPE)
-        .point(POINT)
-        .build();
+    summaryVO = SummaryVO.builder()
+      .title(TITLE)
+      .type(TYPE)
+      .point(POINT)
+      .build();
 
-      studentSummaryVO = StudentSummaryVO.builder()
-        .studentName(STUDENT_NAME)
-        .batchCode(BATCH_CODE)
-        .university(UNIVERSITY)
-              .scores(Collections.singletonList(summaryVO))
-        .build();
+    studentSummaryVO = StudentSummaryVO.builder()
+      .studentName(STUDENT_NAME)
+      .batchCode(BATCH_CODE)
+      .university(UNIVERSITY)
+      .avatar(AVATAR)
+      .scores(Collections.singletonList(summaryVO))
+      .build();
 
     summaryWebResponse = SummaryWebResponse.builder()
-        .title(TITLE)
-        .type(TYPE)
-        .point(POINT)
-        .build();
+      .title(TITLE)
+      .type(TYPE)
+      .point(POINT)
+      .build();
 
-    reportDetailWebResponse = ReportDetailWebResponse.builder()
-        .studentName(STUDENT_NAME)
-        .batchCode(BATCH_CODE)
-        .university(UNIVERSITY)
-        .scores(Collections.singletonList(summaryWebResponse))
-        .build();
+    DATA_RESPONSE = ReportDetailResponseMapper.toDataReportDetailWebResponse(
+      studentSummaryVO, URL_PREFIX);
 
-      DATA_RESPONSE = ReportDetailResponseMapper.toDataReportDetailWebResponse(studentSummaryVO);
-
-      when(summaryService.findAllPointSummaryByStudentId(STUDENT_ID, ADMIN_ID)).thenReturn(studentSummaryVO);
+    when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
+    when(summaryService.findAllPointSummaryByStudentId(STUDENT_ID,
+                                                       ADMIN_ID
+    )).thenReturn(studentSummaryVO);
   }
 
   @After
   public void tearDown() throws Exception {
+
     verifyNoMoreInteractions(summaryService);
   }
 
   @Test
   public void findAllSummaryByStudentId() throws Exception {
-    mockMvc.perform(
-        get("/api/scoring/summary/" + STUDENT_ID)
-            .cookie(cookies))
-        .andExpect(status().isOk())
-        .andExpect(content().json(
-            dataResponseJacksonTester.write(DATA_RESPONSE).getJson()));
+
+    mockMvc.perform(get("/api/scoring/summary/" + STUDENT_ID).cookie(cookies))
+      .andExpect(status().isOk())
+      .andExpect(content().json(dataResponseJacksonTester.write(DATA_RESPONSE)
+                                  .getJson()));
     verify(summaryService).findAllPointSummaryByStudentId(STUDENT_ID, ADMIN_ID);
   }
+
 }

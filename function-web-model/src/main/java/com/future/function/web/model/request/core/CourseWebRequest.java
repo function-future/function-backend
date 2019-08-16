@@ -10,24 +10,21 @@ import org.hibernate.validator.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.util.List;
 
-/**
- * Model representation for course web request.
- */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class CourseWebRequest {
-  
+
   @NotBlank(message = "NotBlank")
   private String title;
-  
+
   @NotBlank(message = "NotBlank")
   private String description;
-  
+
   @Size(max = 1,
         message = "Size")
   @FileMustExist
   private List<String> material;
-  
+
 }

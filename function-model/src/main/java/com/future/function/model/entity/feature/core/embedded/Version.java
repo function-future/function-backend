@@ -10,11 +10,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Version {
-  
+
   private Long timestamp;
-  
+
   private String path;
-  
+
   private String url;
-  
+
 }

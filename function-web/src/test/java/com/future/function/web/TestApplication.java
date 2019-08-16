@@ -29,42 +29,42 @@ import static org.mockito.Mockito.when;
   FileProperties.class, SessionProperties.class
 })
 public class TestApplication {
-  
+
   @Bean
   public JedisConnectionFactory jedisConnectionFactory() {
-    
+
     return mock(JedisConnectionFactory.class);
   }
-  
+
   @Bean
   public RedisTemplate<String, Session> redisTemplate(
     JedisConnectionFactory jedisConnectionFactory
   ) {
-    
+
     RedisTemplate<String, Session> redisTemplate = mock(RedisTemplate.class);
-    
+
     when(redisTemplate.getConnectionFactory()).thenReturn(
       jedisConnectionFactory);
-    
+
     ValueOperations valueOperations = mock(ValueOperations.class);
-    
+
     when(redisTemplate.opsForValue()).thenReturn(valueOperations);
-    
+
     when(valueOperations.get(STUDENT_SESSION_ID)).thenReturn(STUDENT_SESSION);
     when(valueOperations.get(MENTOR_SESSION_ID)).thenReturn(MENTOR_SESSION);
     when(valueOperations.get(JUDGE_SESSION_ID)).thenReturn(JUDGE_SESSION);
     when(valueOperations.get(ADMIN_SESSION_ID)).thenReturn(ADMIN_SESSION);
-    
+
     return redisTemplate;
   }
-  
+
   @Bean
   public SessionResolver sessionResolver(
     RedisTemplate<String, Session> redisTemplate,
     SessionProperties sessionProperties
   ) {
-    
+
     return new SessionResolver(redisTemplate, sessionProperties);
   }
-  
+
 }

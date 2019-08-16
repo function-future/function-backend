@@ -23,45 +23,45 @@ import static org.assertj.core.api.Assertions.assertThat;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = TestApplication.class)
 public class BatchRepositoryTest {
-  
+
   private static final String NUMBER_1 = "1";
-  
+
   private static final String NUMBER_2 = "2";
-  
+
   private static final Sort SORT = new Sort(
     new Sort.Order(Sort.Direction.DESC, FieldName.BaseEntity.CREATED_AT));
-  
+
   private static final Pageable PAGEABLE = new PageRequest(0, 10, SORT);
-  
+
   private static final String ID_1 = "id-1";
-  
+
   @Autowired
   private BatchRepository batchRepository;
-  
+
   @Before
   public void setUp() {
-    
+
     Batch firstBatch = new Batch(ID_1, "name-1", NUMBER_1);
     firstBatch.setCreatedAt(5L);
     firstBatch.setUpdatedAt(10L);
     Batch secondBatch = new Batch("id-2", "name-2", NUMBER_2);
     secondBatch.setCreatedAt(15L);
     secondBatch.setUpdatedAt(20L);
-    
+
     batchRepository.save(Arrays.asList(firstBatch, secondBatch));
   }
-  
+
   @After
   public void tearDown() {
-    
+
     batchRepository.deleteAll();
   }
-  
+
   @Test
   public void testGivenMethodCallByFindingBatchesReturnBatchObject() {
-    
+
     Page<Batch> foundBatches = batchRepository.findAllByDeletedFalse(PAGEABLE);
-    
+
     assertThat(foundBatches.getContent()
                  .get(0)
                  .getCode()).isEqualTo(NUMBER_2);
@@ -69,37 +69,38 @@ public class BatchRepositoryTest {
                  .get(1)
                  .getCode()).isEqualTo(NUMBER_1);
   }
-  
+
   @Test
   public void testGivenMethodCallByFindingFirstBatchReturnBatchObject() {
-    
+
     Optional<Batch> foundBatch =
       batchRepository.findFirstByDeletedFalseOrderByUpdatedAtDesc();
-    
+
     assertThat(foundBatch).isNotEqualTo(Optional.empty());
     assertThat(foundBatch.get()
                  .getCode()).isEqualTo(NUMBER_2);
   }
-  
+
   @Test
   public void testGivenBatchNumberByFindingBatchByNumberReturnBatchObject() {
-    
-    Optional<Batch> foundBatch = batchRepository.findByCodeAndDeletedFalse(NUMBER_1);
-    
+
+    Optional<Batch> foundBatch = batchRepository.findByCodeAndDeletedFalse(
+      NUMBER_1);
+
     assertThat(foundBatch).isNotEqualTo(Optional.empty());
     assertThat(foundBatch.get()
                  .getCode()).isEqualTo(NUMBER_1);
   }
-  
+
   @Test
   public void testGivenBatchIdAndPageableByFindingBatchesReturnPageOfBatch() {
-    
+
     Page<Batch> foundBatches = batchRepository.findAllByIdAndDeletedFalse(
       ID_1, PAGEABLE);
-    
+
     assertThat(foundBatches.getContent()
                  .get(0)
                  .getCode()).isEqualTo(NUMBER_1);
   }
-  
+
 }

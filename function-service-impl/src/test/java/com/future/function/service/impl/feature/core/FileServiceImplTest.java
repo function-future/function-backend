@@ -70,7 +70,7 @@ public class FileServiceImplTest {
 
   @Mock
   private FileProperties fileProperties;
-  
+
   @Mock
   private UserService userService;
 
@@ -133,23 +133,22 @@ public class FileServiceImplTest {
     when(
       fileRepository.findAllByParentIdAndAsResourceFalseAndDeletedFalseOrderByMarkFolderDesc(
         PARENT_ID, PAGEABLE)).thenReturn(returnedPage);
-    
+
     FileV2 parentObject = FileV2.builder()
       .id(PARENT_ID)
       .build();
     when(fileRepository.findByIdAndDeletedFalse(PARENT_ID)).thenReturn(
       Optional.of(parentObject));
-  
+
     Pair<List<FileV2>, Page<FileV2>> pathsAndFilesOrFolders =
       fileService.getFilesAndFolders(PARENT_ID, PAGEABLE);
 
     List<FileV2> paths = pathsAndFilesOrFolders.getFirst();
-    
+
     assertThat(paths).isNotNull();
     assertThat(paths).isEqualTo(Collections.singletonList(parentObject));
-    
-    Page<FileV2> page = pathsAndFilesOrFolders
-      .getSecond();
+
+    Page<FileV2> page = pathsAndFilesOrFolders.getSecond();
 
     assertThat(page).isNotNull();
     assertThat(page).isEqualTo(
@@ -270,7 +269,7 @@ public class FileServiceImplTest {
 
     verify(fileRepository).findAll(fileIds);
     verify(fileRepository).save(fileV2s);
-    
+
     verifyZeroInteractions(userService);
   }
 
@@ -295,7 +294,7 @@ public class FileServiceImplTest {
     when(resourceService.storeFile(null, PARENT_ID, NAME, NAME, NAME.getBytes(),
                                    FileOrigin.FILE
     )).thenReturn(returnedFile);
-  
+
     String userId = "user-id";
     when(userService.getUser(userId)).thenReturn(new User());
 
@@ -305,10 +304,10 @@ public class FileServiceImplTest {
       .used(true)
       .user(new User())
       .build();
-  
+
     when(fileRepository.findByIdAndDeletedFalse(PARENT_ID)).thenReturn(
       Optional.empty());
-    
+
     when(fileRepository.save(any(FileV2.class))).thenReturn(savedFile);
 
     when(fileRepository.findByIdAndDeletedFalse(savedFile.getId())).thenReturn(
@@ -340,7 +339,7 @@ public class FileServiceImplTest {
 
   @Test
   public void testGivenMethodCallAndEmptyByteArrayByCreatingFolderReturnNewFolder() {
-  
+
     String userId = "";
     when(userService.getUser(userId)).thenReturn(new User());
 
@@ -351,7 +350,7 @@ public class FileServiceImplTest {
       .markFolder(true)
       .user(new User())
       .build();
-  
+
     when(fileRepository.findByIdAndDeletedFalse(PARENT_ID)).thenReturn(
       Optional.empty());
     when(fileRepository.findByIdAndDeletedFalse(
@@ -384,10 +383,10 @@ public class FileServiceImplTest {
   @Test
   public void testGivenMethodCallAndEmptyByteArrayAndInvalidRoleByCreatingFolderReturnForbiddenException() {
 
-    catchException(
-      () -> fileService.createFileOrFolder(new Session("", "", "", EMAIL, Role.MENTOR),
-                                           PARENT_ID, NAME, NAME, new byte[] {}
-      ));
+    catchException(() -> fileService.createFileOrFolder(
+      new Session("", "", "", EMAIL, Role.MENTOR), PARENT_ID, NAME, NAME,
+      new byte[] {}
+    ));
 
     assertThat(caughtException().getClass()).isEqualTo(
       ForbiddenException.class);
@@ -453,7 +452,7 @@ public class FileServiceImplTest {
     )).thenReturn(Optional.of(file));
     when(fileRepository.findOne(ID)).thenReturn(file);
     when(fileRepository.save(file)).thenReturn(file);
-  
+
     FileV2 updatedFile = fileService.updateFileOrFolder(
       SESSION, ID, PARENT_ID, NAME, NAME, null);
 

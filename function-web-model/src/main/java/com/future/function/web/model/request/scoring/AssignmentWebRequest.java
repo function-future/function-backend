@@ -12,9 +12,6 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.List;
 
-/**
- * Represent the assignment request in the web as AssignmentWebRequest
- */
 @Data
 @Builder
 @NoArgsConstructor
@@ -32,6 +29,8 @@ public class AssignmentWebRequest {
   private Long deadline;
 
   @FileMustExist
-  @Size(max = 1, message = "Size")
+  @Size(max = 1,
+        message = "Size")
   private List<String> files;
+
 }

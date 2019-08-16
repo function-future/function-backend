@@ -12,7 +12,9 @@ import lombok.NoArgsConstructor;
 public class StudentQuizWebResponse {
 
   private String id;
+
   private QuizWebResponse quiz;
+
   private Integer trials;
 
 }
