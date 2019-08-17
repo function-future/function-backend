@@ -17,4 +17,5 @@ public class QuestionAnswerResponse {
 
   private Float score;
 
+  private String comment;
 }
