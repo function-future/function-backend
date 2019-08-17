@@ -193,6 +193,7 @@ public class QuestionnaireResponseSummaryResponseMapper {
               .getName())
       .avatar(getThumnailUrl(questionResponse.getAppraiser(), urlPrefix))
       .score(questionResponse.getScore())
+      .comment(questionResponse.getComment())
       .build();
 
   }
