@@ -65,7 +65,7 @@ public class ReportController {
   @GetMapping(value = "/students",
               produces = MediaType.APPLICATION_JSON_VALUE)
   public PagingResponse<UserWebResponse> getStudentsWithinBatch(
-    @WithAnyRole(roles = Role.ADMIN)
+    @WithAnyRole(roles = {Role.ADMIN, Role.JUDGE, Role.MENTOR})
       Session session,
     @PathVariable
       String batchCode,
