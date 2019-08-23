@@ -18,7 +18,7 @@ public class QuestionnaireRequest {
   @Title(message = "InvalidTitle")
   private String title;
 
-  @Size(max = 50,
+  @Size(max = 300,
         message = "Size")
   private String desc;
 
