@@ -6,7 +6,7 @@
   <parent>
     <groupId>com.future.function</groupId>
     <artifactId>function</artifactId>
-    <version>1.0.0-1-SNAPSHOT</version>
+      <version>1.0.1-1-SNAPSHOT</version>
   </parent>
 
   <artifactId>function-web</artifactId>
