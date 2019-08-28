@@ -144,9 +144,6 @@ public class QuizServiceImplTest {
     when(quizRepository.findByIdAndDeletedFalse(QUIZ_ID)).thenReturn(
       Optional.of(quiz));
     when(quizRepository.save(quiz)).thenReturn(quiz);
-    when(studentQuizService.createStudentQuizByBatchCode(BATCH_CODE,
-                                                         quiz
-    )).thenReturn(quiz);
     when(questionService.findAllByMultipleQuestionBankId(
       Collections.singletonList(QUESTION_BANK_ID))).thenReturn(
       Collections.singletonList(question));
@@ -227,7 +224,6 @@ public class QuizServiceImplTest {
 
     verify(quizRepository).save(eq(quiz));
     verify(batchService).getBatchByCode(BATCH_CODE);
-    verify(studentQuizService).createStudentQuizByBatchCode(BATCH_CODE, quiz);
     verify(questionBankService).findById(QUESTION_BANK_ID);
   }
 
@@ -242,7 +238,6 @@ public class QuizServiceImplTest {
 
     verify(quizRepository).save(eq(quiz));
     verify(batchService).getBatchByCode(BATCH_CODE);
-    verify(studentQuizService).createStudentQuizByBatchCode(BATCH_CODE, quiz);
     verify(questionBankService).findAll();
   }
 
@@ -326,9 +321,6 @@ public class QuizServiceImplTest {
     Quiz actual = quizService.copyQuizWithTargetBatchCode(batchCode, quiz);
     assertThat(actual.getTitle()).isEqualTo(QUIZ_TITLE);
     verify(quizRepository).findByIdAndDeletedFalse(QUIZ_ID);
-    verify(studentQuizService).copyQuizWithTargetBatch(targetBatchObj, quiz);
-    quiz.getBatch()
-      .setCode(batchCode);
     verify(quizRepository).save(quiz);
     verify(batchService).getBatchByCode(batchCode);
   }
