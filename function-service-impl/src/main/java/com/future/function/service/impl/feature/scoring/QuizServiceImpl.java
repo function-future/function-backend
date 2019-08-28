@@ -71,7 +71,6 @@ public class QuizServiceImpl implements QuizService {
     return Optional.ofNullable(quiz)
       .map(Quiz::getId)
       .map(this::findById)
-      .map(value -> studentQuizService.copyQuizWithTargetBatch(batch, value))
       .map(quizRepository::save)
       .orElseThrow(() -> new UnsupportedOperationException(
         "Failed at #copyQuizWithTargetBatchCode #QuizService"));
@@ -83,9 +82,6 @@ public class QuizServiceImpl implements QuizService {
     return Optional.ofNullable(request)
       .map(this::setBatchAndQuestionBank)
       .map(quizRepository::save)
-      .map(quiz -> studentQuizService.createStudentQuizByBatchCode(
-        quiz.getBatch()
-          .getCode(), quiz))
       .orElseThrow(() -> new UnsupportedOperationException(
         "Failed on #createQuiz #QuizService"));
   }
