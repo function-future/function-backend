@@ -13,6 +13,7 @@ import com.future.function.service.api.feature.scoring.AssignmentService;
 import com.future.function.service.api.feature.scoring.RoomService;
 import com.future.function.service.impl.helper.CopyHelper;
 import com.future.function.service.impl.helper.PageHelper;
+import java.util.Observable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,11 +25,9 @@ import java.util.Objects;
 import java.util.Optional;
 
 @Service
-public class AssignmentServiceImpl implements AssignmentService {
+public class AssignmentServiceImpl extends Observable implements AssignmentService {
 
   private AssignmentRepository assignmentRepository;
-
-  private RoomService roomService;
 
   private ResourceService resourceService;
 
@@ -36,12 +35,11 @@ public class AssignmentServiceImpl implements AssignmentService {
 
   @Autowired
   public AssignmentServiceImpl(
-    AssignmentRepository assignmentRepository, RoomService roomService,
-    ResourceService resourceService, BatchService batchService
+    AssignmentRepository assignmentRepository,
+      ResourceService resourceService, BatchService batchService
   ) {
 
     this.assignmentRepository = assignmentRepository;
-    this.roomService = roomService;
     this.resourceService = resourceService;
     this.batchService = batchService;
   }
@@ -66,28 +64,6 @@ public class AssignmentServiceImpl implements AssignmentService {
       .flatMap(assignmentRepository::findByIdAndDeletedFalse)
       .orElseThrow(
         () -> new NotFoundException("#Failed at #findById #AssignmentService"));
-  }
-
-  @Override
-  public Page<Room> findAllRoomsByAssignmentId(
-    String assignmentId, Pageable pageable
-  ) {
-
-    return roomService.findAllRoomsByAssignmentId(assignmentId, pageable);
-  }
-
-  @Override
-  public Page<Room> findAllRoomsByStudentId(
-    String studentId, Pageable pageable, String userId
-  ) {
-
-    return roomService.findAllByStudentId(studentId, pageable, userId);
-  }
-
-  @Override
-  public Room findRoomById(String id, String userId) {
-
-    return roomService.findById(id, userId);
   }
 
   @Override
@@ -122,7 +98,6 @@ public class AssignmentServiceImpl implements AssignmentService {
       .map(this::storeAssignmentFile)
       .map(this::findAndSetAssignmentBatch)
       .map(assignmentRepository::save)
-      .map(roomService::createRoomsByAssignment)
       .orElseThrow(() -> new UnsupportedOperationException(
         "Failed at #createAssignment #AssignmentService"));
   }
@@ -225,26 +200,12 @@ public class AssignmentServiceImpl implements AssignmentService {
   }
 
   @Override
-  public Room giveScoreToRoomByRoomId(
-    String roomId, String userId, Integer point
-  ) {
-
-    return roomService.giveScoreToRoomByRoomId(roomId, userId, point);
-  }
-
-  @Override
-  public void deleteRoomById(String id) {
-
-    roomService.deleteRoomById(id);
-  }
-
-  @Override
   public void deleteById(String id) {
 
     Optional.ofNullable(id)
       .map(this::findById)
       .ifPresent(assignment -> {
-        roomService.deleteAllRoomsByAssignmentId(assignment.getId());
+        this.notifyObservers(assignment.getId());
         markAssignmentFileAsNotUsed(assignment);
         assignment.setDeleted(true);
         assignmentRepository.save(assignment);

@@ -89,9 +89,6 @@ public class ScoringMediatorServiceImpl implements ScoringMediatorService {
           log.info("ScoringMediatorException: {}", e.getMessage(), e);
         }
       });
-    pair.getSecond()
-      .forEach(
-        assignment -> roomService.createRoomForUserAndSave(user, assignment));
     return user;
   }
 

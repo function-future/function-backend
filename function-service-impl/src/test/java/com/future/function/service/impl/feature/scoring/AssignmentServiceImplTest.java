@@ -9,7 +9,6 @@ import com.future.function.model.entity.feature.scoring.Room;
 import com.future.function.repository.feature.scoring.AssignmentRepository;
 import com.future.function.service.api.feature.core.BatchService;
 import com.future.function.service.api.feature.core.ResourceService;
-import com.future.function.service.api.feature.scoring.RoomService;
 import com.future.function.service.impl.helper.CopyHelper;
 import com.future.function.service.impl.helper.PageHelper;
 import org.junit.After;
@@ -87,9 +86,6 @@ public class AssignmentServiceImplTest {
   private ResourceService resourceService;
 
   @Mock
-  private RoomService roomService;
-
-  @Mock
   private BatchService batchService;
 
   @Before
@@ -146,23 +142,13 @@ public class AssignmentServiceImplTest {
     when(resourceService.markFilesUsed(Collections.singletonList(FILE_ID),
                                        false
     )).thenReturn(true);
-    when(roomService.createRoomsByAssignment(assignment)).thenReturn(
-      assignment);
-    when(roomService.findById(ROOM_ID, USER_ID)).thenReturn(room);
-    when(roomService.findAllRoomsByAssignmentId(any(String.class),
-                                                eq(pageable)
-    )).thenReturn(roomPage);
-    when(roomService.giveScoreToRoomByRoomId(ROOM_ID, USER_ID, 100)).thenReturn(
-      room);
-    when(roomService.findAllByStudentId(USER_ID, pageable, USER_ID)).thenReturn(
-      PageHelper.toPage(Collections.singletonList(room), pageable));
   }
 
   @After
   public void tearDown() throws Exception {
 
     verifyNoMoreInteractions(
-      assignmentRepository, batchService, resourceService, roomService);
+      assignmentRepository, batchService, resourceService);
   }
 
   @Test
@@ -176,18 +162,6 @@ public class AssignmentServiceImplTest {
     assertThat(result.getContent()).isEqualTo(assignmentList);
     verify(batchService).getBatchByCode(BATCH_CODE);
     verify(assignmentRepository).findAllByBatchAndDeletedFalse(batch, pageable);
-  }
-
-  @Test
-  public void testFindAllRoomsWithStudentIdAndPageable() {
-
-    Page<Room> result = assignmentService.findAllRoomsByStudentId(
-      USER_ID, pageable, USER_ID);
-    assertThat(result).isNotNull();
-    assertThat(result.getContent()
-                 .size()).isEqualTo(1);
-    assertThat(result.getContent()).isEqualTo(Collections.singletonList(room));
-    verify(roomService).findAllByStudentId(USER_ID, pageable, USER_ID);
   }
 
   @Test
@@ -212,7 +186,6 @@ public class AssignmentServiceImplTest {
 
     assignmentService.deleteById(assignment.getId());
     verify(assignmentRepository).findByIdAndDeletedFalse(assignment.getId());
-    verify(roomService).deleteAllRoomsByAssignmentId(assignment.getId());
     verify(resourceService).markFilesUsed(
       Collections.singletonList(FILE_ID), false);
     assignment.setDeleted(true);
@@ -227,7 +200,6 @@ public class AssignmentServiceImplTest {
                          .build());
     assignmentService.deleteById(assignment.getId());
     verify(assignmentRepository).findByIdAndDeletedFalse(assignment.getId());
-    verify(roomService).deleteAllRoomsByAssignmentId(assignment.getId());
     verify(resourceService).markFilesUsed(
       Collections.singletonList(FILE_ID), false);
     assignment.setDeleted(true);
@@ -242,7 +214,6 @@ public class AssignmentServiceImplTest {
                          .build());
     assignmentService.deleteById(assignment.getId());
     verify(assignmentRepository).findByIdAndDeletedFalse(assignment.getId());
-    verify(roomService).deleteAllRoomsByAssignmentId(assignment.getId());
     assignment.setDeleted(true);
     verify(assignmentRepository).save(assignment);
   }
@@ -253,7 +224,6 @@ public class AssignmentServiceImplTest {
     assignment.setFile(null);
     assignmentService.deleteById(assignment.getId());
     verify(assignmentRepository).findByIdAndDeletedFalse(assignment.getId());
-    verify(roomService).deleteAllRoomsByAssignmentId(assignment.getId());
     assignment.setDeleted(true);
     verify(assignmentRepository).save(assignment);
   }
@@ -268,7 +238,6 @@ public class AssignmentServiceImplTest {
     verify(resourceService).markFilesUsed(
       Collections.singletonList(FILE_ID), true);
     verify(batchService).getBatchByCode(BATCH_CODE);
-    verify(roomService).createRoomsByAssignment(assignment);
     verify(assignmentRepository).save(assignment);
   }
 
@@ -280,7 +249,6 @@ public class AssignmentServiceImplTest {
     assertThat(actual.getFile()).isEqualTo(null);
     assertThat(actual).isEqualTo(assignment);
     verify(batchService).getBatchByCode(BATCH_CODE);
-    verify(roomService).createRoomsByAssignment(assignment);
     verify(assignmentRepository).save(assignment);
   }
 
@@ -424,42 +392,6 @@ public class AssignmentServiceImplTest {
   }
 
   @Test
-  public void findAllRoomByAssignmentId() {
-
-    Page<Room> actual = assignmentService.findAllRoomsByAssignmentId(
-      "id", pageable);
-    assertThat(actual.getTotalElements()).isEqualTo(1);
-    assertThat(actual.getContent()
-                 .get(0)).isEqualTo(room);
-    verify(roomService).findAllRoomsByAssignmentId("id", pageable);
-  }
-
-  @Test
-  public void findRoomByIdTest() {
-
-    Room actual = assignmentService.findRoomById(ROOM_ID, USER_ID);
-    assertThat(actual).isNotNull();
-    assertThat(actual).isEqualTo(room);
-    verify(roomService).findById(ROOM_ID, USER_ID);
-  }
-
-  @Test
-  public void giveScoreToRoom() {
-
-    Room actual = assignmentService.giveScoreToRoomByRoomId(
-      ROOM_ID, USER_ID, 100);
-    assertThat(actual).isEqualTo(room);
-    verify(roomService).giveScoreToRoomByRoomId(ROOM_ID, USER_ID, 100);
-  }
-
-  @Test
-  public void deleteRoomByIdTest() {
-
-    assignmentService.deleteRoomById(ROOM_ID);
-    verify(roomService).deleteRoomById(ROOM_ID);
-  }
-
-  @Test
   public void copyAssignmentTest() {
 
     when(assignmentRepository.findByIdAndDeletedFalse("id")).thenReturn(
@@ -475,8 +407,6 @@ public class AssignmentServiceImplTest {
     anotherAssignment.setBatch(anotherBatch);
     when(assignmentRepository.save(any(Assignment.class))).thenReturn(
       anotherAssignment);
-    when(roomService.createRoomsByAssignment(anotherAssignment)).thenReturn(
-      anotherAssignment);
     Assignment actual = assignmentService.copyAssignment("id", "CODE");
     assertThat(actual.getBatch()
                  .getCode()).isEqualTo("CODE");
@@ -487,7 +417,6 @@ public class AssignmentServiceImplTest {
     verify(batchService, times(2)).getBatchByCode("CODE");
     verify(assignmentRepository).findByIdAndDeletedFalse("id");
     verify(assignmentRepository).save(any(Assignment.class));
-    verify(roomService).createRoomsByAssignment(anotherAssignment);
   }
 
 }
