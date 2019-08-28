@@ -18,7 +18,6 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -62,8 +61,6 @@ public class QuizServiceImplTest {
   private static final String QUESTION_BANK_DESCRIPTION =
     "question-bank-description";
 
-  private static final String USER_ID = "user-id";
-
   private static final String QUESTION_TEXT = "question-text";
 
   private int PAGE = 0;
@@ -89,9 +86,6 @@ public class QuizServiceImplTest {
 
   @Mock
   private QuizRepository quizRepository;
-
-  @Mock
-  private StudentQuizService studentQuizService;
 
   @Mock
   private QuestionService questionService;
@@ -155,9 +149,7 @@ public class QuizServiceImplTest {
   @After
   public void tearDown() throws Exception {
 
-    verifyNoMoreInteractions(quizRepository, batchService, studentQuizService,
-                             questionService, batchService, questionBankService
-    );
+    verifyNoMoreInteractions(quizRepository, batchService, questionService, batchService, questionBankService);
   }
 
   @Test
@@ -267,25 +259,6 @@ public class QuizServiceImplTest {
   }
 
   @Test
-  public void testUpdateQuizSuccessDifferentTrials() {
-
-    quiz.setId(QUIZ_ID);
-    Quiz request = new Quiz();
-    BeanUtils.copyProperties(quiz, request);
-    request.setTrials(15);
-    when(studentQuizService.updateQuizTrials(request)).thenReturn(request);
-
-    Quiz actual = quizService.updateQuiz(request);
-    assertThat(actual).isEqualTo(request);
-
-    verify(quizRepository).findByIdAndDeletedFalse(eq(QUIZ_ID));
-    verify(quizRepository).save(eq(quiz));
-    verify(batchService).getBatchByCode(BATCH_CODE);
-    verify(questionBankService).findById(QUESTION_BANK_ID);
-    verify(studentQuizService).updateQuizTrials(request);
-  }
-
-  @Test
   public void testUpdateQuizFindByIdNotFound() {
 
     quiz.setId("randomId");
@@ -304,7 +277,6 @@ public class QuizServiceImplTest {
     quiz.setDeleted(true);
     verify(quizRepository).findByIdAndDeletedFalse(QUIZ_ID);
     verify(quizRepository).save(quiz);
-    verify(studentQuizService).deleteByBatchCodeAndQuiz(quiz);
   }
 
   @Test
@@ -315,9 +287,6 @@ public class QuizServiceImplTest {
       .code(batchCode)
       .build();
     when(batchService.getBatchByCode(batchCode)).thenReturn(targetBatchObj);
-    when(studentQuizService.copyQuizWithTargetBatch(targetBatchObj,
-                                                    quiz
-    )).thenReturn(quiz);
     Quiz actual = quizService.copyQuizWithTargetBatchCode(batchCode, quiz);
     assertThat(actual.getTitle()).isEqualTo(QUIZ_TITLE);
     verify(quizRepository).findByIdAndDeletedFalse(QUIZ_ID);
