@@ -1,95 +1,43 @@
 package com.future.function.service.impl.feature.scoring;
 
-import com.future.function.common.enumeration.core.Role;
-import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.User;
-import com.future.function.model.entity.feature.scoring.Assignment;
-import com.future.function.model.entity.feature.scoring.Quiz;
 import com.future.function.model.entity.feature.scoring.Room;
 import com.future.function.model.entity.feature.scoring.StudentQuiz;
-import com.future.function.service.api.feature.scoring.AssignmentService;
-import com.future.function.service.api.feature.scoring.QuizService;
+import com.future.function.service.api.feature.core.UserService;
 import com.future.function.service.api.feature.scoring.RoomService;
 import com.future.function.service.api.feature.scoring.ScoringMediatorService;
 import com.future.function.service.api.feature.scoring.StudentQuizService;
+import java.util.Observable;
+import java.util.Observer;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
-@Lazy
 @Slf4j
-public class ScoringMediatorServiceImpl implements ScoringMediatorService {
-
-  private static final Pageable MAX_PAGEABLE = new PageRequest(
-    0, Integer.MAX_VALUE);
-
-  private final QuizService quizService;
+public class ScoringMediatorServiceImpl implements ScoringMediatorService, Observer {
 
   private final StudentQuizService studentQuizService;
 
-  private final AssignmentService assignmentService;
-
   private final RoomService roomService;
 
+  private final UserService userService;
+
+  private final ExecutorService executorService;
+
   @Autowired
-  public ScoringMediatorServiceImpl(
-      QuizService quizService, StudentQuizService studentQuizService,
-      AssignmentService assignmentService, RoomService roomService
+  public ScoringMediatorServiceImpl(StudentQuizService studentQuizService, RoomService roomService,
+      UserService userService, ExecutorService executorService
   ) {
-
-    this.quizService = quizService;
     this.studentQuizService = studentQuizService;
-    this.assignmentService = assignmentService;
     this.roomService = roomService;
-  }
-
-  @Override
-  public User createQuizAndAssignmentsByStudent(User user) {
-
-    return Optional.ofNullable(user)
-      .filter(student -> student.getRole()
-        .equals(Role.STUDENT))
-      .map(User::getBatch)
-      .map(Batch::getCode)
-      .map(this::findQuizAndAssignmentAndCreateForStudent)
-      .map(pair -> this.createStudentQuizzesAndRooms(pair, user))
-      .orElse(user);
-  }
-
-  private Pair<List<Quiz>, List<Assignment>> findQuizAndAssignmentAndCreateForStudent(
-    String batchCode
-  ) {
-
-    List<Quiz> first = quizService.findAllByBatchCodeAndPageable(
-      batchCode, MAX_PAGEABLE)
-      .getContent();
-    List<Assignment> second = assignmentService.findAllByBatchCodeAndPageable(
-      batchCode, MAX_PAGEABLE)
-      .getContent();
-    return Pair.of(first, second);
-  }
-
-  private User createStudentQuizzesAndRooms(
-    Pair<List<Quiz>, List<Assignment>> pair, User user
-  ) {
-
-    pair.getFirst()
-      .forEach(quiz -> {
-        try {
-          studentQuizService.createStudentQuizAndSave(user, quiz);
-        } catch (Exception e) {
-          log.info("ScoringMediatorException: {}", e.getMessage(), e);
-        }
-      });
-    return user;
+    this.userService = userService;
+    this.executorService = executorService;
+    this.userService.addObserver(this);
   }
 
   @Override
@@ -102,17 +50,29 @@ public class ScoringMediatorServiceImpl implements ScoringMediatorService {
 
   private User deleteStudentQuizzesAndRooms(User user) {
 
-    studentQuizService.findAllByStudentId(
-      user.getId(), MAX_PAGEABLE, user.getId())
-      .getContent()
-      .stream()
-      .map(StudentQuiz::getId)
-      .forEach(studentQuizService::deleteById);
+    CompletableFuture.runAsync(() -> deleteEveryQuiz(user), executorService);
+    CompletableFuture.runAsync(() -> deleteEveryAssignment(user), executorService);
+    return user;
+  }
+
+  private void deleteEveryAssignment(User user) {
     roomService.findAllByStudentId(user.getId())
       .stream()
       .map(Room::getId)
       .forEach(roomService::deleteRoomById);
-    return user;
   }
 
+  private void deleteEveryQuiz(User user) {
+    studentQuizService.findAllByStudentId(user.getId())
+      .stream()
+      .map(StudentQuiz::getId)
+      .forEach(studentQuizService::deleteById);
+  }
+
+  @Override
+  public void update(Observable o, Object arg) {
+      if(arg instanceof User) {
+        this.deleteQuizAndAssignmentsByStudent((User) arg);
+      }
+  }
 }

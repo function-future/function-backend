@@ -10,18 +10,12 @@ public interface StudentQuizDetailService {
 
   StudentQuizDetail findLatestByStudentQuizId(String studentQuizId);
 
-  List<StudentQuestion> findAllQuestionsByStudentQuizId(String studentQuizId);
-
   List<StudentQuestion> findAllUnansweredQuestionsByStudentQuizId(
     String studentQuizId
   );
 
   StudentQuizDetail answerStudentQuiz(
     String studentQuizId, List<StudentQuestion> answers
-  );
-
-  StudentQuizDetail createStudentQuizDetail(
-    StudentQuiz studentQuiz, List<StudentQuestion> questions
   );
 
   void deleteByStudentQuiz(StudentQuiz studentQuiz);

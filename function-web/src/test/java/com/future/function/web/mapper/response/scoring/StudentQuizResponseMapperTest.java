@@ -57,6 +57,7 @@ public class StudentQuizResponseMapperTest {
     quiz = Quiz.builder()
       .id(QUIZ_ID)
       .batch(batch)
+      .trials(TRIALS + 1)
       .build();
 
     studentQuiz = StudentQuiz.builder()

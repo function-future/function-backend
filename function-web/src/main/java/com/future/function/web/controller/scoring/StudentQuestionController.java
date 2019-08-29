@@ -26,8 +26,7 @@ import java.util.List;
 
 
 @RestController
-@RequestMapping(path = "/api/scoring/students/{studentId}/quizzes" +
-                       "/{studentQuizId}/questions")
+@RequestMapping(path = "/api/scoring/batches/{batchCode}/quizzes/{quizId}/student/questions")
 public class StudentQuestionController {
 
   private StudentQuizService studentQuizService;
@@ -47,16 +46,13 @@ public class StudentQuestionController {
   @ResponseStatus(HttpStatus.OK)
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   public PagingResponse<StudentQuestionWebResponse> findUnansweredStudentQuestionsByStudentQuizId(
-    @PathVariable
-      String studentQuizId,
+    @PathVariable String quizId,
     @WithAnyRole(roles = Role.STUDENT)
       Session session
   ) {
 
     return StudentQuizDetailResponseMapper.toStudentQuestionWebResponses(
-      studentQuizService.findAllUnansweredQuestionByStudentQuizId(studentQuizId,
-                                                                  session.getUserId()
-      ));
+      studentQuizService.findAllUnansweredQuestionByStudentQuizId(session.getUserId(), quizId));
   }
 
   @ResponseStatus(HttpStatus.CREATED)
@@ -64,7 +60,7 @@ public class StudentQuestionController {
                produces = MediaType.APPLICATION_JSON_VALUE)
   public DataResponse<StudentQuizDetailWebResponse> postAnswersForQuestions(
     @PathVariable
-      String studentQuizId,
+      String quizId,
     @RequestBody
       List<StudentQuestionWebRequest> answerRequests,
     @WithAnyRole(roles = Role.STUDENT)
@@ -72,8 +68,7 @@ public class StudentQuestionController {
   ) {
 
     return StudentQuizDetailResponseMapper.toStudentQuizDetailWebResponse(
-      studentQuizService.answerQuestionsByStudentQuizId(studentQuizId,
-                                                        session.getUserId(),
+      studentQuizService.answerQuestionsByStudentQuizId(session.getUserId(), quizId,
                                                         studentQuestionRequestMapper.toStudentQuestionList(
                                                           answerRequests)
       ));

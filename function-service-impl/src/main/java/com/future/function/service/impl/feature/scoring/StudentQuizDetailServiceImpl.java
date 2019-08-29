@@ -10,6 +10,7 @@ import com.future.function.repository.feature.scoring.StudentQuizDetailRepositor
 import com.future.function.service.api.feature.scoring.StudentQuestionService;
 import com.future.function.service.api.feature.scoring.StudentQuizDetailService;
 import com.future.function.service.impl.helper.CopyHelper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +20,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class StudentQuizDetailServiceImpl implements StudentQuizDetailService {
 
   private StudentQuizDetailRepository studentQuizDetailRepository;
@@ -43,20 +45,6 @@ public class StudentQuizDetailServiceImpl implements StudentQuizDetailService {
         studentQuizDetailRepository::findTopByStudentQuizIdAndDeletedFalseOrderByCreatedAtDesc)
       .orElseThrow(() -> new NotFoundException(
         "Failed at #findLatestByStudentQuizId #StudentQuizDetailService"));
-  }
-
-  @Override
-  public List<StudentQuestion> findAllQuestionsByStudentQuizId(
-    String studentQuizId
-  ) {
-
-    return Optional.ofNullable(studentQuizId)
-      .map(this::findLatestByStudentQuizId)
-      .map(StudentQuizDetail::getId)
-      .map(studentQuestionService::findAllByStudentQuizDetailId)
-      .orElseThrow(() -> new NotFoundException(
-        "Failed at #findAllQuestionsByStudentQuizId " +
-        "#StudentQuizDetailService"));
   }
 
   @Override
@@ -155,50 +143,19 @@ public class StudentQuizDetailServiceImpl implements StudentQuizDetailService {
   }
 
   @Override
-  public StudentQuizDetail createStudentQuizDetail(
-    StudentQuiz studentQuiz, List<StudentQuestion> questions
-  ) {
-
-    return Optional.ofNullable(studentQuiz)
-      .map(this::toStudentQuizDetail)
-      .map(studentQuizDetailRepository::save)
-      .map(
-        detail -> validateQuestionsAndCreateStudentQuestions(detail, questions))
-      .orElseThrow(
-        () -> new UnsupportedOperationException("create quiz failed"));
-  }
-
-  private StudentQuizDetail validateQuestionsAndCreateStudentQuestions(
-    StudentQuizDetail studentQuizDetail, List<StudentQuestion> questions
-  ) {
-
-    return Optional.ofNullable(questions)
-      .map(
-        questionList -> studentQuestionService.createStudentQuestionsByStudentQuizDetail(
-          studentQuizDetail, questionList))
-      .map(ignored -> studentQuizDetail)
-      .orElse(studentQuizDetail);
-  }
-
-  @Override
   public void deleteByStudentQuiz(StudentQuiz studentQuiz) {
 
     Optional.ofNullable(studentQuiz)
       .map(StudentQuiz::getId)
       .map(this::findLatestByStudentQuizId)
       .ifPresent(detail -> {
-        studentQuestionService.deleteAllByStudentQuizDetailId(detail.getId());
+        try {
+          studentQuestionService.deleteAllByStudentQuizDetailId(detail.getId());
+        } catch (Exception e) {
+          log.error("StudentQuizDetailService #deleteByStudentQuiz: {}", e.getMessage(), e);
+        }
         detail.setDeleted(true);
         studentQuizDetailRepository.save(detail);
       });
   }
-
-  private StudentQuizDetail toStudentQuizDetail(StudentQuiz studentQuiz) {
-
-    return StudentQuizDetail.builder()
-      .studentQuiz(studentQuiz)
-      .point(0)
-      .build();
-  }
-
 }

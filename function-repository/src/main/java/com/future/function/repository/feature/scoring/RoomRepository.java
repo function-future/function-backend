@@ -24,4 +24,6 @@ public interface RoomRepository extends MongoRepository<Room, String> {
 
   Optional<Room> findByIdAndDeletedFalse(String id);
 
+  Optional<Room> findByStudentIdAndAssignmentIdAndDeletedFalse(String studentId, String assignmentId);
+
 }

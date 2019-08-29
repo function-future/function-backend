@@ -55,6 +55,8 @@ public class StudentQuestionControllerTest extends TestHelper {
 
   private static final String OPTION_ID = "option-id";
 
+  private static final String QUIZ_ID = "quiz-id";
+
   private StudentQuiz studentQuiz;
 
   private StudentQuizDetail studentQuizDetail;
@@ -132,13 +134,12 @@ public class StudentQuestionControllerTest extends TestHelper {
       StudentQuizDetailResponseMapper.toStudentQuestionWebResponses(
         Collections.singletonList(studentQuestion));
 
-    when(studentQuizService.answerQuestionsByStudentQuizId(STUDENT_QUIZ_ID,
-                                                           STUDENT_ID,
+    when(studentQuizService.answerQuestionsByStudentQuizId(TestHelper.STUDENT_ID, QUIZ_ID,
                                                            Collections.singletonList(
                                                              studentQuestion)
     )).thenReturn(studentQuizDetail);
     when(studentQuizService.findAllUnansweredQuestionByStudentQuizId(
-      STUDENT_QUIZ_ID, STUDENT_ID)).thenReturn(
+      TestHelper.STUDENT_ID, QUIZ_ID)).thenReturn(
       Collections.singletonList(studentQuestion));
     when(requestMapper.toStudentQuestionList(
       Collections.singletonList(studentQuestionWebRequest))).thenReturn(
@@ -158,8 +159,7 @@ public class StudentQuestionControllerTest extends TestHelper {
 
     super.setCookie(Role.ADMIN);
     mockMvc.perform(get(
-      "/api/scoring/students/studentId/quizzes/" + STUDENT_QUIZ_ID +
-      "/questions").cookie(cookies))
+        "/api/scoring/batches/"+ BATCH_ID + "/quizzes/"+ QUIZ_ID + "/student/questions").cookie(cookies))
       .andExpect(status().isForbidden());
   }
 
@@ -167,22 +167,20 @@ public class StudentQuestionControllerTest extends TestHelper {
   public void findUnansweredQuestionsByStudentQuizIdTest() throws Exception {
 
     mockMvc.perform(get(
-      "/api/scoring/students/studentId/quizzes/" + STUDENT_QUIZ_ID +
-      "/questions").cookie(cookies))
+        "/api/scoring/batches/"+ BATCH_ID + "/quizzes/"+ QUIZ_ID + "/student/questions").cookie(cookies))
       .andExpect(status().isOk())
       .andExpect(content().json(
         pagingResponseJacksonTester.write(pagingResponse)
           .getJson()));
     verify(studentQuizService).findAllUnansweredQuestionByStudentQuizId(
-      STUDENT_QUIZ_ID, STUDENT_ID);
+      TestHelper.STUDENT_ID, QUIZ_ID);
   }
 
   @Test
   public void postAnswersForQuestionsTest() throws Exception {
 
     mockMvc.perform(post(
-      "/api/scoring/students/studentId/quizzes/" + STUDENT_QUIZ_ID +
-      "/questions").cookie(cookies)
+        "/api/scoring/batches/"+ BATCH_ID + "/quizzes/"+ QUIZ_ID + "/student/questions").cookie(cookies)
                       .contentType(MediaType.APPLICATION_JSON_VALUE)
                       .content(webRequestJacksonTester.write(
                         Collections.singletonList(studentQuestionWebRequest))
@@ -191,8 +189,7 @@ public class StudentQuestionControllerTest extends TestHelper {
       .andExpect(content().json(dataResponseJacksonTester.write(
         studentQuizDetailWebResponseDataResponse)
                                   .getJson()));
-    verify(studentQuizService).answerQuestionsByStudentQuizId(STUDENT_QUIZ_ID,
-                                                              STUDENT_ID,
+    verify(studentQuizService).answerQuestionsByStudentQuizId(TestHelper.STUDENT_ID, QUIZ_ID,
                                                               Collections.singletonList(
                                                                 studentQuestion)
     );
