@@ -80,6 +80,15 @@ public class ScoringMediatorServiceImpl implements ScoringMediatorService {
   private User createStudentQuizzesAndRooms(
     Pair<List<Quiz>, List<Assignment>> pair, User user
   ) {
+
+    pair.getFirst()
+      .forEach(quiz -> {
+        try {
+          studentQuizService.createStudentQuizAndSave(user, quiz);
+        } catch (Exception e) {
+          log.info("ScoringMediatorException: {}", e.getMessage(), e);
+        }
+      });
     pair.getSecond()
       .forEach(
         assignment -> roomService.createRoomForUserAndSave(user, assignment));

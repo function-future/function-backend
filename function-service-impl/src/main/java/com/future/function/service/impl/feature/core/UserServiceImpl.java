@@ -1,17 +1,9 @@
 package com.future.function.service.impl.feature.core;
 
-import com.future.function.common.enumeration.core.Role;
-import com.future.function.common.exception.NotFoundException;
-import com.future.function.common.exception.UnauthorizedException;
-import com.future.function.model.entity.feature.core.FileV2;
-import com.future.function.model.entity.feature.core.User;
-import com.future.function.repository.feature.core.UserRepository;
-import com.future.function.service.api.feature.core.BatchService;
-import com.future.function.service.api.feature.core.ResourceService;
-import com.future.function.service.api.feature.core.UserService;
-import com.future.function.service.api.feature.scoring.ScoringMediatorService;
-import com.future.function.service.impl.helper.CopyHelper;
-import com.future.function.service.impl.helper.PageHelper;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
@@ -19,9 +11,19 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import com.future.function.common.enumeration.core.Role;
+import com.future.function.common.exception.NotFoundException;
+import com.future.function.common.exception.UnauthorizedException;
+import com.future.function.model.entity.feature.core.FileV2;
+import com.future.function.model.entity.feature.core.User;
+import com.future.function.repository.feature.core.UserRepository;
+import com.future.function.service.api.feature.core.BatchService;
+import com.future.function.service.api.feature.core.MailService;
+import com.future.function.service.api.feature.core.ResourceService;
+import com.future.function.service.api.feature.core.UserService;
+import com.future.function.service.api.feature.scoring.ScoringMediatorService;
+import com.future.function.service.impl.helper.CopyHelper;
+import com.future.function.service.impl.helper.PageHelper;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -36,20 +38,18 @@ public class UserServiceImpl implements UserService {
 
   private final BCryptPasswordEncoder encoder;
 
+  private final MailService mailService;
+
   @Autowired
-  public UserServiceImpl(
-    BatchService batchService, UserRepository userRepository,
-    ResourceService resourceService,
-    @Lazy
-      ScoringMediatorService scoringMediatorService,
-    BCryptPasswordEncoder encoder
-  ) {
+  public UserServiceImpl(BatchService batchService, UserRepository userRepository, ResourceService resourceService,
+      @Lazy ScoringMediatorService scoringMediatorService, BCryptPasswordEncoder encoder, MailService mailService) {
 
     this.batchService = batchService;
     this.userRepository = userRepository;
     this.resourceService = resourceService;
     this.scoringMediatorService = scoringMediatorService;
     this.encoder = encoder;
+    this.mailService = mailService;
   }
 
   @Override
@@ -102,9 +102,21 @@ public class UserServiceImpl implements UserService {
       .map(this::setDefaultEncryptedPassword)
       .map(this::setUserPicture)
       .map(userRepository::save)
+      .map(this::sendEmail)
       .map(scoringMediatorService::createQuizAndAssignmentsByStudent)
       .orElseThrow(
         () -> new UnsupportedOperationException("Failed Create User"));
+  }
+
+  private User sendEmail(User user) {
+
+    mailService.sendEmail(user.getEmail(), "Registrasi Sukses", String.format(
+        "Hi %s,\n\nMelalui email ini kami ingin mengabarkan bahwa Anda sudah terdaftar sebagai %s di aplikasi " +
+            "manajemen FUTURE Program.\n\nBerikut informasi kredensial Anda untuk login:\n\tEmail %s\n\tPassword " +
+            "%s\n\nUntuk link login dapat diakses di http://localhost:10001.\n\nTerima kasih!\n\n\n\nFunction App",
+        user.getName(), user.getRole(), user.getEmail(), this.getDefaultPassword(user.getName())));
+
+    return user;
   }
 
   @Override
