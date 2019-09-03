@@ -203,6 +203,7 @@ public class AssignmentServiceImpl extends Observable implements AssignmentServi
     Optional.ofNullable(id)
       .map(this::findById)
       .ifPresent(assignment -> {
+        this.setChanged();
         this.notifyObservers(assignment.getId());
         markAssignmentFileAsNotUsed(assignment);
         assignment.setDeleted(true);
