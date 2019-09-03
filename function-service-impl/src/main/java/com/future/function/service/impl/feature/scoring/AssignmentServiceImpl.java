@@ -4,13 +4,11 @@ import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.scoring.Assignment;
-import com.future.function.model.entity.feature.scoring.Room;
 import com.future.function.model.util.constant.FieldName;
 import com.future.function.repository.feature.scoring.AssignmentRepository;
 import com.future.function.service.api.feature.core.BatchService;
 import com.future.function.service.api.feature.core.ResourceService;
 import com.future.function.service.api.feature.scoring.AssignmentService;
-import com.future.function.service.api.feature.scoring.RoomService;
 import com.future.function.service.impl.helper.CopyHelper;
 import com.future.function.service.impl.helper.PageHelper;
 import java.util.Observable;
@@ -205,6 +203,7 @@ public class AssignmentServiceImpl extends Observable implements AssignmentServi
     Optional.ofNullable(id)
       .map(this::findById)
       .ifPresent(assignment -> {
+        this.setChanged();
         this.notifyObservers(assignment.getId());
         markAssignmentFileAsNotUsed(assignment);
         assignment.setDeleted(true);

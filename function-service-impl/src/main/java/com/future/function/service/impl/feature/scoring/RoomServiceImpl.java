@@ -58,10 +58,11 @@ public class RoomServiceImpl implements RoomService, Observer {
             AuthorizationHelper.getScoringAllowedRoles()))
         .map(ignored -> studentId)
       .flatMap(id -> roomRepository.findByStudentIdAndAssignmentIdAndDeletedFalse(id, assignmentId))
-      .orElseGet(() -> createNewRoomForStudent(studentId, assignmentId));
+      .orElseGet(() -> this.createNewRoomForStudent(studentId, assignmentId));
   }
 
   private Room createNewRoomForStudent(String studentId, String assignmentId) {
+
     User student = userService.getUser(studentId);
     Assignment assignment = assignmentService.findById(assignmentId);
     return this.createRoomForUserAndSave(student, assignment);
@@ -173,6 +174,7 @@ public class RoomServiceImpl implements RoomService, Observer {
 
   @Override
   public void deleteRoomById(String roomId) {
+
     Optional.ofNullable(roomId)
         .flatMap(roomRepository::findByIdAndDeletedFalse)
         .ifPresent(this::setDeleteAsTrueAndSave);
@@ -200,6 +202,7 @@ public class RoomServiceImpl implements RoomService, Observer {
 
   @Override
   public void update(Observable o, Object arg) {
+
     if(arg instanceof Assignment) {
       this.deleteAllRoomsByAssignmentId(((Assignment) arg).getId());
     }
