@@ -68,6 +68,10 @@ public class QuizServiceImpl extends Observable implements QuizService {
     return Optional.ofNullable(quiz)
       .map(Quiz::getId)
       .map(this::findById)
+      .map(currentQuiz -> {
+        currentQuiz.setBatch(batch);
+        return currentQuiz;
+      })
       .map(quizRepository::save)
       .orElseThrow(() -> new UnsupportedOperationException(
         "Failed at #copyQuizWithTargetBatchCode #QuizService"));
@@ -77,17 +81,21 @@ public class QuizServiceImpl extends Observable implements QuizService {
   public Quiz createQuiz(Quiz request) {
 
     return Optional.ofNullable(request)
-      .map(this::setBatchAndQuestionBank)
+      .map(this::setBatch)
+      .map(this::setQuestionBank)
       .map(quizRepository::save)
       .orElseThrow(() -> new UnsupportedOperationException(
         "Failed on #createQuiz #QuizService"));
   }
 
-  private Quiz setBatchAndQuestionBank(Quiz quiz) {
+  private Quiz setQuestionBank(Quiz quiz) {
 
-    quiz.setBatch(batchService.getBatchByCode(quiz.getBatch()
-                                                .getCode()));
     quiz.setQuestionBanks(getQuestionBanksFromService(quiz.getQuestionBanks()));
+    return quiz;
+  }
+
+  private Quiz setBatch(Quiz quiz) {
+    quiz.setBatch(batchService.getBatchByCode(quiz.getBatch().getCode()));
     return quiz;
   }
 
@@ -120,7 +128,8 @@ public class QuizServiceImpl extends Observable implements QuizService {
       .map(Quiz::getId)
       .flatMap(quizRepository::findByIdAndDeletedFalse)
       .map(quiz -> copyRequestedQuizAttributes(request, quiz))
-      .map(this::setBatchAndQuestionBank)
+      .map(this::setBatch)
+      .map(this::setQuestionBank)
       .map(quizRepository::save)
       .orElse(request);
   }
@@ -140,6 +149,7 @@ public class QuizServiceImpl extends Observable implements QuizService {
   }
 
   private void notifyStudentQuizServiceAndSaveDeletedQuiz(Quiz quiz) {
+    this.setChanged();
     this.notifyObservers(quiz);
     quiz.setDeleted(true);
     quizRepository.save(quiz);
