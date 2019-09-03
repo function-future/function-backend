@@ -1,7 +1,5 @@
 package com.future.function.service.api.feature.scoring;
 
-import com.future.function.model.entity.feature.core.User;
-import com.future.function.model.entity.feature.scoring.Assignment;
 import com.future.function.model.entity.feature.scoring.Comment;
 import com.future.function.model.entity.feature.scoring.Room;
 import org.springframework.data.domain.Page;
@@ -11,9 +9,7 @@ import java.util.List;
 
 public interface RoomService {
 
-  Page<Room> findAllRoomsByAssignmentId(String assignmentId, Pageable pageable);
-
-  Room findById(String id, String userId);
+  Room findOrCreateByStudentIdAndAssignmentId(String id, String userId, String assignmentId);
 
   Page<Comment> findAllCommentsByRoomId(String roomId, Pageable pageable);
 
@@ -25,13 +21,11 @@ public interface RoomService {
 
   Comment createComment(Comment comment, String userId);
 
-  Assignment createRoomsByAssignment(Assignment assignment);
+  Room giveScoreToRoomByStudentIdAndAssignmentId(String studentId, String userId, String assignmentId, Integer point);
 
-  void createRoomForUserAndSave(User user, Assignment assignment);
+  void deleteRoomByStudentIdAndAssignmentId(String studentId, String assignmentId);
 
-  Room giveScoreToRoomByRoomId(String roomId, String userId, Integer point);
-
-  void deleteRoomById(String id);
+  void deleteRoomById(String roomId);
 
   void deleteAllRoomsByAssignmentId(String assignmentId);
 

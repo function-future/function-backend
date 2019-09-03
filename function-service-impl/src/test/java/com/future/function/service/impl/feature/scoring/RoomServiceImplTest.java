@@ -9,8 +9,10 @@ import com.future.function.model.entity.feature.scoring.Comment;
 import com.future.function.model.entity.feature.scoring.Room;
 import com.future.function.repository.feature.scoring.RoomRepository;
 import com.future.function.service.api.feature.core.UserService;
+import com.future.function.service.api.feature.scoring.AssignmentService;
 import com.future.function.service.api.feature.scoring.CommentService;
 import com.future.function.service.impl.helper.PageHelper;
+import java.util.Observable;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -75,6 +77,9 @@ public class RoomServiceImplTest {
   @Mock
   private UserService userService;
 
+  @Mock
+  private AssignmentService assignmentService;
+
   @Before
   public void setUp() throws Exception {
 
@@ -108,6 +113,8 @@ public class RoomServiceImplTest {
     when(userService.getUser(USER_ID)).thenReturn(student);
     when(roomRepository.findByIdAndDeletedFalse(ROOM_ID)).thenReturn(
       Optional.of(room));
+    when(roomRepository.findByStudentIdAndAssignmentIdAndDeletedFalse(USER_ID, ASSIGNMENT_ID))
+        .thenReturn(Optional.of(room));
     when(roomRepository.findAllByAssignmentIdAndDeletedFalse(
       ASSIGNMENT_ID)).thenReturn(Collections.singletonList(room));
     when(roomRepository.findAllByAssignmentIdAndDeletedFalse(ASSIGNMENT_ID,
@@ -122,33 +129,36 @@ public class RoomServiceImplTest {
     when(commentService.findAllCommentsByRoomId(ROOM_ID, pageable)).thenReturn(
       PageHelper.toPage(Collections.singletonList(comment), pageable));
     when(commentService.createComment(comment)).thenReturn(comment);
+    when(assignmentService.findById(ASSIGNMENT_ID)).thenReturn(assignment);
+    verify(assignmentService).addObserver(roomService);
   }
 
   @After
   public void tearDown() throws Exception {
 
-    verifyNoMoreInteractions(userService, roomRepository, commentService);
+    verifyNoMoreInteractions(userService, roomRepository, commentService, assignmentService);
   }
 
   @Test
-  public void findAllRoomsByAssignmentId() {
+  public void findOrCreateRoomByStudentIdAndAssignmentIdExist() {
 
-    Page<Room> actual = roomService.findAllRoomsByAssignmentId(
-      ASSIGNMENT_ID, new PageRequest(0, 10));
-    assertThat(actual.getTotalElements()).isEqualTo(1);
-    assertThat(actual.getContent()
-                 .get(0)).isEqualTo(room);
-    verify(roomRepository).findAllByAssignmentIdAndDeletedFalse(
-      ASSIGNMENT_ID, new PageRequest(0, 10));
-  }
-
-  @Test
-  public void findById() {
-
-    Room actual = roomService.findById(ROOM_ID, USER_ID);
+    Room actual = roomService.findOrCreateByStudentIdAndAssignmentId(USER_ID, USER_ID, ASSIGNMENT_ID);
     assertThat(actual).isEqualTo(room);
     verify(userService).getUser(USER_ID);
-    verify(roomRepository).findByIdAndDeletedFalse(ROOM_ID);
+    verify(roomRepository).findByStudentIdAndAssignmentIdAndDeletedFalse(USER_ID, ASSIGNMENT_ID);
+  }
+
+  @Test
+  public void findOrCreateRoomByStudentIdAndAssignmentIdNotExist() {
+
+    when(roomRepository.findByStudentIdAndAssignmentIdAndDeletedFalse(USER_ID, ASSIGNMENT_ID))
+        .thenReturn(Optional.empty());
+    Room actual = roomService.findOrCreateByStudentIdAndAssignmentId(USER_ID, USER_ID, ASSIGNMENT_ID);
+    assertThat(actual).isEqualTo(room);
+    verify(userService, times(2)).getUser(USER_ID);
+    verify(roomRepository).save(any(Room.class));
+    verify(assignmentService).findById(ASSIGNMENT_ID);
+    verify(roomRepository).findByStudentIdAndAssignmentIdAndDeletedFalse(USER_ID, ASSIGNMENT_ID);
   }
 
   @Test
@@ -266,15 +276,6 @@ public class RoomServiceImplTest {
   }
 
   @Test
-  public void createRoomsByAssignment() {
-
-    Assignment actual = roomService.createRoomsByAssignment(assignment);
-    assertThat(actual).isEqualTo(assignment);
-    verify(userService).getStudentsByBatchCode(BATCH_CODE);
-    verify(roomRepository).save(any(Room.class));
-  }
-
-  @Test
   public void giveScoreToRoomByRoomId() {
 
     student.setBatch(batch);
@@ -285,24 +286,32 @@ public class RoomServiceImplTest {
       .build();
     when(userService.getUser(MENTOR_ID)).thenReturn(mentor);
     room.setPoint(100);
-    Room actual = roomService.giveScoreToRoomByRoomId(ROOM_ID, MENTOR_ID, 100);
+    Room actual = roomService.giveScoreToRoomByStudentIdAndAssignmentId(USER_ID, MENTOR_ID, ASSIGNMENT_ID, 100);
     assertThat(actual.getId()).isEqualTo(ROOM_ID);
     assertThat(actual.getPoint()).isEqualTo(100);
-    verify(roomRepository).findByIdAndDeletedFalse(ROOM_ID);
-    verify(userService, times(2)).getUser(MENTOR_ID);
+    verify(roomRepository).findByStudentIdAndAssignmentIdAndDeletedFalse(USER_ID, ASSIGNMENT_ID);
+    verify(userService).getUser(MENTOR_ID);
     verify(roomRepository).save(room);
   }
 
   @Test
   public void giveScoreToRoomByRoomIdByStudent() {
 
-    room.setPoint(100);
     catchException(
-      () -> roomService.giveScoreToRoomByRoomId(ROOM_ID, USER_ID, 100));
+      () -> roomService.giveScoreToRoomByStudentIdAndAssignmentId(USER_ID, USER_ID, ASSIGNMENT_ID,  100));
     assertThat(caughtException().getClass()).isEqualTo(
-      ForbiddenException.class);
-    verify(userService, times(2)).getUser(USER_ID);
-    verify(roomRepository).findByIdAndDeletedFalse(ROOM_ID);
+      UnsupportedOperationException.class);
+    verify(userService).getUser(USER_ID);
+  }
+
+  @Test
+  public void deleteRoomByStudentIdAndAssignmentId() {
+
+    roomService.deleteRoomByStudentIdAndAssignmentId(USER_ID, ASSIGNMENT_ID);
+    verify(roomRepository).findByStudentIdAndAssignmentIdAndDeletedFalse(USER_ID, ASSIGNMENT_ID);
+    room.setDeleted(true);
+    verify(roomRepository).save(room);
+    verify(commentService).deleteAllCommentByRoomId(ROOM_ID);
   }
 
   @Test
@@ -325,4 +334,17 @@ public class RoomServiceImplTest {
     verify(commentService).deleteAllCommentByRoomId(ROOM_ID);
   }
 
+  @Test
+  public void updateObserverTest() {
+    roomService.update(new Observable(), assignment);
+    verify(roomRepository).findAllByAssignmentIdAndDeletedFalse(ASSIGNMENT_ID);
+    room.setDeleted(true);
+    verify(roomRepository).save(room);
+    verify(commentService).deleteAllCommentByRoomId(ROOM_ID);
+  }
+
+  @Test
+  public void updateObserverAnyArgumentTest() {
+    roomService.update(new Observable(), new Object());
+  }
 }

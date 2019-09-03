@@ -10,10 +10,13 @@ import com.future.function.model.entity.feature.scoring.Comment;
 import com.future.function.model.entity.feature.scoring.Room;
 import com.future.function.repository.feature.scoring.RoomRepository;
 import com.future.function.service.api.feature.core.UserService;
+import com.future.function.service.api.feature.scoring.AssignmentService;
 import com.future.function.service.api.feature.scoring.CommentService;
 import com.future.function.service.api.feature.scoring.RoomService;
 import com.future.function.service.impl.helper.AuthorizationHelper;
 import com.future.function.service.impl.helper.PageHelper;
+import java.util.Observable;
+import java.util.Observer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,7 +28,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class RoomServiceImpl implements RoomService {
+public class RoomServiceImpl implements RoomService, Observer {
 
   private RoomRepository roomRepository;
 
@@ -33,42 +36,36 @@ public class RoomServiceImpl implements RoomService {
 
   private CommentService commentService;
 
-  @Autowired
-  public RoomServiceImpl(
-    RoomRepository roomRepository, UserService userService,
-    CommentService commentService
-  ) {
+  private AssignmentService assignmentService;
 
+  @Autowired
+  public RoomServiceImpl(RoomRepository roomRepository, UserService userService, CommentService commentService,
+      AssignmentService assignmentService) {
     this.roomRepository = roomRepository;
     this.userService = userService;
     this.commentService = commentService;
+    this.assignmentService = assignmentService;
+
+    this.assignmentService.addObserver(this);
   }
 
   @Override
-  public Page<Room> findAllRoomsByAssignmentId(
-    String assignmentId, Pageable pageable
-  ) {
+  public Room findOrCreateByStudentIdAndAssignmentId(String studentId, String userId, String assignmentId) {
 
-    return Optional.ofNullable(assignmentId)
-      .map(
-        id -> roomRepository.findAllByAssignmentIdAndDeletedFalse(assignmentId,
-                                                                  pageable
-        ))
-      .orElseGet(() -> PageHelper.empty(pageable));
+    return Optional.ofNullable(userId)
+        .map(userService::getUser)
+        .filter(user -> AuthorizationHelper.isUserAuthorizedForAccess(user, studentId,
+            AuthorizationHelper.getScoringAllowedRoles()))
+        .map(ignored -> studentId)
+      .flatMap(id -> roomRepository.findByStudentIdAndAssignmentIdAndDeletedFalse(id, assignmentId))
+      .orElseGet(() -> this.createNewRoomForStudent(studentId, assignmentId));
   }
 
-  @Override
-  public Room findById(String id, String userId) {
+  private Room createNewRoomForStudent(String studentId, String assignmentId) {
 
-    User user = userService.getUser(userId);
-    return Optional.ofNullable(id)
-      .flatMap(roomRepository::findByIdAndDeletedFalse)
-      .filter(room -> AuthorizationHelper.isUserAuthorizedForAccess(user,
-                                                                    room.getStudent()
-                                                                      .getId(),
-                                                                    AuthorizationHelper.getScoringAllowedRoles()
-      ))
-      .orElseThrow(() -> new NotFoundException("Room not found"));
+    User student = userService.getUser(studentId);
+    Assignment assignment = assignmentService.findById(assignmentId);
+    return this.createRoomForUserAndSave(student, assignment);
   }
 
   @Override
@@ -109,7 +106,9 @@ public class RoomServiceImpl implements RoomService {
     return Optional.of(comment)
       .map(Comment::getRoom)
       .map(Room::getId)
-      .map(roomId -> this.findById(roomId, userId))
+      .flatMap(roomRepository::findByIdAndDeletedFalse)
+      .filter(room -> AuthorizationHelper.isUserAuthorizedForAccess(userService.getUser(userId),
+          room.getStudent().getId(), AuthorizationHelper.getScoringAllowedRoles()))
       .filter(this::validateAssignmentDeadlineNotPassed)
       .map(currentRoom -> setRoomAndAuthor(comment, userId, currentRoom))
       .map(commentService::createComment)
@@ -133,54 +132,30 @@ public class RoomServiceImpl implements RoomService {
              .getDeadline() > new Date().getTime();
   }
 
-  @Override
-  public Assignment createRoomsByAssignment(Assignment assignment) {
-
-    return Optional.ofNullable(assignment)
-      .map(Assignment::getBatch)
-      .map(Batch::getCode)
-      .map(userService::getStudentsByBatchCode)
-      .map(list -> mapEveryStudentToRoom(assignment, list))
-      .map(object -> assignment)
-      .orElseThrow(() -> new UnsupportedOperationException(
-        "Failed on #createRoomsByAssignment #RoomService"));
-  }
-
-  private List<User> mapEveryStudentToRoom(
-    Assignment assignment, List<User> list
-  ) {
-
-    list.forEach(user -> this.createRoomForUserAndSave(user, assignment));
-    return list;
-  }
-
-  @Override
-  public void createRoomForUserAndSave(User user, Assignment assignment) {
+  private Room createRoomForUserAndSave(User user, Assignment assignment) {
 
     Room room = Room.builder()
       .assignment(assignment)
       .point(0)
       .student(user)
       .build();
-    roomRepository.save(room);
+    return roomRepository.save(room);
   }
 
   @Override
-  public Room giveScoreToRoomByRoomId(
-    String roomId, String userId, Integer point
+  public Room giveScoreToRoomByStudentIdAndAssignmentId(
+    String studentId, String userId, String assignmentId, Integer point
   ) {
 
-    User user = userService.getUser(userId);
-    return Optional.ofNullable(roomId)
-      .map(id -> this.findById(id, user.getId()))
-      .filter(room -> AuthorizationHelper.isAuthorizedForEdit(user.getId(),
-                                                              user.getRole(),
-                                                              room, Role.MENTOR
-      ))
+    return Optional.ofNullable(userId)
+      .map(userService::getUser)
+      .filter(user -> user.getRole().equals(Role.MENTOR))
+      .map(ignored -> studentId)
+      .flatMap(id -> roomRepository.findByStudentIdAndAssignmentIdAndDeletedFalse(id, assignmentId))
       .map(room -> setRoomPoint(point, room))
       .map(roomRepository::save)
-      .orElseThrow(() -> new ForbiddenException(
-        "Failed at #giveScoreToRoomByRoomId #RoomService"));
+      .orElseThrow(() -> new UnsupportedOperationException(
+        "Failed at #giveScoreToRoomByStudentIdAndAssignmentId #RoomService"));
   }
 
   private Room setRoomPoint(Integer point, Room room) {
@@ -190,11 +165,19 @@ public class RoomServiceImpl implements RoomService {
   }
 
   @Override
-  public void deleteRoomById(String id) {
+  public void deleteRoomByStudentIdAndAssignmentId(String studentId, String assignmentId) {
 
-    Optional.ofNullable(id)
-      .flatMap(roomRepository::findByIdAndDeletedFalse)
+    Optional.ofNullable(studentId)
+      .flatMap(id -> roomRepository.findByStudentIdAndAssignmentIdAndDeletedFalse(studentId, assignmentId))
       .ifPresent(this::setDeleteAsTrueAndSave);
+  }
+
+  @Override
+  public void deleteRoomById(String roomId) {
+
+    Optional.ofNullable(roomId)
+        .flatMap(roomRepository::findByIdAndDeletedFalse)
+        .ifPresent(this::setDeleteAsTrueAndSave);
   }
 
   @Override
@@ -207,7 +190,7 @@ public class RoomServiceImpl implements RoomService {
 
   private void setEveryRoomAsDeleted(List<Room> list) {
 
-    list.forEach(this::setDeleteAsTrueAndSave);
+    list.parallelStream().forEach(this::setDeleteAsTrueAndSave);
   }
 
   private void setDeleteAsTrueAndSave(Room room) {
@@ -217,4 +200,11 @@ public class RoomServiceImpl implements RoomService {
     roomRepository.save(room);
   }
 
+  @Override
+  public void update(Observable o, Object arg) {
+
+    if(arg instanceof Assignment) {
+      this.deleteAllRoomsByAssignmentId(((Assignment) arg).getId());
+    }
+  }
 }

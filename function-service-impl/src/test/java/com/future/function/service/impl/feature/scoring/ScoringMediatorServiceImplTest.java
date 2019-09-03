@@ -178,7 +178,6 @@ public class ScoringMediatorServiceImplTest {
     verify(assignmentService).findAllByBatchCodeAndPageable(
       BATCH_CODE, pageable);
     verify(studentQuizService).createStudentQuizAndSave(user, quiz);
-    verify(roomService).createRoomForUserAndSave(user, assignment);
   }
 
   @Test
@@ -202,7 +201,6 @@ public class ScoringMediatorServiceImplTest {
     verify(assignmentService).findAllByBatchCodeAndPageable(
       BATCH_CODE, pageable);
     verify(studentQuizService).createStudentQuizAndSave(user, quiz);
-    verify(roomService).createRoomForUserAndSave(user, assignment);
   }
 
   @Test
