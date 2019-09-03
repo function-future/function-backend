@@ -86,7 +86,7 @@ public class StudentQuizServiceImpl implements StudentQuizService, Observer {
     return Optional.ofNullable(studentId)
       .flatMap(id -> studentQuizRepository.findByStudentIdAndQuizIdAndDeletedFalse(id, quizId))
       .filter(Objects::nonNull)
-      .orElseGet(() -> createNewStudentQuiz(studentId, quizId));
+      .orElseGet(() -> this.createNewStudentQuiz(studentId, quizId));
   }
 
   private StudentQuiz createNewStudentQuiz(String studentId, String quizId) {
@@ -113,11 +113,15 @@ public class StudentQuizServiceImpl implements StudentQuizService, Observer {
 
     return Optional.ofNullable(studentQuiz)
       .filter(Objects::nonNull)
-      .filter(currentStudentQuiz -> currentStudentQuiz.getTrials() < currentStudentQuiz.getQuiz().getTrials())
+      .filter(this::validateTrialsNotReachedLimit)
       .map(this::addStudentQuizTrials)
       .map(studentQuizRepository::save)
       .map(StudentQuiz::getId)
       .orElse(null);
+  }
+
+  private boolean validateTrialsNotReachedLimit(StudentQuiz currentStudentQuiz) {
+    return currentStudentQuiz.getTrials() < currentStudentQuiz.getQuiz().getTrials();
   }
 
   private StudentQuiz addStudentQuizTrials(StudentQuiz studentQuiz) {
@@ -167,6 +171,7 @@ public class StudentQuizServiceImpl implements StudentQuizService, Observer {
   }
 
   private void findStudentQuizAndDelete(User student, Quiz quiz) {
+
     Optional.ofNullable(student)
           .map(User::getId)
           .flatMap(studentId -> studentQuizRepository.findByStudentIdAndQuizIdAndDeletedFalse(studentId, quiz.getId()))
@@ -195,6 +200,7 @@ public class StudentQuizServiceImpl implements StudentQuizService, Observer {
 
   @Override
   public void update(Observable o, Object arg) {
+
     if(arg instanceof Quiz) {
       this.deleteByBatchCodeAndQuiz((Quiz) arg);
     }

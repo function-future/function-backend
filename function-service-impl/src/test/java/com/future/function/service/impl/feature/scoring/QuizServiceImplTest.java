@@ -31,6 +31,7 @@ import java.util.UUID;
 import static com.googlecode.catchexception.CatchException.catchException;
 import static com.googlecode.catchexception.CatchException.caughtException;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -286,11 +287,12 @@ public class QuizServiceImplTest {
     Batch targetBatchObj = Batch.builder()
       .code(batchCode)
       .build();
+    when(quizRepository.save(any(Quiz.class))).thenReturn(quiz);
     when(batchService.getBatchByCode(batchCode)).thenReturn(targetBatchObj);
     Quiz actual = quizService.copyQuizWithTargetBatchCode(batchCode, quiz);
     assertThat(actual.getTitle()).isEqualTo(QUIZ_TITLE);
     verify(quizRepository).findByIdAndDeletedFalse(QUIZ_ID);
-    verify(quizRepository).save(quiz);
+    verify(quizRepository).save(any(Quiz.class));
     verify(batchService).getBatchByCode(batchCode);
   }
 

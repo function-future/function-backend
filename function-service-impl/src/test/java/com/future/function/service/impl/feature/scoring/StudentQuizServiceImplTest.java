@@ -249,6 +249,7 @@ public class StudentQuizServiceImplTest {
 
   @Test
   public void findByIdNotExistAndCreateNew() {
+
     when(studentQuizRepository.findByStudentIdAndQuizIdAndDeletedFalse(USER_ID, QUIZ_ID)).thenReturn(
       Optional.empty());
     StudentQuiz studentQuiz = studentQuizService.findOrCreateByStudentIdAndQuizId(USER_ID, QUIZ_ID);
@@ -324,6 +325,7 @@ public class StudentQuizServiceImplTest {
 
   @Test
   public void updateObserverSendQuizObjectTest() {
+
     studentQuizService.update(new Observable(), quiz);
     verify(userService).getStudentsByBatchCode(BATCH_CODE);
     verify(studentQuizRepository).findByStudentIdAndQuizIdAndDeletedFalse(USER_ID, QUIZ_ID);

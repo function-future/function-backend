@@ -9,9 +9,7 @@ import com.future.function.service.api.feature.scoring.StudentQuizService;
 import com.future.function.web.TestHelper;
 import com.future.function.web.TestSecurityConfiguration;
 import com.future.function.web.mapper.response.scoring.StudentQuizResponseMapper;
-import com.future.function.web.model.request.scoring.StudentQuizWebRequest;
 import com.future.function.web.model.response.base.DataResponse;
-import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.feature.scoring.QuizWebResponse;
 import com.future.function.web.model.response.feature.scoring.StudentQuizWebResponse;
 import org.junit.After;
@@ -19,7 +17,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
@@ -34,7 +31,6 @@ import java.util.Collections;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -69,8 +65,6 @@ public class StudentQuizControllerTest extends TestHelper {
   private QuizWebResponse quizWebResponse;
 
   private Pageable pageable;
-
-  private Page<StudentQuiz> studentQuizPage;
 
   private DataResponse<StudentQuizWebResponse> dataResponse;
 
@@ -115,9 +109,6 @@ public class StudentQuizControllerTest extends TestHelper {
       .build();
 
     pageable = new PageRequest(0, 10);
-
-    studentQuizPage = new PageImpl<>(
-      Collections.singletonList(studentQuiz), pageable, 1);
 
     dataResponse = StudentQuizResponseMapper.toStudentQuizWebResponse(
       studentQuiz);
