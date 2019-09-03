@@ -149,11 +149,7 @@ public class StudentQuizDetailServiceImpl implements StudentQuizDetailService {
       .map(StudentQuiz::getId)
       .map(this::findLatestByStudentQuizId)
       .ifPresent(detail -> {
-        try {
-          studentQuestionService.deleteAllByStudentQuizDetailId(detail.getId());
-        } catch (Exception e) {
-          log.error("StudentQuizDetailService #deleteByStudentQuiz: {}", e.getMessage(), e);
-        }
+        studentQuestionService.deleteAllByStudentQuizDetailId(detail.getId());
         detail.setDeleted(true);
         studentQuizDetailRepository.save(detail);
       });
