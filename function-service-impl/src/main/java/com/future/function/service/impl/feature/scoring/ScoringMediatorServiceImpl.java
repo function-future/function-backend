@@ -89,6 +89,9 @@ public class ScoringMediatorServiceImpl implements ScoringMediatorService {
           log.info("ScoringMediatorException: {}", e.getMessage(), e);
         }
       });
+    pair.getSecond()
+      .forEach(
+        assignment -> roomService.createRoomForUserAndSave(user, assignment));
     return user;
   }
 
@@ -103,8 +106,7 @@ public class ScoringMediatorServiceImpl implements ScoringMediatorService {
   private User deleteStudentQuizzesAndRooms(User user) {
 
     studentQuizService.findAllByStudentId(
-      user.getId(), MAX_PAGEABLE, user.getId())
-      .getContent()
+      user.getId())
       .stream()
       .map(StudentQuiz::getId)
       .forEach(studentQuizService::deleteById);

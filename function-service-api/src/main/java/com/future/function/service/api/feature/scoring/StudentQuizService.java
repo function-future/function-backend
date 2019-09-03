@@ -1,41 +1,27 @@
 package com.future.function.service.api.feature.scoring;
 
-import com.future.function.model.entity.feature.core.Batch;
-import com.future.function.model.entity.feature.core.User;
 import com.future.function.model.entity.feature.scoring.Quiz;
 import com.future.function.model.entity.feature.scoring.StudentQuestion;
 import com.future.function.model.entity.feature.scoring.StudentQuiz;
 import com.future.function.model.entity.feature.scoring.StudentQuizDetail;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
 public interface StudentQuizService {
 
-  Page<StudentQuiz> findAllByStudentId(
-    String studentId, Pageable pageable, String userId
-  );
+  List<StudentQuiz> findAllByStudentId(String studentId);
 
   List<StudentQuizDetail> findAllQuizByStudentId(String studentId);
 
-  StudentQuiz findById(String id, String userId);
+  StudentQuiz findOrCreateByStudentIdAndQuizId(String studentId, String quizId);
 
   List<StudentQuestion> findAllUnansweredQuestionByStudentQuizId(
-    String studentQuizId, String userId
+    String studentId, String quizId
   );
-
-  Quiz updateQuizTrials(Quiz quiz);
 
   StudentQuizDetail answerQuestionsByStudentQuizId(
-    String studentQuizId, String userId, List<StudentQuestion> answers
+    String studentId, String quizId, List<StudentQuestion> answers
   );
-
-  StudentQuiz createStudentQuizAndSave(User user, Quiz quiz);
-
-  Quiz createStudentQuizByBatchCode(String batchCode, Quiz quiz);
-
-  Quiz copyQuizWithTargetBatch(Batch targetBatch, Quiz quiz);
 
   void deleteById(String id);
 

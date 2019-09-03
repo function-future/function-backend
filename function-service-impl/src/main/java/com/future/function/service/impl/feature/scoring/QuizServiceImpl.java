@@ -8,9 +8,9 @@ import com.future.function.repository.feature.scoring.QuizRepository;
 import com.future.function.service.api.feature.core.BatchService;
 import com.future.function.service.api.feature.scoring.QuestionBankService;
 import com.future.function.service.api.feature.scoring.QuizService;
-import com.future.function.service.api.feature.scoring.StudentQuizService;
 import com.future.function.service.impl.helper.CopyHelper;
 import com.future.function.service.impl.helper.PageHelper;
+import java.util.Observable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,11 +21,9 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-public class QuizServiceImpl implements QuizService {
+public class QuizServiceImpl extends Observable implements QuizService {
 
   private QuizRepository quizRepository;
-
-  private StudentQuizService studentQuizService;
 
   private QuestionBankService questionBankService;
 
@@ -33,12 +31,11 @@ public class QuizServiceImpl implements QuizService {
 
   @Autowired
   public QuizServiceImpl(
-    QuizRepository quizRepository, StudentQuizService studentQuizService,
-    QuestionBankService questionBankService, BatchService batchService
+    QuizRepository quizRepository, QuestionBankService questionBankService,
+      BatchService batchService
   ) {
 
     this.quizRepository = quizRepository;
-    this.studentQuizService = studentQuizService;
     this.questionBankService = questionBankService;
     this.batchService = batchService;
   }
@@ -67,30 +64,41 @@ public class QuizServiceImpl implements QuizService {
   @Override
   public Quiz copyQuizWithTargetBatchCode(String targetBatchCode, Quiz quiz) {
 
-    Batch batch = batchService.getBatchByCode(targetBatchCode);
     return Optional.ofNullable(quiz)
       .map(Quiz::getId)
       .map(this::findById)
+      .map(currentQuiz -> this.initializeNewQuiz(currentQuiz, targetBatchCode))
       .map(quizRepository::save)
       .orElseThrow(() -> new UnsupportedOperationException(
         "Failed at #copyQuizWithTargetBatchCode #QuizService"));
+  }
+
+  private Quiz initializeNewQuiz(Quiz quiz, String targetBatchCode) {
+    Quiz newQuiz = Quiz.builder().build();
+    CopyHelper.copyProperties(quiz, newQuiz);
+    newQuiz.setBatch(Batch.builder().code(targetBatchCode).build());
+    return this.setBatch(newQuiz);
   }
 
   @Override
   public Quiz createQuiz(Quiz request) {
 
     return Optional.ofNullable(request)
-      .map(this::setBatchAndQuestionBank)
+      .map(this::setBatch)
+      .map(this::setQuestionBank)
       .map(quizRepository::save)
       .orElseThrow(() -> new UnsupportedOperationException(
         "Failed on #createQuiz #QuizService"));
   }
 
-  private Quiz setBatchAndQuestionBank(Quiz quiz) {
+  private Quiz setQuestionBank(Quiz quiz) {
 
-    quiz.setBatch(batchService.getBatchByCode(quiz.getBatch()
-                                                .getCode()));
     quiz.setQuestionBanks(getQuestionBanksFromService(quiz.getQuestionBanks()));
+    return quiz;
+  }
+
+  private Quiz setBatch(Quiz quiz) {
+    quiz.setBatch(batchService.getBatchByCode(quiz.getBatch().getCode()));
     return quiz;
   }
 
@@ -122,20 +130,11 @@ public class QuizServiceImpl implements QuizService {
     return Optional.ofNullable(request)
       .map(Quiz::getId)
       .flatMap(quizRepository::findByIdAndDeletedFalse)
-      .map(quiz -> updateStudentQuizTrialsIfChanged(request, quiz))
       .map(quiz -> copyRequestedQuizAttributes(request, quiz))
-      .map(this::setBatchAndQuestionBank)
+      .map(this::setBatch)
+      .map(this::setQuestionBank)
       .map(quizRepository::save)
       .orElse(request);
-  }
-
-  private Quiz updateStudentQuizTrialsIfChanged(Quiz request, Quiz quiz) {
-
-    return Optional.of(request)
-      .filter(currentQuiz -> currentQuiz.getTrials() != quiz.getTrials())
-      .map(studentQuizService::updateQuizTrials)
-      .map(ignored -> quiz)
-      .orElse(quiz);
   }
 
   private Quiz copyRequestedQuizAttributes(Quiz request, Quiz quiz) {
@@ -149,12 +148,12 @@ public class QuizServiceImpl implements QuizService {
 
     Optional.ofNullable(id)
       .flatMap(quizRepository::findByIdAndDeletedFalse)
-      .ifPresent(this::deleteAllStudentQuizAndSaveDeletedQuiz);
+      .ifPresent(this::notifyStudentQuizServiceAndSaveDeletedQuiz);
   }
 
-  private void deleteAllStudentQuizAndSaveDeletedQuiz(Quiz quiz) {
-
-    studentQuizService.deleteByBatchCodeAndQuiz(quiz);
+  private void notifyStudentQuizServiceAndSaveDeletedQuiz(Quiz quiz) {
+    this.setChanged();
+    this.notifyObservers(quiz);
     quiz.setDeleted(true);
     quizRepository.save(quiz);
   }

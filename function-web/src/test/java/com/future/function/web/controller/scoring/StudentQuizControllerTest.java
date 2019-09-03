@@ -10,7 +10,6 @@ import com.future.function.web.TestHelper;
 import com.future.function.web.TestSecurityConfiguration;
 import com.future.function.web.mapper.response.scoring.StudentQuizResponseMapper;
 import com.future.function.web.model.response.base.DataResponse;
-import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.feature.scoring.QuizWebResponse;
 import com.future.function.web.model.response.feature.scoring.StudentQuizWebResponse;
 import org.junit.After;
@@ -24,6 +23,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Collections;
@@ -31,7 +31,7 @@ import java.util.Collections;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -62,17 +62,11 @@ public class StudentQuizControllerTest extends TestHelper {
 
   private User user;
 
-  private StudentQuizWebResponse webResponse;
-
   private QuizWebResponse quizWebResponse;
 
   private Pageable pageable;
 
-  private Page<StudentQuiz> studentQuizPage;
-
   private DataResponse<StudentQuizWebResponse> dataResponse;
-
-  private PagingResponse<StudentQuizWebResponse> pagingResponse;
 
   @MockBean
   private StudentQuizService studentQuizService;
@@ -81,7 +75,7 @@ public class StudentQuizControllerTest extends TestHelper {
   public void setUp() {
 
     super.setUp();
-    super.setCookie(Role.ADMIN);
+    super.setCookie(Role.STUDENT);
 
     batch = Batch.builder()
       .code(BATCH_CODE)
@@ -114,26 +108,12 @@ public class StudentQuizControllerTest extends TestHelper {
       .batchCode(BATCH_CODE)
       .build();
 
-    webResponse = StudentQuizWebResponse.builder()
-      .id(STUDENT_QUIZ_ID)
-      .quiz(quizWebResponse)
-      .build();
-
     pageable = new PageRequest(0, 10);
-
-    studentQuizPage = new PageImpl<>(
-      Collections.singletonList(studentQuiz), pageable, 1);
 
     dataResponse = StudentQuizResponseMapper.toStudentQuizWebResponse(
       studentQuiz);
 
-    pagingResponse = StudentQuizResponseMapper.toPagingStudentQuizWebResponse(
-      studentQuizPage);
-
-    when(studentQuizService.findAllByStudentId(STUDENT_ID, pageable,
-                                               ADMIN_ID
-    )).thenReturn(studentQuizPage);
-    when(studentQuizService.findById(STUDENT_QUIZ_ID, ADMIN_ID)).thenReturn(
+    when(studentQuizService.findOrCreateByStudentIdAndQuizId(TestHelper.STUDENT_ID, QUIZ_ID)).thenReturn(
       studentQuiz);
   }
 
@@ -144,29 +124,16 @@ public class StudentQuizControllerTest extends TestHelper {
   }
 
   @Test
-  public void getAllStudentQuiz() throws Exception {
-
-    mockMvc.perform(get(
-      "/api/scoring/students/" + STUDENT_ID + "/quizzes").cookie(cookies)
-                      .param("page", "1")
-                      .param("size", "10"))
-      .andExpect(status().isOk())
-      .andExpect(content().json(
-        pagingResponseJacksonTester.write(pagingResponse)
-          .getJson()));
-    verify(studentQuizService).findAllByStudentId(
-      STUDENT_ID, pageable, ADMIN_ID);
-  }
-
-  @Test
   public void getStudentQuizById() throws Exception {
 
-    mockMvc.perform(get("/api/scoring/students/" + STUDENT_ID + "/quizzes/" +
-                        STUDENT_QUIZ_ID).cookie(cookies))
+    mockMvc.perform(post("/api/scoring/batches/" + BATCH_CODE + "/quizzes/" +
+                        QUIZ_ID + "/student")
+        .cookie(cookies)
+        .contentType(MediaType.APPLICATION_JSON_VALUE))
       .andExpect(status().isOk())
       .andExpect(content().json(dataResponseJacksonTester.write(dataResponse)
                                   .getJson()));
-    verify(studentQuizService).findById(STUDENT_QUIZ_ID, ADMIN_ID);
+    verify(studentQuizService).findOrCreateByStudentIdAndQuizId(TestHelper.STUDENT_ID, QUIZ_ID);
   }
 
 }

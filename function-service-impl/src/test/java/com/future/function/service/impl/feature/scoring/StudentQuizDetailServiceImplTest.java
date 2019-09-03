@@ -168,21 +168,6 @@ public class StudentQuizDetailServiceImplTest {
   }
 
   @Test
-  public void findAllQuestionsByStudentQuizId() {
-
-    List<StudentQuestion> actual =
-      studentQuizDetailService.findAllQuestionsByStudentQuizId(STUDENT_QUIZ_ID);
-    assertThat(actual.size()).isEqualTo(1);
-    assertThat(actual.get(0)
-                 .getId()).isEqualTo(STUDENT_QUESTION_ID);
-    verify(
-      studentQuizDetailRepository).findTopByStudentQuizIdAndDeletedFalseOrderByCreatedAtDesc(
-      STUDENT_QUIZ_ID);
-    verify(studentQuestionService).findAllByStudentQuizDetailId(
-      STUDENT_QUIZ_DETAIL_ID);
-  }
-
-  @Test
   public void findAllUnansweredQuestionsByStudentQuizId() {
 
     List<StudentQuestion> actual =
@@ -233,45 +218,6 @@ public class StudentQuizDetailServiceImplTest {
     verify(studentQuestionService).postAnswerForAllStudentQuestion(
       Collections.singletonList(studentQuestion), STUDENT_QUIZ_DETAIL_ID);
     verify(studentQuizDetailRepository).save(studentQuizDetail);
-  }
-
-  @Test
-  public void createStudentQuizDetail() {
-
-    StudentQuizDetail actual = studentQuizDetailService.createStudentQuizDetail(
-      studentQuiz, Collections.singletonList(studentQuestion));
-    assertThat(actual.getStudentQuiz()
-                 .getId()).isEqualTo(STUDENT_QUIZ_ID);
-    verify(studentQuestionService).createStudentQuestionsByStudentQuizDetail(
-      any(StudentQuizDetail.class),
-      eq(Collections.singletonList(studentQuestion))
-    );
-    verify(studentQuizDetailRepository).save(any(StudentQuizDetail.class));
-  }
-
-  @Test
-  public void createStudentQuizDetailThrowUnsupportedOperationException() {
-
-    when(studentQuizDetailRepository.save(
-      any(StudentQuizDetail.class))).thenReturn(null);
-    catchException(
-      () -> studentQuizDetailService.createStudentQuizDetail(studentQuiz,
-                                                             Collections.singletonList(
-                                                               studentQuestion)
-      ));
-    assertThat(caughtException().getClass()).isEqualTo(
-      UnsupportedOperationException.class);
-    verify(studentQuizDetailRepository).save(any(StudentQuizDetail.class));
-  }
-
-  @Test
-  public void createStudentQuizDetailNoQuestions() {
-
-    StudentQuizDetail actual = studentQuizDetailService.createStudentQuizDetail(
-      studentQuiz, null);
-    assertThat(actual.getStudentQuiz()
-                 .getId()).isEqualTo(STUDENT_QUIZ_ID);
-    verify(studentQuizDetailRepository).save(any(StudentQuizDetail.class));
   }
 
   @Test

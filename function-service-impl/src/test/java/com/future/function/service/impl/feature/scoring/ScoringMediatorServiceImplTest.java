@@ -153,10 +153,7 @@ public class ScoringMediatorServiceImplTest {
                                                          pageable
     )).thenReturn(
       new PageImpl<>(Collections.singletonList(assignment), pageable, 1));
-    when(studentQuizService.findAllByStudentId(USER_ID, pageable,
-                                               USER_ID
-    )).thenReturn(
-      new PageImpl<>(Collections.singletonList(studentQuiz), pageable, 1));
+    when(studentQuizService.findAllByStudentId(USER_ID)).thenReturn(Collections.singletonList(studentQuiz));
     when(roomService.findAllByStudentId(USER_ID)).thenReturn(
       Collections.singletonList(room));
   }
@@ -178,6 +175,7 @@ public class ScoringMediatorServiceImplTest {
     verify(assignmentService).findAllByBatchCodeAndPageable(
       BATCH_CODE, pageable);
     verify(studentQuizService).createStudentQuizAndSave(user, quiz);
+    verify(roomService).createRoomForUserAndSave(user, assignment);
   }
 
   @Test
@@ -192,8 +190,6 @@ public class ScoringMediatorServiceImplTest {
   @Test
   public void createQuizAndAssignmentsByStudentThrowException() {
 
-    doThrow(Exception.class).when(studentQuizService)
-      .createStudentQuizAndSave(user, quiz);
     User actual = mediatorService.createQuizAndAssignmentsByStudent(user);
     assertThat(actual.getId()).isEqualTo(USER_ID);
     assertThat(actual.getName()).isEqualTo(USERNAME);
@@ -201,6 +197,7 @@ public class ScoringMediatorServiceImplTest {
     verify(assignmentService).findAllByBatchCodeAndPageable(
       BATCH_CODE, pageable);
     verify(studentQuizService).createStudentQuizAndSave(user, quiz);
+    verify(roomService).createRoomForUserAndSave(user, assignment);
   }
 
   @Test
@@ -209,7 +206,7 @@ public class ScoringMediatorServiceImplTest {
     User actual = mediatorService.deleteQuizAndAssignmentsByStudent(user);
     assertThat(actual.getId()).isEqualTo(USER_ID);
     assertThat(actual.getName()).isEqualTo(USERNAME);
-    verify(studentQuizService).findAllByStudentId(USER_ID, pageable, USER_ID);
+    verify(studentQuizService).findAllByStudentId(USER_ID);
     verify(studentQuizService).deleteById(STUDENT_QUIZ_ID);
     verify(roomService).findAllByStudentId(USER_ID);
     verify(roomService).deleteRoomById(ROOM_ID);
