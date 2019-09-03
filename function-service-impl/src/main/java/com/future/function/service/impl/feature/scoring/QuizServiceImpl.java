@@ -64,17 +64,20 @@ public class QuizServiceImpl extends Observable implements QuizService {
   @Override
   public Quiz copyQuizWithTargetBatchCode(String targetBatchCode, Quiz quiz) {
 
-    Batch batch = batchService.getBatchByCode(targetBatchCode);
     return Optional.ofNullable(quiz)
       .map(Quiz::getId)
       .map(this::findById)
-      .map(currentQuiz -> {
-        currentQuiz.setBatch(batch);
-        return currentQuiz;
-      })
+      .map(currentQuiz -> this.initializeNewQuiz(currentQuiz, targetBatchCode))
       .map(quizRepository::save)
       .orElseThrow(() -> new UnsupportedOperationException(
         "Failed at #copyQuizWithTargetBatchCode #QuizService"));
+  }
+
+  private Quiz initializeNewQuiz(Quiz quiz, String targetBatchCode) {
+    Quiz newQuiz = Quiz.builder().build();
+    CopyHelper.copyProperties(quiz, newQuiz);
+    newQuiz.setBatch(Batch.builder().code(targetBatchCode).build());
+    return this.setBatch(newQuiz);
   }
 
   @Override
