@@ -179,6 +179,7 @@ public class StudentQuizServiceImpl implements StudentQuizService, Observer {
   }
 
   private void deleteAllDetailAndSaveDeletedStudentQuiz(StudentQuiz value) {
+
     studentQuizDetailService.deleteByStudentQuiz(value);
     value.setDeleted(true);
     studentQuizRepository.save(value);

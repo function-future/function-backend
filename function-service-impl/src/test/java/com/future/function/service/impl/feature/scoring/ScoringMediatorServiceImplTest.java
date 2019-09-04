@@ -33,6 +33,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -180,7 +181,7 @@ public class ScoringMediatorServiceImplTest {
   public void tearDown() throws Exception {
 
     verifyNoMoreInteractions(
-      quizService, assignmentService, studentQuizService, roomService, userService);
+      quizService, assignmentService, studentQuizService, roomService, userService, executorService);
   }
 
   @Test
@@ -193,15 +194,18 @@ public class ScoringMediatorServiceImplTest {
     verify(studentQuizService).deleteById(STUDENT_QUIZ_ID);
     verify(roomService).findAllByStudentId(USER_ID);
     verify(roomService).deleteRoomById(ROOM_ID);
+    verify(executorService, times(2)).execute(any(Runnable.class));
   }
 
   @Test
   public void updateOnNotifyObserverTest() {
+
     mediatorService.update(new Observable(), user);
     verify(studentQuizService).findAllByStudentId(USER_ID);
     verify(studentQuizService).deleteById(STUDENT_QUIZ_ID);
     verify(roomService).findAllByStudentId(USER_ID);
     verify(roomService).deleteRoomById(ROOM_ID);
+    verify(executorService, times(2)).execute(any(Runnable.class));
   }
 
   @Test

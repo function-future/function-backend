@@ -56,6 +56,7 @@ public class ScoringMediatorServiceImpl implements ScoringMediatorService, Obser
   }
 
   private void deleteEveryAssignment(User user) {
+
     roomService.findAllByStudentId(user.getId())
       .stream()
       .map(Room::getId)
@@ -63,6 +64,7 @@ public class ScoringMediatorServiceImpl implements ScoringMediatorService, Obser
   }
 
   private void deleteEveryQuiz(User user) {
+
     studentQuizService.findAllByStudentId(user.getId())
       .stream()
       .map(StudentQuiz::getId)
@@ -70,7 +72,8 @@ public class ScoringMediatorServiceImpl implements ScoringMediatorService, Obser
   }
 
   @Override
-  public void update(Observable o, Object arg) {
+  public void update(Observable o, Object arg)
+  {
       if(arg instanceof User) {
         this.deleteQuizAndAssignmentsByStudent((User) arg);
       }
