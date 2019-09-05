@@ -10,7 +10,6 @@ import com.future.function.repository.feature.scoring.QuizRepository;
 import com.future.function.service.api.feature.core.BatchService;
 import com.future.function.service.api.feature.scoring.QuestionBankService;
 import com.future.function.service.api.feature.scoring.QuestionService;
-import com.future.function.service.api.feature.scoring.StudentQuizService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -134,7 +133,7 @@ public class QuizServiceImplTest {
     quizPage = new PageImpl<>(quizList, pageable, TOTAL);
 
     when(
-      quizRepository.findAllByBatchAndDeletedFalse(batch, pageable)).thenReturn(
+      quizRepository.findAllByBatchAndDeletedFalseOrderByEndDateAsc(batch, pageable)).thenReturn(
       quizPage);
     when(quizRepository.findByIdAndDeletedFalse(QUIZ_ID)).thenReturn(
       Optional.of(quiz));
@@ -191,7 +190,7 @@ public class QuizServiceImplTest {
     assertThat(actual.getTotalElements()).isEqualTo(TOTAL);
     assertThat(actual).isEqualTo(quizPage);
 
-    verify(quizRepository).findAllByBatchAndDeletedFalse(batch, pageable);
+    verify(quizRepository).findAllByBatchAndDeletedFalseOrderByEndDateAsc(batch, pageable);
     verify(batchService).getBatchByCode(BATCH_CODE);
   }
 
@@ -205,7 +204,7 @@ public class QuizServiceImplTest {
     assertThat(actual.getTotalElements()).isEqualTo(TOTAL);
     assertThat(actual).isEqualTo(quizPage);
 
-    verify(quizRepository).findAllByBatchAndDeletedFalse(batch, pageable);
+    verify(quizRepository).findAllByBatchAndDeletedFalseOrderByEndDateAsc(batch, pageable);
     verify(batchService).getBatchByCode(BATCH_CODE);
   }
 

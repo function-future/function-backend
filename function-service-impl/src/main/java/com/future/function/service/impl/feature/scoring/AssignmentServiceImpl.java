@@ -13,10 +13,8 @@ import com.future.function.service.impl.helper.CopyHelper;
 import com.future.function.service.impl.helper.PageHelper;
 import com.future.function.service.impl.helper.SortHelper;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Observable;
-import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -56,7 +54,7 @@ public class AssignmentServiceImpl extends Observable implements AssignmentServi
 
     return Optional.ofNullable(batchCode)
       .map(batchService::getBatchByCode)
-      .map(batch -> assignmentRepository.findAllByBatchAndDeletedFalse(batch,
+      .map(batch -> assignmentRepository.findAllByBatchAndDeletedFalseOrderByDeadlineDesc(batch,
                                                                        pageable
       ))
       .map(this::sortByClosestDeadline)

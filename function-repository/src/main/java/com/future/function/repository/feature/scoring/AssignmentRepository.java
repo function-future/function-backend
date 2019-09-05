@@ -13,7 +13,7 @@ public interface AssignmentRepository
 
   Optional<Assignment> findByIdAndDeletedFalse(String id);
 
-  Page<Assignment> findAllByBatchAndDeletedFalse(
+  Page<Assignment> findAllByBatchAndDeletedFalseOrderByDeadlineDesc(
     Batch batch, Pageable pageable
   );
 

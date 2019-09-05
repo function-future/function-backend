@@ -11,12 +11,7 @@ import com.future.function.service.api.feature.scoring.QuizService;
 import com.future.function.service.impl.helper.CopyHelper;
 import com.future.function.service.impl.helper.PageHelper;
 import com.future.function.service.impl.helper.SortHelper;
-import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
 import java.util.Observable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -66,7 +61,7 @@ public class QuizServiceImpl extends Observable implements QuizService {
     return Optional.ofNullable(batchCode)
       .map(batchService::getBatchByCode)
       .map(
-        batch -> quizRepository.findAllByBatchAndDeletedFalse(batch, pageable))
+        batch -> quizRepository.findAllByBatchAndDeletedFalseOrderByEndDateAsc(batch, pageable))
       .map(this::sortByClosestDeadline)
       .orElseGet(() -> PageHelper.empty(pageable));
   }
