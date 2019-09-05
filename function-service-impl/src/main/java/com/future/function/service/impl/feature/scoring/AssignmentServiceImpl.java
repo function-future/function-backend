@@ -11,9 +11,16 @@ import com.future.function.service.api.feature.core.ResourceService;
 import com.future.function.service.api.feature.scoring.AssignmentService;
 import com.future.function.service.impl.helper.CopyHelper;
 import com.future.function.service.impl.helper.PageHelper;
+import com.future.function.service.impl.helper.SortHelper;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.Observable;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -52,7 +59,15 @@ public class AssignmentServiceImpl extends Observable implements AssignmentServi
       .map(batch -> assignmentRepository.findAllByBatchAndDeletedFalse(batch,
                                                                        pageable
       ))
+      .map(this::sortByClosestDeadline)
       .orElseGet(() -> PageHelper.empty(pageable));
+  }
+
+  private Page<Assignment> sortByClosestDeadline(Page<Assignment> assignmentPage) {
+    List<Assignment> sortedAssignment = new ArrayList<>(assignmentPage.getContent());
+    sortedAssignment.sort((asg1, asg2) -> SortHelper.compareClosestDeadline(asg1.getDeadline(), asg2.getDeadline()));
+    return new PageImpl<>(sortedAssignment, new PageRequest(assignmentPage.getNumber(), assignmentPage.getSize()),
+        assignmentPage.getTotalElements());
   }
 
   @Override

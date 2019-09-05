@@ -10,9 +10,18 @@ import com.future.function.service.api.feature.scoring.QuestionBankService;
 import com.future.function.service.api.feature.scoring.QuizService;
 import com.future.function.service.impl.helper.CopyHelper;
 import com.future.function.service.impl.helper.PageHelper;
+import com.future.function.service.impl.helper.SortHelper;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.Observable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -58,7 +67,15 @@ public class QuizServiceImpl extends Observable implements QuizService {
       .map(batchService::getBatchByCode)
       .map(
         batch -> quizRepository.findAllByBatchAndDeletedFalse(batch, pageable))
+      .map(this::sortByClosestDeadline)
       .orElseGet(() -> PageHelper.empty(pageable));
+  }
+
+  private Page<Quiz> sortByClosestDeadline(Page<Quiz> quizPage) {
+    List<Quiz> sortedQuiz = new ArrayList<>(quizPage.getContent());
+    sortedQuiz.sort((quiz1, quiz2) -> SortHelper.compareClosestDeadline(quiz1.getEndDate(), quiz2.getEndDate()));
+    return new PageImpl<>(sortedQuiz, new PageRequest(quizPage.getNumber(), quizPage.getSize()),
+        quizPage.getTotalElements());
   }
 
   @Override

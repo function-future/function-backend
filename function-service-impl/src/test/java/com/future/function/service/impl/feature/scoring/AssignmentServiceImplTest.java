@@ -11,6 +11,7 @@ import com.future.function.service.api.feature.core.BatchService;
 import com.future.function.service.api.feature.core.ResourceService;
 import com.future.function.service.impl.helper.CopyHelper;
 import com.future.function.service.impl.helper.PageHelper;
+import java.util.Arrays;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -44,7 +45,7 @@ public class AssignmentServiceImplTest {
 
   private static final String ASSIGNMENT_DESCRIPTION = "assignment-description";
 
-  private static final long ASSIGNMENT_DEADLINE = new Date().getTime();
+  private static final long ASSIGNMENT_DEADLINE = new Date().getTime() + 150000;
 
   private static final String BATCH_CODE = "batchCode";
 
@@ -59,6 +60,8 @@ public class AssignmentServiceImplTest {
   private static final String FILE_ID = "file-id";
 
   private Assignment assignment;
+
+  private Assignment assignment2;
 
   private FileV2 file;
 
@@ -114,6 +117,10 @@ public class AssignmentServiceImplTest {
       .file(file)
       .build();
 
+    assignment2 = Assignment.builder().build();
+    BeanUtils.copyProperties(assignment, assignment2, "id");
+    assignment2.setDeadline(assignment2.getDeadline() - 1000000);
+
     room = Room.builder()
       .id(ROOM_ID)
       .build();
@@ -122,8 +129,9 @@ public class AssignmentServiceImplTest {
 
     assignmentList = new ArrayList<>();
     assignmentList.add(assignment);
+    assignmentList.add(assignment2);
 
-    assignmentPage = new PageImpl<>(assignmentList, pageable, 1);
+    assignmentPage = new PageImpl<>(assignmentList, pageable, 2);
     roomPage = new PageImpl<>(Collections.singletonList(room), pageable, 1);
 
     when(
@@ -158,7 +166,51 @@ public class AssignmentServiceImplTest {
       BATCH_CODE, pageable);
     assertThat(result).isNotNull();
     assertThat(result.getContent()
-                 .size()).isEqualTo(1);
+                 .size()).isEqualTo(2);
+    assertThat(result.getContent()).isEqualTo(assignmentList);
+    verify(batchService).getBatchByCode(BATCH_CODE);
+    verify(assignmentRepository).findAllByBatchAndDeletedFalse(batch, pageable);
+  }
+
+  @Test
+  public void testFindAllAssignmentWithPageableAllAboveDeadline() {
+
+    assignment2.setDeadline(assignment2.getDeadline() + 2000000);
+    Page<Assignment> result = assignmentService.findAllByBatchCodeAndPageable(
+        BATCH_CODE, pageable);
+    assertThat(result).isNotNull();
+    assertThat(result.getContent()
+        .size()).isEqualTo(2);
+    assertThat(result.getContent()).isEqualTo(assignmentList);
+    verify(batchService).getBatchByCode(BATCH_CODE);
+    verify(assignmentRepository).findAllByBatchAndDeletedFalse(batch, pageable);
+  }
+
+  @Test
+  public void testFindAllAssignmentWithPageableAssignment1BelowDeadline() {
+
+    assignment2.setDeadline(assignment2.getDeadline() + 2000000);
+    assignment.setDeadline(assignment.getDeadline() - 3000000);
+    List<Assignment> expected = Arrays.asList(assignment2, assignment);
+    Page<Assignment> result = assignmentService.findAllByBatchCodeAndPageable(
+        BATCH_CODE, pageable);
+    assertThat(result).isNotNull();
+    assertThat(result.getContent()
+        .size()).isEqualTo(2);
+    assertThat(result.getContent()).isEqualTo(expected);
+    verify(batchService).getBatchByCode(BATCH_CODE);
+    verify(assignmentRepository).findAllByBatchAndDeletedFalse(batch, pageable);
+  }
+
+  @Test
+  public void testFindAllAssignmentWithPageableAllAssignmentBelowDeadline() {
+
+    assignment.setDeadline(assignment.getDeadline() - 3000000);
+    Page<Assignment> result = assignmentService.findAllByBatchCodeAndPageable(
+        BATCH_CODE, pageable);
+    assertThat(result).isNotNull();
+    assertThat(result.getContent()
+        .size()).isEqualTo(2);
     assertThat(result.getContent()).isEqualTo(assignmentList);
     verify(batchService).getBatchByCode(BATCH_CODE);
     verify(assignmentRepository).findAllByBatchAndDeletedFalse(batch, pageable);
