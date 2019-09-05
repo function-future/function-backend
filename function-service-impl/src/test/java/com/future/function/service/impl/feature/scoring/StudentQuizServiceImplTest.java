@@ -309,6 +309,7 @@ public class StudentQuizServiceImplTest {
     studentQuiz.setDeleted(true);
     verify(studentQuizRepository).findByIdAndDeletedFalse(STUDENT_QUIZ_ID);
     verify(studentQuizRepository).save(studentQuiz);
+    verify(studentQuizDetailService).deleteByStudentQuiz(studentQuiz);
   }
 
   @Test

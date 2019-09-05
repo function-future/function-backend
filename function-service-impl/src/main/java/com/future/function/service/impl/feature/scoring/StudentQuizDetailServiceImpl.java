@@ -10,6 +10,7 @@ import com.future.function.repository.feature.scoring.StudentQuizDetailRepositor
 import com.future.function.service.api.feature.scoring.StudentQuestionService;
 import com.future.function.service.api.feature.scoring.StudentQuizDetailService;
 import com.future.function.service.impl.helper.CopyHelper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +20,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class StudentQuizDetailServiceImpl implements StudentQuizDetailService {
 
   private StudentQuizDetailRepository studentQuizDetailRepository;

@@ -316,8 +316,6 @@ public class UserServiceImplTest {
                            .replace(" ", "") + "functionapp";
     when(encoder.encode(rawPassword)).thenReturn(PASSWORD);
     when(userRepository.save(userStudent)).thenReturn(userStudent);
-    when(scoringMediatorService.createQuizAndAssignmentsByStudent(
-      userStudent)).thenReturn(userStudent);
 
     User createdUserStudent = userService.createUser(userStudent);
 
@@ -330,8 +328,6 @@ public class UserServiceImplTest {
     verify(batchService).getBatchByCode(NUMBER);
     verify(resourceService).markFilesUsed(FILE_IDS, true);
     verify(resourceService).getFile(PICTURE_ID);
-    verify(scoringMediatorService).createQuizAndAssignmentsByStudent(
-      userStudent);
     verify(encoder).encode(rawPassword);
     verify(userRepository).save(userStudent);
     verify(mailService).sendEmail(eq(userStudent.getEmail()), eq("Registrasi Sukses"), anyString());
@@ -377,8 +373,6 @@ public class UserServiceImplTest {
                            .replace(" ", "") + "functionapp";
     when(encoder.encode(PASSWORD)).thenReturn(PASSWORD);
     when(userRepository.save(userMentor)).thenReturn(userMentor);
-    when(scoringMediatorService.createQuizAndAssignmentsByStudent(
-      userMentor)).thenReturn(userMentor);
 
     User createdUserMentor = userService.createUser(userMentor);
 
@@ -388,8 +382,6 @@ public class UserServiceImplTest {
 
     verify(resourceService).markFilesUsed(FILE_IDS, true);
     verify(resourceService).getFile(PICTURE_ID);
-    verify(scoringMediatorService).createQuizAndAssignmentsByStudent(
-      userMentor);
     verify(encoder).encode(rawPassword);
     verify(userRepository).save(userMentor);
     verify(mailService).sendEmail(eq(userMentor.getEmail()), eq("Registrasi Sukses"), anyString());
@@ -404,9 +396,6 @@ public class UserServiceImplTest {
                            .replace(" ", "") + "functionapp";
     when(encoder.encode(rawPassword)).thenReturn(PASSWORD);
     when(userRepository.save(userMentor)).thenReturn(userMentor);
-    when(scoringMediatorService.createQuizAndAssignmentsByStudent(
-      userMentor)).thenReturn(userMentor);
-
     User createdUserMentor = userService.createUser(userMentor);
 
     assertThat(createdUserMentor).isNotNull();
@@ -415,8 +404,6 @@ public class UserServiceImplTest {
     verify(encoder).encode(rawPassword);
     verify(userRepository).save(userMentor);
     verify(mailService).sendEmail(eq(userMentor.getEmail()), eq("Registrasi Sukses"), anyString());
-    verify(scoringMediatorService).createQuizAndAssignmentsByStudent(
-      userMentor);
     verifyZeroInteractions(batchService, resourceService);
   }
 
@@ -493,9 +480,6 @@ public class UserServiceImplTest {
 
     when(userRepository.findOne(STUDENT_ID)).thenReturn(userStudent);
 
-    when(scoringMediatorService.deleteQuizAndAssignmentsByStudent(
-      userStudent)).thenReturn(userStudent);
-
     User deletedUserStudent = new User();
     BeanUtils.copyProperties(userStudent, deletedUserStudent);
     deletedUserStudent.setDeleted(true);
@@ -512,8 +496,6 @@ public class UserServiceImplTest {
     verify(resourceService).markFilesUsed(FILE_IDS, false);
     verify(resourceService).getFile(PICTURE_ID);
     verify(userRepository).save(markedDeletedUserStudent);
-    verify(scoringMediatorService).deleteQuizAndAssignmentsByStudent(
-      userStudent);
     verifyZeroInteractions(batchService, encoder, mailService);
   }
 
@@ -523,9 +505,6 @@ public class UserServiceImplTest {
     userMentor.setPictureV2(PICTURE);
 
     when(userRepository.findOne(MENTOR_ID)).thenReturn(userMentor);
-    when(scoringMediatorService.deleteQuizAndAssignmentsByStudent(
-      userMentor)).thenReturn(userMentor);
-
 
     User deletedUserMentor = new User();
     BeanUtils.copyProperties(userMentor, deletedUserMentor);
@@ -542,8 +521,6 @@ public class UserServiceImplTest {
     verify(resourceService).markFilesUsed(FILE_IDS, false);
     verify(resourceService).getFile(PICTURE_ID);
     verify(userRepository).save(markedDeletedUserMentor);
-    verify(scoringMediatorService).deleteQuizAndAssignmentsByStudent(
-      userMentor);
     verifyZeroInteractions(batchService, encoder, mailService);
   }
 

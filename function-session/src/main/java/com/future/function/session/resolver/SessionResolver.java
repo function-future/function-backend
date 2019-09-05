@@ -117,6 +117,7 @@ public class SessionResolver implements HandlerMethodArgumentResolver {
       new UsernamePasswordAuthenticationToken(session.getUserId(), "");
     SecurityContextHolder.getContext()
       .setAuthentication(authentication);
+    SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);
 
     return session;
   }

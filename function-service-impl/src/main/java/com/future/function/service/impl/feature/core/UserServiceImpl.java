@@ -24,9 +24,15 @@ import com.future.function.service.api.feature.core.UserService;
 import com.future.function.service.api.feature.scoring.ScoringMediatorService;
 import com.future.function.service.impl.helper.CopyHelper;
 import com.future.function.service.impl.helper.PageHelper;
+import java.util.Observable;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
 
 @Service
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl extends Observable implements UserService {
 
   private final BatchService batchService;
 
@@ -34,20 +40,17 @@ public class UserServiceImpl implements UserService {
 
   private final ResourceService resourceService;
 
-  private final ScoringMediatorService scoringMediatorService;
-
   private final BCryptPasswordEncoder encoder;
 
   private final MailService mailService;
 
   @Autowired
   public UserServiceImpl(BatchService batchService, UserRepository userRepository, ResourceService resourceService,
-      @Lazy ScoringMediatorService scoringMediatorService, BCryptPasswordEncoder encoder, MailService mailService) {
+      BCryptPasswordEncoder encoder, MailService mailService) {
 
     this.batchService = batchService;
     this.userRepository = userRepository;
     this.resourceService = resourceService;
-    this.scoringMediatorService = scoringMediatorService;
     this.encoder = encoder;
     this.mailService = mailService;
   }
@@ -103,7 +106,6 @@ public class UserServiceImpl implements UserService {
       .map(this::setUserPicture)
       .map(userRepository::save)
       .map(this::sendEmail)
-      .map(scoringMediatorService::createQuizAndAssignmentsByStudent)
       .orElseThrow(
         () -> new UnsupportedOperationException("Failed Create User"));
   }
@@ -156,8 +158,7 @@ public class UserServiceImpl implements UserService {
 
     Optional.ofNullable(userId)
       .map(userRepository::findOne)
-      .map(scoringMediatorService::deleteQuizAndAssignmentsByStudent)
-      .ifPresent(this::markDeleted);
+      .ifPresent(this::markDeletedAndNotifyObserver);
   }
 
   @Override
@@ -211,11 +212,12 @@ public class UserServiceImpl implements UserService {
     );
   }
 
-  private void markDeleted(User user) {
+  private void markDeletedAndNotifyObserver(User user) {
 
     user.setDeleted(true);
     deleteUserPicture(user);
-    userRepository.save(user);
+    this.setChanged();
+    this.notifyObservers(userRepository.save(user));
   }
 
   private User setUserPicture(User user, User foundUser) {

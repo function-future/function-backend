@@ -7,16 +7,20 @@ import com.future.function.model.entity.feature.scoring.Assignment;
 import com.future.function.model.entity.feature.scoring.Quiz;
 import com.future.function.model.entity.feature.scoring.Room;
 import com.future.function.model.entity.feature.scoring.StudentQuiz;
+import com.future.function.service.api.feature.core.UserService;
 import com.future.function.service.api.feature.scoring.AssignmentService;
 import com.future.function.service.api.feature.scoring.QuizService;
 import com.future.function.service.api.feature.scoring.RoomService;
 import com.future.function.service.api.feature.scoring.StudentQuizService;
+import java.util.Observable;
+import java.util.concurrent.ExecutorService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -26,7 +30,10 @@ import java.util.Collections;
 import java.util.Date;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -98,6 +105,12 @@ public class ScoringMediatorServiceImplTest {
   @Mock
   private RoomService roomService;
 
+  @Mock
+  private UserService userService;
+
+  @Mock
+  private ExecutorService executorService;
+
   @InjectMocks
   private ScoringMediatorServiceImpl mediatorService;
 
@@ -156,48 +169,19 @@ public class ScoringMediatorServiceImplTest {
     when(studentQuizService.findAllByStudentId(USER_ID)).thenReturn(Collections.singletonList(studentQuiz));
     when(roomService.findAllByStudentId(USER_ID)).thenReturn(
       Collections.singletonList(room));
+    doAnswer((InvocationOnMock invocation) -> {
+      ((Runnable) invocation.getArguments()[0]).run();
+      return null;
+    }).when(this.executorService).execute(any(Runnable.class));
+
+    verify(userService).addObserver(mediatorService);
   }
 
   @After
   public void tearDown() throws Exception {
 
     verifyNoMoreInteractions(
-      quizService, assignmentService, studentQuizService, roomService);
-  }
-
-  @Test
-  public void createQuizAndAssignmentsByStudent() {
-
-    User actual = mediatorService.createQuizAndAssignmentsByStudent(user);
-    assertThat(actual.getId()).isEqualTo(USER_ID);
-    assertThat(actual.getName()).isEqualTo(USERNAME);
-    verify(quizService).findAllByBatchCodeAndPageable(BATCH_CODE, pageable);
-    verify(assignmentService).findAllByBatchCodeAndPageable(
-      BATCH_CODE, pageable);
-    verify(studentQuizService).createStudentQuizAndSave(user, quiz);
-    verify(roomService).createRoomForUserAndSave(user, assignment);
-  }
-
-  @Test
-  public void createQuizAndAssignmentsByStudentUserRoleIsNotStudent() {
-
-    user.setRole(Role.ADMIN);
-    User actual = mediatorService.createQuizAndAssignmentsByStudent(user);
-    assertThat(actual.getId()).isEqualTo(USER_ID);
-    assertThat(actual.getName()).isEqualTo(USERNAME);
-  }
-
-  @Test
-  public void createQuizAndAssignmentsByStudentThrowException() {
-
-    User actual = mediatorService.createQuizAndAssignmentsByStudent(user);
-    assertThat(actual.getId()).isEqualTo(USER_ID);
-    assertThat(actual.getName()).isEqualTo(USERNAME);
-    verify(quizService).findAllByBatchCodeAndPageable(BATCH_CODE, pageable);
-    verify(assignmentService).findAllByBatchCodeAndPageable(
-      BATCH_CODE, pageable);
-    verify(studentQuizService).createStudentQuizAndSave(user, quiz);
-    verify(roomService).createRoomForUserAndSave(user, assignment);
+      quizService, assignmentService, studentQuizService, roomService, userService, executorService);
   }
 
   @Test
@@ -210,6 +194,22 @@ public class ScoringMediatorServiceImplTest {
     verify(studentQuizService).deleteById(STUDENT_QUIZ_ID);
     verify(roomService).findAllByStudentId(USER_ID);
     verify(roomService).deleteRoomById(ROOM_ID);
+    verify(executorService, times(2)).execute(any(Runnable.class));
   }
 
+  @Test
+  public void updateOnNotifyObserverTest() {
+
+    mediatorService.update(new Observable(), user);
+    verify(studentQuizService).findAllByStudentId(USER_ID);
+    verify(studentQuizService).deleteById(STUDENT_QUIZ_ID);
+    verify(roomService).findAllByStudentId(USER_ID);
+    verify(roomService).deleteRoomById(ROOM_ID);
+    verify(executorService, times(2)).execute(any(Runnable.class));
+  }
+
+  @Test
+  public void updateOnNotifyObserverAnyArgumentTest() {
+    mediatorService.update(new Observable(), new Object());
+  }
 }

@@ -80,6 +80,7 @@ public class AuthServiceImpl implements AuthService {
 
     SecurityContextHolder.getContext()
       .setAuthentication(authentication);
+    SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);
   }
 
   private UsernamePasswordAuthenticationToken toAuthentication(User user) {

@@ -2,6 +2,7 @@ package com.future.function.service.api.feature.core;
 
 import com.future.function.common.enumeration.core.Role;
 import com.future.function.model.entity.feature.core.User;
+import java.util.Observer;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -32,5 +33,7 @@ public interface UserService {
   User changeProfilePicture(User user);
 
   Page<User> getUsersByNameContainsIgnoreCase(String name, Pageable pageable);
+
+  void addObserver(Observer observer);
 
 }

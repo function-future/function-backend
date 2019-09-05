@@ -18,6 +18,7 @@ import java.util.Objects;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.function.Consumer;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +28,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class StudentQuizServiceImpl implements StudentQuizService, Observer {
 
   private StudentQuizRepository studentQuizRepository;
@@ -156,10 +158,7 @@ public class StudentQuizServiceImpl implements StudentQuizService, Observer {
 
     Optional.ofNullable(id)
       .flatMap(studentQuizRepository::findByIdAndDeletedFalse)
-      .ifPresent(quiz -> {
-        quiz.setDeleted(true);
-        studentQuizRepository.save(quiz);
-      });
+      .ifPresent(this::deleteAllDetailAndSaveDeletedStudentQuiz);
   }
 
   @Override
