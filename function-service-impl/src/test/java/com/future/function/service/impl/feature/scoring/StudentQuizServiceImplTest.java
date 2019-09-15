@@ -14,7 +14,9 @@ import com.future.function.model.entity.feature.scoring.StudentQuizDetail;
 import com.future.function.repository.feature.scoring.StudentQuizRepository;
 import com.future.function.service.api.feature.core.BatchService;
 import com.future.function.service.api.feature.core.UserService;
+import com.future.function.service.api.feature.scoring.QuizService;
 import com.future.function.service.api.feature.scoring.StudentQuizDetailService;
+import java.util.Observable;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -83,8 +85,6 @@ public class StudentQuizServiceImplTest {
 
   private Pageable pageable;
 
-  private Page<StudentQuiz> studentQuizPage;
-
   @InjectMocks
   private StudentQuizServiceImpl studentQuizService;
 
@@ -96,6 +96,9 @@ public class StudentQuizServiceImplTest {
 
   @Mock
   private BatchService batchService;
+
+  @Mock
+  private QuizService quizService;
 
   @Mock
   private StudentQuizDetailService studentQuizDetailService;
@@ -129,7 +132,7 @@ public class StudentQuizServiceImplTest {
 
     quiz = Quiz.builder()
       .id(QUIZ_ID)
-      .trials(QUIZ_TRIALS)
+      .trials(QUIZ_TRIALS + 1)
       .batch(batch)
       .build();
 
@@ -156,12 +159,10 @@ public class StudentQuizServiceImplTest {
 
     pageable = new PageRequest(0, 10);
 
-    studentQuizPage = new PageImpl<>(
-      Collections.singletonList(studentQuiz), pageable, 1);
-
-    when(studentQuizRepository.findAllByStudentIdAndDeletedFalse(USER_ID,
-                                                                 pageable
-    )).thenReturn(studentQuizPage);
+    when(studentQuizRepository.findAllByStudentIdAndDeletedFalse(USER_ID))
+        .thenReturn(Collections.singletonList(studentQuiz));
+    when(studentQuizRepository.findByStudentIdAndQuizIdAndDeletedFalse(USER_ID, QUIZ_ID))
+        .thenReturn(Optional.of(studentQuiz));
     when(studentQuizRepository.findAllByStudentIdAndDeletedFalse(
       USER_ID)).thenReturn(Collections.singletonList(studentQuiz));
     when(studentQuizRepository.findByStudentIdAndQuizIdAndDeletedFalse(USER_ID,
@@ -179,12 +180,7 @@ public class StudentQuizServiceImplTest {
     when(userService.getUser(USER_ID)).thenReturn(student);
     when(batchService.getBatchByCode(BATCH_CODE)).thenReturn(batch);
     when(batchService.getBatchByCode(TARGET_BATCH)).thenReturn(batch);
-    when(studentQuizDetailService.createStudentQuizDetail(studentQuiz,
-                                                          null
-    )).thenReturn(new StudentQuizDetail());
     when(studentQuizDetailService.findAllUnansweredQuestionsByStudentQuizId(
-      STUDENT_QUIZ_ID)).thenReturn(Collections.singletonList(studentQuestion));
-    when(studentQuizDetailService.findAllQuestionsByStudentQuizId(
       STUDENT_QUIZ_ID)).thenReturn(Collections.singletonList(studentQuestion));
     when(studentQuizDetailService.answerStudentQuiz(STUDENT_QUIZ_ID,
                                                     Collections.singletonList(
@@ -192,13 +188,14 @@ public class StudentQuizServiceImplTest {
     )).thenReturn(studentQuizDetail);
     when(studentQuizDetailService.findLatestByStudentQuizId(
       STUDENT_QUIZ_ID)).thenReturn(studentQuizDetail);
-
+    when(quizService.findById(QUIZ_ID)).thenReturn(quiz);
+    verify(quizService).addObserver(studentQuizService);
   }
 
   @After
   public void tearDown() throws Exception {
 
-    verifyNoMoreInteractions(studentQuizRepository, batchService,
+    verifyNoMoreInteractions(studentQuizRepository, batchService, quizService,
                              studentQuizDetailService, userService
     );
   }
@@ -206,18 +203,12 @@ public class StudentQuizServiceImplTest {
   @Test
   public void findAllByStudentId() {
 
-    Page<StudentQuiz> actual = studentQuizService.findAllByStudentId(
-      USER_ID, pageable, USER_ID);
-    assertThat(actual.getTotalElements()).isEqualTo(1);
-    assertThat(actual.getContent()
-                 .get(0)
-                 .getId()).isEqualTo(STUDENT_QUIZ_ID);
-    assertThat(actual.getContent()
-                 .get(0)
-                 .getTrials()).isEqualTo(QUIZ_TRIALS);
+    List<StudentQuiz> actual = studentQuizService.findAllByStudentId(USER_ID);
+    assertThat(actual.size()).isEqualTo(1);
+    assertThat(actual.get(0).getId()).isEqualTo(STUDENT_QUIZ_ID);
+    assertThat(actual.get(0).getTrials()).isEqualTo(QUIZ_TRIALS);
     verify(userService).getUser(USER_ID);
-    verify(studentQuizRepository).findAllByStudentIdAndDeletedFalse(
-      USER_ID, pageable);
+    verify(studentQuizRepository).findAllByStudentIdAndDeletedFalse(USER_ID);
   }
 
   @Test
@@ -247,56 +238,27 @@ public class StudentQuizServiceImplTest {
   }
 
   @Test
-  public void findAllByStudentIdAccessedByAnotherStudent() {
+  public void findByIdExist() {
 
-    when(userService.getUser("student-2")).thenReturn(User.builder()
-                                                        .id("student-2")
-                                                        .role(Role.STUDENT)
-                                                        .build());
-    catchException(
-      () -> studentQuizService.findAllByStudentId(USER_ID, pageable,
-                                                  "student-2"
-      ));
-    assertThat(caughtException().getClass()).isEqualTo(
-      ForbiddenException.class);
-    verify(userService).getUser("student-2");
-  }
-
-  @Test
-  public void findById() {
-
-    StudentQuiz studentQuiz = studentQuizService.findById(
-      STUDENT_QUIZ_ID, USER_ID);
+    StudentQuiz studentQuiz = studentQuizService.findOrCreateByStudentIdAndQuizId(
+      USER_ID, QUIZ_ID);
     assertThat(studentQuiz.getId()).isEqualTo(STUDENT_QUIZ_ID);
     assertThat(studentQuiz.getTrials()).isEqualTo(QUIZ_TRIALS);
-    verify(userService).getUser(USER_ID);
-    verify(studentQuizRepository).findByIdAndDeletedFalse(STUDENT_QUIZ_ID);
+    verify(studentQuizRepository).findByStudentIdAndQuizIdAndDeletedFalse(USER_ID, QUIZ_ID);
   }
 
   @Test
-  public void findByIdThrowNotFoundException() {
+  public void findByIdNotExistAndCreateNew() {
 
-    when(studentQuizRepository.findByIdAndDeletedFalse("id")).thenReturn(
+    when(studentQuizRepository.findByStudentIdAndQuizIdAndDeletedFalse(USER_ID, QUIZ_ID)).thenReturn(
       Optional.empty());
-    catchException(() -> studentQuizService.findById("id", USER_ID));
-    assertThat(caughtException().getClass()).isEqualTo(NotFoundException.class);
-    verify(studentQuizRepository).findByIdAndDeletedFalse("id");
+    StudentQuiz studentQuiz = studentQuizService.findOrCreateByStudentIdAndQuizId(USER_ID, QUIZ_ID);
+    assertThat(studentQuiz.getId()).isEqualTo(STUDENT_QUIZ_ID);
+    assertThat(studentQuiz.getTrials()).isEqualTo(QUIZ_TRIALS);
+    verify(quizService).findById(QUIZ_ID);
     verify(userService).getUser(USER_ID);
-  }
-
-  @Test
-  public void findByIdAnotherStudentAndThrowForbiddenException() {
-
-    when(userService.getUser("student-2")).thenReturn(User.builder()
-                                                        .id("student-2")
-                                                        .role(Role.STUDENT)
-                                                        .build());
-    catchException(
-      () -> studentQuizService.findById(STUDENT_QUIZ_ID, "student-2"));
-    assertThat(caughtException().getClass()).isEqualTo(
-      ForbiddenException.class);
-    verify(userService).getUser("student-2");
-    verify(studentQuizRepository).findByIdAndDeletedFalse(STUDENT_QUIZ_ID);
+    verify(studentQuizRepository).findByStudentIdAndQuizIdAndDeletedFalse(USER_ID, QUIZ_ID);
+    verify(studentQuizRepository).save(any(StudentQuiz.class));
   }
 
   @Test
@@ -304,108 +266,40 @@ public class StudentQuizServiceImplTest {
 
     List<StudentQuestion> actual =
       studentQuizService.findAllUnansweredQuestionByStudentQuizId(
-        STUDENT_QUIZ_ID, USER_ID);
+        USER_ID, QUIZ_ID);
     assertThat(actual.size()).isEqualTo(1);
     verify(studentQuizDetailService).findAllUnansweredQuestionsByStudentQuizId(
       STUDENT_QUIZ_ID);
-    verify(studentQuizRepository).findByIdAndDeletedFalse(STUDENT_QUIZ_ID);
+    verify(studentQuizRepository).findByStudentIdAndQuizIdAndDeletedFalse(USER_ID, QUIZ_ID);
     studentQuiz.setTrials(QUIZ_TRIALS - 1);
-    verify(userService).getUser(USER_ID);
     verify(studentQuizRepository).save(studentQuiz);
   }
 
   @Test
   public void findAllUnansweredQuestionsByStudentQuizIdAndTrialEqualZero() {
 
-    studentQuiz.setTrials(0);
+    quiz.setTrials(QUIZ_TRIALS);
     catchException(
       () -> studentQuizService.findAllUnansweredQuestionByStudentQuizId(
-        STUDENT_QUIZ_ID, USER_ID));
+        USER_ID, QUIZ_ID));
     assertThat(caughtException().getClass()).isEqualTo(
       UnsupportedOperationException.class);
-    verify(studentQuizRepository).findByIdAndDeletedFalse(STUDENT_QUIZ_ID);
-    verify(userService).getUser(USER_ID);
+    verify(studentQuizRepository).findByStudentIdAndQuizIdAndDeletedFalse(USER_ID, QUIZ_ID);
   }
 
   @Test
   public void answerQuestionsByStudentQuizId() {
 
     StudentQuizDetail actual =
-      studentQuizService.answerQuestionsByStudentQuizId(STUDENT_QUIZ_ID,
-                                                        USER_ID,
+      studentQuizService.answerQuestionsByStudentQuizId(USER_ID, QUIZ_ID,
                                                         Collections.singletonList(
                                                           studentQuestion)
       );
     assertThat(actual.getStudentQuiz()
                  .getId()).isEqualTo(STUDENT_QUIZ_ID);
-    verify(userService, times(2)).getUser(USER_ID);
-    verify(studentQuizRepository).findByIdAndDeletedFalse(STUDENT_QUIZ_ID);
+    verify(studentQuizRepository).findByStudentIdAndQuizIdAndDeletedFalse(USER_ID, QUIZ_ID);
     verify(studentQuizDetailService).answerStudentQuiz(
       STUDENT_QUIZ_ID, Collections.singletonList(studentQuestion));
-  }
-
-  @Test
-  public void createStudentQuizAndSave() {
-
-    StudentQuiz actual = studentQuizService.createStudentQuizAndSave(
-      student, quiz);
-    assertThat(actual.getQuiz()
-                 .getId()).isEqualTo(QUIZ_ID);
-    assertThat(actual.getQuiz()
-                 .getTrials()).isEqualTo(QUIZ_TRIALS);
-    assertThat(actual.getStudent()
-                 .getId()).isEqualTo(USER_ID);
-    assertThat(actual.getStudent()
-                 .getName()).isEqualTo(USER_NAME);
-    verify(studentQuizDetailService).createStudentQuizDetail(studentQuiz, null);
-    verify(studentQuizRepository).save(any(StudentQuiz.class));
-  }
-
-  @Test
-  public void createStudentQuizAndSaveRequestQuizIsNull() {
-
-    catchException(
-      () -> studentQuizService.createStudentQuizAndSave(student, null));
-    assertThat(caughtException().getClass()).isEqualTo(
-      UnsupportedOperationException.class);
-  }
-
-  @Test
-  public void createStudentQuizByBatchCode() {
-
-    Quiz actual = studentQuizService.createStudentQuizByBatchCode(
-      BATCH_CODE, quiz);
-    assertThat(actual.getBatch()
-                 .getCode()).isEqualTo(BATCH_CODE);
-    verify(userService).getStudentsByBatchCode(BATCH_CODE);
-    verify(studentQuizDetailService).createStudentQuizDetail(studentQuiz, null);
-    verify(studentQuizRepository).save(any(StudentQuiz.class));
-  }
-
-  @Test
-  public void createStudentQuizByBatchCodeStudentQuizFailToSave() {
-
-    when(userService.getStudentsByBatchCode(BATCH_CODE)).thenReturn(
-      Collections.emptyList());
-    catchException(
-      () -> studentQuizService.createStudentQuizByBatchCode(BATCH_CODE, quiz));
-    assertThat(caughtException().getClass()).isEqualTo(
-      UnsupportedOperationException.class);
-    verify(userService).getStudentsByBatchCode(BATCH_CODE);
-  }
-
-  @Test
-  public void copyQuizFromBatch() {
-
-    Batch targetBatch = Batch.builder()
-      .code(TARGET_BATCH)
-      .build();
-    Quiz actual = studentQuizService.copyQuizWithTargetBatch(targetBatch, quiz);
-    assertThat(actual.getTrials()).isEqualTo(QUIZ_TRIALS);
-    assertThat(actual.getId()).isNotEqualTo(QUIZ_ID);
-    verify(studentQuizRepository).save(any(StudentQuiz.class));
-    verify(userService).getStudentsByBatchCode(TARGET_BATCH);
-    verify(studentQuizDetailService).createStudentQuizDetail(studentQuiz, null);
   }
 
   @Test
@@ -415,6 +309,7 @@ public class StudentQuizServiceImplTest {
     studentQuiz.setDeleted(true);
     verify(studentQuizRepository).findByIdAndDeletedFalse(STUDENT_QUIZ_ID);
     verify(studentQuizRepository).save(studentQuiz);
+    verify(studentQuizDetailService).deleteByStudentQuiz(studentQuiz);
   }
 
   @Test
@@ -430,15 +325,17 @@ public class StudentQuizServiceImplTest {
   }
 
   @Test
-  public void updateStudentQuizTrials() {
+  public void updateObserverSendQuizObjectTest() {
 
-    quiz.setTrials(100);
-    Quiz actual = studentQuizService.updateQuizTrials(quiz);
-    assertThat(actual).isEqualTo(quiz);
+    studentQuizService.update(new Observable(), quiz);
     verify(userService).getStudentsByBatchCode(BATCH_CODE);
-    verify(studentQuizRepository).findByStudentIdAndQuizIdAndDeletedFalse(
-      USER_ID, QUIZ_ID);
-    verify(studentQuizRepository).save(any(StudentQuiz.class));
+    verify(studentQuizRepository).findByStudentIdAndQuizIdAndDeletedFalse(USER_ID, QUIZ_ID);
+    verify(studentQuizDetailService).deleteByStudentQuiz(studentQuiz);
+    verify(studentQuizRepository).save(studentQuiz);
   }
 
+  @Test
+  public void updateObserverSendRandomObjectTest() {
+    studentQuizService.update(new Observable(), new Object());
+  }
 }

@@ -7,7 +7,7 @@ import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.model.entity.feature.scoring.Assignment;
 import com.future.function.model.entity.feature.scoring.Room;
-import com.future.function.service.api.feature.scoring.AssignmentService;
+import com.future.function.service.api.feature.scoring.RoomService;
 import com.future.function.web.TestHelper;
 import com.future.function.web.TestSecurityConfiguration;
 import com.future.function.web.mapper.helper.ResponseHelper;
@@ -15,7 +15,6 @@ import com.future.function.web.mapper.response.scoring.RoomResponseMapper;
 import com.future.function.web.model.request.scoring.RoomPointWebRequest;
 import com.future.function.web.model.response.base.BaseResponse;
 import com.future.function.web.model.response.base.DataResponse;
-import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.feature.scoring.RoomWebResponse;
 import org.junit.After;
 import org.junit.Before;
@@ -43,6 +42,7 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -87,14 +87,12 @@ public class RoomControllerTest extends TestHelper {
 
   private DataResponse<RoomWebResponse> DATA_RESPONSE;
 
-  private PagingResponse<RoomWebResponse> PAGING_RESPONSE;
-
   private BaseResponse BASE_RESPONSE;
 
   private JacksonTester<RoomPointWebRequest> roomPointWebRequestJacksonTester;
 
   @MockBean
-  private AssignmentService assignmentService;
+  private RoomService roomService;
 
   @MockBean
   private FileProperties fileProperties;
@@ -150,57 +148,33 @@ public class RoomControllerTest extends TestHelper {
     DATA_RESPONSE = RoomResponseMapper.toDataRoomWebResponse(
       this.room, URL_PREFIX);
 
-    PAGING_RESPONSE = RoomResponseMapper.toPagingRoomWebResponse(
-      roomPage, URL_PREFIX);
-
     BASE_RESPONSE = ResponseHelper.toBaseResponse(HttpStatus.OK);
 
-    when(assignmentService.findAllRoomsByAssignmentId(ASSIGNMENT_ID,
-                                                      pageable
-    )).thenReturn(roomPage);
-    when(assignmentService.giveScoreToRoomByRoomId(ROOM_ID, MENTOR_ID,
-                                                   100
+    when(roomService.giveScoreToRoomByStudentIdAndAssignmentId(USER_ID, MENTOR_ID
+                                                   , ASSIGNMENT_ID, 100
     )).thenReturn(room);
-    when(assignmentService.findRoomById(ROOM_ID, ADMIN_ID)).thenReturn(room);
+    when(roomService.findOrCreateByStudentIdAndAssignmentId(USER_ID, TestHelper.ADMIN_ID, ASSIGNMENT_ID))
+        .thenReturn(room);
   }
 
   @After
   public void tearDown() throws Exception {
 
-    verifyNoMoreInteractions(assignmentService, fileProperties);
+    verifyNoMoreInteractions(roomService, fileProperties);
   }
 
   @Test
-  public void findAllRoomsByAssignmentId() throws Exception {
+  public void findOrCreateRoomByStudentIdAndAssignmentId() throws Exception {
 
     when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
-    mockMvc.perform(get(
+    mockMvc.perform(post(
       "/api/scoring/batches/" + BATCH_CODE + "/assignments/" + ASSIGNMENT_ID +
-      "/rooms").cookie(cookies)
-                      .param("page", "1")
-                      .param("size", "10"))
-      .andExpect(status().isOk())
-      .andExpect(content().json(
-        pagingResponseJacksonTester.write(PAGING_RESPONSE)
-          .getJson()));
-    verify(fileProperties).getUrlPrefix();
-    verify(assignmentService).findAllRoomsByAssignmentId(
-      ASSIGNMENT_ID, pageable);
-  }
-
-  @Test
-  public void findRoomById() throws Exception {
-
-    when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
-    mockMvc.perform(get(
-      "/api/scoring/batches/" + BATCH_CODE + "/assignments/" + ASSIGNMENT_ID +
-      "/rooms/" + ROOM_ID).cookie(cookies)
-                      .param("roomId", ROOM_ID))
+      "/room/" + USER_ID).cookie(cookies))
       .andExpect(status().isOk())
       .andExpect(content().json(dataResponseJacksonTester.write(DATA_RESPONSE)
                                   .getJson()));
     verify(fileProperties).getUrlPrefix();
-    verify(assignmentService).findRoomById(ROOM_ID, ADMIN_ID);
+    verify(roomService).findOrCreateByStudentIdAndAssignmentId(USER_ID, TestHelper.ADMIN_ID, ASSIGNMENT_ID);
 
   }
 
@@ -211,7 +185,7 @@ public class RoomControllerTest extends TestHelper {
     when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
     mockMvc.perform(put(
       "/api/scoring/batches/" + BATCH_CODE + "/assignments/" + ASSIGNMENT_ID +
-      "/rooms/" + ROOM_ID).cookie(cookies)
+      "/room/" + USER_ID).cookie(cookies)
                       .contentType(MediaType.APPLICATION_JSON_VALUE)
                       .content(roomPointWebRequestJacksonTester.write(
                         roomPointWebRequest)
@@ -220,7 +194,7 @@ public class RoomControllerTest extends TestHelper {
       .andExpect(content().json(dataResponseJacksonTester.write(DATA_RESPONSE)
                                   .getJson()));
     verify(fileProperties).getUrlPrefix();
-    verify(assignmentService).giveScoreToRoomByRoomId(ROOM_ID, MENTOR_ID, 100);
+    verify(roomService).giveScoreToRoomByStudentIdAndAssignmentId(USER_ID, MENTOR_ID, ASSIGNMENT_ID, 100);
   }
 
   @Test
@@ -229,7 +203,7 @@ public class RoomControllerTest extends TestHelper {
     super.setCookie(Role.ADMIN);
     mockMvc.perform(put(
       "/api/scoring/batches/" + BATCH_CODE + "/assignments/" + ASSIGNMENT_ID +
-      "/rooms/" + ROOM_ID).cookie(cookies)
+      "/room/" + USER_ID).cookie(cookies)
                       .contentType(MediaType.APPLICATION_JSON_VALUE)
                       .content(roomPointWebRequestJacksonTester.write(
                         roomPointWebRequest)
@@ -239,15 +213,15 @@ public class RoomControllerTest extends TestHelper {
   }
 
   @Test
-  public void deleteRoomById() throws Exception {
+  public void deleteRoomByStudentId() throws Exception {
 
     mockMvc.perform(delete(
       "/api/scoring/batches/" + BATCH_CODE + "/assignments/" + ASSIGNMENT_ID +
-      "/rooms/" + ROOM_ID).cookie(cookies))
+      "/room/" + USER_ID).cookie(cookies))
       .andExpect(status().isOk())
       .andExpect(content().json(baseResponseJacksonTester.write(BASE_RESPONSE)
                                   .getJson()));
-    verify(assignmentService).deleteRoomById(ROOM_ID);
+    verify(roomService).deleteRoomByStudentIdAndAssignmentId(USER_ID, ASSIGNMENT_ID);
     verifyZeroInteractions(fileProperties);
   }
 
