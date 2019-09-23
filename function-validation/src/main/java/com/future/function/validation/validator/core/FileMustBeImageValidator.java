@@ -11,6 +11,7 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 public class FileMustBeImageValidator
@@ -38,6 +39,7 @@ public class FileMustBeImageValidator
       .orElseGet(Collections::emptyList)
       .stream()
       .map(fileRepositoryV2::findOne)
+      .filter(Objects::nonNull)
       .map(FileV2::getFilePath)
       .map(FilenameUtils::getExtension)
       .allMatch(extension -> fileProperties.getImageExtensions()
