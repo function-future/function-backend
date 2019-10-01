@@ -49,24 +49,22 @@ public class StudentQuizDetailServiceImpl implements StudentQuizDetailService {
 
   @Override
   public List<StudentQuestion> findAllUnansweredQuestionsByStudentQuizId(
-    String studentQuizId
+    StudentQuiz studentQuiz
   ) {
 
-    return Optional.ofNullable(studentQuizId)
-      .map(this::findLatestByStudentQuizId)
-      .map(StudentQuizDetail::getStudentQuiz)
+    return Optional.ofNullable(studentQuiz)
       .map(StudentQuiz::getQuiz)
       .filter(quiz -> quiz.getEndDate() > new Date().getTime())
       .map(this::findAllQuestionsFromStudentQuestionService)
-      .map(questionList -> createStudentQuestions(studentQuizId, questionList))
+      .map(questionList -> createStudentQuestions(studentQuiz, questionList))
       .orElseThrow(() -> new UnsupportedOperationException("DEADLINE"));
   }
 
   private List<StudentQuestion> createStudentQuestions(
-    String studentQuizId, List<Question> questionList
+    StudentQuiz studentQuiz, List<Question> questionList
   ) {
 
-    return Optional.ofNullable(studentQuizId)
+    return Optional.ofNullable(studentQuiz)
       .map(this::createNewStudentQuizDetail)
       .map(
         studentQuizDetail -> studentQuestionService.createStudentQuestionsFromQuestionList(
@@ -81,23 +79,21 @@ public class StudentQuizDetailServiceImpl implements StudentQuizDetailService {
       quiz.getQuestionBanks(), quiz.getQuestionCount());
   }
 
-  private StudentQuizDetail createNewStudentQuizDetail(String studentQuizId) {
+  private StudentQuizDetail createNewStudentQuizDetail(StudentQuiz studentQuiz) {
 
-    return Optional.ofNullable(studentQuizId)
-      .map(this::findLatestByStudentQuizId)
+    return Optional.ofNullable(studentQuiz)
       .map(this::initializeStudentQuizDetail)
       .map(studentQuizDetailRepository::save)
       .orElse(null);
   }
 
   private StudentQuizDetail initializeStudentQuizDetail(
-    StudentQuizDetail source
+    StudentQuiz studentQuiz
   ) {
 
-    StudentQuizDetail studentQuizDetail = StudentQuizDetail.builder()
+    return StudentQuizDetail.builder()
+      .studentQuiz(studentQuiz)
       .build();
-    CopyHelper.copyProperties(source, studentQuizDetail);
-    return studentQuizDetail;
   }
 
   @Override

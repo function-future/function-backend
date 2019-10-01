@@ -6,16 +6,15 @@ import com.future.function.model.entity.feature.scoring.ReportDetail;
 import com.future.function.model.vo.scoring.StudentSummaryVO;
 
 import java.util.List;
+import org.springframework.data.domain.Pageable;
 
 public interface ReportDetailService {
 
   List<StudentSummaryVO> findAllSummaryByReportId(
-    String reportId, String userId
+    Report report, String userId, String type, Pageable pageable
   );
 
-  List<ReportDetail> findAllDetailByReportId(String reportId);
-
-  Report createReportDetailByReport(Report report, User student);
+  ReportDetail createReportDetailByReport(User student);
 
   ReportDetail findByStudentId(String studentId, String userId);
 
@@ -23,6 +22,6 @@ public interface ReportDetailService {
     Report report, List<ReportDetail> detailList
   );
 
-  void deleteAllByReportId(String reportId);
+  void deleteAll();
 
 }

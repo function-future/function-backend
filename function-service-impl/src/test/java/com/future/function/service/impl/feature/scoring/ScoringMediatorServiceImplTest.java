@@ -167,8 +167,8 @@ public class ScoringMediatorServiceImplTest {
     )).thenReturn(
       new PageImpl<>(Collections.singletonList(assignment), pageable, 1));
     when(studentQuizService.findAllByStudentId(USER_ID)).thenReturn(Collections.singletonList(studentQuiz));
-    when(roomService.findAllByStudentId(USER_ID)).thenReturn(
-      Collections.singletonList(room));
+    when(roomService.findAllByStudentId(USER_ID, pageable)).thenReturn(
+      new PageImpl<>(Collections.singletonList(room)));
     doAnswer((InvocationOnMock invocation) -> {
       ((Runnable) invocation.getArguments()[0]).run();
       return null;
@@ -192,7 +192,7 @@ public class ScoringMediatorServiceImplTest {
     assertThat(actual.getName()).isEqualTo(USERNAME);
     verify(studentQuizService).findAllByStudentId(USER_ID);
     verify(studentQuizService).deleteById(STUDENT_QUIZ_ID);
-    verify(roomService).findAllByStudentId(USER_ID);
+    verify(roomService).findAllByStudentId(USER_ID, pageable);
     verify(roomService).deleteRoomById(ROOM_ID);
     verify(executorService, times(2)).execute(any(Runnable.class));
   }
@@ -203,7 +203,7 @@ public class ScoringMediatorServiceImplTest {
     mediatorService.update(new Observable(), user);
     verify(studentQuizService).findAllByStudentId(USER_ID);
     verify(studentQuizService).deleteById(STUDENT_QUIZ_ID);
-    verify(roomService).findAllByStudentId(USER_ID);
+    verify(roomService).findAllByStudentId(USER_ID, pageable);
     verify(roomService).deleteRoomById(ROOM_ID);
     verify(executorService, times(2)).execute(any(Runnable.class));
   }

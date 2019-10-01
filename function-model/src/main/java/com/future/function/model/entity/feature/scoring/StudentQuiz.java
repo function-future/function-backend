@@ -34,6 +34,7 @@ public class StudentQuiz extends BaseEntity {
   private User student;
 
   @Field(FieldName.StudentQuiz.QUIZ)
+  @DBRef(lazy = true)
   private Quiz quiz;
 
   @Field(FieldName.StudentQuiz.TRIALS)

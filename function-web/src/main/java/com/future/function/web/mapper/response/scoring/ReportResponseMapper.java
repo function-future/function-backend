@@ -1,11 +1,13 @@
 package com.future.function.web.mapper.response.scoring;
 
 import com.future.function.model.entity.feature.scoring.Report;
+import com.future.function.model.entity.feature.scoring.ReportDetail;
 import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.mapper.response.core.UserResponseMapper;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
+import com.future.function.web.model.response.feature.core.UserWebResponse;
 import com.future.function.web.model.response.feature.scoring.ReportWebResponse;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -43,13 +45,18 @@ public class ReportResponseMapper {
                      .getCode())
         .studentCount(value.getStudents()
                         .size())
-        .students(UserResponseMapper.toUserWebResponseList(value.getStudents(),
-                                                           urlPrefix
-        ))
+        .students(toUserWebResponse(value.getStudents(), urlPrefix))
         .uploadedDate(value.getCreatedAt())
         .build())
       .orElseThrow(() -> new UnsupportedOperationException(
         "Failed at #buildReportWebResponse #ReportResponseMapper"));
+  }
+
+  private static List<UserWebResponse> toUserWebResponse(List<ReportDetail> students, String urlPrefix) {
+    return UserResponseMapper.toUserWebResponseList(students.stream()
+        .map(ReportDetail::getUser)
+        .collect(Collectors.toList()), urlPrefix);
+
   }
 
   public static DataResponse<ReportWebResponse> toDataReportWebResponse(

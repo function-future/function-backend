@@ -11,6 +11,7 @@ import com.future.function.web.model.response.feature.scoring.ReportDetailWebRes
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpStatus;
 
 import java.util.Collections;
@@ -85,7 +86,7 @@ public class ReportDetailResponseMapperTest {
       .batchCode(BATCH_CODE)
       .university(UNIVERSITY)
       .avatar(FILE_URL)
-      .scores(Collections.singletonList(summaryVO))
+      .scores(new PageImpl<>(Collections.singletonList(summaryVO)))
       .totalPoint(TOTAL_POINT)
       .build();
   }

@@ -13,8 +13,11 @@ import com.future.function.service.impl.helper.CopyHelper;
 import com.future.function.service.impl.helper.PageHelper;
 import com.future.function.service.impl.helper.SortHelper;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Observable;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -63,7 +66,8 @@ public class AssignmentServiceImpl extends Observable implements AssignmentServi
 
   private Page<Assignment> sortByClosestDeadline(Page<Assignment> assignmentPage) {
     List<Assignment> sortedAssignment = new ArrayList<>(assignmentPage.getContent());
-    sortedAssignment.sort((asg1, asg2) -> SortHelper.compareClosestDeadline(asg1.getDeadline(), asg2.getDeadline()));
+    Arrays.parallelSort(sortedAssignment.toArray(new Assignment[0]),
+        (asg1, asg2) -> SortHelper.compareClosestDeadline(asg1.getDeadline(), asg2.getDeadline()));
     return new PageImpl<>(sortedAssignment, new PageRequest(assignmentPage.getNumber(), assignmentPage.getSize()),
         assignmentPage.getTotalElements());
   }

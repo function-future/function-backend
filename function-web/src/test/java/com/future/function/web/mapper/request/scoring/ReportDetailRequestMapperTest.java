@@ -70,9 +70,6 @@ public class ReportDetailRequestMapperTest {
       reportDetailScoreWebRequest, REPORT_ID);
     assertThat(actual.size()).isEqualTo(1);
     assertThat(actual.get(0)
-                 .getReport()
-                 .getId()).isEqualTo(REPORT_ID);
-    assertThat(actual.get(0)
                  .getUser()
                  .getId()).isEqualTo(STUDENT_ID);
     assertThat(actual.get(0)

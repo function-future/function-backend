@@ -190,7 +190,7 @@ public class AssignmentServiceImplTest {
 
     assignment2.setDeadline(assignment2.getDeadline() + 2000000);
     assignment.setDeadline(assignment.getDeadline() - 3000000);
-    List<Assignment> expected = Arrays.asList(assignment2, assignment);
+    List<Assignment> expected = Arrays.asList(assignment, assignment2);
     Page<Assignment> result = assignmentService.findAllByBatchCodeAndPageable(
         BATCH_CODE, pageable);
     assertThat(result).isNotNull();

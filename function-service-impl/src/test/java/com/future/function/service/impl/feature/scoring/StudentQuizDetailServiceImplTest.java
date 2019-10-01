@@ -172,16 +172,12 @@ public class StudentQuizDetailServiceImplTest {
 
     List<StudentQuestion> actual =
       studentQuizDetailService.findAllUnansweredQuestionsByStudentQuizId(
-        STUDENT_QUIZ_ID);
+        studentQuiz);
     assertThat(actual.get(0)
                  .getNumber()).isEqualTo(1);
     assertThat(actual.get(0)
                  .getQuestion()
                  .getLabel()).isEqualTo(QUESTION_TEXT);
-    verify(studentQuizDetailRepository,
-           times(2)
-    ).findTopByStudentQuizIdAndDeletedFalseOrderByCreatedAtDesc(
-      STUDENT_QUIZ_ID);
     verify(studentQuizDetailRepository).save(any(StudentQuizDetail.class));
     verify(
       studentQuestionService).findAllRandomQuestionsFromMultipleQuestionBank(
@@ -198,12 +194,9 @@ public class StudentQuizDetailServiceImplTest {
     quiz.setEndDate(deadline.getTime() - 10000000L);
     catchException(
       () -> studentQuizDetailService.findAllUnansweredQuestionsByStudentQuizId(
-        STUDENT_QUIZ_ID));
+          studentQuiz));
     assertThat(caughtException().getClass()).isEqualTo(
       UnsupportedOperationException.class);
-    verify(
-      studentQuizDetailRepository).findTopByStudentQuizIdAndDeletedFalseOrderByCreatedAtDesc(
-      STUDENT_QUIZ_ID);
   }
 
   @Test

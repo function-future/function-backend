@@ -43,12 +43,6 @@ public class ReportDetailRequestMapper {
     return request.getScores()
       .stream()
       .map(this::buildReportDetail)
-      .map(detail -> {
-        detail.setReport(Report.builder()
-                           .id(reportId)
-                           .build());
-        return detail;
-      })
       .collect(Collectors.toList());
   }
 

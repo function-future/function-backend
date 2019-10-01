@@ -5,6 +5,7 @@ import com.future.function.common.properties.core.FileProperties;
 import com.future.function.service.api.feature.scoring.ReportService;
 import com.future.function.session.annotation.WithAnyRole;
 import com.future.function.session.model.Session;
+import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.request.scoring.ReportDetailRequestMapper;
 import com.future.function.web.mapper.response.scoring.ReportDetailResponseMapper;
 import com.future.function.web.model.request.scoring.ReportDetailScoreWebRequest;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -50,12 +52,15 @@ public class ReportDetailController {
   public DataResponse<List<ReportDetailWebResponse>> findComparisonByReportId(
     @PathVariable
       String judgingId,
+    @RequestParam String type,
+    @RequestParam(defaultValue = "1") int page,
+    @RequestParam(defaultValue = "10") int size,
     @WithAnyRole(roles = { Role.ADMIN, Role.JUDGE, Role.MENTOR })
       Session session
   ) {
 
     return ReportDetailResponseMapper.toDataListReportDetailWebResponse(
-      reportService.findAllSummaryByReportId(judgingId, session.getUserId()),
+      reportService.findAllSummaryByReportId(judgingId, session.getUserId(), type, PageHelper.toPageable(page, size)),
       fileProperties.getUrlPrefix()
     );
   }

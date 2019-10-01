@@ -4,6 +4,7 @@ import com.future.function.common.exception.BadRequestException;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.model.entity.feature.scoring.Report;
+import com.future.function.model.entity.feature.scoring.ReportDetail;
 import com.future.function.validation.RequestValidator;
 import com.future.function.web.model.request.scoring.ReportWebRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,12 +45,13 @@ public class ReportRequestMapper {
       .orElseThrow(() -> new BadRequestException("Bad Request"));
   }
 
-  private List<User> buildStudentsFromStudentIds(List<String> studentIds) {
+  private List<ReportDetail> buildStudentsFromStudentIds(List<String> studentIds) {
 
     return studentIds.stream()
       .map(id -> User.builder()
         .id(id)
         .build())
+      .map(user -> ReportDetail.builder().user(user).build())
       .collect(Collectors.toList());
   }
 

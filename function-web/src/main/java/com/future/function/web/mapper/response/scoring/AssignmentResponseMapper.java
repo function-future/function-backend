@@ -46,9 +46,13 @@ public final class AssignmentResponseMapper {
     return Optional.ofNullable(assignment)
       .map(Assignment::getFile)
       .map(file -> {
-        response.setFileId(file.getId());
-        response.setFile(urlPrefix.concat(file.getFileUrl()));
-        return response;
+        if(file.getFileUrl() == null) {
+          return null;
+        } else {
+          response.setFileId(file.getId());
+          response.setFile(urlPrefix.concat(file.getFileUrl()));
+          return response;
+        }
       })
       .orElse(response);
   }

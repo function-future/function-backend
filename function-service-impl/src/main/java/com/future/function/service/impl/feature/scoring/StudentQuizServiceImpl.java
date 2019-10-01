@@ -1,8 +1,5 @@
 package com.future.function.service.impl.feature.scoring;
 
-import com.future.function.common.enumeration.core.Role;
-import com.future.function.common.exception.ForbiddenException;
-import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.model.entity.feature.scoring.Quiz;
 import com.future.function.model.entity.feature.scoring.StudentQuestion;
@@ -13,13 +10,14 @@ import com.future.function.service.api.feature.core.UserService;
 import com.future.function.service.api.feature.scoring.QuizService;
 import com.future.function.service.api.feature.scoring.StudentQuizDetailService;
 import com.future.function.service.api.feature.scoring.StudentQuizService;
-import com.future.function.service.impl.helper.AuthorizationHelper;
+import com.future.function.service.impl.helper.PageHelper;
 import java.util.Objects;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.function.Consumer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -62,19 +60,20 @@ public class StudentQuizServiceImpl implements StudentQuizService, Observer {
   }
 
   @Override
-  public List<StudentQuizDetail> findAllQuizByStudentId(String studentId) {
+  public Page<StudentQuizDetail> findAllQuizByStudentId(String studentId, Pageable pageable) {
 
     return Optional.ofNullable(studentId)
-      .map(studentQuizRepository::findAllByStudentIdAndDeletedFalse)
+      .map(userId -> studentQuizRepository.findAllByStudentIdAndDeletedFalse(userId, pageable))
       .map(this::mapStudentQuizzesToDetail)
-      .orElseGet(ArrayList::new);
+      .map(list -> PageHelper.toPage(list, pageable))
+      .orElseGet(() -> PageHelper.empty(pageable));
   }
 
   private List<StudentQuizDetail> mapStudentQuizzesToDetail(
-    List<StudentQuiz> quizList
+    Page<StudentQuiz> quizPage
   ) {
 
-    return quizList.stream()
+    return quizPage.getContent().stream()
       .map(StudentQuiz::getId)
       .map(studentQuizDetailService::findLatestByStudentQuizId)
       .collect(Collectors.toList());
@@ -102,12 +101,12 @@ public class StudentQuizServiceImpl implements StudentQuizService, Observer {
 
     return Optional.ofNullable(studentId)
       .flatMap(id -> studentQuizRepository.findByStudentIdAndQuizIdAndDeletedFalse(id, quizId))
-      .map(this::updateStudentQuizTrialsAndReturnId)
+      .map(this::updateStudentQuizTrialsAndReturn)
       .map(studentQuizDetailService::findAllUnansweredQuestionsByStudentQuizId)
       .orElseThrow(() -> new UnsupportedOperationException("EMPTY_TRIALS"));
   }
 
-  private String updateStudentQuizTrialsAndReturnId(
+  private StudentQuiz updateStudentQuizTrialsAndReturn(
     StudentQuiz studentQuiz
   ) {
 
@@ -116,7 +115,6 @@ public class StudentQuizServiceImpl implements StudentQuizService, Observer {
       .filter(this::validateTrialsNotReachedLimit)
       .map(this::addStudentQuizTrials)
       .map(studentQuizRepository::save)
-      .map(StudentQuiz::getId)
       .orElse(null);
   }
 

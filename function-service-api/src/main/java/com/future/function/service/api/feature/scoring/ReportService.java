@@ -23,7 +23,7 @@ public interface ReportService {
   void deleteById(String id);
 
   List<StudentSummaryVO> findAllSummaryByReportId(
-    String reportId, String userId
+    String reportId, String userId, String type, Pageable pageable
   );
 
   Page<Pair<User, Integer>> findAllStudentsAndFinalPointByBatch(

@@ -22,7 +22,7 @@ public final class StudentQuizDetailResponseMapper {
     StudentQuizDetail studentQuizDetail
   ) {
 
-    return ResponseHelper.toDataResponse(HttpStatus.OK,
+    return ResponseHelper.toDataResponse(HttpStatus.CREATED,
                                          buildStudentQuizDetailWebResponse(
                                            studentQuizDetail)
     );

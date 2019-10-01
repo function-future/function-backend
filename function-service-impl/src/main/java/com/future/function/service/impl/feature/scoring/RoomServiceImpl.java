@@ -1,9 +1,6 @@
 package com.future.function.service.impl.feature.scoring;
 
 import com.future.function.common.enumeration.core.Role;
-import com.future.function.common.exception.ForbiddenException;
-import com.future.function.common.exception.NotFoundException;
-import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.model.entity.feature.scoring.Assignment;
 import com.future.function.model.entity.feature.scoring.Comment;
@@ -22,7 +19,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -69,11 +65,12 @@ public class RoomServiceImpl implements RoomService, Observer {
   }
 
   @Override
-  public Page<Comment> findAllCommentsByRoomId(
-    String roomId, Pageable pageable
+  public Page<Comment> findAllCommentsByStudentIdAndAssignmentId(
+    String studentId, String assignmentId, Pageable pageable
   ) {
-
-    return commentService.findAllCommentsByRoomId(roomId, pageable);
+    return roomRepository.findByStudentIdAndAssignmentIdAndDeletedFalse(studentId, assignmentId)
+        .map(room -> commentService.findAllCommentsByStudentIdAndAssignmentId(room, pageable))
+        .orElseGet(() -> PageHelper.empty(pageable));
   }
 
   @Override
@@ -93,11 +90,11 @@ public class RoomServiceImpl implements RoomService, Observer {
   }
 
   @Override
-  public List<Room> findAllByStudentId(String studentId) {
+  public Page<Room> findAllByStudentId(String studentId, Pageable pageable) {
 
     return Optional.ofNullable(studentId)
-      .map(roomRepository::findAllByStudentIdAndDeletedFalse)
-      .orElseGet(ArrayList::new);
+      .map(userId -> roomRepository.findAllByStudentIdAndDeletedFalse(userId, pageable))
+      .orElseGet(() -> PageHelper.empty(pageable));
   }
 
   @Override
@@ -105,8 +102,8 @@ public class RoomServiceImpl implements RoomService, Observer {
 
     return Optional.of(comment)
       .map(Comment::getRoom)
-      .map(Room::getId)
-      .flatMap(roomRepository::findByIdAndDeletedFalse)
+      .flatMap(room -> roomRepository
+          .findByStudentIdAndAssignmentIdAndDeletedFalse(room.getStudent().getId(), room.getAssignment().getId()))
       .filter(room -> AuthorizationHelper.isUserAuthorizedForAccess(userService.getUser(userId),
           room.getStudent().getId(), AuthorizationHelper.getScoringAllowedRoles()))
       .filter(this::validateAssignmentDeadlineNotPassed)

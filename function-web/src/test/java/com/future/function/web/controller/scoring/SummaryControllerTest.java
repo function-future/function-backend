@@ -18,6 +18,9 @@ import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Collections;
@@ -54,6 +57,8 @@ public class SummaryControllerTest extends TestHelper {
 
   private SummaryVO summaryVO;
 
+  private Pageable pageable;
+
   private StudentSummaryVO studentSummaryVO;
 
   private SummaryWebResponse summaryWebResponse;
@@ -83,7 +88,7 @@ public class SummaryControllerTest extends TestHelper {
       .batchCode(BATCH_CODE)
       .university(UNIVERSITY)
       .avatar(AVATAR)
-      .scores(Collections.singletonList(summaryVO))
+      .scores(new PageImpl<>(Collections.singletonList(summaryVO)))
       .build();
 
     summaryWebResponse = SummaryWebResponse.builder()
@@ -92,12 +97,14 @@ public class SummaryControllerTest extends TestHelper {
       .point(POINT)
       .build();
 
+    pageable = new PageRequest(0, 10);
+
     DATA_RESPONSE = ReportDetailResponseMapper.toDataReportDetailWebResponse(
       studentSummaryVO, URL_PREFIX);
 
     when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
-    when(summaryService.findAllPointSummaryByStudentId(STUDENT_ID,
-                                                       ADMIN_ID
+    when(summaryService.findAllPointSummaryByStudentId(STUDENT_ID, pageable,
+                                                       ADMIN_ID, "quiz"
     )).thenReturn(studentSummaryVO);
   }
 
@@ -114,7 +121,7 @@ public class SummaryControllerTest extends TestHelper {
       .andExpect(status().isOk())
       .andExpect(content().json(dataResponseJacksonTester.write(DATA_RESPONSE)
                                   .getJson()));
-    verify(summaryService).findAllPointSummaryByStudentId(STUDENT_ID, ADMIN_ID);
+    verify(summaryService).findAllPointSummaryByStudentId(STUDENT_ID, pageable, ADMIN_ID, "quiz");
   }
 
 }

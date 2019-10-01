@@ -27,6 +27,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -63,11 +66,13 @@ public class ReportDetailControllerTest extends TestHelper {
 
   private static final String TITLE = "quiz-title";
 
-  private static final String TYPE = "type";
+  private static final String TYPE = "Assignment";
 
   private static final int POINT = 100;
 
   private ReportDetail reportDetail;
+
+  private Pageable pageable;
 
   private StudentSummaryVO studentSummaryVO;
 
@@ -135,14 +140,13 @@ public class ReportDetailControllerTest extends TestHelper {
     reportDetail = ReportDetail.builder()
       .user(student)
       .point(POINT)
-      .report(report)
       .build();
     studentSummaryVO = StudentSummaryVO.builder()
       .studentName(STUDENT_NAME)
       .university(UNIVERSITY)
       .batchCode(BATCH_CODE)
       .avatar(AVATAR)
-      .scores(Collections.singletonList(summaryVO))
+      .scores(new PageImpl<>(Collections.singletonList(summaryVO)))
       .build();
     scoreStudentWebRequest = ScoreStudentWebRequest.builder()
       .studentId(STUDENT_ID)
@@ -171,6 +175,8 @@ public class ReportDetailControllerTest extends TestHelper {
       .point(POINT)
       .build();
 
+    pageable = new PageRequest(0, 10);
+
     DATA_RESPONSE = ResponseHelper.toDataResponse(
       HttpStatus.OK, Collections.singletonList(reportDetailWebResponse));
     CREATED_DATA_RESPONSE = ResponseHelper.toDataResponse(HttpStatus.CREATED,
@@ -183,7 +189,7 @@ public class ReportDetailControllerTest extends TestHelper {
                                           REPORT_ID
     )).thenReturn(Collections.singletonList(reportDetail));
     when(
-      reportService.findAllSummaryByReportId(REPORT_ID, JUDGE_ID)).thenReturn(
+      reportService.findAllSummaryByReportId(REPORT_ID, JUDGE_ID, TYPE, pageable)).thenReturn(
       Collections.singletonList(studentSummaryVO));
     when(reportService.giveScoreToReportStudents(REPORT_ID,
                                                  Collections.singletonList(
@@ -202,11 +208,11 @@ public class ReportDetailControllerTest extends TestHelper {
 
     mockMvc.perform(get(
       "/api/scoring/batches/" + BATCH_CODE + "/judgings/" + REPORT_ID +
-      "/comparisons").cookie(cookies))
+      "/comparisons").cookie(cookies).param("type", TYPE))
       .andExpect(status().isOk())
       .andExpect(content().json(dataResponseJacksonTester.write(DATA_RESPONSE)
                                   .getJson()));
-    verify(reportService).findAllSummaryByReportId(REPORT_ID, JUDGE_ID);
+    verify(reportService).findAllSummaryByReportId(REPORT_ID, JUDGE_ID, TYPE, pageable);
   }
 
   @Test

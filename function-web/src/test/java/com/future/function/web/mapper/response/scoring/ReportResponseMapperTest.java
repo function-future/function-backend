@@ -5,6 +5,7 @@ import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.model.entity.feature.scoring.Report;
+import com.future.function.model.entity.feature.scoring.ReportDetail;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.feature.core.BatchWebResponse;
@@ -56,6 +57,8 @@ public class ReportResponseMapperTest {
 
   private Report report;
 
+  private ReportDetail reportDetail;
+
   private Batch batch;
 
   private ReportWebResponse response;
@@ -105,12 +108,17 @@ public class ReportResponseMapperTest {
       .university(STUDENT_UNIVERSITY)
       .build();
 
+    reportDetail = ReportDetail
+        .builder()
+        .user(user)
+        .build();
+
     report = Report.builder()
       .id(ID)
       .title(NAME)
       .batch(batch)
       .description(DESCRIPTION)
-      .students(Collections.singletonList(user))
+      .students(Collections.singletonList(reportDetail))
       .build();
 
     report.setCreatedAt(CREATED_AT);

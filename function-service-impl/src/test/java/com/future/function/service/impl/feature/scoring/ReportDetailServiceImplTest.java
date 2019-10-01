@@ -23,6 +23,9 @@ import org.mockito.runners.MockitoJUnitRunner;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import static com.googlecode.catchexception.CatchException.catchException;
 import static com.googlecode.catchexception.CatchException.caughtException;
@@ -59,7 +62,11 @@ public class ReportDetailServiceImplTest {
 
   private static final int POINT = 100;
 
+  private static final String TYPE = "Assignment";
+
   private Report report;
+
+  private Pageable pageable;
 
   private ReportDetail reportDetail;
 
@@ -99,48 +106,48 @@ public class ReportDetailServiceImplTest {
       .university(UNIVERSITY)
       .batchCode(BATCH_CODE)
       .avatar(FILE_URL)
-      .scores(Collections.singletonList(summaryVO))
+      .scores(new PageImpl<>(Collections.singletonList(summaryVO)))
       .build();
 
+    pageable = new PageRequest(0, 10);
+
+    batch = Batch.builder()
+        .code(BATCH_CODE)
+        .build();
+
+    fileV2 = FileV2.builder()
+        .fileUrl(FILE_URL)
+        .build();
+
+    student = User.builder()
+        .id(USER_ID)
+        .name(USER_NAME)
+        .university(UNIVERSITY)
+        .batch(batch)
+        .pictureV2(fileV2)
+        .role(Role.STUDENT)
+        .build();
+
+    reportDetail = ReportDetail.builder()
+        .id(REPORT_DETAIL_ID)
+        .user(student)
+        .point(0)
+        .build();
 
     report = Report.builder()
       .id(REPORT_ID)
       .title(TITLE)
       .description(DESCRIPTION)
+      .students(Collections.singletonList(reportDetail))
       .build();
 
-    batch = Batch.builder()
-      .code(BATCH_CODE)
-      .build();
-
-    fileV2 = FileV2.builder()
-      .fileUrl(FILE_URL)
-      .build();
-
-    student = User.builder()
-      .id(USER_ID)
-      .name(USER_NAME)
-      .university(UNIVERSITY)
-      .batch(batch)
-      .pictureV2(fileV2)
-      .role(Role.STUDENT)
-      .build();
-
-    reportDetail = ReportDetail.builder()
-      .id(REPORT_DETAIL_ID)
-      .report(report)
-      .user(student)
-      .point(0)
-      .build();
-
-    when(reportDetailRepository.findAllByReportIdAndDeletedFalse(
-      REPORT_ID)).thenReturn(Collections.singletonList(reportDetail));
+    when(reportDetailRepository.findAll()).thenReturn(Collections.singletonList(reportDetail));
     when(reportDetailRepository.save(reportDetail)).thenReturn(reportDetail);
     when(
       reportDetailRepository.findByUserIdAndDeletedFalse(USER_ID)).thenReturn(
       Optional.of(reportDetail));
-    when(summaryService.findAllPointSummaryByStudentId(USER_ID,
-                                                       USER_ID
+    when(summaryService.findAllPointSummaryByStudentId(USER_ID, pageable,
+                                                       USER_ID, TYPE
     )).thenReturn(studentSummaryVO);
     when(userService.getUser(USER_ID)).thenReturn(student);
   }
@@ -152,20 +159,10 @@ public class ReportDetailServiceImplTest {
   }
 
   @Test
-  public void findAllDetailByReportId() {
-
-    List<ReportDetail> actual = reportDetailService.findAllDetailByReportId(
-      REPORT_ID);
-    assertThat(actual.size()).isEqualTo(1);
-    assertThat(actual.get(0)).isEqualTo(reportDetail);
-    verify(reportDetailRepository).findAllByReportIdAndDeletedFalse(REPORT_ID);
-  }
-
-  @Test
   public void findAllSummaryByReportId() {
 
     List<StudentSummaryVO> actual =
-      reportDetailService.findAllSummaryByReportId(REPORT_ID, USER_ID);
+      reportDetailService.findAllSummaryByReportId(report, USER_ID, TYPE, pageable);
     assertThat(actual.size()).isEqualTo(1);
     assertThat(actual.get(0)
                  .getStudentName()).isEqualTo(USER_NAME);
@@ -177,23 +174,22 @@ public class ReportDetailServiceImplTest {
                  .getAvatar()).isEqualTo(FILE_URL);
     assertThat(actual.get(0)
                  .getScores()
+                 .getContent()
                  .get(0)
                  .getPoint()).isEqualTo(POINT);
-    verify(reportDetailRepository).findAllByReportIdAndDeletedFalse(REPORT_ID);
-    verify(summaryService).findAllPointSummaryByStudentId(USER_ID, USER_ID);
+    verify(summaryService).findAllPointSummaryByStudentId(USER_ID, pageable, USER_ID, "Assignment");
   }
 
   @Test
   public void findAllSummaryByReportIdFailedToGetSummary() {
 
-    when(summaryService.findAllPointSummaryByStudentId(USER_ID,
-                                                       USER_ID
+    when(summaryService.findAllPointSummaryByStudentId(USER_ID, pageable,
+                                                       USER_ID, "Assignment"
     )).thenReturn(null);
     List<StudentSummaryVO> actual =
-      reportDetailService.findAllSummaryByReportId(REPORT_ID, USER_ID);
+      reportDetailService.findAllSummaryByReportId(report, USER_ID, TYPE, pageable);
     assertThat(actual.size()).isEqualTo(0);
-    verify(reportDetailRepository).findAllByReportIdAndDeletedFalse(REPORT_ID);
-    verify(summaryService).findAllPointSummaryByStudentId(USER_ID, USER_ID);
+    verify(summaryService).findAllPointSummaryByStudentId(USER_ID, pageable, USER_ID, "Assignment");
   }
 
   @Test
@@ -204,25 +200,11 @@ public class ReportDetailServiceImplTest {
       Optional.empty());
     when(reportDetailRepository.save(any(ReportDetail.class))).thenReturn(
       reportDetail);
-    Report actual = reportDetailService.createReportDetailByReport(
-      report, student);
-    assertThat(actual).isEqualTo(report);
+    ReportDetail actual = reportDetailService.createReportDetailByReport(student);
+    assertThat(actual).isEqualTo(reportDetail);
     verify(reportDetailRepository).save(any(ReportDetail.class));
     verify(reportDetailRepository).findByUserIdAndDeletedFalse(USER_ID);
     verify(userService).getUser(USER_ID);
-  }
-
-  @Test
-  public void createReportDetailByReportAndReportDetailByStudentExist() {
-
-    when(reportDetailRepository.save(any(ReportDetail.class))).thenReturn(
-      reportDetail);
-    catchException(
-      () -> reportDetailService.createReportDetailByReport(report, student));
-    assertThat(caughtException().getClass()).isEqualTo(
-      UnsupportedOperationException.class);
-    verify(userService).getUser(USER_ID);
-    verify(reportDetailRepository).findByUserIdAndDeletedFalse(USER_ID);
   }
 
   @Test
@@ -291,9 +273,9 @@ public class ReportDetailServiceImplTest {
   public void deleteAllByReportId() {
 
     reportDetail.setDeleted(true);
-    reportDetailService.deleteAllByReportId(REPORT_ID);
+    reportDetailService.deleteAll();
+    verify(reportDetailRepository).findAll();
     verify(reportDetailRepository).save(reportDetail);
-    verify(reportDetailRepository).findAllByReportIdAndDeletedFalse(REPORT_ID);
   }
 
 }

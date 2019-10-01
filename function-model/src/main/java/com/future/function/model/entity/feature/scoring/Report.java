@@ -41,6 +41,8 @@ public class Report extends BaseEntity {
   @Field(FieldName.Report.BATCH)
   private Batch batch;
 
-  private List<User> students;
+  @DBRef(lazy = true)
+  @Field(FieldName.Report.STUDENTS)
+  private List<ReportDetail> students;
 
 }
