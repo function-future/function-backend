@@ -438,6 +438,7 @@ public class UserServiceImplTest {
     when(encoder.matches(rawPassword, PASSWORD)).thenReturn(true);
     when(encoder.encode(rawPassword)).thenReturn(PASSWORD);
     when(userRepository.save(userStudent)).thenReturn(userStudent);
+    when(functionProperties.getMailGreetingMessage()).thenReturn("%s %s %s %s");
 
     User updatedUserStudent = userService.updateUser(userStudent);
 
@@ -455,7 +456,8 @@ public class UserServiceImplTest {
     verify(encoder).matches(rawPassword, PASSWORD);
     verify(encoder).encode(rawPassword);
     verify(userRepository).save(userStudent);
-    verifyZeroInteractions(mailService, functionProperties);
+    verify(mailService).sendEmail(eq(userStudent.getEmail()), eq("Registrasi Sukses"), anyString());
+    verify(functionProperties).getMailGreetingMessage();
   }
 
   @Test

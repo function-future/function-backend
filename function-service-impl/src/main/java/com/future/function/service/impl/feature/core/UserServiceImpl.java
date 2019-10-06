@@ -135,14 +135,15 @@ public class UserServiceImpl extends Observable implements UserService {
 
   private User setUserPassword(User user, User foundUser) {
 
-    String password = Optional.of(foundUser)
-      .filter(u -> !encoder.matches(this.getDefaultPassword(u.getName()),
-                                    u.getPassword()
+    Optional.of(foundUser)
+      .filter(u -> encoder.matches(this.getDefaultPassword(u.getName()),
+                                   u.getPassword()
       ))
-      .map(User::getPassword)
-      .orElseGet(() -> encoder.encode(this.getDefaultPassword(user.getName())));
-
-    user.setPassword(password);
+      .ifPresent(u -> {
+        user.setPassword(
+          encoder.encode(this.getDefaultPassword(user.getName())));
+        this.sendEmail(user);
+      });
 
     return foundUser;
   }
