@@ -21,4 +21,6 @@ public class AuthWebResponse {
 
   private String avatar;
 
+  private String batchCode;
+
 }
