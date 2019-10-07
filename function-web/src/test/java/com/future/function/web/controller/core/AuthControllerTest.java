@@ -2,6 +2,7 @@ package com.future.function.web.controller.core;
 
 import com.future.function.common.enumeration.core.Role;
 import com.future.function.common.properties.core.FileProperties;
+import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.service.api.feature.core.AuthService;
@@ -44,7 +45,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(value = AuthController.class)
 public class AuthControllerTest extends TestHelper {
 
-  private static final User USER = User.builder()
+  private static final User MENTOR = User.builder()
     .id("id")
     .role(Role.MENTOR)
     .email(MENTOR_EMAIL)
@@ -56,6 +57,21 @@ public class AuthControllerTest extends TestHelper {
                  .build())
     .build();
 
+  private static final User STUDENT = User.builder()
+    .id("id")
+    .role(Role.STUDENT)
+    .email(STUDENT_EMAIL)
+    .name("name")
+    .phone("phone")
+    .address("address")
+    .pictureV2(FileV2.builder()
+                 .thumbnailUrl("thumbnail-url")
+                 .build())
+    .batch(Batch.builder()
+             .code("batch-code")
+             .build())
+    .build();
+
   private static final String PASSWORD = "password";
 
   private static final AuthWebRequest AUTH_WEB_REQUEST = new AuthWebRequest(
@@ -63,8 +79,11 @@ public class AuthControllerTest extends TestHelper {
 
   private static final String URL_PREFIX = "url-prefix";
 
-  private static final DataResponse<AuthWebResponse> DATA_RESPONSE =
-    AuthResponseMapper.toAuthDataResponse(USER, URL_PREFIX);
+  private static final DataResponse<AuthWebResponse> MENTOR_DATA_RESPONSE =
+    AuthResponseMapper.toAuthDataResponse(MENTOR, URL_PREFIX);
+
+  private static final DataResponse<AuthWebResponse> STUDENT_DATA_RESPONSE =
+    AuthResponseMapper.toAuthDataResponse(STUDENT, URL_PREFIX);
 
   private static final BaseResponse OK_BASE_RESPONSE =
     ResponseHelper.toBaseResponse(HttpStatus.OK);
@@ -98,7 +117,7 @@ public class AuthControllerTest extends TestHelper {
 
     when(authService.login(eq(MENTOR_EMAIL), eq(PASSWORD),
                            any(HttpServletResponse.class)
-    )).thenReturn(USER);
+    )).thenReturn(MENTOR);
 
     mockMvc.perform(post("/api/core/auth").contentType(
       MediaType.APPLICATION_JSON)
@@ -106,7 +125,8 @@ public class AuthControllerTest extends TestHelper {
                         authWebRequestJacksonTester.write(AUTH_WEB_REQUEST)
                           .getJson()))
       .andExpect(status().isOk())
-      .andExpect(content().json(dataResponseJacksonTester.write(DATA_RESPONSE)
+      .andExpect(content().json(dataResponseJacksonTester.write(
+        MENTOR_DATA_RESPONSE)
                                   .getJson()));
 
     verify(fileProperties).getUrlPrefix();
@@ -115,7 +135,7 @@ public class AuthControllerTest extends TestHelper {
   }
 
   @Test
-  public void testGivenApiCallAndCookieByGettingLoginStatusReturnDataResponse()
+  public void testGivenApiCallAndCookieByGettingMentorLoginStatusReturnDataResponse()
     throws Exception {
 
     super.setCookie(Role.MENTOR);
@@ -124,15 +144,40 @@ public class AuthControllerTest extends TestHelper {
 
     when(authService.getLoginStatus(eq(MENTOR_SESSION_ID),
                                     any(HttpServletResponse.class)
-    )).thenReturn(USER);
+    )).thenReturn(MENTOR);
 
     mockMvc.perform(get("/api/core/auth").cookie(cookies))
       .andExpect(status().isOk())
-      .andExpect(content().json(dataResponseJacksonTester.write(DATA_RESPONSE)
+      .andExpect(content().json(dataResponseJacksonTester.write(
+        MENTOR_DATA_RESPONSE)
                                   .getJson()));
 
     verify(fileProperties).getUrlPrefix();
     verify(authService).getLoginStatus(eq(MENTOR_SESSION_ID),
+                                       any(HttpServletResponse.class)
+    );
+  }
+
+  @Test
+  public void testGivenApiCallAndCookieByGettingStudentLoginStatusReturnDataResponse()
+    throws Exception {
+
+    super.setCookie(Role.STUDENT);
+
+    when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
+
+    when(authService.getLoginStatus(eq(STUDENT_SESSION_ID),
+                                    any(HttpServletResponse.class)
+    )).thenReturn(STUDENT);
+
+    mockMvc.perform(get("/api/core/auth").cookie(cookies))
+      .andExpect(status().isOk())
+      .andExpect(content().json(dataResponseJacksonTester.write(
+        STUDENT_DATA_RESPONSE)
+                                  .getJson()));
+
+    verify(fileProperties).getUrlPrefix();
+    verify(authService).getLoginStatus(eq(STUDENT_SESSION_ID),
                                        any(HttpServletResponse.class)
     );
   }
