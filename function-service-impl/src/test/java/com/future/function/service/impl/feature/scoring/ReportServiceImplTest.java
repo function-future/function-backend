@@ -229,7 +229,7 @@ public class ReportServiceImplTest {
 
   @Test
   public void createReport() {
-    when(reportRepository.existsByStudentsContainsAndDeletedFalse(Collections.singletonList(reportDetail))).thenReturn(true);
+    when(reportRepository.existsByStudentsContainsAndDeletedFalse(Collections.singletonList(reportDetail))).thenReturn(false);
     report.setStudents(Collections.singletonList(reportDetail));
     Report actual = reportService.createReport(report);
     report.setStudents(null);
@@ -242,7 +242,7 @@ public class ReportServiceImplTest {
 
   @Test
   public void createReportStudentsAlreadyExist() {
-    when(reportRepository.existsByStudentsContainsAndDeletedFalse(Collections.singletonList(reportDetail))).thenReturn(false);
+    when(reportRepository.existsByStudentsContainsAndDeletedFalse(Collections.singletonList(reportDetail))).thenReturn(true);
     report.setStudents(Collections.singletonList(reportDetail));
     catchException(() -> reportService.createReport(report));
     assertThat(caughtException().getClass()).isEqualTo(UnsupportedOperationException.class);
