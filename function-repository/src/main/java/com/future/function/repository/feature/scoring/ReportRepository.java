@@ -16,6 +16,6 @@ public interface ReportRepository extends MongoRepository<Report, String> {
 
   Page<Report> findAllByBatchAndDeletedFalse(Batch batch, Pageable pageable);
 
-  boolean existsDistinctByStudentsEqualsAndDeletedFalse(List<ReportDetail> students);
+  boolean existsByStudentsContainsAndDeletedFalse(List<ReportDetail> students);
 
 }

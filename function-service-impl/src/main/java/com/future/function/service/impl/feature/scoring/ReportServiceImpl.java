@@ -14,7 +14,6 @@ import com.future.function.service.api.feature.scoring.ReportDetailService;
 import com.future.function.service.api.feature.scoring.ReportService;
 import com.future.function.service.impl.helper.CopyHelper;
 import com.future.function.service.impl.helper.PageHelper;
-import java.util.Collections;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -95,7 +94,7 @@ public class ReportServiceImpl implements ReportService {
     return Optional.ofNullable(students)
       .map(this::createOrGetDetails)
       .map(studentList -> this.setReportDetails(report, studentList))
-      .filter(currentReport -> reportRepository.existsDistinctByStudentsEqualsAndDeletedFalse(currentReport.getStudents()))
+      .filter(currentReport -> !reportRepository.existsByStudentsContainsAndDeletedFalse(report.getStudents()))
       .orElse(null);
   }
 

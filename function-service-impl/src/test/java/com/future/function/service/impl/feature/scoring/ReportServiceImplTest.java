@@ -32,7 +32,6 @@ import java.util.Optional;
 import static com.googlecode.catchexception.CatchException.catchException;
 import static com.googlecode.catchexception.CatchException.caughtException;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -230,7 +229,7 @@ public class ReportServiceImplTest {
 
   @Test
   public void createReport() {
-    when(reportRepository.existsDistinctByStudentsEqualsAndDeletedFalse(Collections.singletonList(reportDetail))).thenReturn(true);
+    when(reportRepository.existsByStudentsContainsAndDeletedFalse(Collections.singletonList(reportDetail))).thenReturn(true);
     report.setStudents(Collections.singletonList(reportDetail));
     Report actual = reportService.createReport(report);
     report.setStudents(null);
@@ -238,18 +237,18 @@ public class ReportServiceImplTest {
     verify(reportRepository).save(report);
     verify(reportDetailService).createReportDetailByReport(student);
     verify(batchService).getBatchByCode(BATCH_CODE);
-    verify(reportRepository).existsDistinctByStudentsEqualsAndDeletedFalse(Collections.singletonList(reportDetail));
+    verify(reportRepository).existsByStudentsContainsAndDeletedFalse(Collections.singletonList(reportDetail));
   }
 
   @Test
   public void createReportStudentsAlreadyExist() {
-    when(reportRepository.existsDistinctByStudentsEqualsAndDeletedFalse(Collections.singletonList(reportDetail))).thenReturn(false);
+    when(reportRepository.existsByStudentsContainsAndDeletedFalse(Collections.singletonList(reportDetail))).thenReturn(false);
     report.setStudents(Collections.singletonList(reportDetail));
     catchException(() -> reportService.createReport(report));
     assertThat(caughtException().getClass()).isEqualTo(UnsupportedOperationException.class);
     verify(reportDetailService).createReportDetailByReport(student);
     verify(batchService).getBatchByCode(BATCH_CODE);
-    verify(reportRepository).existsDistinctByStudentsEqualsAndDeletedFalse(Collections.singletonList(reportDetail));
+    verify(reportRepository).existsByStudentsContainsAndDeletedFalse(Collections.singletonList(reportDetail));
   }
 
   @Test
