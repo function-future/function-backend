@@ -27,7 +27,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping(
-  "/api/scoring/batches/{batchCode}/judgings/{judgingId" + "}/comparisons")
+  "/api/scoring/batches/{batchCode}/judgings/{judgingId}/comparisons")
 public class ReportDetailController {
 
   private ReportService reportService;
