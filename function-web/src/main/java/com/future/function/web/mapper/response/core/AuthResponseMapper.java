@@ -1,5 +1,7 @@
 package com.future.function.web.mapper.response.core;
 
+import com.future.function.common.enumeration.core.Role;
+import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.web.mapper.helper.ResponseHelper;
@@ -36,7 +38,17 @@ public final class AuthResponseMapper {
               .name())
       .avatar(
         AuthResponseMapper.getThumbnailUrl(user.getPictureV2(), urlPrefix))
+      .batchCode(AuthResponseMapper.getBatchCode(user))
       .build();
+  }
+
+  private static String getBatchCode(User user) {
+
+    return Optional.of(user)
+      .filter(u -> Role.STUDENT.equals(u.getRole()))
+      .map(User::getBatch)
+      .map(Batch::getCode)
+      .orElse(null);
   }
 
   private static String getThumbnailUrl(FileV2 file, String urlPrefix) {
