@@ -5,6 +5,7 @@ import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.scoring.QuestionBank;
 import com.future.function.model.entity.feature.scoring.Quiz;
 import com.future.function.service.api.feature.scoring.QuizService;
+import com.future.function.session.model.Session;
 import com.future.function.web.TestHelper;
 import com.future.function.web.TestSecurityConfiguration;
 import com.future.function.web.mapper.helper.ResponseHelper;
@@ -72,6 +73,8 @@ public class QuizControllerTest extends TestHelper {
   private static final String QUIZ_BATCH_ID = "batchCode";
 
   private Pageable pageable;
+
+  private Session session;
 
   private Quiz quiz;
 
@@ -169,14 +172,15 @@ public class QuizControllerTest extends TestHelper {
 
     BASE_RESPONSE = ResponseHelper.toBaseResponse(HttpStatus.OK);
 
-    when(quizService.findById(QUIZ_ID)).thenReturn(quiz);
+    when(quizService.findById(QUIZ_ID, ADMIN_SESSION.getRole(),
+        ADMIN_SESSION.getBatchId())).thenReturn(quiz);
     when(quizService.createQuiz(quiz)).thenReturn(quiz);
     when(quizService.updateQuiz(quiz)).thenReturn(quiz);
     when(quizService.findAllByBatchCodeAndPageable(QUIZ_BATCH_CODE,
-                                                   pageable
-    )).thenReturn(quizPage);
+                                                   pageable, ADMIN_SESSION.getRole(),
+        ADMIN_SESSION.getBatchId())).thenReturn(quizPage);
     when(
-      quizService.copyQuizWithTargetBatchCode(QUIZ_BATCH_ID, quiz)).thenReturn(
+      quizService.copyQuizWithTargetBatchCode(QUIZ_BATCH_ID, QUIZ_ID)).thenReturn(
       quiz);
     when(requestMapper.toQuiz(quizWebRequest, QUIZ_BATCH_CODE)).thenReturn(
       quiz);
@@ -204,7 +208,8 @@ public class QuizControllerTest extends TestHelper {
       .andExpect(content().json(dataResponseJacksonTester.write(DATA_RESPONSE)
                                   .getJson()));
 
-    verify(quizService).findById(QUIZ_ID);
+    verify(quizService).findById(QUIZ_ID, ADMIN_SESSION.getRole(),
+        ADMIN_SESSION.getBatchId());
   }
 
   @Test
@@ -233,7 +238,7 @@ public class QuizControllerTest extends TestHelper {
           .getJson()));
 
     verify(quizService).findAllByBatchCodeAndPageable(
-      QUIZ_BATCH_CODE, pageable);
+      QUIZ_BATCH_CODE, pageable, ADMIN_SESSION.getRole(), ADMIN_SESSION.getBatchId());
   }
 
   @Test
@@ -248,7 +253,7 @@ public class QuizControllerTest extends TestHelper {
           .getJson()));
 
     verify(quizService).findAllByBatchCodeAndPageable(
-      QUIZ_BATCH_CODE, pageable);
+      QUIZ_BATCH_CODE, pageable, ADMIN_SESSION.getRole(), ADMIN_SESSION.getBatchId());
   }
 
   @Test
@@ -282,8 +287,7 @@ public class QuizControllerTest extends TestHelper {
       .andExpect(content().json(
         dataResponseJacksonTester.write(CREATED_DATA_RESPONSE)
           .getJson()));
-    verify(quizService).findById(QUIZ_ID);
-    verify(quizService).copyQuizWithTargetBatchCode(QUIZ_BATCH_ID, quiz);
+    verify(quizService).copyQuizWithTargetBatchCode(QUIZ_BATCH_ID, QUIZ_ID);
     verify(requestMapper).validateCopyQuizWebRequest(copyQuizWebRequest);
   }
 

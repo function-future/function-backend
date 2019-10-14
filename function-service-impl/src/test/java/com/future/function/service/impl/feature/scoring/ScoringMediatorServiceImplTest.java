@@ -158,14 +158,6 @@ public class ScoringMediatorServiceImplTest {
       .build();
 
     pageable = new PageRequest(PAGE, SIZE);
-
-    when(quizService.findAllByBatchCodeAndPageable(BATCH_CODE,
-                                                   pageable
-    )).thenReturn(new PageImpl<>(Collections.singletonList(quiz), pageable, 1));
-    when(assignmentService.findAllByBatchCodeAndPageable(BATCH_CODE,
-                                                         pageable
-    )).thenReturn(
-      new PageImpl<>(Collections.singletonList(assignment), pageable, 1));
     when(studentQuizService.findAllByStudentId(USER_ID)).thenReturn(Collections.singletonList(studentQuiz));
     when(roomService.findAllByStudentId(USER_ID, pageable)).thenReturn(
       new PageImpl<>(Collections.singletonList(room)));

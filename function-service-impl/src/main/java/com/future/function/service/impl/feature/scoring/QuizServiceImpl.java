@@ -1,5 +1,7 @@
 package com.future.function.service.impl.feature.scoring;
 
+import com.future.function.common.enumeration.core.Role;
+import com.future.function.common.exception.ForbiddenException;
 import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.scoring.QuestionBank;
@@ -11,6 +13,7 @@ import com.future.function.service.api.feature.scoring.QuizService;
 import com.future.function.service.impl.helper.CopyHelper;
 import com.future.function.service.impl.helper.PageHelper;
 import com.future.function.service.impl.helper.SortHelper;
+import com.future.function.session.model.Session;
 import java.util.ArrayList;
 import java.util.Observable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,25 +48,49 @@ public class QuizServiceImpl extends Observable implements QuizService {
   }
 
   @Override
-  public Quiz findById(String id) {
+  public Quiz findById(String id, Role role, String sessionBatchId) {
 
     return Optional.ofNullable(id)
       .flatMap(quizRepository::findByIdAndDeletedFalse)
+      .map(quiz -> this.validateStudentBatch(quiz, role, sessionBatchId))
       .orElseThrow(
         () -> new NotFoundException("Failed at #findById #QuizService"));
   }
 
   @Override
   public Page<Quiz> findAllByBatchCodeAndPageable(
-    String batchCode, Pageable pageable
+    String batchCode, Pageable pageable, Role role, String sessionBatchId
   ) {
 
     return Optional.ofNullable(batchCode)
       .map(batchService::getBatchByCode)
+      .map(batch -> this.validateStudentBatch(batch, role, sessionBatchId))
       .map(
         batch -> quizRepository.findAllByBatchAndDeletedFalseOrderByEndDateAsc(batch, pageable))
       .map(this::sortByClosestDeadline)
       .orElseGet(() -> PageHelper.empty(pageable));
+  }
+
+  private Batch validateStudentBatch(Batch batch, Role role, String sessionBatchId) {
+    boolean isStudent = role.equals(Role.STUDENT);
+    if(isStudent && sessionBatchId.equals(batch.getId())) {
+      return batch;
+    } else if (!isStudent) {
+      return batch;
+    } else {
+      throw new ForbiddenException("User Not Allowed");
+    }
+  }
+
+  private Quiz validateStudentBatch(Quiz quiz, Role role, String sessionBatchId) {
+    boolean isStudent = role.equals(Role.STUDENT);
+    if(isStudent && sessionBatchId.equals(quiz.getBatch().getId())) {
+      return quiz;
+    } else if (!isStudent) {
+      return quiz;
+    } else {
+      throw new ForbiddenException("User Not Allowed");
+    }
   }
 
   private Page<Quiz> sortByClosestDeadline(Page<Quiz> quizPage) {
@@ -74,11 +101,10 @@ public class QuizServiceImpl extends Observable implements QuizService {
   }
 
   @Override
-  public Quiz copyQuizWithTargetBatchCode(String targetBatchCode, Quiz quiz) {
+  public Quiz copyQuizWithTargetBatchCode(String targetBatchCode, String quizId) {
 
-    return Optional.ofNullable(quiz)
-      .map(Quiz::getId)
-      .map(this::findById)
+    return Optional.ofNullable(quizId)
+      .flatMap(quizRepository::findByIdAndDeletedFalse)
       .map(currentQuiz -> this.initializeNewQuiz(currentQuiz, targetBatchCode))
       .map(quizRepository::save)
       .orElseThrow(() -> new UnsupportedOperationException(

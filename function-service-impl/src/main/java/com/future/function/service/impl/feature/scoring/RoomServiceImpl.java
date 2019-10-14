@@ -60,7 +60,7 @@ public class RoomServiceImpl implements RoomService, Observer {
   private Room createNewRoomForStudent(String studentId, String assignmentId) {
 
     User student = userService.getUser(studentId);
-    Assignment assignment = assignmentService.findById(assignmentId);
+    Assignment assignment = assignmentService.findById(assignmentId, student.getRole(), student.getBatch().getId());
     return this.createRoomForUserAndSave(student, assignment);
   }
 

@@ -1,5 +1,7 @@
 package com.future.function.service.impl.feature.scoring;
 
+import com.future.function.common.enumeration.core.Role;
+import com.future.function.common.exception.ForbiddenException;
 import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.FileV2;
@@ -52,16 +54,28 @@ public class AssignmentServiceImpl extends Observable implements AssignmentServi
 
   @Override
   public Page<Assignment> findAllByBatchCodeAndPageable(
-    String batchCode, Pageable pageable
+    String batchCode, Pageable pageable, Role role, String sessionBatchId
   ) {
 
     return Optional.ofNullable(batchCode)
       .map(batchService::getBatchByCode)
+      .map(batch -> this.validateStudentBatch(batch, role, sessionBatchId))
       .map(batch -> assignmentRepository.findAllByBatchAndDeletedFalseOrderByDeadlineDesc(batch,
                                                                        pageable
       ))
       .map(this::sortByClosestDeadline)
       .orElseGet(() -> PageHelper.empty(pageable));
+  }
+
+  private Batch validateStudentBatch(Batch batch, Role role, String sessionBatchId) {
+    boolean isStudent = role.equals(Role.STUDENT);
+    if(!isStudent) {
+      return batch;
+    } else if(sessionBatchId.equals(batch.getId())) {
+      return batch;
+    } else {
+      throw new ForbiddenException("User Not Allowed");
+    }
   }
 
   private Page<Assignment> sortByClosestDeadline(Page<Assignment> assignmentPage) {
@@ -73,12 +87,24 @@ public class AssignmentServiceImpl extends Observable implements AssignmentServi
   }
 
   @Override
-  public Assignment findById(String id) {
+  public Assignment findById(String id, Role role, String sessionBatchId) {
 
     return Optional.ofNullable(id)
       .flatMap(assignmentRepository::findByIdAndDeletedFalse)
+      .map(assignment -> this.validateStudentBatch(assignment, role, sessionBatchId))
       .orElseThrow(
         () -> new NotFoundException("#Failed at #findById #AssignmentService"));
+  }
+
+  private Assignment validateStudentBatch(Assignment assignment, Role role, String sessionBatchId) {
+    boolean isStudent = role.equals(Role.STUDENT);
+    if(!isStudent) {
+      return assignment;
+    } else if(sessionBatchId.equals(assignment.getBatch().getId())) {
+      return assignment;
+    } else {
+      throw new ForbiddenException("User Not Allowed");
+    }
   }
 
   @Override
@@ -88,7 +114,7 @@ public class AssignmentServiceImpl extends Observable implements AssignmentServi
 
     Batch targetBatch = batchService.getBatchByCode(targetBatchCode);
     return Optional.ofNullable(assignmentId)
-      .map(this::findById)
+      .flatMap(assignmentRepository::findByIdAndDeletedFalse)
       .map(assignment -> initializeNewAssignment(targetBatch, assignment))
       .map(this::createAssignment)
       .orElseThrow(() -> new UnsupportedOperationException(
@@ -145,7 +171,7 @@ public class AssignmentServiceImpl extends Observable implements AssignmentServi
 
     return Optional.ofNullable(request)
       .map(Assignment::getId)
-      .map(this::findById)
+      .flatMap(assignmentRepository::findByIdAndDeletedFalse)
       .map(foundAssignment -> setAssignmentFile(request, foundAssignment))
       .map(
         foundAssignment -> copyAssignmentRequestAttributesBasedOnFileExistence(
@@ -218,7 +244,7 @@ public class AssignmentServiceImpl extends Observable implements AssignmentServi
   public void deleteById(String id) {
 
     Optional.ofNullable(id)
-      .map(this::findById)
+      .flatMap(assignmentRepository::findByIdAndDeletedFalse)
       .ifPresent(assignment -> {
         this.setChanged();
         this.notifyObservers(assignment.getId());

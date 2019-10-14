@@ -49,6 +49,8 @@ public class RoomServiceImplTest {
 
   private static final String BATCH_CODE = "batchCode";
 
+  private static final String BATCH_ID = "batchId";
+
   private static final String MENTOR_ID = "mentor-id";
 
   private Room room;
@@ -85,6 +87,7 @@ public class RoomServiceImplTest {
 
     batch = Batch.builder()
       .code(BATCH_CODE)
+      .id(BATCH_ID)
       .build();
     assignment = Assignment.builder()
       .id(ASSIGNMENT_ID)
@@ -95,6 +98,7 @@ public class RoomServiceImplTest {
       .id(USER_ID)
       .name(USERNAME)
       .role(Role.STUDENT)
+      .batch(batch)
       .build();
     room = Room.builder()
       .assignment(assignment)
@@ -129,7 +133,7 @@ public class RoomServiceImplTest {
     when(commentService.findAllCommentsByStudentIdAndAssignmentId(room, pageable)).thenReturn(
       PageHelper.toPage(Collections.singletonList(comment), pageable));
     when(commentService.createComment(comment)).thenReturn(comment);
-    when(assignmentService.findById(ASSIGNMENT_ID)).thenReturn(assignment);
+    when(assignmentService.findById(ASSIGNMENT_ID, Role.STUDENT, BATCH_ID)).thenReturn(assignment);
     verify(assignmentService).addObserver(roomService);
   }
 
@@ -157,7 +161,7 @@ public class RoomServiceImplTest {
     assertThat(actual).isEqualTo(room);
     verify(userService, times(2)).getUser(USER_ID);
     verify(roomRepository).save(any(Room.class));
-    verify(assignmentService).findById(ASSIGNMENT_ID);
+    verify(assignmentService).findById(ASSIGNMENT_ID, Role.STUDENT, BATCH_ID);
     verify(roomRepository).findByStudentIdAndAssignmentIdAndDeletedFalse(USER_ID, ASSIGNMENT_ID);
   }
 

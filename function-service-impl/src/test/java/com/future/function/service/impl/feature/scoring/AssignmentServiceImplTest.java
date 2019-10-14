@@ -1,5 +1,7 @@
 package com.future.function.service.impl.feature.scoring;
 
+import com.future.function.common.enumeration.core.Role;
+import com.future.function.common.exception.ForbiddenException;
 import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.FileV2;
@@ -162,7 +164,7 @@ public class AssignmentServiceImplTest {
   public void testFindAllAssignmentWithPageable() {
 
     Page<Assignment> result = assignmentService.findAllByBatchCodeAndPageable(
-      BATCH_CODE, pageable);
+      BATCH_CODE, pageable, Role.STUDENT, BATCH_ID);
     assertThat(result).isNotNull();
     assertThat(result.getContent()
                  .size()).isEqualTo(2);
@@ -172,11 +174,33 @@ public class AssignmentServiceImplTest {
   }
 
   @Test
+  public void testFindAllAssignmentWithPageableAsAdmin() {
+
+    Page<Assignment> result = assignmentService.findAllByBatchCodeAndPageable(
+        BATCH_CODE, pageable, Role.ADMIN, "");
+    assertThat(result).isNotNull();
+    assertThat(result.getContent()
+        .size()).isEqualTo(2);
+    assertThat(result.getContent()).isEqualTo(assignmentList);
+    verify(batchService).getBatchByCode(BATCH_CODE);
+    verify(assignmentRepository).findAllByBatchAndDeletedFalseOrderByDeadlineDesc(batch, pageable);
+  }
+
+  @Test
+  public void testFindAllAssignmentWithPageableAsAnotherBatchStudent() {
+
+    catchException(() -> assignmentService.findAllByBatchCodeAndPageable(
+        BATCH_CODE, pageable, Role.STUDENT, "another-batch-id"));
+    assertThat(caughtException().getClass()).isEqualTo(ForbiddenException.class);
+    verify(batchService).getBatchByCode(BATCH_CODE);
+  }
+
+  @Test
   public void testFindAllAssignmentWithPageableAllAboveDeadline() {
 
     assignment2.setDeadline(assignment2.getDeadline() + 2000000);
     Page<Assignment> result = assignmentService.findAllByBatchCodeAndPageable(
-        BATCH_CODE, pageable);
+        BATCH_CODE, pageable, Role.STUDENT, BATCH_ID);
     assertThat(result).isNotNull();
     assertThat(result.getContent()
         .size()).isEqualTo(2);
@@ -192,7 +216,7 @@ public class AssignmentServiceImplTest {
     assignment.setDeadline(assignment.getDeadline() - 3000000);
     List<Assignment> expected = Arrays.asList(assignment, assignment2);
     Page<Assignment> result = assignmentService.findAllByBatchCodeAndPageable(
-        BATCH_CODE, pageable);
+        BATCH_CODE, pageable, Role.STUDENT, BATCH_ID);
     assertThat(result).isNotNull();
     assertThat(result.getContent()
         .size()).isEqualTo(2);
@@ -206,7 +230,7 @@ public class AssignmentServiceImplTest {
 
     assignment.setDeadline(assignment.getDeadline() - 3000000);
     Page<Assignment> result = assignmentService.findAllByBatchCodeAndPageable(
-        BATCH_CODE, pageable);
+        BATCH_CODE, pageable, Role.STUDENT, BATCH_ID);
     assertThat(result).isNotNull();
     assertThat(result.getContent()
         .size()).isEqualTo(2);
@@ -218,16 +242,34 @@ public class AssignmentServiceImplTest {
   @Test
   public void testFindByIdSuccess() {
 
-    Assignment result = assignmentService.findById(assignment.getId());
+    Assignment result = assignmentService.findById(assignment.getId(), Role.STUDENT, BATCH_ID);
     assertThat(result).isNotNull();
     assertThat(result).isEqualTo(assignment);
     verify(assignmentRepository).findByIdAndDeletedFalse(assignment.getId());
   }
 
   @Test
+  public void testFindByIdSuccessRoleAdmin() {
+
+    Assignment result = assignmentService.findById(assignment.getId(), Role.ADMIN, "");
+    assertThat(result).isNotNull();
+    assertThat(result).isEqualTo(assignment);
+    verify(assignmentRepository).findByIdAndDeletedFalse(assignment.getId());
+  }
+
+  @Test
+  public void testFindByIdFailedAnotherStudentBatchAccess() {
+
+    catchException(() -> assignmentService
+        .findById(assignment.getId(), Role.STUDENT, "another-batch-id"));
+    assertThat(caughtException().getClass()).isEqualTo(ForbiddenException.class);
+    verify(assignmentRepository).findByIdAndDeletedFalse(assignment.getId());
+  }
+
+  @Test
   public void testFindByIdNull() {
 
-    catchException(() -> assignmentService.findById(null));
+    catchException(() -> assignmentService.findById(null, Role.STUDENT, BATCH_ID));
     assertThat(caughtException().getClass()).isEqualTo(NotFoundException.class);
     verifyZeroInteractions(assignmentRepository);
   }

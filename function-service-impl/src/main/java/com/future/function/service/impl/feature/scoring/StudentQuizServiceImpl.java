@@ -1,5 +1,6 @@
 package com.future.function.service.impl.feature.scoring;
 
+import com.future.function.common.enumeration.core.Role;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.model.entity.feature.scoring.Quiz;
 import com.future.function.model.entity.feature.scoring.StudentQuestion;
@@ -89,7 +90,7 @@ public class StudentQuizServiceImpl implements StudentQuizService, Observer {
   }
 
   private StudentQuiz createNewStudentQuiz(String studentId, String quizId) {
-    Quiz quiz = quizService.findById(quizId);
+    Quiz quiz = quizService.findById(quizId, Role.ADMIN, "");
     User student = userService.getUser(studentId);
     return this.createStudentQuizAndSave(student, quiz);
   }

@@ -159,13 +159,15 @@ public class AssignmentControllerTest extends TestHelper {
 
     when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
     when(assignmentService.findAllByBatchCodeAndPageable(BATCH_CODE,
-                                                         pageable
+                                                         pageable, ADMIN_SESSION.getRole(),
+        ADMIN_SESSION.getBatchId()
     )).thenReturn(assignmentPage);
     when(assignmentService.copyAssignment(ASSIGNMENT_ID, "BATCH-3")).thenReturn(
       assignment);
     when(assignmentService.createAssignment(assignment)).thenReturn(assignment);
     when(assignmentService.updateAssignment(assignment)).thenReturn(assignment);
-    when(assignmentService.findById(ASSIGNMENT_ID)).thenReturn(assignment);
+    when(assignmentService.findById(ASSIGNMENT_ID, ADMIN_SESSION.getRole(),
+        ADMIN_SESSION.getBatchId())).thenReturn(assignment);
     when(assignmentRequestMapper.toAssignment(assignmentWebRequest,
                                               BATCH_CODE
     )).thenReturn(assignment);
@@ -212,7 +214,8 @@ public class AssignmentControllerTest extends TestHelper {
       .andExpect(content().json(dataResponseJacksonTester.write(DATA_RESPONSE)
                                   .getJson()));
 
-    verify(assignmentService).findById(ASSIGNMENT_ID);
+    verify(assignmentService).findById(ASSIGNMENT_ID, ADMIN_SESSION.getRole(),
+        ADMIN_SESSION.getBatchId());
     verifyZeroInteractions(assignmentRequestMapper);
 
   }
@@ -280,7 +283,7 @@ public class AssignmentControllerTest extends TestHelper {
           .getJson()));
 
     verify(assignmentService).findAllByBatchCodeAndPageable(
-      BATCH_CODE, pageable);
+      BATCH_CODE, pageable, ADMIN_SESSION.getRole(), ADMIN_SESSION.getBatchId());
     verifyZeroInteractions(assignmentRequestMapper);
   }
 
@@ -297,7 +300,7 @@ public class AssignmentControllerTest extends TestHelper {
           .getJson()));
 
     verify(assignmentService).findAllByBatchCodeAndPageable(
-      BATCH_CODE, pageable);
+      BATCH_CODE, pageable, ADMIN_SESSION.getRole(), ADMIN_SESSION.getBatchId());
     verifyZeroInteractions(assignmentRequestMapper);
   }
 
