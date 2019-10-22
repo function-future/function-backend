@@ -1,6 +1,7 @@
 package com.future.function;
 
 import com.future.function.common.properties.core.FileProperties;
+import com.future.function.common.properties.core.FunctionProperties;
 import com.future.function.common.properties.core.SessionProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -20,7 +21,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableMongoRepositories
 @EnableMongoAuditing(auditorAwareRef = "auditorAware")
 @EnableConfigurationProperties(value = {
-  FileProperties.class, SessionProperties.class
+  FileProperties.class, SessionProperties.class, FunctionProperties.class
 })
 public class FunctionApplication {
 
