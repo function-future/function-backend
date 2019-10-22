@@ -1,7 +1,11 @@
 package com.future.function.service.impl.feature.core;
 
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+
 import javax.mail.internet.MimeMessage;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -15,9 +19,13 @@ public class MailServiceImpl implements MailService {
 
   private final JavaMailSender mailSender;
 
-  public MailServiceImpl(JavaMailSender mailSender) {
+  private final ExecutorService executorService;
+
+  @Autowired
+  public MailServiceImpl(JavaMailSender mailSender, ExecutorService executorService) {
 
     this.mailSender = mailSender;
+    this.executorService = executorService;
   }
 
   @Override
@@ -31,7 +39,7 @@ public class MailServiceImpl implements MailService {
       messageHelper.setSubject(subject);
       messageHelper.setText(messageContent);
 
-      mailSender.send(message);
+      CompletableFuture.runAsync(() -> mailSender.send(message), executorService);
     } catch (Exception e) {
       log.error("Failed send message: ", e);
     }

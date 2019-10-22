@@ -1,9 +1,13 @@
 package com.future.function.service.impl.feature.core;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
+
+import java.util.concurrent.ExecutorService;
 
 import javax.mail.Message;
 import javax.mail.internet.InternetAddress;
@@ -15,6 +19,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.mail.javamail.JavaMailSender;
 
@@ -29,6 +34,9 @@ public class MailServiceImplTest {
 
   @Mock
   private JavaMailSender mailSender;
+
+  @Mock
+  private ExecutorService executorService;
 
   @InjectMocks
   private MailServiceImpl mailService;
@@ -62,6 +70,10 @@ public class MailServiceImplTest {
   public void testGivenRecipientAndSubjectAndMessageContentBySendingEmailReturnSuccessfulSendEmail() throws Exception {
 
     when(mailSender.createMimeMessage()).thenReturn(message);
+    doAnswer((InvocationOnMock invocation) -> {
+      ((Runnable) invocation.getArguments()[0]).run();
+      return null;
+    }).when(this.executorService).execute(any(Runnable.class));
 
     mailService.sendEmail(RECIPIENT, SUBJECT, MESSAGE_CONTENT);
 

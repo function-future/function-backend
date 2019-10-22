@@ -3,6 +3,7 @@ package com.future.function.service.impl.feature.core;
 import com.future.function.common.enumeration.core.Role;
 import com.future.function.common.exception.NotFoundException;
 import com.future.function.common.exception.UnauthorizedException;
+import com.future.function.common.properties.core.FunctionProperties;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.User;
@@ -34,7 +35,13 @@ import java.util.Optional;
 import static com.googlecode.catchexception.CatchException.catchException;
 import static com.googlecode.catchexception.CatchException.caughtException;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class UserServiceImplTest {
@@ -108,6 +115,9 @@ public class UserServiceImplTest {
   @InjectMocks
   private UserServiceImpl userService;
 
+  @Mock
+  private FunctionProperties functionProperties;
+
   @Before
   public void setUp() {
 
@@ -139,9 +149,8 @@ public class UserServiceImplTest {
   @After
   public void tearDown() {
 
-    verifyNoMoreInteractions(batchService, userRepository, resourceService,
-                             scoringMediatorService, encoder, mailService
-    );
+    verifyNoMoreInteractions(batchService, userRepository, resourceService, scoringMediatorService, encoder,
+        mailService, functionProperties);
   }
 
   @Test
@@ -155,7 +164,7 @@ public class UserServiceImplTest {
     assertThat(foundUserStudent).isEqualTo(userStudent);
 
     verify(userRepository).findOne(STUDENT_ID);
-    verifyZeroInteractions(batchService, resourceService, encoder, mailService);
+    verifyZeroInteractions(batchService, resourceService, encoder, mailService, functionProperties);
   }
 
   @Test
@@ -169,7 +178,7 @@ public class UserServiceImplTest {
     assertThat(foundUserMentor).isEqualTo(userMentor);
 
     verify(userRepository).findOne(MENTOR_ID);
-    verifyZeroInteractions(batchService, resourceService, encoder, mailService);
+    verifyZeroInteractions(batchService, resourceService, encoder, mailService, functionProperties);
   }
 
   @Test
@@ -183,7 +192,7 @@ public class UserServiceImplTest {
     assertThat(caughtException().getMessage()).isEqualTo("Get User Not Found");
 
     verify(userRepository).findOne(NON_EXISTING_USER_ID);
-    verifyZeroInteractions(batchService, resourceService, encoder, mailService);
+    verifyZeroInteractions(batchService, resourceService, encoder, mailService, functionProperties);
   }
 
   @Test
@@ -217,7 +226,7 @@ public class UserServiceImplTest {
     verify(
       userRepository).findAllByRoleAndNameContainsIgnoreCaseAndDeletedFalse(
       Role.STUDENT, "", PAGEABLE);
-    verifyZeroInteractions(batchService, resourceService, encoder, mailService);
+    verifyZeroInteractions(batchService, resourceService, encoder, mailService, functionProperties);
   }
 
   @Test
@@ -254,7 +263,7 @@ public class UserServiceImplTest {
     verify(userRepository).findAllByBatchAndRoleAndDeletedFalse(
       BATCH, Role.STUDENT, PAGEABLE);
     verify(batchService).getBatchByCode(NUMBER);
-    verifyZeroInteractions(resourceService, encoder, mailService);
+    verifyZeroInteractions(resourceService, encoder, mailService, functionProperties);
   }
 
   @Test
@@ -267,7 +276,7 @@ public class UserServiceImplTest {
     assertThat(foundUserStudentsPage.getTotalElements()).isEqualTo(0);
 
     verifyZeroInteractions(
-      userRepository, batchService, resourceService, encoder, mailService);
+      userRepository, batchService, resourceService, encoder, mailService, functionProperties);
   }
 
   @Test
@@ -300,7 +309,7 @@ public class UserServiceImplTest {
     verify(
       userRepository).findAllByRoleAndNameContainsIgnoreCaseAndDeletedFalse(
       Role.MENTOR, name, PAGEABLE);
-    verifyZeroInteractions(batchService, resourceService, encoder, mailService);
+    verifyZeroInteractions(batchService, resourceService, encoder, mailService, functionProperties);
   }
 
   @Test
@@ -316,6 +325,7 @@ public class UserServiceImplTest {
                            .replace(" ", "") + "functionapp";
     when(encoder.encode(rawPassword)).thenReturn(PASSWORD);
     when(userRepository.save(userStudent)).thenReturn(userStudent);
+    when(functionProperties.getMailGreetingMessage()).thenReturn("%s %s %s %s");
 
     User createdUserStudent = userService.createUser(userStudent);
 
@@ -331,6 +341,7 @@ public class UserServiceImplTest {
     verify(encoder).encode(rawPassword);
     verify(userRepository).save(userStudent);
     verify(mailService).sendEmail(eq(userStudent.getEmail()), eq("Registrasi Sukses"), anyString());
+    verify(functionProperties).getMailGreetingMessage();
   }
 
   @Test
@@ -358,7 +369,7 @@ public class UserServiceImplTest {
     verify(resourceService).getFile(PICTURE_ID);
     verify(encoder).encode(rawPassword);
     verify(userRepository).save(userStudent);
-    verifyZeroInteractions(mailService);
+    verifyZeroInteractions(mailService, functionProperties);
   }
 
   @Test
@@ -373,6 +384,7 @@ public class UserServiceImplTest {
                            .replace(" ", "") + "functionapp";
     when(encoder.encode(PASSWORD)).thenReturn(PASSWORD);
     when(userRepository.save(userMentor)).thenReturn(userMentor);
+    when(functionProperties.getMailGreetingMessage()).thenReturn("%s %s %s %s");
 
     User createdUserMentor = userService.createUser(userMentor);
 
@@ -385,6 +397,7 @@ public class UserServiceImplTest {
     verify(encoder).encode(rawPassword);
     verify(userRepository).save(userMentor);
     verify(mailService).sendEmail(eq(userMentor.getEmail()), eq("Registrasi Sukses"), anyString());
+    verify(functionProperties).getMailGreetingMessage();
     verifyZeroInteractions(batchService);
   }
 
@@ -396,6 +409,7 @@ public class UserServiceImplTest {
                            .replace(" ", "") + "functionapp";
     when(encoder.encode(rawPassword)).thenReturn(PASSWORD);
     when(userRepository.save(userMentor)).thenReturn(userMentor);
+    when(functionProperties.getMailGreetingMessage()).thenReturn("%s %s %s %s");
     User createdUserMentor = userService.createUser(userMentor);
 
     assertThat(createdUserMentor).isNotNull();
@@ -404,6 +418,7 @@ public class UserServiceImplTest {
     verify(encoder).encode(rawPassword);
     verify(userRepository).save(userMentor);
     verify(mailService).sendEmail(eq(userMentor.getEmail()), eq("Registrasi Sukses"), anyString());
+    verify(functionProperties).getMailGreetingMessage();
     verifyZeroInteractions(batchService, resourceService);
   }
 
@@ -423,6 +438,7 @@ public class UserServiceImplTest {
     when(encoder.matches(rawPassword, PASSWORD)).thenReturn(true);
     when(encoder.encode(rawPassword)).thenReturn(PASSWORD);
     when(userRepository.save(userStudent)).thenReturn(userStudent);
+    when(functionProperties.getMailGreetingMessage()).thenReturn("%s %s %s %s");
 
     User updatedUserStudent = userService.updateUser(userStudent);
 
@@ -440,7 +456,8 @@ public class UserServiceImplTest {
     verify(encoder).matches(rawPassword, PASSWORD);
     verify(encoder).encode(rawPassword);
     verify(userRepository).save(userStudent);
-    verifyZeroInteractions(mailService);
+    verify(mailService).sendEmail(eq(userStudent.getEmail()), eq("Registrasi Sukses"), anyString());
+    verify(functionProperties).getMailGreetingMessage();
   }
 
   @Test
@@ -470,7 +487,7 @@ public class UserServiceImplTest {
     verify(resourceService, times(2)).getFile(PICTURE_ID);
     verify(encoder).matches(rawPassword, PASSWORD);
     verify(userRepository).save(userMentor);
-    verifyZeroInteractions(batchService, mailService);
+    verifyZeroInteractions(batchService, mailService, functionProperties);
   }
 
   @Test
@@ -496,7 +513,7 @@ public class UserServiceImplTest {
     verify(resourceService).markFilesUsed(FILE_IDS, false);
     verify(resourceService).getFile(PICTURE_ID);
     verify(userRepository).save(markedDeletedUserStudent);
-    verifyZeroInteractions(batchService, encoder, mailService);
+    verifyZeroInteractions(batchService, encoder, mailService, functionProperties);
   }
 
   @Test
@@ -521,7 +538,7 @@ public class UserServiceImplTest {
     verify(resourceService).markFilesUsed(FILE_IDS, false);
     verify(resourceService).getFile(PICTURE_ID);
     verify(userRepository).save(markedDeletedUserMentor);
-    verifyZeroInteractions(batchService, encoder, mailService);
+    verifyZeroInteractions(batchService, encoder, mailService, functionProperties);
   }
 
   @Test
@@ -542,7 +559,7 @@ public class UserServiceImplTest {
     verify(batchService).getBatchByCode(NUMBER);
     verify(userRepository).findAllByRoleAndBatchAndDeletedFalse(
       Role.STUDENT, BATCH);
-    verifyZeroInteractions(resourceService, encoder, mailService);
+    verifyZeroInteractions(resourceService, encoder, mailService, functionProperties);
   }
 
   @Test
@@ -554,7 +571,7 @@ public class UserServiceImplTest {
     assertThat(foundStudents).isEmpty();
 
     verifyZeroInteractions(
-      batchService, userRepository, resourceService, encoder, mailService);
+      batchService, userRepository, resourceService, encoder, mailService, functionProperties);
   }
 
   @Test
@@ -568,7 +585,7 @@ public class UserServiceImplTest {
     assertThat(caughtException().getClass()).isEqualTo(NotFoundException.class);
 
     verify(batchService).getBatchByCode(NUMBER);
-    verifyZeroInteractions(userRepository, resourceService, encoder, mailService);
+    verifyZeroInteractions(userRepository, resourceService, encoder, mailService, functionProperties);
   }
 
   @Test
@@ -587,7 +604,7 @@ public class UserServiceImplTest {
     verify(batchService).getBatchByCode(NUMBER);
     verify(userRepository).findAllByRoleAndBatchAndDeletedFalse(
       Role.STUDENT, BATCH);
-    verifyZeroInteractions(resourceService, encoder, mailService);
+    verifyZeroInteractions(resourceService, encoder, mailService, functionProperties);
   }
 
   @Test
@@ -602,7 +619,7 @@ public class UserServiceImplTest {
     assertThat(retrievedUser).isEqualTo(userMentor);
 
     verify(userRepository).findByEmailAndDeletedFalse(EMAIL_MENTOR);
-    verifyZeroInteractions(resourceService, encoder, mailService);
+    verifyZeroInteractions(resourceService, encoder, mailService, functionProperties);
   }
 
   @Test
@@ -617,7 +634,7 @@ public class UserServiceImplTest {
     assertThat(caughtException().getMessage()).isEqualTo("Get User Not Found");
 
     verify(userRepository).findByEmailAndDeletedFalse(EMAIL_MENTOR);
-    verifyZeroInteractions(resourceService, encoder, mailService);
+    verifyZeroInteractions(resourceService, encoder, mailService, functionProperties);
   }
 
   @Test
@@ -637,7 +654,7 @@ public class UserServiceImplTest {
 
     verify(userRepository).findByEmailAndDeletedFalse(EMAIL_STUDENT);
     verify(encoder).matches(rawPassword, PASSWORD);
-    verifyZeroInteractions(resourceService, mailService);
+    verifyZeroInteractions(resourceService, mailService, functionProperties);
   }
 
   @Test
@@ -659,7 +676,7 @@ public class UserServiceImplTest {
 
     verify(userRepository).findByEmailAndDeletedFalse(EMAIL_STUDENT);
     verify(encoder).matches(rawPassword, PASSWORD);
-    verifyZeroInteractions(resourceService, mailService);
+    verifyZeroInteractions(resourceService, mailService, functionProperties);
   }
 
   @Test
@@ -681,7 +698,7 @@ public class UserServiceImplTest {
     verify(encoder).matches(OLD_PASSWORD, userStudent.getPassword());
     verify(encoder).encode(NEW_PASSWORD);
     verify(userRepository).save(userStudent);
-    verifyZeroInteractions(resourceService, mailService);
+    verifyZeroInteractions(resourceService, mailService, functionProperties);
   }
 
   @Test
@@ -705,7 +722,7 @@ public class UserServiceImplTest {
 
     verify(userRepository).findByEmailAndDeletedFalse(EMAIL_STUDENT);
     verify(encoder).matches(OLD_PASSWORD, userStudent.getPassword());
-    verifyZeroInteractions(resourceService, mailService);
+    verifyZeroInteractions(resourceService, mailService, functionProperties);
   }
 
   @Test
@@ -725,7 +742,7 @@ public class UserServiceImplTest {
 
     verify(userRepository).findAllByNameContainsIgnoreCaseAndDeletedFalse(
       namePart, PAGEABLE);
-    verifyZeroInteractions(resourceService, encoder, mailService);
+    verifyZeroInteractions(resourceService, encoder, mailService, functionProperties);
   }
 
   @Test
@@ -762,7 +779,7 @@ public class UserServiceImplTest {
       Collections.singletonList(PICTURE_ID), true);
     verify(resourceService).getFile(PICTURE_ID);
     verify(userRepository).save(savedUser);
-    verifyZeroInteractions(mailService);
+    verifyZeroInteractions(mailService, functionProperties);
   }
 
   @Test
@@ -784,7 +801,7 @@ public class UserServiceImplTest {
     assertThat(updatedUser).isEqualTo(user);
 
     verify(userRepository).findByEmailAndDeletedFalse(EMAIL_STUDENT);
-    verifyZeroInteractions(resourceService, mailService);
+    verifyZeroInteractions(resourceService, mailService, functionProperties);
   }
 
 }
