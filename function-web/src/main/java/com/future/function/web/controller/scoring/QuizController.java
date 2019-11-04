@@ -45,16 +45,15 @@ public class QuizController {
       int page,
     @RequestParam(defaultValue = "10")
       int size,
+      @RequestParam(defaultValue = "false")
+      boolean isPassedDeadline,
     @WithAnyRole(roles = { Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT })
       Session session
   ) {
 
     return QuizResponseMapper.toQuizWebPagingResponse(
-      quizService.findAllByBatchCodeAndPageable(batchCode,
-                                                PageHelper.toPageable(page,
-                                                                      size),
-                                                session.getRole(), session.getBatchId()
-      ));
+      quizService.findAllByBatchCodeAndPageable(batchCode, PageHelper.toPageable(page, size),
+          session.getRole(), session.getBatchId(), isPassedDeadline));
   }
 
   @ResponseStatus(value = HttpStatus.OK)
@@ -67,7 +66,9 @@ public class QuizController {
       Session session
   ) {
 
-    return QuizResponseMapper.toQuizWebDataResponse(quizService.findById(id, session.getRole(), session.getBatchId()));
+    return QuizResponseMapper.toQuizWebDataResponse(
+        quizService.findById(id, session.getRole(), session.getBatchId())
+    );
   }
 
   @ResponseStatus(HttpStatus.CREATED)

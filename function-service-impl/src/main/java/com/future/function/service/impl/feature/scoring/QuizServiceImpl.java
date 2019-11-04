@@ -12,14 +12,11 @@ import com.future.function.service.api.feature.scoring.QuestionBankService;
 import com.future.function.service.api.feature.scoring.QuizService;
 import com.future.function.service.impl.helper.CopyHelper;
 import com.future.function.service.impl.helper.PageHelper;
-import com.future.function.service.impl.helper.SortHelper;
-import com.future.function.session.model.Session;
-import java.util.ArrayList;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Observable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -52,26 +49,48 @@ public class QuizServiceImpl extends Observable implements QuizService {
 
     return Optional.ofNullable(id)
       .flatMap(quizRepository::findByIdAndDeletedFalse)
-      .map(quiz -> this.validateStudentBatch(quiz, role, sessionBatchId))
+      .map(quiz -> this.validateStudentBatchWithQuiz(quiz, role, sessionBatchId))
       .orElseThrow(
         () -> new NotFoundException("Failed at #findById #QuizService"));
   }
 
+  private Quiz validateStudentBatchWithQuiz(Quiz quiz, Role role, String sessionBatchId) {
+    boolean isStudent = role.equals(Role.STUDENT);
+    if(!isStudent)  {
+      return quiz;
+    } else if (sessionBatchId.equals(quiz.getBatch().getId())) {
+      return quiz;
+    } else {
+      throw new ForbiddenException("User Not Allowed");
+    }
+  }
+
   @Override
   public Page<Quiz> findAllByBatchCodeAndPageable(
-    String batchCode, Pageable pageable, Role role, String sessionBatchId
+    String batchCode, Pageable pageable, Role role, String sessionBatchId, boolean deadline
   ) {
 
     return Optional.ofNullable(batchCode)
       .map(batchService::getBatchByCode)
-      .map(batch -> this.validateStudentBatch(batch, role, sessionBatchId))
-      .map(
-        batch -> quizRepository.findAllByBatchAndDeletedFalseOrderByEndDateAsc(batch, pageable))
-      .map(this::sortByClosestDeadline)
+      .map(batch -> this.validateStudentBatchWithBatch(batch, role, sessionBatchId))
+      .map(batch -> this.getQuizPage(batch, pageable, deadline))
       .orElseGet(() -> PageHelper.empty(pageable));
   }
 
-  private Batch validateStudentBatch(Batch batch, Role role, String sessionBatchId) {
+  private Page<Quiz> getQuizPage(Batch batch, Pageable pageable, boolean deadline) {
+    return Optional.of(batch)
+        .filter(filter -> deadline)
+        .map(currentBatch -> quizRepository
+            .findAllByBatchAndDeletedFalseAndEndDateAfterOrderByEndDateDesc(currentBatch, getDateInLong(), pageable))
+        .orElseGet(() -> quizRepository
+            .findAllByBatchAndDeletedFalseAndEndDateBeforeOrderByEndDateAsc(batch, getDateInLong(), pageable));
+  }
+
+  private Long getDateInLong() {
+    return LocalDate.now().atTime(23, 59)
+        .atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+  }
+  private Batch validateStudentBatchWithBatch(Batch batch, Role role, String sessionBatchId) {
     boolean isStudent = role.equals(Role.STUDENT);
     if(isStudent && sessionBatchId.equals(batch.getId())) {
       return batch;
@@ -82,102 +101,89 @@ public class QuizServiceImpl extends Observable implements QuizService {
     }
   }
 
-  private Quiz validateStudentBatch(Quiz quiz, Role role, String sessionBatchId) {
-    boolean isStudent = role.equals(Role.STUDENT);
-    if(isStudent && sessionBatchId.equals(quiz.getBatch().getId())) {
-      return quiz;
-    } else if (!isStudent) {
-      return quiz;
-    } else {
-      throw new ForbiddenException("User Not Allowed");
-    }
-  }
-
-  private Page<Quiz> sortByClosestDeadline(Page<Quiz> quizPage) {
-    List<Quiz> sortedQuiz = new ArrayList<>(quizPage.getContent());
-    sortedQuiz.sort((quiz1, quiz2) -> SortHelper.compareClosestDeadline(quiz1.getEndDate(), quiz2.getEndDate()));
-    return new PageImpl<>(sortedQuiz, new PageRequest(quizPage.getNumber(), quizPage.getSize()),
-        quizPage.getTotalElements());
-  }
-
   @Override
   public Quiz copyQuizWithTargetBatchCode(String targetBatchCode, String quizId) {
 
     return Optional.ofNullable(quizId)
       .flatMap(quizRepository::findByIdAndDeletedFalse)
-      .map(currentQuiz -> this.initializeNewQuiz(currentQuiz, targetBatchCode))
+      .map(foundQuiz -> this.createQuiz(foundQuiz, targetBatchCode))
       .map(quizRepository::save)
       .orElseThrow(() -> new UnsupportedOperationException(
         "Failed at #copyQuizWithTargetBatchCode #QuizService"));
   }
 
-  private Quiz initializeNewQuiz(Quiz quiz, String targetBatchCode) {
+  private Quiz createQuiz(Quiz quiz, String targetBatchCode) {
     Quiz newQuiz = Quiz.builder().build();
+    Batch codeOnlyBatch = Batch.builder().code(targetBatchCode).build();
     CopyHelper.copyProperties(quiz, newQuiz);
-    newQuiz.setBatch(Batch.builder().code(targetBatchCode).build());
-    return this.setBatch(newQuiz);
+    newQuiz.setBatch(codeOnlyBatch);
+    return this.getBatchObjAndSetToQuiz(newQuiz);
   }
 
   @Override
   public Quiz createQuiz(Quiz request) {
 
     return Optional.ofNullable(request)
-      .map(this::setBatch)
-      .map(this::setQuestionBank)
+      .map(this::getBatchObjAndSetToQuiz)
+      .map(this::setQuestionBankList)
       .map(quizRepository::save)
       .orElseThrow(() -> new UnsupportedOperationException(
         "Failed on #createQuiz #QuizService"));
   }
 
-  private Quiz setQuestionBank(Quiz quiz) {
-
-    quiz.setQuestionBanks(getQuestionBanksFromService(quiz.getQuestionBanks()));
+  private Quiz setQuestionBankList(Quiz quiz) {
+    List<QuestionBank> idOnlyQuestionBanks = quiz.getQuestionBanks();
+    List<QuestionBank> questionBankList = getQuestionBankList(idOnlyQuestionBanks);
+    quiz.setQuestionBanks(questionBankList);
     return quiz;
   }
 
-  private Quiz setBatch(Quiz quiz) {
-    quiz.setBatch(batchService.getBatchByCode(quiz.getBatch().getCode()));
+  private Quiz getBatchObjAndSetToQuiz(Quiz quiz) {
+    Batch batchObj = batchService.getBatchByCode(quiz.getBatch().getCode());
+    quiz.setBatch(batchObj);
     return quiz;
   }
 
-  private List<QuestionBank> getQuestionBanksFromService(
-    List<QuestionBank> questionBanks
+  private List<QuestionBank> getQuestionBankList(
+    List<QuestionBank> idOnlyQuestionBanks
   ) {
 
-    return Optional.of(questionBanks)
-      .filter(questionBankList -> !questionBankList.get(0)
-        .getId()
-        .equals("ALL"))
+    return Optional.of(idOnlyQuestionBanks)
+      .filter(this::isSelectedOrAll)
       .map(this::getSelectedQuestionBanks)
       .orElseGet(questionBankService::findAll);
   }
 
+  private boolean isSelectedOrAll(List<QuestionBank> questionBankList) {
+    return !questionBankList.get(0).getId().equals("ALL");
+  }
+
   private List<QuestionBank> getSelectedQuestionBanks(
-    List<QuestionBank> questionBanks
+    List<QuestionBank> idOnlyQuestionBanks
   ) {
 
-    return questionBanks.stream()
+    return idOnlyQuestionBanks.stream()
       .map(QuestionBank::getId)
       .map(questionBankService::findById)
       .collect(Collectors.toList());
   }
 
   @Override
-  public Quiz updateQuiz(Quiz request) {
+  public Quiz updateQuiz(Quiz requestedQuiz) {
 
-    return Optional.ofNullable(request)
+    return Optional.ofNullable(requestedQuiz)
       .map(Quiz::getId)
       .flatMap(quizRepository::findByIdAndDeletedFalse)
-      .map(quiz -> copyRequestedQuizAttributes(request, quiz))
-      .map(this::setBatch)
-      .map(this::setQuestionBank)
+      .map(quiz -> copyAttributes(requestedQuiz, quiz))
+      .map(this::getBatchObjAndSetToQuiz)
+      .map(this::setQuestionBankList)
       .map(quizRepository::save)
-      .orElse(request);
+      .orElse(requestedQuiz);
   }
 
-  private Quiz copyRequestedQuizAttributes(Quiz request, Quiz quiz) {
+  private Quiz copyAttributes(Quiz requestedQuiz, Quiz quiz) {
 
-    CopyHelper.copyProperties(request, quiz);
+    CopyHelper.copyProperties(requestedQuiz, quiz);
     return quiz;
   }
 
@@ -186,10 +192,10 @@ public class QuizServiceImpl extends Observable implements QuizService {
 
     Optional.ofNullable(id)
       .flatMap(quizRepository::findByIdAndDeletedFalse)
-      .ifPresent(this::notifyStudentQuizServiceAndSaveDeletedQuiz);
+      .ifPresent(this::notifyObserversAndDeleteQuiz);
   }
 
-  private void notifyStudentQuizServiceAndSaveDeletedQuiz(Quiz quiz) {
+  private void notifyObserversAndDeleteQuiz(Quiz quiz) {
     this.setChanged();
     this.notifyObservers(quiz);
     quiz.setDeleted(true);

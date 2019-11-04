@@ -51,14 +51,15 @@ public class AssignmentController {
       int page,
     @RequestParam(defaultValue = "10")
       int size,
+      @RequestParam(defaultValue = "false")
+      boolean isPassedDeadline,
     @WithAnyRole(roles = { Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT })
       Session session
   ) {
 
     return AssignmentResponseMapper.toAssignmentsPagingResponse(
-      assignmentService.findAllByBatchCodeAndPageable(batchCode,
-                                                      PageHelper.toPageable(
-                                                        page, size), session.getRole(), session.getBatchId()
+      assignmentService.findAllByBatchCodeAndPageable(batchCode, PageHelper.toPageable(page, size),
+          session.getRole(), session.getBatchId(), isPassedDeadline
       ), fileProperties.getUrlPrefix());
   }
 

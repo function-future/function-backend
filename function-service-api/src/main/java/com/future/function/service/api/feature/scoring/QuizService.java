@@ -12,7 +12,7 @@ public interface QuizService {
 
   Quiz findById(String id, Role role, String sessionBatchId);
 
-  Page<Quiz> findAllByBatchCodeAndPageable(String batchCode, Pageable pageable, Role role, String sessionBatchId);
+  Page<Quiz> findAllByBatchCodeAndPageable(String batchCode, Pageable pageable, Role role, String sessionBatchId, boolean deadline);
 
   Quiz copyQuizWithTargetBatchCode(String targetBatchCode, String quizId);
 

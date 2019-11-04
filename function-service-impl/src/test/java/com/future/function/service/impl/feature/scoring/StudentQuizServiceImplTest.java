@@ -190,7 +190,7 @@ public class StudentQuizServiceImplTest {
     )).thenReturn(studentQuizDetail);
     when(studentQuizDetailService.findLatestByStudentQuizId(
       STUDENT_QUIZ_ID)).thenReturn(studentQuizDetail);
-    when(quizService.findById(QUIZ_ID, Role.ADMIN, "")).thenReturn(quiz);
+    when(quizService.findById(QUIZ_ID, Role.ADMIN, null)).thenReturn(quiz);
     verify(quizService).addObserver(studentQuizService);
   }
 
@@ -209,7 +209,6 @@ public class StudentQuizServiceImplTest {
     assertThat(actual.size()).isEqualTo(1);
     assertThat(actual.get(0).getId()).isEqualTo(STUDENT_QUIZ_ID);
     assertThat(actual.get(0).getTrials()).isEqualTo(QUIZ_TRIALS);
-    verify(userService).getUser(USER_ID);
     verify(studentQuizRepository).findAllByStudentIdAndDeletedFalse(USER_ID);
   }
 
@@ -257,7 +256,7 @@ public class StudentQuizServiceImplTest {
     StudentQuiz studentQuiz = studentQuizService.findOrCreateByStudentIdAndQuizId(USER_ID, QUIZ_ID);
     assertThat(studentQuiz.getId()).isEqualTo(STUDENT_QUIZ_ID);
     assertThat(studentQuiz.getTrials()).isEqualTo(QUIZ_TRIALS);
-    verify(quizService).findById(QUIZ_ID, Role.ADMIN, "");
+    verify(quizService).findById(QUIZ_ID, Role.ADMIN, null);
     verify(userService).getUser(USER_ID);
     verify(studentQuizRepository).findByStudentIdAndQuizIdAndDeletedFalse(USER_ID, QUIZ_ID);
     verify(studentQuizRepository).save(any(StudentQuiz.class));

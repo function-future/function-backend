@@ -160,7 +160,7 @@ public class AssignmentControllerTest extends TestHelper {
     when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
     when(assignmentService.findAllByBatchCodeAndPageable(BATCH_CODE,
                                                          pageable, ADMIN_SESSION.getRole(),
-        ADMIN_SESSION.getBatchId()
+        ADMIN_SESSION.getBatchId(), false
     )).thenReturn(assignmentPage);
     when(assignmentService.copyAssignment(ASSIGNMENT_ID, "BATCH-3")).thenReturn(
       assignment);
@@ -283,7 +283,7 @@ public class AssignmentControllerTest extends TestHelper {
           .getJson()));
 
     verify(assignmentService).findAllByBatchCodeAndPageable(
-      BATCH_CODE, pageable, ADMIN_SESSION.getRole(), ADMIN_SESSION.getBatchId());
+      BATCH_CODE, pageable, ADMIN_SESSION.getRole(), ADMIN_SESSION.getBatchId(), false);
     verifyZeroInteractions(assignmentRequestMapper);
   }
 
@@ -300,7 +300,7 @@ public class AssignmentControllerTest extends TestHelper {
           .getJson()));
 
     verify(assignmentService).findAllByBatchCodeAndPageable(
-      BATCH_CODE, pageable, ADMIN_SESSION.getRole(), ADMIN_SESSION.getBatchId());
+      BATCH_CODE, pageable, ADMIN_SESSION.getRole(), ADMIN_SESSION.getBatchId(), false);
     verifyZeroInteractions(assignmentRequestMapper);
   }
 

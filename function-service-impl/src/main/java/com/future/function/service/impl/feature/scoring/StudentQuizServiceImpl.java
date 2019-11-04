@@ -54,8 +54,6 @@ public class StudentQuizServiceImpl implements StudentQuizService, Observer {
   public List<StudentQuiz> findAllByStudentId(String studentId) {
 
     return Optional.of(studentId)
-      .map(userService::getUser)
-      .map(User::getId)
       .map(studentQuizRepository::findAllByStudentIdAndDeletedFalse)
       .orElseGet(ArrayList::new);
   }
@@ -65,16 +63,16 @@ public class StudentQuizServiceImpl implements StudentQuizService, Observer {
 
     return Optional.ofNullable(studentId)
       .map(userId -> studentQuizRepository.findAllByStudentIdAndDeletedFalse(userId, pageable))
-      .map(this::mapStudentQuizzesToDetail)
+      .map(this::mapToDetailList)
       .map(list -> PageHelper.toPage(list, pageable))
       .orElseGet(() -> PageHelper.empty(pageable));
   }
 
-  private List<StudentQuizDetail> mapStudentQuizzesToDetail(
-    Page<StudentQuiz> quizPage
+  private List<StudentQuizDetail> mapToDetailList(
+    Page<StudentQuiz> studentQuizPage
   ) {
 
-    return quizPage.getContent().stream()
+    return studentQuizPage.getContent().stream()
       .map(StudentQuiz::getId)
       .map(studentQuizDetailService::findLatestByStudentQuizId)
       .collect(Collectors.toList());
@@ -86,13 +84,27 @@ public class StudentQuizServiceImpl implements StudentQuizService, Observer {
     return Optional.ofNullable(studentId)
       .flatMap(id -> studentQuizRepository.findByStudentIdAndQuizIdAndDeletedFalse(id, quizId))
       .filter(Objects::nonNull)
-      .orElseGet(() -> this.createNewStudentQuiz(studentId, quizId));
+      .orElseGet(() -> this.createStudentQuiz(studentId, quizId));
   }
 
-  private StudentQuiz createNewStudentQuiz(String studentId, String quizId) {
-    Quiz quiz = quizService.findById(quizId, Role.ADMIN, "");
+  private StudentQuiz createStudentQuiz(String studentId, String quizId) {
+    Quiz quiz = quizService.findById(quizId, Role.ADMIN, null);
     User student = userService.getUser(studentId);
-    return this.createStudentQuizAndSave(student, quiz);
+    return Optional.ofNullable(quiz)
+        .map(quizObj -> toStudentQuiz(student, quizObj))
+        .map(studentQuizRepository::save)
+        .orElseThrow(() -> new UnsupportedOperationException(
+            "Failed at #createStudentQuizAndSave #StudentQuizService"));
+  }
+
+  private StudentQuiz toStudentQuiz(User user, Quiz quiz) {
+
+    return StudentQuiz.builder()
+        .quiz(quiz)
+        .student(user)
+        .trials(0)
+        .done(false)
+        .build();
   }
 
   @Override
@@ -102,28 +114,28 @@ public class StudentQuizServiceImpl implements StudentQuizService, Observer {
 
     return Optional.ofNullable(studentId)
       .flatMap(id -> studentQuizRepository.findByStudentIdAndQuizIdAndDeletedFalse(id, quizId))
-      .map(this::updateStudentQuizTrialsAndReturn)
+      .map(this::updateTrialsAndReturn)
       .map(studentQuizDetailService::findAllUnansweredQuestionsByStudentQuizId)
       .orElseThrow(() -> new UnsupportedOperationException("EMPTY_TRIALS"));
   }
 
-  private StudentQuiz updateStudentQuizTrialsAndReturn(
+  private StudentQuiz updateTrialsAndReturn(
     StudentQuiz studentQuiz
   ) {
 
     return Optional.ofNullable(studentQuiz)
       .filter(Objects::nonNull)
-      .filter(this::validateTrialsNotReachedLimit)
-      .map(this::addStudentQuizTrials)
+      .filter(this::validateTrials)
+      .map(this::addTrials)
       .map(studentQuizRepository::save)
       .orElse(null);
   }
 
-  private boolean validateTrialsNotReachedLimit(StudentQuiz currentStudentQuiz) {
-    return currentStudentQuiz.getTrials() < currentStudentQuiz.getQuiz().getTrials();
+  private boolean validateTrials(StudentQuiz studentQuiz) {
+    return studentQuiz.getTrials() < studentQuiz.getQuiz().getTrials();
   }
 
-  private StudentQuiz addStudentQuizTrials(StudentQuiz studentQuiz) {
+  private StudentQuiz addTrials(StudentQuiz studentQuiz) {
 
     studentQuiz.setTrials(studentQuiz.getTrials() + 1);
     return studentQuiz;
@@ -138,18 +150,9 @@ public class StudentQuizServiceImpl implements StudentQuizService, Observer {
       .flatMap(id -> studentQuizRepository.findByStudentIdAndQuizIdAndDeletedFalse(id, quizId))
       .filter(Objects::nonNull)
       .map(StudentQuiz::getId)
-      .map(id -> studentQuizDetailService.answerStudentQuiz(id, answers))
+      .map(studentQuizId -> studentQuizDetailService.answerStudentQuiz(studentQuizId, answers))
       .orElseThrow(() -> new UnsupportedOperationException(
         "Failed at #answerQuestionsByStudentQuizId #StudentQuizService"));
-  }
-
-  private StudentQuiz createStudentQuizAndSave(User user, Quiz quiz) {
-
-    return Optional.ofNullable(quiz)
-      .map(quizObj -> toStudentQuizWithUserAndQuiz(user, quizObj))
-      .map(studentQuizRepository::save)
-      .orElseThrow(() -> new UnsupportedOperationException(
-        "Failed at #createStudentQuizAndSave #StudentQuizService"));
   }
 
   @Override
@@ -157,7 +160,7 @@ public class StudentQuizServiceImpl implements StudentQuizService, Observer {
 
     Optional.ofNullable(id)
       .flatMap(studentQuizRepository::findByIdAndDeletedFalse)
-      .ifPresent(this::deleteAllDetailAndSaveDeletedStudentQuiz);
+      .ifPresent(this::deleteAllDetailAndDelete);
   }
 
   @Override
@@ -166,32 +169,22 @@ public class StudentQuizServiceImpl implements StudentQuizService, Observer {
     userService.getStudentsByBatchCode(quiz.getBatch()
                                          .getCode())
       .parallelStream()
-      .forEach(user -> findStudentQuizAndDelete(user, quiz));
+      .forEach(user -> findAndDelete(user, quiz));
   }
 
-  private void findStudentQuizAndDelete(User student, Quiz quiz) {
+  private void findAndDelete(User student, Quiz quiz) {
 
     Optional.ofNullable(student)
           .map(User::getId)
           .flatMap(studentId -> studentQuizRepository.findByStudentIdAndQuizIdAndDeletedFalse(studentId, quiz.getId()))
-          .ifPresent(this::deleteAllDetailAndSaveDeletedStudentQuiz);
+          .ifPresent(this::deleteAllDetailAndDelete);
   }
 
-  private void deleteAllDetailAndSaveDeletedStudentQuiz(StudentQuiz value) {
+  private void deleteAllDetailAndDelete(StudentQuiz studentQuiz) {
 
-    studentQuizDetailService.deleteByStudentQuiz(value);
-    value.setDeleted(true);
-    studentQuizRepository.save(value);
-  }
-
-  private StudentQuiz toStudentQuizWithUserAndQuiz(User user, Quiz quiz) {
-
-    return StudentQuiz.builder()
-      .quiz(quiz)
-      .student(user)
-      .trials(0)
-      .done(false)
-      .build();
+    studentQuizDetailService.deleteByStudentQuiz(studentQuiz);
+    studentQuiz.setDeleted(true);
+    studentQuizRepository.save(studentQuiz);
   }
 
   @Override

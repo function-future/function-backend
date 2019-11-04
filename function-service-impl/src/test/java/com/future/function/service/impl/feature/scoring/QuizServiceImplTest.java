@@ -12,6 +12,8 @@ import com.future.function.repository.feature.scoring.QuizRepository;
 import com.future.function.service.api.feature.core.BatchService;
 import com.future.function.service.api.feature.scoring.QuestionBankService;
 import com.future.function.service.api.feature.scoring.QuestionService;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -66,6 +68,9 @@ public class QuizServiceImplTest {
     "question-bank-description";
 
   private static final String QUESTION_TEXT = "question-text";
+
+  private Long DATE_NOW = LocalDate.now().atTime(23, 59)
+      .atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
 
   private int PAGE = 0;
 
@@ -138,8 +143,11 @@ public class QuizServiceImplTest {
     quizPage = new PageImpl<>(quizList, pageable, TOTAL);
 
     when(
-      quizRepository.findAllByBatchAndDeletedFalseOrderByEndDateAsc(batch, pageable)).thenReturn(
+      quizRepository.findAllByBatchAndDeletedFalseAndEndDateBeforeOrderByEndDateAsc(batch, DATE_NOW, pageable)).thenReturn(
       quizPage);
+    when(
+        quizRepository.findAllByBatchAndDeletedFalseAndEndDateAfterOrderByEndDateDesc(batch, DATE_NOW, pageable)).thenReturn(
+        quizPage);
     when(quizRepository.findByIdAndDeletedFalse(QUIZ_ID)).thenReturn(
       Optional.of(quiz));
     when(quizRepository.save(quiz)).thenReturn(quiz);
@@ -212,12 +220,12 @@ public class QuizServiceImplTest {
   public void testFindPageOfQuizWithPageableFilterAndSearch() {
 
     Page<Quiz> actual = quizService.findAllByBatchCodeAndPageable(
-      BATCH_CODE, pageable, Role.STUDENT, BATCH_ID);
+      BATCH_CODE, pageable, Role.STUDENT, BATCH_ID, true);
     assertThat(actual.getContent()).isEqualTo(quizList);
     assertThat(actual.getTotalElements()).isEqualTo(TOTAL);
     assertThat(actual).isEqualTo(quizPage);
 
-    verify(quizRepository).findAllByBatchAndDeletedFalseOrderByEndDateAsc(batch, pageable);
+    verify(quizRepository).findAllByBatchAndDeletedFalseAndEndDateAfterOrderByEndDateDesc(batch, DATE_NOW, pageable);
     verify(batchService).getBatchByCode(BATCH_CODE);
   }
 
@@ -225,12 +233,12 @@ public class QuizServiceImplTest {
   public void testFindPageOfQuizWithPageableFilterAndSearchAndAccessedByAdmin() {
 
     Page<Quiz> actual = quizService.findAllByBatchCodeAndPageable(
-        BATCH_CODE, pageable, Role.ADMIN, "");
+        BATCH_CODE, pageable, Role.ADMIN, "", true);
     assertThat(actual.getContent()).isEqualTo(quizList);
     assertThat(actual.getTotalElements()).isEqualTo(TOTAL);
     assertThat(actual).isEqualTo(quizPage);
 
-    verify(quizRepository).findAllByBatchAndDeletedFalseOrderByEndDateAsc(batch, pageable);
+    verify(quizRepository).findAllByBatchAndDeletedFalseAndEndDateAfterOrderByEndDateDesc(batch, DATE_NOW, pageable);
     verify(batchService).getBatchByCode(BATCH_CODE);
   }
 
@@ -238,13 +246,13 @@ public class QuizServiceImplTest {
   public void testFindPageOfQuizWithPageableFilterNullAndSearchNull() {
 
     Page<Quiz> actual = quizService.findAllByBatchCodeAndPageable(
-      BATCH_CODE, pageable, Role.STUDENT, BATCH_ID);
+      BATCH_CODE, pageable, Role.STUDENT, BATCH_ID, false);
 
     assertThat(actual.getContent()).isEqualTo(quizList);
     assertThat(actual.getTotalElements()).isEqualTo(TOTAL);
     assertThat(actual).isEqualTo(quizPage);
 
-    verify(quizRepository).findAllByBatchAndDeletedFalseOrderByEndDateAsc(batch, pageable);
+    verify(quizRepository).findAllByBatchAndDeletedFalseAndEndDateBeforeOrderByEndDateAsc(batch, DATE_NOW, pageable);
     verify(batchService).getBatchByCode(BATCH_CODE);
   }
 
@@ -252,7 +260,7 @@ public class QuizServiceImplTest {
   public void testFindPageOfQuizWithPageableFilterNullAndSearchNullAndAnotherStudentBatchAccess() {
 
     catchException(() -> quizService.findAllByBatchCodeAndPageable(
-        BATCH_CODE, pageable, Role.STUDENT, "another-batch-id"));
+        BATCH_CODE, pageable, Role.STUDENT, "another-batch-id", true));
 
     assertThat(caughtException().getClass()).isEqualTo(ForbiddenException.class);
 

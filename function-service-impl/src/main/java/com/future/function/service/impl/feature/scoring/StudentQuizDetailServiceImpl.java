@@ -9,7 +9,6 @@ import com.future.function.model.entity.feature.scoring.StudentQuizDetail;
 import com.future.function.repository.feature.scoring.StudentQuizDetailRepository;
 import com.future.function.service.api.feature.scoring.StudentQuestionService;
 import com.future.function.service.api.feature.scoring.StudentQuizDetailService;
-import com.future.function.service.impl.helper.CopyHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -54,40 +53,44 @@ public class StudentQuizDetailServiceImpl implements StudentQuizDetailService {
 
     return Optional.ofNullable(studentQuiz)
       .map(StudentQuiz::getQuiz)
-      .filter(quiz -> quiz.getEndDate() > new Date().getTime())
-      .map(this::findAllQuestionsFromStudentQuestionService)
-      .map(questionList -> createStudentQuestions(studentQuiz, questionList))
+      .filter(this::validateDeadline)
+      .map(this::findAllQuestions)
+      .map(questionList -> toStudentQuestions(studentQuiz, questionList))
       .orElseThrow(() -> new UnsupportedOperationException("DEADLINE"));
   }
 
-  private List<StudentQuestion> createStudentQuestions(
+  private boolean validateDeadline(Quiz quiz) {
+    return quiz.getEndDate() > new Date().getTime();
+  }
+
+  private List<Question> findAllQuestions(Quiz quiz) {
+
+    return studentQuestionService.findAllRandomQuestionsFromMultipleQuestionBank(
+        quiz.getQuestionBanks(), quiz.getQuestionCount());
+  }
+
+  private List<StudentQuestion> toStudentQuestions(
     StudentQuiz studentQuiz, List<Question> questionList
   ) {
 
     return Optional.ofNullable(studentQuiz)
-      .map(this::createNewStudentQuizDetail)
+      .map(this::createDetail)
       .map(
         studentQuizDetail -> studentQuestionService.createStudentQuestionsFromQuestionList(
           questionList, studentQuizDetail))
       .orElseThrow(() -> new UnsupportedOperationException(
-        "Failed at #createStudentQuestions #StudentQuizDetailService"));
+        "Failed at #toStudentQuestions #StudentQuizDetailService"));
   }
 
-  private List<Question> findAllQuestionsFromStudentQuestionService(Quiz quiz) {
-
-    return studentQuestionService.findAllRandomQuestionsFromMultipleQuestionBank(
-      quiz.getQuestionBanks(), quiz.getQuestionCount());
-  }
-
-  private StudentQuizDetail createNewStudentQuizDetail(StudentQuiz studentQuiz) {
+  private StudentQuizDetail createDetail(StudentQuiz studentQuiz) {
 
     return Optional.ofNullable(studentQuiz)
-      .map(this::initializeStudentQuizDetail)
+      .map(this::toDetail)
       .map(studentQuizDetailRepository::save)
       .orElse(null);
   }
 
-  private StudentQuizDetail initializeStudentQuizDetail(
+  private StudentQuizDetail toDetail(
     StudentQuiz studentQuiz
   ) {
 
@@ -101,12 +104,12 @@ public class StudentQuizDetailServiceImpl implements StudentQuizDetailService {
     String studentQuizId, List<StudentQuestion> answers
   ) {
 
-    StudentQuizDetail detail = this.findLatestByStudentQuizId(studentQuizId);
-    return Optional.ofNullable(detail)
-      .map(value -> mapToStudentQuestionsWithDetail(answers, value))
+    StudentQuizDetail studentQuizDetail = this.findLatestByStudentQuizId(studentQuizId);
+    return Optional.ofNullable(studentQuizDetail)
+      .map(detail -> mapToStudentQuestionsWithDetail(answers, detail))
       .map(answerList -> studentQuestionService.postAnswerForAllStudentQuestion(
-        answerList, detail.getId()))
-      .map(point -> setStudentQuizDetailPoint(detail, point))
+        answerList, studentQuizDetail.getId()))
+      .map(point -> setStudentQuizDetailPoint(studentQuizDetail, point))
       .map(studentQuizDetailRepository::save)
       .orElseThrow(() -> new UnsupportedOperationException(
         "Failed at #answerStudentQuiz #StudentQuizDetailService"));
@@ -126,11 +129,11 @@ public class StudentQuizDetailServiceImpl implements StudentQuizDetailService {
 
     return answers.stream()
       .map(
-        answer -> setStudentQuestionStudentQuizDetailAttribute(detail, answer))
+        answer -> setAnswerDetail(detail, answer))
       .collect(Collectors.toList());
   }
 
-  private StudentQuestion setStudentQuestionStudentQuizDetailAttribute(
+  private StudentQuestion setAnswerDetail(
     StudentQuizDetail detail, StudentQuestion answer
   ) {
 

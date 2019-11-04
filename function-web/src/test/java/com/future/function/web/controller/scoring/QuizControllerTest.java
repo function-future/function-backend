@@ -178,7 +178,7 @@ public class QuizControllerTest extends TestHelper {
     when(quizService.updateQuiz(quiz)).thenReturn(quiz);
     when(quizService.findAllByBatchCodeAndPageable(QUIZ_BATCH_CODE,
                                                    pageable, ADMIN_SESSION.getRole(),
-        ADMIN_SESSION.getBatchId())).thenReturn(quizPage);
+        ADMIN_SESSION.getBatchId(), false)).thenReturn(quizPage);
     when(
       quizService.copyQuizWithTargetBatchCode(QUIZ_BATCH_ID, QUIZ_ID)).thenReturn(
       quiz);
@@ -238,7 +238,7 @@ public class QuizControllerTest extends TestHelper {
           .getJson()));
 
     verify(quizService).findAllByBatchCodeAndPageable(
-      QUIZ_BATCH_CODE, pageable, ADMIN_SESSION.getRole(), ADMIN_SESSION.getBatchId());
+      QUIZ_BATCH_CODE, pageable, ADMIN_SESSION.getRole(), ADMIN_SESSION.getBatchId(), false);
   }
 
   @Test
@@ -253,7 +253,7 @@ public class QuizControllerTest extends TestHelper {
           .getJson()));
 
     verify(quizService).findAllByBatchCodeAndPageable(
-      QUIZ_BATCH_CODE, pageable, ADMIN_SESSION.getRole(), ADMIN_SESSION.getBatchId());
+      QUIZ_BATCH_CODE, pageable, ADMIN_SESSION.getRole(), ADMIN_SESSION.getBatchId(), false);
   }
 
   @Test

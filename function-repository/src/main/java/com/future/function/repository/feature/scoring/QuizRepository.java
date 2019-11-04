@@ -12,6 +12,8 @@ public interface QuizRepository extends MongoRepository<Quiz, String> {
 
   Optional<Quiz> findByIdAndDeletedFalse(String id);
 
-  Page<Quiz> findAllByBatchAndDeletedFalseOrderByEndDateAsc(Batch batch, Pageable pageable);
+  Page<Quiz> findAllByBatchAndDeletedFalseAndEndDateBeforeOrderByEndDateAsc(Batch batch, Long endDate, Pageable pageable);
+
+  Page<Quiz> findAllByBatchAndDeletedFalseAndEndDateAfterOrderByEndDateDesc(Batch batch, Long endDate, Pageable pageable);
 
 }

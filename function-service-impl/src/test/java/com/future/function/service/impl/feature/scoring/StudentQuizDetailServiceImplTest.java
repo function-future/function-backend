@@ -128,10 +128,6 @@ public class StudentQuizDetailServiceImplTest {
       studentQuizDetail);
     when(studentQuizDetailRepository.save(
       any(StudentQuizDetail.class))).thenReturn(studentQuizDetail);
-    when(studentQuestionService.createStudentQuestionsByStudentQuizDetail(
-      studentQuizDetail,
-      Collections.singletonList(studentQuestion)
-    )).thenReturn(Collections.singletonList(studentQuestion));
     when(studentQuestionService.findAllRandomQuestionsFromMultipleQuestionBank(
       Collections.singletonList(questionBank), QUESTION_COUNT)).thenReturn(
       Collections.singletonList(question));

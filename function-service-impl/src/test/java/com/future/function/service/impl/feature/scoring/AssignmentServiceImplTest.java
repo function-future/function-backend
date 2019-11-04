@@ -12,6 +12,8 @@ import com.future.function.repository.feature.scoring.AssignmentRepository;
 import com.future.function.service.api.feature.core.BatchService;
 import com.future.function.service.api.feature.core.ResourceService;
 import com.future.function.service.impl.helper.CopyHelper;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Arrays;
 import org.junit.After;
 import org.junit.Before;
@@ -39,6 +41,9 @@ import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class AssignmentServiceImplTest {
+
+  private static final Long DATE_NOW = LocalDate.now().atTime(23, 59)
+      .atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
 
   private static final String ASSIGNMENT_ID = "assignment-id";
 
@@ -138,9 +143,10 @@ public class AssignmentServiceImplTest {
     when(
       assignmentRepository.findByIdAndDeletedFalse(ASSIGNMENT_ID)).thenReturn(
       Optional.of(assignment));
-    when(assignmentRepository.findAllByBatchAndDeletedFalseOrderByDeadlineDesc(batch,
-                                                            pageable
-    )).thenReturn(assignmentPage);
+    when(assignmentRepository.findAllByBatchAndDeletedFalseAndDeadlineAfterOrderByDeadlineDesc(batch, DATE_NOW, pageable))
+        .thenReturn(assignmentPage);
+    when(assignmentRepository.findAllByBatchAndDeletedFalseAndDeadlineBeforeOrderByDeadlineAsc(batch, DATE_NOW, pageable))
+        .thenReturn(assignmentPage);
     when(assignmentRepository.save(assignment)).thenReturn(assignment);
     when(batchService.getBatchByCode(BATCH_CODE)).thenReturn(batch);
     when(batchService.getBatchById(BATCH_ID)).thenReturn(batch);
@@ -164,33 +170,33 @@ public class AssignmentServiceImplTest {
   public void testFindAllAssignmentWithPageable() {
 
     Page<Assignment> result = assignmentService.findAllByBatchCodeAndPageable(
-      BATCH_CODE, pageable, Role.STUDENT, BATCH_ID);
+      BATCH_CODE, pageable, Role.STUDENT, BATCH_ID, true);
     assertThat(result).isNotNull();
     assertThat(result.getContent()
                  .size()).isEqualTo(2);
     assertThat(result.getContent()).isEqualTo(assignmentList);
     verify(batchService).getBatchByCode(BATCH_CODE);
-    verify(assignmentRepository).findAllByBatchAndDeletedFalseOrderByDeadlineDesc(batch, pageable);
+    verify(assignmentRepository).findAllByBatchAndDeletedFalseAndDeadlineAfterOrderByDeadlineDesc(batch, DATE_NOW, pageable);
   }
 
   @Test
   public void testFindAllAssignmentWithPageableAsAdmin() {
 
     Page<Assignment> result = assignmentService.findAllByBatchCodeAndPageable(
-        BATCH_CODE, pageable, Role.ADMIN, "");
+        BATCH_CODE, pageable, Role.ADMIN, "", false);
     assertThat(result).isNotNull();
     assertThat(result.getContent()
         .size()).isEqualTo(2);
     assertThat(result.getContent()).isEqualTo(assignmentList);
     verify(batchService).getBatchByCode(BATCH_CODE);
-    verify(assignmentRepository).findAllByBatchAndDeletedFalseOrderByDeadlineDesc(batch, pageable);
+    verify(assignmentRepository).findAllByBatchAndDeletedFalseAndDeadlineBeforeOrderByDeadlineAsc(batch, DATE_NOW, pageable);
   }
 
   @Test
   public void testFindAllAssignmentWithPageableAsAnotherBatchStudent() {
 
     catchException(() -> assignmentService.findAllByBatchCodeAndPageable(
-        BATCH_CODE, pageable, Role.STUDENT, "another-batch-id"));
+        BATCH_CODE, pageable, Role.STUDENT, "another-batch-id", true));
     assertThat(caughtException().getClass()).isEqualTo(ForbiddenException.class);
     verify(batchService).getBatchByCode(BATCH_CODE);
   }
@@ -200,13 +206,13 @@ public class AssignmentServiceImplTest {
 
     assignment2.setDeadline(assignment2.getDeadline() + 2000000);
     Page<Assignment> result = assignmentService.findAllByBatchCodeAndPageable(
-        BATCH_CODE, pageable, Role.STUDENT, BATCH_ID);
+        BATCH_CODE, pageable, Role.STUDENT, BATCH_ID, true);
     assertThat(result).isNotNull();
     assertThat(result.getContent()
         .size()).isEqualTo(2);
     assertThat(result.getContent()).isEqualTo(assignmentList);
     verify(batchService).getBatchByCode(BATCH_CODE);
-    verify(assignmentRepository).findAllByBatchAndDeletedFalseOrderByDeadlineDesc(batch, pageable);
+    verify(assignmentRepository).findAllByBatchAndDeletedFalseAndDeadlineAfterOrderByDeadlineDesc(batch, DATE_NOW, pageable);
   }
 
   @Test
@@ -216,13 +222,13 @@ public class AssignmentServiceImplTest {
     assignment.setDeadline(assignment.getDeadline() - 3000000);
     List<Assignment> expected = Arrays.asList(assignment, assignment2);
     Page<Assignment> result = assignmentService.findAllByBatchCodeAndPageable(
-        BATCH_CODE, pageable, Role.STUDENT, BATCH_ID);
+        BATCH_CODE, pageable, Role.STUDENT, BATCH_ID, true);
     assertThat(result).isNotNull();
     assertThat(result.getContent()
         .size()).isEqualTo(2);
     assertThat(result.getContent()).isEqualTo(expected);
     verify(batchService).getBatchByCode(BATCH_CODE);
-    verify(assignmentRepository).findAllByBatchAndDeletedFalseOrderByDeadlineDesc(batch, pageable);
+    verify(assignmentRepository).findAllByBatchAndDeletedFalseAndDeadlineAfterOrderByDeadlineDesc(batch, DATE_NOW, pageable);
   }
 
   @Test
@@ -230,13 +236,13 @@ public class AssignmentServiceImplTest {
 
     assignment.setDeadline(assignment.getDeadline() - 3000000);
     Page<Assignment> result = assignmentService.findAllByBatchCodeAndPageable(
-        BATCH_CODE, pageable, Role.STUDENT, BATCH_ID);
+        BATCH_CODE, pageable, Role.STUDENT, BATCH_ID, true);
     assertThat(result).isNotNull();
     assertThat(result.getContent()
         .size()).isEqualTo(2);
     assertThat(result.getContent()).isEqualTo(assignmentList);
     verify(batchService).getBatchByCode(BATCH_CODE);
-    verify(assignmentRepository).findAllByBatchAndDeletedFalseOrderByDeadlineDesc(batch, pageable);
+    verify(assignmentRepository).findAllByBatchAndDeletedFalseAndDeadlineAfterOrderByDeadlineDesc(batch, DATE_NOW, pageable);
   }
 
   @Test

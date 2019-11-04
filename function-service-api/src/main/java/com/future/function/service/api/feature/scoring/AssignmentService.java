@@ -9,7 +9,7 @@ import org.springframework.data.domain.Pageable;
 public interface AssignmentService {
 
   Page<Assignment> findAllByBatchCodeAndPageable(
-    String batchCode, Pageable pageable, Role role, String sessionBatchId
+    String batchCode, Pageable pageable, Role role, String sessionBatchId, boolean deadline
   );
 
   Assignment findById(String id, Role role, String sessionBatchId);

@@ -14,6 +14,8 @@ import com.future.function.service.api.feature.scoring.AssignmentService;
 import com.future.function.service.impl.helper.CopyHelper;
 import com.future.function.service.impl.helper.PageHelper;
 import com.future.function.service.impl.helper.SortHelper;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -54,17 +56,28 @@ public class AssignmentServiceImpl extends Observable implements AssignmentServi
 
   @Override
   public Page<Assignment> findAllByBatchCodeAndPageable(
-    String batchCode, Pageable pageable, Role role, String sessionBatchId
+    String batchCode, Pageable pageable, Role role, String sessionBatchId, boolean deadline
   ) {
 
     return Optional.ofNullable(batchCode)
       .map(batchService::getBatchByCode)
       .map(batch -> this.validateStudentBatch(batch, role, sessionBatchId))
-      .map(batch -> assignmentRepository.findAllByBatchAndDeletedFalseOrderByDeadlineDesc(batch,
-                                                                       pageable
-      ))
-      .map(this::sortByClosestDeadline)
+      .map(batch -> getAssignmentPage(batch, pageable, deadline))
       .orElseGet(() -> PageHelper.empty(pageable));
+  }
+
+  private Long getDateInLong() {
+    return LocalDate.now().atTime(23, 59)
+        .atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+  }
+
+  private Page<Assignment> getAssignmentPage(Batch batch, Pageable pageable, boolean deadline) {
+    return Optional.of(batch)
+        .filter(filter -> deadline)
+          .map(currentBatch -> assignmentRepository
+              .findAllByBatchAndDeletedFalseAndDeadlineAfterOrderByDeadlineDesc(currentBatch, getDateInLong(), pageable))
+          .orElseGet(() -> assignmentRepository
+              .findAllByBatchAndDeletedFalseAndDeadlineBeforeOrderByDeadlineAsc(batch, getDateInLong(), pageable));
   }
 
   private Batch validateStudentBatch(Batch batch, Role role, String sessionBatchId) {
@@ -76,14 +89,6 @@ public class AssignmentServiceImpl extends Observable implements AssignmentServi
     } else {
       throw new ForbiddenException("User Not Allowed");
     }
-  }
-
-  private Page<Assignment> sortByClosestDeadline(Page<Assignment> assignmentPage) {
-    List<Assignment> sortedAssignment = new ArrayList<>(assignmentPage.getContent());
-    Arrays.parallelSort(sortedAssignment.toArray(new Assignment[0]),
-        (asg1, asg2) -> SortHelper.compareClosestDeadline(asg1.getDeadline(), asg2.getDeadline()));
-    return new PageImpl<>(sortedAssignment, new PageRequest(assignmentPage.getNumber(), assignmentPage.getSize()),
-        assignmentPage.getTotalElements());
   }
 
   @Override
