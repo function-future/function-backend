@@ -9,6 +9,7 @@ import com.future.function.model.enums.scoring.ScoringType;
 import com.future.function.model.vo.scoring.StudentSummaryVO;
 import com.future.function.model.vo.scoring.SummaryVO;
 import com.future.function.service.api.feature.core.UserService;
+import com.future.function.service.api.feature.scoring.ReportDetailService;
 import com.future.function.service.api.feature.scoring.RoomService;
 import com.future.function.service.api.feature.scoring.StudentQuizService;
 import com.future.function.service.api.feature.scoring.SummaryService;

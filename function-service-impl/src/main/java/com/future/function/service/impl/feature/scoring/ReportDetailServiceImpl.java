@@ -53,6 +53,21 @@ public class ReportDetailServiceImpl implements ReportDetailService {
   }
 
   @Override
+  public StudentSummaryVO findSummaryByStudentId(String studentId, String userId, String type, Pageable pageable) {
+    return Optional.ofNullable(studentId)
+            .flatMap(reportDetailRepository::findByUserIdAndDeletedFalse)
+            .map(reportDetail -> this.findSummaryAndSetPoint(reportDetail, userId, type, pageable))
+            .orElseThrow(() -> new NotFoundException("NOT_FOUND"));
+
+  }
+
+  private StudentSummaryVO findSummaryAndSetPoint(ReportDetail reportDetail, String userId, String type, Pageable pageable) {
+    StudentSummaryVO summaryVO = summaryService.findAllPointSummaryByStudentId(reportDetail.getUser().getId(), pageable, userId, type);
+    summaryVO.setPoint(reportDetail.getPoint());
+    return summaryVO;
+  }
+
+  @Override
   public ReportDetail createReportDetailByReport(User student) {
     ReportDetail foundReportDetail = this.findByStudentId(student.getId(), student.getId());
     return Optional.ofNullable(student)

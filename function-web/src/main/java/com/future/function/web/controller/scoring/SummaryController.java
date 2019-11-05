@@ -60,8 +60,8 @@ public class SummaryController {
   ) {
 
     return ReportDetailResponseMapper.toDataReportDetailWebResponse(
-      summaryService.findAllPointSummaryByStudentId(studentId, PageHelper.toPageable(page, size),
-                                                    session.getUserId(), type
+      reportDetailService.findSummaryByStudentId(studentId, session.getUserId(),
+              type, PageHelper.toPageable(page, size)
       ), fileProperties.getUrlPrefix());
   }
 
