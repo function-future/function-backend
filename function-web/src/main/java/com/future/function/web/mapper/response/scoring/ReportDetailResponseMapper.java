@@ -52,23 +52,12 @@ public class ReportDetailResponseMapper {
       .orElse(null);
   }
 
-  public static DataResponse<List<ReportDetailWebResponse>> toDataListReportDetailWebResponseFromReportDetail(
-    HttpStatus httpStatus, List<ReportDetail> reportDetailList, String urlPrefix
+  public static DataResponse<ReportDetailWebResponse> toDataReportDetailWebResponse(
+    HttpStatus httpStatus, ReportDetail reportDetail, String urlPrefix
   ) {
 
     return ResponseHelper.toDataResponse(
-      httpStatus, buildListFromReportDetailList(reportDetailList, urlPrefix));
-  }
-
-  private static List<ReportDetailWebResponse> buildListFromReportDetailList(
-    List<ReportDetail> reportDetails, String urlPrefix
-  ) {
-
-    return reportDetails.stream()
-      .map(
-        reportDetail -> ReportDetailResponseMapper.buildReportDetailWebResponse(
-          reportDetail, urlPrefix))
-      .collect(Collectors.toList());
+      httpStatus, buildReportDetailWebResponse(reportDetail, urlPrefix));
   }
 
   private static ReportDetailWebResponse buildReportDetailWebResponse(

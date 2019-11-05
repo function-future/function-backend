@@ -34,13 +34,13 @@ public class ReportRequestMapper {
 
     return Optional.ofNullable(request)
       .map(validator::validate)
-      .map(value -> Report.builder()
-        .title(value.getName())
-        .description(value.getDescription())
+      .map(reportWebRequest -> Report.builder()
+        .title(reportWebRequest.getName())
+        .description(reportWebRequest.getDescription())
         .batch(Batch.builder()
                  .code(batchCode)
                  .build())
-        .students(buildStudentsFromStudentIds(value.getStudents()))
+        .students(buildStudentsFromStudentIds(reportWebRequest.getStudents()))
         .build())
       .orElseThrow(() -> new BadRequestException("Bad Request"));
   }

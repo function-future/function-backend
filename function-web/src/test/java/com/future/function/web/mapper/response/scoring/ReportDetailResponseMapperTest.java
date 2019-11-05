@@ -104,7 +104,7 @@ public class ReportDetailResponseMapperTest {
         studentSummaryVO, URL_PREFIX);
     assertThat(actual.getData()
                  .getBatchCode()).isEqualTo(BATCH_CODE);
-    assertThat(actual.getData()
+    assertThat(actual.getData() 
                  .getStudentName()).isEqualTo(STUDENT_NAME);
     assertThat(actual.getData()
                  .getScores()
@@ -142,23 +142,15 @@ public class ReportDetailResponseMapperTest {
   @Test
   public void toDataListReportDetailWebResponseFromReportDetail() {
 
-    DataResponse<List<ReportDetailWebResponse>> actual =
-      ReportDetailResponseMapper.toDataListReportDetailWebResponseFromReportDetail(
-        HttpStatus.CREATED, Collections.singletonList(reportDetail),
+    DataResponse<ReportDetailWebResponse> actual =
+      ReportDetailResponseMapper.toDataReportDetailWebResponse(
+        HttpStatus.CREATED, reportDetail,
         URL_PREFIX
       );
-    assertThat(actual.getData()
-                 .get(0)
-                 .getBatchCode()).isEqualTo(BATCH_CODE);
-    assertThat(actual.getData()
-                 .get(0)
-                 .getStudentName()).isEqualTo(STUDENT_NAME);
-    assertThat(actual.getData()
-                 .get(0)
-                 .getUniversity()).isEqualTo(UNIVERSITY);
-    assertThat(actual.getData()
-                 .get(0)
-                 .getAvatar()).isEqualTo(URL_PREFIX + FILE_URL);
+    assertThat(actual.getData().getBatchCode()).isEqualTo(BATCH_CODE);
+    assertThat(actual.getData().getStudentName()).isEqualTo(STUDENT_NAME);
+    assertThat(actual.getData().getUniversity()).isEqualTo(UNIVERSITY);
+    assertThat(actual.getData().getAvatar()).isEqualTo(URL_PREFIX + FILE_URL);
   }
 
   @Test

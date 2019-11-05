@@ -259,12 +259,9 @@ public class ReportDetailServiceImplTest {
   @Test
   public void giveScoreToEachStudentInDetail() {
 
-    List<ReportDetail> actual =
-      reportDetailService.giveScoreToEachStudentInDetail(report,
-                                                         Collections.singletonList(
-                                                           reportDetail)
-      );
-    assertThat(actual.get(0)).isEqualTo(reportDetail);
+    ReportDetail actual =
+      reportDetailService.giveScoreToEachStudentInDetail(reportDetail);
+    assertThat(actual).isEqualTo(reportDetail);
     verify(reportDetailRepository).findByUserIdAndDeletedFalse(USER_ID);
     verify(reportDetailRepository).save(reportDetail);
   }

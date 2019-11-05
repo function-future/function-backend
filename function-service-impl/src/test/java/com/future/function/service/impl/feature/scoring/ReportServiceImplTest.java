@@ -147,10 +147,6 @@ public class ReportServiceImplTest {
     when(reportDetailService.findAllSummaryByReportId(report,
                                                       USER_ID, TYPE, pageable
     )).thenReturn(Collections.singletonList(studentSummaryVO));
-    when(reportDetailService.giveScoreToEachStudentInDetail(report,
-                                                            Collections.singletonList(
-                                                              reportDetail)
-    )).thenReturn(Collections.singletonList(reportDetail));
     when(batchService.getBatchByCode(BATCH_CODE)).thenReturn(batch);
   }
 
@@ -312,34 +308,6 @@ public class ReportServiceImplTest {
     assertThat(actual.get(0)
                  .getStudentName()).isEqualTo(STUDENT_NAME);
     verify(reportDetailService).findAllSummaryByReportId(report, USER_ID, TYPE, pageable);
-    verify(reportRepository).findByIdAndDeletedFalse(REPORT_ID);
-  }
-
-  @Test
-  public void giveScoreToReportStudentsTest() {
-
-    reportDetail.setPoint(POINT);
-    List<ReportDetail> actual = reportService.giveScoreToReportStudents(
-      REPORT_ID, Collections.singletonList(reportDetail));
-    assertThat(actual.get(0)
-                 .getPoint()).isEqualTo(POINT);
-    assertThat(actual.size()).isEqualTo(1);
-    verify(reportRepository).findByIdAndDeletedFalse(REPORT_ID);
-    verify(reportDetailService).giveScoreToEachStudentInDetail(
-      report, Collections.singletonList(reportDetail));
-  }
-
-  @Test
-  public void giveScoreToReportStudentsTestReportNotFound() {
-
-    when(reportRepository.findByIdAndDeletedFalse(REPORT_ID)).thenReturn(
-      Optional.empty());
-    catchException(() -> reportService.giveScoreToReportStudents(REPORT_ID,
-                                                                 Collections.singletonList(
-                                                                   reportDetail)
-    ));
-    assertThat(caughtException().getClass()).isEqualTo(
-      UnsupportedOperationException.class);
     verify(reportRepository).findByIdAndDeletedFalse(REPORT_ID);
   }
 

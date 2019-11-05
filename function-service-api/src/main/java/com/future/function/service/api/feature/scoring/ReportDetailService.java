@@ -18,9 +18,7 @@ public interface ReportDetailService {
 
   ReportDetail findByStudentId(String studentId, String userId);
 
-  List<ReportDetail> giveScoreToEachStudentInDetail(
-    Report report, List<ReportDetail> detailList
-  );
+  ReportDetail giveScoreToEachStudentInDetail(ReportDetail reportDetail);
 
   void deleteAll();
 

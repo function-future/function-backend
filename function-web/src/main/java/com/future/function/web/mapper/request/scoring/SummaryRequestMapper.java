@@ -2,48 +2,32 @@ package com.future.function.web.mapper.request.scoring;
 
 import com.future.function.common.exception.BadRequestException;
 import com.future.function.model.entity.feature.core.User;
-import com.future.function.model.entity.feature.scoring.Report;
 import com.future.function.model.entity.feature.scoring.ReportDetail;
 import com.future.function.validation.RequestValidator;
-import com.future.function.web.model.request.scoring.ReportDetailScoreWebRequest;
 import com.future.function.web.model.request.scoring.ScoreStudentWebRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Component
-public class ReportDetailRequestMapper {
+public class SummaryRequestMapper {
 
   private RequestValidator validator;
 
   @Autowired
-  public ReportDetailRequestMapper(RequestValidator validator) {
+  public SummaryRequestMapper(RequestValidator validator) {
 
     this.validator = validator;
   }
 
-  public List<ReportDetail> toReportDetailList(
-    ReportDetailScoreWebRequest request, String reportId
-  ) {
+  public ReportDetail toReportDetail(ScoreStudentWebRequest request) {
 
     return Optional.ofNullable(request)
       .map(validator::validate)
-      .map(value -> toValidatedReportDetailList(value, reportId))
-      .orElseThrow(
-        () -> new BadRequestException("Failed mapping at #toReportDetailList"));
-  }
-
-  private List<ReportDetail> toValidatedReportDetailList(
-    ReportDetailScoreWebRequest request, String reportId
-  ) {
-
-    return request.getScores()
-      .stream()
       .map(this::buildReportDetail)
-      .collect(Collectors.toList());
+      .orElseThrow(
+        () -> new BadRequestException("BAD_REQUEST"));
   }
 
   private ReportDetail buildReportDetail(ScoreStudentWebRequest request) {

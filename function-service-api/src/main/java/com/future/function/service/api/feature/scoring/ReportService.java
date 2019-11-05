@@ -30,8 +30,4 @@ public interface ReportService {
     String batchCode, Pageable pageable
   );
 
-  List<ReportDetail> giveScoreToReportStudents(
-    String reportId, List<ReportDetail> reportDetailList
-  );
-
 }

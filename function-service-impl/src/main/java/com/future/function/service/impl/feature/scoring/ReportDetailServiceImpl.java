@@ -1,5 +1,6 @@
 package com.future.function.service.impl.feature.scoring;
 
+import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.model.entity.feature.scoring.Report;
 import com.future.function.model.entity.feature.scoring.ReportDetail;
@@ -83,30 +84,20 @@ public class ReportDetailServiceImpl implements ReportDetailService {
   }
 
   @Override
-  public List<ReportDetail> giveScoreToEachStudentInDetail(
-    Report report, List<ReportDetail> detailList
-  ) {
-
-    return detailList.stream()
-      .map(this::findReportDetailAndMapReport)
-      .map(reportDetailRepository::save)
-      .collect(Collectors.toList());
-  }
-
-  private ReportDetail findReportDetailAndMapReport(
+  public ReportDetail giveScoreToEachStudentInDetail(
     ReportDetail reportDetail
   ) {
 
     return Optional.ofNullable(reportDetail)
-      .map(ReportDetail::getUser)
-      .map(User::getId)
-      .flatMap(reportDetailRepository::findByUserIdAndDeletedFalse)
-      .map(
-        currentReportDetail -> copyReportDetailRequestAttributes(reportDetail,
-                                                                 currentReportDetail
-        ))
-      .orElseThrow(() -> new UnsupportedOperationException(
-        "Failed at #findReportDetailAndMapReport #ReportDetailService"));
+        .map(ReportDetail::getUser)
+        .map(User::getId)
+        .flatMap(reportDetailRepository::findByUserIdAndDeletedFalse)
+        .map(
+            currentReportDetail -> copyReportDetailRequestAttributes(reportDetail,
+                currentReportDetail
+            ))
+        .map(reportDetailRepository::save)
+        .orElseThrow(() -> new NotFoundException("NOT_FOUND"));
   }
 
   private ReportDetail copyReportDetailRequestAttributes(

@@ -210,20 +210,6 @@ public class ReportServiceImpl implements ReportService {
       .orElse(0);
   }
 
-  @Override
-  public List<ReportDetail> giveScoreToReportStudents(
-    String reportId, List<ReportDetail> reportDetailList
-  ) {
-
-    return Optional.ofNullable(reportId)
-      .flatMap(reportRepository::findByIdAndDeletedFalse)
-      .map(report -> reportDetailService.giveScoreToEachStudentInDetail(report,
-                                                                        reportDetailList
-      ))
-      .orElseThrow(() -> new UnsupportedOperationException(
-        "Failed at #giveScoreToReportStudents"));
-  }
-
   private void setDetailsAsDeletedAndSave(Report report) {
 
     report.setDeleted(true);
