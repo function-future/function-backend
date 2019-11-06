@@ -88,9 +88,6 @@ public class SummaryControllerTest extends TestHelper {
   private JacksonTester<ScoreStudentWebRequest> scoreStudentWebRequestJacksonTester;
 
   @MockBean
-  private SummaryService summaryService;
-
-  @MockBean
   private ReportDetailService reportDetailService;
 
   @MockBean
@@ -148,9 +145,8 @@ public class SummaryControllerTest extends TestHelper {
       studentSummaryVO, URL_PREFIX);
 
     when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
-    when(summaryService.findAllPointSummaryByStudentId(STUDENT_ID, pageable,
-                                                       ADMIN_ID, "quiz"
-    )).thenReturn(studentSummaryVO);
+    when(reportDetailService.findSummaryByStudentId(STUDENT_ID, ADMIN_ID, "quiz", pageable))
+        .thenReturn(studentSummaryVO);
     when(reportDetailService.giveScoreToEachStudentInDetail(reportDetail))
         .thenReturn(reportDetail);
     when(requestMapper.toReportDetail(scoreStudentWebRequest)).thenReturn(reportDetail);
@@ -159,7 +155,7 @@ public class SummaryControllerTest extends TestHelper {
   @After
   public void tearDown() throws Exception {
 
-    verifyNoMoreInteractions(summaryService);
+    verifyNoMoreInteractions(reportDetailService, fileProperties, requestMapper);
   }
 
   @Test
@@ -169,7 +165,8 @@ public class SummaryControllerTest extends TestHelper {
       .andExpect(status().isOk())
       .andExpect(content().json(dataResponseJacksonTester.write(DATA_RESPONSE)
                                   .getJson()));
-    verify(summaryService).findAllPointSummaryByStudentId(STUDENT_ID, pageable, ADMIN_ID, "quiz");
+    verify(reportDetailService).findSummaryByStudentId(STUDENT_ID, ADMIN_ID, "quiz", pageable);
+    verify(fileProperties).getUrlPrefix();
   }
 
   @Test
@@ -187,5 +184,6 @@ public class SummaryControllerTest extends TestHelper {
                                   .getJson()));
     verify(requestMapper).toReportDetail(scoreStudentWebRequest);
     verify(reportDetailService).giveScoreToEachStudentInDetail(reportDetail);
+    verify(fileProperties).getUrlPrefix();
   }
 }

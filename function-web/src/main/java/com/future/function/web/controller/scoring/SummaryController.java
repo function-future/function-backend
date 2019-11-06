@@ -28,8 +28,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/scoring/summary")
 public class SummaryController {
 
-  private SummaryService summaryService;
-
   private ReportDetailService reportDetailService;
 
   private SummaryRequestMapper requestMapper;
@@ -37,12 +35,10 @@ public class SummaryController {
   private FileProperties fileProperties;
 
   @Autowired
-  public SummaryController(
-    SummaryService summaryService, FileProperties fileProperties,
-      ReportDetailService reportDetailService, SummaryRequestMapper requestMapper
+  public SummaryController(FileProperties fileProperties, ReportDetailService reportDetailService,
+      SummaryRequestMapper requestMapper
   ) {
 
-    this.summaryService = summaryService;
     this.fileProperties = fileProperties;
     this.reportDetailService = reportDetailService;
     this.requestMapper = requestMapper;

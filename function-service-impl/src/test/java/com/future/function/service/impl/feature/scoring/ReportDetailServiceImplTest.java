@@ -177,19 +177,19 @@ public class ReportDetailServiceImplTest {
                  .getContent()
                  .get(0)
                  .getPoint()).isEqualTo(POINT);
-    verify(summaryService).findAllPointSummaryByStudentId(USER_ID, pageable, USER_ID, "Assignment");
+    verify(summaryService).findAllPointSummaryByStudentId(USER_ID, pageable, USER_ID, TYPE);
   }
 
   @Test
   public void findAllSummaryByReportIdFailedToGetSummary() {
 
     when(summaryService.findAllPointSummaryByStudentId(USER_ID, pageable,
-                                                       USER_ID, "Assignment"
+                                                       USER_ID, TYPE
     )).thenReturn(null);
     List<StudentSummaryVO> actual =
       reportDetailService.findAllSummaryByReportId(report, USER_ID, TYPE, pageable);
     assertThat(actual.size()).isEqualTo(0);
-    verify(summaryService).findAllPointSummaryByStudentId(USER_ID, pageable, USER_ID, "Assignment");
+    verify(summaryService).findAllPointSummaryByStudentId(USER_ID, pageable, USER_ID, TYPE);
   }
 
   @Test
@@ -214,6 +214,14 @@ public class ReportDetailServiceImplTest {
     assertThat(actual).isEqualTo(reportDetail);
     verify(reportDetailRepository).findByUserIdAndDeletedFalse(USER_ID);
     verify(userService).getUser(USER_ID);
+  }
+
+  @Test
+  public void findSummaryByStudentId() {
+
+    StudentSummaryVO actual = reportDetailService.findSummaryByStudentId(USER_ID, USER_ID, TYPE, pageable);
+    assertThat(actual).isEqualTo(studentSummaryVO);
+    verify(reportDetailRepository).findByUserIdAndDeletedFalse(USER_ID);
   }
 
   @Test
