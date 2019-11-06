@@ -21,4 +21,6 @@ public interface AssignmentRepository
       Batch batch, Long deadline, Pageable pageable
   );
 
+  Boolean existsByIdAndDeletedFalse(String id);
+
 }
