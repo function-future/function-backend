@@ -1,6 +1,7 @@
 package com.future.function.web.model.request.scoring;
 
 import com.future.function.validation.annotation.scoring.StudentListMustExist;
+import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,6 +24,7 @@ public class ReportWebRequest {
   private String description;
 
   @StudentListMustExist
+  @NotNull(message = "NotNull")
   @Size(min = 2,
         max = 3,
         message = "Size")

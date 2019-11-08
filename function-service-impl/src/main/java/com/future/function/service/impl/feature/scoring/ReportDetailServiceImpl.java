@@ -68,20 +68,19 @@ public class ReportDetailServiceImpl implements ReportDetailService {
   }
 
   @Override
-  public ReportDetail createReportDetailByReport(User student) {
-    ReportDetail foundReportDetail = this.findByStudentId(student.getId(), student.getId());
+  public ReportDetail createOrGetReportDetail(User student) {
     return Optional.ofNullable(student)
-      .filter(ignored -> Objects.isNull(foundReportDetail))
-      .map(this::buildReportDetail)
-      .map(reportDetailRepository::save)
-      .orElse(foundReportDetail);
+      .map(User::getId)
+      .flatMap(reportDetailRepository::findByUserIdAndDeletedFalse)
+      .orElseGet(() -> this.buildAndSaveReportDetail(student));
   }
 
-  private ReportDetail buildReportDetail(User student) {
+  private ReportDetail buildAndSaveReportDetail(User student) {
 
-    return ReportDetail.builder()
+    ReportDetail reportDetail = ReportDetail.builder()
       .user(student)
       .build();
+    return reportDetailRepository.save(reportDetail);
   }
 
   @Override

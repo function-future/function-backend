@@ -16,7 +16,7 @@ public interface ReportDetailService {
 
   StudentSummaryVO findSummaryByStudentId(String studentId, String userId, String type, Pageable pageable);
 
-  ReportDetail createReportDetailByReport(User student);
+  ReportDetail createOrGetReportDetail(User student);
 
   ReportDetail findByStudentId(String studentId, String userId);
 

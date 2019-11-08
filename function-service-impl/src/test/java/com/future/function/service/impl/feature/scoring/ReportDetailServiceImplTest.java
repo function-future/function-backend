@@ -200,11 +200,10 @@ public class ReportDetailServiceImplTest {
       Optional.empty());
     when(reportDetailRepository.save(any(ReportDetail.class))).thenReturn(
       reportDetail);
-    ReportDetail actual = reportDetailService.createReportDetailByReport(student);
+    ReportDetail actual = reportDetailService.createOrGetReportDetail(student);
     assertThat(actual).isEqualTo(reportDetail);
     verify(reportDetailRepository).save(any(ReportDetail.class));
     verify(reportDetailRepository).findByUserIdAndDeletedFalse(USER_ID);
-    verify(userService).getUser(USER_ID);
   }
 
   @Test

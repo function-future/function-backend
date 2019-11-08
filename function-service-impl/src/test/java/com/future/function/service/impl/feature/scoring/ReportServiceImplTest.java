@@ -143,7 +143,7 @@ public class ReportServiceImplTest {
       new PageImpl<>(Collections.singletonList(student), pageable, 1));
     when(reportDetailService.findByStudentId(USER_ID, USER_ID)).thenReturn(
       reportDetail);
-    when(reportDetailService.createReportDetailByReport(student)).thenReturn(reportDetail);
+    when(reportDetailService.createOrGetReportDetail(student)).thenReturn(reportDetail);
     when(reportDetailService.findAllSummaryByReportId(report,
                                                       USER_ID, TYPE, pageable
     )).thenReturn(Collections.singletonList(studentSummaryVO));
@@ -231,7 +231,7 @@ public class ReportServiceImplTest {
     report.setStudents(null);
     assertThat(actual).isEqualTo(report);
     verify(reportRepository).save(report);
-    verify(reportDetailService).createReportDetailByReport(student);
+    verify(reportDetailService).createOrGetReportDetail(student);
     verify(batchService).getBatchByCode(BATCH_CODE);
     verify(reportRepository).existsByStudentsContainsAndDeletedFalse(Collections.singletonList(reportDetail));
   }
@@ -242,7 +242,7 @@ public class ReportServiceImplTest {
     report.setStudents(Collections.singletonList(reportDetail));
     catchException(() -> reportService.createReport(report));
     assertThat(caughtException().getClass()).isEqualTo(UnsupportedOperationException.class);
-    verify(reportDetailService).createReportDetailByReport(student);
+    verify(reportDetailService).createOrGetReportDetail(student);
     verify(batchService).getBatchByCode(BATCH_CODE);
     verify(reportRepository).existsByStudentsContainsAndDeletedFalse(Collections.singletonList(reportDetail));
   }
@@ -264,6 +264,7 @@ public class ReportServiceImplTest {
     reportDetail.setUser(student);
     Report actual = reportService.updateReport(report);
     assertThat(actual).isEqualTo(actual);
+    verify(batchService).getBatchByCode(BATCH_CODE);
     verify(reportRepository).findByIdAndDeletedFalse(REPORT_ID);
     verify(reportRepository).save(report);
   }
@@ -277,11 +278,12 @@ public class ReportServiceImplTest {
       .role(Role.STUDENT)
       .build();
     when(userService.getUser(id)).thenReturn(anotherStudent);
-    when(reportDetailService.createReportDetailByReport(anotherStudent)).thenReturn(reportDetail);
+    when(reportDetailService.createOrGetReportDetail(anotherStudent)).thenReturn(reportDetail);
     report.setStudents(Collections.singletonList(reportDetail));
     reportDetail.setUser(student);
     Report actual = reportService.updateReport(report);
     assertThat(actual).isEqualTo(actual);
+    verify(batchService).getBatchByCode(BATCH_CODE);
     verify(reportRepository).findByIdAndDeletedFalse(REPORT_ID);
     verify(reportRepository).save(report);
   }

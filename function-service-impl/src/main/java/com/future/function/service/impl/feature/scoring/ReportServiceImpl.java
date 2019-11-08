@@ -111,7 +111,7 @@ public class ReportServiceImpl implements ReportService {
       .map(ReportDetail::getUser)
       .map(User::getId)
       .map(userService::getUser)
-      .map(student -> reportDetailService.createReportDetailByReport(student))
+      .map(student -> reportDetailService.createOrGetReportDetail(student))
       .collect(Collectors.toList());
   }
 
@@ -123,7 +123,7 @@ public class ReportServiceImpl implements ReportService {
       .map(Report::getId)
       .map(this::findById)
       .map(foundReport -> this.copyReportRequestAttributesIgnoreBatchField(report, foundReport))
-      .map(currentReport -> this.checkStudentIdsChangedAndDeleteIfChanged(report, students))
+      .map(currentReport -> this.checkStudentIdsChangedAndDeleteIfChanged(currentReport, students))
       .map(reportRepository::save)
       .orElse(report);
   }
@@ -132,7 +132,7 @@ public class ReportServiceImpl implements ReportService {
     Report request, Report report
   ) {
 
-    CopyHelper.copyProperties(request, report, FieldName.Report.BATCH);
+    CopyHelper.copyProperties(request, report, FieldName.Report.BATCH, FieldName.Report.STUDENTS);
     return report;
   }
 
@@ -151,13 +151,12 @@ public class ReportServiceImpl implements ReportService {
         .map(User::getId)
         .collect(Collectors.toList());
     return Optional.ofNullable(report)
-        .map(Report::getStudents)
-        .map(list -> isStudentListEquals(studentIds, list))
+        .map(currentReport -> isStudentListEquals(studentIds, currentReport.getStudents()))
         .orElse(false);
   }
 
-  private boolean isStudentListEquals(List<String> students, List<ReportDetail> list) {
-    return list.stream().map(ReportDetail::getUser).map(User::getId).collect(Collectors.toList()).containsAll(students);
+  private boolean isStudentListEquals(List<String> students, List<ReportDetail> foundStudents) {
+    return foundStudents.stream().map(ReportDetail::getUser).map(User::getId).collect(Collectors.toList()).containsAll(students);
   }
 
   @Override
