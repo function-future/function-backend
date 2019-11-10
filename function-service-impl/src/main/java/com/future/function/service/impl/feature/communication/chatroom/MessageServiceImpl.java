@@ -28,21 +28,14 @@ public class MessageServiceImpl implements MessageService {
 
   private final UserService userService;
 
-  private MessagePublisherService publisherService;
-
-  @Value("${function.mq.topic.chat}")
-  private String mqTopicChat;
-
   @Autowired
   public MessageServiceImpl(
           MessageRepository messageRepository, ChatroomService chatroomService,
-          UserService userService,
-          MessagePublisherService publisherService) {
+          UserService userService) {
 
     this.messageRepository = messageRepository;
     this.chatroomService = chatroomService;
     this.userService = userService;
-    this.publisherService = publisherService;
   }
 
   @Override

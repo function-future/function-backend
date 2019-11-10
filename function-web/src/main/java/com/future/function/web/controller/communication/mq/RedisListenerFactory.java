@@ -1,7 +1,5 @@
-package com.future.function.service.impl.feature.communication.mq;
+package com.future.function.web.controller.communication.mq;
 
-import com.future.function.service.api.feature.communication.mq.MessageListenerFactory;
-import com.future.function.service.api.feature.communication.mq.BaseListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

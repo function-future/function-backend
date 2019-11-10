@@ -13,6 +13,7 @@ import com.future.function.service.api.feature.communication.chatroom.MessageSta
 import com.future.function.service.api.feature.core.UserService;
 import com.future.function.web.TestHelper;
 import com.future.function.web.TestSecurityConfiguration;
+import com.future.function.web.controller.communication.chatroom.ChatroomController;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.mapper.request.communication.ChatroomRequestMapper;
 import com.future.function.web.mapper.request.communication.MessageRequestMapper;

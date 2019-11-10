@@ -1,4 +1,4 @@
-package com.future.function.service.api.feature.communication.mq;
+package com.future.function.web.controller.communication.mq;
 
 import org.springframework.data.redis.connection.MessageListener;
 

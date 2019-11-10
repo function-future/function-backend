@@ -2,11 +2,9 @@ package com.future.function.web.configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.future.function.common.properties.communication.MqProperties;
-import com.future.function.service.api.feature.communication.mq.MessageListenerFactory;
+import com.future.function.web.controller.communication.mq.MessageListenerFactory;
 import com.future.function.session.model.Session;
 import com.future.function.session.serializer.JsonSerializer;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
