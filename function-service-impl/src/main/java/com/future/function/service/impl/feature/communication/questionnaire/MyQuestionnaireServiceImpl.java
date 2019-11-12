@@ -1,23 +1,9 @@
 package com.future.function.service.impl.feature.communication.questionnaire;
 
 import com.future.function.common.enumeration.communication.ParticipantType;
-import com.future.function.model.entity.feature.communication.questionnaire.Answer;
-import com.future.function.model.entity.feature.communication.questionnaire.QuestionQuestionnaire;
-import com.future.function.model.entity.feature.communication.questionnaire.QuestionResponse;
-import com.future.function.model.entity.feature.communication.questionnaire.QuestionResponseSummary;
-import com.future.function.model.entity.feature.communication.questionnaire.Questionnaire;
-import com.future.function.model.entity.feature.communication.questionnaire.QuestionnaireParticipant;
-import com.future.function.model.entity.feature.communication.questionnaire.QuestionnaireResponse;
-import com.future.function.model.entity.feature.communication.questionnaire.QuestionnaireResponseSummary;
-import com.future.function.model.entity.feature.communication.questionnaire.UserQuestionnaireSummary;
+import com.future.function.model.entity.feature.communication.questionnaire.*;
 import com.future.function.model.entity.feature.core.User;
-import com.future.function.repository.feature.communication.questionnaire.QuestionQuestionnaireRepository;
-import com.future.function.repository.feature.communication.questionnaire.QuestionResponseRepository;
-import com.future.function.repository.feature.communication.questionnaire.QuestionResponseSummaryRepository;
-import com.future.function.repository.feature.communication.questionnaire.QuestionnaireParticipantRepository;
-import com.future.function.repository.feature.communication.questionnaire.QuestionnaireResponseRepository;
-import com.future.function.repository.feature.communication.questionnaire.QuestionnaireResponseSummaryRepository;
-import com.future.function.repository.feature.communication.questionnaire.UserQuestionnaireSummaryRepository;
+import com.future.function.repository.feature.communication.questionnaire.*;
 import com.future.function.service.api.feature.communication.questionnaire.MyQuestionnaireService;
 import com.future.function.service.api.feature.core.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -52,6 +39,9 @@ public class MyQuestionnaireServiceImpl implements MyQuestionnaireService {
   private final QuestionResponseSummaryRepository
     questionResponseSummaryRepository;
 
+  private final QuestionResponseQueueRepository
+    questionResponseQueueRepository;
+
   @Autowired
   public MyQuestionnaireServiceImpl(
     QuestionnaireParticipantRepository questionnaireParticipantRepository,
@@ -61,9 +51,8 @@ public class MyQuestionnaireServiceImpl implements MyQuestionnaireService {
     QuestionnaireResponseSummaryRepository questionnaireResponseSummaryRepository,
     UserQuestionnaireSummaryRepository userQuestionnaireSummaryRepository,
     QuestionResponseSummaryRepository questionResponseSummaryRepository,
-    UserService userService
+    QuestionResponseQueueRepository questionResponseQueueRepository
   ) {
-
     this.questionnaireParticipantRepository =
       questionnaireParticipantRepository;
     this.questionQuestionnaireRepository = questionQuestionnaireRepository;
@@ -74,13 +63,13 @@ public class MyQuestionnaireServiceImpl implements MyQuestionnaireService {
     this.userQuestionnaireSummaryRepository =
       userQuestionnaireSummaryRepository;
     this.questionResponseSummaryRepository = questionResponseSummaryRepository;
+    this.questionResponseQueueRepository = questionResponseQueueRepository;
   }
 
   @Override
   public Page<Questionnaire> getQuestionnairesByMemberLoginAsAppraiser(
     User memberLogin, Pageable pageable
   ) {
-
     Page<QuestionnaireParticipant> results =
       questionnaireParticipantRepository.findAllByMemberAndParticipantTypeAndDeletedFalseOrderByCreatedAtDesc(
         memberLogin, ParticipantType.APPRAISER, pageable);
@@ -139,12 +128,57 @@ public class MyQuestionnaireServiceImpl implements MyQuestionnaireService {
       questionnaire);
   }
 
+
+
+
   @Override
   public QuestionnaireResponse createQuestionnaireResponseToAppraiseeFromMemberLoginAsAppraiser(
     Questionnaire questionnaire, List<QuestionResponse> questionResponses,
     User memberLogin, User appraisee
   ) {
+    Answer scoreSummary = Answer.builder()
+      .maximum(0F)
+      .minimum(6F)
+      .build();
 
+    Float avarageScore = new Float(0.0);
+
+    for (QuestionResponse questionResponse : questionResponses) {
+      questionResponseRepository.save(questionResponse);
+      updateQuestionResponseSummary(questionnaire, questionResponse);
+      scoreSummary.setMaximum(
+        scoreSummary.getMaximum() < questionResponse.getScore()
+          ? questionResponse.getScore() : scoreSummary.getMaximum());
+      scoreSummary.setMinimum(
+        scoreSummary.getMinimum() > questionResponse.getScore()
+          ? questionResponse.getScore() : scoreSummary.getMinimum());
+      avarageScore += questionResponse.getScore();
+    }
+
+    avarageScore = avarageScore / questionResponses.size();
+    scoreSummary.setAverage(avarageScore);
+
+    QuestionnaireResponse questionnaireResponse =
+      QuestionnaireResponse.builder()
+        .questionnaire(questionnaire)
+        .details(questionResponses)
+        .appraisee(appraisee)
+        .appraiser(memberLogin)
+        .scoreSummary(scoreSummary)
+        .build();
+
+    this.updateQuestionnaireResponseSummary(questionnaireResponse);
+
+    this.updateUserQuestionnaireSummary(questionnaireResponse);
+
+    return questionnaireResponseRepository.save(questionnaireResponse);
+  }
+
+
+  @Scheduled(fixedDelayString = "#{@questionnaireProperties.updateUserSummariesPeriod}")
+  public void updateScore() {
+    System.out.println("update summary");
+    /**
     Answer scoreSummary = Answer.builder()
       .maximum(0F)
       .minimum(6F)
@@ -180,8 +214,10 @@ public class MyQuestionnaireServiceImpl implements MyQuestionnaireService {
 
     this.updateUserQuestionnaireSummary(questionnaireResponse);
 
-    return questionnaireResponseRepository.save(questionnaireResponse);
-  }
+    this.questionnaireResponseRepository.save(questionnaireResponse);
+
+    **/
+   }
 
   public void updateQuestionResponseSummary(
     Questionnaire questionnaire, QuestionResponse questionResponse
@@ -337,4 +373,14 @@ public class MyQuestionnaireServiceImpl implements MyQuestionnaireService {
     userQuestionnaireSummaryRepository.save(userQuestionnaireSummary);
   }
 
+  private QuestionResponse toQuestionResponse(QuestionResponseQueue questionResponseQueue){
+    return
+      QuestionResponse.builder()
+        .appraisee(questionResponseQueue.getAppraisee())
+        .appraiser(questionResponseQueue.getAppraiser())
+        .comment(questionResponseQueue.getComment())
+        .score(questionResponseQueue.getScore())
+        .question(questionResponseQueue.getQuestion())
+        .build();
+  }
 }

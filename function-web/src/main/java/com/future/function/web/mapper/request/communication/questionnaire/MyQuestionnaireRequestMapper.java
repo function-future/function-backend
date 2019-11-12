@@ -38,7 +38,6 @@ public class MyQuestionnaireRequestMapper {
   private QuestionResponse toQuestionResponse(
     QuestionResponseRequest response, User appraiser, User appraisee
   ) {
-
     return QuestionResponse.builder()
       .appraiser(appraiser)
       .appraisee(appraisee)
