@@ -15,6 +15,6 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties("questionnaire")
 public class QuestionnaireProperties {
 
-  private long updateUserSummariesPeriod = 10000L;
+  private long updateUserSummariesPeriod = 120000L;
 
 }
