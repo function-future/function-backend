@@ -143,7 +143,7 @@ public class MyQuestionnaireController {
 
     myQuestionnaireService.createQuestionnaireResponseToAppraiseeFromMemberLoginAsAppraiser(
       questionnaireService.getQuestionnaire(questionnaireId),
-      myQuestionnaireRequestMapper.toListQuestionResponse(
+      myQuestionnaireRequestMapper.toListQuestionResponseQueue(
         responses.getResponses(), userService.getUser(session.getUserId()),
         userService.getUser(appraiseeId)
       ), userService.getUser(session.getUserId()),

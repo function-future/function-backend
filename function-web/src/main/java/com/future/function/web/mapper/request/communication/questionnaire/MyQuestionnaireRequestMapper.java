@@ -1,6 +1,7 @@
 package com.future.function.web.mapper.request.communication.questionnaire;
 
 import com.future.function.model.entity.feature.communication.questionnaire.QuestionResponse;
+import com.future.function.model.entity.feature.communication.questionnaire.QuestionResponseQueue;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.service.api.feature.communication.questionnaire.QuestionnaireService;
 import com.future.function.web.model.request.communication.questionnaire.QuestionResponseRequest;
@@ -26,19 +27,19 @@ public class MyQuestionnaireRequestMapper {
   }
 
 
-  public List<QuestionResponse> toListQuestionResponse(
+  public List<QuestionResponseQueue> toListQuestionResponseQueue(
     List<QuestionResponseRequest> responses, User appraiser, User appraisee
   ) {
 
     return responses.stream()
-      .map(response -> toQuestionResponse(response, appraiser, appraisee))
+      .map(response -> toQuestionResponseQueue(response, appraiser, appraisee))
       .collect(Collectors.toList());
   }
 
-  private QuestionResponse toQuestionResponse(
+  private QuestionResponseQueue toQuestionResponseQueue(
     QuestionResponseRequest response, User appraiser, User appraisee
   ) {
-    return QuestionResponse.builder()
+    return QuestionResponseQueue.builder()
       .appraiser(appraiser)
       .appraisee(appraisee)
       .question(

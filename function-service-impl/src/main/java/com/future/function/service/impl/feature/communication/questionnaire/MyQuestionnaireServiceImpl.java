@@ -128,11 +128,15 @@ public class MyQuestionnaireServiceImpl implements MyQuestionnaireService {
       questionnaire);
   }
 
-
-
-
   @Override
-  public QuestionnaireResponse createQuestionnaireResponseToAppraiseeFromMemberLoginAsAppraiser(
+  public QuestionnaireResponse createQuestionnaireResponseToAppraiseeFromMemberLoginAsAppraiser(Questionnaire questionnaire, List<QuestionResponseQueue> questionResponses, User memberLogin, User appraisee) {
+    for (QuestionResponseQueue q : questionResponses){
+      this.questionResponseQueueRepository.save(q);
+    }
+    return null;
+  }
+
+  public void updateUserSummary(
     Questionnaire questionnaire, List<QuestionResponse> questionResponses,
     User memberLogin, User appraisee
   ) {
@@ -171,52 +175,52 @@ public class MyQuestionnaireServiceImpl implements MyQuestionnaireService {
 
     this.updateUserQuestionnaireSummary(questionnaireResponse);
 
-    return questionnaireResponseRepository.save(questionnaireResponse);
+    this.questionnaireResponseRepository.save(questionnaireResponse);
   }
-
 
   @Scheduled(fixedDelayString = "#{@questionnaireProperties.updateUserSummariesPeriod}")
   public void updateScore() {
     System.out.println("update summary");
-    /**
-    Answer scoreSummary = Answer.builder()
-      .maximum(0F)
-      .minimum(6F)
-      .build();
 
-    Float avarageScore = new Float(0.0);
+    List<QuestionResponseQueue> questionResponseQueues =
+      this.questionResponseQueueRepository.findAll();
 
-    for (QuestionResponse questionResponse : questionResponses) {
-      questionResponseRepository.save(questionResponse);
-      updateQuestionResponseSummary(questionnaire, questionResponse);
-      scoreSummary.setMaximum(
-        scoreSummary.getMaximum() < questionResponse.getScore()
-        ? questionResponse.getScore() : scoreSummary.getMaximum());
-      scoreSummary.setMinimum(
-        scoreSummary.getMinimum() > questionResponse.getScore()
-        ? questionResponse.getScore() : scoreSummary.getMinimum());
-      avarageScore += questionResponse.getScore();
+    if (!questionResponseQueues.isEmpty()) {
+      QuestionResponse questionResponse = toQuestionResponse(questionResponseQueues.get(0));
+      Questionnaire questionnaireTemp = questionResponse.getQuestion().getQuestionnaire();
+      User appraiseeTemp = questionResponse.getAppraisee();
+      User appraiserTemp = questionResponse.getAppraiser();
+      List<QuestionResponse> questionResponses = new ArrayList<QuestionResponse>();
+
+      for (QuestionResponseQueue q: questionResponseQueues) {
+        if (questionnaireTemp.getId().equals(q.getQuestion().getQuestionnaire().getId()) &&
+          appraiseeTemp.getId().equals(q.getAppraisee().getId()) &&
+          appraiserTemp.getId().equals(q.getAppraiser().getId())
+        ) {
+          questionResponses.add(toQuestionResponse(q));
+        } else {
+          updateUserSummary(
+            questionnaireTemp,
+            questionResponses,
+            appraiserTemp,
+            appraiseeTemp
+            );
+          questionnaireTemp = q.getQuestion().getQuestionnaire();
+          appraiseeTemp = q.getAppraisee();
+          appraiserTemp = q.getAppraiser();
+          questionResponses.clear();
+          questionResponses.add(toQuestionResponse(q));
+        }
+      }
+      updateUserSummary(
+        questionnaireTemp,
+        questionResponses,
+        appraiserTemp,
+        appraiseeTemp
+      );
     }
 
-    avarageScore = avarageScore / questionResponses.size();
-    scoreSummary.setAverage(avarageScore);
 
-    QuestionnaireResponse questionnaireResponse =
-      QuestionnaireResponse.builder()
-        .questionnaire(questionnaire)
-        .details(questionResponses)
-        .appraisee(appraisee)
-        .appraiser(memberLogin)
-        .scoreSummary(scoreSummary)
-        .build();
-
-    this.updateQuestionnaireResponseSummary(questionnaireResponse);
-
-    this.updateUserQuestionnaireSummary(questionnaireResponse);
-
-    this.questionnaireResponseRepository.save(questionnaireResponse);
-
-    **/
    }
 
   public void updateQuestionResponseSummary(
@@ -383,4 +387,49 @@ public class MyQuestionnaireServiceImpl implements MyQuestionnaireService {
         .question(questionResponseQueue.getQuestion())
         .build();
   }
+
+
+
+//  @Override
+//  public QuestionnaireResponse createQuestionnaireResponseToAppraiseeFromMemberLoginAsAppraiser(
+//    Questionnaire questionnaire, List<QuestionResponse> questionResponses,
+//    User memberLogin, User appraisee
+//  ) {
+//    Answer scoreSummary = Answer.builder()
+//      .maximum(0F)
+//      .minimum(6F)
+//      .build();
+//
+//    Float avarageScore = new Float(0.0);
+//
+//    for (QuestionResponse questionResponse : questionResponses) {
+//      questionResponseRepository.save(questionResponse);
+//      updateQuestionResponseSummary(questionnaire, questionResponse);
+//      scoreSummary.setMaximum(
+//        scoreSummary.getMaximum() < questionResponse.getScore()
+//          ? questionResponse.getScore() : scoreSummary.getMaximum());
+//      scoreSummary.setMinimum(
+//        scoreSummary.getMinimum() > questionResponse.getScore()
+//          ? questionResponse.getScore() : scoreSummary.getMinimum());
+//      avarageScore += questionResponse.getScore();
+//    }
+//
+//    avarageScore = avarageScore / questionResponses.size();
+//    scoreSummary.setAverage(avarageScore);
+//
+//    QuestionnaireResponse questionnaireResponse =
+//      QuestionnaireResponse.builder()
+//        .questionnaire(questionnaire)
+//        .details(questionResponses)
+//        .appraisee(appraisee)
+//        .appraiser(memberLogin)
+//        .scoreSummary(scoreSummary)
+//        .build();
+//
+//    this.updateQuestionnaireResponseSummary(questionnaireResponse);
+//
+//    this.updateUserQuestionnaireSummary(questionnaireResponse);
+//
+//    return questionnaireResponseRepository.save(questionnaireResponse);
+//  }
 }
