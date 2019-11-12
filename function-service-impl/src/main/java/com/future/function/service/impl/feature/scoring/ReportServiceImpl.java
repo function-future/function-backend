@@ -94,7 +94,7 @@ public class ReportServiceImpl implements ReportService {
     return Optional.ofNullable(students)
       .map(this::createOrGetDetails)
       .map(studentList -> this.setReportDetails(report, studentList))
-      .filter(currentReport -> !reportRepository.existsByStudentsContainsAndDeletedFalse(report.getStudents()))
+      .filter(currentReport -> !reportRepository.findByStudentsAndDeletedFalse(report.getStudents()).isPresent())
       .orElse(null);
   }
 
@@ -123,7 +123,7 @@ public class ReportServiceImpl implements ReportService {
       .map(Report::getId)
       .map(this::findById)
       .map(foundReport -> this.copyReportRequestAttributesIgnoreBatchField(report, foundReport))
-      .map(currentReport -> this.checkStudentIdsChangedAndDeleteIfChanged(currentReport, students))
+      .map(currentReport -> this.checkAndChangeStudents(currentReport, students))
       .map(reportRepository::save)
       .orElse(report);
   }
@@ -136,11 +136,11 @@ public class ReportServiceImpl implements ReportService {
     return report;
   }
 
-  private Report checkStudentIdsChangedAndDeleteIfChanged(Report report, List<ReportDetail> students) {
+  private Report checkAndChangeStudents(Report report, List<ReportDetail> students) {
 
     return Optional.ofNullable(report)
       .filter(currentReport -> this.isStudentListChangedFromRepository(currentReport, students))
-      .orElseGet(() -> this.createReportDetailByReportAndStudentId(report, report.getStudents()));
+      .orElseGet(() -> this.createReportDetailByReportAndStudentId(report, students));
   }
 
   private boolean isStudentListChangedFromRepository(Report report, List<ReportDetail> students) {

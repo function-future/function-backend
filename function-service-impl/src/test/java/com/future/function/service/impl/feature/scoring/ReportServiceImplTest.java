@@ -225,7 +225,7 @@ public class ReportServiceImplTest {
 
   @Test
   public void createReport() {
-    when(reportRepository.existsByStudentsContainsAndDeletedFalse(Collections.singletonList(reportDetail))).thenReturn(false);
+    when(reportRepository.findByStudentsAndDeletedFalse(Collections.singletonList(reportDetail))).thenReturn(Optional.empty());
     report.setStudents(Collections.singletonList(reportDetail));
     Report actual = reportService.createReport(report);
     report.setStudents(null);
@@ -233,18 +233,18 @@ public class ReportServiceImplTest {
     verify(reportRepository).save(report);
     verify(reportDetailService).createOrGetReportDetail(student);
     verify(batchService).getBatchByCode(BATCH_CODE);
-    verify(reportRepository).existsByStudentsContainsAndDeletedFalse(Collections.singletonList(reportDetail));
+    verify(reportRepository).findByStudentsAndDeletedFalse(Collections.singletonList(reportDetail));
   }
 
   @Test
   public void createReportStudentsAlreadyExist() {
-    when(reportRepository.existsByStudentsContainsAndDeletedFalse(Collections.singletonList(reportDetail))).thenReturn(true);
+    when(reportRepository.findByStudentsAndDeletedFalse(Collections.singletonList(reportDetail))).thenReturn(Optional.of(report));
     report.setStudents(Collections.singletonList(reportDetail));
     catchException(() -> reportService.createReport(report));
     assertThat(caughtException().getClass()).isEqualTo(UnsupportedOperationException.class);
     verify(reportDetailService).createOrGetReportDetail(student);
     verify(batchService).getBatchByCode(BATCH_CODE);
-    verify(reportRepository).existsByStudentsContainsAndDeletedFalse(Collections.singletonList(reportDetail));
+    verify(reportRepository).findByStudentsAndDeletedFalse(Collections.singletonList(reportDetail));
   }
 
   @Test
@@ -264,7 +264,6 @@ public class ReportServiceImplTest {
     reportDetail.setUser(student);
     Report actual = reportService.updateReport(report);
     assertThat(actual).isEqualTo(actual);
-    verify(batchService).getBatchByCode(BATCH_CODE);
     verify(reportRepository).findByIdAndDeletedFalse(REPORT_ID);
     verify(reportRepository).save(report);
   }
@@ -283,7 +282,6 @@ public class ReportServiceImplTest {
     reportDetail.setUser(student);
     Report actual = reportService.updateReport(report);
     assertThat(actual).isEqualTo(actual);
-    verify(batchService).getBatchByCode(BATCH_CODE);
     verify(reportRepository).findByIdAndDeletedFalse(REPORT_ID);
     verify(reportRepository).save(report);
   }

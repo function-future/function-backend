@@ -23,11 +23,11 @@ public class ReportWebRequest {
   @NotBlank(message = "NotBlank")
   private String description;
 
-  @StudentListMustExist
   @NotNull(message = "NotNull")
   @Size(min = 2,
-        max = 3,
-        message = "Size")
+      max = 3,
+      message = "Size")
+  @StudentListMustExist
   private List<String> students;
 
 }
