@@ -132,15 +132,18 @@ public class MyQuestionnaireServiceImpl implements MyQuestionnaireService {
   }
 
   @Override
-  public void createQuestionnaireResponseToAppraiseeFromMemberLoginAsAppraiser(Questionnaire questionnaire, List<QuestionResponseQueue> questionResponses, User memberLogin, User appraisee) {
+  public void createQuestionnaireResponseToAppraiseeFromMemberLoginAsAppraiser(
+    Questionnaire questionnaire,
+    List<QuestionResponseQueue> questionResponses,
+    User memberLogin,
+    User appraisee
+  ) {
     questionResponseQueueRepository.save(questionResponses);
 
     if (!questionnaireResponseRepository
           .findByQuestionnaireAndAppraiseeAndAppraiserAndDeletedFalse(
-              questionnaire, appraisee, memberLogin
-          )
+              questionnaire, appraisee, memberLogin)
       .isPresent()) {
-
       Answer answer = Answer.builder()
         .maximum(0F)
         .minimum(0F)

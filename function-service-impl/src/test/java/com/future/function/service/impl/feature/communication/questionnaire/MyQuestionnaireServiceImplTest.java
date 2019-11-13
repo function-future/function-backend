@@ -64,6 +64,8 @@ public class MyQuestionnaireServiceImplTest {
   private static final String USER_QUESTIONNAIRE_SUMMARY_ID_1 =
     "userQuestionnaireSummaryId1";
 
+  private static final String COMMENT = "comment";
+
   private QuestionnaireParticipant questionnaireParticipant1;
 
   private User user1;
@@ -157,6 +159,7 @@ public class MyQuestionnaireServiceImplTest {
       .id(QUESTION_RESPONSE_ID_1)
       .question(question1)
       .score(SCORE)
+      .comment(COMMENT)
       .appraisee(user1)
       .appraiser(memberLoggedIn)
       .build();
@@ -165,6 +168,7 @@ public class MyQuestionnaireServiceImplTest {
       .id(QUESTION_RESPONSE_QUEUE_ID)
       .question(question1)
       .score(SCORE)
+      .comment(COMMENT)
       .appraisee(user1)
       .appraiser(memberLoggedIn)
       .build();
@@ -485,11 +489,36 @@ public class MyQuestionnaireServiceImplTest {
     verify(questionResponseQueueRepository).delete(Arrays.asList(questionResponseQueue, questionResponseQueue2));
   }
 
-  @Test void testToQuestionResponse() {
+  @Test
+  public void testToQuestionResponse() {
     QuestionResponse q = myQuestionnaireService.toQuestionResponse(questionResponseQueue);
 
     assertThat(q.getAppraisee().getId()).isEqualTo(questionResponse1.getAppraisee().getId());
     assertThat(q.getAppraiser().getId()).isEqualTo(questionResponse1.getAppraiser().getId());
     assertThat(q.getQuestion().getQuestionnaire().getId()).isEqualTo(questionResponse1.getQuestion().getQuestionnaire().getId());
+  }
+
+  @Test
+  public void testCreateQuestionnaireResponseToAppraiseeFromMemberLoginAsAppraiser() {
+//    doNothing().when(questionResponseQueueRepository)
+//      .save(Arrays.asList(questionResponseQueue,questionResponseQueue2));
+    when(questionnaireResponseRepository.findByQuestionnaireAndAppraiseeAndAppraiserAndDeletedFalse(
+      questionnaire1,user1, memberLoggedIn
+    )).thenReturn(Optional.empty());
+
+    myQuestionnaireService.createQuestionnaireResponseToAppraiseeFromMemberLoginAsAppraiser(
+      questionnaire1,
+      Arrays.asList(questionResponseQueue,questionResponseQueue2),
+      memberLoggedIn,
+      user1
+    );
+
+    verify(questionnaireResponseRepository)
+      .findByQuestionnaireAndAppraiseeAndAppraiserAndDeletedFalse(
+        questionnaire1,user1, memberLoggedIn);
+    verify(questionResponseQueueRepository)
+      .save(Arrays.asList(questionResponseQueue,questionResponseQueue2));
+    verify(questionnaireResponseRepository)
+      .save(any(QuestionnaireResponse.class));
   }
 }

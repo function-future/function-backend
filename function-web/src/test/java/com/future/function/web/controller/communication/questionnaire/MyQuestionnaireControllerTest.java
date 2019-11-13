@@ -3,10 +3,7 @@ package com.future.function.web.controller.communication.questionnaire;
 import com.future.function.common.enumeration.communication.ParticipantType;
 import com.future.function.common.enumeration.core.Role;
 import com.future.function.common.properties.core.FileProperties;
-import com.future.function.model.entity.feature.communication.questionnaire.QuestionQuestionnaire;
-import com.future.function.model.entity.feature.communication.questionnaire.QuestionResponse;
-import com.future.function.model.entity.feature.communication.questionnaire.Questionnaire;
-import com.future.function.model.entity.feature.communication.questionnaire.QuestionnaireParticipant;
+import com.future.function.model.entity.feature.communication.questionnaire.*;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.User;
@@ -45,10 +42,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -107,6 +101,8 @@ public class MyQuestionnaireControllerTest extends TestHelper {
   private static final String COMMENT = "comment";
 
   private static final String QUESTION_RESPONSE_ID = "questionResponseId";
+
+  private static final String QUESTION_RESPONSE_QUEUE_ID = "questionResponseQueueId";
 
   private static final Questionnaire QUESTIONNAIRE = Questionnaire.builder()
     .id(QUESTIONNAIRE_ID_1)
@@ -175,6 +171,12 @@ public class MyQuestionnaireControllerTest extends TestHelper {
     QuestionResponse.builder()
       .id(QUESTION_RESPONSE_ID)
       .build();
+
+  private static final QuestionResponseQueue QUESTION_RESPONSE_QUEUE =
+    QuestionResponseQueue.builder()
+      .id(QUESTION_RESPONSE_QUEUE_ID)
+      .build();
+
 
   private final QuestionnaireResponseRequest
     QUESTIONNAIRE_RESPONSE_WEB_REQUEST = QuestionnaireResponseRequest.builder()
@@ -327,15 +329,15 @@ public class MyQuestionnaireControllerTest extends TestHelper {
     when(userService.getUser(any(String.class))).thenReturn(MEMBER_1);
     when(questionnaireService.getQuestionnaire(QUESTIONNAIRE_ID_1)).thenReturn(
       QUESTIONNAIRE);
-    when(myQuestionnaireRequestMapper.toListQuestionResponse(
+    when(myQuestionnaireRequestMapper.toListQuestionResponseQueue(
       Arrays.asList(QUESTION_RESPONSE_REQUEST), MEMBER_1, MEMBER_1)).thenReturn(
-      Arrays.asList(QUESTION_RESPONSE));
+      Arrays.asList(QUESTION_RESPONSE_QUEUE));
 
-    when(
-      myQuestionnaireService.createQuestionnaireResponseToAppraiseeFromMemberLoginAsAppraiser(
-        QUESTIONNAIRE, Arrays.asList(QUESTION_RESPONSE), MEMBER_1,
+    doNothing().when(myQuestionnaireService)
+      .createQuestionnaireResponseToAppraiseeFromMemberLoginAsAppraiser(
+        QUESTIONNAIRE, Arrays.asList(QUESTION_RESPONSE_QUEUE), MEMBER_1,
         MEMBER_1
-      )).thenReturn(null);
+      );
 
     mockMvc.perform(post(
       "/api/communication/my-questionnaires/" + QUESTIONNAIRE_ID_1 +
@@ -350,8 +352,8 @@ public class MyQuestionnaireControllerTest extends TestHelper {
     verify(userService, times(4)).getUser(any(String.class));
     verify(
       myQuestionnaireService).createQuestionnaireResponseToAppraiseeFromMemberLoginAsAppraiser(
-      QUESTIONNAIRE, Arrays.asList(QUESTION_RESPONSE), MEMBER_1, MEMBER_1);
-    verify(myQuestionnaireRequestMapper).toListQuestionResponse(
+      QUESTIONNAIRE, Arrays.asList(QUESTION_RESPONSE_QUEUE), MEMBER_1, MEMBER_1);
+    verify(myQuestionnaireRequestMapper).toListQuestionResponseQueue(
       Arrays.asList(QUESTION_RESPONSE_REQUEST), MEMBER_1, MEMBER_1);
   }
 
