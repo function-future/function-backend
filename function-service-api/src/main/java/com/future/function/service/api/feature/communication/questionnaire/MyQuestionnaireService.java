@@ -25,7 +25,7 @@ public interface MyQuestionnaireService {
     Questionnaire questionnaire
   );
 
-  QuestionnaireResponse createQuestionnaireResponseToAppraiseeFromMemberLoginAsAppraiser(
+  void createQuestionnaireResponseToAppraiseeFromMemberLoginAsAppraiser(
     Questionnaire questionnaire, List<QuestionResponseQueue> questionResponses,
     User memberLogin, User appraisee
   );

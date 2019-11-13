@@ -1,29 +1,16 @@
 package com.future.function.service.impl.feature.communication.questionnaire;
 
 import com.future.function.common.enumeration.communication.ParticipantType;
-import com.future.function.model.entity.feature.communication.questionnaire.Answer;
-import com.future.function.model.entity.feature.communication.questionnaire.QuestionQuestionnaire;
-import com.future.function.model.entity.feature.communication.questionnaire.QuestionResponse;
-import com.future.function.model.entity.feature.communication.questionnaire.QuestionResponseSummary;
-import com.future.function.model.entity.feature.communication.questionnaire.Questionnaire;
-import com.future.function.model.entity.feature.communication.questionnaire.QuestionnaireParticipant;
-import com.future.function.model.entity.feature.communication.questionnaire.QuestionnaireResponse;
-import com.future.function.model.entity.feature.communication.questionnaire.QuestionnaireResponseSummary;
-import com.future.function.model.entity.feature.communication.questionnaire.UserQuestionnaireSummary;
+import com.future.function.model.entity.feature.communication.questionnaire.*;
 import com.future.function.model.entity.feature.core.User;
-import com.future.function.repository.feature.communication.questionnaire.QuestionQuestionnaireRepository;
-import com.future.function.repository.feature.communication.questionnaire.QuestionResponseRepository;
-import com.future.function.repository.feature.communication.questionnaire.QuestionResponseSummaryRepository;
-import com.future.function.repository.feature.communication.questionnaire.QuestionnaireParticipantRepository;
-import com.future.function.repository.feature.communication.questionnaire.QuestionnaireResponseRepository;
-import com.future.function.repository.feature.communication.questionnaire.QuestionnaireResponseSummaryRepository;
-import com.future.function.repository.feature.communication.questionnaire.UserQuestionnaireSummaryRepository;
+import com.future.function.repository.feature.communication.questionnaire.*;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -37,9 +24,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class MyQuestionnaireServiceImplTest {
@@ -47,6 +32,8 @@ public class MyQuestionnaireServiceImplTest {
   private static final Pageable PAGEABLE = new PageRequest(0, 10);
 
   private static final String USER_ID_1 = "userId1";
+
+  private static final String USER_ID_2 = "userId2";
 
   private static final String USER_LOGGED_IN_ID_1 = "userLoggedInId1";
 
@@ -65,6 +52,10 @@ public class MyQuestionnaireServiceImplTest {
 
   private static final String QUESTION_RESPONSE_ID_1 = "questionResponseId1";
 
+  private static final String QUESTION_RESPONSE_QUEUE_ID = "questionResponseQueueId";
+
+  private static final String QUESTION_RESPONSE_QUEUE_ID2 = "questionResponseQueueId2";
+
   private static final String QUESTION_RESPONSE_SUMMARY_ID_1 =
     "questionResponseSummaryId1";
 
@@ -76,6 +67,8 @@ public class MyQuestionnaireServiceImplTest {
   private QuestionnaireParticipant questionnaireParticipant1;
 
   private User user1;
+
+  private User user2;
 
   private User memberLoggedIn;
 
@@ -96,6 +89,10 @@ public class MyQuestionnaireServiceImplTest {
   private Answer answer;
 
   private Answer answerUpdated;
+
+  private QuestionResponseQueue questionResponseQueue;
+
+  private QuestionResponseQueue questionResponseQueue2;
 
   @Mock
   private QuestionnaireParticipantRepository questionnaireParticipantRepository;
@@ -119,6 +116,10 @@ public class MyQuestionnaireServiceImplTest {
   @Mock
   private QuestionResponseSummaryRepository questionResponseSummaryRepository;
 
+  @Mock
+  private QuestionResponseQueueRepository questionResponseQueueRepository;
+
+  @Spy
   @InjectMocks
   private MyQuestionnaireServiceImpl myQuestionnaireService;
 
@@ -127,6 +128,10 @@ public class MyQuestionnaireServiceImplTest {
 
     user1 = User.builder()
       .id(USER_ID_1)
+      .build();
+
+    user2 = User.builder()
+      .id(USER_ID_2)
       .build();
 
     memberLoggedIn = User.builder()
@@ -145,6 +150,7 @@ public class MyQuestionnaireServiceImplTest {
 
     question1 = QuestionQuestionnaire.builder()
       .id(QUESTION_ID_1)
+      .questionnaire(questionnaire1)
       .build();
 
     questionResponse1 = QuestionResponse.builder()
@@ -152,6 +158,23 @@ public class MyQuestionnaireServiceImplTest {
       .question(question1)
       .score(SCORE)
       .appraisee(user1)
+      .appraiser(memberLoggedIn)
+      .build();
+
+    questionResponseQueue = QuestionResponseQueue.builder()
+      .id(QUESTION_RESPONSE_QUEUE_ID)
+      .question(question1)
+      .score(SCORE)
+      .appraisee(user1)
+      .appraiser(memberLoggedIn)
+      .build();
+
+    questionResponseQueue2 = QuestionResponseQueue.builder()
+      .id(QUESTION_RESPONSE_QUEUE_ID2)
+      .question(question1)
+      .score(SCORE)
+      .appraisee(user2)
+      .appraiser(memberLoggedIn)
       .build();
 
     answer = Answer.builder()
@@ -174,6 +197,7 @@ public class MyQuestionnaireServiceImplTest {
 
     questionnaireResponse1 = QuestionnaireResponse.builder()
       .id(QUESTIONNAIRE_RESPONSE_ID_1)
+      .questionnaire(questionnaire1)
       .appraisee(user1)
       .build();
 
@@ -198,7 +222,8 @@ public class MyQuestionnaireServiceImplTest {
                              questionnaireResponseRepository,
                              questionnaireResponseSummaryRepository,
                              userQuestionnaireSummaryRepository,
-                             questionResponseSummaryRepository
+                             questionResponseSummaryRepository,
+                             questionResponseQueueRepository
     );
   }
 
@@ -290,7 +315,7 @@ public class MyQuestionnaireServiceImplTest {
   }
 
   @Test
-  public void createQuestionnaireResponseToAppraiseeFromMemberLoginAsAppraiser() {
+  public void updateUserSummary() {
 
     when(questionResponseRepository.save(questionResponse1)).thenReturn(
       questionResponse1);
@@ -313,20 +338,22 @@ public class MyQuestionnaireServiceImplTest {
     when(questionnaireResponseRepository.save(
       any(QuestionnaireResponse.class))).thenReturn(questionnaireResponse1);
 
+    when(questionnaireResponseRepository
+      .findByQuestionnaireAndAppraiseeAndAppraiserAndDeletedFalse(
+        questionnaire1, user1, memberLoggedIn
+      )).thenReturn(Optional.ofNullable(questionnaireResponse1));
+
     when(questionnaireResponseSummaryRepository.save(
       questionnaireResponseSummary)).thenReturn(questionnaireResponseSummary);
 
     when(userQuestionnaireSummaryRepository.save(
       userQuestionnaireSummary)).thenReturn(userQuestionnaireSummary);
 
-    QuestionnaireResponse questionnaireResponse =
-      myQuestionnaireService.createQuestionnaireResponseToAppraiseeFromMemberLoginAsAppraiser(
+
+    myQuestionnaireService.updateUserSummary(
         questionnaire1, Arrays.asList(questionResponse1), memberLoggedIn,
         user1
       );
-
-    assertThat(questionnaireResponse.getId()).isEqualTo(
-      QUESTIONNAIRE_RESPONSE_ID_1);
 
     verify(questionResponseRepository).save(questionResponse1);
 
@@ -347,6 +374,11 @@ public class MyQuestionnaireServiceImplTest {
     verify(questionnaireResponseRepository).save(
       any(QuestionnaireResponse.class));
 
+    verify(questionnaireResponseRepository)
+      .findByQuestionnaireAndAppraiseeAndAppraiserAndDeletedFalse(
+        questionnaire1, user1, memberLoggedIn
+      );
+
     verify(questionnaireResponseSummaryRepository).save(
       questionnaireResponseSummary);
 
@@ -354,7 +386,7 @@ public class MyQuestionnaireServiceImplTest {
   }
 
   @Test
-  public void createQuestionnaireResponseToAppraiseeFromMemberLoginAsAppraiserForFirstTime() {
+  public void updateUserSummaryForFirstTime() {
 
     when(questionResponseRepository.save(questionResponse1)).thenReturn(
       questionResponse1);
@@ -376,20 +408,23 @@ public class MyQuestionnaireServiceImplTest {
     when(questionnaireResponseRepository.save(
       any(QuestionnaireResponse.class))).thenReturn(questionnaireResponse1);
 
+    when(questionnaireResponseRepository
+      .findByQuestionnaireAndAppraiseeAndAppraiserAndDeletedFalse(
+        questionnaire1, user1, memberLoggedIn
+      )).thenReturn(Optional.ofNullable(questionnaireResponse1));
+
+
     when(questionnaireResponseSummaryRepository.save(
       questionnaireResponseSummary)).thenReturn(questionnaireResponseSummary);
 
     when(userQuestionnaireSummaryRepository.save(
       userQuestionnaireSummary)).thenReturn(userQuestionnaireSummary);
 
-    QuestionnaireResponse questionnaireResponse =
-      myQuestionnaireService.createQuestionnaireResponseToAppraiseeFromMemberLoginAsAppraiser(
-        questionnaire1, Arrays.asList(questionResponse1), memberLoggedIn,
-        user1
-      );
 
-    assertThat(questionnaireResponse.getId()).isEqualTo(
-      QUESTIONNAIRE_RESPONSE_ID_1);
+    myQuestionnaireService.updateUserSummary(
+      questionnaire1, Arrays.asList(questionResponse1), memberLoggedIn,
+      user1
+    );
 
     verify(questionResponseRepository).save(questionResponse1);
 
@@ -400,6 +435,11 @@ public class MyQuestionnaireServiceImplTest {
     verify(
       questionnaireResponseSummaryRepository).findByAppraiseeAndQuestionnaireAndDeletedFalse(
       user1, questionnaire1);
+
+    verify(questionnaireResponseRepository)
+      .findByQuestionnaireAndAppraiseeAndAppraiserAndDeletedFalse(
+        questionnaire1, user1, memberLoggedIn
+      );
 
     verify(
       userQuestionnaireSummaryRepository).findFirstByAppraiseeAndDeletedFalse(
@@ -421,8 +461,8 @@ public class MyQuestionnaireServiceImplTest {
     questionnaireResponseSummary.setAppraisee(user1);
     questionnaireResponseSummary.setScoreSummary(answerUpdated);
 
-    verify(questionnaireResponseSummaryRepository).save(
-      questionnaireResponseSummary);
+//    verify(questionnaireResponseSummaryRepository).save(
+//      questionnaireResponseSummary);
 
     userQuestionnaireSummary.setId(null);
     userQuestionnaireSummary.setAppraisee(user1);
@@ -432,4 +472,24 @@ public class MyQuestionnaireServiceImplTest {
     verify(userQuestionnaireSummaryRepository).save(userQuestionnaireSummary);
   }
 
+  @Test
+  public void testUpdateScore() {
+    when(questionResponseQueueRepository.findAll())
+      .thenReturn(Arrays.asList(questionResponseQueue, questionResponseQueue2));
+    doNothing().when(myQuestionnaireService).updateUserSummary(any(Questionnaire.class), anyListOf(QuestionResponse.class), any(User.class), any(User.class));
+
+    myQuestionnaireService.updateScore();
+
+    verify(myQuestionnaireService, times(2)).updateUserSummary(any(Questionnaire.class), anyListOf(QuestionResponse.class), any(User.class), any(User.class));
+    verify(questionResponseQueueRepository).findAll();
+    verify(questionResponseQueueRepository).delete(Arrays.asList(questionResponseQueue, questionResponseQueue2));
+  }
+
+  @Test void testToQuestionResponse() {
+    QuestionResponse q = myQuestionnaireService.toQuestionResponse(questionResponseQueue);
+
+    assertThat(q.getAppraisee().getId()).isEqualTo(questionResponse1.getAppraisee().getId());
+    assertThat(q.getAppraiser().getId()).isEqualTo(questionResponse1.getAppraiser().getId());
+    assertThat(q.getQuestion().getQuestionnaire().getId()).isEqualTo(questionResponse1.getQuestion().getQuestionnaire().getId());
+  }
 }
