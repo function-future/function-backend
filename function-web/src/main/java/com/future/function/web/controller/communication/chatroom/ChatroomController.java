@@ -30,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -259,6 +260,18 @@ public class ChatroomController {
     }
     messageStatusService.updateSeenStatus(
       chatroomId, messageId, session.getUserId());
+    return ResponseHelper.toBaseResponse(HttpStatus.OK);
+  }
+
+  @PostMapping(value = "/{chatroomId}/_enter", produces = MediaType.APPLICATION_JSON_VALUE)
+  public BaseResponse enterChatroom(Session session, @PathVariable String chatroomId) {
+    chatroomService.enterChatroom(chatroomId, session.getUserId());
+    return ResponseHelper.toBaseResponse(HttpStatus.OK);
+  }
+
+  @PostMapping(value = "/{chatroomId}/_leave", produces = MediaType.APPLICATION_JSON_VALUE)
+  public BaseResponse leaveChatroom(Session session, @PathVariable String chatroomId) {
+    chatroomService.leaveChatroom(chatroomId, session.getUserId());
     return ResponseHelper.toBaseResponse(HttpStatus.OK);
   }
 

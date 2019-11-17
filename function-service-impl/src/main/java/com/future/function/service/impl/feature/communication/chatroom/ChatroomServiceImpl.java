@@ -12,6 +12,8 @@ import com.future.function.service.impl.helper.PageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.redis.core.ListOperations;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -26,12 +28,15 @@ public class ChatroomServiceImpl implements ChatroomService {
 
   private final ChatroomRepository chatroomRepository;
 
+  private final ListOperations<String, Object> redisListOperations;
 
   @Autowired
   public ChatroomServiceImpl(
-    UserService userService, ChatroomRepository chatroomRepository
+    UserService userService,
+    ChatroomRepository chatroomRepository,
+    RedisTemplate<String, Object> redisTemplate
   ) {
-
+    this.redisListOperations = redisTemplate.opsForList();
     this.userService = userService;
     this.chatroomRepository = chatroomRepository;
   }
@@ -122,6 +127,17 @@ public class ChatroomServiceImpl implements ChatroomService {
 
     return chatroomRepository.findByType(ChatroomType.PUBLIC.name())
       .orElseThrow(() -> new NotFoundException("Chatroom not found"));
+  }
+
+  @Override
+  public void enterChatroom(String chatroomId, String userId) {
+    redisListOperations.remove("chatroom:" + chatroomId + ":active.user", 1, userId);
+    redisListOperations.rightPush("chatroom:" + chatroomId + ":active.user", userId);
+  }
+
+  @Override
+  public void leaveChatroom(String chatroomId, String userId) {
+    redisListOperations.remove("chatroom:" + chatroomId + ":active.user", 1, userId);
   }
 
   private Chatroom updateMember(
