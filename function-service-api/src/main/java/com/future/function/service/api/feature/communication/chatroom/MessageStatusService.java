@@ -16,8 +16,12 @@ public interface MessageStatusService {
 
   MessageStatus createMessageStatus(MessageStatus messageStatus, String userId);
 
-  void updateSeenStatus(String chatroomId, String messageId, String userId);
+  void updateSeenStatus(String chatroomId, String messageId, String userId, Boolean isAll);
 
   MessageStatus updateMessageStatus(MessageStatus messageStatus, String userId);
+
+  void enterChatroom(String chatroomId, String userId);
+
+  void leaveChatroom(String chatroomId, String userId);
 
 }

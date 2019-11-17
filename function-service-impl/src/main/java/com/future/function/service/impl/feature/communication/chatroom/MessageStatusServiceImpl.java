@@ -10,6 +10,8 @@ import com.future.function.service.api.feature.communication.chatroom.MessageSer
 import com.future.function.service.api.feature.communication.chatroom.MessageStatusService;
 import com.future.function.service.api.feature.core.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.SetOperations;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,16 +28,21 @@ public class MessageStatusServiceImpl implements MessageStatusService {
 
   private final MessageService messageService;
 
+  private final SetOperations<String, Object> redisSetOperations;
+
+
   @Autowired
   public MessageStatusServiceImpl(
     UserService userService, MessageStatusRepository messageStatusRepository,
-    ChatroomService chatroomService, MessageService messageService
+    ChatroomService chatroomService, MessageService messageService, RedisTemplate<String, Object> redisTemplate
   ) {
 
     this.userService = userService;
     this.chatroomService = chatroomService;
     this.messageStatusRepository = messageStatusRepository;
     this.messageService = messageService;
+    this.redisSetOperations = redisTemplate.opsForSet();
+
   }
 
   @Override
@@ -82,16 +89,16 @@ public class MessageStatusServiceImpl implements MessageStatusService {
 
   @Override
   public void updateSeenStatus(
-    String chatroomId, String messageId, String userId
+    String chatroomId, String messageId, String userId, Boolean isAll
   ) {
 
-    Long timestamp = Optional.of(messageId)
+    Long timestamp = Optional.ofNullable(messageId)
       .map(messageService::getMessage)
       .map(Message::getCreatedAt)
       .orElse(0L);
     this.getUnseenMessageStatus(chatroomId, userId)
       .forEach(messageStatus -> {
-        if (messageStatus.getMessage()
+        if (isAll || messageStatus.getMessage()
               .getCreatedAt() <= timestamp) {
           messageStatus.setSeen(true);
           this.updateMessageStatus(messageStatus, userId);
@@ -110,6 +117,17 @@ public class MessageStatusServiceImpl implements MessageStatusService {
       .map(msgStatus -> this.setChatroom(msgStatus, userId))
       .map(messageStatusRepository::save)
       .orElse(messageStatus);
+  }
+
+  @Override
+  public void enterChatroom(String chatroomId, String userId) {
+    redisSetOperations.add("chatroom:" + chatroomId + ":active.user", userId);
+    this.updateSeenStatus(chatroomId, null, userId, true);
+  }
+
+  @Override
+  public void leaveChatroom(String chatroomId, String userId) {
+    redisSetOperations.remove("chatroom:" + chatroomId + ":active.user", userId);
   }
 
   private MessageStatus setMember(MessageStatus messageStatus) {

@@ -156,7 +156,7 @@ public class ChatroomResponseMapper {
       .collect(Collectors.toList());
   }
 
-  private static MessageResponse toMessageResponse(
+  public static MessageResponse toMessageResponse(
     Message message, String urlPrefix
   ) {
 

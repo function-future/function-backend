@@ -6,6 +6,7 @@ import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.communication.chatting.Chatroom;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.repository.feature.communication.chatting.ChatroomRepository;
+import com.future.function.service.api.feature.communication.chatroom.MessageStatusService;
 import com.future.function.service.api.feature.core.UserService;
 import com.future.function.service.impl.feature.communication.chatroom.ChatroomServiceImpl;
 import com.future.function.session.model.Session;
@@ -24,6 +25,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.SetOperations;
 import org.springframework.data.redis.core.ValueOperations;
 
 import java.util.ArrayList;
@@ -90,15 +92,14 @@ public class ChatroomServiceImplTest {
 
   private Chatroom chatroom;
 
-  private static RedisTemplate<String, Object> redisTemplate;
-
-  private static ListOperations<String, Object> listOperations;
-
   @Mock
   private UserService userService;
 
   @Mock
   private ChatroomRepository chatroomRepository;
+
+  @Mock
+  private MessageStatusService messageStatusService;
 
   @InjectMocks
   private ChatroomServiceImpl chatroomService;
@@ -112,15 +113,6 @@ public class ChatroomServiceImplTest {
       .type(TYPE)
       .members(Arrays.asList(MEMBER_1, MEMBER_2))
       .build();
-  }
-
-  @BeforeClass
-  public static void setUpClass() {
-
-    redisTemplate = mock(RedisTemplate.class);
-    listOperations = mock(ListOperations.class);
-
-    when(redisTemplate.opsForList()).thenReturn(listOperations);
   }
 
   @After
@@ -330,20 +322,5 @@ public class ChatroomServiceImplTest {
     verify(chatroomRepository).save(chatroom);
     verify(userService, times(2)).getUser(USER_ID_1);
     verify(userService).getUser(USER_ID_2);
-  }
-
-  @Test
-  public void testGivenChatroomIdAndUserIdByEnterChatroomReturnVoid() {
-    chatroomService.enterChatroom(CHATROOM_ID, USER_ID_1);
-
-    verify(redisTemplate.opsForList()).remove("chatroom:" + CHATROOM_ID + ":active.user", 1, USER_ID_1);
-    verify(redisTemplate.opsForList()).rightPush("chatroom:" + CHATROOM_ID + ":active.user", USER_ID_1);
-  }
-
-  @Test
-  public void testGivenChatroomIdAndUserIdByLeaveChatroomReturnVoid() {
-    chatroomService.leaveChatroom(CHATROOM_ID, USER_ID_1);
-
-    verify(redisTemplate.opsForList()).remove("chatroom:" + CHATROOM_ID + ":active.user", 1, USER_ID_1);
   }
 }

@@ -259,19 +259,19 @@ public class ChatroomController {
         .getId();
     }
     messageStatusService.updateSeenStatus(
-      chatroomId, messageId, session.getUserId());
+      chatroomId, messageId, session.getUserId(), false);
     return ResponseHelper.toBaseResponse(HttpStatus.OK);
   }
 
   @PostMapping(value = "/{chatroomId}/_enter", produces = MediaType.APPLICATION_JSON_VALUE)
   public BaseResponse enterChatroom(Session session, @PathVariable String chatroomId) {
-    chatroomService.enterChatroom(chatroomId, session.getUserId());
+    messageStatusService.enterChatroom(chatroomId, session.getUserId());
     return ResponseHelper.toBaseResponse(HttpStatus.OK);
   }
 
   @PostMapping(value = "/{chatroomId}/_leave", produces = MediaType.APPLICATION_JSON_VALUE)
   public BaseResponse leaveChatroom(Session session, @PathVariable String chatroomId) {
-    chatroomService.leaveChatroom(chatroomId, session.getUserId());
+    messageStatusService.leaveChatroom(chatroomId, session.getUserId());
     return ResponseHelper.toBaseResponse(HttpStatus.OK);
   }
 
