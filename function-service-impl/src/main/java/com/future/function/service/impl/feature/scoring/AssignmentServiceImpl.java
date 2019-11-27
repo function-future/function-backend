@@ -66,10 +66,10 @@ public class AssignmentServiceImpl extends Observable implements AssignmentServi
   private Page<Assignment> getAssignmentPage(Batch batch, Pageable pageable, boolean deadline) {
     return Optional.of(batch)
         .filter(filter -> deadline)
-          .map(currentBatch -> assignmentRepository
-              .findAllByBatchAndDeletedFalseAndDeadlineAfterOrderByDeadlineDesc(currentBatch, getDateInLong(), pageable))
+        .map(currentBatch -> assignmentRepository
+            .findAllByBatchAndDeletedFalseAndDeadlineLessThanOrderByDeadlineAsc(currentBatch, getDateInLong(), pageable))
           .orElseGet(() -> assignmentRepository
-              .findAllByBatchAndDeletedFalseAndDeadlineBeforeOrderByDeadlineAsc(batch, getDateInLong(), pageable));
+              .findAllByBatchAndDeadlineGreaterThanOrderByDeadlineDesc(batch, getDateInLong(), pageable));
   }
 
   private Batch validateStudentBatch(Batch batch, Role role, String sessionBatchId) {

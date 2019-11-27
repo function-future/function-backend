@@ -143,9 +143,9 @@ public class AssignmentServiceImplTest {
     when(
       assignmentRepository.findByIdAndDeletedFalse(ASSIGNMENT_ID)).thenReturn(
       Optional.of(assignment));
-    when(assignmentRepository.findAllByBatchAndDeletedFalseAndDeadlineAfterOrderByDeadlineDesc(batch, DATE_NOW, pageable))
+    when(assignmentRepository.findAllByBatchAndDeadlineGreaterThanOrderByDeadlineDesc(batch, DATE_NOW, pageable))
         .thenReturn(assignmentPage);
-    when(assignmentRepository.findAllByBatchAndDeletedFalseAndDeadlineBeforeOrderByDeadlineAsc(batch, DATE_NOW, pageable))
+    when(assignmentRepository.findAllByBatchAndDeletedFalseAndDeadlineLessThanOrderByDeadlineAsc(batch, DATE_NOW, pageable))
         .thenReturn(assignmentPage);
     when(assignmentRepository.save(assignment)).thenReturn(assignment);
     when(batchService.getBatchByCode(BATCH_CODE)).thenReturn(batch);
@@ -176,7 +176,7 @@ public class AssignmentServiceImplTest {
                  .size()).isEqualTo(2);
     assertThat(result.getContent()).isEqualTo(assignmentList);
     verify(batchService).getBatchByCode(BATCH_CODE);
-    verify(assignmentRepository).findAllByBatchAndDeletedFalseAndDeadlineAfterOrderByDeadlineDesc(batch, DATE_NOW, pageable);
+    verify(assignmentRepository).findAllByBatchAndDeletedFalseAndDeadlineLessThanOrderByDeadlineAsc(batch, DATE_NOW, pageable);
   }
 
   @Test
@@ -189,7 +189,7 @@ public class AssignmentServiceImplTest {
         .size()).isEqualTo(2);
     assertThat(result.getContent()).isEqualTo(assignmentList);
     verify(batchService).getBatchByCode(BATCH_CODE);
-    verify(assignmentRepository).findAllByBatchAndDeletedFalseAndDeadlineBeforeOrderByDeadlineAsc(batch, DATE_NOW, pageable);
+    verify(assignmentRepository).findAllByBatchAndDeadlineGreaterThanOrderByDeadlineDesc(batch, DATE_NOW, pageable);
   }
 
   @Test
@@ -212,7 +212,7 @@ public class AssignmentServiceImplTest {
         .size()).isEqualTo(2);
     assertThat(result.getContent()).isEqualTo(assignmentList);
     verify(batchService).getBatchByCode(BATCH_CODE);
-    verify(assignmentRepository).findAllByBatchAndDeletedFalseAndDeadlineAfterOrderByDeadlineDesc(batch, DATE_NOW, pageable);
+    verify(assignmentRepository).findAllByBatchAndDeletedFalseAndDeadlineLessThanOrderByDeadlineAsc(batch, DATE_NOW, pageable);
   }
 
   @Test
@@ -228,7 +228,7 @@ public class AssignmentServiceImplTest {
         .size()).isEqualTo(2);
     assertThat(result.getContent()).isEqualTo(expected);
     verify(batchService).getBatchByCode(BATCH_CODE);
-    verify(assignmentRepository).findAllByBatchAndDeletedFalseAndDeadlineAfterOrderByDeadlineDesc(batch, DATE_NOW, pageable);
+    verify(assignmentRepository).findAllByBatchAndDeletedFalseAndDeadlineLessThanOrderByDeadlineAsc(batch, DATE_NOW, pageable);
   }
 
   @Test
@@ -242,7 +242,7 @@ public class AssignmentServiceImplTest {
         .size()).isEqualTo(2);
     assertThat(result.getContent()).isEqualTo(assignmentList);
     verify(batchService).getBatchByCode(BATCH_CODE);
-    verify(assignmentRepository).findAllByBatchAndDeletedFalseAndDeadlineAfterOrderByDeadlineDesc(batch, DATE_NOW, pageable);
+    verify(assignmentRepository).findAllByBatchAndDeletedFalseAndDeadlineLessThanOrderByDeadlineAsc(batch, DATE_NOW, pageable);
   }
 
   @Test

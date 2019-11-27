@@ -73,17 +73,24 @@ public class QuizServiceImpl extends Observable implements QuizService {
     return Optional.ofNullable(batchCode)
       .map(batchService::getBatchByCode)
       .map(batch -> this.validateStudentBatchWithBatch(batch, role, sessionBatchId))
-      .map(batch -> this.getQuizPage(batch, pageable, deadline))
+      .map(batch -> this.getQuizPage(batch, pageable, deadline, role))
       .orElseGet(() -> PageHelper.empty(pageable));
   }
 
-  private Page<Quiz> getQuizPage(Batch batch, Pageable pageable, boolean deadline) {
+  private Page<Quiz> getQuizPage(Batch batch, Pageable pageable, boolean deadline, Role role) {
     return Optional.of(batch)
         .filter(filter -> deadline)
         .map(currentBatch -> quizRepository
-            .findAllByBatchAndDeletedFalseAndEndDateAfterOrderByEndDateDesc(currentBatch, getDateInLong(), pageable))
-        .orElseGet(() -> quizRepository
-            .findAllByBatchAndDeletedFalseAndEndDateBeforeOrderByEndDateAsc(batch, getDateInLong(), pageable));
+            .findAllByBatchAndDeletedFalseAndEndDateLessThanOrderByEndDateAsc(currentBatch, getDateInLong(), pageable))
+        .orElseGet(() -> getQuizByRole(batch, pageable, role));
+  }
+
+  private Page<Quiz> getQuizByRole(Batch batch, Pageable pageable, Role role) {
+    return role.equals(Role.ADMIN) ? quizRepository
+        .findAllByBatchAndDeletedFalseAndEndDateGreaterThanOrderByEndDateDesc(batch, getDateInLong(), pageable) :
+        quizRepository
+        .findAllByBatchAndDeletedFalseAndStartDateLessThanEqualAndEndDateGreaterThanOrderByEndDateDesc(
+            batch, getDateInLong(), getDateInLong(), pageable);
   }
 
   private Long getDateInLong() {

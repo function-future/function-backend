@@ -156,7 +156,12 @@ public class ReportServiceImpl implements ReportService {
   }
 
   private boolean isStudentListEquals(List<String> students, List<ReportDetail> foundStudents) {
-    return foundStudents.stream().map(ReportDetail::getUser).map(User::getId).collect(Collectors.toList()).containsAll(students);
+    return foundStudents.stream()
+        .map(ReportDetail::getUser)
+        .map(User::getId)
+        .collect(Collectors.toList())
+        .containsAll(students) &&
+        foundStudents.size() == students.size();
   }
 
   @Override

@@ -143,11 +143,10 @@ public class QuizServiceImplTest {
     quizPage = new PageImpl<>(quizList, pageable, TOTAL);
 
     when(
-      quizRepository.findAllByBatchAndDeletedFalseAndEndDateBeforeOrderByEndDateAsc(batch, DATE_NOW, pageable)).thenReturn(
+      quizRepository.findAllByBatchAndDeletedFalseAndEndDateLessThanOrderByEndDateAsc(batch, DATE_NOW, pageable)).thenReturn(
       quizPage);
-    when(
-        quizRepository.findAllByBatchAndDeletedFalseAndEndDateAfterOrderByEndDateDesc(batch, DATE_NOW, pageable)).thenReturn(
-        quizPage);
+    when(quizRepository.findAllByBatchAndDeletedFalseAndStartDateLessThanEqualAndEndDateGreaterThanOrderByEndDateDesc(
+        batch, DATE_NOW, DATE_NOW, pageable)).thenReturn(quizPage);
     when(quizRepository.findByIdAndDeletedFalse(QUIZ_ID)).thenReturn(
       Optional.of(quiz));
     when(quizRepository.save(quiz)).thenReturn(quiz);
@@ -220,12 +219,13 @@ public class QuizServiceImplTest {
   public void testFindPageOfQuizWithPageableFilterAndSearch() {
 
     Page<Quiz> actual = quizService.findAllByBatchCodeAndPageable(
-      BATCH_CODE, pageable, Role.STUDENT, BATCH_ID, true);
+      BATCH_CODE, pageable, Role.STUDENT, BATCH_ID, false);
     assertThat(actual.getContent()).isEqualTo(quizList);
     assertThat(actual.getTotalElements()).isEqualTo(TOTAL);
     assertThat(actual).isEqualTo(quizPage);
 
-    verify(quizRepository).findAllByBatchAndDeletedFalseAndEndDateAfterOrderByEndDateDesc(batch, DATE_NOW, pageable);
+    verify(quizRepository).findAllByBatchAndDeletedFalseAndStartDateLessThanEqualAndEndDateGreaterThanOrderByEndDateDesc(
+        batch, DATE_NOW, DATE_NOW, pageable);
     verify(batchService).getBatchByCode(BATCH_CODE);
   }
 
@@ -233,12 +233,13 @@ public class QuizServiceImplTest {
   public void testFindPageOfQuizWithPageableFilterAndSearchAndAccessedByAdmin() {
 
     Page<Quiz> actual = quizService.findAllByBatchCodeAndPageable(
-        BATCH_CODE, pageable, Role.ADMIN, "", true);
+        BATCH_CODE, pageable, Role.ADMIN, "", false);
     assertThat(actual.getContent()).isEqualTo(quizList);
     assertThat(actual.getTotalElements()).isEqualTo(TOTAL);
     assertThat(actual).isEqualTo(quizPage);
 
-    verify(quizRepository).findAllByBatchAndDeletedFalseAndEndDateAfterOrderByEndDateDesc(batch, DATE_NOW, pageable);
+    verify(quizRepository).findAllByBatchAndDeletedFalseAndStartDateLessThanEqualAndEndDateGreaterThanOrderByEndDateDesc(
+        batch, DATE_NOW, DATE_NOW, pageable);
     verify(batchService).getBatchByCode(BATCH_CODE);
   }
 
@@ -246,13 +247,13 @@ public class QuizServiceImplTest {
   public void testFindPageOfQuizWithPageableFilterNullAndSearchNull() {
 
     Page<Quiz> actual = quizService.findAllByBatchCodeAndPageable(
-      BATCH_CODE, pageable, Role.STUDENT, BATCH_ID, false);
+      BATCH_CODE, pageable, Role.STUDENT, BATCH_ID, true);
 
     assertThat(actual.getContent()).isEqualTo(quizList);
     assertThat(actual.getTotalElements()).isEqualTo(TOTAL);
     assertThat(actual).isEqualTo(quizPage);
 
-    verify(quizRepository).findAllByBatchAndDeletedFalseAndEndDateBeforeOrderByEndDateAsc(batch, DATE_NOW, pageable);
+    verify(quizRepository).findAllByBatchAndDeletedFalseAndEndDateLessThanOrderByEndDateAsc(batch, DATE_NOW, pageable);
     verify(batchService).getBatchByCode(BATCH_CODE);
   }
 

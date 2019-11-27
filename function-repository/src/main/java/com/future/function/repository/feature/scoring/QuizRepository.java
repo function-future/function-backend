@@ -12,9 +12,13 @@ public interface QuizRepository extends MongoRepository<Quiz, String> {
 
   Optional<Quiz> findByIdAndDeletedFalse(String id);
 
-  Page<Quiz> findAllByBatchAndDeletedFalseAndEndDateBeforeOrderByEndDateAsc(Batch batch, Long endDate, Pageable pageable);
+  Page<Quiz> findAllByBatchAndDeletedFalseAndEndDateLessThanOrderByEndDateAsc(Batch batch, Long endDate, Pageable pageable);
 
-  Page<Quiz> findAllByBatchAndDeletedFalseAndEndDateAfterOrderByEndDateDesc(Batch batch, Long endDate, Pageable pageable);
+  Page<Quiz> findAllByBatchAndDeletedFalseAndStartDateLessThanEqualAndEndDateGreaterThanOrderByEndDateDesc(
+      Batch batch, Long startDate, Long endDate, Pageable pageable);
+
+  Page<Quiz> findAllByBatchAndDeletedFalseAndEndDateGreaterThanOrderByEndDateDesc(
+      Batch batch, Long endDate, Pageable pageable);
 
   Boolean existsByIdAndDeletedFalse(String id);
 }
