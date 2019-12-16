@@ -233,18 +233,6 @@ public class ReportServiceImplTest {
     verify(reportRepository).save(report);
     verify(reportDetailService).createOrGetReportDetail(student);
     verify(batchService).getBatchByCode(BATCH_CODE);
-    verify(reportRepository).findByStudentsAndDeletedFalse(Collections.singletonList(reportDetail));
-  }
-
-  @Test
-  public void createReportStudentsAlreadyExist() {
-    when(reportRepository.findByStudentsAndDeletedFalse(Collections.singletonList(reportDetail))).thenReturn(Optional.of(report));
-    report.setStudents(Collections.singletonList(reportDetail));
-    catchException(() -> reportService.createReport(report));
-    assertThat(caughtException().getClass()).isEqualTo(UnsupportedOperationException.class);
-    verify(reportDetailService).createOrGetReportDetail(student);
-    verify(batchService).getBatchByCode(BATCH_CODE);
-    verify(reportRepository).findByStudentsAndDeletedFalse(Collections.singletonList(reportDetail));
   }
 
   @Test

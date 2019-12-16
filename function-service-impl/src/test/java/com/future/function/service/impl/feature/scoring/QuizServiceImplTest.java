@@ -232,14 +232,17 @@ public class QuizServiceImplTest {
   @Test
   public void testFindPageOfQuizWithPageableFilterAndSearchAndAccessedByAdmin() {
 
+    when(quizRepository.findAllByBatchAndDeletedFalseAndEndDateGreaterThanOrderByEndDateDesc(batch, DATE_NOW, pageable))
+        .thenReturn(quizPage);
+
     Page<Quiz> actual = quizService.findAllByBatchCodeAndPageable(
         BATCH_CODE, pageable, Role.ADMIN, "", false);
     assertThat(actual.getContent()).isEqualTo(quizList);
     assertThat(actual.getTotalElements()).isEqualTo(TOTAL);
     assertThat(actual).isEqualTo(quizPage);
 
-    verify(quizRepository).findAllByBatchAndDeletedFalseAndStartDateLessThanEqualAndEndDateGreaterThanOrderByEndDateDesc(
-        batch, DATE_NOW, DATE_NOW, pageable);
+    verify(quizRepository).findAllByBatchAndDeletedFalseAndEndDateGreaterThanOrderByEndDateDesc(
+        batch, DATE_NOW, pageable);
     verify(batchService).getBatchByCode(BATCH_CODE);
   }
 

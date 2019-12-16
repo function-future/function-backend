@@ -94,7 +94,6 @@ public class ReportServiceImpl implements ReportService {
     return Optional.ofNullable(students)
       .map(this::createOrGetDetails)
       .map(studentList -> this.setReportDetails(report, studentList))
-      .filter(currentReport -> !reportRepository.findByStudentsAndDeletedFalse(report.getStudents()).isPresent())
       .orElse(null);
   }
 
