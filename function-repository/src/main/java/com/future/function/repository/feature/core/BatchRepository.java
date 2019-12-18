@@ -17,4 +17,6 @@ public interface BatchRepository extends MongoRepository<Batch, String> {
 
   Optional<Batch> findByCodeAndDeletedFalse(String code);
 
+  Boolean existsDistinctByCodeAndDeletedFalse(String code);
+
 }

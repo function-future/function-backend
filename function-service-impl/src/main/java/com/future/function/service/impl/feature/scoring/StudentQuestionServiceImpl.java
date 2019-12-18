@@ -68,26 +68,38 @@ public class StudentQuestionServiceImpl implements StudentQuestionService {
       .collect(Collectors.toList());
   }
 
+  private List<Question> getListOfQuestions(
+      int questionCount, List<Question> questionList
+  ) {
+
+    Collections.shuffle(questionList);
+    if (questionList.size() < questionCount) {
+      questionCount = questionList.size();
+    }
+    return questionList.subList(0, questionCount);
+  }
+
   @Override
   public List<StudentQuestion> createStudentQuestionsFromQuestionList(
     List<Question> questionList, StudentQuizDetail studentQuizDetail
   ) {
 
     return IntStream.range(0, questionList.size())
-      .mapToObj(i -> Pair.of(i, questionList.get(i)))
-      .map(pair -> mapStudentQuizDetail(studentQuizDetail, pair))
+      .mapToObj(i -> Pair.of(i + 1, questionList.get(i)))
+      .map(pair -> toDetail(studentQuizDetail, pair))
       .map(studentQuestionRepository::save)
       .collect(Collectors.toList());
   }
 
-  private StudentQuestion mapStudentQuizDetail(
+  private StudentQuestion toDetail(
     StudentQuizDetail studentQuizDetail, Pair<Integer, Question> pair
   ) {
-
+    Question question = pair.getSecond();
+    int number = pair.getFirst();
     return StudentQuestion.builder()
-      .question(pair.getSecond())
-      .option(findCorrectOptionFromQuestion(pair.getSecond()))
-      .number(pair.getFirst() + 1)
+      .question(question)
+      .option(findCorrectOptionFromQuestion(question))
+      .number(number)
       .studentQuizDetail(studentQuizDetail)
       .build();
   }
@@ -102,17 +114,6 @@ public class StudentQuestionServiceImpl implements StudentQuestionService {
         "Failed at #FindCorrectOption #StudentQuestionService"));
   }
 
-  private List<Question> getListOfQuestions(
-    int questionCount, List<Question> questionList
-  ) {
-
-    Collections.shuffle(questionList);
-    if (questionList.size() < questionCount) {
-      questionCount = questionList.size();
-    }
-    return questionList.subList(0, questionCount);
-  }
-
   @Override
   public Integer postAnswerForAllStudentQuestion(
     List<StudentQuestion> answers, String studentQuizDetailId
@@ -121,80 +122,52 @@ public class StudentQuestionServiceImpl implements StudentQuestionService {
     return Optional.ofNullable(studentQuizDetailId)
       .map(this::findAllByStudentQuizDetailId)
       .map(questions -> getCorrectQuestionsCount(answers, questions))
+      .map(pair -> getTotalPoint(pair.getFirst(), pair.getSecond()))
       .orElseThrow(() -> new UnsupportedOperationException(
         "Failed at #postAnswerForAllStudentQuestion #StudentQuestionService"));
   }
 
-  private int getCorrectQuestionsCount(
-    List<StudentQuestion> answers, List<StudentQuestion> questions
+  private Pair<Integer, Long> getCorrectQuestionsCount(
+    List<StudentQuestion> answers, List<StudentQuestion> questionList
   ) {
 
-    Long correctQuestionsCount = questions.stream()
+    Long correctQuestionsCount = questionList.stream()
       .filter(question -> checkRequestedOptionCorrect(answers, question))
-      .map(question -> setCorrectOption(answers, questions, question))
+      .map(this::setQuestionCorrect)
       .map(studentQuestionRepository::save)
       .count();
-    return getTotalPoint(questions, correctQuestionsCount);
+    return Pair.of(questionList.size(), correctQuestionsCount);
   }
 
-  private StudentQuestion setCorrectOption(
-    List<StudentQuestion> answers, List<StudentQuestion> questions,
+  private boolean checkRequestedOptionCorrect(
+      List<StudentQuestion> answers, StudentQuestion question
+  ) {
+
+    return question.getOption()
+        .getId()
+        .equals(getAnswerIdFromAnswerList(answers, question));
+  }
+
+  private String getAnswerIdFromAnswerList(
+      List<StudentQuestion> answers, StudentQuestion question
+  ) {
+
+    return answers.get(question.getNumber() - 1).getOption().getId();
+  }
+
+  private StudentQuestion setQuestionCorrect(
     StudentQuestion question
   ) {
 
     question.setCorrect(true);
-    question.setOption(answers.get(questions.size() - 1)
-                         .getOption());
     return question;
   }
 
-  private boolean checkRequestedOptionCorrect(
-    List<StudentQuestion> answers, StudentQuestion question
-  ) {
-
-    return question.getOption()
-      .getId()
-      .equals(getAnswerIdFromAnswerList(answers, question));
-  }
-
-  private String getAnswerIdFromAnswerList(
-    List<StudentQuestion> answers, StudentQuestion question
-  ) {
-
-    return answers.get(question.getNumber() - 1)
-      .getOption()
-      .getId();
-  }
-
   private int getTotalPoint(
-    List<StudentQuestion> questions, Long correctQuestions
+    Integer questionCount, Long correctQuestions
   ) {
 
-    return (int) ((correctQuestions.floatValue() / questions.size()) * 100);
-  }
-
-  @Override
-  public List<StudentQuestion> createStudentQuestionsByStudentQuizDetail(
-    StudentQuizDetail studentQuizDetail, List<StudentQuestion> studentQuestions
-  ) {
-
-    return IntStream.range(0, studentQuestions.size())
-      .mapToObj(i -> Pair.of(i, studentQuestions.get(i)))
-      .map(pair -> setStudentQuizDetailAndNumber(studentQuizDetail, pair))
-      .map(Pair::getSecond)
-      .map(studentQuestionRepository::save)
-      .collect(Collectors.toList());
-  }
-
-  private Pair<Integer, StudentQuestion> setStudentQuizDetailAndNumber(
-    StudentQuizDetail studentQuizDetail, Pair<Integer, StudentQuestion> pair
-  ) {
-
-    pair.getSecond()
-      .setStudentQuizDetail(studentQuizDetail);
-    pair.getSecond()
-      .setNumber(pair.getFirst() + 1);
-    return pair;
+    return (int) ((correctQuestions.floatValue() / questionCount) * 100);
   }
 
   @Override
@@ -207,12 +180,10 @@ public class StudentQuestionServiceImpl implements StudentQuestionService {
 
   private void safeDeleteStudentQuestionList(List<StudentQuestion> list) {
 
-    list.stream()
-      .map(question -> {
+    list.forEach(question -> {
         question.setDeleted(true);
-        return question;
-      })
-      .forEach(studentQuestionRepository::save);
+        studentQuestionRepository.save(question);
+      });
 
   }
 

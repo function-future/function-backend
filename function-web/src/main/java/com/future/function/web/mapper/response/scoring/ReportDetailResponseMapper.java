@@ -4,6 +4,7 @@ import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.model.entity.feature.scoring.ReportDetail;
 import com.future.function.model.vo.scoring.StudentSummaryVO;
+import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.feature.scoring.ReportDetailWebResponse;
@@ -39,6 +40,7 @@ public class ReportDetailResponseMapper {
       .scores(ScoreSummaryResponseMapper.toDataListSummaryResponse(
         summaryDTO.getScores())
                 .getData())
+            .paging(PageHelper.toPaging(summaryDTO.getScores()))
       .point(summaryDTO.getPoint())
       .totalPoint(summaryDTO.getTotalPoint())
       .build();
@@ -52,23 +54,12 @@ public class ReportDetailResponseMapper {
       .orElse(null);
   }
 
-  public static DataResponse<List<ReportDetailWebResponse>> toDataListReportDetailWebResponseFromReportDetail(
-    HttpStatus httpStatus, List<ReportDetail> reportDetailList, String urlPrefix
+  public static DataResponse<ReportDetailWebResponse> toDataReportDetailWebResponse(
+    HttpStatus httpStatus, ReportDetail reportDetail, String urlPrefix
   ) {
 
     return ResponseHelper.toDataResponse(
-      httpStatus, buildListFromReportDetailList(reportDetailList, urlPrefix));
-  }
-
-  private static List<ReportDetailWebResponse> buildListFromReportDetailList(
-    List<ReportDetail> reportDetails, String urlPrefix
-  ) {
-
-    return reportDetails.stream()
-      .map(
-        reportDetail -> ReportDetailResponseMapper.buildReportDetailWebResponse(
-          reportDetail, urlPrefix))
-      .collect(Collectors.toList());
+      httpStatus, buildReportDetailWebResponse(reportDetail, urlPrefix));
   }
 
   private static ReportDetailWebResponse buildReportDetailWebResponse(

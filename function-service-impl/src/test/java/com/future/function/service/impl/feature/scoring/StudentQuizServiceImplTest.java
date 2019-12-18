@@ -161,6 +161,8 @@ public class StudentQuizServiceImplTest {
 
     when(studentQuizRepository.findAllByStudentIdAndDeletedFalse(USER_ID))
         .thenReturn(Collections.singletonList(studentQuiz));
+    when(studentQuizRepository.findAllByStudentIdAndDeletedFalse(USER_ID, pageable))
+        .thenReturn(new PageImpl<>(Collections.singletonList(studentQuiz)));
     when(studentQuizRepository.findByStudentIdAndQuizIdAndDeletedFalse(USER_ID, QUIZ_ID))
         .thenReturn(Optional.of(studentQuiz));
     when(studentQuizRepository.findAllByStudentIdAndDeletedFalse(
@@ -181,14 +183,14 @@ public class StudentQuizServiceImplTest {
     when(batchService.getBatchByCode(BATCH_CODE)).thenReturn(batch);
     when(batchService.getBatchByCode(TARGET_BATCH)).thenReturn(batch);
     when(studentQuizDetailService.findAllUnansweredQuestionsByStudentQuizId(
-      STUDENT_QUIZ_ID)).thenReturn(Collections.singletonList(studentQuestion));
+      studentQuiz)).thenReturn(Collections.singletonList(studentQuestion));
     when(studentQuizDetailService.answerStudentQuiz(STUDENT_QUIZ_ID,
                                                     Collections.singletonList(
                                                       studentQuestion)
     )).thenReturn(studentQuizDetail);
     when(studentQuizDetailService.findLatestByStudentQuizId(
       STUDENT_QUIZ_ID)).thenReturn(studentQuizDetail);
-    when(quizService.findById(QUIZ_ID)).thenReturn(quiz);
+    when(quizService.findById(QUIZ_ID, Role.ADMIN, null)).thenReturn(quiz);
     verify(quizService).addObserver(studentQuizService);
   }
 
@@ -207,22 +209,21 @@ public class StudentQuizServiceImplTest {
     assertThat(actual.size()).isEqualTo(1);
     assertThat(actual.get(0).getId()).isEqualTo(STUDENT_QUIZ_ID);
     assertThat(actual.get(0).getTrials()).isEqualTo(QUIZ_TRIALS);
-    verify(userService).getUser(USER_ID);
     verify(studentQuizRepository).findAllByStudentIdAndDeletedFalse(USER_ID);
   }
 
   @Test
   public void findAllByStudentIdNoPageable() {
 
-    List<StudentQuizDetail> actual = studentQuizService.findAllQuizByStudentId(
-      USER_ID);
-    assertThat(actual.size()).isEqualTo(1);
-    assertThat(actual.get(0)
+    Page<StudentQuizDetail> actual = studentQuizService.findAllQuizByStudentId(
+      USER_ID, pageable);
+    assertThat(actual.getContent().size()).isEqualTo(1);
+    assertThat(actual.getContent().get(0)
                  .getStudentQuiz()
                  .getId()).isEqualTo(STUDENT_QUIZ_ID);
-    assertThat(actual.get(0)
+    assertThat(actual.getContent().get(0)
                  .getPoint()).isEqualTo(studentQuizDetail.getPoint());
-    verify(studentQuizRepository).findAllByStudentIdAndDeletedFalse(USER_ID);
+    verify(studentQuizRepository).findAllByStudentIdAndDeletedFalse(USER_ID, pageable);
     verify(studentQuizDetailService).findLatestByStudentQuizId(STUDENT_QUIZ_ID);
   }
 
@@ -230,11 +231,11 @@ public class StudentQuizServiceImplTest {
   public void findAllByStudentIdEmptyStudentQuiz() {
 
     when(studentQuizRepository.findAllByStudentIdAndDeletedFalse(
-      USER_ID)).thenReturn(null);
-    List<StudentQuizDetail> actual = studentQuizService.findAllQuizByStudentId(
-      USER_ID);
-    assertThat(actual.size()).isEqualTo(0);
-    verify(studentQuizRepository).findAllByStudentIdAndDeletedFalse(USER_ID);
+      USER_ID, pageable)).thenReturn(null);
+    Page<StudentQuizDetail> actual = studentQuizService.findAllQuizByStudentId(
+      USER_ID, pageable);
+    assertThat(actual.getContent().size()).isEqualTo(0);
+    verify(studentQuizRepository).findAllByStudentIdAndDeletedFalse(USER_ID, pageable);
   }
 
   @Test
@@ -255,7 +256,7 @@ public class StudentQuizServiceImplTest {
     StudentQuiz studentQuiz = studentQuizService.findOrCreateByStudentIdAndQuizId(USER_ID, QUIZ_ID);
     assertThat(studentQuiz.getId()).isEqualTo(STUDENT_QUIZ_ID);
     assertThat(studentQuiz.getTrials()).isEqualTo(QUIZ_TRIALS);
-    verify(quizService).findById(QUIZ_ID);
+    verify(quizService).findById(QUIZ_ID, Role.ADMIN, null);
     verify(userService).getUser(USER_ID);
     verify(studentQuizRepository).findByStudentIdAndQuizIdAndDeletedFalse(USER_ID, QUIZ_ID);
     verify(studentQuizRepository).save(any(StudentQuiz.class));
@@ -269,7 +270,7 @@ public class StudentQuizServiceImplTest {
         USER_ID, QUIZ_ID);
     assertThat(actual.size()).isEqualTo(1);
     verify(studentQuizDetailService).findAllUnansweredQuestionsByStudentQuizId(
-      STUDENT_QUIZ_ID);
+        studentQuiz);
     verify(studentQuizRepository).findByStudentIdAndQuizIdAndDeletedFalse(USER_ID, QUIZ_ID);
     studentQuiz.setTrials(QUIZ_TRIALS - 1);
     verify(studentQuizRepository).save(studentQuiz);

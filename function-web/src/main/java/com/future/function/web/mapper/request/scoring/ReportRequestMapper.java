@@ -4,6 +4,7 @@ import com.future.function.common.exception.BadRequestException;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.model.entity.feature.scoring.Report;
+import com.future.function.model.entity.feature.scoring.ReportDetail;
 import com.future.function.validation.RequestValidator;
 import com.future.function.web.model.request.scoring.ReportWebRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,23 +34,24 @@ public class ReportRequestMapper {
 
     return Optional.ofNullable(request)
       .map(validator::validate)
-      .map(value -> Report.builder()
-        .title(value.getName())
-        .description(value.getDescription())
+      .map(reportWebRequest -> Report.builder()
+        .title(reportWebRequest.getName())
+        .description(reportWebRequest.getDescription())
         .batch(Batch.builder()
                  .code(batchCode)
                  .build())
-        .students(buildStudentsFromStudentIds(value.getStudents()))
+        .students(buildStudentsFromStudentIds(reportWebRequest.getStudents()))
         .build())
       .orElseThrow(() -> new BadRequestException("Bad Request"));
   }
 
-  private List<User> buildStudentsFromStudentIds(List<String> studentIds) {
+  private List<ReportDetail> buildStudentsFromStudentIds(List<String> studentIds) {
 
     return studentIds.stream()
       .map(id -> User.builder()
         .id(id)
         .build())
+      .map(user -> ReportDetail.builder().user(user).build())
       .collect(Collectors.toList());
   }
 

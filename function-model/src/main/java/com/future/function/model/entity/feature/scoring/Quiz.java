@@ -48,14 +48,14 @@ public class Quiz extends BaseEntity {
   @Field(value = FieldName.Quiz.TRIALS)
   private int trials;
 
-  @DBRef
+  @DBRef(lazy = true)
   @Field(value = FieldName.Quiz.QUESTION_BANK)
   private List<QuestionBank> questionBanks;
 
   @Field(value = FieldName.Quiz.QUESTION_COUNT)
   private int questionCount;
 
-  @DBRef
+  @DBRef(lazy = true)
   @Field(value = FieldName.Quiz.BATCH)
   private Batch batch;
 

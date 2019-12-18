@@ -1,5 +1,7 @@
 package com.future.function.web.mapper.request.scoring;
 
+import com.future.function.model.entity.feature.core.User;
+import com.future.function.model.entity.feature.scoring.Assignment;
 import com.future.function.model.entity.feature.scoring.Comment;
 import com.future.function.model.entity.feature.scoring.Room;
 import com.future.function.validation.RequestValidator;
@@ -24,6 +26,10 @@ public class CommentRequestMapperTest {
 
   private static final String COMMENT = "text";
 
+  private static final String USER_ID = "user-id";
+
+  private static final String ASSIGNMENT_ID = "assignment-id";
+
   private CommentWebRequest commentWebRequest;
 
   private Comment comment;
@@ -43,7 +49,8 @@ public class CommentRequestMapperTest {
       .comment(COMMENT)
       .build();
     room = Room.builder()
-      .id(ROOM_ID)
+      .student(User.builder().id(USER_ID).build())
+      .assignment(Assignment.builder().id(ASSIGNMENT_ID).build())
       .build();
     comment = Comment.builder()
       .room(room)
@@ -62,9 +69,10 @@ public class CommentRequestMapperTest {
   @Test
   public void toCommentFromRequestWithRoomId() {
 
-    Comment actual = commentRequestMapper.toCommentFromRequestWithRoomId(
-      commentWebRequest, ROOM_ID);
-    assertThat(actual.getRoom()).isEqualTo(room);
+    Comment actual = commentRequestMapper.toCommentFromRequestWithStudentIdAndAssignmentId(
+      commentWebRequest, USER_ID, ASSIGNMENT_ID);
+    assertThat(actual.getRoom().getStudent().getId()).isEqualTo(room.getStudent().getId());
+    assertThat(actual.getRoom().getAssignment().getId()).isEqualTo(room.getAssignment().getId());
     verify(validator).validate(commentWebRequest);
   }
 

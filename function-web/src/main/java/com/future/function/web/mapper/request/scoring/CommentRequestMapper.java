@@ -1,5 +1,7 @@
 package com.future.function.web.mapper.request.scoring;
 
+import com.future.function.model.entity.feature.core.User;
+import com.future.function.model.entity.feature.scoring.Assignment;
 import com.future.function.model.entity.feature.scoring.Comment;
 import com.future.function.model.entity.feature.scoring.Room;
 import com.future.function.validation.RequestValidator;
@@ -18,19 +20,20 @@ public class CommentRequestMapper {
     this.validator = validator;
   }
 
-  public Comment toCommentFromRequestWithRoomId(
-    CommentWebRequest request, String roomId
+  public Comment toCommentFromRequestWithStudentIdAndAssignmentId(
+    CommentWebRequest request, String studentId, String assignmentId
   ) {
 
-    return toValidatedComment(request, roomId);
+    return toValidatedComment(request, studentId, assignmentId);
   }
 
-  private Comment toValidatedComment(CommentWebRequest request, String roomId) {
+  private Comment toValidatedComment(CommentWebRequest request, String studentId, String assignmentId) {
 
     request = validator.validate(request);
     return Comment.builder()
       .room(Room.builder()
-              .id(roomId)
+              .student(User.builder().id(studentId).build())
+              .assignment(Assignment.builder().id(assignmentId).build())
               .build())
       .text(request.getComment())
       .build();

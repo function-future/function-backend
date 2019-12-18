@@ -1,6 +1,7 @@
 package com.future.function.web.model.response.feature.scoring;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.future.function.web.model.response.base.paging.Paging;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -25,10 +26,12 @@ public class ReportDetailWebResponse {
 
   private String avatar;
 
-  private List<SummaryWebResponse> scores;
-
   private Integer point;
 
   private Integer totalPoint;
+
+  private Paging paging;
+
+  private List<SummaryWebResponse> scores;
 
 }

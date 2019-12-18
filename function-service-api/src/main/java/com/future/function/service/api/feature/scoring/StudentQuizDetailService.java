@@ -11,7 +11,7 @@ public interface StudentQuizDetailService {
   StudentQuizDetail findLatestByStudentQuizId(String studentQuizId);
 
   List<StudentQuestion> findAllUnansweredQuestionsByStudentQuizId(
-    String studentQuizId
+    StudentQuiz studentQuiz
   );
 
   StudentQuizDetail answerStudentQuiz(

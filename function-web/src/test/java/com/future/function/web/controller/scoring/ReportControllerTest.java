@@ -6,6 +6,7 @@ import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.model.entity.feature.scoring.Report;
+import com.future.function.model.entity.feature.scoring.ReportDetail;
 import com.future.function.service.api.feature.scoring.ReportService;
 import com.future.function.web.TestHelper;
 import com.future.function.web.TestSecurityConfiguration;
@@ -96,6 +97,8 @@ public class ReportControllerTest extends TestHelper {
 
   private User user;
 
+  private ReportDetail reportDetail;
+
   private Pageable pageable;
 
   private Paging paging;
@@ -169,12 +172,17 @@ public class ReportControllerTest extends TestHelper {
     BeanUtils.copyProperties(userWebResponse, userWebResponseWithFinalPoint);
     userWebResponseWithFinalPoint.setFinalPoint(FINAL_POINT);
 
+    reportDetail = ReportDetail
+        .builder()
+        .user(user)
+        .build();
+
     report = Report.builder()
       .id(REPORT_ID)
       .title(TITLE)
       .description(DESCRIPTION)
       .batch(batch)
-      .students(Collections.singletonList(user))
+      .students(Collections.singletonList(reportDetail))
       .build();
 
     report.setCreatedAt(CREATED_AT);

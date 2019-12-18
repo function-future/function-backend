@@ -2,6 +2,7 @@ package com.future.function.web.mapper.response.scoring;
 
 import com.future.function.model.vo.scoring.SummaryVO;
 import com.future.function.web.model.response.base.DataResponse;
+import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.feature.scoring.SummaryWebResponse;
 import org.junit.After;
 import org.junit.Before;
@@ -9,6 +10,7 @@ import org.junit.Test;
 
 import java.util.Collections;
 import java.util.List;
+import org.springframework.data.domain.PageImpl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -54,9 +56,9 @@ public class ScoreSummaryWebResponseMapperTest {
   @Test
   public void toDataListSummaryResponse() {
 
-    DataResponse<List<SummaryWebResponse>> actual =
+    PagingResponse<SummaryWebResponse> actual =
       ScoreSummaryResponseMapper.toDataListSummaryResponse(
-        Collections.singletonList(summaryVO));
+        new PageImpl<>(Collections.singletonList(summaryVO)));
     assertThat(actual.getData()
                  .get(0)
                  .getTitle()).isEqualTo(TITLE);
