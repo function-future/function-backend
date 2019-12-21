@@ -20,8 +20,4 @@ public interface ChatroomService {
 
   Chatroom getPublicChatroom();
 
-  void enterChatroom(String chatroomId, String userId);
-
-  void leaveChatroom(String chatroomId, String userId);
-
 }
