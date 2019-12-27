@@ -34,9 +34,12 @@ public final class StudentQuizDetailResponseMapper {
 
     return StudentQuizDetailWebResponse.builder()
       .point(studentQuizDetail.getPoint())
-      .trials(studentQuizDetail.getStudentQuiz()
-                .getTrials())
+      .trials(getTrialsLeft(studentQuizDetail))
       .build();
+  }
+
+  private static int getTrialsLeft(StudentQuizDetail studentQuizDetail) {
+    return studentQuizDetail.getStudentQuiz().getQuiz().getTrials() - studentQuizDetail.getStudentQuiz().getTrials();
   }
 
   public static PagingResponse<StudentQuestionWebResponse> toStudentQuestionWebResponses(

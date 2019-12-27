@@ -3,6 +3,7 @@ package com.future.function.web.controller.scoring;
 import com.future.function.common.enumeration.core.Role;
 import com.future.function.model.entity.feature.scoring.Option;
 import com.future.function.model.entity.feature.scoring.Question;
+import com.future.function.model.entity.feature.scoring.Quiz;
 import com.future.function.model.entity.feature.scoring.StudentQuestion;
 import com.future.function.model.entity.feature.scoring.StudentQuiz;
 import com.future.function.model.entity.feature.scoring.StudentQuizDetail;
@@ -57,6 +58,8 @@ public class StudentQuestionControllerTest extends TestHelper {
 
   private static final String QUIZ_ID = "quiz-id";
 
+  private Quiz quiz;
+
   private StudentQuiz studentQuiz;
 
   private StudentQuizDetail studentQuizDetail;
@@ -92,8 +95,14 @@ public class StudentQuestionControllerTest extends TestHelper {
     super.setUp();
     super.setCookie(Role.STUDENT);
 
+    quiz = Quiz.builder()
+      .id(QUIZ_ID)
+      .trials(10)
+      .build();
+
     studentQuiz = StudentQuiz.builder()
       .id(STUDENT_QUIZ_ID)
+      .quiz(quiz)
       .build();
 
     studentQuizDetail = StudentQuizDetail.builder()
