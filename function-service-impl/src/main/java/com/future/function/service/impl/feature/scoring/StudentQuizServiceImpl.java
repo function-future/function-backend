@@ -1,6 +1,7 @@
 package com.future.function.service.impl.feature.scoring;
 
 import com.future.function.common.enumeration.core.Role;
+import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.model.entity.feature.scoring.Quiz;
 import com.future.function.model.entity.feature.scoring.StudentQuestion;
@@ -153,6 +154,15 @@ public class StudentQuizServiceImpl implements StudentQuizService, Observer {
       .map(studentQuizId -> studentQuizDetailService.answerStudentQuiz(studentQuizId, answers))
       .orElseThrow(() -> new UnsupportedOperationException(
         "Failed at #answerQuestionsByStudentQuizId #StudentQuizService"));
+  }
+
+  @Override
+  public Long findTimeLimitByStudentQuiz(String studentId, String quizId) {
+    return Optional.ofNullable(studentId)
+        .flatMap(id -> studentQuizRepository.findByStudentIdAndQuizIdAndDeletedFalse(id, quizId))
+        .map(StudentQuiz::getQuiz)
+        .map(Quiz::getTimeLimit)
+        .orElseThrow(() -> new NotFoundException("NOT_FOUND"));
   }
 
   @Override

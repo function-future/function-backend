@@ -25,6 +25,8 @@ public interface StudentQuizService {
     String studentId, String quizId, List<StudentQuestion> answers
   );
 
+  Long findTimeLimitByStudentQuiz(String studentId, String quizId);
+
   void deleteById(String id);
 
   void deleteByBatchCodeAndQuiz(Quiz quiz);
