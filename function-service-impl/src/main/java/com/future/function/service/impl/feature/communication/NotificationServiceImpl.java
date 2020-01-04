@@ -5,10 +5,12 @@ import com.future.function.model.entity.feature.communication.reminder.Notificat
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.repository.feature.communication.reminder.NotificationRepository;
 import com.future.function.service.api.feature.communication.NotificationService;
+import com.future.function.service.api.feature.communication.mq.MessagePublisherService;
 import com.future.function.service.api.feature.core.UserService;
 import com.future.function.service.impl.helper.PageHelper;
 import com.future.function.session.model.Session;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -23,13 +25,19 @@ public class NotificationServiceImpl implements NotificationService {
 
   private final UserService userService;
 
+  private final MessagePublisherService publisherService;
+
+  @Value("${function.mq.topic.notification}")
+  private String mqTopicNotification;
+
   @Autowired
   public NotificationServiceImpl(
-    NotificationRepository notificationRepository, UserService userService
-  ) {
+          NotificationRepository notificationRepository, UserService userService,
+          MessagePublisherService publisherService) {
 
     this.notificationRepository = notificationRepository;
     this.userService = userService;
+    this.publisherService = publisherService;
   }
 
   @Override
@@ -63,6 +71,10 @@ public class NotificationServiceImpl implements NotificationService {
       .map(this::setMember)
       .map(n -> this.setSeen(n, false))
       .map(notificationRepository::save)
+      .map(n -> {
+        publisherService.publish(n.getMember().getId(), mqTopicNotification);
+        return n;
+      })
       .orElseThrow(UnsupportedOperationException::new);
   }
 
