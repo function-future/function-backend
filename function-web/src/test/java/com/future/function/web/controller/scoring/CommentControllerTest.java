@@ -3,6 +3,7 @@ package com.future.function.web.controller.scoring;
 import com.future.function.common.enumeration.core.Role;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.User;
+import com.future.function.model.entity.feature.scoring.Assignment;
 import com.future.function.model.entity.feature.scoring.Comment;
 import com.future.function.model.entity.feature.scoring.Room;
 import com.future.function.service.api.feature.scoring.RoomService;
@@ -50,8 +51,6 @@ public class CommentControllerTest extends TestHelper {
 
   private static final String BATCH_CODE = "3";
 
-  private static final String ROOM_ID = "room-id";
-
   private static final String USER_ID = STUDENT_SESSION_ID;
 
   private static final String USER_NAME = "user-name";
@@ -62,7 +61,6 @@ public class CommentControllerTest extends TestHelper {
 
   private static final String ASSIGNMENT_ID = "assignment-id";
 
-
   private Comment comment;
 
   private Room room;
@@ -72,8 +70,6 @@ public class CommentControllerTest extends TestHelper {
   private User user;
 
   private Pageable pageable;
-
-  private List<Comment> commentList;
 
   private CommentWebRequest commentWebRequest;
 
@@ -113,6 +109,7 @@ public class CommentControllerTest extends TestHelper {
 
     room = Room.builder()
       .student(user)
+      .assignment(Assignment.builder().id(ASSIGNMENT_ID).build())
       .point(0)
       .build();
 
@@ -143,11 +140,11 @@ public class CommentControllerTest extends TestHelper {
 
     BASE_RESPONSE = ResponseHelper.toBaseResponse(HttpStatus.OK);
 
-    when(roomService.findAllCommentsByRoomId(ROOM_ID, pageable)).thenReturn(
+    when(roomService.findAllCommentsByStudentIdAndAssignmentId(USER_ID, ASSIGNMENT_ID, pageable)).thenReturn(
       commentPage);
     when(roomService.createComment(comment, STUDENT_ID)).thenReturn(comment);
-    when(commentRequestMapper.toCommentFromRequestWithRoomId(commentWebRequest,
-                                                             ROOM_ID
+    when(commentRequestMapper.toCommentFromRequestWithStudentIdAndAssignmentId(commentWebRequest,
+                                                             USER_ID, ASSIGNMENT_ID
     )).thenReturn(comment);
   }
 
@@ -162,12 +159,12 @@ public class CommentControllerTest extends TestHelper {
 
     mockMvc.perform(get(
       "/api/scoring/batches/" + BATCH_CODE + "/assignments/" + ASSIGNMENT_ID +
-      "/rooms/" + ROOM_ID + "/comments").cookie(cookies))
+      "/room/" + USER_ID + "/comments").cookie(cookies))
       .andExpect(status().isOk())
       .andExpect(content().json(
         pagingResponseJacksonTester.write(PAGING_RESPONSE)
           .getJson()));
-    verify(roomService).findAllCommentsByRoomId(ROOM_ID, pageable);
+    verify(roomService).findAllCommentsByStudentIdAndAssignmentId(USER_ID, ASSIGNMENT_ID, pageable);
   }
 
   @Test
@@ -175,7 +172,7 @@ public class CommentControllerTest extends TestHelper {
 
     mockMvc.perform(post(
       "/api/scoring/batches/" + BATCH_CODE + "/assignments/" + ASSIGNMENT_ID +
-      "/rooms/" + ROOM_ID + "/comments").cookie(cookies)
+      "/room/" + USER_ID + "/comments").cookie(cookies)
                       .contentType(MediaType.APPLICATION_JSON_VALUE)
                       .content(roomPointWebRequestJacksonTester.write(
                         commentWebRequest)
@@ -185,8 +182,8 @@ public class CommentControllerTest extends TestHelper {
         dataResponseJacksonTester.write(CREATED_DATA_RESPONSE)
           .getJson()));
     verify(roomService).createComment(comment, STUDENT_ID);
-    verify(commentRequestMapper).toCommentFromRequestWithRoomId(
-      commentWebRequest, ROOM_ID);
+    verify(commentRequestMapper).toCommentFromRequestWithStudentIdAndAssignmentId(
+      commentWebRequest, USER_ID, ASSIGNMENT_ID);
   }
 
 }

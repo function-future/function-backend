@@ -1,6 +1,7 @@
 package com.future.function.service.impl.feature.scoring;
 
 import com.future.function.model.entity.feature.scoring.Comment;
+import com.future.function.model.entity.feature.scoring.Room;
 import com.future.function.repository.feature.scoring.CommentRepository;
 import com.future.function.service.api.feature.scoring.CommentService;
 import com.future.function.service.impl.helper.PageHelper;
@@ -23,14 +24,13 @@ public class CommentServiceImpl implements CommentService {
   }
 
   @Override
-  public Page<Comment> findAllCommentsByRoomId(
-    String roomId, Pageable pageable
+  public Page<Comment> findAllCommentsByStudentIdAndAssignmentId(
+    Room room, Pageable pageable
   ) {
 
-    return Optional.ofNullable(roomId)
-      .map(id -> commentRepository.findAllByRoomIdOrderByCreatedAtDesc(id,
-                                                                       pageable
-      ))
+    return Optional.ofNullable(room)
+      .map(Room::getId)
+      .map(id -> commentRepository.findAllByRoomIdOrderByCreatedAtDesc(id, pageable))
       .orElseGet(() -> PageHelper.empty(pageable));
   }
 

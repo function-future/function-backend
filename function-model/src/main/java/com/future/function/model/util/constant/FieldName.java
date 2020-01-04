@@ -420,6 +420,8 @@ public interface FieldName {
 
     public static final String BATCH = "batch";
 
+    public static final String STUDENTS = "students";
+
   }
 
   @NoArgsConstructor(access = AccessLevel.PRIVATE)

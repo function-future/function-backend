@@ -13,6 +13,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -57,7 +58,8 @@ public class ScoringMediatorServiceImpl implements ScoringMediatorService, Obser
 
   private void deleteEveryAssignment(User user) {
 
-    roomService.findAllByStudentId(user.getId())
+    roomService.findAllByStudentId(user.getId(), new PageRequest(0, Integer.MAX_VALUE))
+      .getContent()
       .stream()
       .map(Room::getId)
       .forEach(roomService::deleteRoomById);

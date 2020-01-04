@@ -25,6 +25,9 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.Collections;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import static com.googlecode.catchexception.CatchException.catchException;
 import static com.googlecode.catchexception.CatchException.caughtException;
@@ -53,9 +56,13 @@ public class SummaryServiceImplTest {
 
   private static final String FILE_URL = "file-url";
 
+  private static final String TYPE = "quiz";
+
   private static final int POINT = 100;
 
   private User student;
+
+  private Pageable pageable;
 
   private Room room;
 
@@ -113,10 +120,12 @@ public class SummaryServiceImplTest {
                      .build())
       .build();
 
-    when(roomService.findAllByStudentId(STUDENT_ID)).thenReturn(
-      Collections.singletonList(room));
-    when(studentQuizService.findAllQuizByStudentId(STUDENT_ID)).thenReturn(
-      Collections.singletonList(studentQuizDetail));
+    pageable = new PageRequest(0, 10);
+
+    when(roomService.findAllByStudentId(STUDENT_ID, pageable)).thenReturn(
+      new PageImpl<>(Collections.singletonList(room)));
+    when(studentQuizService.findAllQuizByStudentId(STUDENT_ID, pageable)).thenReturn(
+      new PageImpl<>(Collections.singletonList(studentQuizDetail)));
     when(userService.getUser(USER_ID)).thenReturn(User.builder()
                                                     .id(USER_ID)
                                                     .role(Role.STUDENT)
@@ -132,28 +141,53 @@ public class SummaryServiceImplTest {
   }
 
   @Test
-  public void findAllPointSummaryByStudentId() {
+  public void findAllPointSummaryByStudentIdQuiz() {
 
     StudentSummaryVO actual = summaryService.findAllPointSummaryByStudentId(
-      STUDENT_ID, USER_ID);
+      STUDENT_ID, pageable, USER_ID, TYPE);
     assertThat(actual.getStudentName()).isEqualTo(STUDENT_NAME);
     assertThat(actual.getBatchCode()).isEqualTo(BATCH_CODE);
     assertThat(actual.getUniversity()).isEqualTo(UNIVERSITY);
     assertThat(actual.getAvatar()).isEqualTo(FILE_URL);
-    assertThat(actual.getScores()
+    assertThat(actual.getScores().getContent()
                  .get(0)
-                 .getTitle()).isEqualTo(ASSIGNMENT_TITLE);
-    assertThat(actual.getScores()
-                 .get(0)
-                 .getType()).isEqualTo(ScoringType.ASSIGNMENT.getType());
-    assertThat(actual.getScores()
-                 .get(1)
                  .getTitle()).isEqualTo(QUIZ_TITLE);
-    assertThat(actual.getScores()
-                 .get(1)
+    assertThat(actual.getScores().getContent()
+                 .get(0)
                  .getType()).isEqualTo(ScoringType.QUIZ.getType());
-    verify(roomService).findAllByStudentId(STUDENT_ID);
-    verify(studentQuizService).findAllQuizByStudentId(STUDENT_ID);
+    verify(studentQuizService).findAllQuizByStudentId(STUDENT_ID, pageable);
+    verify(userService, times(2)).getUser(USER_ID);
+  }
+
+  @Test
+  public void findAllPointSummaryByStudentIdUnknownType() {
+
+    StudentSummaryVO actual = summaryService.findAllPointSummaryByStudentId(
+        STUDENT_ID, pageable, USER_ID, "type");
+    assertThat(actual.getStudentName()).isEqualTo(STUDENT_NAME);
+    assertThat(actual.getBatchCode()).isEqualTo(BATCH_CODE);
+    assertThat(actual.getUniversity()).isEqualTo(UNIVERSITY);
+    assertThat(actual.getAvatar()).isEqualTo(FILE_URL);
+    assertThat(actual.getScores().getContent().size()).isEqualTo(0);
+    verify(userService, times(2)).getUser(USER_ID);
+  }
+
+  @Test
+  public void findAllPointSummaryByStudentIdAssignment() {
+
+    StudentSummaryVO actual = summaryService.findAllPointSummaryByStudentId(
+        STUDENT_ID, pageable, USER_ID, "assignment");
+    assertThat(actual.getStudentName()).isEqualTo(STUDENT_NAME);
+    assertThat(actual.getBatchCode()).isEqualTo(BATCH_CODE);
+    assertThat(actual.getUniversity()).isEqualTo(UNIVERSITY);
+    assertThat(actual.getAvatar()).isEqualTo(FILE_URL);
+    assertThat(actual.getScores().getContent()
+        .get(0)
+        .getTitle()).isEqualTo(ASSIGNMENT_TITLE);
+    assertThat(actual.getScores().getContent()
+        .get(0)
+        .getType()).isEqualTo(ScoringType.ASSIGNMENT.getType());
+    verify(roomService).findAllByStudentId(STUDENT_ID, pageable);
     verify(userService, times(2)).getUser(USER_ID);
   }
 
@@ -166,25 +200,19 @@ public class SummaryServiceImplTest {
       .build();
     when(userService.getUser("id")).thenReturn(anotherUser);
     StudentSummaryVO actual = summaryService.findAllPointSummaryByStudentId(
-      STUDENT_ID, "id");
+      STUDENT_ID, pageable,"id", "assignment");
     assertThat(actual.getStudentName()).isEqualTo(STUDENT_NAME);
     assertThat(actual.getBatchCode()).isEqualTo(BATCH_CODE);
     assertThat(actual.getUniversity()).isEqualTo(UNIVERSITY);
     assertThat(actual.getAvatar()).isEqualTo(FILE_URL);
     assertThat(actual.getScores()
+                 .getContent()
                  .get(0)
                  .getTitle()).isEqualTo(ASSIGNMENT_TITLE);
-    assertThat(actual.getScores()
+    assertThat(actual.getScores().getContent()
                  .get(0)
                  .getType()).isEqualTo(ScoringType.ASSIGNMENT.getType());
-    assertThat(actual.getScores()
-                 .get(1)
-                 .getTitle()).isEqualTo(QUIZ_TITLE);
-    assertThat(actual.getScores()
-                 .get(1)
-                 .getType()).isEqualTo(ScoringType.QUIZ.getType());
-    verify(roomService).findAllByStudentId(STUDENT_ID);
-    verify(studentQuizService).findAllQuizByStudentId(STUDENT_ID);
+    verify(roomService).findAllByStudentId(STUDENT_ID, pageable);
     verify(userService).getUser("id");
     verify(userService).getUser(STUDENT_ID);
   }
@@ -198,7 +226,7 @@ public class SummaryServiceImplTest {
       .build();
     when(userService.getUser("id")).thenReturn(anotherUser);
     catchException(
-      () -> summaryService.findAllPointSummaryByStudentId(STUDENT_ID, "id"));
+      () -> summaryService.findAllPointSummaryByStudentId(STUDENT_ID, pageable, "id", TYPE));
     assertThat(caughtException().getClass()).isEqualTo(
       ForbiddenException.class);
     verify(userService).getUser("id");

@@ -1,11 +1,14 @@
 package com.future.function.web.mapper.response.scoring;
 
 import com.future.function.model.vo.scoring.SummaryVO;
+import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.model.response.base.DataResponse;
+import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.feature.scoring.SummaryWebResponse;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 
 import java.util.List;
@@ -31,19 +34,19 @@ public class ScoreSummaryResponseMapper {
       .build();
   }
 
-  public static DataResponse<List<SummaryWebResponse>> toDataListSummaryResponse(
-    List<SummaryVO> summaryVOList
+  public static PagingResponse<SummaryWebResponse> toDataListSummaryResponse(
+    Page<SummaryVO> summaryVOPage
   ) {
 
-    return ResponseHelper.toDataResponse(
-      HttpStatus.OK, buildSummaryResponseList(summaryVOList));
+    return ResponseHelper.toPagingResponse(
+      HttpStatus.OK, buildSummaryResponseList(summaryVOPage), PageHelper.toPaging(summaryVOPage));
   }
 
   private static List<SummaryWebResponse> buildSummaryResponseList(
-    List<SummaryVO> dtoList
+    Page<SummaryVO> summaryVOPage
   ) {
 
-    return dtoList.stream()
+    return summaryVOPage.getContent().stream()
       .map(ScoreSummaryResponseMapper::buildSummaryResponse)
       .collect(Collectors.toList());
   }

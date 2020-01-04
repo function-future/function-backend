@@ -17,7 +17,7 @@ public interface StudentQuizRepository
     String studentId, String quizId
   );
 
-  Page<StudentQuiz> findAllByStudentId(String studentId, Pageable pageable);
+  Page<StudentQuiz> findAllByStudentIdAndDeletedFalse(String studentId, Pageable pageable);
 
   List<StudentQuiz> findAllByStudentIdAndDeletedFalse(String studentId);
 

@@ -11,6 +11,7 @@ import com.future.function.web.model.response.feature.scoring.ReportDetailWebRes
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpStatus;
 
 import java.util.Collections;
@@ -85,7 +86,7 @@ public class ReportDetailResponseMapperTest {
       .batchCode(BATCH_CODE)
       .university(UNIVERSITY)
       .avatar(FILE_URL)
-      .scores(Collections.singletonList(summaryVO))
+      .scores(new PageImpl<>(Collections.singletonList(summaryVO)))
       .totalPoint(TOTAL_POINT)
       .build();
   }
@@ -103,7 +104,7 @@ public class ReportDetailResponseMapperTest {
         studentSummaryVO, URL_PREFIX);
     assertThat(actual.getData()
                  .getBatchCode()).isEqualTo(BATCH_CODE);
-    assertThat(actual.getData()
+    assertThat(actual.getData() 
                  .getStudentName()).isEqualTo(STUDENT_NAME);
     assertThat(actual.getData()
                  .getScores()
@@ -141,23 +142,15 @@ public class ReportDetailResponseMapperTest {
   @Test
   public void toDataListReportDetailWebResponseFromReportDetail() {
 
-    DataResponse<List<ReportDetailWebResponse>> actual =
-      ReportDetailResponseMapper.toDataListReportDetailWebResponseFromReportDetail(
-        HttpStatus.CREATED, Collections.singletonList(reportDetail),
+    DataResponse<ReportDetailWebResponse> actual =
+      ReportDetailResponseMapper.toDataReportDetailWebResponse(
+        HttpStatus.CREATED, reportDetail,
         URL_PREFIX
       );
-    assertThat(actual.getData()
-                 .get(0)
-                 .getBatchCode()).isEqualTo(BATCH_CODE);
-    assertThat(actual.getData()
-                 .get(0)
-                 .getStudentName()).isEqualTo(STUDENT_NAME);
-    assertThat(actual.getData()
-                 .get(0)
-                 .getUniversity()).isEqualTo(UNIVERSITY);
-    assertThat(actual.getData()
-                 .get(0)
-                 .getAvatar()).isEqualTo(URL_PREFIX + FILE_URL);
+    assertThat(actual.getData().getBatchCode()).isEqualTo(BATCH_CODE);
+    assertThat(actual.getData().getStudentName()).isEqualTo(STUDENT_NAME);
+    assertThat(actual.getData().getUniversity()).isEqualTo(UNIVERSITY);
+    assertThat(actual.getData().getAvatar()).isEqualTo(URL_PREFIX + FILE_URL);
   }
 
   @Test
