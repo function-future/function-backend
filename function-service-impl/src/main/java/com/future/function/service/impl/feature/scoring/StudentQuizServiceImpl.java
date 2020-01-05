@@ -12,18 +12,13 @@ import com.future.function.service.api.feature.scoring.QuizService;
 import com.future.function.service.api.feature.scoring.StudentQuizDetailService;
 import com.future.function.service.api.feature.scoring.StudentQuizService;
 import com.future.function.service.impl.helper.PageHelper;
-import java.util.Objects;
-import java.util.Observable;
-import java.util.Observer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -90,7 +85,7 @@ public class StudentQuizServiceImpl implements StudentQuizService, Observer {
   private StudentQuiz createStudentQuiz(String studentId, String quizId) {
     Quiz quiz = quizService.findById(quizId, Role.ADMIN, null);
     User student = userService.getUser(studentId);
-    return Optional.ofNullable(quiz)
+    return Optional.of(quiz)
         .map(quizObj -> toStudentQuiz(student, quizObj))
         .map(studentQuizRepository::save)
         .orElseThrow(() -> new UnsupportedOperationException(
@@ -114,24 +109,14 @@ public class StudentQuizServiceImpl implements StudentQuizService, Observer {
 
     return Optional.ofNullable(studentId)
       .flatMap(id -> studentQuizRepository.findByStudentIdAndQuizIdAndDeletedFalse(id, quizId))
-      .map(this::updateTrialsAndReturn)
+      .filter(this::isStudentQuizTrialsLessThanQuizTrials)
+      .map(this::addTrials)
+      .map(studentQuizRepository::save)
       .map(studentQuizDetailService::findAllUnansweredQuestionsByStudentQuizId)
       .orElseThrow(() -> new UnsupportedOperationException("EMPTY_TRIALS"));
   }
 
-  private StudentQuiz updateTrialsAndReturn(
-    StudentQuiz studentQuiz
-  ) {
-
-    return Optional.ofNullable(studentQuiz)
-      .filter(Objects::nonNull)
-      .filter(this::validateTrials)
-      .map(this::addTrials)
-      .map(studentQuizRepository::save)
-      .orElse(null);
-  }
-
-  private boolean validateTrials(StudentQuiz studentQuiz) {
+  private boolean isStudentQuizTrialsLessThanQuizTrials(StudentQuiz studentQuiz) {
     return studentQuiz.getTrials() < studentQuiz.getQuiz().getTrials();
   }
 
@@ -146,11 +131,9 @@ public class StudentQuizServiceImpl implements StudentQuizService, Observer {
     String studentId, String quizId, List<StudentQuestion> answers
   ) {
 
-    return Optional.of(studentId)
+    return Optional.ofNullable(studentId)
       .flatMap(id -> studentQuizRepository.findByStudentIdAndQuizIdAndDeletedFalse(id, quizId))
-      .filter(Objects::nonNull)
-      .map(StudentQuiz::getId)
-      .map(studentQuizId -> studentQuizDetailService.answerStudentQuiz(studentQuizId, answers))
+      .map(studentQuiz -> studentQuizDetailService.answerStudentQuiz(studentQuiz.getId(), answers))
       .orElseThrow(() -> new UnsupportedOperationException(
         "Failed at #answerQuestionsByStudentQuizId #StudentQuizService"));
   }

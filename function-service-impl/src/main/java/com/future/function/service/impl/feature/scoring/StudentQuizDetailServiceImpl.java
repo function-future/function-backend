@@ -1,11 +1,7 @@
 package com.future.function.service.impl.feature.scoring;
 
 import com.future.function.common.exception.NotFoundException;
-import com.future.function.model.entity.feature.scoring.Question;
-import com.future.function.model.entity.feature.scoring.Quiz;
-import com.future.function.model.entity.feature.scoring.StudentQuestion;
-import com.future.function.model.entity.feature.scoring.StudentQuiz;
-import com.future.function.model.entity.feature.scoring.StudentQuizDetail;
+import com.future.function.model.entity.feature.scoring.*;
 import com.future.function.repository.feature.scoring.StudentQuizDetailRepository;
 import com.future.function.service.api.feature.scoring.StudentQuestionService;
 import com.future.function.service.api.feature.scoring.StudentQuizDetailService;
@@ -53,13 +49,13 @@ public class StudentQuizDetailServiceImpl implements StudentQuizDetailService {
 
     return Optional.ofNullable(studentQuiz)
       .map(StudentQuiz::getQuiz)
-      .filter(this::validateDeadline)
+      .filter(this::isEndDateHasPassed)
       .map(this::findAllQuestions)
       .map(questionList -> toStudentQuestions(studentQuiz, questionList))
       .orElseThrow(() -> new UnsupportedOperationException("DEADLINE"));
   }
 
-  private boolean validateDeadline(Quiz quiz) {
+  private boolean isEndDateHasPassed(Quiz quiz) {
     return quiz.getEndDate() > new Date().getTime();
   }
 
@@ -74,7 +70,8 @@ public class StudentQuizDetailServiceImpl implements StudentQuizDetailService {
   ) {
 
     return Optional.ofNullable(studentQuiz)
-      .map(this::createDetail)
+      .map(this::toStudentQuizDetail)
+      .map(studentQuizDetailRepository::save)
       .map(
         studentQuizDetail -> studentQuestionService.createStudentQuestionsFromQuestionList(
           questionList, studentQuizDetail))
@@ -82,15 +79,7 @@ public class StudentQuizDetailServiceImpl implements StudentQuizDetailService {
         "Failed at #toStudentQuestions #StudentQuizDetailService"));
   }
 
-  private StudentQuizDetail createDetail(StudentQuiz studentQuiz) {
-
-    return Optional.ofNullable(studentQuiz)
-      .map(this::toDetail)
-      .map(studentQuizDetailRepository::save)
-      .orElse(null);
-  }
-
-  private StudentQuizDetail toDetail(
+  private StudentQuizDetail toStudentQuizDetail(
     StudentQuiz studentQuiz
   ) {
 
@@ -144,13 +133,11 @@ public class StudentQuizDetailServiceImpl implements StudentQuizDetailService {
   @Override
   public void deleteByStudentQuiz(StudentQuiz studentQuiz) {
 
-    Optional.ofNullable(studentQuiz)
-      .map(StudentQuiz::getId)
-      .map(this::findLatestByStudentQuizId)
-      .ifPresent(detail -> {
-        studentQuestionService.deleteAllByStudentQuizDetailId(detail.getId());
-        detail.setDeleted(true);
-        studentQuizDetailRepository.save(detail);
-      });
+    studentQuizDetailRepository.findAllByStudentQuizIdAndDeletedFalse(studentQuiz.getId())
+       .forEach(detail -> {
+          studentQuestionService.deleteAllByStudentQuizDetailId(detail.getId());
+          detail.setDeleted(true);
+          studentQuizDetailRepository.save(detail);
+       });
   }
 }

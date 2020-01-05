@@ -1,11 +1,7 @@
 package com.future.function.service.impl.feature.scoring;
 
 import com.future.function.common.exception.NotFoundException;
-import com.future.function.model.entity.feature.scoring.Option;
-import com.future.function.model.entity.feature.scoring.Question;
-import com.future.function.model.entity.feature.scoring.QuestionBank;
-import com.future.function.model.entity.feature.scoring.StudentQuestion;
-import com.future.function.model.entity.feature.scoring.StudentQuizDetail;
+import com.future.function.model.entity.feature.scoring.*;
 import com.future.function.repository.feature.scoring.StudentQuestionRepository;
 import com.future.function.service.api.feature.scoring.QuestionService;
 import com.future.function.service.api.feature.scoring.StudentQuestionService;
@@ -55,13 +51,13 @@ public class StudentQuestionServiceImpl implements StudentQuestionService {
 
     return Optional.of(questionBanks)
       .filter(list -> !list.isEmpty())
-      .map(this::getIdFromQuestionBanks)
+      .map(this::toQuestionBankIdList)
       .map(questionService::findAllByMultipleQuestionBankId)
       .map(questionList -> getListOfQuestions(questionCount, questionList))
       .orElseGet(ArrayList::new);
   }
 
-  private List<String> getIdFromQuestionBanks(List<QuestionBank> list) {
+  private List<String> toQuestionBankIdList(List<QuestionBank> list) {
 
     return list.stream()
       .map(QuestionBank::getId)
