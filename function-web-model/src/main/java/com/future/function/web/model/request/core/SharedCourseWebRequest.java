@@ -1,5 +1,6 @@
 package com.future.function.web.model.request.core;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.future.function.common.data.core.SharedCourseData;
 import com.future.function.validation.annotation.core.BatchCodesMustBeDistinct;
 import com.future.function.validation.annotation.core.BatchMustExist;
@@ -24,6 +25,7 @@ public class SharedCourseWebRequest implements SharedCourseData {
   @BatchMustExist(field = "originBatch")
   private String originBatch;
 
+  @JsonIgnore
   private String targetBatch;
 
   @CourseMustBeDistinct
