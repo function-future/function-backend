@@ -55,6 +55,17 @@ public class StudentQuestionController {
       studentQuizService.findAllUnansweredQuestionByStudentQuizId(session.getUserId(), quizId));
   }
 
+  @ResponseStatus(HttpStatus.OK)
+  @GetMapping(value = "/time", produces = MediaType.APPLICATION_JSON_VALUE)
+  public DataResponse<Long> findTimeLimitOfQuiz(
+      @PathVariable String quizId,
+      @WithAnyRole(roles = Role.STUDENT)
+          Session session
+  ) {
+    return StudentQuizDetailResponseMapper.toStudentQuestionTimeWebResponse(
+        studentQuizService.findTimeLimitByStudentQuiz(session.getUserId(), quizId));
+  }
+
   @ResponseStatus(HttpStatus.CREATED)
   @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE,
                produces = MediaType.APPLICATION_JSON_VALUE)

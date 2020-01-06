@@ -79,4 +79,12 @@ public final class StudentQuizDetailResponseMapper {
       .collect(Collectors.toList());
   }
 
+  public static DataResponse<Long> toStudentQuestionTimeWebResponse(Long timeLimit) {
+    return DataResponse.<Long>builder()
+        .data(timeLimit)
+        .code(HttpStatus.OK.value())
+        .status(HttpStatus.OK.name())
+        .build();
+  }
+
 }

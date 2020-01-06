@@ -34,6 +34,8 @@ public class StudentQuizDetailResponseMapperTest {
 
   private static final String OPTION_LABEL = "option-label";
 
+  private static final Long TIME_LIMIT = 1000L;
+
   private Quiz quiz;
 
   private StudentQuiz studentQuiz;
@@ -126,4 +128,9 @@ public class StudentQuizDetailResponseMapperTest {
                  .getCorrect()).isEqualTo(null);
   }
 
+  @Test
+  public void toTimeLimitWebResponse() {
+    DataResponse<Long> actual = StudentQuizDetailResponseMapper.toStudentQuestionTimeWebResponse(TIME_LIMIT);
+    assertThat(actual.getData()).isEqualTo(TIME_LIMIT);
+  }
 }

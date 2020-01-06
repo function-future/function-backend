@@ -67,6 +67,8 @@ public class StudentQuizServiceImplTest {
 
   private static final String QUESTION_TEXT = "question-text";
 
+  private static final Long TIME_LIMIT = 1000L;
+
   private Batch batch;
 
   private User student;
@@ -134,6 +136,7 @@ public class StudentQuizServiceImplTest {
       .id(QUIZ_ID)
       .trials(QUIZ_TRIALS + 1)
       .batch(batch)
+      .timeLimit(TIME_LIMIT)
       .build();
 
     studentQuiz = StudentQuiz.builder()
@@ -338,5 +341,21 @@ public class StudentQuizServiceImplTest {
   @Test
   public void updateObserverSendRandomObjectTest() {
     studentQuizService.update(new Observable(), new Object());
+  }
+
+  @Test
+  public void findTimeLimitByStudentQuiz() {
+    Long actual = studentQuizService.findTimeLimitByStudentQuiz(USER_ID, QUIZ_ID);
+    assertThat(actual).isEqualTo(TIME_LIMIT);
+    verify(studentQuizRepository).findByStudentIdAndQuizIdAndDeletedFalse(USER_ID, QUIZ_ID);
+  }
+
+  @Test
+  public void findTimeLimitByStudentQuizExpectNotFound() {
+    when(studentQuizRepository.findByStudentIdAndQuizIdAndDeletedFalse(USER_ID, QUIZ_ID))
+        .thenReturn(Optional.empty());
+    catchException(() -> studentQuizService.findTimeLimitByStudentQuiz(USER_ID, QUIZ_ID));
+    assertThat(caughtException().getClass()).isEqualTo(NotFoundException.class);
+    verify(studentQuizRepository).findByStudentIdAndQuizIdAndDeletedFalse(USER_ID, QUIZ_ID);
   }
 }
