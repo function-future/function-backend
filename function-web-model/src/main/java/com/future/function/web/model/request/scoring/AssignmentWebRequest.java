@@ -2,6 +2,7 @@ package com.future.function.web.model.request.scoring;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.future.function.validation.annotation.core.FileMustExist;
+import com.future.function.validation.annotation.scoring.DateNotPassed;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -25,6 +26,7 @@ public class AssignmentWebRequest {
   @NotBlank(message = "NotBlank")
   private String description;
 
+  @DateNotPassed
   @NotNull(message = "NotNull")
   private Long deadline;
 

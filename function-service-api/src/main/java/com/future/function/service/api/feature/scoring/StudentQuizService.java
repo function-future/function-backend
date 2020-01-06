@@ -6,12 +6,14 @@ import com.future.function.model.entity.feature.scoring.StudentQuiz;
 import com.future.function.model.entity.feature.scoring.StudentQuizDetail;
 
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface StudentQuizService {
 
   List<StudentQuiz> findAllByStudentId(String studentId);
 
-  List<StudentQuizDetail> findAllQuizByStudentId(String studentId);
+  Page<StudentQuizDetail> findAllQuizByStudentId(String studentId, Pageable pageable);
 
   StudentQuiz findOrCreateByStudentIdAndQuizId(String studentId, String quizId);
 
@@ -22,6 +24,8 @@ public interface StudentQuizService {
   StudentQuizDetail answerQuestionsByStudentQuizId(
     String studentId, String quizId, List<StudentQuestion> answers
   );
+
+  Long findTimeLimitByStudentQuiz(String studentId, String quizId);
 
   void deleteById(String id);
 

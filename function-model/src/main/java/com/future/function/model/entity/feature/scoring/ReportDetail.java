@@ -36,8 +36,4 @@ public class ReportDetail extends BaseEntity {
   @Field(FieldName.ReportDetail.USER)
   private User user;
 
-  @DBRef(lazy = true)
-  @Field(FieldName.ReportDetail.REPORT)
-  private Report report;
-
 }

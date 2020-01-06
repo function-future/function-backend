@@ -2,6 +2,7 @@ package com.future.function.web.mapper.response.scoring;
 
 import com.future.function.model.entity.feature.scoring.Option;
 import com.future.function.model.entity.feature.scoring.Question;
+import com.future.function.model.entity.feature.scoring.Quiz;
 import com.future.function.model.entity.feature.scoring.StudentQuestion;
 import com.future.function.model.entity.feature.scoring.StudentQuiz;
 import com.future.function.model.entity.feature.scoring.StudentQuizDetail;
@@ -33,6 +34,10 @@ public class StudentQuizDetailResponseMapperTest {
 
   private static final String OPTION_LABEL = "option-label";
 
+  private static final Long TIME_LIMIT = 1000L;
+
+  private Quiz quiz;
+
   private StudentQuiz studentQuiz;
 
   private StudentQuizDetail studentQuizDetail;
@@ -46,8 +51,14 @@ public class StudentQuizDetailResponseMapperTest {
   @Before
   public void setUp() throws Exception {
 
+    quiz = Quiz.builder()
+      .trials(10)
+      .build();
+
     studentQuiz = StudentQuiz.builder()
       .id(STUDENT_QUIZ_ID)
+      .quiz(quiz)
+      .trials(5)
       .build();
 
     studentQuizDetail = StudentQuizDetail.builder()
@@ -91,6 +102,8 @@ public class StudentQuizDetailResponseMapperTest {
         studentQuizDetail);
     assertThat(response.getData()
                  .getPoint()).isEqualTo(0);
+    assertThat(response.getData()
+                .getTrials()).isEqualTo(5);
 
   }
 
@@ -115,4 +128,9 @@ public class StudentQuizDetailResponseMapperTest {
                  .getCorrect()).isEqualTo(null);
   }
 
+  @Test
+  public void toTimeLimitWebResponse() {
+    DataResponse<Long> actual = StudentQuizDetailResponseMapper.toStudentQuestionTimeWebResponse(TIME_LIMIT);
+    assertThat(actual.getData()).isEqualTo(TIME_LIMIT);
+  }
 }

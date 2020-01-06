@@ -1,6 +1,8 @@
 package com.future.function.service.impl.feature.scoring;
 
+import com.future.function.common.enumeration.core.Role;
 import com.future.function.common.exception.BadRequestException;
+import com.future.function.common.exception.ForbiddenException;
 import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.scoring.Question;
@@ -10,7 +12,8 @@ import com.future.function.repository.feature.scoring.QuizRepository;
 import com.future.function.service.api.feature.core.BatchService;
 import com.future.function.service.api.feature.scoring.QuestionBankService;
 import com.future.function.service.api.feature.scoring.QuestionService;
-import com.future.function.service.api.feature.scoring.StudentQuizService;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -57,12 +60,17 @@ public class QuizServiceImplTest {
 
   private static final String BATCH_CODE = "batch-code";
 
+  private static final String BATCH_ID = "batch-id";
+
   private static final String QUESTION_BANK_ID = "question-bank-id";
 
   private static final String QUESTION_BANK_DESCRIPTION =
     "question-bank-description";
 
   private static final String QUESTION_TEXT = "question-text";
+
+  private Long DATE_NOW = LocalDate.now().atTime(23, 59)
+      .atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
 
   private int PAGE = 0;
 
@@ -102,6 +110,7 @@ public class QuizServiceImplTest {
 
     batch = Batch.builder()
       .code(BATCH_CODE)
+      .id(BATCH_ID)
       .build();
 
     questionBank = QuestionBank.builder()
@@ -134,8 +143,10 @@ public class QuizServiceImplTest {
     quizPage = new PageImpl<>(quizList, pageable, TOTAL);
 
     when(
-      quizRepository.findAllByBatchAndDeletedFalse(batch, pageable)).thenReturn(
+      quizRepository.findAllByBatchAndDeletedFalseAndEndDateLessThanOrderByEndDateAsc(batch, DATE_NOW, pageable)).thenReturn(
       quizPage);
+    when(quizRepository.findAllByBatchAndDeletedFalseAndStartDateLessThanEqualAndEndDateGreaterThanOrderByEndDateDesc(
+        batch, DATE_NOW, DATE_NOW, pageable)).thenReturn(quizPage);
     when(quizRepository.findByIdAndDeletedFalse(QUIZ_ID)).thenReturn(
       Optional.of(quiz));
     when(quizRepository.save(quiz)).thenReturn(quiz);
@@ -158,16 +169,38 @@ public class QuizServiceImplTest {
 
     when(quizRepository.findByIdAndDeletedFalse(QUIZ_ID)).thenReturn(
       Optional.of(quiz));
-    Quiz actual = quizService.findById(QUIZ_ID);
+    Quiz actual = quizService.findById(QUIZ_ID, Role.ADMIN, "");
     assertThat(actual).isNotNull();
     assertThat(actual).isEqualTo(quiz);
     verify(quizRepository).findByIdAndDeletedFalse(QUIZ_ID);
   }
 
   @Test
+  public void testFindQuizByIdAccessedByStudent() {
+
+    when(quizRepository.findByIdAndDeletedFalse(QUIZ_ID)).thenReturn(
+        Optional.of(quiz));
+    Quiz actual = quizService.findById(QUIZ_ID, Role.STUDENT, BATCH_ID);
+    assertThat(actual).isNotNull();
+    assertThat(actual).isEqualTo(quiz);
+    verify(quizRepository).findByIdAndDeletedFalse(QUIZ_ID);
+  }
+
+  @Test
+  public void testFindQuizByIdAccessedByAnotherStudentBatch() {
+
+    when(quizRepository.findByIdAndDeletedFalse(QUIZ_ID)).thenReturn(
+        Optional.of(quiz));
+    catchException(() -> quizService
+        .findById(QUIZ_ID, Role.STUDENT, "another-batch-id"));
+    assertThat(caughtException().getClass()).isEqualTo(ForbiddenException.class);
+    verify(quizRepository).findByIdAndDeletedFalse(QUIZ_ID);
+  }
+
+  @Test
   public void testFindQuizByIdAndDeletedFalseNull() {
 
-    catchException(() -> quizService.findById(null));
+    catchException(() -> quizService.findById(null, Role.ADMIN, ""));
 
     assertThat(caughtException().getClass()).isEqualTo(NotFoundException.class);
   }
@@ -177,7 +210,7 @@ public class QuizServiceImplTest {
 
     when(quizRepository.findByIdAndDeletedFalse("")).thenReturn(
       Optional.empty());
-    catchException(() -> quizService.findById(""));
+    catchException(() -> quizService.findById("", Role.ADMIN, ""));
     assertThat(caughtException().getClass()).isEqualTo(NotFoundException.class);
     verify(quizRepository).findByIdAndDeletedFalse("");
   }
@@ -186,12 +219,30 @@ public class QuizServiceImplTest {
   public void testFindPageOfQuizWithPageableFilterAndSearch() {
 
     Page<Quiz> actual = quizService.findAllByBatchCodeAndPageable(
-      BATCH_CODE, pageable);
+      BATCH_CODE, pageable, Role.STUDENT, BATCH_ID, false);
     assertThat(actual.getContent()).isEqualTo(quizList);
     assertThat(actual.getTotalElements()).isEqualTo(TOTAL);
     assertThat(actual).isEqualTo(quizPage);
 
-    verify(quizRepository).findAllByBatchAndDeletedFalse(batch, pageable);
+    verify(quizRepository).findAllByBatchAndDeletedFalseAndStartDateLessThanEqualAndEndDateGreaterThanOrderByEndDateDesc(
+        batch, DATE_NOW, DATE_NOW, pageable);
+    verify(batchService).getBatchByCode(BATCH_CODE);
+  }
+
+  @Test
+  public void testFindPageOfQuizWithPageableFilterAndSearchAndAccessedByAdmin() {
+
+    when(quizRepository.findAllByBatchAndDeletedFalseAndEndDateGreaterThanOrderByEndDateDesc(batch, DATE_NOW, pageable))
+        .thenReturn(quizPage);
+
+    Page<Quiz> actual = quizService.findAllByBatchCodeAndPageable(
+        BATCH_CODE, pageable, Role.ADMIN, "", false);
+    assertThat(actual.getContent()).isEqualTo(quizList);
+    assertThat(actual.getTotalElements()).isEqualTo(TOTAL);
+    assertThat(actual).isEqualTo(quizPage);
+
+    verify(quizRepository).findAllByBatchAndDeletedFalseAndEndDateGreaterThanOrderByEndDateDesc(
+        batch, DATE_NOW, pageable);
     verify(batchService).getBatchByCode(BATCH_CODE);
   }
 
@@ -199,13 +250,24 @@ public class QuizServiceImplTest {
   public void testFindPageOfQuizWithPageableFilterNullAndSearchNull() {
 
     Page<Quiz> actual = quizService.findAllByBatchCodeAndPageable(
-      BATCH_CODE, pageable);
+      BATCH_CODE, pageable, Role.STUDENT, BATCH_ID, true);
 
     assertThat(actual.getContent()).isEqualTo(quizList);
     assertThat(actual.getTotalElements()).isEqualTo(TOTAL);
     assertThat(actual).isEqualTo(quizPage);
 
-    verify(quizRepository).findAllByBatchAndDeletedFalse(batch, pageable);
+    verify(quizRepository).findAllByBatchAndDeletedFalseAndEndDateLessThanOrderByEndDateAsc(batch, DATE_NOW, pageable);
+    verify(batchService).getBatchByCode(BATCH_CODE);
+  }
+
+  @Test
+  public void testFindPageOfQuizWithPageableFilterNullAndSearchNullAndAnotherStudentBatchAccess() {
+
+    catchException(() -> quizService.findAllByBatchCodeAndPageable(
+        BATCH_CODE, pageable, Role.STUDENT, "another-batch-id", true));
+
+    assertThat(caughtException().getClass()).isEqualTo(ForbiddenException.class);
+
     verify(batchService).getBatchByCode(BATCH_CODE);
   }
 
@@ -289,7 +351,7 @@ public class QuizServiceImplTest {
       .build();
     when(quizRepository.save(any(Quiz.class))).thenReturn(quiz);
     when(batchService.getBatchByCode(batchCode)).thenReturn(targetBatchObj);
-    Quiz actual = quizService.copyQuizWithTargetBatchCode(batchCode, quiz);
+    Quiz actual = quizService.copyQuizWithTargetBatchCode(batchCode, QUIZ_ID);
     assertThat(actual.getTitle()).isEqualTo(QUIZ_TITLE);
     verify(quizRepository).findByIdAndDeletedFalse(QUIZ_ID);
     verify(quizRepository).save(any(Quiz.class));

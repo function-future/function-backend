@@ -14,8 +14,8 @@ import java.util.Map;
 public class DataMigration_010 {
 
   @ChangeSet(author = "oliver",
-             id = "questionBankAccessList",
-             order = "0001")
+      id = "questionBankAccessList",
+      order = "0001")
   public void insertQuestionBankAccessList(MongoTemplate mongoTemplate) {
 
     String urlRegex = "^\\/question-banks(\\/|\\/.*)?$";
@@ -33,49 +33,49 @@ public class DataMigration_010 {
     otherComponents.put("read", false);
 
     Access adminAccess = Access.builder()
-      .urlRegex(urlRegex)
-      .components(adminComponents)
-      .role(Role.ADMIN)
-      .build();
+        .urlRegex(urlRegex)
+        .components(adminComponents)
+        .role(Role.ADMIN)
+        .build();
 
     mongoTemplate.insert(adminAccess, DocumentName.ACCESS);
 
     Access mentorAccess = Access.builder()
-      .urlRegex(urlRegex)
-      .components(otherComponents)
-      .role(Role.MENTOR)
-      .build();
+        .urlRegex(urlRegex)
+        .components(otherComponents)
+        .role(Role.MENTOR)
+        .build();
 
     mongoTemplate.insert(mentorAccess, DocumentName.ACCESS);
 
     Access judgeAccess = Access.builder()
-      .urlRegex(urlRegex)
-      .components(otherComponents)
-      .role(Role.JUDGE)
-      .build();
+        .urlRegex(urlRegex)
+        .components(otherComponents)
+        .role(Role.JUDGE)
+        .build();
 
     mongoTemplate.insert(judgeAccess, DocumentName.ACCESS);
 
     Access studentAccess = Access.builder()
-      .urlRegex(urlRegex)
-      .components(otherComponents)
-      .role(Role.STUDENT)
-      .build();
+        .urlRegex(urlRegex)
+        .components(otherComponents)
+        .role(Role.STUDENT)
+        .build();
 
     mongoTemplate.insert(studentAccess, DocumentName.ACCESS);
   }
 
   @ChangeSet(author = "oliver",
-             id = "allScoringListAndDetailPageAccessList",
-             order = "0002")
+      id = "allScoringListAndDetailPageAccessList",
+      order = "0002")
   public void insertAllScoringListAndDetailPageAccessList(
-    MongoTemplate mongoTemplate
+      MongoTemplate mongoTemplate
   ) {
 
     String urlRegex = "^\\/batches\\/[A-Za-z0-9\\-]+\\" +
-                      "/(assignments|quizzes|final-judging)" +
-                      "(\\/|\\/[A-Za-z0-9\\-]+)?(\\/|\\" +
-                      "/(detail|addDetail|add)(\\/)?)?$";
+        "/(assignments|quizzes|final-judging)" +
+        "(\\/|\\/[A-Za-z0-9\\-]+)?(\\/|\\" +
+        "/(detail|addDetail|add)(\\/)?)?$";
 
     Map<String, Object> adminComponents = new HashMap<>();
     adminComponents.put("add", true);
@@ -93,45 +93,45 @@ public class DataMigration_010 {
     studentComponents.put("add", false);
     studentComponents.put("delete", false);
     studentComponents.put("edit", false);
-    studentComponents.put("read", false);
+    studentComponents.put("read", true);
 
     Access adminAccess = Access.builder()
-      .urlRegex(urlRegex)
-      .components(adminComponents)
-      .role(Role.ADMIN)
-      .build();
+        .urlRegex(urlRegex)
+        .components(adminComponents)
+        .role(Role.ADMIN)
+        .build();
 
     mongoTemplate.insert(adminAccess, DocumentName.ACCESS);
 
     Access mentorAccess = Access.builder()
-      .urlRegex(urlRegex)
-      .components(otherComponents)
-      .role(Role.MENTOR)
-      .build();
+        .urlRegex(urlRegex)
+        .components(otherComponents)
+        .role(Role.MENTOR)
+        .build();
 
     mongoTemplate.insert(mentorAccess, DocumentName.ACCESS);
 
     Access judgeAccess = Access.builder()
-      .urlRegex(urlRegex)
-      .components(otherComponents)
-      .role(Role.JUDGE)
-      .build();
+        .urlRegex(urlRegex)
+        .components(otherComponents)
+        .role(Role.JUDGE)
+        .build();
 
     mongoTemplate.insert(judgeAccess, DocumentName.ACCESS);
 
     Access studentAccess = Access.builder()
-      .urlRegex(urlRegex)
-      .components(studentComponents)
-      .role(Role.STUDENT)
-      .build();
+        .urlRegex(urlRegex)
+        .components(studentComponents)
+        .role(Role.STUDENT)
+        .build();
 
     mongoTemplate.insert(studentAccess, DocumentName.ACCESS);
   }
 
 
   @ChangeSet(author = "oliver",
-             id = "scoringBatchesPageAccessList",
-             order = "0003")
+      id = "scoringBatchesPageAccessList",
+      order = "0003")
   public void insertScoringBatchesAccessList(MongoTemplate mongoTemplate) {
 
     String urlRegex = "^\\/.*\\/batches(\\/|\\/add|\\/.+\\/edit)?$";
@@ -155,45 +155,45 @@ public class DataMigration_010 {
     studentComponents.put("read", false);
 
     Access adminAccess = Access.builder()
-      .urlRegex(urlRegex)
-      .components(adminComponents)
-      .role(Role.ADMIN)
-      .build();
+        .urlRegex(urlRegex)
+        .components(adminComponents)
+        .role(Role.ADMIN)
+        .build();
 
     mongoTemplate.insert(adminAccess, DocumentName.ACCESS);
 
     Access mentorAccess = Access.builder()
-      .urlRegex(urlRegex)
-      .components(otherComponents)
-      .role(Role.MENTOR)
-      .build();
+        .urlRegex(urlRegex)
+        .components(otherComponents)
+        .role(Role.MENTOR)
+        .build();
 
     mongoTemplate.insert(mentorAccess, DocumentName.ACCESS);
 
     Access judgeAccess = Access.builder()
-      .urlRegex(urlRegex)
-      .components(otherComponents)
-      .role(Role.JUDGE)
-      .build();
+        .urlRegex(urlRegex)
+        .components(otherComponents)
+        .role(Role.JUDGE)
+        .build();
 
     mongoTemplate.insert(judgeAccess, DocumentName.ACCESS);
 
     Access studentAccess = Access.builder()
-      .urlRegex(urlRegex)
-      .components(studentComponents)
-      .role(Role.STUDENT)
-      .build();
+        .urlRegex(urlRegex)
+        .components(studentComponents)
+        .role(Role.STUDENT)
+        .build();
 
     mongoTemplate.insert(studentAccess, DocumentName.ACCESS);
   }
 
   @ChangeSet(author = "oliver",
-             id = "studentQuizAccessList",
-             order = "0004")
+      id = "studentQuizAccessList",
+      order = "0004")
   public void insertStudentQuizAccessList(MongoTemplate mongoTemplate) {
 
     String urlRegex =
-      "^\\/quizzes(\\/([A-Za-z0-9\\/\\-]+(\\/(detail|questions)?))?)?$";
+        "^\\/quizzes(\\/([A-Za-z0-9\\/\\-]+(\\/(detail|questions)?))?)?$";
 
     Map<String, Object> otherComponents = new HashMap<>();
     otherComponents.put("add", false);
@@ -208,45 +208,45 @@ public class DataMigration_010 {
     studentComponents.put("read", true);
 
     Access adminAccess = Access.builder()
-      .urlRegex(urlRegex)
-      .components(otherComponents)
-      .role(Role.ADMIN)
-      .build();
+        .urlRegex(urlRegex)
+        .components(otherComponents)
+        .role(Role.ADMIN)
+        .build();
 
     mongoTemplate.insert(adminAccess, DocumentName.ACCESS);
 
     Access mentorAccess = Access.builder()
-      .urlRegex(urlRegex)
-      .components(otherComponents)
-      .role(Role.MENTOR)
-      .build();
+        .urlRegex(urlRegex)
+        .components(otherComponents)
+        .role(Role.MENTOR)
+        .build();
 
     mongoTemplate.insert(mentorAccess, DocumentName.ACCESS);
 
     Access judgeAccess = Access.builder()
-      .urlRegex(urlRegex)
-      .components(otherComponents)
-      .role(Role.JUDGE)
-      .build();
+        .urlRegex(urlRegex)
+        .components(otherComponents)
+        .role(Role.JUDGE)
+        .build();
 
     mongoTemplate.insert(judgeAccess, DocumentName.ACCESS);
 
     Access studentAccess = Access.builder()
-      .urlRegex(urlRegex)
-      .components(studentComponents)
-      .role(Role.STUDENT)
-      .build();
+        .urlRegex(urlRegex)
+        .components(studentComponents)
+        .role(Role.STUDENT)
+        .build();
 
     mongoTemplate.insert(studentAccess, DocumentName.ACCESS);
   }
 
   @ChangeSet(author = "oliver",
-             id = "studentRoomAccessList",
-             order = "0005")
+      id = "studentRoomAccessList",
+      order = "0005")
   public void insertStudentRoomAccessList(MongoTemplate mongoTemplate) {
 
     String urlRegex =
-      "^\\/batches\\/.*\\/assignments\\/.*\\/rooms(\\/|\\/.*)?$";
+        "^\\/batches\\/.*\\/assignments\\/.*\\/rooms(\\/|\\/.*)?$";
 
     Map<String, Object> adminComponents = new HashMap<>();
     adminComponents.put("add", false);
@@ -275,47 +275,47 @@ public class DataMigration_010 {
     withoutScoreComponents.put("read", true);
 
     Access adminAccess = Access.builder()
-      .urlRegex(urlRegex)
-      .components(adminComponents)
-      .role(Role.ADMIN)
-      .build();
+        .urlRegex(urlRegex)
+        .components(adminComponents)
+        .role(Role.ADMIN)
+        .build();
 
     mongoTemplate.insert(adminAccess, DocumentName.ACCESS);
 
     Access mentorAccess = Access.builder()
-      .urlRegex(urlRegex)
-      .components(withScoreComponents)
-      .role(Role.MENTOR)
-      .build();
+        .urlRegex(urlRegex)
+        .components(withScoreComponents)
+        .role(Role.MENTOR)
+        .build();
 
     mongoTemplate.insert(mentorAccess, DocumentName.ACCESS);
 
     Access judgeAccess = Access.builder()
-      .urlRegex(urlRegex)
-      .components(withoutScoreComponents)
-      .role(Role.JUDGE)
-      .build();
+        .urlRegex(urlRegex)
+        .components(withoutScoreComponents)
+        .role(Role.JUDGE)
+        .build();
 
     mongoTemplate.insert(judgeAccess, DocumentName.ACCESS);
 
     Access studentAccess = Access.builder()
-      .urlRegex(urlRegex)
-      .components(withoutScoreComponents)
-      .role(Role.STUDENT)
-      .build();
+        .urlRegex(urlRegex)
+        .components(withoutScoreComponents)
+        .role(Role.STUDENT)
+        .build();
 
     mongoTemplate.insert(studentAccess, DocumentName.ACCESS);
   }
 
   @ChangeSet(author = "oliver",
-             id = "finalJudgingComparisonAccessList",
-             order = "0006")
+      id = "finalJudgingComparisonAccessList",
+      order = "0006")
   public void insertFinalJudgingComparisonAccessList(
-    MongoTemplate mongoTemplate
+      MongoTemplate mongoTemplate
   ) {
 
     String urlRegex =
-      "^\\/batches\\/.*\\/final-judging\\/.*\\/comparison(\\/)?$";
+        "^\\/batches\\/.*\\/final-judging\\/.*\\/comparison(\\/)?$";
 
     Map<String, Object> onlyReadComponents = new HashMap<>();
     onlyReadComponents.put("add", false);
@@ -336,41 +336,41 @@ public class DataMigration_010 {
     studentComponents.put("read", false);
 
     Access adminAccess = Access.builder()
-      .urlRegex(urlRegex)
-      .components(onlyReadComponents)
-      .role(Role.ADMIN)
-      .build();
+        .urlRegex(urlRegex)
+        .components(onlyReadComponents)
+        .role(Role.ADMIN)
+        .build();
 
     mongoTemplate.insert(adminAccess, DocumentName.ACCESS);
 
     Access mentorAccess = Access.builder()
-      .urlRegex(urlRegex)
-      .components(onlyReadComponents)
-      .role(Role.MENTOR)
-      .build();
+        .urlRegex(urlRegex)
+        .components(onlyReadComponents)
+        .role(Role.MENTOR)
+        .build();
 
     mongoTemplate.insert(mentorAccess, DocumentName.ACCESS);
 
     Access judgeAccess = Access.builder()
-      .urlRegex(urlRegex)
-      .components(addAndReadComponents)
-      .role(Role.JUDGE)
-      .build();
+        .urlRegex(urlRegex)
+        .components(addAndReadComponents)
+        .role(Role.JUDGE)
+        .build();
 
     mongoTemplate.insert(judgeAccess, DocumentName.ACCESS);
 
     Access studentAccess = Access.builder()
-      .urlRegex(urlRegex)
-      .components(studentComponents)
-      .role(Role.STUDENT)
-      .build();
+        .urlRegex(urlRegex)
+        .components(studentComponents)
+        .role(Role.STUDENT)
+        .build();
 
     mongoTemplate.insert(studentAccess, DocumentName.ACCESS);
   }
 
   @ChangeSet(author = "oliver",
-             id = "pointsAccessList",
-             order = "0007")
+      id = "pointsAccessList",
+      order = "0007")
   public void insertPointsAccessList(MongoTemplate mongoTemplate) {
 
     String urlRegex = "^\\/points(\\/)?$";
@@ -388,34 +388,88 @@ public class DataMigration_010 {
     studentComponents.put("read", true);
 
     Access adminAccess = Access.builder()
-      .urlRegex(urlRegex)
-      .components(allFalseComponents)
-      .role(Role.ADMIN)
-      .build();
+        .urlRegex(urlRegex)
+        .components(allFalseComponents)
+        .role(Role.ADMIN)
+        .build();
 
     mongoTemplate.insert(adminAccess, DocumentName.ACCESS);
 
     Access mentorAccess = Access.builder()
-      .urlRegex(urlRegex)
-      .components(allFalseComponents)
-      .role(Role.MENTOR)
-      .build();
+        .urlRegex(urlRegex)
+        .components(allFalseComponents)
+        .role(Role.MENTOR)
+        .build();
 
     mongoTemplate.insert(mentorAccess, DocumentName.ACCESS);
 
     Access judgeAccess = Access.builder()
-      .urlRegex(urlRegex)
-      .components(allFalseComponents)
-      .role(Role.JUDGE)
-      .build();
+        .urlRegex(urlRegex)
+        .components(allFalseComponents)
+        .role(Role.JUDGE)
+        .build();
 
     mongoTemplate.insert(judgeAccess, DocumentName.ACCESS);
 
     Access studentAccess = Access.builder()
-      .urlRegex(urlRegex)
-      .components(studentComponents)
-      .role(Role.STUDENT)
-      .build();
+        .urlRegex(urlRegex)
+        .components(studentComponents)
+        .role(Role.STUDENT)
+        .build();
+
+    mongoTemplate.insert(studentAccess, DocumentName.ACCESS);
+  }
+
+  @ChangeSet(author = "oliver",
+      id = "studentAssignmentListAccessList",
+      order = "0008")
+  public void insertStudentAssignmentListAccessList(
+      MongoTemplate mongoTemplate
+  ) {
+
+    String urlRegex = "^\\/assignments(\\/)?$";
+
+    Map<String, Object> otherComponents = new HashMap<>();
+    otherComponents.put("add", false);
+    otherComponents.put("delete", false);
+    otherComponents.put("edit", false);
+    otherComponents.put("read", false);
+
+    Map<String, Object> studentComponents = new HashMap<>();
+    studentComponents.put("add", false);
+    studentComponents.put("delete", false);
+    studentComponents.put("edit", false);
+    studentComponents.put("read", true);
+
+    Access adminAccess = Access.builder()
+        .urlRegex(urlRegex)
+        .components(otherComponents)
+        .role(Role.ADMIN)
+        .build();
+
+    mongoTemplate.insert(adminAccess, DocumentName.ACCESS);
+
+    Access mentorAccess = Access.builder()
+        .urlRegex(urlRegex)
+        .components(otherComponents)
+        .role(Role.MENTOR)
+        .build();
+
+    mongoTemplate.insert(mentorAccess, DocumentName.ACCESS);
+
+    Access judgeAccess = Access.builder()
+        .urlRegex(urlRegex)
+        .components(otherComponents)
+        .role(Role.JUDGE)
+        .build();
+
+    mongoTemplate.insert(judgeAccess, DocumentName.ACCESS);
+
+    Access studentAccess = Access.builder()
+        .urlRegex(urlRegex)
+        .components(studentComponents)
+        .role(Role.STUDENT)
+        .build();
 
     mongoTemplate.insert(studentAccess, DocumentName.ACCESS);
   }

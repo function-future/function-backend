@@ -28,4 +28,6 @@ public interface UserRepository extends MongoRepository<User, String> {
     String name, Pageable pageable
   );
 
+  boolean existsByIdAndRoleAndDeletedFalse(String id, Role role);
+
 }

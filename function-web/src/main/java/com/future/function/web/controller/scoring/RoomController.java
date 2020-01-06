@@ -6,6 +6,7 @@ import com.future.function.service.api.feature.scoring.RoomService;
 import com.future.function.session.annotation.WithAnyRole;
 import com.future.function.session.model.Session;
 import com.future.function.web.mapper.helper.ResponseHelper;
+import com.future.function.web.mapper.request.scoring.RoomRequestMapper;
 import com.future.function.web.mapper.response.scoring.RoomResponseMapper;
 import com.future.function.web.model.request.scoring.RoomPointWebRequest;
 import com.future.function.web.model.response.base.BaseResponse;
@@ -31,13 +32,16 @@ public class RoomController {
 
   private RoomService roomService;
 
+  private RoomRequestMapper requestMapper;
+
   @Autowired
   public RoomController(
-      RoomService roomService, FileProperties fileProperties
+      RoomService roomService, RoomRequestMapper roomRequestMapper, FileProperties fileProperties
   ) {
 
     this.roomService = roomService;
     this.fileProperties = fileProperties;
+    this.requestMapper = roomRequestMapper;
   }
 
   @ResponseStatus(HttpStatus.OK)
@@ -69,7 +73,7 @@ public class RoomController {
     @WithAnyRole(roles = Role.MENTOR)
       Session session
   ) {
-
+    request = requestMapper.validate(request);
     return RoomResponseMapper.toDataRoomWebResponse(
       roomService.giveScoreToRoomByStudentIdAndAssignmentId(studentId, session.getUserId(), assignmentId, request.getPoint()
       ), fileProperties.getUrlPrefix());

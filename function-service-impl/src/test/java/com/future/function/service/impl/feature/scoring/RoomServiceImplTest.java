@@ -21,12 +21,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import java.util.Collections;
 import java.util.Date;
-import java.util.List;
 import java.util.Optional;
 
 import static com.googlecode.catchexception.CatchException.catchException;
@@ -48,6 +48,8 @@ public class RoomServiceImplTest {
   private static final String USERNAME = "userName";
 
   private static final String BATCH_CODE = "batchCode";
+
+  private static final String BATCH_ID = "batchId";
 
   private static final String MENTOR_ID = "mentor-id";
 
@@ -85,6 +87,7 @@ public class RoomServiceImplTest {
 
     batch = Batch.builder()
       .code(BATCH_CODE)
+      .id(BATCH_ID)
       .build();
     assignment = Assignment.builder()
       .id(ASSIGNMENT_ID)
@@ -95,6 +98,7 @@ public class RoomServiceImplTest {
       .id(USER_ID)
       .name(USERNAME)
       .role(Role.STUDENT)
+      .batch(batch)
       .build();
     room = Room.builder()
       .assignment(assignment)
@@ -121,15 +125,15 @@ public class RoomServiceImplTest {
                                                              pageable
     )).thenReturn(roomPage);
     when(roomRepository.save(any(Room.class))).thenReturn(room);
-    when(roomRepository.findAllByStudentIdAndDeletedFalse(USER_ID)).thenReturn(
-      Collections.singletonList(room));
+    when(roomRepository.findAllByStudentIdAndDeletedFalse(USER_ID, pageable)).thenReturn(
+      new PageImpl<>(Collections.singletonList(room)));
     when(roomRepository.findAllByStudentIdAndDeletedFalse(USER_ID,
                                                           pageable
     )).thenReturn(roomPage);
-    when(commentService.findAllCommentsByRoomId(ROOM_ID, pageable)).thenReturn(
+    when(commentService.findAllCommentsByStudentIdAndAssignmentId(room, pageable)).thenReturn(
       PageHelper.toPage(Collections.singletonList(comment), pageable));
     when(commentService.createComment(comment)).thenReturn(comment);
-    when(assignmentService.findById(ASSIGNMENT_ID)).thenReturn(assignment);
+    when(assignmentService.findById(ASSIGNMENT_ID, Role.STUDENT, BATCH_ID)).thenReturn(assignment);
     verify(assignmentService).addObserver(roomService);
   }
 
@@ -157,17 +161,17 @@ public class RoomServiceImplTest {
     assertThat(actual).isEqualTo(room);
     verify(userService, times(2)).getUser(USER_ID);
     verify(roomRepository).save(any(Room.class));
-    verify(assignmentService).findById(ASSIGNMENT_ID);
+    verify(assignmentService).findById(ASSIGNMENT_ID, Role.STUDENT, BATCH_ID);
     verify(roomRepository).findByStudentIdAndAssignmentIdAndDeletedFalse(USER_ID, ASSIGNMENT_ID);
   }
 
   @Test
   public void findAllByStudentId() {
 
-    List<Room> actual = roomService.findAllByStudentId(USER_ID);
-    assertThat(actual.size()).isEqualTo(1);
-    assertThat(actual.get(0)).isEqualTo(room);
-    verify(roomRepository).findAllByStudentIdAndDeletedFalse(USER_ID);
+    Page<Room> actual = roomService.findAllByStudentId(USER_ID, pageable);
+    assertThat(actual.getContent().size()).isEqualTo(1);
+    assertThat(actual.getContent().get(0)).isEqualTo(room);
+    verify(roomRepository).findAllByStudentIdAndDeletedFalse(USER_ID, pageable);
   }
 
   @Test
@@ -228,13 +232,14 @@ public class RoomServiceImplTest {
   @Test
   public void findAllCommentsByRoomId() {
 
-    Page<Comment> actual = roomService.findAllCommentsByRoomId(
-      ROOM_ID, pageable);
+    Page<Comment> actual = roomService.findAllCommentsByStudentIdAndAssignmentId(
+      USER_ID, ASSIGNMENT_ID, pageable);
     assertThat(actual.getTotalElements()).isEqualTo(1);
     assertThat(actual.getSize()).isEqualTo(10);
     assertThat(actual.getContent()
                  .get(0)).isEqualTo(comment);
-    verify(commentService).findAllCommentsByRoomId(ROOM_ID, pageable);
+    verify(roomRepository).findByStudentIdAndAssignmentIdAndDeletedFalse(USER_ID, ASSIGNMENT_ID);
+    verify(commentService).findAllCommentsByStudentIdAndAssignmentId(room, pageable);
   }
 
   @Test
@@ -243,7 +248,7 @@ public class RoomServiceImplTest {
     Comment actual = roomService.createComment(comment, USER_ID);
     assertThat(actual.getRoom()).isEqualTo(room);
     assertThat(actual.getAuthor()).isEqualTo(student);
-    verify(roomRepository).findByIdAndDeletedFalse(ROOM_ID);
+    verify(roomRepository).findByStudentIdAndAssignmentIdAndDeletedFalse(USER_ID, ASSIGNMENT_ID);
     verify(userService, times(2)).getUser(USER_ID);
     verify(commentService).createComment(comment);
   }
@@ -260,7 +265,7 @@ public class RoomServiceImplTest {
     catchException(() -> roomService.createComment(comment, "student-2"));
     assertThat(caughtException().getClass()).isEqualTo(
       ForbiddenException.class);
-    verify(roomRepository).findByIdAndDeletedFalse(ROOM_ID);
+    verify(roomRepository).findByStudentIdAndAssignmentIdAndDeletedFalse(USER_ID, ASSIGNMENT_ID);
     verify(userService).getUser("student-2");
   }
 
@@ -271,7 +276,7 @@ public class RoomServiceImplTest {
     catchException(() -> roomService.createComment(comment, USER_ID));
     assertThat(caughtException().getClass()).isEqualTo(
       UnsupportedOperationException.class);
-    verify(roomRepository).findByIdAndDeletedFalse(ROOM_ID);
+    verify(roomRepository).findByStudentIdAndAssignmentIdAndDeletedFalse(USER_ID, ASSIGNMENT_ID);
     verify(userService).getUser(USER_ID);
   }
 
