@@ -10,9 +10,6 @@ public class AuditorAwareWrapper implements AuditorAware<String> {
   @Override
   public String getCurrentAuditor() {
 
-//    return SecurityContextHolder.getContext()
-//      .getAuthentication()
-//      .getName();
   try {
     return SecurityContextHolder.getContext()
         .getAuthentication()
