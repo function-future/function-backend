@@ -72,10 +72,14 @@ public class NotificationServiceImpl implements NotificationService {
       .map(n -> this.setSeen(n, false))
       .map(notificationRepository::save)
       .map(n -> {
-        publisherService.publish(n.getMember().getId(), mqTopicNotification);
+        this.publishNotification(n);
         return n;
       })
       .orElseThrow(UnsupportedOperationException::new);
+  }
+
+  private void publishNotification(Notification notification) {
+    publisherService.publish(notification.getMember().getId(), mqTopicNotification);
   }
 
   @Override
