@@ -20,4 +20,6 @@ public interface ChatroomService {
 
   Chatroom getPublicChatroom();
 
+  void authorizeSubscription(String userId, String chatroomId);
+
 }

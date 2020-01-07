@@ -78,7 +78,11 @@ public class ChatRedisListener implements BaseListener {
   }
 
   private void publishMessageToWebsocket(MessageResponse message, String chatroomId) {
-    messagingTemplate.convertAndSend("/topic/chatrooms/" + chatroomId, message);
+    if (chatroomService.getPublicChatroom().getId().equals(chatroomId)) {
+      messagingTemplate.convertAndSend("/topic/chatrooms/public", message);
+    } else {
+      messagingTemplate.convertAndSend("/topic/chatrooms/" + chatroomId, message);
+    }
   }
 
   private void generateMessageStatus(String chatroomId, String userId, Message chatMessage) {

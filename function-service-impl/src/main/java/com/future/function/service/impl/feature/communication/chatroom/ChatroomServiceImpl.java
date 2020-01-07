@@ -124,6 +124,20 @@ public class ChatroomServiceImpl implements ChatroomService {
       .orElseThrow(() -> new NotFoundException("Chatroom not found"));
   }
 
+  @Override
+  public void authorizeSubscription(String userId, String chatroomId) {
+    Optional.ofNullable(chatroomId)
+      .map(id -> {
+        if (id.equalsIgnoreCase(ChatroomType.PUBLIC.name())) {
+          return this.getPublicChatroom();
+        } else {
+          return chatroomRepository.findOne(id);
+        }
+      })
+      .map(c -> this.validateAuthorization(c, userId))
+      .orElseThrow(() -> new NotFoundException("Chatroom not found"));
+  }
+
   private Chatroom updateMember(
     Chatroom existingChatroom, Chatroom newChatroom
   ) {

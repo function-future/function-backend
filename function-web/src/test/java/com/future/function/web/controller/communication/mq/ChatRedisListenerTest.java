@@ -142,7 +142,7 @@ public class ChatRedisListenerTest {
     chatRedisListener.onMessage(message, bytes);
 
     verify(objectMapper).readValue(message.getBody(), ChatPayload.class);
-    verify(chatroomService).getPublicChatroom();
+    verify(chatroomService, times(2)).getPublicChatroom();
     verify(messageRequestMapper).toMessage(chatPayloadPublic.getMessageRequest(), chatPayloadPublic.getUserId(), chatPayloadPublic.getChatroomId());
     verify(messageService).createMessage(messagePublic, chatPayloadPublic.getUserId());
     verify(fileProperties).getUrlPrefix();
@@ -163,6 +163,7 @@ public class ChatRedisListenerTest {
     when(chatroomService.getChatroom(chatPayload.getChatroomId(), chatPayload.getUserId())).thenReturn(chatroom);
     when(messageStatusService.createMessageStatus(any(MessageStatus.class), anyString())).thenReturn(null);
     when(redisSetOperations.isMember("chatroom:" + chatroomId + ":active.user", userId)).thenReturn(true);
+    when(chatroomService.getPublicChatroom()).thenReturn(chatroomPublic);
 
     chatRedisListener.onMessage(message, bytes);
 
@@ -175,6 +176,7 @@ public class ChatRedisListenerTest {
     verify(chatroomService).getChatroom(chatPayload.getChatroomId(), chatPayload.getUserId());
     verify(messageStatusService, times(2)).createMessageStatus(any(MessageStatus.class), anyString());
     verify(redisSetOperations).isMember("chatroom:" + chatroomId + ":active.user", "userId2");
+    verify(chatroomService).getPublicChatroom();
 
   }
 }

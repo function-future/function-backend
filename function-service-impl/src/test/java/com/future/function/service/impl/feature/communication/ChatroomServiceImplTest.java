@@ -31,6 +31,7 @@ import org.springframework.data.redis.core.ValueOperations;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Optional;
 
 import static com.googlecode.catchexception.CatchException.catchException;
 import static com.googlecode.catchexception.CatchException.caughtException;
@@ -322,5 +323,27 @@ public class ChatroomServiceImplTest {
     verify(chatroomRepository).save(chatroom);
     verify(userService, times(2)).getUser(USER_ID_1);
     verify(userService).getUser(USER_ID_2);
+  }
+
+  @Test
+  public void testGivenUserIdAndChatroomIdByCallingAuthorizeSubscriptionReturnVoid1() {
+    when(chatroomRepository.findByType(ChatroomType.PUBLIC.name())).thenReturn(Optional.of(chatroom));
+    when(userService.getUser(USER_ID_1)).thenReturn(MEMBER_1);
+
+    chatroomService.authorizeSubscription(USER_ID_1, "public");
+
+    verify(chatroomRepository).findByType(ChatroomType.PUBLIC.name());
+    verify(userService).getUser(USER_ID_1);
+  }
+
+  @Test
+  public void testGivenUserIdAndChatroomIdByCallingAuthorizeSubscriptionReturnVoid2() {
+    when(chatroomRepository.findOne(CHATROOM_ID)).thenReturn(chatroom);
+    when(userService.getUser(USER_ID_1)).thenReturn(MEMBER_1);
+
+    chatroomService.authorizeSubscription(USER_ID_1, CHATROOM_ID);
+
+    verify(chatroomRepository).findOne(CHATROOM_ID);
+    verify(userService).getUser(USER_ID_1);
   }
 }
