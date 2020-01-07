@@ -35,20 +35,4 @@ public class DataMigration_017 {
       );
   }
 
-  public void changeAdminMenuList(MongoDatabase mongoDatabase) {
-    MongoCollection<Document> menuCollection = mongoDatabase.getCollection(DocumentName.MENU);
-    Bson filter = Filters.eq(FieldName.Menu.ROLE, Role.ADMIN);
-    menuCollection
-        .find(Filters.eq(FieldName.Menu.ROLE, Role.ADMIN))
-        .forEach((Consumer<? super Document>) document -> {
-          document.remove("questionBanks");
-          document.remove("quizzes");
-          document.remove("assignments");
-          document.remove("comparisons");
-          document.put("grades", true);
-          document.put("points", true);
-          menuCollection.findOneAndReplace(filter, document);
-        });
-  }
-
 }
