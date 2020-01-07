@@ -1,4 +1,4 @@
-name: Maven Install and Sonarcloud Analysis
+name: Sonarcloud Analysis
 
 on: push
 
