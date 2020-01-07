@@ -15,7 +15,7 @@ jobs:
         mvn clean install
     - name: Sonar Check by Sonarcloud
       run: |
-        mvn verify sonar:sonar -Dsonar.login=$SONAR_TOKEN
+        mvn verify sonar:sonar -Dsonar.projectKey=function-future_function-backend -Dsonar.organization=function-future -Dsonar.login=$SONAR_TOKEN
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
