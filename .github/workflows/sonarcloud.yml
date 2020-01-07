@@ -12,9 +12,7 @@ jobs:
         tzutil /s "SE Asia Standard Time"
     - name: Sonar Check by Sonarcloud
       run: |
-        mvn clean install \
-        | mvn org.jacoco:jacoco-maven-plugin:prepare-agent install \
-        | mvn sonar:sonar -Dsonar.projectKey=function-future_function-backend -Dsonar.organization=function-future -Dsonar.login=$SONAR_TOKEN
+        mvn clean install && mvn org.jacoco:jacoco-maven-plugin:prepare-agent install && mvn sonar:sonar -Dsonar.projectKey=function-future_function-backend -Dsonar.organization=function-future -Dsonar.login=$SONAR_TOKEN
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
