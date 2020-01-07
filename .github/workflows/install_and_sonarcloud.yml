@@ -7,9 +7,9 @@ jobs:
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v1
-    - name: Check Current Timezone
+    - name: Switch to SE Asia Standard Time Zone
       run: |
-        tzutil /g
+        tzutil /s "SE Asia Standard Time"
     - name: Maven Clean Install
       run: |
         mvn clean install
