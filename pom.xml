@@ -43,7 +43,6 @@
     <jacoco.version>0.8.4</jacoco.version>
     <java.version>1.8</java.version>
     <maven-javadoc-plugin.version>3.1.0</maven-javadoc-plugin.version>
-    <mongobee.version>0.13</mongobee.version>
     <mongock.version>2.0.2</mongock.version>
     <?SORTPOM IGNORE?>
     <sonar.coverage.exclusions>
