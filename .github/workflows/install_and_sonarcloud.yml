@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
-    - name: Maven Install
+    - name: Maven Clean Install
       run: |
         mvn clean install
     - name: Sonar Check by Sonarcloud
