@@ -309,20 +309,22 @@ public class SharedCourseServiceImplTest {
       .code(originBatchCode)
       .build();
     when(batchService.getBatchByCode(originBatchCode)).thenReturn(originBatch);
+    when(batchService.getBatchByCode(BATCH_CODE)).thenReturn(BATCH);
     when(sharedCourseRepository.findAllByBatch(originBatch)).thenReturn(
       Stream.of(sharedCourse));
-    when(batchService.getBatchByCode(BATCH_CODE)).thenReturn(BATCH);
     when(sharedCourseRepository.save(sharedCourse)).thenReturn(sharedCourse);
 
+    List<String> sharedCourseIds = Collections.singletonList(
+      sharedCourse.getId());
     List<Course> createdCourseList = sharedCourseService.createCourseForBatch(
-      COURSE_IDS, originBatchCode, BATCH_CODE);
+      sharedCourseIds, originBatchCode, BATCH_CODE);
 
     assertThat(createdCourseList).isNotEmpty();
     assertThat(createdCourseList).isEqualTo(courseList);
 
     verify(batchService).getBatchByCode(originBatchCode);
-    verify(sharedCourseRepository).findAllByBatch(originBatch);
     verify(batchService).getBatchByCode(BATCH_CODE);
+    verify(sharedCourseRepository).findAllByBatch(originBatch);
     verify(sharedCourseRepository).save(sharedCourse);
     verifyZeroInteractions(discussionService);
   }

@@ -53,6 +53,26 @@ public class SharedCourseServiceImpl implements SharedCourseService {
     this.discussionService = discussionService;
   }
 
+  private Course setCourseId(SharedCourse sharedCourse) {
+
+    Course course = sharedCourse.getCourse();
+    course.setId(sharedCourse.getId());
+
+    return course;
+  }
+
+  private SharedCourse deleteCourseFile(SharedCourse sharedCourse) {
+
+    return Optional.of(sharedCourse)
+      .map(SharedCourse::getCourse)
+      .map(Course::getFile)
+      .map(FileV2::getId)
+      .map(fileId -> resourceService.markFilesUsed(
+        Collections.singletonList(fileId), false))
+      .map(ignored -> sharedCourse)
+      .orElse(sharedCourse);
+  }
+
   @Override
   public Course getCourseByIdAndBatchCode(String courseId, String batchCode) {
 
@@ -63,13 +83,6 @@ public class SharedCourseServiceImpl implements SharedCourseService {
       .orElseThrow(() -> new NotFoundException("Get Course Not Found"));
   }
 
-  private Course setCourseId(SharedCourse sharedCourse) {
-
-    Course course = sharedCourse.getCourse();
-    course.setId(sharedCourse.getId());
-
-    return course;
-  }
 
   private Optional<Batch> getBatch(String batchCode) {
 
@@ -152,26 +165,26 @@ public class SharedCourseServiceImpl implements SharedCourseService {
   }
 
   private List<Course> createCourseForBatchFromAnotherBatch(
-    List<String> courseIds, String originBatchCode, String targetBatchCode
+    List<String> sharedCourseIds, String originBatchCode, String targetBatchCode
   ) {
 
     Batch originBatch = batchService.getBatchByCode(originBatchCode);
+    Batch targetBatch = batchService.getBatchByCode(targetBatchCode);
 
     return sharedCourseRepository.findAllByBatch(originBatch)
+      .filter(sharedCourse -> sharedCourseIds.contains(sharedCourse.getId()))
       .map(SharedCourse::getCourse)
-      .filter(course -> courseIds.contains(course.getId()))
-      .map(course -> this.buildSharedCourse(course, batchService.getBatchByCode(
-        targetBatchCode)))
+      .map(course -> this.buildSharedCourse(course, targetBatch))
       .map(sharedCourseRepository::save)
       .map(this::setCourseId)
       .collect(Collectors.toList());
   }
 
-  private SharedCourse buildSharedCourse(Course course, Batch batch) {
+  private SharedCourse buildSharedCourse(Course course, Batch targetBatch) {
 
     return SharedCourse.builder()
       .course(course)
-      .batch(batch)
+      .batch(targetBatch)
       .build();
   }
 
@@ -243,18 +256,6 @@ public class SharedCourseServiceImpl implements SharedCourseService {
     CopyHelper.copyProperties(course, sharedCourse.getCourse());
 
     return sharedCourseRepository.save(sharedCourse);
-  }
-
-  private SharedCourse deleteCourseFile(SharedCourse sharedCourse) {
-
-    return Optional.of(sharedCourse)
-      .map(SharedCourse::getCourse)
-      .map(Course::getFile)
-      .map(FileV2::getId)
-      .map(fileId -> resourceService.markFilesUsed(
-        Collections.singletonList(fileId), false))
-      .map(ignored -> sharedCourse)
-      .orElse(sharedCourse);
   }
 
 }
