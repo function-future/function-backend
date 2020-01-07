@@ -7,6 +7,9 @@ jobs:
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v1
+    - name: Check Current Timezone
+      run: |
+        tzutil /g
     - name: Maven Clean Install
       run: |
         mvn clean install
