@@ -6,7 +6,7 @@
   <parent>
     <groupId>com.future.function</groupId>
     <artifactId>function</artifactId>
-      <version>1.0.1-1-SNAPSHOT</version>
+    <version>1.0.1-1-SNAPSHOT</version>
   </parent>
 
   <artifactId>function-repository</artifactId>
@@ -24,6 +24,12 @@
       <groupId>com.future.function</groupId>
       <artifactId>function-model</artifactId>
       <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <optional>true</optional>
     </dependency>
 
     <dependency>
