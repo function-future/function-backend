@@ -1,5 +1,6 @@
 package com.future.function.service.impl.feature.core;
 
+import com.future.function.common.enumeration.core.FileOrigin;
 import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.Course;
@@ -23,6 +24,7 @@ import org.springframework.util.StringUtils;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -174,10 +176,21 @@ public class SharedCourseServiceImpl implements SharedCourseService {
     return sharedCourseRepository.findAllByBatch(originBatch)
       .filter(sharedCourse -> sharedCourseIds.contains(sharedCourse.getId()))
       .map(SharedCourse::getCourse)
+      .map(this::createCourseFileCopy)
       .map(course -> this.buildSharedCourse(course, targetBatch))
       .map(sharedCourseRepository::save)
       .map(this::setCourseId)
       .collect(Collectors.toList());
+  }
+
+  private Course createCourseFileCopy(Course course) {
+
+    Optional.of(course)
+      .filter(c -> Objects.nonNull(c.getFile()))
+      .ifPresent(c -> c.setFile(
+        resourceService.createACopy(course.getFile(), FileOrigin.COURSE)));
+
+    return course;
   }
 
   private SharedCourse buildSharedCourse(Course course, Batch targetBatch) {
@@ -194,6 +207,7 @@ public class SharedCourseServiceImpl implements SharedCourseService {
 
     return courseIds.stream()
       .map(courseService::getCourse)
+      .map(this::createCourseFileCopy)
       .map(course -> Pair.of(course, batchService.getBatchByCode(batchCode)))
       .map(courseAndBatchPair -> this.buildSharedCourse(
         courseAndBatchPair.getFirst(), courseAndBatchPair.getSecond()))
