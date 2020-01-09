@@ -4,8 +4,8 @@ import com.future.function.common.enumeration.communication.ChatroomType;
 import com.future.function.model.entity.feature.communication.chatting.Chatroom;
 import com.future.function.model.entity.feature.communication.chatting.Message;
 import com.future.function.model.entity.feature.core.User;
-import com.future.function.service.api.feature.communication.MessageService;
-import com.future.function.service.api.feature.communication.MessageStatusService;
+import com.future.function.service.api.feature.communication.chatroom.MessageService;
+import com.future.function.service.api.feature.communication.chatroom.MessageStatusService;
 import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.model.response.base.DataResponse;
@@ -156,7 +156,7 @@ public class ChatroomResponseMapper {
       .collect(Collectors.toList());
   }
 
-  private static MessageResponse toMessageResponse(
+  public static MessageResponse toMessageResponse(
     Message message, String urlPrefix
   ) {
 

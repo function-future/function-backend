@@ -1,5 +1,6 @@
 package com.future.function.service.impl.feature.core;
 
+import com.future.function.common.enumeration.core.FileOrigin;
 import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.Course;
@@ -19,6 +20,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -309,20 +311,32 @@ public class SharedCourseServiceImplTest {
       .code(originBatchCode)
       .build();
     when(batchService.getBatchByCode(originBatchCode)).thenReturn(originBatch);
+    when(batchService.getBatchByCode(BATCH_CODE)).thenReturn(BATCH);
     when(sharedCourseRepository.findAllByBatch(originBatch)).thenReturn(
       Stream.of(sharedCourse));
-    when(batchService.getBatchByCode(BATCH_CODE)).thenReturn(BATCH);
+
+    FileV2 copiedFile = new FileV2();
+    BeanUtils.copyProperties(FILE, copiedFile);
+    String copiedFileId = "copied-file-id";
+    copiedFile.setId(copiedFileId);
+    when(resourceService.createACopy(FILE, FileOrigin.COURSE)).thenReturn(
+      copiedFile);
     when(sharedCourseRepository.save(sharedCourse)).thenReturn(sharedCourse);
 
+    List<String> sharedCourseIds = Collections.singletonList(
+      sharedCourse.getId());
     List<Course> createdCourseList = sharedCourseService.createCourseForBatch(
-      COURSE_IDS, originBatchCode, BATCH_CODE);
+      sharedCourseIds, originBatchCode, BATCH_CODE);
 
     assertThat(createdCourseList).isNotEmpty();
     assertThat(createdCourseList).isEqualTo(courseList);
+    assertThat(createdCourseList.get(0)
+                 .getFile()).isEqualTo(copiedFile);
 
     verify(batchService).getBatchByCode(originBatchCode);
-    verify(sharedCourseRepository).findAllByBatch(originBatch);
     verify(batchService).getBatchByCode(BATCH_CODE);
+    verify(sharedCourseRepository).findAllByBatch(originBatch);
+    verify(resourceService).createACopy(FILE, FileOrigin.COURSE);
     verify(sharedCourseRepository).save(sharedCourse);
     verifyZeroInteractions(discussionService);
   }
@@ -332,6 +346,13 @@ public class SharedCourseServiceImplTest {
 
     when(courseService.getCourse(COURSE_ID)).thenReturn(course);
     when(batchService.getBatchByCode(BATCH_CODE)).thenReturn(BATCH);
+
+    FileV2 copiedFile = new FileV2();
+    BeanUtils.copyProperties(FILE, copiedFile);
+    String copiedFileId = "copied-file-id";
+    copiedFile.setId(copiedFileId);
+    when(resourceService.createACopy(FILE, FileOrigin.COURSE)).thenReturn(
+      copiedFile);
     when(sharedCourseRepository.save(sharedCourse)).thenReturn(sharedCourse);
 
     List<Course> createdCourseList = sharedCourseService.createCourseForBatch(
@@ -339,11 +360,14 @@ public class SharedCourseServiceImplTest {
 
     assertThat(createdCourseList).isNotEmpty();
     assertThat(createdCourseList).isEqualTo(courseList);
+    assertThat(createdCourseList.get(0)
+                 .getFile()).isEqualTo(copiedFile);
 
     verify(courseService).getCourse(COURSE_ID);
     verify(batchService).getBatchByCode(BATCH_CODE);
+    verify(resourceService).createACopy(FILE, FileOrigin.COURSE);
     verify(sharedCourseRepository).save(sharedCourse);
-    verifyZeroInteractions(resourceService, discussionService);
+    verifyZeroInteractions(discussionService);
   }
 
   @Test
@@ -351,6 +375,13 @@ public class SharedCourseServiceImplTest {
 
     when(courseService.getCourse(COURSE_ID)).thenReturn(course);
     when(batchService.getBatchByCode(BATCH_CODE)).thenReturn(BATCH);
+
+    FileV2 copiedFile = new FileV2();
+    BeanUtils.copyProperties(FILE, copiedFile);
+    String copiedFileId = "copied-file-id";
+    copiedFile.setId(copiedFileId);
+    when(resourceService.createACopy(FILE, FileOrigin.COURSE)).thenReturn(
+      copiedFile);
     when(sharedCourseRepository.save(sharedCourse)).thenReturn(sharedCourse);
 
     List<Course> createdCourseList = sharedCourseService.createCourseForBatch(
@@ -358,11 +389,14 @@ public class SharedCourseServiceImplTest {
 
     assertThat(createdCourseList).isNotEmpty();
     assertThat(createdCourseList).isEqualTo(courseList);
+    assertThat(createdCourseList.get(0)
+                 .getFile()).isEqualTo(copiedFile);
 
     verify(courseService).getCourse(COURSE_ID);
     verify(batchService).getBatchByCode(BATCH_CODE);
+    verify(resourceService).createACopy(FILE, FileOrigin.COURSE);
     verify(sharedCourseRepository).save(sharedCourse);
-    verifyZeroInteractions(resourceService, discussionService);
+    verifyZeroInteractions(discussionService);
   }
 
   @Test
