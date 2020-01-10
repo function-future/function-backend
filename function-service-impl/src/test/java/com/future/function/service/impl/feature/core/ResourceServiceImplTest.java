@@ -300,7 +300,9 @@ public class ResourceServiceImplTest {
       .name("")
       .asResource(true)
       .parentId(parentId)
-      .filePath("\\announcement\\" + fileId + "-0\\" + fileName)
+      .filePath(
+        File.separator + "announcement" + File.separator + fileId + "-0" +
+        File.separator + fileName)
       .fileUrl("/announcement/" + fileName)
       .build();
 
