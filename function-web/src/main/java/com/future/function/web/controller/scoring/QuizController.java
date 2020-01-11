@@ -45,16 +45,15 @@ public class QuizController {
       int page,
     @RequestParam(defaultValue = "10")
       int size,
-    @WithAnyRole(roles = { Role.ADMIN, Role.JUDGE, Role.MENTOR })
+      @RequestParam(defaultValue = "false")
+      boolean isPassedDeadline,
+    @WithAnyRole(roles = { Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT })
       Session session
   ) {
 
     return QuizResponseMapper.toQuizWebPagingResponse(
-      quizService.findAllByBatchCodeAndPageable(batchCode,
-                                                PageHelper.toPageable(page,
-                                                                      size
-                                                )
-      ));
+      quizService.findAllByBatchCodeAndPageable(batchCode, PageHelper.toPageable(page, size),
+          session.getRole(), session.getBatchId(), isPassedDeadline));
   }
 
   @ResponseStatus(value = HttpStatus.OK)
@@ -63,11 +62,13 @@ public class QuizController {
   public DataResponse<QuizWebResponse> getQuizById(
     @PathVariable
       String id,
-    @WithAnyRole(roles = { Role.ADMIN, Role.JUDGE, Role.MENTOR })
+    @WithAnyRole(roles = { Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT })
       Session session
   ) {
 
-    return QuizResponseMapper.toQuizWebDataResponse(quizService.findById(id));
+    return QuizResponseMapper.toQuizWebDataResponse(
+        quizService.findById(id, session.getRole(), session.getBatchId())
+    );
   }
 
   @ResponseStatus(HttpStatus.CREATED)
@@ -85,10 +86,8 @@ public class QuizController {
     return QuizResponseMapper.toQuizWebDataResponse(HttpStatus.CREATED,
                                                     quizService.copyQuizWithTargetBatchCode(
                                                       request.getBatchCode(),
-                                                      quizService.findById(
-                                                        request.getQuizId())
-                                                    )
-    );
+                                                      request.getQuizId())
+                                                    );
   }
 
   @ResponseStatus(value = HttpStatus.CREATED)

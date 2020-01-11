@@ -3,6 +3,7 @@ package com.future.function.web.controller.scoring;
 import com.future.function.common.enumeration.core.Role;
 import com.future.function.model.entity.feature.scoring.Option;
 import com.future.function.model.entity.feature.scoring.Question;
+import com.future.function.model.entity.feature.scoring.Quiz;
 import com.future.function.model.entity.feature.scoring.StudentQuestion;
 import com.future.function.model.entity.feature.scoring.StudentQuiz;
 import com.future.function.model.entity.feature.scoring.StudentQuizDetail;
@@ -16,6 +17,7 @@ import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.feature.scoring.StudentQuestionWebResponse;
 import com.future.function.web.model.response.feature.scoring.StudentQuizDetailWebResponse;
+import java.io.IOException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -57,6 +59,10 @@ public class StudentQuestionControllerTest extends TestHelper {
 
   private static final String QUIZ_ID = "quiz-id";
 
+  private static final Long TIME_LIMIT = 10000L;
+
+  private Quiz quiz;
+
   private StudentQuiz studentQuiz;
 
   private StudentQuizDetail studentQuizDetail;
@@ -71,6 +77,8 @@ public class StudentQuestionControllerTest extends TestHelper {
 
   private DataResponse<StudentQuizDetailWebResponse>
     studentQuizDetailWebResponseDataResponse;
+
+  private DataResponse<Long> timeLimitDataResponse;
 
   private PagingResponse<StudentQuestionWebResponse> pagingResponse;
 
@@ -92,8 +100,14 @@ public class StudentQuestionControllerTest extends TestHelper {
     super.setUp();
     super.setCookie(Role.STUDENT);
 
+    quiz = Quiz.builder()
+      .id(QUIZ_ID)
+      .trials(10)
+      .build();
+
     studentQuiz = StudentQuiz.builder()
       .id(STUDENT_QUIZ_ID)
+      .quiz(quiz)
       .build();
 
     studentQuizDetail = StudentQuizDetail.builder()
@@ -129,6 +143,8 @@ public class StudentQuestionControllerTest extends TestHelper {
     studentQuizDetailWebResponseDataResponse =
       StudentQuizDetailResponseMapper.toStudentQuizDetailWebResponse(
         studentQuizDetail);
+
+    timeLimitDataResponse = StudentQuizDetailResponseMapper.toStudentQuestionTimeWebResponse(TIME_LIMIT);
 
     pagingResponse =
       StudentQuizDetailResponseMapper.toStudentQuestionWebResponses(
@@ -197,4 +213,17 @@ public class StudentQuestionControllerTest extends TestHelper {
       Collections.singletonList(studentQuestionWebRequest));
   }
 
+  @Test
+  public void findTimeLimitTest() throws Exception {
+    when(studentQuizService.findTimeLimitByStudentQuiz(TestHelper.STUDENT_ID, QUIZ_ID)).thenReturn(TIME_LIMIT);
+    mockMvc.perform(get(
+        "/api/scoring/batches/"+ BATCH_ID + "/quizzes/"+ QUIZ_ID + "/student/questions/time")
+        .cookie(cookies)
+        .contentType(MediaType.APPLICATION_JSON_VALUE))
+        .andExpect(status().isOk())
+        .andExpect(content().json(dataResponseJacksonTester.write(
+            timeLimitDataResponse)
+            .getJson()));
+    verify(studentQuizService).findTimeLimitByStudentQuiz(TestHelper.STUDENT_ID, QUIZ_ID);
+  }
 }

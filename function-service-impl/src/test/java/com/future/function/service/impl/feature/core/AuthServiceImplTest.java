@@ -1,10 +1,13 @@
 package com.future.function.service.impl.feature.core;
 
 import com.future.function.common.enumeration.core.Role;
+import com.future.function.common.exception.ForbiddenException;
 import com.future.function.common.exception.UnauthorizedException;
+import com.future.function.common.properties.communication.WsProperties;
 import com.future.function.common.properties.core.SessionProperties;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.User;
+import com.future.function.service.api.feature.communication.chatroom.ChatroomService;
 import com.future.function.service.api.feature.core.UserService;
 import com.future.function.session.model.Session;
 import org.junit.After;
@@ -16,11 +19,13 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.mock.web.MockHttpServletResponse;
 
 import javax.servlet.http.Cookie;
+import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
 import static com.googlecode.catchexception.CatchException.catchException;
@@ -67,6 +72,12 @@ public class AuthServiceImplTest {
   @Mock
   private SessionProperties sessionProperties;
 
+  @Mock
+  private WsProperties wsProperties;
+
+  @Mock
+  private ChatroomService chatroomService;
+
   @InjectMocks
   private AuthServiceImpl authService;
 
@@ -82,7 +93,7 @@ public class AuthServiceImplTest {
   @AfterClass
   public static void tearDownClass() {
 
-    int numberOfTestMethodInClass = 4;
+    int numberOfTestMethodInClass = 8;
 
     verify(redisTemplate, times(numberOfTestMethodInClass)).opsForValue();
 
@@ -191,4 +202,61 @@ public class AuthServiceImplTest {
     verifyZeroInteractions(userService, sessionProperties);
   }
 
+  @Test
+  public void testGivenDestinationAndUserIdByCallingAuthorizeInboundChannelCase1() {
+    HashMap<String, String> properties = new HashMap<>();
+    properties.put("chat", "/topic/chatrooms/{chatroomId}");
+    properties.put("notification", "/topic/users/{userId}/notifications");
+
+    when(wsProperties.getTopic()).thenReturn(properties);
+    doNothing().when(chatroomService).authorizeSubscription(USER_ID, "chatroomid");
+
+    authService.authorizeInboundChannel("/topic/chatrooms/chatroomid", USER_ID);
+
+    verify(wsProperties).getTopic();
+    verify(chatroomService).authorizeSubscription(USER_ID, "chatroomid");
+  }
+
+  @Test
+  public void testGivenDestinationAndUserIdByCallingAuthorizeInboundChannelCase2() {
+    HashMap<String, String> properties = new HashMap<>();
+    properties.put("chat", "/topic/chatrooms/{chatroomId}");
+    properties.put("notification", "/topic/users/{userId}/notifications");
+
+    when(wsProperties.getTopic()).thenReturn(properties);
+
+    authService.authorizeInboundChannel("/topic/users/" + USER_ID + "/notifications", USER_ID);
+
+    verify(wsProperties).getTopic();
+  }
+
+  @Test
+  public void testGivenDestinationAndUserIdByCallingAuthorizeInboundChannelCase3() {
+    HashMap<String, String> properties = new HashMap<>();
+    properties.put("chat", "/topic/chatrooms/{chatroomId}");
+    properties.put("notification", "/topic/users/{userId}/notifications");
+
+    when(wsProperties.getTopic()).thenReturn(properties);
+
+    catchException(() -> authService.authorizeInboundChannel("/topic/users/asdfasdf/notifications", USER_ID));
+    assertThat(caughtException().getClass()).isEqualTo(
+            ForbiddenException.class);
+
+    verify(wsProperties).getTopic();
+  }
+
+  @Test
+  public void testGivenDestinationAndUserIdByCallingAuthorizeInboundChannelCase4() {
+    HashMap<String, String> properties = new HashMap<>();
+    properties.put("chat", "/topic/chatrooms/{chatroomId}");
+    properties.put("notification", "/topic/users/{userId}/notifications");
+
+    when(wsProperties.getTopic()).thenReturn(properties);
+
+    catchException(() -> authService.authorizeInboundChannel("/topic/asdfasfd", USER_ID));
+    assertThat(caughtException().getClass()).isEqualTo(
+            ForbiddenException.class);
+
+    verify(wsProperties).getTopic();
+  }
 }

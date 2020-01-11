@@ -25,10 +25,6 @@ public interface StudentQuestionService {
     List<StudentQuestion> answers, String studentQuizDetailId
   );
 
-  List<StudentQuestion> createStudentQuestionsByStudentQuizDetail(
-    StudentQuizDetail studentQuizDetail, List<StudentQuestion> studentQuestions
-  );
-
   void deleteAllByStudentQuizDetailId(String studentQuizDetailId);
 
 }

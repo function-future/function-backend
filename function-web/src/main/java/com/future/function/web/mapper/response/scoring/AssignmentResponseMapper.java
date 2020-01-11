@@ -1,5 +1,6 @@
 package com.future.function.web.mapper.response.scoring;
 
+import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.scoring.Assignment;
 import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
@@ -45,12 +46,18 @@ public final class AssignmentResponseMapper {
 
     return Optional.ofNullable(assignment)
       .map(Assignment::getFile)
-      .map(file -> {
-        response.setFileId(file.getId());
-        response.setFile(urlPrefix.concat(file.getFileUrl()));
-        return response;
-      })
+      .map(file -> validateAndSetFile(response, urlPrefix, file))
       .orElse(response);
+  }
+
+  private static AssignmentWebResponse validateAndSetFile(AssignmentWebResponse response, String urlPrefix, FileV2 file) {
+    if(file.getFileUrl() == null) {
+      return null;
+    } else {
+      response.setFileId(file.getId());
+      response.setFile(urlPrefix.concat(file.getFileUrl()));
+      return response;
+    }
   }
 
   public static DataResponse<AssignmentWebResponse> toAssignmentDataResponse(

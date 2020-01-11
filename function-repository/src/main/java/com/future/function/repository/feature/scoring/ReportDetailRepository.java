@@ -9,8 +9,6 @@ import java.util.Optional;
 public interface ReportDetailRepository
   extends MongoRepository<ReportDetail, String> {
 
-  List<ReportDetail> findAllByReportIdAndDeletedFalse(String reportId);
-
   Optional<ReportDetail> findByUserIdAndDeletedFalse(String studentId);
 
 }

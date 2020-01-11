@@ -11,6 +11,7 @@ import com.future.function.service.api.feature.scoring.RoomService;
 import com.future.function.web.TestHelper;
 import com.future.function.web.TestSecurityConfiguration;
 import com.future.function.web.mapper.helper.ResponseHelper;
+import com.future.function.web.mapper.request.scoring.RoomRequestMapper;
 import com.future.function.web.mapper.response.scoring.RoomResponseMapper;
 import com.future.function.web.model.request.scoring.RoomPointWebRequest;
 import com.future.function.web.model.response.base.BaseResponse;
@@ -97,6 +98,9 @@ public class RoomControllerTest extends TestHelper {
   @MockBean
   private FileProperties fileProperties;
 
+  @MockBean
+  private RoomRequestMapper roomRequestMapper;
+
   @Before
   public void setUp() {
 
@@ -160,7 +164,7 @@ public class RoomControllerTest extends TestHelper {
   @After
   public void tearDown() throws Exception {
 
-    verifyNoMoreInteractions(roomService, fileProperties);
+    verifyNoMoreInteractions(roomService, fileProperties, roomRequestMapper);
   }
 
   @Test
@@ -182,6 +186,7 @@ public class RoomControllerTest extends TestHelper {
   public void updateRoomScoreByMentor() throws Exception {
 
     super.setCookie(Role.MENTOR);
+    when(roomRequestMapper.validate(roomPointWebRequest)).thenReturn(roomPointWebRequest);
     when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
     mockMvc.perform(put(
       "/api/scoring/batches/" + BATCH_CODE + "/assignments/" + ASSIGNMENT_ID +
@@ -194,6 +199,7 @@ public class RoomControllerTest extends TestHelper {
       .andExpect(content().json(dataResponseJacksonTester.write(DATA_RESPONSE)
                                   .getJson()));
     verify(fileProperties).getUrlPrefix();
+    verify(roomRequestMapper).validate(roomPointWebRequest);
     verify(roomService).giveScoreToRoomByStudentIdAndAssignmentId(USER_ID, MENTOR_ID, ASSIGNMENT_ID, 100);
   }
 

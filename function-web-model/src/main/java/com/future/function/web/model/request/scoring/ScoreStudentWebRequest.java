@@ -1,5 +1,6 @@
 package com.future.function.web.model.request.scoring;
 
+import com.future.function.validation.annotation.scoring.StudentMustExist;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,6 +16,7 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 public class ScoreStudentWebRequest {
 
+  @StudentMustExist
   @NotBlank(message = "NotBlank")
   private String studentId;
 

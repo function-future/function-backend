@@ -1,5 +1,7 @@
 package com.future.function.web.model.request.scoring;
 
+import com.future.function.validation.annotation.scoring.DateNotPassed;
+import com.future.function.validation.annotation.scoring.QuestionBankMustExist;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,10 +25,12 @@ public class QuizWebRequest {
   @NotBlank(message = "NotBlank")
   private String description;
 
+  @DateNotPassed
   @Min(value = 1,
        message = "MinimalOnePositiveNumber")
   private Long startDate;
 
+  @DateNotPassed
   @Min(value = 1,
        message = "MinimalOnePositiveNumber")
   private Long endDate;
@@ -43,6 +47,7 @@ public class QuizWebRequest {
        message = "MinimalOnePositiveNumber")
   private Integer questionCount;
 
+  @QuestionBankMustExist
   @NotNull(message = "NotNull")
   @Size(min = 1,
         message = "Size")

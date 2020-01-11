@@ -13,6 +13,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
@@ -33,6 +34,8 @@ public class CommentServiceImplTest {
   private static final String USERNAME = "userName";
 
   private static final String COMMENT = "text";
+
+  private static final String ASSIGNMENT_ID = "assignment-id";
 
   private Room room;
 
@@ -68,10 +71,8 @@ public class CommentServiceImplTest {
 
     when(commentRepository.findAllByRoomIdOrderByCreatedAtDesc(
       ROOM_ID)).thenReturn(Collections.singletonList(comment));
-    when(commentRepository.findAllByRoomIdOrderByCreatedAtDesc(ROOM_ID,
-                                                               pageable
-    )).thenReturn(
-      PageHelper.toPage(Collections.singletonList(comment), pageable));
+    when(commentRepository.findAllByRoomIdOrderByCreatedAtDesc(ROOM_ID, pageable))
+        .thenReturn(new PageImpl<>(Collections.singletonList(comment), pageable, 1));
     when(commentRepository.save(comment)).thenReturn(comment);
   }
 
@@ -84,14 +85,13 @@ public class CommentServiceImplTest {
   @Test
   public void findAllCommentsByRoomId() {
 
-    Page<Comment> actual = commentService.findAllCommentsByRoomId(
-      ROOM_ID, pageable);
+    Page<Comment> actual = commentService.findAllCommentsByStudentIdAndAssignmentId(
+      room, pageable);
     assertThat(actual.getSize()).isEqualTo(10);
     assertThat(actual.getTotalElements()).isEqualTo(1);
     assertThat(actual.getContent()
                  .get(0)).isEqualTo(comment);
-    verify(commentRepository).findAllByRoomIdOrderByCreatedAtDesc(
-      ROOM_ID, pageable);
+    verify(commentRepository).findAllByRoomIdOrderByCreatedAtDesc(ROOM_ID, pageable);
   }
 
   @Test

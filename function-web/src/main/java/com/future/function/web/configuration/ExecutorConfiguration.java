@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class ExecutorConfiguration {
 
-  @Value("executor.thread.pool")
+  @Value("${executor.thread.pool}")
   private int threadPool = 5;
 
   @Bean

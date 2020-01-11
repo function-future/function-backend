@@ -14,4 +14,5 @@ public interface AuthService {
     String sessionId, HttpServletResponse servletResponse
   );
 
+  void authorizeInboundChannel(String destination, String userId);
 }

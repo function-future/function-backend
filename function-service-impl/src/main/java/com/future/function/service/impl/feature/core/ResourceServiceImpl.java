@@ -16,6 +16,7 @@ import org.springframework.util.StringUtils;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -42,6 +43,20 @@ public class ResourceServiceImpl implements ResourceService {
     imageExtensions = fileProperties.getImageExtensions();
     storagePath = fileProperties.getStoragePath() + FileHelper.PATH_SEPARATOR;
     thumbnailSuffix = fileProperties.getThumbnailSuffix();
+  }
+
+  @Override
+  public FileV2 createACopy(FileV2 sourceFile, FileOrigin fileOrigin) {
+
+    FileV2 file = this.storeAndSaveFile(sourceFile.getName(),
+                                        sourceFile.getFileUrl(),
+                                        FileHelper.toByteArray(
+                                          new File(sourceFile.getFilePath())),
+                                        fileOrigin
+    );
+    this.markFilesUsed(Collections.singletonList(file.getId()), true);
+
+    return file;
   }
 
   @Override

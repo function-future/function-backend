@@ -17,4 +17,6 @@ public interface QuestionBankRepository
 
   List<QuestionBank> findAllByDeletedFalse();
 
+  Boolean existsByIdAndDeletedFalse(String id);
+
 }
