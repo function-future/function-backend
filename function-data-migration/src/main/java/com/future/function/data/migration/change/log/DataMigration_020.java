@@ -11,8 +11,8 @@ import org.springframework.data.mongodb.core.query.Query;
 
 import java.util.List;
 
-@ChangeLog(order = "019")
-public class DataMigration_019 {
+@ChangeLog(order = "020")
+public class DataMigration_020 {
 
     // Update menu list for scoring.
 
