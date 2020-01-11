@@ -72,6 +72,12 @@
         <groupId>com.github.cloudyrock.mongock</groupId>
         <artifactId>mongock-spring</artifactId>
         <version>${mongock.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongo-java-driver</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
 
       <dependency>
