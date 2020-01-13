@@ -42,7 +42,7 @@
     <jackson-annotations.version>2.8.0</jackson-annotations.version>
     <jacoco.version>0.8.4</jacoco.version>
     <java.version>1.8</java.version>
-    <maven-javadoc-plugin.version>3.1.0</maven-javadoc-plugin.version>                            
+    <maven-javadoc-plugin.version>3.1.0</maven-javadoc-plugin.version>
     <mongock.version>2.0.2</mongock.version>
     <powermock.version>1.7.4</powermock.version>
     <?SORTPOM IGNORE?>
@@ -58,6 +58,10 @@
     </sonar.coverage.exclusions>
     <?SORTPOM RESUME?>
     <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+    <sonar.login>${env.SONAR_TOKEN}</sonar.login>
+    <sonar.moduleKey>${project.artifactId}</sonar.moduleKey>
+    <sonar.organization>function-future</sonar.organization>
+    <sonar.projectKey>${project.groupId}:${project.artifactId}</sonar.projectKey>
     <sortpom-maven-plugin.version>2.8.0</sortpom-maven-plugin.version>
     <spring-security-test.version>5.1.4.RELEASE</spring-security-test.version>
     <swagger.version>2.9.2</swagger.version>
