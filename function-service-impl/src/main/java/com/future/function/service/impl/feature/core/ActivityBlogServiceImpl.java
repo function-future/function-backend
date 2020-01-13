@@ -16,6 +16,7 @@ import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Optional;
@@ -54,9 +55,14 @@ public class ActivityBlogServiceImpl implements ActivityBlogService {
   ) {
 
     return Optional.ofNullable(userId)
-      .filter(ObjectId::isValid)
+      .filter(this::isValidUserId)
       .map(id -> activityBlogRepository.findAll(id, search, pageable))
       .orElseGet(() -> PageHelper.empty(pageable));
+  }
+
+  private boolean isValidUserId(String userId) {
+
+    return StringUtils.isEmpty(userId) || ObjectId.isValid(userId);
   }
 
   @Override
