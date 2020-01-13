@@ -4,12 +4,12 @@ on: push
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
     - name: Switch to Jakarta Time Zone
       run: |
-        tzutil /s "SE Asia Standard Time"
+        sudo timedatectl set-timezone Asia/Jakarta
     - name: Sonar Scan by Sonarcloud
       run: |
         mvn clean install org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar
