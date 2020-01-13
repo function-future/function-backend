@@ -1,9 +1,11 @@
 package com.future.function.web.mapper.request.core;
 
 import com.future.function.common.enumeration.core.Role;
+import com.future.function.common.exception.BadRequestException;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.User;
+import com.future.function.session.model.Session;
 import com.future.function.validation.RequestValidator;
 import com.future.function.web.model.request.core.UserWebRequest;
 import org.junit.After;
@@ -16,6 +18,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.Collections;
 
+import static com.googlecode.catchexception.CatchException.catchException;
+import static com.googlecode.catchexception.CatchException.caughtException;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -29,8 +33,6 @@ public class UserRequestMapperTest {
   private static final String ADMIN_EMAIL = "admin@test.com";
 
   private static final String NAME = "name";
-
-  private static final String PASSWORD = "namefunctionapp";
 
   private static final String NUMBER = "1";
 
@@ -202,6 +204,38 @@ public class UserRequestMapperTest {
 
     verify(validator).validate(STUDENT_WEB_REQUEST);
     verify(validator).validate(VALID_ADMIN_WEB_REQUEST);
+  }
+
+  @Test
+  public void testGivenUserIdAndSameUserIdInSessionByValidatingUserIdIsNotLoggedInUserReturnBadRequestException() {
+
+    String userId = "user-id";
+    Session session = Session.builder()
+      .userId(userId)
+      .build();
+
+    catchException(
+      () -> userRequestMapper.validateNotLoggedInUser(session, userId));
+
+    assertThat(caughtException().getClass()).isEqualTo(
+      BadRequestException.class);
+    assertThat(caughtException().getMessage()).isEqualTo(
+      "Self-deletion Attempt");
+  }
+
+  @Test
+  public void testGivenUserIdAndDifferentUserIdInSessionByValidatingUserIdIsNotLoggedInUserReturnUserId() {
+
+    String userId = "user-id";
+    Session session = Session.builder()
+      .userId(userId + "2")
+      .build();
+
+    String validatedResult =
+      userRequestMapper.validateNotLoggedInUser(session, userId);
+
+    assertThat(validatedResult).isNotEqualTo(userId);
+    assertThat(validatedResult).isEqualTo(userId + "2");
   }
 
 }
