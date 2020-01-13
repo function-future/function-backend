@@ -1,9 +1,11 @@
 package com.future.function.web.mapper.request.core;
 
 import com.future.function.common.enumeration.core.Role;
+import com.future.function.common.exception.BadRequestException;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.User;
+import com.future.function.session.model.Session;
 import com.future.function.validation.RequestValidator;
 import com.future.function.web.model.request.core.UserWebRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -91,6 +93,14 @@ public class UserRequestMapper {
   public User toUser(String userId, UserWebRequest request) {
 
     return toValidatedUser(userId, request);
+  }
+
+  public String validateNotLoggedInUser(Session session, String userId) {
+
+    return Optional.ofNullable(session)
+      .map(Session::getUserId)
+      .filter(sessionUserId -> !userId.equals(sessionUserId))
+      .orElseThrow(() -> new BadRequestException("Self-deletion Attempt"));
   }
 
 }

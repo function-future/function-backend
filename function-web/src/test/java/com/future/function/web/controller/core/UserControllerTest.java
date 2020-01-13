@@ -1,6 +1,7 @@
 package com.future.function.web.controller.core;
 
 import com.future.function.common.enumeration.core.Role;
+import com.future.function.common.exception.BadRequestException;
 import com.future.function.common.properties.core.FileProperties;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.FileV2;
@@ -64,6 +65,7 @@ public class UserControllerTest extends TestHelper {
   private static final String UNIVERSITY = "university";
 
   private static final User STUDENT = User.builder()
+    .id(STUDENT_ID)
     .role(Role.STUDENT)
     .email(STUDENT_EMAIL)
     .name(NAME)
@@ -109,6 +111,9 @@ public class UserControllerTest extends TestHelper {
 
   private static final BaseResponse BASE_RESPONSE =
     ResponseHelper.toBaseResponse(HttpStatus.OK);
+
+  private static final BaseResponse BAD_REQUEST_BASE_RESPONSE =
+    ResponseHelper.toBaseResponse(HttpStatus.BAD_REQUEST);
 
   private JacksonTester<UserWebRequest> userWebRequestJacksonTester;
 
@@ -157,20 +162,45 @@ public class UserControllerTest extends TestHelper {
   }
 
   @Test
-  public void testGivenEmailFromPathVariableByDeletingUserByEmailReturnBaseResponseOK()
+  public void testGivenUserIdFromPathVariableByDeletingUserByUserIdReturnBaseResponseOK()
     throws Exception {
 
     super.setCookie(Role.ADMIN);
 
-    mockMvc.perform(delete("/api/core/users/" + STUDENT_EMAIL).cookie(cookies))
+    when(userRequestMapper.validateNotLoggedInUser(ADMIN_SESSION, STUDENT_ID)).thenReturn(
+      STUDENT_ID);
+
+    mockMvc.perform(delete("/api/core/users/" + STUDENT_ID).cookie(cookies))
       .andExpect(status().isOk())
       .andExpect(content().json(baseResponseJacksonTester.write(BASE_RESPONSE)
                                   .getJson()))
       .andReturn()
       .getResponse();
 
-    verify(userService).deleteUser(STUDENT_EMAIL);
-    verifyZeroInteractions(userRequestMapper, fileProperties);
+    verify(userService).deleteUser(STUDENT_ID);
+    verify(userRequestMapper).validateNotLoggedInUser(ADMIN_SESSION, STUDENT_ID);
+    verifyZeroInteractions(fileProperties);
+  }
+
+  @Test
+  public void testGivenUserIdAndSameLoggedInUserFromPathVariableByDeletingUserByUserIdReturnBaseResponseBadRequest()
+    throws Exception {
+
+    super.setCookie(Role.ADMIN);
+
+    when(userRequestMapper.validateNotLoggedInUser(ADMIN_SESSION, ADMIN_ID)).thenThrow(
+      new BadRequestException("Self-deletion Attempt"));
+
+    mockMvc.perform(delete("/api/core/users/" + ADMIN_ID).cookie(cookies))
+      .andExpect(status().isBadRequest())
+      .andExpect(content().json(
+        baseResponseJacksonTester.write(BAD_REQUEST_BASE_RESPONSE)
+          .getJson()))
+      .andReturn()
+      .getResponse();
+
+    verify(userRequestMapper).validateNotLoggedInUser(ADMIN_SESSION, ADMIN_ID);
+    verifyZeroInteractions(userService, fileProperties);
   }
 
   @Test
