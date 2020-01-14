@@ -16,6 +16,10 @@ public interface ChatroomRepository extends MongoRepository<Chatroom, String> {
     ChatroomType type, User member, Pageable pageable
   );
 
+  Page<Chatroom> findAllByMembersOrderByUpdatedAtDesc(
+    User member, Pageable pageable
+  );
+
   Page<Chatroom> findAllByTitleContainingIgnoreCaseAndMembersOrderByUpdatedAtDesc(
     String titleKeyword, User member, Pageable pageable
   );

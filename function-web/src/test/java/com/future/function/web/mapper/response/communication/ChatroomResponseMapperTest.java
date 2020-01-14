@@ -9,6 +9,7 @@ import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.service.api.feature.communication.chatroom.MessageService;
 import com.future.function.service.api.feature.communication.chatroom.MessageStatusService;
+import com.future.function.service.api.feature.core.UserService;
 import com.future.function.session.model.Session;
 import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.model.response.base.DataResponse;
@@ -113,11 +114,21 @@ public class ChatroomResponseMapperTest {
     .type(ChatroomType.GROUP)
     .build();
 
+  private static Chatroom CHATROOM_2 = Chatroom.builder()
+          .id(CHATROOM_ID)
+          .members(Arrays.asList(MEMBER_1, MEMBER_2))
+          .title(CHATROOM_TITLE)
+          .type(ChatroomType.PRIVATE)
+          .build();
+
   @Mock
   private MessageService messageService;
 
   @Mock
   private MessageStatusService messageStatusService;
+
+  @Mock
+  private UserService userService;
 
   @After
   public void tearDown() {
@@ -157,12 +168,14 @@ public class ChatroomResponseMapperTest {
     when(messageStatusService.getSeenStatus(CHATROOM_ID,
                                             SESSION.getUserId()
     )).thenReturn(IS_SEEN);
+    when(userService.getUser(MEMBER_ID_1)).thenReturn(MEMBER_1);
 
     PagingResponse<ChatroomResponse> data =
       ChatroomResponseMapper.toPagingChatroomResponse(new PageImpl<>(
                                                         Collections.singletonList(CHATROOM), PageHelper.toPageable(1, 1), 1),
                                                       messageService,
                                                       messageStatusService,
+                                                      userService,
                                                       URL_PREFIX,
                                                       SESSION.getUserId()
       );
@@ -179,6 +192,43 @@ public class ChatroomResponseMapperTest {
     verify(messageService).getLastMessage(CHATROOM_ID, SESSION.getUserId());
     verify(messageStatusService).getSeenStatus(
       CHATROOM_ID, SESSION.getUserId());
+    verify(userService).getUser(MEMBER_ID_1);
+  }
+
+  @Test
+  public void testGivenPagedChatroomAndMessageAndBooleanByCallingToPagingChatroomResponseReturnPaging2() {
+
+    when(messageService.getLastMessage(CHATROOM_ID,
+            SESSION.getUserId()
+    )).thenReturn(MESSAGE_1);
+    when(messageStatusService.getSeenStatus(CHATROOM_ID,
+            SESSION.getUserId()
+    )).thenReturn(IS_SEEN);
+    when(userService.getUser(MEMBER_ID_1)).thenReturn(MEMBER_1);
+
+    PagingResponse<ChatroomResponse> data =
+            ChatroomResponseMapper.toPagingChatroomResponse(new PageImpl<>(
+                            Collections.singletonList(CHATROOM_2), PageHelper.toPageable(1, 1), 1),
+                    messageService,
+                    messageStatusService,
+                    userService,
+                    URL_PREFIX,
+                    SESSION.getUserId()
+            );
+
+    assertThat(data).isNotNull();
+    assertThat(data.getPaging()
+            .getPage()).isEqualTo(1);
+    assertThat(data.getPaging()
+            .getSize()).isEqualTo(1);
+    assertThat(data.getData()
+            .get(0)
+            .getId()).isEqualTo(CHATROOM_ID);
+
+    verify(messageService).getLastMessage(CHATROOM_ID, SESSION.getUserId());
+    verify(messageStatusService).getSeenStatus(
+            CHATROOM_ID, SESSION.getUserId());
+    verify(userService).getUser(MEMBER_ID_1);
   }
 
   @Test

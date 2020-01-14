@@ -19,6 +19,8 @@ public class ChatroomResponse {
 
   private String name;
 
+  private String picture;
+
   private List<ChatroomParticipantResponse> participants;
 
   private LastMessageResponse lastMessage;

@@ -224,6 +224,8 @@ public interface FieldName {
 
     public static final String TYPE = "type";
 
+    public static final String CHATROOM_PICTURE = "picture";
+
   }
 
   @NoArgsConstructor(access = AccessLevel.PRIVATE)

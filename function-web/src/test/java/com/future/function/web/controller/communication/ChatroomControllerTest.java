@@ -200,9 +200,10 @@ public class ChatroomControllerTest extends TestHelper {
     PagingResponse<ChatroomResponse> response =
       ChatroomResponseMapper.toPagingChatroomResponse(
         chatroomService.getChatroomsWithKeyword(KEYWORD, MEMBER_ID_1, PAGEABLE),
-        messageService, messageStatusService, URL_PREFIX,
+        messageService, messageStatusService, userService, URL_PREFIX,
         ADMIN_SESSION.getUserId()
       );
+    when(userService.getUser(ADMIN_SESSION.getUserId())).thenReturn(MEMBER_1);
 
     mockMvc.perform(get("/api/communication/chatrooms").cookie(cookies)
                       .param("search", KEYWORD))
@@ -217,6 +218,8 @@ public class ChatroomControllerTest extends TestHelper {
     verify(messageStatusService, times(4)).getSeenStatus(
       CHATROOM_ID, ADMIN_SESSION.getUserId());
     verify(fileProperties).getUrlPrefix();
+    verify(userService, times(4)).getUser(ADMIN_SESSION.getUserId());
+
   }
 
   @Test
@@ -226,7 +229,7 @@ public class ChatroomControllerTest extends TestHelper {
     MESSAGE.setCreatedAt(1L);
 
     when(
-      chatroomService.getChatrooms("GROUP", MEMBER_ID_1, PAGEABLE)).thenReturn(
+      chatroomService.getChatrooms(MEMBER_ID_1, PAGEABLE)).thenReturn(
       new PageImpl<>(Arrays.asList(CHATROOM, CHATROOM), PAGEABLE, 2));
     when(messageService.getLastMessage(CHATROOM_ID,
                                        ADMIN_SESSION.getUserId()
@@ -235,27 +238,28 @@ public class ChatroomControllerTest extends TestHelper {
                                             ADMIN_SESSION.getUserId()
     )).thenReturn(false);
     when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
+    when(userService.getUser(ADMIN_SESSION.getUserId())).thenReturn(MEMBER_1);
 
     PagingResponse<ChatroomResponse> response =
       ChatroomResponseMapper.toPagingChatroomResponse(
-        chatroomService.getChatrooms("GROUP", MEMBER_ID_1, PAGEABLE),
-        messageService, messageStatusService, URL_PREFIX,
+        chatroomService.getChatrooms(MEMBER_ID_1, PAGEABLE),
+        messageService, messageStatusService, userService, URL_PREFIX,
         ADMIN_SESSION.getUserId()
       );
 
-    mockMvc.perform(get("/api/communication/chatrooms").cookie(cookies)
-                      .param("type", "GROUP"))
+    mockMvc.perform(get("/api/communication/chatrooms").cookie(cookies))
       .andExpect(status().isOk())
       .andExpect(content().json(pagingResponseJacksonTester.write(response)
                                   .getJson()));
 
     verify(chatroomService, times(2)).getChatrooms(
-      "GROUP", MEMBER_ID_1, PAGEABLE);
+      MEMBER_ID_1, PAGEABLE);
     verify(messageService, times(4)).getLastMessage(
       CHATROOM_ID, ADMIN_SESSION.getUserId());
     verify(messageStatusService, times(4)).getSeenStatus(
       CHATROOM_ID, ADMIN_SESSION.getUserId());
     verify(fileProperties).getUrlPrefix();
+    verify(userService, times(4)).getUser(ADMIN_SESSION.getUserId());
 
   }
 

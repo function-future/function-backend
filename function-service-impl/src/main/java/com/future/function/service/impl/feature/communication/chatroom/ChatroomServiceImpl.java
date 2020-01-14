@@ -38,13 +38,12 @@ public class ChatroomServiceImpl implements ChatroomService {
 
   @Override
   public Page<Chatroom> getChatrooms(
-    String type, String userId, Pageable pageable
+    String userId, Pageable pageable
   ) {
 
-    ChatroomType chatroomType = ChatroomType.fromString(type);
     User user = userService.getUser(userId);
-    return chatroomRepository.findAllByTypeAndMembersOrderByUpdatedAtDesc(
-      chatroomType, user, pageable);
+    return chatroomRepository.findAllByMembersOrderByUpdatedAtDesc(
+      user, pageable);
   }
 
   @Override

@@ -126,14 +126,14 @@ public class ChatroomServiceImplTest {
   public void testGivenTypeAndMemberByGettingChatroomByTypeAndMemberReturnPagedChatrooms() {
 
     when(userService.getUser(USER_ID_1)).thenReturn(MEMBER_1);
-    when(chatroomRepository.findAllByTypeAndMembersOrderByUpdatedAtDesc(TYPE,
+    when(chatroomRepository.findAllByMembersOrderByUpdatedAtDesc(
                                                                         MEMBER_1,
                                                                         PAGEABLE
     )).thenReturn(
       new PageImpl<>(Collections.singletonList(chatroom), PAGEABLE, 1));
 
     Page<Chatroom> chatroomPage = chatroomService.getChatrooms(
-      TYPE.name(), USER_ID_1, PAGEABLE);
+      USER_ID_1, PAGEABLE);
 
     assertThat(chatroomPage.getTotalElements()).isEqualTo(1);
     assertThat(chatroomPage.getContent()
@@ -159,8 +159,7 @@ public class ChatroomServiceImplTest {
                  .contains(MEMBER_2)).isTrue();
 
     verify(userService).getUser(USER_ID_1);
-    verify(chatroomRepository).findAllByTypeAndMembersOrderByUpdatedAtDesc(
-      TYPE, MEMBER_1, PAGEABLE);
+    verify(chatroomRepository).findAllByMembersOrderByUpdatedAtDesc(MEMBER_1, PAGEABLE);
   }
 
   @Test

@@ -18,6 +18,8 @@ public class ChatroomRequest {
   @ChatroomName(message = "InvalidName")
   private String name;
 
+  private String picture;
+
   @NotEmpty(message = "NotEmpty")
   private List<String> members;
 

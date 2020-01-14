@@ -6,7 +6,7 @@ import org.springframework.data.domain.Pageable;
 
 public interface ChatroomService {
 
-  Page<Chatroom> getChatrooms(String type, String userId, Pageable pageable);
+  Page<Chatroom> getChatrooms(String userId, Pageable pageable);
 
   Page<Chatroom> getChatroomsWithKeyword(
     String keyword, String userId, Pageable pageable

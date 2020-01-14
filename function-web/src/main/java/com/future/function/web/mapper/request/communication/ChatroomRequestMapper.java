@@ -49,6 +49,7 @@ public class ChatroomRequestMapper {
       .type(request.getMembers()
               .size() > 2 ? ChatroomType.GROUP : ChatroomType.PRIVATE)
       .members(members)
+      .picture(request.getPicture())
       .build();
 
     if (chatroomId != null) {

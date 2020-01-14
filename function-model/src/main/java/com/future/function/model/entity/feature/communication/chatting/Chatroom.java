@@ -34,6 +34,9 @@ public class Chatroom extends BaseEntity {
   @Field(FieldName.Chatroom.TYPE)
   private ChatroomType type;
 
+  @Field(FieldName.Chatroom.CHATROOM_PICTURE)
+  private String picture;
+
   @Field(FieldName.Chatroom.MEMBERS)
   @DBRef(lazy = true)
   private List<User> members;

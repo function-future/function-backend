@@ -6,6 +6,7 @@ import com.future.function.model.entity.feature.communication.chatting.Message;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.service.api.feature.communication.chatroom.MessageService;
 import com.future.function.service.api.feature.communication.chatroom.MessageStatusService;
+import com.future.function.service.api.feature.core.UserService;
 import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.model.response.base.DataResponse;
@@ -57,14 +58,16 @@ public class ChatroomResponseMapper {
   }
 
   public static PagingResponse<ChatroomResponse> toPagingChatroomResponse(
-    Page<Chatroom> data, MessageService messageService,
-    MessageStatusService messageStatusService, String urlPrefix, String userId
+          Page<Chatroom> data, MessageService messageService,
+          MessageStatusService messageStatusService, UserService userService,
+          String urlPrefix, String userId
   ) {
 
     return ResponseHelper.toPagingResponse(HttpStatus.OK,
                                            toChatroomResponseList(data,
                                                                   messageService,
                                                                   messageStatusService,
+                                                                  userService,
                                                                   userId,
                                                                   urlPrefix
                                            ), PageHelper.toPaging(data)
@@ -73,19 +76,20 @@ public class ChatroomResponseMapper {
 
   private static List<ChatroomResponse> toChatroomResponseList(
     Page<Chatroom> data, MessageService messageService,
-    MessageStatusService messageStatusService, String userId, String urlPrefix
+    MessageStatusService messageStatusService, UserService userService,
+    String userId, String urlPrefix
   ) {
 
     return data.getContent()
       .stream()
       .map(content -> toChatroomResponse(content, messageService.getLastMessage(
         content.getId(), userId), messageStatusService.getSeenStatus(
-        content.getId(), userId), urlPrefix))
+        content.getId(), userId), urlPrefix, userService.getUser(userId)))
       .collect(Collectors.toList());
   }
 
   private static ChatroomResponse toChatroomResponse(
-    Chatroom chatroom, Message lastMessage, boolean isSeen, String urlPrefix
+    Chatroom chatroom, Message lastMessage, boolean isSeen, String urlPrefix, User user
   ) {
 
     List<ChatroomParticipantResponse> participants = new ArrayList<>();
@@ -98,7 +102,22 @@ public class ChatroomResponseMapper {
       .lastMessage(toLastMessageResponse(lastMessage, isSeen))
       .type(getType(chatroom))
       .name(chatroom.getTitle())
+      .picture(getPictureUrl(chatroom, user, urlPrefix))
       .build();
+  }
+
+  private static String getPictureUrl(Chatroom chatroom, User user, String urlPrefix) {
+    if (getType(chatroom).equals(ChatroomType.PRIVATE.name())) {
+      return chatroom.getMembers()
+              .stream()
+              .filter(member -> !member.getId().equals(user.getId()))
+              .map(member -> ParticipantResponseMapper.getAvatarThumbnailUrl(user.getPictureV2(), urlPrefix))
+              .findFirst()
+              .orElse("");
+
+    } else {
+      return chatroom.getPicture();
+    }
   }
 
   private static ChatroomParticipantResponse toChatroomParticipantResponse(

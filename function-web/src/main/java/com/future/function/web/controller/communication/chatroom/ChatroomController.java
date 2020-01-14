@@ -1,21 +1,17 @@
 package com.future.function.web.controller.communication.chatroom;
 
-import com.future.function.common.enumeration.communication.ChatroomType;
 import com.future.function.common.enumeration.core.Role;
 import com.future.function.common.properties.core.FileProperties;
-import com.future.function.model.entity.feature.communication.chatting.Chatroom;
-import com.future.function.model.entity.feature.communication.chatting.Message;
-import com.future.function.model.entity.feature.communication.chatting.MessageStatus;
 import com.future.function.service.api.feature.communication.chatroom.ChatroomService;
 import com.future.function.service.api.feature.communication.chatroom.MessageService;
 import com.future.function.service.api.feature.communication.chatroom.MessageStatusService;
 import com.future.function.service.api.feature.communication.mq.MessagePublisherService;
+import com.future.function.service.api.feature.core.UserService;
 import com.future.function.session.annotation.WithAnyRole;
 import com.future.function.session.model.Session;
 import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.mapper.request.communication.ChatroomRequestMapper;
-import com.future.function.web.mapper.request.communication.MessageRequestMapper;
 import com.future.function.web.mapper.response.communication.ChatroomResponseMapper;
 import com.future.function.web.model.mq.ChatPayload;
 import com.future.function.web.model.request.communication.ChatroomRequest;
@@ -30,7 +26,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -60,6 +55,8 @@ public class ChatroomController {
 
   private MessagePublisherService publisherService;
 
+  private UserService userService;
+
   @Value("${function.mq.topic.chat}")
   private String mqTopicChat;
 
@@ -69,7 +66,7 @@ public class ChatroomController {
           ChatroomService chatroomService, MessageService messageService,
           MessageStatusService messageStatusService,
           FileProperties fileProperties,
-          MessagePublisherService publisherService) {
+          MessagePublisherService publisherService, UserService userService) {
 
     this.fileProperties = fileProperties;
     this.chatroomRequestMapper = chatroomRequestMapper;
@@ -77,14 +74,12 @@ public class ChatroomController {
     this.messageService = messageService;
     this.messageStatusService = messageStatusService;
     this.publisherService = publisherService;
+    this.userService = userService;
   }
 
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   public PagingResponse<ChatroomResponse> getChatrooms(
     Session session,
-    @RequestParam(required = false,
-                  defaultValue = "PUBLIC")
-      String type,
     @RequestParam(required = false)
       String search,
     @RequestParam(required = false,
@@ -99,14 +94,14 @@ public class ChatroomController {
       return ChatroomResponseMapper.toPagingChatroomResponse(
         chatroomService.getChatroomsWithKeyword(
           search, session.getUserId(), PageHelper.toPageable(page, size)),
-        messageService, messageStatusService, fileProperties.getUrlPrefix(),
+        messageService, messageStatusService, userService, fileProperties.getUrlPrefix(),
         session.getUserId()
       );
     } else {
       return ChatroomResponseMapper.toPagingChatroomResponse(
         chatroomService.getChatrooms(
-          type, session.getUserId(), PageHelper.toPageable(page, size)),
-        messageService, messageStatusService, fileProperties.getUrlPrefix(),
+          session.getUserId(), PageHelper.toPageable(page, size)),
+        messageService, messageStatusService, userService, fileProperties.getUrlPrefix(),
         session.getUserId()
       );
     }
