@@ -3,8 +3,8 @@ package com.future.function.data.migration.change.log;
 import com.future.function.common.enumeration.core.Role;
 import com.future.function.model.entity.feature.core.Menu;
 import com.future.function.model.util.constant.DocumentName;
-import com.github.mongobee.changeset.ChangeLog;
-import com.github.mongobee.changeset.ChangeSet;
+import com.github.cloudyrock.mongock.ChangeLog;
+import com.github.cloudyrock.mongock.ChangeSet;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
 import java.util.HashMap;

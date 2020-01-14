@@ -1,4 +1,4 @@
-package com.future.function.web.controller.communication;
+package com.future.function.web.controller.communication.chatroom;
 
 import com.future.function.common.enumeration.communication.ChatroomType;
 import com.future.function.common.enumeration.core.Role;
@@ -6,9 +6,10 @@ import com.future.function.common.properties.core.FileProperties;
 import com.future.function.model.entity.feature.communication.chatting.Chatroom;
 import com.future.function.model.entity.feature.communication.chatting.Message;
 import com.future.function.model.entity.feature.communication.chatting.MessageStatus;
-import com.future.function.service.api.feature.communication.ChatroomService;
-import com.future.function.service.api.feature.communication.MessageService;
-import com.future.function.service.api.feature.communication.MessageStatusService;
+import com.future.function.service.api.feature.communication.chatroom.ChatroomService;
+import com.future.function.service.api.feature.communication.chatroom.MessageService;
+import com.future.function.service.api.feature.communication.chatroom.MessageStatusService;
+import com.future.function.service.api.feature.communication.mq.MessagePublisherService;
 import com.future.function.session.annotation.WithAnyRole;
 import com.future.function.session.model.Session;
 import com.future.function.web.mapper.helper.PageHelper;
@@ -16,6 +17,7 @@ import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.mapper.request.communication.ChatroomRequestMapper;
 import com.future.function.web.mapper.request.communication.MessageRequestMapper;
 import com.future.function.web.mapper.response.communication.ChatroomResponseMapper;
+import com.future.function.web.model.mq.ChatPayload;
 import com.future.function.web.model.request.communication.ChatroomRequest;
 import com.future.function.web.model.request.communication.MessageRequest;
 import com.future.function.web.model.response.base.BaseResponse;
@@ -25,8 +27,10 @@ import com.future.function.web.model.response.feature.communication.chatting.Cha
 import com.future.function.web.model.response.feature.communication.chatting.ChatroomResponse;
 import com.future.function.web.model.response.feature.communication.chatting.MessageResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -46,8 +50,6 @@ public class ChatroomController {
 
   private ChatroomRequestMapper chatroomRequestMapper;
 
-  private MessageRequestMapper messageRequestMapper;
-
   private ChatroomService chatroomService;
 
   private MessageService messageService;
@@ -56,20 +58,25 @@ public class ChatroomController {
 
   private MessageStatusService messageStatusService;
 
+  private MessagePublisherService publisherService;
+
+  @Value("${function.mq.topic.chat}")
+  private String mqTopicChat;
+
   @Autowired
   public ChatroomController(
-    ChatroomRequestMapper chatroomRequestMapper,
-    ChatroomService chatroomService, MessageService messageService,
-    MessageStatusService messageStatusService,
-    MessageRequestMapper messageRequestMapper, FileProperties fileProperties
-  ) {
+          ChatroomRequestMapper chatroomRequestMapper,
+          ChatroomService chatroomService, MessageService messageService,
+          MessageStatusService messageStatusService,
+          FileProperties fileProperties,
+          MessagePublisherService publisherService) {
 
     this.fileProperties = fileProperties;
     this.chatroomRequestMapper = chatroomRequestMapper;
     this.chatroomService = chatroomService;
     this.messageService = messageService;
     this.messageStatusService = messageStatusService;
-    this.messageRequestMapper = messageRequestMapper;
+    this.publisherService = publisherService;
   }
 
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
@@ -211,29 +218,11 @@ public class ChatroomController {
     @RequestBody
       MessageRequest messageRequest
   ) {
-
-    if (chatroomId.equalsIgnoreCase("public")) {
-      chatroomId = chatroomService.getPublicChatroom()
-        .getId();
-    }
-    Message message = messageService.createMessage(
-      messageRequestMapper.toMessage(messageRequest, session.getUserId(),
-                                     chatroomId
-      ), session.getUserId());
-    Chatroom chatroom = chatroomService.getChatroom(
-      chatroomId, session.getUserId());
-    if (!chatroom.getType()
-      .equals(ChatroomType.PUBLIC)) {
-      chatroom.getMembers()
-        .forEach(member -> messageStatusService.createMessageStatus(
-          MessageStatus.builder()
-            .message(message)
-            .chatroom(chatroom)
-            .member(member)
-            .seen(member.getId()
-                    .equals(session.getUserId()))
-            .build(), session.getUserId()));
-    }
+    publisherService.publish(ChatPayload.builder()
+            .messageRequest(messageRequest)
+            .chatroomId(chatroomId)
+            .userId(session.getUserId())
+            .build(), mqTopicChat);
     return ResponseHelper.toBaseResponse(HttpStatus.CREATED);
   }
 
@@ -270,7 +259,19 @@ public class ChatroomController {
         .getId();
     }
     messageStatusService.updateSeenStatus(
-      chatroomId, messageId, session.getUserId());
+      chatroomId, messageId, session.getUserId(), false);
+    return ResponseHelper.toBaseResponse(HttpStatus.OK);
+  }
+
+  @PostMapping(value = "/{chatroomId}/_enter", produces = MediaType.APPLICATION_JSON_VALUE)
+  public BaseResponse enterChatroom(Session session, @PathVariable String chatroomId) {
+    messageStatusService.enterChatroom(chatroomId, session.getUserId());
+    return ResponseHelper.toBaseResponse(HttpStatus.OK);
+  }
+
+  @PostMapping(value = "/{chatroomId}/_leave", produces = MediaType.APPLICATION_JSON_VALUE)
+  public BaseResponse leaveChatroom(Session session, @PathVariable String chatroomId) {
+    messageStatusService.leaveChatroom(chatroomId, session.getUserId());
     return ResponseHelper.toBaseResponse(HttpStatus.OK);
   }
 

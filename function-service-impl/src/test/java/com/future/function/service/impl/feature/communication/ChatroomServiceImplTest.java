@@ -6,10 +6,13 @@ import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.communication.chatting.Chatroom;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.repository.feature.communication.chatting.ChatroomRepository;
+import com.future.function.service.api.feature.communication.chatroom.MessageStatusService;
 import com.future.function.service.api.feature.core.UserService;
+import com.future.function.service.impl.feature.communication.chatroom.ChatroomServiceImpl;
 import com.future.function.session.model.Session;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -20,18 +23,21 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.redis.core.ListOperations;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.SetOperations;
+import org.springframework.data.redis.core.ValueOperations;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Optional;
 
 import static com.googlecode.catchexception.CatchException.catchException;
 import static com.googlecode.catchexception.CatchException.caughtException;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ChatroomServiceImplTest {
@@ -92,6 +98,9 @@ public class ChatroomServiceImplTest {
 
   @Mock
   private ChatroomRepository chatroomRepository;
+
+  @Mock
+  private MessageStatusService messageStatusService;
 
   @InjectMocks
   private ChatroomServiceImpl chatroomService;
@@ -316,4 +325,25 @@ public class ChatroomServiceImplTest {
     verify(userService).getUser(USER_ID_2);
   }
 
+  @Test
+  public void testGivenUserIdAndChatroomIdByCallingAuthorizeSubscriptionReturnVoid1() {
+    when(chatroomRepository.findByType(ChatroomType.PUBLIC.name())).thenReturn(Optional.of(chatroom));
+    when(userService.getUser(USER_ID_1)).thenReturn(MEMBER_1);
+
+    chatroomService.authorizeSubscription(USER_ID_1, "public");
+
+    verify(chatroomRepository).findByType(ChatroomType.PUBLIC.name());
+    verify(userService).getUser(USER_ID_1);
+  }
+
+  @Test
+  public void testGivenUserIdAndChatroomIdByCallingAuthorizeSubscriptionReturnVoid2() {
+    when(chatroomRepository.findOne(CHATROOM_ID)).thenReturn(chatroom);
+    when(userService.getUser(USER_ID_1)).thenReturn(MEMBER_1);
+
+    chatroomService.authorizeSubscription(USER_ID_1, CHATROOM_ID);
+
+    verify(chatroomRepository).findOne(CHATROOM_ID);
+    verify(userService).getUser(USER_ID_1);
+  }
 }

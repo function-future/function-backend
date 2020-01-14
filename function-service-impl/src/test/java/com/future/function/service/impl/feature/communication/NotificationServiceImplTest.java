@@ -4,6 +4,7 @@ import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.communication.reminder.Notification;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.repository.feature.communication.reminder.NotificationRepository;
+import com.future.function.service.api.feature.communication.mq.MessagePublisherService;
 import com.future.function.service.api.feature.core.UserService;
 import com.future.function.service.impl.helper.PageHelper;
 import com.future.function.session.model.Session;
@@ -13,6 +14,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
@@ -22,10 +24,7 @@ import java.util.Collections;
 import static com.googlecode.catchexception.CatchException.catchException;
 import static com.googlecode.catchexception.CatchException.caughtException;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class NotificationServiceImplTest {
@@ -72,8 +71,14 @@ public class NotificationServiceImplTest {
   @Mock
   private UserService userService;
 
+  @Mock
+  private MessagePublisherService publisherService;
+
   @InjectMocks
   private NotificationServiceImpl notificationService;
+
+  @Value("${function.mq.topic.notification}")
+  private String mqTopicNotification;
 
   @After
   public void tearDown() {
@@ -115,6 +120,7 @@ public class NotificationServiceImplTest {
     when(userService.getUser(USER_ID)).thenReturn(USER);
     when(notificationRepository.save(NOTIFICATION_1)).thenReturn(
       NOTIFICATION_1);
+    doNothing().when(publisherService).publish(USER_ID, mqTopicNotification);
 
     Notification notification = notificationService.createNotification(
       NOTIFICATION_1);
@@ -125,6 +131,7 @@ public class NotificationServiceImplTest {
                  .getId()).isEqualTo(USER_ID);
 
     verify(userService).getUser(USER_ID);
+    verify(publisherService).publish(USER_ID, mqTopicNotification);
     verify(notificationRepository).save(NOTIFICATION_1);
   }
 
