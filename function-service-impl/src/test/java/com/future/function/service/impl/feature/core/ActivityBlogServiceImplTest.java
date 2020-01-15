@@ -139,20 +139,56 @@ public class ActivityBlogServiceImplTest {
   }
 
   @Test
-  public void testGivenPageableAndEmptyDatabaseByFindingActivityBlogsReturnEmptyPage() {
+  public void testGivenUserIdAndPageableByFindingActivityBlogsReturnPageOfActivityBlog() {
 
-    Page<ActivityBlog> activityBlogPage = PageHelper.empty(PAGEABLE);
-    when(activityBlogRepository.findAll("", "", PAGEABLE)).thenReturn(
+    String userId = "551137c2f9e1fac808a5f572";
+    Page<ActivityBlog> activityBlogPage = PageHelper.toPage(
+      Collections.singletonList(activityBlog), PAGEABLE);
+    when(activityBlogRepository.findAll(userId, "", PAGEABLE)).thenReturn(
       activityBlogPage);
 
     Page<ActivityBlog> activityBlogs = activityBlogService.getActivityBlogs(
-      "", "", PAGEABLE);
+      userId, "", PAGEABLE);
 
     assertThat(activityBlogs).isNotNull();
     assertThat(activityBlogs).isEqualTo(activityBlogPage);
 
-    verify(activityBlogRepository).findAll("", "", PAGEABLE);
+    verify(activityBlogRepository).findAll(userId, "", PAGEABLE);
     verifyZeroInteractions(resourceService, userService);
+  }
+
+  @Test
+  public void testGivenPageableAndEmptyDatabaseByFindingActivityBlogsReturnEmptyPage() {
+
+    String userId = "551137c2f9e1fac808a5f572";
+    Page<ActivityBlog> activityBlogPage = PageHelper.empty(PAGEABLE);
+    when(activityBlogRepository.findAll(userId, "", PAGEABLE)).thenReturn(
+      activityBlogPage);
+
+    Page<ActivityBlog> activityBlogs = activityBlogService.getActivityBlogs(
+      userId, "", PAGEABLE);
+
+    assertThat(activityBlogs).isNotNull();
+    assertThat(activityBlogs).isEqualTo(activityBlogPage);
+
+    verify(activityBlogRepository).findAll(userId, "", PAGEABLE);
+    verifyZeroInteractions(resourceService, userService);
+  }
+
+  @Test
+  public void testGivenPageableAndNonObjectIdCompliantUserIdByFindingActivityBlogsReturnEmptyPage() {
+
+    String nonObjectIdCompliantUserId = "random-id";
+    Page<ActivityBlog> activityBlogPage = PageHelper.empty(PAGEABLE);
+
+    Page<ActivityBlog> activityBlogs = activityBlogService.getActivityBlogs(
+      nonObjectIdCompliantUserId, "", PAGEABLE);
+
+    assertThat(activityBlogs).isNotNull();
+    assertThat(activityBlogs).isEqualTo(activityBlogPage);
+
+    verifyZeroInteractions(
+      activityBlogRepository, resourceService, userService);
   }
 
   @Test

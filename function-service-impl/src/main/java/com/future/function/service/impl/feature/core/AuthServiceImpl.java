@@ -1,9 +1,12 @@
 package com.future.function.service.impl.feature.core;
 
+import com.future.function.common.exception.ForbiddenException;
 import com.future.function.common.exception.UnauthorizedException;
+import com.future.function.common.properties.communication.WsProperties;
 import com.future.function.common.properties.core.SessionProperties;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.User;
+import com.future.function.service.api.feature.communication.chatroom.ChatroomService;
 import com.future.function.service.api.feature.core.AuthService;
 import com.future.function.service.api.feature.core.UserService;
 import com.future.function.session.model.Session;
@@ -14,9 +17,11 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.util.UriTemplate;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -31,16 +36,22 @@ public class AuthServiceImpl implements AuthService {
 
   private final SessionProperties sessionProperties;
 
+  private final WsProperties wsProperties;
+
+  private final ChatroomService chatroomService;
+
   @Autowired
   public AuthServiceImpl(
-    UserService userService, RedisTemplate<String, Session> redisTemplate,
-    SessionProperties sessionProperties
-  ) {
+          UserService userService, RedisTemplate<String, Session> redisTemplate,
+          SessionProperties sessionProperties,
+          WsProperties wsProperties, ChatroomService chatroomService) {
 
     this.userService = userService;
     this.redisTemplate = redisTemplate;
     this.valueOperations = redisTemplate.opsForValue();
     this.sessionProperties = sessionProperties;
+    this.wsProperties = wsProperties;
+    this.chatroomService = chatroomService;
   }
 
   @Override
@@ -145,6 +156,38 @@ public class AuthServiceImpl implements AuthService {
     cookie.setPath("/");
 
     response.addCookie(cookie);
+  }
+
+  @Override
+  public void authorizeInboundChannel(String destination, String userId) {
+    boolean isUriMatch = false;
+    for (Map.Entry<String, String> entry: wsProperties.getTopic().entrySet()) {
+      UriTemplate uriTemplate = new UriTemplate(entry.getValue());
+      if (uriTemplate.matches(destination)) {
+        isUriMatch = true;
+        this.checkAuthorization(userId, entry.getKey(), uriTemplate.match(destination));
+        break;
+      }
+    }
+    if (!isUriMatch) {
+      throw new ForbiddenException("Path Unknown");
+    }
+  }
+
+  private void checkAuthorization(String userId, String key, Map<String, String> data) {
+    switch (key) {
+      case "chat":
+        chatroomService.authorizeSubscription(userId, data.get("chatroomId"));
+        break;
+      case "notification":
+        if (data.get("userId").equals(userId)) {
+          break;
+        } else {
+          throw new ForbiddenException("UserId didn't match");
+        }
+      default:
+        break;
+    }
   }
 
 }

@@ -68,7 +68,8 @@ public class UserController {
       String userId
   ) {
 
-    userService.deleteUser(userId);
+    userService.deleteUser(
+      userRequestMapper.validateNotLoggedInUser(session, userId));
     return ResponseHelper.toBaseResponse(HttpStatus.OK);
   }
 

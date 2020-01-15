@@ -8,6 +8,8 @@ import java.util.List;
 
 public interface ResourceService {
 
+  FileV2 createACopy(FileV2 sourceFile, FileOrigin fileOrigin);
+
   FileV2 storeAndSaveFile(
     String objectName, String fileName, byte[] bytes, FileOrigin fileOrigin
   );
