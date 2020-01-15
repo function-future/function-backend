@@ -3,21 +3,24 @@ package com.future.function.service.impl.feature.communication.chatroom;
 import com.future.function.common.enumeration.communication.ChatroomType;
 import com.future.function.common.exception.ForbiddenException;
 import com.future.function.common.exception.NotFoundException;
+import com.future.function.common.properties.communication.MqProperties;
+import com.future.function.common.properties.communication.RedisProperties;
 import com.future.function.model.entity.feature.communication.chatting.Chatroom;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.repository.feature.communication.chatting.ChatroomRepository;
 import com.future.function.service.api.feature.communication.chatroom.ChatroomService;
+import com.future.function.service.api.feature.communication.mq.MessagePublisherService;
 import com.future.function.service.api.feature.core.UserService;
 import com.future.function.service.impl.helper.PageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
+import org.springframework.web.util.UriTemplate;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,13 +30,26 @@ public class ChatroomServiceImpl implements ChatroomService {
 
   private final ChatroomRepository chatroomRepository;
 
+  private final ValueOperations<String, Object> valueOperations;
+
+  private final RedisProperties redisProperties;
+
+  private final MessagePublisherService publisherService;
+
+  private final MqProperties mqProperties;
+
   @Autowired
   public ChatroomServiceImpl(
           UserService userService,
-          ChatroomRepository chatroomRepository
-  ) {
+          ChatroomRepository chatroomRepository,
+          RedisTemplate<String, Object> redisTemplate,
+          RedisProperties redisProperties, MessagePublisherService publisherService, MqProperties mqProperties) {
+    this.valueOperations = redisTemplate.opsForValue();
     this.userService = userService;
     this.chatroomRepository = chatroomRepository;
+    this.redisProperties = redisProperties;
+    this.publisherService = publisherService;
+    this.mqProperties = mqProperties;
   }
 
   @Override
@@ -100,6 +116,7 @@ public class ChatroomServiceImpl implements ChatroomService {
       .map(this::setMembers)
       .map(this::setChatroomName)
       .map(chatroomRepository::save)
+      .map(this::syncChatroomList)
       .orElseThrow(UnsupportedOperationException::new);
   }
 
@@ -135,6 +152,27 @@ public class ChatroomServiceImpl implements ChatroomService {
       })
       .map(c -> this.validateAuthorization(c, userId))
       .orElseThrow(() -> new NotFoundException("Chatroom not found"));
+  }
+
+  @Override
+  public void setLimitChatrooms(String userId, long limit) {
+    UriTemplate uriTemplate = new UriTemplate(redisProperties.getKey().get("limit-chatroom"));
+    valueOperations.set(uriTemplate.expand(userId).toString(), limit);
+    this.syncChatroomList(userId);
+  }
+
+  @Override
+  public void syncChatroomList(String userId) {
+    publisherService.publish(userId, mqProperties.getTopic().get("chatroom"));
+  }
+
+  @Override
+  public Chatroom syncChatroomList(Chatroom chatroom) {
+    chatroom.getMembers().forEach(member -> {
+      System.out.println("INSIDE SYNC " + member.getId());
+      this.syncChatroomList(member.getId());
+    });
+    return chatroom;
   }
 
   private Chatroom updateMember(

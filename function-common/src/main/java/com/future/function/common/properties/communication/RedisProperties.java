@@ -14,7 +14,7 @@ import java.util.Map;
 @Component
 @AllArgsConstructor
 @NoArgsConstructor
-@ConfigurationProperties("mq")
-public class MqProperties {
-  private Map<String, String> topic;
+@ConfigurationProperties("redis")
+public class RedisProperties {
+  private Map<String, String> key;
 }

@@ -1,6 +1,7 @@
 package com.future.function.web.controller.communication.chatroom;
 
 import com.future.function.common.enumeration.core.Role;
+import com.future.function.common.properties.communication.MqProperties;
 import com.future.function.common.properties.core.FileProperties;
 import com.future.function.service.api.feature.communication.chatroom.ChatroomService;
 import com.future.function.service.api.feature.communication.chatroom.MessageService;
@@ -14,6 +15,7 @@ import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.mapper.request.communication.ChatroomRequestMapper;
 import com.future.function.web.mapper.response.communication.ChatroomResponseMapper;
 import com.future.function.web.model.mq.ChatPayload;
+import com.future.function.web.model.request.communication.ChatroomLimitRequest;
 import com.future.function.web.model.request.communication.ChatroomRequest;
 import com.future.function.web.model.request.communication.MessageRequest;
 import com.future.function.web.model.response.base.BaseResponse;
@@ -23,7 +25,6 @@ import com.future.function.web.model.response.feature.communication.chatting.Cha
 import com.future.function.web.model.response.feature.communication.chatting.ChatroomResponse;
 import com.future.function.web.model.response.feature.communication.chatting.MessageResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -57,8 +58,7 @@ public class ChatroomController {
 
   private UserService userService;
 
-  @Value("${function.mq.topic.chat}")
-  private String mqTopicChat;
+  private MqProperties mqProperties;
 
   @Autowired
   public ChatroomController(
@@ -66,7 +66,7 @@ public class ChatroomController {
           ChatroomService chatroomService, MessageService messageService,
           MessageStatusService messageStatusService,
           FileProperties fileProperties,
-          MessagePublisherService publisherService, UserService userService) {
+          MessagePublisherService publisherService, UserService userService, MqProperties mqProperties) {
 
     this.fileProperties = fileProperties;
     this.chatroomRequestMapper = chatroomRequestMapper;
@@ -75,6 +75,7 @@ public class ChatroomController {
     this.messageStatusService = messageStatusService;
     this.publisherService = publisherService;
     this.userService = userService;
+    this.mqProperties = mqProperties;
   }
 
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
@@ -217,7 +218,7 @@ public class ChatroomController {
             .messageRequest(messageRequest)
             .chatroomId(chatroomId)
             .userId(session.getUserId())
-            .build(), mqTopicChat);
+            .build(), mqProperties.getTopic().get("chat"));
     return ResponseHelper.toBaseResponse(HttpStatus.CREATED);
   }
 
@@ -267,6 +268,12 @@ public class ChatroomController {
   @PostMapping(value = "/{chatroomId}/_leave", produces = MediaType.APPLICATION_JSON_VALUE)
   public BaseResponse leaveChatroom(Session session, @PathVariable String chatroomId) {
     messageStatusService.leaveChatroom(chatroomId, session.getUserId());
+    return ResponseHelper.toBaseResponse(HttpStatus.OK);
+  }
+
+  @PostMapping(value = "/_setlimit", produces = MediaType.APPLICATION_JSON_VALUE)
+  public BaseResponse setLimit(Session session, @RequestBody ChatroomLimitRequest request) {
+    chatroomService.setLimitChatrooms(session.getUserId(), request.getLimit());
     return ResponseHelper.toBaseResponse(HttpStatus.OK);
   }
 

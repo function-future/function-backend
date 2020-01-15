@@ -179,6 +179,7 @@ public class AuthServiceImpl implements AuthService {
       case "chat":
         chatroomService.authorizeSubscription(userId, data.get("chatroomId"));
         break;
+      case "chatroom":
       case "notification":
         if (data.get("userId").equals(userId)) {
           break;
@@ -186,7 +187,7 @@ public class AuthServiceImpl implements AuthService {
           throw new ForbiddenException("UserId didn't match");
         }
       default:
-        break;
+        throw new ForbiddenException("Forbidden");
     }
   }
 

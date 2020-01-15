@@ -2,6 +2,7 @@ package com.future.function.web.controller.communication;
 
 import com.future.function.common.enumeration.communication.ChatroomType;
 import com.future.function.common.enumeration.core.Role;
+import com.future.function.common.properties.communication.MqProperties;
 import com.future.function.common.properties.core.FileProperties;
 import com.future.function.model.entity.feature.communication.chatting.Chatroom;
 import com.future.function.model.entity.feature.communication.chatting.Message;
@@ -31,6 +32,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.json.JacksonTester;
@@ -45,6 +47,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -113,8 +117,8 @@ public class ChatroomControllerTest extends TestHelper {
 
   private JacksonTester<MessageRequest> messageRequestJacksonTester;
 
-  @Value("${function.mq.topic.chat}")
-  private String mqTopicChat;
+  @MockBean
+  private MqProperties mqProperties;
 
   @MockBean
   private ChatroomRequestMapper chatroomRequestMapper;
@@ -382,6 +386,11 @@ public class ChatroomControllerTest extends TestHelper {
 
     super.setCookie(Role.ADMIN);
 
+    Map<String, String> topic = new HashMap<>();
+    topic.put("chat", "chat");
+
+    when(mqProperties.getTopic()).thenReturn(topic);
+
     ChatPayload chatPayload = ChatPayload.builder()
             .messageRequest(MESSAGE_REQUEST)
             .chatroomId(CHATROOM_ID)
@@ -400,7 +409,8 @@ public class ChatroomControllerTest extends TestHelper {
         ResponseHelper.toBaseResponse(HttpStatus.CREATED))
                                   .getJson()));
 
-    verify(publisherService).publish(chatPayload, mqTopicChat);
+    verify(mqProperties).getTopic();
+    verify(publisherService).publish(chatPayload, topic.get("chat"));
   }
 
   @Test

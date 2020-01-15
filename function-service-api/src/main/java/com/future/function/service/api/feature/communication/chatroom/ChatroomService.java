@@ -22,4 +22,10 @@ public interface ChatroomService {
 
   void authorizeSubscription(String userId, String chatroomId);
 
+  void setLimitChatrooms(String userId, long limit);
+
+  void syncChatroomList(String userId);
+
+  Chatroom syncChatroomList(Chatroom chatroom);
+
 }
