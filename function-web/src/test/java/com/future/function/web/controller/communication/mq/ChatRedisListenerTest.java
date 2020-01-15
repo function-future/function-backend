@@ -138,6 +138,7 @@ public class ChatRedisListenerTest {
     doNothing().when(simpMessagingTemplate).convertAndSend("/topic/chatrooms/" + chatroomPublic.getId(),
             ChatroomResponseMapper.toMessageResponse(messagePublic, "test"));
     when(chatroomService.getChatroom(chatroomPublic.getId(), chatPayloadPublic.getUserId())).thenReturn(chatroomPublic);
+    when(chatroomService.syncChatroomList(chatroomPublic)).thenReturn(chatroom);
 
     chatRedisListener.onMessage(message, bytes);
 
@@ -148,7 +149,8 @@ public class ChatRedisListenerTest {
     verify(fileProperties).getUrlPrefix();
     verify(simpMessagingTemplate).convertAndSend("/topic/chatrooms/" + chatroomPublic.getId(),
             ChatroomResponseMapper.toMessageResponse(messagePublic, "test"));
-    verify(chatroomService).getChatroom(chatroomPublic.getId(), chatPayloadPublic.getUserId());
+    verify(chatroomService, times(2)).getChatroom(chatroomPublic.getId(), chatPayloadPublic.getUserId());
+    verify(chatroomService).syncChatroomList(chatroomPublic);
   }
 
   @Test
@@ -164,6 +166,8 @@ public class ChatRedisListenerTest {
     when(messageStatusService.createMessageStatus(any(MessageStatus.class), anyString())).thenReturn(null);
     when(redisSetOperations.isMember("chatroom:" + chatroomId + ":active.user", userId)).thenReturn(true);
     when(chatroomService.getPublicChatroom()).thenReturn(chatroomPublic);
+    when(chatroomService.getChatroom(chatroomId, userId)).thenReturn(chatroom);
+    when(chatroomService.syncChatroomList(chatroomPublic)).thenReturn(chatroom);
 
     chatRedisListener.onMessage(message, bytes);
 
@@ -173,10 +177,11 @@ public class ChatRedisListenerTest {
     verify(fileProperties).getUrlPrefix();
     verify(simpMessagingTemplate).convertAndSend("/topic/chatrooms/" + chatroomId,
             ChatroomResponseMapper.toMessageResponse(message1, "test"));
-    verify(chatroomService).getChatroom(chatPayload.getChatroomId(), chatPayload.getUserId());
+    verify(chatroomService, times(2)).getChatroom(chatPayload.getChatroomId(), chatPayload.getUserId());
     verify(messageStatusService, times(2)).createMessageStatus(any(MessageStatus.class), anyString());
     verify(redisSetOperations).isMember("chatroom:" + chatroomId + ":active.user", "userId2");
     verify(chatroomService).getPublicChatroom();
+    verify(chatroomService).syncChatroomList(chatroom);
 
   }
 }

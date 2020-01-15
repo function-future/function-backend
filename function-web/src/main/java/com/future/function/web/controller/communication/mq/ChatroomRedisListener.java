@@ -15,6 +15,7 @@ import com.future.function.web.model.response.feature.communication.chatting.Cha
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriTemplate;
@@ -25,8 +26,6 @@ import java.io.IOException;
 public class ChatroomRedisListener implements BaseListener {
 
   private final ObjectMapper objectMapper;
-
-  private final RedisTemplate<String, Object> redisTemplate;
 
   private final RedisProperties redisProperties;
 
@@ -44,6 +43,8 @@ public class ChatroomRedisListener implements BaseListener {
 
   private final WsProperties wsProperties;
 
+  private final ValueOperations<String, Object> valueOperations;
+
   @Autowired
   public ChatroomRedisListener(ObjectMapper objectMapper, RedisTemplate<String, Object> redisTemplate,
                                RedisProperties redisProperties, SimpMessagingTemplate messagingTemplate,
@@ -51,7 +52,7 @@ public class ChatroomRedisListener implements BaseListener {
                                MessageStatusService messageStatusService, UserService userService,
                                FileProperties fileProperties, WsProperties wsProperties) {
     this.objectMapper = objectMapper;
-    this.redisTemplate = redisTemplate;
+    this.valueOperations = redisTemplate.opsForValue();
     this.redisProperties = redisProperties;
     this.messagingTemplate = messagingTemplate;
     this.chatroomService = chatroomService;
@@ -71,7 +72,7 @@ public class ChatroomRedisListener implements BaseListener {
     try {
       String userId = objectMapper.readValue(message.getBody(), String.class);
       UriTemplate uriTemplate = new UriTemplate(redisProperties.getKey().get("limit-chatroom"));
-      Long limit = objectMapper.convertValue(redisTemplate.opsForValue().get(uriTemplate.expand(userId).toString()), Long.class);
+      Long limit = objectMapper.convertValue(valueOperations.get(uriTemplate.expand(userId).toString()), Long.class);
       if (limit == null) {
         limit = 1L;
       }
@@ -86,7 +87,6 @@ public class ChatroomRedisListener implements BaseListener {
       chatroomService.getChatrooms(userId, PageHelper.toPageable(1, limit.intValue())),
       messageService, messageStatusService, userService, fileProperties.getUrlPrefix(), userId
     );
-    System.out.println(userId);
     this.publishMessageToWebsocket(response, userId);
   }
 

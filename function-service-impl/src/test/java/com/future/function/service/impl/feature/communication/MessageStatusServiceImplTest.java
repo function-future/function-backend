@@ -1,5 +1,6 @@
 package com.future.function.service.impl.feature.communication;
 
+import com.future.function.common.properties.communication.RedisProperties;
 import com.future.function.model.entity.feature.communication.chatting.Chatroom;
 import com.future.function.model.entity.feature.communication.chatting.Message;
 import com.future.function.model.entity.feature.communication.chatting.MessageStatus;
@@ -21,9 +22,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.SetOperations;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
@@ -95,6 +94,9 @@ public class MessageStatusServiceImplTest {
 
   @Mock
   private MessageService messageService;
+
+  @Mock
+  private RedisProperties redisProperties;
 
   @InjectMocks
   private MessageStatusServiceImpl messageStatusService;
@@ -292,6 +294,10 @@ public class MessageStatusServiceImplTest {
 
   @Test
   public void testGivenChatroomIdAndUserIdByEnterChatroomReturnVoid() {
+    Map<String, String> key = new HashMap<>();
+    key.put("active-chatroom", "chatroom:{chatroomId}:active.user");
+
+    when(redisProperties.getKey()).thenReturn(key);
     when(userService.getUser(USER_ID)).thenReturn(USER);
     when(
             chatroomService.getChatroom(CHATROOM_ID, SESSION.getUserId())).thenReturn(
@@ -306,6 +312,7 @@ public class MessageStatusServiceImplTest {
             messageStatus2);
     when(messageStatusRepository.save(messageStatus3)).thenReturn(
             messageStatus3);
+    doNothing().when(chatroomService).syncChatroomList(USER_ID);
 
     messageStatusService.enterChatroom(CHATROOM_ID, USER_ID);
 
@@ -320,13 +327,20 @@ public class MessageStatusServiceImplTest {
     verify(messageService).getMessage(MESSAGE_ID_2);
     verify(messageStatusRepository).save(messageStatus2);
     verify(messageStatusRepository).save(messageStatus3);
+    verify(chatroomService).syncChatroomList(USER_ID);
+    verify(redisProperties).getKey();
   }
 
   @Test
   public void testGivenChatroomIdAndUserIdByLeaveChatroomReturnVoid() {
+    Map<String, String> key = new HashMap<>();
+    key.put("active-chatroom", "chatroom:{chatroomId}:active.user");
+
+    when(redisProperties.getKey()).thenReturn(key);
     messageStatusService.leaveChatroom(CHATROOM_ID, USER_ID);
 
     verify(redisTemplate.opsForSet()).remove("chatroom:" + CHATROOM_ID + ":active.user", USER_ID);
+    verify(redisProperties).getKey();
   }
 
 }

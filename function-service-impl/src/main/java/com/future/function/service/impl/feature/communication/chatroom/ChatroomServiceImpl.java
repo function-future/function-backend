@@ -169,7 +169,6 @@ public class ChatroomServiceImpl implements ChatroomService {
   @Override
   public Chatroom syncChatroomList(Chatroom chatroom) {
     chatroom.getMembers().forEach(member -> {
-      System.out.println("INSIDE SYNC " + member.getId());
       this.syncChatroomList(member.getId());
     });
     return chatroom;

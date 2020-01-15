@@ -21,6 +21,7 @@ import com.future.function.web.mapper.request.communication.ChatroomRequestMappe
 import com.future.function.web.mapper.request.communication.MessageRequestMapper;
 import com.future.function.web.mapper.response.communication.ChatroomResponseMapper;
 import com.future.function.web.model.mq.ChatPayload;
+import com.future.function.web.model.request.communication.ChatroomLimitRequest;
 import com.future.function.web.model.request.communication.ChatroomRequest;
 import com.future.function.web.model.request.communication.MessageRequest;
 import com.future.function.web.model.response.base.DataResponse;
@@ -116,6 +117,8 @@ public class ChatroomControllerTest extends TestHelper {
   private JacksonTester<ChatroomRequest> chatroomRequestJacksonTester;
 
   private JacksonTester<MessageRequest> messageRequestJacksonTester;
+
+  private JacksonTester<ChatroomLimitRequest> chatroomLimitRequestJacksonTester;
 
   @MockBean
   private MqProperties mqProperties;
@@ -500,6 +503,33 @@ public class ChatroomControllerTest extends TestHelper {
                     .getJson()));
 
     verify(messageStatusService).leaveChatroom(CHATROOM_ID, ADMIN_SESSION.getUserId());
+  }
+
+  @Test
+  public void testGivenCallToChatroomsApiBySetLimitReturnBaseResponseOk()
+          throws Exception {
+
+    super.setCookie(Role.ADMIN);
+
+    ChatroomLimitRequest request = ChatroomLimitRequest.builder()
+            .limit(5L)
+            .build();
+
+    doNothing().when(chatroomService)
+            .setLimitChatrooms(ADMIN_SESSION.getUserId(), request.getLimit());
+
+    mockMvc.perform(post(
+            "/api/communication/chatrooms/_setlimit").cookie(cookies)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .content(
+                    chatroomLimitRequestJacksonTester.write(request)
+                            .getJson()))
+            .andExpect(status().isOk())
+            .andExpect(content().json(baseResponseJacksonTester.write(
+                    ResponseHelper.toBaseResponse(HttpStatus.OK))
+                    .getJson()));
+
+    verify(chatroomService).setLimitChatrooms(ADMIN_SESSION.getUserId(), request.getLimit());
   }
 
 }

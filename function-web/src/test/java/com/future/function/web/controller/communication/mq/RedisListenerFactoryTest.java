@@ -20,6 +20,9 @@ public class RedisListenerFactoryTest {
   @Mock
   NotificationRedisListener notificationRedisListener;
 
+  @Mock
+  ChatroomRedisListener chatroomRedisListener;
+
   @InjectMocks
   RedisListenerFactory listenerFactory;
 
@@ -33,6 +36,12 @@ public class RedisListenerFactoryTest {
   public void testGivenNotificationTopicByGettingMessageListenerReturnMessageListener() {
     NotificationRedisListener listener = (NotificationRedisListener) listenerFactory.getMessageListener("notification");
     assertThat(listener).isEqualTo(notificationRedisListener);
+  }
+
+  @Test
+  public void testGivenChatroomTopicByGettingMessageListenerReturnMessageListener() {
+    ChatroomRedisListener listener = (ChatroomRedisListener) listenerFactory.getMessageListener("chatroom");
+    assertThat(listener).isEqualTo(chatroomRedisListener);
   }
 
   @Test
