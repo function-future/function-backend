@@ -28,4 +28,5 @@ public interface ChatroomService {
 
   Chatroom syncChatroomList(Chatroom chatroom);
 
+  Chatroom updateDate(Chatroom chatroom);
 }
