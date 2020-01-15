@@ -234,8 +234,8 @@ public class UserRequestMapperTest {
     String validatedResult =
       userRequestMapper.validateNotLoggedInUser(session, userId);
 
-    assertThat(validatedResult).isNotEqualTo(userId);
-    assertThat(validatedResult).isEqualTo(userId + "2");
+    assertThat(validatedResult).isEqualTo(userId);
+    assertThat(validatedResult).isNotEqualTo(userId + "2");
   }
 
 }
