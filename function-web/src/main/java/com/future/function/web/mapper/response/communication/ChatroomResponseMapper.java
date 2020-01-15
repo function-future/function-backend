@@ -111,9 +111,8 @@ public class ChatroomResponseMapper {
       return chatroom.getMembers()
               .stream()
               .filter(member -> !member.getId().equals(user.getId()))
-              .map(member -> ParticipantResponseMapper.getAvatarThumbnailUrl(user.getPictureV2(), urlPrefix))
-              .findFirst()
-              .orElse("");
+              .map(member -> ParticipantResponseMapper.getAvatarThumbnailUrl(member.getPictureV2(), urlPrefix))
+              .collect(Collectors.joining());
 
     } else {
       return chatroom.getPicture();
