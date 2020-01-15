@@ -342,6 +342,38 @@ public class SharedCourseServiceImplTest {
   }
 
   @Test
+  public void testGivenCourseIdsAndNoMaterialCourseAndOriginBatchCodeAndTargetBatchCodeByCreatingCourseForBatchFromAnotherBatchReturnListOfCourse() {
+
+    String originBatchCode = "origin-batch-code";
+    Batch originBatch = Batch.builder()
+      .code(originBatchCode)
+      .build();
+    when(batchService.getBatchByCode(originBatchCode)).thenReturn(originBatch);
+    when(batchService.getBatchByCode(BATCH_CODE)).thenReturn(BATCH);
+    sharedCourse.getCourse().setFile(new FileV2());
+    when(sharedCourseRepository.findAllByBatch(originBatch)).thenReturn(
+      Stream.of(sharedCourse));
+
+    when(sharedCourseRepository.save(sharedCourse)).thenReturn(sharedCourse);
+
+    List<String> sharedCourseIds = Collections.singletonList(
+      sharedCourse.getId());
+    List<Course> createdCourseList = sharedCourseService.createCourseForBatch(
+      sharedCourseIds, originBatchCode, BATCH_CODE);
+
+    assertThat(createdCourseList).isNotEmpty();
+    assertThat(createdCourseList).isEqualTo(courseList);
+    assertThat(createdCourseList.get(0)
+                 .getFile()).isEqualTo(new FileV2());
+
+    verify(batchService).getBatchByCode(originBatchCode);
+    verify(batchService).getBatchByCode(BATCH_CODE);
+    verify(sharedCourseRepository).findAllByBatch(originBatch);
+    verify(sharedCourseRepository).save(sharedCourse);
+    verifyZeroInteractions(resourceService, discussionService);
+  }
+
+  @Test
   public void testGivenCourseIdsAndNullOriginBatchCodeAndTargetBatchCodeByCreatingCourseForBatchFromMasterDataReturnListOfCourse() {
 
     when(courseService.getCourse(COURSE_ID)).thenReturn(course);
@@ -397,6 +429,29 @@ public class SharedCourseServiceImplTest {
     verify(resourceService).createACopy(FILE, FileOrigin.COURSE);
     verify(sharedCourseRepository).save(sharedCourse);
     verifyZeroInteractions(discussionService);
+  }
+
+  @Test
+  public void testGivenCourseIdsAndNoMaterialCourseAndEmptyOriginBatchCodeAndTargetBatchCodeByCreatingCourseForBatchFromMasterDataReturnListOfCourse() {
+
+    course.setFile(new FileV2());
+    when(courseService.getCourse(COURSE_ID)).thenReturn(course);
+    when(batchService.getBatchByCode(BATCH_CODE)).thenReturn(BATCH);
+
+    when(sharedCourseRepository.save(sharedCourse)).thenReturn(sharedCourse);
+
+    List<Course> createdCourseList = sharedCourseService.createCourseForBatch(
+      COURSE_IDS, "", BATCH_CODE);
+
+    assertThat(createdCourseList).isNotEmpty();
+    assertThat(createdCourseList).isEqualTo(courseList);
+    assertThat(createdCourseList.get(0)
+                 .getFile()).isEqualTo(new FileV2());
+
+    verify(courseService).getCourse(COURSE_ID);
+    verify(batchService).getBatchByCode(BATCH_CODE);
+    verify(sharedCourseRepository).save(sharedCourse);
+    verifyZeroInteractions(resourceService, discussionService);
   }
 
   @Test
