@@ -12,6 +12,8 @@ import com.future.function.service.api.feature.communication.chatroom.ChatroomSe
 import com.future.function.service.api.feature.communication.mq.MessagePublisherService;
 import com.future.function.service.api.feature.core.UserService;
 import com.future.function.service.impl.helper.PageHelper;
+import org.checkerframework.checker.nullness.Opt;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -122,16 +124,24 @@ public class ChatroomServiceImpl implements ChatroomService {
 
   @Override
   public Chatroom updateChatroom(Chatroom chatroom, String userId) {
-
-    return Optional.of(chatroom)
+    Chatroom beforeUpdate = Optional.of(chatroom)
       .map(Chatroom::getId)
       .map(chatroomRepository::findOne)
+      .orElse(chatroom);
+
+    Chatroom afterUpdate = Optional.of(beforeUpdate)
       .map(c -> this.validateAuthorization(c, userId))
       .map(room -> this.updateMember(room, chatroom))
       .map(room -> this.updateTitle(room, chatroom))
       .map(chatroomRepository::save)
+      .map(this::syncChatroomList)
       .orElse(chatroom);
+
+    this.syncChatroomList(beforeUpdate);
+    return afterUpdate;
   }
+
+
 
   @Override
   public Chatroom getPublicChatroom() {
@@ -172,6 +182,12 @@ public class ChatroomServiceImpl implements ChatroomService {
       this.syncChatroomList(member.getId());
     });
     return chatroom;
+  }
+
+  @Override
+  public Chatroom updateDate(Chatroom chatroom) {
+    chatroom.setUpdatedAt(new Date().getTime());
+    return chatroomRepository.save(chatroom);
   }
 
   private Chatroom updateMember(

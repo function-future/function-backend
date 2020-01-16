@@ -123,7 +123,7 @@ public class ChatroomServiceImplTest {
   @AfterClass
   public static void tearDownClass() {
 
-    int numberOfTestMethodInClass = 13;
+    int numberOfTestMethodInClass = 14;
 
     verify(redisTemplate, times(numberOfTestMethodInClass)).opsForValue();
   }
@@ -414,5 +414,14 @@ public class ChatroomServiceImplTest {
     verify(mqProperties, times(2)).getTopic();
     verify(messagePublisherService).publish(USER_ID_1, "chatroom");
     verify(messagePublisherService).publish(USER_ID_2, "chatroom");
+  }
+
+  @Test
+  public void testGivenChatroomByCallingUpdateDateReturnChatroom() {
+    when(chatroomRepository.save(chatroom)).thenReturn(chatroom);
+
+    chatroomService.updateDate(chatroom);
+
+    verify(chatroomRepository).save(chatroom);
   }
 }

@@ -235,7 +235,7 @@ public class MessageServiceImplTest {
       chatroomService.getChatroom(CHATROOM_ID, SESSION.getUserId())).thenReturn(
       CHATROOM);
     when(
-      chatroomService.updateChatroom(CHATROOM, SESSION.getUserId())).thenReturn(
+      chatroomService.updateDate(CHATROOM)).thenReturn(
       CHATROOM);
 
     message1.setChatroom(CHATROOM);
@@ -251,7 +251,7 @@ public class MessageServiceImplTest {
     verify(messageRepository).save(message1);
     verify(userService).getUser(USER_ID);
     verify(chatroomService).getChatroom(CHATROOM_ID, SESSION.getUserId());
-    verify(chatroomService).updateChatroom(CHATROOM, SESSION.getUserId());
+    verify(chatroomService).updateDate(CHATROOM);
   }
 
 }
