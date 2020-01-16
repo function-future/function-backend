@@ -19,7 +19,7 @@ public class DataMigration_021 {
       order = "0001")
   public void addScoringAccess(MongoTemplate mongoTemplate) {
 
-    String scoringRegex = "\\/scoring(\\/)?";
+    String scoringRegex = "\\/scoring(\\/|.*)?";
     String finalJudgingRegex = "\\/final-judging(\\/)?";
 
     Map<String, Object> adminComponents = new HashMap<>();
