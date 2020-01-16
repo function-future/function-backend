@@ -99,7 +99,8 @@ public class UserRequestMapper {
 
     return Optional.ofNullable(session)
       .map(Session::getUserId)
-      .filter(sessionUserId -> !userId.equals(sessionUserId))
+      .filter(loggedInUserId -> !userId.equals(loggedInUserId))
+      .map(loggedInUserId -> userId)
       .orElseThrow(() -> new BadRequestException("Self-deletion Attempt"));
   }
 

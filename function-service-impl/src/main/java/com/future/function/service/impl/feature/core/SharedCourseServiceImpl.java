@@ -24,7 +24,6 @@ import org.springframework.util.StringUtils;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -186,7 +185,7 @@ public class SharedCourseServiceImpl implements SharedCourseService {
   private Course createCourseFileCopy(Course course) {
 
     Optional.of(course)
-      .filter(c -> Objects.nonNull(c.getFile()))
+      .filter(c -> !new FileV2().equals(c.getFile()))
       .ifPresent(c -> c.setFile(
         resourceService.createACopy(course.getFile(), FileOrigin.COURSE)));
 
