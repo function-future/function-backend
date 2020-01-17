@@ -26,10 +26,10 @@ public class DataMigration_022 {
     adminComponents.put("delete", true);
 
     Map<String, Object> otherComponents = new HashMap<>();
-    adminComponents.put("read", true);
-    adminComponents.put("create", false);
-    adminComponents.put("edit", false);
-    adminComponents.put("delete", false);
+    otherComponents.put("read", true);
+    otherComponents.put("create", false);
+    otherComponents.put("edit", false);
+    otherComponents.put("delete", false);
 
     Access adminScoringAccess = Access.builder()
         .role(Role.ADMIN)
