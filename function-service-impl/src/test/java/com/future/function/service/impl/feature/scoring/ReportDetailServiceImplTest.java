@@ -221,6 +221,7 @@ public class ReportDetailServiceImplTest {
     StudentSummaryVO actual = reportDetailService.findSummaryByStudentId(USER_ID, USER_ID, TYPE, pageable);
     assertThat(actual).isEqualTo(studentSummaryVO);
     verify(reportDetailRepository).findByUserIdAndDeletedFalse(USER_ID);
+    verify(userService).getUser(USER_ID);
   }
 
   @Test
