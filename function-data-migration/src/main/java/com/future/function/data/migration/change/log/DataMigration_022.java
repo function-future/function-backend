@@ -8,11 +8,9 @@ import com.github.cloudyrock.mongock.ChangeSet;
 import java.util.HashMap;
 import java.util.Map;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 
-@ChangeLog(order = "021")
-public class DataMigration_021 {
+@ChangeLog(order = "022")
+public class DataMigration_022 {
 
   @ChangeSet(author = "oliver",
       id = "addScoringAccessList",
@@ -20,7 +18,6 @@ public class DataMigration_021 {
   public void addScoringAccess(MongoTemplate mongoTemplate) {
 
     String scoringRegex = "\\/scoring(\\/|.*)?";
-    String finalJudgingRegex = "\\/final-judging(\\/)?";
 
     Map<String, Object> adminComponents = new HashMap<>();
     adminComponents.put("read", true);
