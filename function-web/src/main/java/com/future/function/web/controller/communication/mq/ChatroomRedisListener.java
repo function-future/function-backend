@@ -7,6 +7,7 @@ import com.future.function.common.properties.core.FileProperties;
 import com.future.function.service.api.feature.communication.chatroom.ChatroomService;
 import com.future.function.service.api.feature.communication.chatroom.MessageService;
 import com.future.function.service.api.feature.communication.chatroom.MessageStatusService;
+import com.future.function.service.api.feature.core.ResourceService;
 import com.future.function.service.api.feature.core.UserService;
 import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.response.communication.ChatroomResponseMapper;
@@ -39,6 +40,8 @@ public class ChatroomRedisListener implements BaseListener {
 
   private final UserService userService;
 
+  private final ResourceService resourceService;
+
   private final FileProperties fileProperties;
 
   private final WsProperties wsProperties;
@@ -50,7 +53,7 @@ public class ChatroomRedisListener implements BaseListener {
                                RedisProperties redisProperties, SimpMessagingTemplate messagingTemplate,
                                ChatroomService chatroomService, MessageService messageService,
                                MessageStatusService messageStatusService, UserService userService,
-                               FileProperties fileProperties, WsProperties wsProperties) {
+                               ResourceService resourceService, FileProperties fileProperties, WsProperties wsProperties) {
     this.objectMapper = objectMapper;
     this.valueOperations = redisTemplate.opsForValue();
     this.redisProperties = redisProperties;
@@ -59,6 +62,7 @@ public class ChatroomRedisListener implements BaseListener {
     this.messageService = messageService;
     this.messageStatusService = messageStatusService;
     this.userService = userService;
+    this.resourceService = resourceService;
     this.fileProperties = fileProperties;
     this.wsProperties = wsProperties;
   }
@@ -85,7 +89,7 @@ public class ChatroomRedisListener implements BaseListener {
   private void processMessage(String userId, Long limit) {
     PagingResponse<ChatroomResponse> response = ChatroomResponseMapper.toPagingChatroomResponse(
       chatroomService.getChatrooms(userId, PageHelper.toPageable(1, limit.intValue())),
-      messageService, messageStatusService, userService, fileProperties.getUrlPrefix(), userId
+      messageService, messageStatusService, userService, resourceService, fileProperties.getUrlPrefix(), userId
     );
     this.publishMessageToWebsocket(response, userId);
   }

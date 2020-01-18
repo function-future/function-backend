@@ -9,6 +9,7 @@ import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.service.api.feature.communication.chatroom.MessageService;
 import com.future.function.service.api.feature.communication.chatroom.MessageStatusService;
+import com.future.function.service.api.feature.core.ResourceService;
 import com.future.function.service.api.feature.core.UserService;
 import com.future.function.session.model.Session;
 import com.future.function.web.mapper.helper.PageHelper;
@@ -130,6 +131,9 @@ public class ChatroomResponseMapperTest {
   @Mock
   private UserService userService;
 
+  @Mock
+  private ResourceService resourceService;
+
   @After
   public void tearDown() {
 
@@ -140,7 +144,7 @@ public class ChatroomResponseMapperTest {
   public void testGivenChatroomByCallingToChatroomDetailDataReturnDataResponse() {
 
     DataResponse<ChatroomDetailResponse> data =
-      ChatroomResponseMapper.toChatroomDetailDataResponse(CHATROOM, URL_PREFIX);
+      ChatroomResponseMapper.toChatroomDetailDataResponse(CHATROOM, URL_PREFIX, resourceService);
 
     assertThat(data).isNotNull();
     assertThat(data.getCode()).isEqualTo(200);
@@ -176,6 +180,7 @@ public class ChatroomResponseMapperTest {
                                                       messageService,
                                                       messageStatusService,
                                                       userService,
+                                                      resourceService,
                                                       URL_PREFIX,
                                                       SESSION.getUserId()
       );
@@ -212,6 +217,7 @@ public class ChatroomResponseMapperTest {
                     messageService,
                     messageStatusService,
                     userService,
+                    resourceService,
                     URL_PREFIX,
                     SESSION.getUserId()
             );

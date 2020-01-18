@@ -10,10 +10,9 @@ import com.future.function.model.entity.feature.core.User;
 import com.future.function.repository.feature.communication.chatting.ChatroomRepository;
 import com.future.function.service.api.feature.communication.chatroom.ChatroomService;
 import com.future.function.service.api.feature.communication.mq.MessagePublisherService;
+import com.future.function.service.api.feature.core.ResourceService;
 import com.future.function.service.api.feature.core.UserService;
 import com.future.function.service.impl.helper.PageHelper;
-import org.checkerframework.checker.nullness.Opt;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -40,18 +39,21 @@ public class ChatroomServiceImpl implements ChatroomService {
 
   private final MqProperties mqProperties;
 
+  private final ResourceService resourceService;
+
   @Autowired
   public ChatroomServiceImpl(
           UserService userService,
           ChatroomRepository chatroomRepository,
           RedisTemplate<String, Object> redisTemplate,
-          RedisProperties redisProperties, MessagePublisherService publisherService, MqProperties mqProperties) {
+          RedisProperties redisProperties, MessagePublisherService publisherService, MqProperties mqProperties, ResourceService resourceService) {
     this.valueOperations = redisTemplate.opsForValue();
     this.userService = userService;
     this.chatroomRepository = chatroomRepository;
     this.redisProperties = redisProperties;
     this.publisherService = publisherService;
     this.mqProperties = mqProperties;
+    this.resourceService = resourceService;
   }
 
   @Override
@@ -117,6 +119,7 @@ public class ChatroomServiceImpl implements ChatroomService {
     return Optional.of(chatroom)
       .map(this::setMembers)
       .map(this::setChatroomName)
+      .map(this::markFileAsUsed)
       .map(chatroomRepository::save)
       .map(this::syncChatroomList)
       .orElseThrow(UnsupportedOperationException::new);
@@ -133,6 +136,10 @@ public class ChatroomServiceImpl implements ChatroomService {
       .map(c -> this.validateAuthorization(c, userId))
       .map(room -> this.updateMember(room, chatroom))
       .map(room -> this.updateTitle(room, chatroom))
+      .map(room -> {
+        this.markFileAsUsed(chatroom);
+        return room;
+      })
       .map(chatroomRepository::save)
       .map(this::syncChatroomList)
       .orElse(chatroom);
@@ -140,8 +147,6 @@ public class ChatroomServiceImpl implements ChatroomService {
     this.syncChatroomList(beforeUpdate);
     return afterUpdate;
   }
-
-
 
   @Override
   public Chatroom getPublicChatroom() {
@@ -188,6 +193,15 @@ public class ChatroomServiceImpl implements ChatroomService {
   public Chatroom updateDate(Chatroom chatroom) {
     chatroom.setUpdatedAt(new Date().getTime());
     return chatroomRepository.save(chatroom);
+  }
+
+  private Chatroom markFileAsUsed(Chatroom chatroom) {
+    try {
+      resourceService.markFilesUsed(Collections.singletonList(chatroom.getPicture()), true);
+    } catch (NotFoundException e) {
+      return chatroom;
+    }
+    return chatroom;
   }
 
   private Chatroom updateMember(

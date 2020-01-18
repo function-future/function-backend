@@ -10,6 +10,7 @@ import com.future.function.model.entity.feature.core.User;
 import com.future.function.repository.feature.communication.chatting.ChatroomRepository;
 import com.future.function.service.api.feature.communication.chatroom.MessageStatusService;
 import com.future.function.service.api.feature.communication.mq.MessagePublisherService;
+import com.future.function.service.api.feature.core.ResourceService;
 import com.future.function.service.api.feature.core.UserService;
 import com.future.function.service.impl.feature.communication.chatroom.ChatroomServiceImpl;
 import com.future.function.session.model.Session;
@@ -107,6 +108,9 @@ public class ChatroomServiceImplTest {
 
   @Mock
   private MqProperties mqProperties;
+
+  @Mock
+  private ResourceService resourceService;
 
   private static RedisTemplate<String, Object> redisTemplate;
 

@@ -7,6 +7,7 @@ import com.future.function.service.api.feature.communication.chatroom.ChatroomSe
 import com.future.function.service.api.feature.communication.chatroom.MessageService;
 import com.future.function.service.api.feature.communication.chatroom.MessageStatusService;
 import com.future.function.service.api.feature.communication.mq.MessagePublisherService;
+import com.future.function.service.api.feature.core.ResourceService;
 import com.future.function.service.api.feature.core.UserService;
 import com.future.function.session.annotation.WithAnyRole;
 import com.future.function.session.model.Session;
@@ -60,13 +61,15 @@ public class ChatroomController {
 
   private MqProperties mqProperties;
 
+  private ResourceService resourceService;
+
   @Autowired
   public ChatroomController(
           ChatroomRequestMapper chatroomRequestMapper,
           ChatroomService chatroomService, MessageService messageService,
           MessageStatusService messageStatusService,
           FileProperties fileProperties,
-          MessagePublisherService publisherService, UserService userService, MqProperties mqProperties) {
+          MessagePublisherService publisherService, UserService userService, MqProperties mqProperties, ResourceService resourceService) {
 
     this.fileProperties = fileProperties;
     this.chatroomRequestMapper = chatroomRequestMapper;
@@ -76,6 +79,7 @@ public class ChatroomController {
     this.publisherService = publisherService;
     this.userService = userService;
     this.mqProperties = mqProperties;
+    this.resourceService = resourceService;
   }
 
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
@@ -95,14 +99,14 @@ public class ChatroomController {
       return ChatroomResponseMapper.toPagingChatroomResponse(
         chatroomService.getChatroomsWithKeyword(
           search, session.getUserId(), PageHelper.toPageable(page, size)),
-        messageService, messageStatusService, userService, fileProperties.getUrlPrefix(),
+        messageService, messageStatusService, userService, resourceService, fileProperties.getUrlPrefix(),
         session.getUserId()
       );
     } else {
       return ChatroomResponseMapper.toPagingChatroomResponse(
         chatroomService.getChatrooms(
           session.getUserId(), PageHelper.toPageable(page, size)),
-        messageService, messageStatusService, userService, fileProperties.getUrlPrefix(),
+        messageService, messageStatusService, userService, resourceService, fileProperties.getUrlPrefix(),
         session.getUserId()
       );
     }
@@ -118,7 +122,7 @@ public class ChatroomController {
 
     return ChatroomResponseMapper.toChatroomDetailDataResponse(
       chatroomService.getChatroom(chatroomId, session.getUserId()),
-      fileProperties.getUrlPrefix()
+      fileProperties.getUrlPrefix(), resourceService
     );
   }
 
@@ -199,7 +203,7 @@ public class ChatroomController {
     return ChatroomResponseMapper.toChatroomDetailDataResponse(
       chatroomService.createChatroom(
         chatroomRequestMapper.toChatroom(chatroomRequest, null)),
-      fileProperties.getUrlPrefix()
+      fileProperties.getUrlPrefix(), resourceService
     );
   }
 
@@ -237,7 +241,7 @@ public class ChatroomController {
       chatroomService.updateChatroom(
         chatroomRequestMapper.toChatroom(chatroomRequest, chatroomId),
         session.getUserId()
-      ), fileProperties.getUrlPrefix());
+      ), fileProperties.getUrlPrefix(), resourceService);
   }
 
   @PutMapping(value = "/{chatroomId:.+}/messages/{messageId:.+}/_read",

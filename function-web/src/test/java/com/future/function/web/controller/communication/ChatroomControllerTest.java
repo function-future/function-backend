@@ -12,6 +12,7 @@ import com.future.function.service.api.feature.communication.chatroom.ChatroomSe
 import com.future.function.service.api.feature.communication.chatroom.MessageService;
 import com.future.function.service.api.feature.communication.chatroom.MessageStatusService;
 import com.future.function.service.api.feature.communication.mq.MessagePublisherService;
+import com.future.function.service.api.feature.core.ResourceService;
 import com.future.function.service.api.feature.core.UserService;
 import com.future.function.web.TestHelper;
 import com.future.function.web.TestSecurityConfiguration;
@@ -98,8 +99,7 @@ public class ChatroomControllerTest extends TestHelper {
     .build();
 
   private final DataResponse<ChatroomDetailResponse>
-    CHATROOM_DETAIL_DATA_RESPONSE =
-    ChatroomResponseMapper.toChatroomDetailDataResponse(CHATROOM, URL_PREFIX);
+    CHATROOM_DETAIL_DATA_RESPONSE = new DataResponse<ChatroomDetailResponse>();
 
   private final Pageable PAGEABLE = new PageRequest(0, 10);
 
@@ -146,6 +146,9 @@ public class ChatroomControllerTest extends TestHelper {
 
   @MockBean
   private MessagePublisherService publisherService;
+
+  @MockBean
+  private ResourceService resourceService;
 
   @Override
   @Before
@@ -207,7 +210,7 @@ public class ChatroomControllerTest extends TestHelper {
     PagingResponse<ChatroomResponse> response =
       ChatroomResponseMapper.toPagingChatroomResponse(
         chatroomService.getChatroomsWithKeyword(KEYWORD, MEMBER_ID_1, PAGEABLE),
-        messageService, messageStatusService, userService, URL_PREFIX,
+        messageService, messageStatusService, userService, resourceService, URL_PREFIX,
         ADMIN_SESSION.getUserId()
       );
     when(userService.getUser(ADMIN_SESSION.getUserId())).thenReturn(MEMBER_1);
@@ -250,7 +253,7 @@ public class ChatroomControllerTest extends TestHelper {
     PagingResponse<ChatroomResponse> response =
       ChatroomResponseMapper.toPagingChatroomResponse(
         chatroomService.getChatrooms(MEMBER_ID_1, PAGEABLE),
-        messageService, messageStatusService, userService, URL_PREFIX,
+        messageService, messageStatusService, userService, resourceService, URL_PREFIX,
         ADMIN_SESSION.getUserId()
       );
 
@@ -366,7 +369,7 @@ public class ChatroomControllerTest extends TestHelper {
     when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
 
     DataResponse<ChatroomDetailResponse> response =
-      ChatroomResponseMapper.toChatroomDetailDataResponse(CHATROOM, URL_PREFIX);
+      ChatroomResponseMapper.toChatroomDetailDataResponse(CHATROOM, URL_PREFIX, resourceService);
 
     mockMvc.perform(post("/api/communication/chatrooms").cookie(cookies)
                       .contentType(MediaType.APPLICATION_JSON_VALUE)
