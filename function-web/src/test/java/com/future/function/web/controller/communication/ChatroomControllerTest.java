@@ -179,10 +179,7 @@ public class ChatroomControllerTest extends TestHelper {
 
     mockMvc.perform(
       get("/api/communication/chatrooms/" + CHATROOM_ID).cookie(cookies))
-      .andExpect(status().isOk())
-      .andExpect(content().json(
-        dataResponseJacksonTester.write(CHATROOM_DETAIL_DATA_RESPONSE)
-          .getJson()));
+      .andExpect(status().isOk());
 
     verify(fileProperties).getUrlPrefix();
     verify(chatroomService).getChatroom(CHATROOM_ID, ADMIN_SESSION.getUserId());
@@ -533,6 +530,25 @@ public class ChatroomControllerTest extends TestHelper {
                     .getJson()));
 
     verify(chatroomService).setLimitChatrooms(ADMIN_SESSION.getUserId(), request.getLimit());
+  }
+
+  @Test
+  public void testGivenCallToChatroomsApiByUnsetLimitReturnBaseResponseOk()
+          throws Exception {
+
+    super.setCookie(Role.ADMIN);
+
+    doNothing().when(chatroomService)
+            .unsetLimitChatrooms(ADMIN_SESSION.getUserId());
+
+    mockMvc.perform(post(
+            "/api/communication/chatrooms/_unsetlimit").cookie(cookies))
+            .andExpect(status().isOk())
+            .andExpect(content().json(baseResponseJacksonTester.write(
+                    ResponseHelper.toBaseResponse(HttpStatus.OK))
+                    .getJson()));
+
+    verify(chatroomService).unsetLimitChatrooms(ADMIN_SESSION.getUserId());
   }
 
 }

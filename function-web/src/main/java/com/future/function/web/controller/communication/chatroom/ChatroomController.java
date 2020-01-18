@@ -281,4 +281,10 @@ public class ChatroomController {
     return ResponseHelper.toBaseResponse(HttpStatus.OK);
   }
 
+  @PostMapping(value = "/_unsetlimit", produces = MediaType.APPLICATION_JSON_VALUE)
+  public BaseResponse unsetLimit(Session session) {
+    chatroomService.unsetLimitChatrooms(session.getUserId());
+    return ResponseHelper.toBaseResponse(HttpStatus.OK);
+  }
+
 }

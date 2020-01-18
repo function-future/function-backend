@@ -24,6 +24,8 @@ public interface ChatroomService {
 
   void setLimitChatrooms(String userId, long limit);
 
+  void unsetLimitChatrooms(String userId);
+
   void syncChatroomList(String userId);
 
   Chatroom syncChatroomList(Chatroom chatroom);

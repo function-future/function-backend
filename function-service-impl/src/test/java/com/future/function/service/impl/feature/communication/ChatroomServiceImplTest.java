@@ -24,10 +24,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.redis.core.ListOperations;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.SetOperations;
-import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.data.redis.core.*;
 
 import java.util.*;
 
@@ -116,6 +113,8 @@ public class ChatroomServiceImplTest {
 
   private static ValueOperations<String, Object> valueOperations;
 
+  private static RedisOperations<String, Object> redisOperations;
+
   @BeforeClass
   public static void setupClass() {
     redisTemplate = mock(RedisTemplate.class);
@@ -127,7 +126,7 @@ public class ChatroomServiceImplTest {
   @AfterClass
   public static void tearDownClass() {
 
-    int numberOfTestMethodInClass = 14;
+    int numberOfTestMethodInClass = 15;
 
     verify(redisTemplate, times(numberOfTestMethodInClass)).opsForValue();
   }
@@ -399,10 +398,27 @@ public class ChatroomServiceImplTest {
     when(mqProperties.getTopic()).thenReturn(topic);
     doNothing().when(messagePublisherService).publish(USER_ID_1, "chatroom");
     when(redisProperties.getKey()).thenReturn(key);
-    chatroomService.syncChatroomList(USER_ID_1);
+    chatroomService.setLimitChatrooms(USER_ID_1, 2);
 
     verify(mqProperties).getTopic();
     verify(messagePublisherService).publish(USER_ID_1, "chatroom");
+  }
+
+  @Test
+  public void testGivenUserIdAndLimitByCallingUnsetLimitChatroomsReturnVoid() {
+    Map<String, String> key = new HashMap<>();
+    key.put("limit-chatroom", "limit-chatroom");
+
+    redisOperations = mock(RedisOperations.class);
+    when(valueOperations.getOperations()).thenReturn(redisOperations);
+    doNothing().when(redisOperations).delete(USER_ID_1);
+
+    when(redisProperties.getKey()).thenReturn(key);
+    chatroomService.unsetLimitChatrooms(USER_ID_1);
+
+    verify(redisProperties).getKey();
+    verify(valueOperations).getOperations();
+    verify(redisOperations).delete(key.get("limit-chatroom"));
   }
 
   @Test

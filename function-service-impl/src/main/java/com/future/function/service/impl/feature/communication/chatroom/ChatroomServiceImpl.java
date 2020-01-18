@@ -177,6 +177,12 @@ public class ChatroomServiceImpl implements ChatroomService {
   }
 
   @Override
+  public void unsetLimitChatrooms(String userId) {
+    UriTemplate uriTemplate = new UriTemplate(redisProperties.getKey().get("limit-chatroom"));
+    valueOperations.getOperations().delete(uriTemplate.expand(userId).toString());
+  }
+
+  @Override
   public void syncChatroomList(String userId) {
     publisherService.publish(userId, mqProperties.getTopic().get("chatroom"));
   }
