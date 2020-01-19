@@ -1,5 +1,6 @@
 package com.future.function.service.impl.feature.communication.chatroom;
 
+import com.future.function.common.enumeration.communication.ChatroomType;
 import com.future.function.common.properties.communication.RedisProperties;
 import com.future.function.model.entity.feature.communication.chatting.Chatroom;
 import com.future.function.model.entity.feature.communication.chatting.Message;
@@ -126,6 +127,9 @@ public class MessageStatusServiceImpl implements MessageStatusService {
 
   @Override
   public void enterChatroom(String chatroomId, String userId) {
+    if (chatroomId.equalsIgnoreCase(ChatroomType.PUBLIC.name())) {
+      chatroomId = chatroomService.getPublicChatroom().getId();
+    }
     UriTemplate uriTemplate = new UriTemplate(redisProperties.getKey().get("active-chatroom"));
     redisSetOperations.add(uriTemplate.expand(chatroomId).toString(), userId);
     this.updateSeenStatus(chatroomId, null, userId, true);
@@ -134,6 +138,9 @@ public class MessageStatusServiceImpl implements MessageStatusService {
 
   @Override
   public void leaveChatroom(String chatroomId, String userId) {
+    if (chatroomId.equalsIgnoreCase(ChatroomType.PUBLIC.name())) {
+      chatroomId = chatroomService.getPublicChatroom().getId();
+    }
     UriTemplate uriTemplate = new UriTemplate(redisProperties.getKey().get("active-chatroom"));
     redisSetOperations.remove(uriTemplate.expand(chatroomId).toString(), userId);
   }
