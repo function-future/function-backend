@@ -517,7 +517,7 @@ public class DataMigration_006 {
              order = "0008")
   public void insertChatroomAccessList(MongoTemplate mongoTemplate) {
 
-    String urlRegex = "^\\(m)?/chatrooms(\\/(\\w+)?)?$";
+    String urlRegex = "^(\\/m)?\\/chatrooms(\\/(\\w+)?)?$";
 
     Map<String, Object> nonGuestComponent = new HashMap<>();
     nonGuestComponent.put("add", true);
