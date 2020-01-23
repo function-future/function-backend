@@ -337,9 +337,21 @@ public class MyQuestionnaireServiceImpl implements MyQuestionnaireService {
                                    ) / (count + 1));
       questionnaireResponseSummary.setScoreSummary(tempAnswerSummary);
       questionnaireResponseSummary.setCounter(count + 1);
-      questionnaireResponseSummaryRepository.save(questionnaireResponseSummary);
-    }
+    } else {
+      Answer tempAnswerSummary = Answer.builder()
+        .minimum(questionnaireResponse.getScoreSummary().getMinimum())
+        .average(questionnaireResponse.getScoreSummary().getAverage())
+        .maximum(questionnaireResponse.getScoreSummary().getMaximum())
+        .build();
 
+      questionnaireResponseSummary = QuestionnaireResponseSummary.builder()
+        .scoreSummary(tempAnswerSummary)
+        .appraisee(questionnaireResponse.getAppraisee())
+        .questionnaire(questionnaireResponse.getQuestionnaire())
+        .counter(1)
+        .build();
+    }
+    questionnaireResponseSummaryRepository.save(questionnaireResponseSummary);
   }
 
   public void updateUserQuestionnaireSummary(
