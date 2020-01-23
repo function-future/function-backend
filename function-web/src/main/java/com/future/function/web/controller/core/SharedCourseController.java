@@ -66,7 +66,7 @@ public class SharedCourseController {
   ) {
 
     return CourseResponseMapper.toCoursesPagingResponse(
-      sharedCourseService.getCoursesByBatchCode(batchCode,
+      sharedCourseService.getCoursesByBatchCode(session, batchCode,
                                                 PageHelper.toPageable(page,
                                                                       size
                                                 )
@@ -85,7 +85,8 @@ public class SharedCourseController {
   ) {
 
     return CourseResponseMapper.toCourseDataResponse(
-      sharedCourseService.getCourseByIdAndBatchCode(courseId, batchCode),
+      sharedCourseService.getCourseByIdAndBatchCode(session, courseId,
+                                                    batchCode),
       fileProperties.getUrlPrefix()
     );
   }
@@ -163,7 +164,7 @@ public class SharedCourseController {
   ) {
 
     return DiscussionResponseMapper.toDiscussionPagingResponse(
-      sharedCourseService.getDiscussions(session.getEmail(), courseId,
+      sharedCourseService.getDiscussions(session, courseId,
                                          batchCode,
                                          PageHelper.toPageable(page, size)
       ));
@@ -183,10 +184,12 @@ public class SharedCourseController {
   ) {
 
     return DiscussionResponseMapper.toDiscussionDataResponse(
-      sharedCourseService.createDiscussion(
-        discussionRequestMapper.toDiscussion(request, session.getEmail(),
+      sharedCourseService.createDiscussion(session,
+                                           discussionRequestMapper.toDiscussion(
+                                             request, session.getEmail(),
                                              courseId, batchCode
-        )));
+                                           )
+      ));
   }
 
 }
