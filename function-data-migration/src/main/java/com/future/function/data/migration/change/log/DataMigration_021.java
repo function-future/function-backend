@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@ChangeLog(order = "020")
+@ChangeLog(order = "021")
 public class DataMigration_021 {
 
   @ChangeSet(author = "jonathan",
