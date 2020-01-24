@@ -35,13 +35,7 @@ import java.util.Optional;
 import static com.googlecode.catchexception.CatchException.catchException;
 import static com.googlecode.catchexception.CatchException.caughtException;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.anyString;
-import static org.mockito.Mockito.eq;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class UserServiceImplTest {
@@ -218,7 +212,7 @@ public class UserServiceImplTest {
       PageHelper.toPage(studentsList, PAGEABLE));
 
     Page<User> foundUserStudentsPage = userService.getUsers(
-      Role.STUDENT, "", PAGEABLE);
+      Role.STUDENT, "", "", PAGEABLE);
 
     assertThat(foundUserStudentsPage).isNotNull();
     assertThat(foundUserStudentsPage.getContent()).isEqualTo(studentsList);
@@ -227,6 +221,43 @@ public class UserServiceImplTest {
       userRepository).findAllByRoleAndNameContainsIgnoreCaseAndDeletedFalse(
       Role.STUDENT, "", PAGEABLE);
     verifyZeroInteractions(batchService, resourceService, encoder, mailService, functionProperties);
+  }
+
+  @Test
+  public void testGivenRoleStudentAndBatchCodeByGettingUsersReturnStudentsPage() {
+
+    User additionalUser = User.builder()
+      .role(Role.STUDENT)
+      .email(EMAIL_STUDENT)
+      .name(NAME_STUDENT)
+      .password(PASSWORD)
+      .phone(PHONE)
+      .address(ADDRESS)
+      .pictureV2(PICTURE)
+      .batch(BATCH)
+      .university(UNIVERSITY)
+      .build();
+    additionalUser.setDeleted(false);
+
+    List<User> studentsList = Arrays.asList(userStudent, additionalUser);
+
+    when(batchService.getBatchByCode(NUMBER)).thenReturn(BATCH);
+    when(
+      userRepository.findAllByBatchAndRoleAndNameContainsIgnoreCaseAndDeletedFalse(
+        BATCH, Role.STUDENT, "", PAGEABLE)).thenReturn(
+      PageHelper.toPage(studentsList, PAGEABLE));
+
+    Page<User> foundUserStudentsPage = userService.getUsers(
+      Role.STUDENT, NUMBER, "", PAGEABLE);
+
+    assertThat(foundUserStudentsPage).isNotNull();
+    assertThat(foundUserStudentsPage.getContent()).isEqualTo(studentsList);
+
+    verify(batchService).getBatchByCode(NUMBER);
+    verify(
+      userRepository).findAllByBatchAndRoleAndNameContainsIgnoreCaseAndDeletedFalse(
+      BATCH, Role.STUDENT, "", PAGEABLE);
+    verifyZeroInteractions(resourceService, encoder, mailService, functionProperties);
   }
 
   @Test
@@ -301,7 +332,7 @@ public class UserServiceImplTest {
       PageHelper.toPage(mentorsList, PAGEABLE));
 
     Page<User> foundUserMentorsPage = userService.getUsers(
-      Role.MENTOR, name, PAGEABLE);
+      Role.MENTOR, "", name, PAGEABLE);
 
     assertThat(foundUserMentorsPage).isNotNull();
     assertThat(foundUserMentorsPage.getContent()).isEqualTo(mentorsList);

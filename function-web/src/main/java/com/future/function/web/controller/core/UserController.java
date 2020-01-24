@@ -95,6 +95,8 @@ public class UserController {
     @RequestParam(required = false)
       String role,
     @RequestParam(defaultValue = "")
+      String batch,
+    @RequestParam(defaultValue = "")
       String name,
     @RequestParam(defaultValue = "1")
       int page,
@@ -103,7 +105,7 @@ public class UserController {
   ) {
 
     return UserResponseMapper.toUsersPagingResponse(userService.getUsers(
-      Role.toRole(role), name, PageHelper.toPageable(page, size)),
+      Role.toRole(role), batch, name, PageHelper.toPageable(page, size)),
                                                     fileProperties.getUrlPrefix()
     );
   }

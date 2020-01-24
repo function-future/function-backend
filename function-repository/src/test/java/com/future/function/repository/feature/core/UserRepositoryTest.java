@@ -34,15 +34,13 @@ public class UserRepositoryTest {
 
   private static final String BATCH_CODE = "batch-code";
 
-  private static final String BATCH_ID = "batch-id";
-
-  private static final Batch BATCH = Batch.builder()
-    .id(BATCH_ID)
-    .code(BATCH_CODE)
-    .build();
-
   @Autowired
   private UserRepository userRepository;
+
+  @Autowired
+  private BatchRepository batchRepository;
+
+  private Batch batch;
 
   private User user1;
 
@@ -50,6 +48,10 @@ public class UserRepositoryTest {
 
   @Before
   public void setUp() {
+
+    batch = Batch.builder()
+      .code(BATCH_CODE)
+      .build();
 
     user1 = User.builder()
       .role(Role.ADMIN)
@@ -62,7 +64,7 @@ public class UserRepositoryTest {
       .role(Role.STUDENT)
       .name(NAME_2)
       .email(EMAIL_2)
-      .batch(BATCH)
+      .batch(batchRepository.save(batch))
       .build();
     user2.setDeleted(false);
 
@@ -74,6 +76,7 @@ public class UserRepositoryTest {
   public void tearDown() {
 
     userRepository.deleteAll();
+    batchRepository.deleteAll();
   }
 
   @Test
@@ -102,8 +105,7 @@ public class UserRepositoryTest {
   public void testGivenBatchAndRoleAndPageableByFindingUsersByRoleAndPageableReturnPageOfUsers() {
 
     Page<User> foundUsersPage =
-      userRepository.findAllByBatchAndRoleAndDeletedFalse(
-        BATCH, Role.STUDENT, new PageRequest(0, 5));
+      userRepository.findAllByBatchAndRoleAndDeletedFalse(batch, Role.STUDENT, new PageRequest(0, 5));
 
     assertThat(foundUsersPage).isNotNull();
     assertThat(foundUsersPage.getContent()).isNotEmpty();
@@ -114,7 +116,7 @@ public class UserRepositoryTest {
   public void testGivenRoleAndBatchByFindingUsersByRoleAndBatchReturnListOfUsers() {
 
     List<User> foundUsers = userRepository.findAllByRoleAndBatchAndDeletedFalse(
-      Role.STUDENT, BATCH);
+      Role.STUDENT, batch);
 
     assertThat(foundUsers).isNotEmpty();
     assertThat(foundUsers.size()).isEqualTo(1);
@@ -144,6 +146,18 @@ public class UserRepositoryTest {
     assertThat(foundUsers.getContent()).isNotEmpty();
     assertThat(foundUsers.getContent()).isEqualTo(
       Collections.singletonList(user1));
+  }
+
+  @Test
+  public void testGivenBatchAndRoleAndNameByFindingUsersByBatchAndRoleAndNameContainsIgnoreCaseReturnPageOfUsers() {
+
+    Page<User> foundUsers =
+      userRepository.findAllByBatchAndRoleAndNameContainsIgnoreCaseAndDeletedFalse(
+        batch, Role.STUDENT, "E-2", new PageRequest(0, 10));
+
+    assertThat(foundUsers.getContent()).isNotEmpty();
+    assertThat(foundUsers.getContent()).isEqualTo(
+      Collections.singletonList(user2));
   }
 
 }

@@ -22,6 +22,10 @@ public interface UserRepository extends MongoRepository<User, String> {
     Batch batch, Role role, Pageable pageable
   );
 
+  Page<User> findAllByBatchAndRoleAndNameContainsIgnoreCaseAndDeletedFalse(
+    Batch batch, Role role, String name, Pageable pageable
+  );
+
   List<User> findAllByRoleAndBatchAndDeletedFalse(Role role, Batch batch);
 
   Page<User> findAllByNameContainsIgnoreCaseAndDeletedFalse(
