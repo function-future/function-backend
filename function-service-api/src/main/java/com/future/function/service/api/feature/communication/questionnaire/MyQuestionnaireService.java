@@ -17,6 +17,10 @@ public interface MyQuestionnaireService {
     Questionnaire questionnaire, User memberLogin
   );
 
+  List<QuestionnaireResponse> getListAppraiseeDone(
+    Questionnaire questionnaire, User memberLogin
+  );
+
   QuestionnaireParticipant getQuestionnaireParticipantById(
     String questionnaireParticipantId
   );

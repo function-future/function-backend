@@ -108,7 +108,19 @@ public class MyQuestionnaireServiceImpl implements MyQuestionnaireService {
     }
 
     return participantsList;
+  }
 
+  @Override
+  public List<QuestionnaireResponse> getListAppraiseeDone(
+    Questionnaire questionnaire, User memberLogin
+  ) {
+    List<QuestionnaireResponse> questionnaireResponses;
+
+    questionnaireResponses =
+      questionnaireResponseRepository
+        .findAllByQuestionnaireAndAppraiserAndDeletedFalse(questionnaire, memberLogin);
+
+    return questionnaireResponses;
   }
 
   @Override

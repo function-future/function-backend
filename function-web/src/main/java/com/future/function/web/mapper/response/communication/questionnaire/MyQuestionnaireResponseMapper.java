@@ -4,15 +4,13 @@ import com.future.function.common.enumeration.core.Role;
 import com.future.function.model.entity.feature.communication.questionnaire.QuestionQuestionnaire;
 import com.future.function.model.entity.feature.communication.questionnaire.Questionnaire;
 import com.future.function.model.entity.feature.communication.questionnaire.QuestionnaireParticipant;
+import com.future.function.model.entity.feature.communication.questionnaire.QuestionnaireResponse;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.model.response.base.DataResponse;
-import com.future.function.web.model.response.feature.communication.questionnaire.AppraisalDataResponse;
-import com.future.function.web.model.response.feature.communication.questionnaire.AppraiseeResponse;
-import com.future.function.web.model.response.feature.communication.questionnaire.QuestionQuestionnaireResponse;
-import com.future.function.web.model.response.feature.communication.questionnaire.QuestionnaireDetailResponse;
+import com.future.function.web.model.response.feature.communication.questionnaire.*;
 import com.future.function.web.model.response.feature.core.BatchWebResponse;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -155,4 +153,25 @@ public class MyQuestionnaireResponseMapper {
       HttpStatus.OK, toQuestionQuestionnaireResponseList(data));
   }
 
+
+  public static DataResponse<List<QuestionnaireDoneResponse>> toDataResponseQuestionnaireDoneResponseList(
+    List<QuestionnaireResponse> data, String urlPrefix
+  ) {
+
+    return ResponseHelper.toDataResponse(HttpStatus.OK, toQuestionnaireDataResponseList(data, urlPrefix));
+  }
+
+  private static List<QuestionnaireDoneResponse> toQuestionnaireDataResponseList(List<QuestionnaireResponse> data, String urlPrefix) {
+
+    return data.stream()
+      .map(d -> toQuestionnaireDoneResponse(d, urlPrefix))
+      .collect(Collectors.toList());
+  }
+
+  private static QuestionnaireDoneResponse toQuestionnaireDoneResponse(QuestionnaireResponse data, String urlPrefix){
+    return QuestionnaireDoneResponse.builder()
+      .appraiseeResponse(toAppraiseeResponse(data.getAppraisee(), urlPrefix))
+      .score(data.getScoreSummary().getAverage())
+      .build();
+  }
 }

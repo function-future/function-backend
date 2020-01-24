@@ -16,10 +16,7 @@ import com.future.function.web.model.request.communication.questionnaire.Questio
 import com.future.function.web.model.response.base.BaseResponse;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
-import com.future.function.web.model.response.feature.communication.questionnaire.AppraisalDataResponse;
-import com.future.function.web.model.response.feature.communication.questionnaire.AppraiseeResponse;
-import com.future.function.web.model.response.feature.communication.questionnaire.QuestionQuestionnaireResponse;
-import com.future.function.web.model.response.feature.communication.questionnaire.QuestionnaireDetailResponse;
+import com.future.function.web.model.response.feature.communication.questionnaire.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -95,6 +92,21 @@ public class MyQuestionnaireController {
         questionnaireService.getQuestionnaire(questionnaireId),
         userService.getUser(session.getUserId())
       ), fileProperties.getUrlPrefix());
+  }
+
+  @ResponseStatus(HttpStatus.OK)
+  @GetMapping(value = "/{questionnaireId}/appraisees-done",
+    produces = MediaType.APPLICATION_JSON_VALUE)
+  public DataResponse<List<QuestionnaireDoneResponse>> getListAprraiseesDone(
+    @PathVariable
+      String questionnaireId, Session session
+  ) {
+    return MyQuestionnaireResponseMapper.toDataResponseQuestionnaireDoneResponseList(
+      myQuestionnaireService.getListAppraiseeDone(
+        questionnaireService.getQuestionnaire(questionnaireId),
+        userService.getUser(session.getUserId())
+        ),fileProperties.getUrlPrefix()
+    );
   }
 
   @ResponseStatus(HttpStatus.OK)
