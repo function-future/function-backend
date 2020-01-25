@@ -207,8 +207,8 @@ public class UserServiceImplTest {
 
     List<User> studentsList = Arrays.asList(userStudent, additionalUser);
 
-    when(userRepository.findAllByRoleAndNameContainsIgnoreCaseAndDeletedFalse(
-      Role.STUDENT, "", PAGEABLE)).thenReturn(
+    when(userRepository.findAllByNameContainsIgnoreCaseAndRoleAndDeletedFalse(
+      "", Role.STUDENT, PAGEABLE)).thenReturn(
       PageHelper.toPage(studentsList, PAGEABLE));
 
     Page<User> foundUserStudentsPage = userService.getUsers(
@@ -218,8 +218,8 @@ public class UserServiceImplTest {
     assertThat(foundUserStudentsPage.getContent()).isEqualTo(studentsList);
 
     verify(
-      userRepository).findAllByRoleAndNameContainsIgnoreCaseAndDeletedFalse(
-      Role.STUDENT, "", PAGEABLE);
+      userRepository).findAllByNameContainsIgnoreCaseAndRoleAndDeletedFalse(
+      "", Role.STUDENT, PAGEABLE);
     verifyZeroInteractions(batchService, resourceService, encoder, mailService, functionProperties);
   }
 
@@ -327,8 +327,8 @@ public class UserServiceImplTest {
     List<User> mentorsList = Arrays.asList(userMentor, additionalUser);
 
     String name = "MENT";
-    when(userRepository.findAllByRoleAndNameContainsIgnoreCaseAndDeletedFalse(
-      Role.MENTOR, name, PAGEABLE)).thenReturn(
+    when(userRepository.findAllByNameContainsIgnoreCaseAndRoleAndDeletedFalse(
+      name, Role.MENTOR, PAGEABLE)).thenReturn(
       PageHelper.toPage(mentorsList, PAGEABLE));
 
     Page<User> foundUserMentorsPage = userService.getUsers(
@@ -338,8 +338,8 @@ public class UserServiceImplTest {
     assertThat(foundUserMentorsPage.getContent()).isEqualTo(mentorsList);
 
     verify(
-      userRepository).findAllByRoleAndNameContainsIgnoreCaseAndDeletedFalse(
-      Role.MENTOR, name, PAGEABLE);
+      userRepository).findAllByNameContainsIgnoreCaseAndRoleAndDeletedFalse(
+      name, Role.MENTOR, PAGEABLE);
     verifyZeroInteractions(batchService, resourceService, encoder, mailService, functionProperties);
   }
 
@@ -576,8 +576,8 @@ public class UserServiceImplTest {
   public void testGivenBatchCodeByGettingStudentsByBatchCodeReturnListOfStudents() {
 
     when(batchService.getBatchByCode(NUMBER)).thenReturn(BATCH);
-    when(userRepository.findAllByRoleAndBatchAndDeletedFalse(Role.STUDENT,
-                                                             BATCH
+    when(userRepository.findAllByBatchAndRoleAndDeletedFalse(BATCH,
+                                                             Role.STUDENT
     )).thenReturn(Collections.singletonList(userStudent));
 
     List<User> foundStudents = userService.getStudentsByBatchCode(NUMBER);
@@ -588,8 +588,8 @@ public class UserServiceImplTest {
     assertThat(foundStudents.get(0)).isEqualTo(userStudent);
 
     verify(batchService).getBatchByCode(NUMBER);
-    verify(userRepository).findAllByRoleAndBatchAndDeletedFalse(
-      Role.STUDENT, BATCH);
+    verify(userRepository).findAllByBatchAndRoleAndDeletedFalse(
+      BATCH, Role.STUDENT);
     verifyZeroInteractions(resourceService, encoder, mailService, functionProperties);
   }
 
@@ -623,8 +623,7 @@ public class UserServiceImplTest {
   public void testGivenBatchCodeWithNoStudentRegisteredForThatCodeByGettingStudentsByBatchCodeReturnEmptyList() {
 
     when(batchService.getBatchByCode(NUMBER)).thenReturn(BATCH);
-    when(userRepository.findAllByRoleAndBatchAndDeletedFalse(Role.STUDENT,
-                                                             BATCH
+    when(userRepository.findAllByBatchAndRoleAndDeletedFalse(BATCH, Role.STUDENT
     )).thenReturn(Collections.emptyList());
 
     List<User> foundStudents = userService.getStudentsByBatchCode(NUMBER);
@@ -633,8 +632,8 @@ public class UserServiceImplTest {
     assertThat(foundStudents).isEmpty();
 
     verify(batchService).getBatchByCode(NUMBER);
-    verify(userRepository).findAllByRoleAndBatchAndDeletedFalse(
-      Role.STUDENT, BATCH);
+    verify(userRepository).findAllByBatchAndRoleAndDeletedFalse(
+      BATCH, Role.STUDENT);
     verifyZeroInteractions(resourceService, encoder, mailService, functionProperties);
   }
 

@@ -113,10 +113,10 @@ public class UserRepositoryTest {
   }
 
   @Test
-  public void testGivenRoleAndBatchByFindingUsersByRoleAndBatchReturnListOfUsers() {
+  public void testGivenBatchAndRoleByFindingUsersByRoleAndBatchReturnListOfUsers() {
 
-    List<User> foundUsers = userRepository.findAllByRoleAndBatchAndDeletedFalse(
-      Role.STUDENT, batch);
+    List<User> foundUsers = userRepository.findAllByBatchAndRoleAndDeletedFalse(
+      batch, Role.STUDENT);
 
     assertThat(foundUsers).isNotEmpty();
     assertThat(foundUsers.size()).isEqualTo(1);
@@ -140,8 +140,8 @@ public class UserRepositoryTest {
   public void testGivenRoleAndNameByFindingUsersByRoleAndNameContainsIgnoreCaseReturnPageOfUsers() {
 
     Page<User> foundUsers =
-      userRepository.findAllByRoleAndNameContainsIgnoreCaseAndDeletedFalse(
-        Role.ADMIN, "E-1", new PageRequest(0, 10));
+      userRepository.findAllByNameContainsIgnoreCaseAndRoleAndDeletedFalse(
+        "E-1", Role.ADMIN, new PageRequest(0, 10));
 
     assertThat(foundUsers.getContent()).isNotEmpty();
     assertThat(foundUsers.getContent()).isEqualTo(
