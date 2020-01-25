@@ -21,13 +21,13 @@ public class DataMigration_022 {
 
     Map<String, Object> adminComponents = new HashMap<>();
     adminComponents.put("read", true);
-    adminComponents.put("create", true);
+    adminComponents.put("add", true);
     adminComponents.put("edit", true);
     adminComponents.put("delete", true);
 
     Map<String, Object> otherComponents = new HashMap<>();
     otherComponents.put("read", true);
-    otherComponents.put("create", false);
+    otherComponents.put("add", false);
     otherComponents.put("edit", false);
     otherComponents.put("delete", false);
 
@@ -69,19 +69,19 @@ public class DataMigration_022 {
 
     Map<String, Object> adminComponents = new HashMap<>();
     adminComponents.put("read", true);
-    adminComponents.put("create", true);
+    adminComponents.put("add", true);
     adminComponents.put("edit", true);
     adminComponents.put("delete", true);
 
     Map<String, Object> studentComponents = new HashMap<>();
     studentComponents.put("read", false);
-    studentComponents.put("create", true);
+    studentComponents.put("add", true);
     studentComponents.put("edit", true);
     studentComponents.put("delete", true);
 
     Map<String, Object> otherComponents = new HashMap<>();
     otherComponents.put("read", true);
-    otherComponents.put("create", false);
+    otherComponents.put("add", false);
     otherComponents.put("edit", false);
     otherComponents.put("delete", false);
 
