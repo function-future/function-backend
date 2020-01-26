@@ -12,9 +12,11 @@ import com.future.function.service.api.feature.core.UserService;
 import com.future.function.service.impl.helper.AuthorizationHelper;
 import com.future.function.service.impl.helper.CopyHelper;
 import com.future.function.service.impl.helper.PageHelper;
+import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Optional;
@@ -52,9 +54,15 @@ public class ActivityBlogServiceImpl implements ActivityBlogService {
     String userId, String search, Pageable pageable
   ) {
 
-    return Optional.ofNullable(
-      activityBlogRepository.findAll(userId, search, pageable))
+    return Optional.ofNullable(userId)
+      .filter(this::isValidUserId)
+      .map(id -> activityBlogRepository.findAll(id, search, pageable))
       .orElseGet(() -> PageHelper.empty(pageable));
+  }
+
+  private boolean isValidUserId(String userId) {
+
+    return StringUtils.isEmpty(userId) || ObjectId.isValid(userId);
   }
 
   @Override

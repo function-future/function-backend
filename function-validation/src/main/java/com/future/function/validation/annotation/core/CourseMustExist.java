@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
 
 @Documented
 @Constraint(validatedBy = CourseMustExistValidator.class)
-@Target({ ElementType.FIELD })
+@Target({ ElementType.TYPE })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface CourseMustExist {
 
@@ -21,5 +21,7 @@ public @interface CourseMustExist {
   Class<?>[] groups() default {};
 
   Class<? extends Payload>[] payload() default {};
+
+  String field() default "courses";
 
 }

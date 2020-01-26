@@ -34,9 +34,12 @@ public final class StudentQuizDetailResponseMapper {
 
     return StudentQuizDetailWebResponse.builder()
       .point(studentQuizDetail.getPoint())
-      .trials(studentQuizDetail.getStudentQuiz()
-                .getTrials())
+      .trials(getTrialsLeft(studentQuizDetail))
       .build();
+  }
+
+  private static int getTrialsLeft(StudentQuizDetail studentQuizDetail) {
+    return studentQuizDetail.getStudentQuiz().getQuiz().getTrials() - studentQuizDetail.getStudentQuiz().getTrials();
   }
 
   public static PagingResponse<StudentQuestionWebResponse> toStudentQuestionWebResponses(
@@ -74,6 +77,14 @@ public final class StudentQuizDetailResponseMapper {
         return option;
       })
       .collect(Collectors.toList());
+  }
+
+  public static DataResponse<Long> toStudentQuestionTimeWebResponse(Long timeLimit) {
+    return DataResponse.<Long>builder()
+        .data(timeLimit)
+        .code(HttpStatus.OK.value())
+        .status(HttpStatus.OK.name())
+        .build();
   }
 
 }

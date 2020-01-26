@@ -11,16 +11,14 @@ import com.future.function.service.api.feature.communication.chatroom.MessageSer
 import com.future.function.service.api.feature.core.UserService;
 import com.future.function.service.impl.feature.communication.chatroom.MessageStatusServiceImpl;
 import com.future.function.session.model.Session;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.SetOperations;
+import org.springframework.web.util.UriTemplate;
 
 import java.util.*;
 
@@ -83,6 +81,8 @@ public class MessageStatusServiceImplTest {
 
   private static SetOperations<String, Object> setOperations;
 
+  private static RedisProperties redisProperties;
+
   @Mock
   private UserService userService;
 
@@ -95,9 +95,6 @@ public class MessageStatusServiceImplTest {
   @Mock
   private MessageService messageService;
 
-  @Mock
-  private RedisProperties redisProperties;
-
   @InjectMocks
   private MessageStatusServiceImpl messageStatusService;
 
@@ -106,8 +103,19 @@ public class MessageStatusServiceImplTest {
 
     redisTemplate = mock(RedisTemplate.class);
     setOperations = mock(SetOperations.class);
+    redisProperties = mock(RedisProperties.class);
 
     when(redisTemplate.opsForSet()).thenReturn(setOperations);
+    Map<String, String> key = new HashMap<>();
+    key.put("active-chatroom", "chatroom:{chatroomId}:active.user");
+    when(redisProperties.getKey()).thenReturn(key);
+  }
+
+  @AfterClass
+  public static void tearDownClass() {
+    int numberOfTestMethodInClass = 7;
+    verify(redisTemplate, times(numberOfTestMethodInClass)).opsForSet();
+    verify(redisProperties, times(numberOfTestMethodInClass)).getKey();
   }
 
   @Before
@@ -294,10 +302,6 @@ public class MessageStatusServiceImplTest {
 
   @Test
   public void testGivenChatroomIdAndUserIdByEnterChatroomReturnVoid() {
-    Map<String, String> key = new HashMap<>();
-    key.put("active-chatroom", "chatroom:{chatroomId}:active.user");
-
-    when(redisProperties.getKey()).thenReturn(key);
     when(userService.getUser(USER_ID)).thenReturn(USER);
     when(
             chatroomService.getChatroom(CHATROOM_ID, SESSION.getUserId())).thenReturn(
@@ -316,7 +320,7 @@ public class MessageStatusServiceImplTest {
 
     messageStatusService.enterChatroom(CHATROOM_ID, USER_ID);
 
-    verify(redisTemplate.opsForSet()).add("chatroom:" + CHATROOM_ID + ":active.user", USER_ID);
+    verify(setOperations).add("chatroom:" + CHATROOM_ID + ":active.user", USER_ID);
     verify(userService, times(3)).getUser(USER_ID);
     verify(chatroomService, times(3)).getChatroom(
             CHATROOM_ID, SESSION.getUserId());
@@ -328,19 +332,13 @@ public class MessageStatusServiceImplTest {
     verify(messageStatusRepository).save(messageStatus2);
     verify(messageStatusRepository).save(messageStatus3);
     verify(chatroomService).syncChatroomList(USER_ID);
-    verify(redisProperties).getKey();
   }
 
   @Test
   public void testGivenChatroomIdAndUserIdByLeaveChatroomReturnVoid() {
-    Map<String, String> key = new HashMap<>();
-    key.put("active-chatroom", "chatroom:{chatroomId}:active.user");
-
-    when(redisProperties.getKey()).thenReturn(key);
     messageStatusService.leaveChatroom(CHATROOM_ID, USER_ID);
 
-    verify(redisTemplate.opsForSet()).remove("chatroom:" + CHATROOM_ID + ":active.user", USER_ID);
-    verify(redisProperties).getKey();
+    verify(setOperations).remove("chatroom:" + CHATROOM_ID + ":active.user", USER_ID);
   }
 
 }

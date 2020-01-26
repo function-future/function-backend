@@ -42,8 +42,7 @@ public class ChatroomRedisListenerTest {
   @Mock
   private ObjectMapper objectMapper;
 
-  @Mock
-  private RedisProperties redisProperties;
+  private static RedisProperties redisProperties;
 
   @Mock
   private SimpMessagingTemplate simpMessagingTemplate;
@@ -63,8 +62,7 @@ public class ChatroomRedisListenerTest {
   @Mock
   private FileProperties fileProperties;
 
-  @Mock
-  private WsProperties wsProperties;
+  private static WsProperties wsProperties;
 
   private static RedisTemplate<String, Object> redisTemplate;
 
@@ -125,8 +123,18 @@ public class ChatroomRedisListenerTest {
   public static void setupClass() {
     redisTemplate = mock(RedisTemplate.class);
     valueOperations = mock(ValueOperations.class);
+    redisProperties = mock(RedisProperties.class);
+    wsProperties = mock(WsProperties.class);
 
     when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+
+    Map<String, String> key = new HashMap<>();
+    key.put("limit-chatroom", "limit-chatroom/{userId}");
+    when(redisProperties.getKey()).thenReturn(key);
+
+    Map<String, String> topic = new HashMap<>();
+    topic.put("chatroom", "chatroom/{userId}");
+    when(wsProperties.getTopic()).thenReturn(topic);
   }
 
   @AfterClass
@@ -135,28 +143,24 @@ public class ChatroomRedisListenerTest {
     int numberOfTestMethodInClass = 2;
 
     verify(redisTemplate, times(numberOfTestMethodInClass)).opsForValue();
+    verify(redisProperties, times(numberOfTestMethodInClass)).getKey();
+    verify(wsProperties, times(numberOfTestMethodInClass)).getTopic();
   }
 
   @Test
   public void testGivenMessageByCallingOnMessageReturnVoid1() throws IOException {
-    Map<String, String> key = new HashMap<>();
-    Map<String, String> topic = new HashMap<>();
-    key.put("limit-chatroom", "limit-chatroom/{userId}");
-    topic.put("chatroom", "chatroom/{userId}");
+
     Pageable page = PageHelper.toPageable(1, limit.intValue());
 
     when(objectMapper.readValue(message.getBody(), String.class)).thenReturn(userId);
-    when(redisProperties.getKey()).thenReturn(key);
     when(valueOperations.get("limit-chatroom/" + userId)).thenReturn(limit);
     when(objectMapper.convertValue(limit, Long.class)).thenReturn(limit);
     when(chatroomService.getChatrooms(userId, page)).thenReturn(new PageImpl<>(Collections.singletonList(chatroom), page, 1));
     when(fileProperties.getUrlPrefix()).thenReturn("prefix");
-    when(wsProperties.getTopic()).thenReturn(topic);
 
     chatroomRedisListener.onMessage(message, bytes);
 
     verify(objectMapper).readValue(message.getBody(), String.class);
-    verify(redisProperties).getKey();
     verify(valueOperations).get("limit-chatroom/" + userId);
     verify(objectMapper).convertValue(limit, Long.class);
     verify(chatroomService).getChatrooms(userId, page);
@@ -167,29 +171,21 @@ public class ChatroomRedisListenerTest {
 
   @Test
   public void testGivenMessageByCallingOnMessageReturnVoid2() throws IOException {
-    Map<String, String> key = new HashMap<>();
-    Map<String, String> topic = new HashMap<>();
-    key.put("limit-chatroom", "limit-chatroom/{userId}");
-    topic.put("chatroom", "chatroom/{userId}");
     Pageable page = PageHelper.toPageable(1, 1);
 
     when(objectMapper.readValue(message.getBody(), String.class)).thenReturn(userId);
-    when(redisProperties.getKey()).thenReturn(key);
     when(valueOperations.get("limit-chatroom/" + userId)).thenReturn(limit);
     when(objectMapper.convertValue(limit, Long.class)).thenReturn(null);
     when(chatroomService.getChatrooms(userId, page)).thenReturn(new PageImpl<>(Collections.singletonList(chatroom), page, 1));
     when(fileProperties.getUrlPrefix()).thenReturn("prefix");
-    when(wsProperties.getTopic()).thenReturn(topic);
 
     chatroomRedisListener.onMessage(message, bytes);
 
     verify(objectMapper).readValue(message.getBody(), String.class);
-    verify(redisProperties).getKey();
     verify(valueOperations, times(2)).get("limit-chatroom/" + userId);
     verify(objectMapper).convertValue(limit, Long.class);
     verify(chatroomService).getChatrooms(userId, page);
     verify(fileProperties).getUrlPrefix();
-    verify(wsProperties).getTopic();
 
   }
 

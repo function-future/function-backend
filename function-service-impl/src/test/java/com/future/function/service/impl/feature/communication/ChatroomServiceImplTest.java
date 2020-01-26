@@ -25,6 +25,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.*;
+import org.springframework.web.util.UriTemplate;
 
 import java.util.*;
 
@@ -97,8 +98,7 @@ public class ChatroomServiceImplTest {
   @Mock
   private MessageStatusService messageStatusService;
 
-  @Mock
-  private RedisProperties redisProperties;
+  private static RedisProperties redisProperties;
 
   @Mock
   private MessagePublisherService messagePublisherService;
@@ -119,8 +119,13 @@ public class ChatroomServiceImplTest {
   public static void setupClass() {
     redisTemplate = mock(RedisTemplate.class);
     valueOperations = mock(ValueOperations.class);
+    redisProperties = mock(RedisProperties.class);
 
     when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+
+    Map<String, String> key = new HashMap<>();
+    key.put("limit-chatroom", "limit-chatroom");
+    when(redisProperties.getKey()).thenReturn(key);
   }
 
   @AfterClass
@@ -129,6 +134,7 @@ public class ChatroomServiceImplTest {
     int numberOfTestMethodInClass = 15;
 
     verify(redisTemplate, times(numberOfTestMethodInClass)).opsForValue();
+    verify(redisProperties, times(numberOfTestMethodInClass)).getKey();
   }
 
   @InjectMocks
@@ -391,13 +397,10 @@ public class ChatroomServiceImplTest {
   @Test
   public void testGivenUserIdAndLimitByCallingSetLimitChatroomsReturnVoid() {
     Map<String, String> topic = new HashMap<>();
-    Map<String, String> key = new HashMap<>();
     topic.put("chatroom", "chatroom");
-    key.put("limit-chatroom", "limit-chatroom");
 
     when(mqProperties.getTopic()).thenReturn(topic);
     doNothing().when(messagePublisherService).publish(USER_ID_1, "chatroom");
-    when(redisProperties.getKey()).thenReturn(key);
     chatroomService.setLimitChatrooms(USER_ID_1, 2);
 
     verify(mqProperties).getTopic();
@@ -413,10 +416,8 @@ public class ChatroomServiceImplTest {
     when(valueOperations.getOperations()).thenReturn(redisOperations);
     doNothing().when(redisOperations).delete(USER_ID_1);
 
-    when(redisProperties.getKey()).thenReturn(key);
     chatroomService.unsetLimitChatrooms(USER_ID_1);
 
-    verify(redisProperties).getKey();
     verify(valueOperations).getOperations();
     verify(redisOperations).delete(key.get("limit-chatroom"));
   }

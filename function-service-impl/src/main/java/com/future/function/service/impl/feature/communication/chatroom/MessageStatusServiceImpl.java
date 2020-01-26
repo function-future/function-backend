@@ -35,6 +35,8 @@ public class MessageStatusServiceImpl implements MessageStatusService {
 
   private final RedisProperties redisProperties;
 
+  private UriTemplate uriTemplate;
+
 
   @Autowired
   public MessageStatusServiceImpl(
@@ -47,7 +49,7 @@ public class MessageStatusServiceImpl implements MessageStatusService {
     this.messageStatusRepository = messageStatusRepository;
     this.messageService = messageService;
     this.redisSetOperations = redisTemplate.opsForSet();
-
+    this.uriTemplate = new UriTemplate(redisProperties.getKey().get("active-chatroom"));
     this.redisProperties = redisProperties;
   }
 
@@ -130,7 +132,6 @@ public class MessageStatusServiceImpl implements MessageStatusService {
     if (chatroomId.equalsIgnoreCase(ChatroomType.PUBLIC.name())) {
       chatroomId = chatroomService.getPublicChatroom().getId();
     }
-    UriTemplate uriTemplate = new UriTemplate(redisProperties.getKey().get("active-chatroom"));
     redisSetOperations.add(uriTemplate.expand(chatroomId).toString(), userId);
     this.updateSeenStatus(chatroomId, null, userId, true);
     chatroomService.syncChatroomList(userId);
@@ -141,7 +142,6 @@ public class MessageStatusServiceImpl implements MessageStatusService {
     if (chatroomId.equalsIgnoreCase(ChatroomType.PUBLIC.name())) {
       chatroomId = chatroomService.getPublicChatroom().getId();
     }
-    UriTemplate uriTemplate = new UriTemplate(redisProperties.getKey().get("active-chatroom"));
     redisSetOperations.remove(uriTemplate.expand(chatroomId).toString(), userId);
   }
 

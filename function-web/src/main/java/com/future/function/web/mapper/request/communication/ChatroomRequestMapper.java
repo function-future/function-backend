@@ -49,7 +49,7 @@ public class ChatroomRequestMapper {
       .type(request.getMembers()
               .size() > 2 ? ChatroomType.GROUP : ChatroomType.PRIVATE)
       .members(members)
-      .picture(request.getPicture())
+      .picture(request.getPicture() != null && request.getPicture().size() > 0 ? request.getPicture().get(0) : null)
       .build();
 
     if (chatroomId != null) {

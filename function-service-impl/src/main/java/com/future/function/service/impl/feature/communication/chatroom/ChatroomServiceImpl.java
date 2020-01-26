@@ -41,6 +41,8 @@ public class ChatroomServiceImpl implements ChatroomService {
 
   private final ResourceService resourceService;
 
+  private UriTemplate uriTemplate;
+
   @Autowired
   public ChatroomServiceImpl(
           UserService userService,
@@ -54,6 +56,8 @@ public class ChatroomServiceImpl implements ChatroomService {
     this.publisherService = publisherService;
     this.mqProperties = mqProperties;
     this.resourceService = resourceService;
+    this.uriTemplate = new UriTemplate(redisProperties.getKey().get("limit-chatroom"));
+
   }
 
   @Override
@@ -138,6 +142,7 @@ public class ChatroomServiceImpl implements ChatroomService {
       .map(room -> this.updateTitle(room, chatroom))
       .map(room -> {
         this.markFileAsUsed(chatroom);
+        room.setPicture(chatroom.getPicture());
         return room;
       })
       .map(chatroomRepository::save)
@@ -171,14 +176,12 @@ public class ChatroomServiceImpl implements ChatroomService {
 
   @Override
   public void setLimitChatrooms(String userId, long limit) {
-    UriTemplate uriTemplate = new UriTemplate(redisProperties.getKey().get("limit-chatroom"));
     valueOperations.set(uriTemplate.expand(userId).toString(), limit);
     this.syncChatroomList(userId);
   }
 
   @Override
   public void unsetLimitChatrooms(String userId) {
-    UriTemplate uriTemplate = new UriTemplate(redisProperties.getKey().get("limit-chatroom"));
     valueOperations.getOperations().delete(uriTemplate.expand(userId).toString());
   }
 

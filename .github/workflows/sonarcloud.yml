@@ -1,0 +1,18 @@
+name: Sonarcloud Analysis
+
+on: push
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: Switch to Jakarta Time Zone
+      run: |
+        sudo timedatectl set-timezone Asia/Jakarta
+    - name: Sonar Scan by Sonarcloud
+      run: |
+        mvn clean install org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

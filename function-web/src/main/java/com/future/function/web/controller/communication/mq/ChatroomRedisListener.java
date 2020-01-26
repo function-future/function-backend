@@ -48,6 +48,10 @@ public class ChatroomRedisListener implements BaseListener {
 
   private final ValueOperations<String, Object> valueOperations;
 
+  private UriTemplate uriTemplateWs;
+
+  private UriTemplate uriTemplateRedis;
+
   @Autowired
   public ChatroomRedisListener(ObjectMapper objectMapper, RedisTemplate<String, Object> redisTemplate,
                                RedisProperties redisProperties, SimpMessagingTemplate messagingTemplate,
@@ -65,6 +69,9 @@ public class ChatroomRedisListener implements BaseListener {
     this.resourceService = resourceService;
     this.fileProperties = fileProperties;
     this.wsProperties = wsProperties;
+    this.uriTemplateWs = new UriTemplate(wsProperties.getTopic().get("chatroom"));
+    this.uriTemplateRedis = new UriTemplate(redisProperties.getKey().get("limit-chatroom"));
+
   }
 
   @Override
@@ -75,8 +82,7 @@ public class ChatroomRedisListener implements BaseListener {
   public void onMessage(Message message, byte[] bytes) {
     try {
       String userId = objectMapper.readValue(message.getBody(), String.class);
-      UriTemplate uriTemplate = new UriTemplate(redisProperties.getKey().get("limit-chatroom"));
-      Long limit = objectMapper.convertValue(valueOperations.get(uriTemplate.expand(userId).toString()), Long.class);
+      Long limit = objectMapper.convertValue(valueOperations.get(uriTemplateRedis.expand(userId).toString()), Long.class);
       if (limit == null) {
         limit = 1L;
       }
@@ -95,7 +101,6 @@ public class ChatroomRedisListener implements BaseListener {
   }
 
   private void publishMessageToWebsocket(PagingResponse<ChatroomResponse> message, String userId) {
-    UriTemplate uriTemplate = new UriTemplate(wsProperties.getTopic().get("chatroom"));
-    messagingTemplate.convertAndSend(uriTemplate.expand(userId).toString(), message);
+    messagingTemplate.convertAndSend(uriTemplateWs.expand(userId).toString(), message);
   }
 }
