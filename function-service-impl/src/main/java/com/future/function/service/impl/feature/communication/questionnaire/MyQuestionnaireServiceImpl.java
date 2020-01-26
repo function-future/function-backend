@@ -184,9 +184,9 @@ public class MyQuestionnaireServiceImpl implements MyQuestionnaireService {
 
     Float avarageScore = new Float(0.0);
 
-    System.out.println(questionResponses.size());
+//    System.out.println(questionResponses.size());
     for (QuestionResponse questionResponse : questionResponses) {
-      System.out.println(questionResponse);
+//      System.out.println(questionResponse);
       this.questionResponseRepository.save(questionResponse);
       updateQuestionResponseSummary(questionnaire, questionResponse);
       scoreSummary.setMaximum(

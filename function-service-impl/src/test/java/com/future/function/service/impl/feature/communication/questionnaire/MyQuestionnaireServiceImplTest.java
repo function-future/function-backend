@@ -203,6 +203,7 @@ public class MyQuestionnaireServiceImplTest {
       .id(QUESTIONNAIRE_RESPONSE_ID_1)
       .questionnaire(questionnaire1)
       .appraisee(user1)
+      .appraiser(memberLoggedIn)
       .build();
 
     questionnaireResponseSummary = QuestionnaireResponseSummary.builder()
@@ -520,5 +521,26 @@ public class MyQuestionnaireServiceImplTest {
       .save(Arrays.asList(questionResponseQueue,questionResponseQueue2));
     verify(questionnaireResponseRepository)
       .save(any(QuestionnaireResponse.class));
+  }
+
+  @Test
+  public void testgetListAppraiseeDone(){
+
+    when(questionnaireResponseRepository.findAllByQuestionnaireAndAppraiserAndDeletedFalse(
+      questionnaire1,
+      memberLoggedIn
+    )).thenReturn(Arrays.asList(questionnaireResponse1));
+
+    List<QuestionnaireResponse> ret = myQuestionnaireService.getListAppraiseeDone(
+      questionnaire1,
+      memberLoggedIn
+    );
+
+    verify(questionnaireResponseRepository)
+      .findAllByQuestionnaireAndAppraiserAndDeletedFalse(
+        questionnaire1, memberLoggedIn);
+
+    assertThat(ret.size()).isEqualTo(1);
+    assertThat(ret.get(0)).isEqualTo(questionnaireResponse1);
   }
 }

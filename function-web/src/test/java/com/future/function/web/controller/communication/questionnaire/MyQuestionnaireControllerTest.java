@@ -20,10 +20,7 @@ import com.future.function.web.model.request.communication.questionnaire.Questio
 import com.future.function.web.model.request.communication.questionnaire.QuestionnaireResponseRequest;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
-import com.future.function.web.model.response.feature.communication.questionnaire.AppraisalDataResponse;
-import com.future.function.web.model.response.feature.communication.questionnaire.AppraiseeResponse;
-import com.future.function.web.model.response.feature.communication.questionnaire.QuestionQuestionnaireResponse;
-import com.future.function.web.model.response.feature.communication.questionnaire.QuestionnaireDetailResponse;
+import com.future.function.web.model.response.feature.communication.questionnaire.*;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -183,6 +180,21 @@ public class MyQuestionnaireControllerTest extends TestHelper {
     .responses(Arrays.asList(QUESTION_RESPONSE_REQUEST))
     .build();
 
+  private static final String QUESTIONNNAIRE_RESPONSE_ID = "qr1";
+
+  private static final Answer SCORE = Answer.builder()
+    .minimum(0)
+    .maximum(6)
+    .average(3)
+    .build();
+
+  private static final QuestionnaireResponse QUESTIONNAIRE_RESPONSE =
+    QuestionnaireResponse.builder()
+      .id(QUESTIONNNAIRE_RESPONSE_ID)
+      .scoreSummary(SCORE)
+      .appraisee(MEMBER_1)
+      .build();
+
 
   @MockBean
   private MyQuestionnaireService myQuestionnaireService;
@@ -269,6 +281,38 @@ public class MyQuestionnaireControllerTest extends TestHelper {
     verify(questionnaireService).getQuestionnaire(QUESTIONNAIRE_ID_1);
     verify(
       myQuestionnaireService).getListAppraisedByQuestionnaireAndMemberLoginAsAppraiser(
+      QUESTIONNAIRE, USER);
+    verify(fileProperties).getUrlPrefix();
+  }
+
+  @Test
+  public void getListAprraiseeDone() throws Exception {
+
+    when(userService.getUser(any(String.class))).thenReturn(USER);
+    when(questionnaireService.getQuestionnaire(QUESTIONNAIRE_ID_1)).thenReturn(
+      QUESTIONNAIRE);
+    when(
+      myQuestionnaireService.getListAppraiseeDone(
+        QUESTIONNAIRE, USER)).thenReturn(Arrays.asList(QUESTIONNAIRE_RESPONSE));
+    when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
+
+    DataResponse<List<QuestionnaireDoneResponse>> response =
+      MyQuestionnaireResponseMapper.toDataResponseQuestionnaireDoneResponseList(
+        Arrays.asList(QUESTIONNAIRE_RESPONSE),
+        URL_PREFIX
+      );
+
+    mockMvc.perform(get(
+      "/api/communication/my-questionnaires/" + QUESTIONNAIRE_ID_1 +
+        "/appraisees-done").cookie(cookies))
+      .andExpect(status().isOk())
+      .andExpect(content().json(dataResponseJacksonTester.write(response)
+        .getJson()));
+
+    verify(userService).getUser(any(String.class));
+    verify(questionnaireService).getQuestionnaire(QUESTIONNAIRE_ID_1);
+    verify(
+      myQuestionnaireService).getListAppraiseeDone(
       QUESTIONNAIRE, USER);
     verify(fileProperties).getUrlPrefix();
   }
