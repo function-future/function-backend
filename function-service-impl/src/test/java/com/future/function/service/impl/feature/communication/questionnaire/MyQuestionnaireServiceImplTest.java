@@ -390,7 +390,7 @@ public class MyQuestionnaireServiceImplTest {
     verify(userQuestionnaireSummaryRepository).save(userQuestionnaireSummary);
   }
 
-  @Test
+
   public void updateUserSummaryForFirstTime() {
 
     when(questionResponseRepository.save(questionResponse1)).thenReturn(
