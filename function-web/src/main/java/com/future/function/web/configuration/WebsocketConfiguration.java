@@ -59,8 +59,8 @@ public class WebsocketConfiguration extends AbstractWebSocketMessageBrokerConfig
   public void registerStompEndpoints(StompEndpointRegistry stompEndpointRegistry) {
     stompEndpointRegistry
             .addEndpoint(endpoint)
-            .addInterceptors(httpSessionHandshakeInterceptor())
             .setAllowedOrigins("*")
+            .addInterceptors(httpSessionHandshakeInterceptor())
             .withSockJS();
   }
 

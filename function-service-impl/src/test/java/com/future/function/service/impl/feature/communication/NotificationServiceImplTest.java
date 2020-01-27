@@ -1,6 +1,7 @@
 package com.future.function.service.impl.feature.communication;
 
 import com.future.function.common.exception.NotFoundException;
+import com.future.function.common.properties.communication.MqProperties;
 import com.future.function.model.entity.feature.communication.reminder.Notification;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.repository.feature.communication.reminder.NotificationRepository;
@@ -20,6 +21,8 @@ import org.springframework.data.domain.PageRequest;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import static com.googlecode.catchexception.CatchException.catchException;
 import static com.googlecode.catchexception.CatchException.caughtException;
@@ -74,11 +77,11 @@ public class NotificationServiceImplTest {
   @Mock
   private MessagePublisherService publisherService;
 
+  @Mock
+  private MqProperties mqProperties;
+
   @InjectMocks
   private NotificationServiceImpl notificationService;
-
-  @Value("${function.mq.topic.notification}")
-  private String mqTopicNotification;
 
   @After
   public void tearDown() {
@@ -117,10 +120,14 @@ public class NotificationServiceImplTest {
   @Test
   public void testGivenNotificationByCreatingNotificationReturnNotification() {
 
+    Map<String, String> topic = new HashMap<>();
+    topic.put("notification", "notification");
+
     when(userService.getUser(USER_ID)).thenReturn(USER);
     when(notificationRepository.save(NOTIFICATION_1)).thenReturn(
       NOTIFICATION_1);
-    doNothing().when(publisherService).publish(USER_ID, mqTopicNotification);
+    when(mqProperties.getTopic()).thenReturn(topic);
+    doNothing().when(publisherService).publish(USER_ID, topic.get("notification"));
 
     Notification notification = notificationService.createNotification(
       NOTIFICATION_1);
@@ -131,7 +138,8 @@ public class NotificationServiceImplTest {
                  .getId()).isEqualTo(USER_ID);
 
     verify(userService).getUser(USER_ID);
-    verify(publisherService).publish(USER_ID, mqTopicNotification);
+    verify(mqProperties).getTopic();
+    verify(publisherService).publish(USER_ID, topic.get("notification"));
     verify(notificationRepository).save(NOTIFICATION_1);
   }
 

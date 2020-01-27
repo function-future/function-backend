@@ -1,5 +1,7 @@
 package com.future.function.service.impl.feature.communication.chatroom;
 
+import com.future.function.common.enumeration.communication.ChatroomType;
+import com.future.function.common.properties.communication.RedisProperties;
 import com.future.function.model.entity.feature.communication.chatting.Chatroom;
 import com.future.function.model.entity.feature.communication.chatting.Message;
 import com.future.function.model.entity.feature.communication.chatting.MessageStatus;
@@ -13,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.SetOperations;
 import org.springframework.stereotype.Service;
+import org.springframework.web.util.UriTemplate;
 
 import java.util.List;
 import java.util.Optional;
@@ -30,19 +33,24 @@ public class MessageStatusServiceImpl implements MessageStatusService {
 
   private final SetOperations<String, Object> redisSetOperations;
 
+  private final RedisProperties redisProperties;
+
+  private UriTemplate uriTemplate;
+
 
   @Autowired
   public MessageStatusServiceImpl(
-    UserService userService, MessageStatusRepository messageStatusRepository,
-    ChatroomService chatroomService, MessageService messageService, RedisTemplate<String, Object> redisTemplate
-  ) {
+          UserService userService, MessageStatusRepository messageStatusRepository,
+          ChatroomService chatroomService, MessageService messageService, RedisTemplate<String, Object> redisTemplate,
+          RedisProperties redisProperties) {
 
     this.userService = userService;
     this.chatroomService = chatroomService;
     this.messageStatusRepository = messageStatusRepository;
     this.messageService = messageService;
     this.redisSetOperations = redisTemplate.opsForSet();
-
+    this.uriTemplate = new UriTemplate(redisProperties.getKey().get("active-chatroom"));
+    this.redisProperties = redisProperties;
   }
 
   @Override
@@ -121,13 +129,20 @@ public class MessageStatusServiceImpl implements MessageStatusService {
 
   @Override
   public void enterChatroom(String chatroomId, String userId) {
-    redisSetOperations.add("chatroom:" + chatroomId + ":active.user", userId);
+    if (chatroomId.equalsIgnoreCase(ChatroomType.PUBLIC.name())) {
+      chatroomId = chatroomService.getPublicChatroom().getId();
+    }
+    redisSetOperations.add(uriTemplate.expand(chatroomId).toString(), userId);
     this.updateSeenStatus(chatroomId, null, userId, true);
+    chatroomService.syncChatroomList(userId);
   }
 
   @Override
   public void leaveChatroom(String chatroomId, String userId) {
-    redisSetOperations.remove("chatroom:" + chatroomId + ":active.user", userId);
+    if (chatroomId.equalsIgnoreCase(ChatroomType.PUBLIC.name())) {
+      chatroomId = chatroomService.getPublicChatroom().getId();
+    }
+    redisSetOperations.remove(uriTemplate.expand(chatroomId).toString(), userId);
   }
 
   private MessageStatus setMember(MessageStatus messageStatus) {

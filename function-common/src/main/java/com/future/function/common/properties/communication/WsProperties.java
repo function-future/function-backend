@@ -14,7 +14,7 @@ import java.util.Map;
 @Component
 @AllArgsConstructor
 @NoArgsConstructor
-@ConfigurationProperties("function.ws")
+@ConfigurationProperties("ws")
 public class WsProperties {
   private Map<String, String> topic;
 }
