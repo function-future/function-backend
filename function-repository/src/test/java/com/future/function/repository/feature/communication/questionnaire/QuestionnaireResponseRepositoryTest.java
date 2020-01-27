@@ -28,6 +28,8 @@ public class QuestionnaireResponseRepositoryTest {
 
   private static final String ID_USER_1 = "id_user1";
 
+  private static final String ID_USER_2 = "id_user2";
+
   private static final String QUESTIONNAIRE_ID = "questionnaire_id";
 
   private static final String QUESTION_RESPONSE_ID1 = "question_response_id1";
@@ -36,6 +38,10 @@ public class QuestionnaireResponseRepositoryTest {
 
   private User appraisee = User.builder()
     .id(ID_USER_1)
+    .build();
+
+  private User appraiser = User.builder()
+    .id(ID_USER_2)
     .build();
 
   private Questionnaire questionnaire = Questionnaire.builder()
@@ -76,6 +82,7 @@ public class QuestionnaireResponseRepositoryTest {
         .id(ID_1)
         .questionnaire(questionnaire)
         .appraisee(appraisee)
+        .appraiser(appraiser)
         .details(questionResponses)
         .build();
 
@@ -84,6 +91,7 @@ public class QuestionnaireResponseRepositoryTest {
         .id(ID_2)
         .questionnaire(questionnaire)
         .appraisee(appraisee)
+        .appraiser(appraiser)
         .details(questionResponses)
         .build();
 
@@ -118,4 +126,14 @@ public class QuestionnaireResponseRepositoryTest {
     //    .isEqualTo(2);
   }
 
+  @Test
+  public void testGivenQuestionnaireAndAppraiserByFindingAllQuestionnaireResponseReturnListQuestionnaireResponse(){
+
+    List<QuestionnaireResponse> questionnaireResponses =
+        questionnaireResponseRepository.findAllByQuestionnaireAndAppraiserAndDeletedFalse(questionnaire, appraiser);
+
+    assertThat(questionnaireResponses.size()).isEqualTo(1);
+    assertThat(questionnaireResponses.get(0)
+      .getId()).isEqualTo(ID_1);
+  }
 }

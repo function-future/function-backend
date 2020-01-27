@@ -19,4 +19,7 @@ public interface QuestionnaireResponseRepository
     Questionnaire questionnaire, User appraisee, User appraiser
   );
 
+  List<QuestionnaireResponse> findAllByQuestionnaireAndAppraiserAndDeletedFalse(
+    Questionnaire questionnaire, User appraiser
+  );
 }

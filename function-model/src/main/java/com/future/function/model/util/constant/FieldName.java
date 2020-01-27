@@ -144,6 +144,7 @@ public interface FieldName {
 
     public static final String COMMENT = "comment";
 
+    public static final String IS_UPDATE = "isUpdate";
   }
 
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -539,4 +540,8 @@ public interface FieldName {
 
   }
 
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  abstract class QuestionResponseQueue {
+
+  }
 }

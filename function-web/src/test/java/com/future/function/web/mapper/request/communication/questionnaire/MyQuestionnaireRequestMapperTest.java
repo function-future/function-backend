@@ -3,6 +3,7 @@ package com.future.function.web.mapper.request.communication.questionnaire;
 import com.future.function.common.enumeration.core.Role;
 import com.future.function.model.entity.feature.communication.questionnaire.QuestionQuestionnaire;
 import com.future.function.model.entity.feature.communication.questionnaire.QuestionResponse;
+import com.future.function.model.entity.feature.communication.questionnaire.QuestionResponseQueue;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.User;
@@ -87,11 +88,12 @@ public class MyQuestionnaireRequestMapperTest {
   @Test
   public void toListQuestionResponse() {
 
+    assertThat(true).isEqualTo(true);
     when(questionnaireService.getQuestionQuestionnaire(QUESTION_ID)).thenReturn(
       QUESTION);
 
-    List<QuestionResponse> data =
-      myQuestionnaireRequestMapper.toListQuestionResponse(
+    List<QuestionResponseQueue> data =
+      myQuestionnaireRequestMapper.toListQuestionResponseQueue(
         Arrays.asList(QUESTION_RESPONSE_REQUEST), MEMBER_1, MEMBER_2);
 
     assertThat(data.size()).isEqualTo(1);
