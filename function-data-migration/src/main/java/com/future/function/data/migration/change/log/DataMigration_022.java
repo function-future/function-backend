@@ -75,9 +75,9 @@ public class DataMigration_022 {
 
     Map<String, Object> studentComponents = new HashMap<>();
     studentComponents.put("read", false);
-    studentComponents.put("add", true);
-    studentComponents.put("edit", true);
-    studentComponents.put("delete", true);
+    studentComponents.put("add", false);
+    studentComponents.put("edit", false);
+    studentComponents.put("delete", false);
 
     Map<String, Object> otherComponents = new HashMap<>();
     otherComponents.put("read", true);
