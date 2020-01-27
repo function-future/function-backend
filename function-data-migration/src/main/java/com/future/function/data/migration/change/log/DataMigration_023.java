@@ -10,8 +10,8 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import java.util.HashMap;
 import java.util.Map;
 
-@ChangeLog(order = "022")
-public class DataMigration_022 {
+@ChangeLog(order = "023")
+public class DataMigration_023 {
 
   @ChangeSet(author = "priagung",
           id = "chatroomAccessListMigration",

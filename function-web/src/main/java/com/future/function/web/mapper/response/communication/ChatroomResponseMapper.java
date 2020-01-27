@@ -115,7 +115,8 @@ public class ChatroomResponseMapper {
   }
 
   private static FileContentWebResponse getPictureUrl(Chatroom chatroom, User user, String urlPrefix, FileV2 picture) {
-    if (getType(chatroom).equals(ChatroomType.PRIVATE.name())) {
+    String chatroomType = getType(chatroom);
+    if (chatroomType != null && chatroomType.equals(ChatroomType.PRIVATE.name())) {
       return getPrivatePicture(chatroom, user, urlPrefix);
     } else {
       return getGroupPicture(picture, urlPrefix);
