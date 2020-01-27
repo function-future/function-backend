@@ -103,6 +103,25 @@ public class ChatroomRepositoryTest {
   }
 
   @Test
+  public void testGivenMemberByFindingAllChatroomReturnPagedChatrooms() {
+
+    Page<Chatroom> chatrooms =
+            chatroomRepository.findAllByMembersOrderByUpdatedAtDesc(
+                    member1, PAGEABLE);
+
+    assertThat(chatrooms.getTotalElements()).isEqualTo(3);
+    assertThat(chatrooms.getContent()
+            .get(0)
+            .getTitle()).isEqualTo(TITLE_3);
+    assertThat(chatrooms.getContent()
+            .get(1)
+            .getTitle()).isEqualTo(TITLE_2);
+    assertThat(chatrooms.getContent()
+            .get(2)
+            .getTitle()).isEqualTo(TITLE_1);
+  }
+
+  @Test
   public void testGivenTypeAndMemberAndKeywordByFindingAllChatroomReturnPagedChatrooms() {
 
     Page<Chatroom> chatrooms =

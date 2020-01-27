@@ -225,6 +225,8 @@ public interface FieldName {
 
     public static final String TYPE = "type";
 
+    public static final String CHATROOM_PICTURE = "picture";
+
   }
 
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -420,6 +422,8 @@ public interface FieldName {
     public static final String USED_AT = "usedAt";
 
     public static final String BATCH = "batch";
+
+    public static final String STUDENTS = "students";
 
   }
 

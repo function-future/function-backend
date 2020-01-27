@@ -3,8 +3,8 @@ package com.future.function.data.migration.change.log;
 import com.future.function.common.enumeration.communication.ChatroomType;
 import com.future.function.model.util.constant.DocumentName;
 import com.future.function.model.util.constant.FieldName;
-import com.github.mongobee.changeset.ChangeLog;
-import com.github.mongobee.changeset.ChangeSet;
+import com.github.cloudyrock.mongock.ChangeLog;
+import com.github.cloudyrock.mongock.ChangeSet;
 import com.mongodb.BasicDBObject;
 import org.springframework.data.mongodb.core.MongoTemplate;
 

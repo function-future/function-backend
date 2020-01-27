@@ -15,6 +15,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
@@ -76,24 +77,26 @@ public class FileMustBeImageValidatorTest {
   @Test
   public void testGivenListOfFileIdsOfImageFilesByValidatingFileIdsOfImageReturnTrue() {
 
-    when(fileRepositoryV2.findOne(FILE_ID)).thenReturn(IMAGE_FILE);
+    when(fileRepositoryV2.findByIdAndDeletedFalse(FILE_ID)).thenReturn(
+      Optional.of(IMAGE_FILE));
 
     assertThat(validator.isValid(FILE_IDS, null)).isTrue();
 
     verify(fileProperties).getImageExtensions();
-    verify(fileRepositoryV2).findOne(FILE_ID);
+    verify(fileRepositoryV2).findByIdAndDeletedFalse(FILE_ID);
     verifyZeroInteractions(annotation);
   }
 
   @Test
   public void testGivenListOfFileIdsOfNonImageFilesByValidatingFileIdsOfImageReturnFalse() {
 
-    when(fileRepositoryV2.findOne(FILE_ID)).thenReturn(TEXT_FILE);
+    when(fileRepositoryV2.findByIdAndDeletedFalse(FILE_ID)).thenReturn(
+      Optional.of(TEXT_FILE));
 
     assertThat(validator.isValid(FILE_IDS, null)).isFalse();
 
     verify(fileProperties).getImageExtensions();
-    verify(fileRepositoryV2).findOne(FILE_ID);
+    verify(fileRepositoryV2).findByIdAndDeletedFalse(FILE_ID);
     verifyZeroInteractions(annotation);
   }
 

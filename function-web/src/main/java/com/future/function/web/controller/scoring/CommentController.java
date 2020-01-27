@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/scoring/batches/{batchCode}/assignments/{assignmentId" +
-                "}/rooms/{roomId}/comments")
+                "}/room/{studentId}/comments")
 public class CommentController {
 
   private RoomService roomService;
@@ -45,7 +45,9 @@ public class CommentController {
   @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   public PagingResponse<CommentWebResponse> findAllCommentsByRoomId(
     @PathVariable
-      String roomId,
+      String studentId,
+    @PathVariable
+      String assignmentId,
     @RequestParam(defaultValue = "1")
       int page,
     @RequestParam(defaultValue = "10")
@@ -56,7 +58,7 @@ public class CommentController {
   ) {
 
     return CommentResponseMapper.toPagingCommentWebResponse(
-      roomService.findAllCommentsByRoomId(roomId,
+      roomService.findAllCommentsByStudentIdAndAssignmentId(studentId, assignmentId,
                                           PageHelper.toPageable(page, size)
       ));
   }
@@ -65,18 +67,21 @@ public class CommentController {
   @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
   public DataResponse<CommentWebResponse> createComment(
     @PathVariable
-      String roomId,
+      String studentId,
+    @PathVariable
+      String assignmentId,
     @RequestBody
       CommentWebRequest webRequest,
-    @WithAnyRole(roles = { Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT })
+    @WithAnyRole(roles = { Role.JUDGE, Role.MENTOR, Role.STUDENT })
       Session session
   ) {
 
     return CommentResponseMapper.toDataCommentWebResponse(HttpStatus.CREATED,
                                                           roomService.createComment(
-                                                            requestMapper.toCommentFromRequestWithRoomId(
+                                                            requestMapper.toCommentFromRequestWithStudentIdAndAssignmentId(
                                                               webRequest,
-                                                              roomId
+                                                              studentId,
+                                                              assignmentId
                                                             ),
                                                             session.getUserId()
                                                           )

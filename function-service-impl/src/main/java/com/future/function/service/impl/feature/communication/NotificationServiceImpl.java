@@ -1,10 +1,12 @@
 package com.future.function.service.impl.feature.communication;
 
 import com.future.function.common.exception.NotFoundException;
+import com.future.function.common.properties.communication.MqProperties;
 import com.future.function.model.entity.feature.communication.reminder.Notification;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.repository.feature.communication.reminder.NotificationRepository;
 import com.future.function.service.api.feature.communication.NotificationService;
+import com.future.function.service.api.feature.communication.mq.MessagePublisherService;
 import com.future.function.service.api.feature.core.UserService;
 import com.future.function.service.impl.helper.PageHelper;
 import com.future.function.session.model.Session;
@@ -23,13 +25,19 @@ public class NotificationServiceImpl implements NotificationService {
 
   private final UserService userService;
 
+  private final MessagePublisherService publisherService;
+
+  private final MqProperties mqProperties;
+
   @Autowired
   public NotificationServiceImpl(
-    NotificationRepository notificationRepository, UserService userService
-  ) {
+          NotificationRepository notificationRepository, UserService userService,
+          MessagePublisherService publisherService, MqProperties mqProperties) {
 
     this.notificationRepository = notificationRepository;
     this.userService = userService;
+    this.publisherService = publisherService;
+    this.mqProperties = mqProperties;
   }
 
   @Override
@@ -63,7 +71,15 @@ public class NotificationServiceImpl implements NotificationService {
       .map(this::setMember)
       .map(n -> this.setSeen(n, false))
       .map(notificationRepository::save)
+      .map(n -> {
+        this.publishNotification(n);
+        return n;
+      })
       .orElseThrow(UnsupportedOperationException::new);
+  }
+
+  private void publishNotification(Notification notification) {
+    publisherService.publish(notification.getMember().getId(), mqProperties.getTopic().get("notification"));
   }
 
   @Override

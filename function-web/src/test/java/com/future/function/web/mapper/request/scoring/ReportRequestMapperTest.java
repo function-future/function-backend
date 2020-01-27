@@ -3,6 +3,7 @@ package com.future.function.web.mapper.request.scoring;
 import com.future.function.common.exception.BadRequestException;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.model.entity.feature.scoring.Report;
+import com.future.function.model.entity.feature.scoring.ReportDetail;
 import com.future.function.validation.RequestValidator;
 import com.future.function.web.model.request.scoring.ReportWebRequest;
 import org.junit.After;
@@ -38,7 +39,9 @@ public class ReportRequestMapperTest {
 
   private User user;
 
-  private List<User> students;
+  private ReportDetail reportDetail;
+
+  private List<ReportDetail> students;
 
   @InjectMocks
   private ReportRequestMapper requestMapper;
@@ -59,7 +62,11 @@ public class ReportRequestMapperTest {
       .id(STUDENT_ID)
       .build();
 
-    students = Collections.singletonList(user);
+    reportDetail = ReportDetail.builder()
+        .user(user)
+        .build();
+
+    students = Collections.singletonList(reportDetail);
 
     when(requestValidator.validate(request)).thenReturn(request);
   }
@@ -78,7 +85,7 @@ public class ReportRequestMapperTest {
     assertThat(actual.getDescription()).isEqualTo(DESCRIPTION);
     assertThat(actual.getBatch()
                  .getCode()).isEqualTo(BATCH_CODE);
-    assertThat(actual.getStudents()).isEqualTo(students);
+    assertThat(actual.getStudents().get(0).getUser()).isEqualTo(students.get(0).getUser());
     verify(requestValidator).validate(request);
   }
 

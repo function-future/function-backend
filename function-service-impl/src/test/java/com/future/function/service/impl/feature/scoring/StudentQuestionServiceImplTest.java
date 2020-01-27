@@ -213,24 +213,6 @@ public class StudentQuestionServiceImplTest {
   }
 
   @Test
-  public void createStudentQuestionsByStudentQuizDetail() {
-
-    List<StudentQuestion> actual =
-      studentQuestionService.createStudentQuestionsByStudentQuizDetail(
-        StudentQuizDetail.builder()
-          .id(STUDENT_QUIZ_DETAIL_ID)
-          .build(), Collections.singletonList(studentQuestion));
-    assertThat(actual.size()).isEqualTo(1);
-    assertThat(actual.get(0)
-                 .getQuestion()
-                 .getLabel()).isEqualTo(QUESTION_TEXT);
-    assertThat(actual.get(0)
-                 .getOption()
-                 .getLabel()).isEqualTo(OPTION_LABEL);
-    verify(studentQuestionRepository).save(studentQuestion);
-  }
-
-  @Test
   public void deleteAllByStudentQuizDetailId() {
 
     studentQuestion.setDeleted(true);

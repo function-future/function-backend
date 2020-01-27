@@ -1,5 +1,6 @@
 package com.future.function.service.impl.feature.scoring;
 
+import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.model.entity.feature.scoring.Report;
 import com.future.function.model.entity.feature.scoring.ReportDetail;
@@ -11,6 +12,7 @@ import com.future.function.service.api.feature.scoring.SummaryService;
 import com.future.function.service.impl.helper.AuthorizationHelper;
 import com.future.function.service.impl.helper.CopyHelper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -41,41 +43,45 @@ public class ReportDetailServiceImpl implements ReportDetailService {
 
   @Override
   public List<StudentSummaryVO> findAllSummaryByReportId(
-    String reportId, String userId
+    Report report, String userId, String type, Pageable pageable
   ) {
 
-    return Optional.ofNullable(reportId)
-      .map(reportDetailRepository::findAllByReportIdAndDeletedFalse)
-      .map(list -> getStudentsSummaryPoints(userId, list))
-      .orElseGet(ArrayList::new);
-  }
-
-  @Override
-  public List<ReportDetail> findAllDetailByReportId(String reportId) {
-
-    return Optional.ofNullable(reportId)
-      .map(reportDetailRepository::findAllByReportIdAndDeletedFalse)
-      .orElseGet(ArrayList::new);
-  }
-
-  @Override
-  public Report createReportDetailByReport(Report report, User student) {
-
     return Optional.ofNullable(report)
-      .filter(ignored -> Objects.isNull(
-        this.findByStudentId(student.getId(), student.getId())))
-      .map(value -> buildReportDetail(value, student))
-      .map(reportDetailRepository::save)
-      .map(ReportDetail::getReport)
-      .orElseThrow(() -> new UnsupportedOperationException("ComparisonExists"));
+      .map(Report::getStudents)
+      .map(list -> getStudentsSummaryPoints(userId, list, type, pageable))
+      .orElseGet(ArrayList::new);
   }
 
-  private ReportDetail buildReportDetail(Report report, User student) {
+  @Override
+  public StudentSummaryVO findSummaryByStudentId(String studentId, String userId, String type, Pageable pageable) {
+    return Optional.ofNullable(studentId)
+            .map(userService::getUser)
+            .map(this::createOrGetReportDetail)
+            .map(reportDetail -> this.findSummaryAndSetPoint(reportDetail, userId, type, pageable))
+            .orElseThrow(() -> new NotFoundException("NOT_FOUND"));
 
-    return ReportDetail.builder()
-      .report(report)
+  }
+
+  private StudentSummaryVO findSummaryAndSetPoint(ReportDetail reportDetail, String userId, String type, Pageable pageable) {
+    StudentSummaryVO summaryVO = summaryService.findAllPointSummaryByStudentId(reportDetail.getUser().getId(), pageable, userId, type);
+    summaryVO.setPoint(reportDetail.getPoint());
+    return summaryVO;
+  }
+
+  @Override
+  public ReportDetail createOrGetReportDetail(User student) {
+    return Optional.ofNullable(student)
+      .map(User::getId)
+      .flatMap(reportDetailRepository::findByUserIdAndDeletedFalse)
+      .orElseGet(() -> this.buildAndSaveReportDetail(student));
+  }
+
+  private ReportDetail buildAndSaveReportDetail(User student) {
+
+    ReportDetail reportDetail = ReportDetail.builder()
       .user(student)
       .build();
+    return reportDetailRepository.save(reportDetail);
   }
 
   @Override
@@ -93,41 +99,20 @@ public class ReportDetailServiceImpl implements ReportDetailService {
   }
 
   @Override
-  public List<ReportDetail> giveScoreToEachStudentInDetail(
-    Report report, List<ReportDetail> detailList
-  ) {
-
-    return detailList.stream()
-      .map(reportDetail -> findReportDetailAndMapReport(report, reportDetail))
-      .map(reportDetailRepository::save)
-      .collect(Collectors.toList());
-  }
-
-  private ReportDetail findReportDetailAndMapReport(
-    Report report, ReportDetail reportDetail
+  public ReportDetail giveScoreToEachStudentInDetail(
+    ReportDetail reportDetail
   ) {
 
     return Optional.ofNullable(reportDetail)
-      .map(ReportDetail::getUser)
-      .map(User::getId)
-      .flatMap(reportDetailRepository::findByUserIdAndDeletedFalse)
-      .map(
-        currentReportDetail -> copyReportDetailRequestAttributes(reportDetail,
-                                                                 currentReportDetail
-        ))
-      .map(currentReportDetail -> setReportOfReportDetail(report,
-                                                          currentReportDetail
-      ))
-      .orElseThrow(() -> new UnsupportedOperationException(
-        "Failed at #findReportDetailAndMapReport #ReportDetailService"));
-  }
-
-  private ReportDetail setReportOfReportDetail(
-    Report report, ReportDetail currentReportDetail
-  ) {
-
-    currentReportDetail.setReport(report);
-    return currentReportDetail;
+        .map(ReportDetail::getUser)
+        .map(User::getId)
+        .flatMap(reportDetailRepository::findByUserIdAndDeletedFalse)
+        .map(
+            currentReportDetail -> copyReportDetailRequestAttributes(reportDetail,
+                currentReportDetail
+            ))
+        .map(reportDetailRepository::save)
+        .orElseThrow(() -> new NotFoundException("NOT_FOUND"));
   }
 
   private ReportDetail copyReportDetailRequestAttributes(
@@ -139,10 +124,9 @@ public class ReportDetailServiceImpl implements ReportDetailService {
   }
 
   @Override
-  public void deleteAllByReportId(String reportId) {
+  public void deleteAll() {
 
-    Optional.ofNullable(reportId)
-      .map(this::findAllDetailByReportId)
+    Optional.ofNullable(reportDetailRepository.findAll())
       .ifPresent(this::deleteReportDetailList);
   }
 
@@ -155,24 +139,24 @@ public class ReportDetailServiceImpl implements ReportDetailService {
   }
 
   private List<StudentSummaryVO> getStudentsSummaryPoints(
-    String userId, List<ReportDetail> list
+    String userId, List<ReportDetail> list, String type, Pageable pageable
   ) {
 
     return list.stream()
-      .map(reportDetail -> getSummaryVOFromReportDetail(userId, reportDetail))
+      .map(reportDetail -> getSummaryVOFromReportDetail(userId, reportDetail, type, pageable))
       .filter(Objects::nonNull)
       .collect(Collectors.toList());
   }
 
   private StudentSummaryVO getSummaryVOFromReportDetail(
-    String userId, ReportDetail reportDetail
+    String userId, ReportDetail reportDetail, String type, Pageable pageable
   ) {
 
     return Optional.ofNullable(reportDetail)
       .map(ReportDetail::getUser)
       .map(User::getId)
       .map(studentId -> summaryService.findAllPointSummaryByStudentId(studentId,
-                                                                      userId
+                                                                      pageable, userId, type
       ))
       .map(summary -> setSummaryPoint(reportDetail, summary))
       .orElse(null);

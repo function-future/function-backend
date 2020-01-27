@@ -159,6 +159,26 @@ public class AssignmentResponseMapperTest {
   }
 
   @Test
+  public void testToAssignmentDataResponseWithHttpStatusSuccessAndFileUrlNull() {
+    fileV2.setFileUrl(null);
+    assignmentWebResponse.setFile(null);
+    assignmentWebResponse.setFileId(null);
+    assignmentWebResponseDataResponse.setCode(HttpStatus.CREATED.value());
+    assignmentWebResponseDataResponse.setStatus(
+        ResponseHelper.toProperStatusFormat(
+            HttpStatus.CREATED.getReasonPhrase()));
+    DataResponse<AssignmentWebResponse> actual =
+        AssignmentResponseMapper.toAssignmentDataResponse(
+            HttpStatus.CREATED, assignment, URL_PREFIX);
+    Assertions.assertThat(actual.getData())
+        .isEqualTo(assignmentWebResponseDataResponse.getData());
+    Assertions.assertThat(actual.getCode())
+        .isEqualTo(assignmentWebResponseDataResponse.getCode());
+    Assertions.assertThat(actual.getStatus())
+        .isEqualTo(assignmentWebResponseDataResponse.getStatus());
+  }
+
+  @Test
   public void testToAssignmentPagingResponseSuccess() {
 
     PagingResponse<AssignmentWebResponse> actual =

@@ -91,7 +91,7 @@ public class ResourceServiceImplTest {
   @AfterClass
   public static void tearDownClass() {
 
-    final int numberOfTestMethodInClass = 12;
+    final int numberOfTestMethodInClass = 13;
 
     verify(
       fileProperties, times(numberOfTestMethodInClass)).getImageExtensions();
@@ -109,6 +109,64 @@ public class ResourceServiceImplTest {
   public void tearDown() {
 
     verifyNoMoreInteractions(fileRepositoryV2);
+  }
+
+  @Test
+  public void testGivenSourceFileObjectAndFileOriginByCreatingAFileCopyReturnCopiedFile()
+    throws Exception {
+
+    File file = mock(File.class);
+    mockStatic(File.class);
+    whenNew(File.class).withArguments(FILE_PATH)
+      .thenReturn(file);
+
+    mockStatic(FileHelper.class);
+    doNothing().when(FileHelper.class, "createJavaIoFile", BYTES, FILE_PATH);
+
+    FileV2 returnedSavedCopiedFile = FileV2.builder()
+      .name("")
+      .asResource(true)
+      .build();
+    when(fileRepositoryV2.save(any(FileV2.class))).thenReturn(
+      returnedSavedCopiedFile);
+
+    String sourceFilePath = "sourceFilePath";
+    File diskSourceFile = mock(File.class);
+    mockStatic(File.class);
+    whenNew(File.class).withArguments(sourceFilePath)
+      .thenReturn(diskSourceFile);
+
+    String fileName = UUID.randomUUID()
+                        .toString() + ".doc";
+    FileV2 sourceFile = FileV2.builder()
+      .name("")
+      .fileUrl(fileName)
+      .filePath(sourceFilePath)
+      .build();
+
+    FileV2 copiedFileInDatabase = FileV2.builder()
+      .id(returnedSavedCopiedFile.getId())
+      .used(false)
+      .build();
+
+    List<String> fileIdList = Collections.singletonList(
+      returnedSavedCopiedFile.getId());
+    List<FileV2> fileV2List = Collections.singletonList(copiedFileInDatabase);
+
+    when(fileRepositoryV2.findAll(fileIdList)).thenReturn(fileV2List);
+
+    copiedFileInDatabase.setUsed(true);
+    when(fileRepositoryV2.save(copiedFileInDatabase)).thenReturn(
+      copiedFileInDatabase);
+
+    FileV2 fileV2 = resourceService.createACopy(sourceFile, FileOrigin.COURSE);
+
+    assertThat(fileV2).isNotNull();
+
+    verify(fileRepositoryV2, times(2)).save(any(FileV2.class));
+
+    verify(fileRepositoryV2).findAll(fileIdList);
+    verify(fileRepositoryV2).save(copiedFileInDatabase);
   }
 
   @Test
@@ -242,7 +300,9 @@ public class ResourceServiceImplTest {
       .name("")
       .asResource(true)
       .parentId(parentId)
-      .filePath("\\announcement\\" + fileId + "-0\\" + fileName)
+      .filePath(
+        File.separator + "announcement" + File.separator + fileId + "-0" +
+        File.separator + fileName)
       .fileUrl("/announcement/" + fileName)
       .build();
 

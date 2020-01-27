@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import org.springframework.data.domain.Page;
 
 @Data
 @Builder
@@ -23,7 +24,7 @@ public class StudentSummaryVO {
 
   private String avatar;
 
-  private List<SummaryVO> scores;
+  private Page<SummaryVO> scores;
 
   private Integer totalPoint;
 

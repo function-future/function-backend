@@ -38,12 +38,24 @@ public class FileMustBeImageValidator
     return Optional.ofNullable(value)
       .orElseGet(Collections::emptyList)
       .stream()
-      .map(fileRepositoryV2::findOne)
-      .filter(Objects::nonNull)
+      .map(fileRepositoryV2::findByIdAndDeletedFalse)
+      .allMatch(this::hasRecognizedImageExtension);
+  }
+
+  private Boolean hasRecognizedImageExtension(Optional<FileV2> retrievedFile) {
+
+    return retrievedFile.map(this::getFileExtension)
+      .map(ext -> fileProperties.getImageExtensions()
+        .contains(DOT + ext))
+      .orElse(Boolean.FALSE);
+  }
+
+  private String getFileExtension(FileV2 retrievedFile) {
+
+    return Optional.ofNullable(retrievedFile)
       .map(FileV2::getFilePath)
       .map(FilenameUtils::getExtension)
-      .allMatch(extension -> fileProperties.getImageExtensions()
-        .contains(DOT + extension));
+      .orElse(null);
   }
 
 }

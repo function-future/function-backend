@@ -1,9 +1,11 @@
 package com.future.function.service.impl.feature.communication;
 
 import com.future.function.common.exception.NotFoundException;
+import com.future.function.common.properties.communication.MqProperties;
 import com.future.function.model.entity.feature.communication.reminder.Notification;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.repository.feature.communication.reminder.NotificationRepository;
+import com.future.function.service.api.feature.communication.mq.MessagePublisherService;
 import com.future.function.service.api.feature.core.UserService;
 import com.future.function.service.impl.helper.PageHelper;
 import com.future.function.session.model.Session;
@@ -13,19 +15,19 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import static com.googlecode.catchexception.CatchException.catchException;
 import static com.googlecode.catchexception.CatchException.caughtException;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class NotificationServiceImplTest {
@@ -72,6 +74,12 @@ public class NotificationServiceImplTest {
   @Mock
   private UserService userService;
 
+  @Mock
+  private MessagePublisherService publisherService;
+
+  @Mock
+  private MqProperties mqProperties;
+
   @InjectMocks
   private NotificationServiceImpl notificationService;
 
@@ -112,9 +120,14 @@ public class NotificationServiceImplTest {
   @Test
   public void testGivenNotificationByCreatingNotificationReturnNotification() {
 
+    Map<String, String> topic = new HashMap<>();
+    topic.put("notification", "notification");
+
     when(userService.getUser(USER_ID)).thenReturn(USER);
     when(notificationRepository.save(NOTIFICATION_1)).thenReturn(
       NOTIFICATION_1);
+    when(mqProperties.getTopic()).thenReturn(topic);
+    doNothing().when(publisherService).publish(USER_ID, topic.get("notification"));
 
     Notification notification = notificationService.createNotification(
       NOTIFICATION_1);
@@ -125,6 +138,8 @@ public class NotificationServiceImplTest {
                  .getId()).isEqualTo(USER_ID);
 
     verify(userService).getUser(USER_ID);
+    verify(mqProperties).getTopic();
+    verify(publisherService).publish(USER_ID, topic.get("notification"));
     verify(notificationRepository).save(NOTIFICATION_1);
   }
 

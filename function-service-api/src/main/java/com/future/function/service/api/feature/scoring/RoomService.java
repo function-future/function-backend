@@ -11,13 +11,13 @@ public interface RoomService {
 
   Room findOrCreateByStudentIdAndAssignmentId(String id, String userId, String assignmentId);
 
-  Page<Comment> findAllCommentsByRoomId(String roomId, Pageable pageable);
+  Page<Comment> findAllCommentsByStudentIdAndAssignmentId(String studentId, String assignmentId, Pageable pageable);
 
   Page<Room> findAllByStudentId(
     String studentId, Pageable pageable, String userId
   );
 
-  List<Room> findAllByStudentId(String studentId);
+  Page<Room> findAllByStudentId(String studentId, Pageable pageable);
 
   Comment createComment(Comment comment, String userId);
 

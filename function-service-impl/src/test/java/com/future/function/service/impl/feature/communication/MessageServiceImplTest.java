@@ -5,8 +5,9 @@ import com.future.function.model.entity.feature.communication.chatting.Chatroom;
 import com.future.function.model.entity.feature.communication.chatting.Message;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.repository.feature.communication.chatting.MessageRepository;
-import com.future.function.service.api.feature.communication.ChatroomService;
+import com.future.function.service.api.feature.communication.chatroom.ChatroomService;
 import com.future.function.service.api.feature.core.UserService;
+import com.future.function.service.impl.feature.communication.chatroom.MessageServiceImpl;
 import com.future.function.session.model.Session;
 import org.bson.types.ObjectId;
 import org.junit.After;
@@ -234,7 +235,7 @@ public class MessageServiceImplTest {
       chatroomService.getChatroom(CHATROOM_ID, SESSION.getUserId())).thenReturn(
       CHATROOM);
     when(
-      chatroomService.updateChatroom(CHATROOM, SESSION.getUserId())).thenReturn(
+      chatroomService.updateDate(CHATROOM)).thenReturn(
       CHATROOM);
 
     message1.setChatroom(CHATROOM);
@@ -250,7 +251,7 @@ public class MessageServiceImplTest {
     verify(messageRepository).save(message1);
     verify(userService).getUser(USER_ID);
     verify(chatroomService).getChatroom(CHATROOM_ID, SESSION.getUserId());
-    verify(chatroomService).updateChatroom(CHATROOM, SESSION.getUserId());
+    verify(chatroomService).updateDate(CHATROOM);
   }
 
 }
