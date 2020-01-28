@@ -1,14 +1,11 @@
 package com.future.function.web.mapper.response.core;
 
 import com.future.function.model.entity.feature.core.Batch;
-import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.model.response.base.DataResponse;
-import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.feature.core.BatchWebResponse;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 
 import java.util.List;
@@ -41,20 +38,19 @@ public class BatchResponseMapper {
     return ResponseHelper.toDataResponse(httpStatus, toBatchWebResponse(batch));
   }
 
-  public static PagingResponse<BatchWebResponse> toBatchesPagingResponse(
-    Page<Batch> data
+  public static DataResponse<List<BatchWebResponse>> toBatchesDataResponse(
+    List<Batch> batches
   ) {
 
-    return ResponseHelper.toPagingResponse(
-      HttpStatus.OK, toBatchWebResponseList(data), PageHelper.toPaging(data));
+    return ResponseHelper.toDataResponse(
+      HttpStatus.OK, toBatchWebResponseList(batches));
   }
 
   private static List<BatchWebResponse> toBatchWebResponseList(
-    Page<Batch> data
+    List<Batch> batches
   ) {
 
-    return data.getContent()
-      .stream()
+    return batches.stream()
       .map(BatchResponseMapper::toBatchWebResponse)
       .collect(Collectors.toList());
   }

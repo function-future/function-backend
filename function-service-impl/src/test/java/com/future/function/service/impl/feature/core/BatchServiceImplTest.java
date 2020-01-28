@@ -3,9 +3,7 @@ package com.future.function.service.impl.feature.core;
 import com.future.function.common.enumeration.core.Role;
 import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.core.Batch;
-import com.future.function.model.util.constant.FieldName;
 import com.future.function.repository.feature.core.BatchRepository;
-import com.future.function.service.impl.helper.PageHelper;
 import com.future.function.session.model.Session;
 import org.junit.After;
 import org.junit.Before;
@@ -15,12 +13,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.beans.BeanUtils;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import static com.googlecode.catchexception.CatchException.catchException;
@@ -36,11 +32,6 @@ public class BatchServiceImplTest {
   private static final String FIRST_BATCH_NUMBER = "1";
 
   private static final String SECOND_BATCH_NUMBER = "2";
-
-  private static final Sort SORT = new Sort(
-    new Sort.Order(Sort.Direction.DESC, FieldName.BaseEntity.CREATED_AT));
-
-  private static final Pageable PAGEABLE = new PageRequest(0, 10, SORT);
 
   private static final String ID_1 = "id-1";
 
@@ -184,70 +175,61 @@ public class BatchServiceImplTest {
       .code(SECOND_BATCH_NUMBER)
       .build();
 
-    Page<Batch> batchPage = PageHelper.toPage(
-      Arrays.asList(secondBatch, batch), PAGEABLE);
+    List<Batch> batches = Arrays.asList(secondBatch, batch);
 
-    when(batchRepository.findAllByDeletedFalse(PAGEABLE)).thenReturn(batchPage);
+    when(batchRepository.findAllByDeletedFalse()).thenReturn(batches);
 
     Session sessionJudge = Session.builder()
       .role(Role.JUDGE)
       .build();
-    Page<Batch> foundBatchPageJudge = batchService.getBatches(sessionJudge,
-                                                              PAGEABLE
-    );
+    List<Batch> foundBatchListJudge = batchService.getBatches(sessionJudge);
 
-    assertThat(foundBatchPageJudge.getContent()).isNotEmpty();
-    assertThat(foundBatchPageJudge).isEqualTo(batchPage);
+    assertThat(foundBatchListJudge).isNotEmpty();
+    assertThat(foundBatchListJudge).isEqualTo(batches);
 
-    verify(batchRepository).findAllByDeletedFalse(PAGEABLE);
+    verify(batchRepository).findAllByDeletedFalse();
 
-    when(batchRepository.findAllByIdAndDeletedFalse(ID_1, PAGEABLE)).thenReturn(
-      batchPage);
+    when(batchRepository.findAllByIdAndDeletedFalse(ID_1)).thenReturn(batches);
 
     Session sessionStudent = Session.builder()
       .batchId(ID_1)
       .role(Role.STUDENT)
       .build();
-    Page<Batch> foundBatchPageStudent = batchService.getBatches(sessionStudent,
-                                                                PAGEABLE
-    );
+    List<Batch> foundBatchListStudent = batchService.getBatches(sessionStudent);
 
-    assertThat(foundBatchPageStudent.getContent()).isNotEmpty();
-    assertThat(foundBatchPageStudent).isEqualTo(batchPage);
+    assertThat(foundBatchListStudent).isNotEmpty();
+    assertThat(foundBatchListStudent).isEqualTo(batches);
 
-    verify(batchRepository).findAllByIdAndDeletedFalse(ID_1, PAGEABLE);
+    verify(batchRepository).findAllByIdAndDeletedFalse(ID_1);
   }
 
   @Test
   public void testGivenNoExistingBatchInDatabaseByFindingBatchesReturnEmptyList() {
 
-    Page<Batch> batchPage = PageHelper.empty(PAGEABLE);
+    List<Batch> batches = Collections.emptyList();
 
-    when(batchRepository.findAllByDeletedFalse(PAGEABLE)).thenReturn(batchPage);
+    when(batchRepository.findAllByDeletedFalse()).thenReturn(batches);
 
     Session sessionJudge = Session.builder()
       .role(Role.JUDGE)
       .build();
-    Page<Batch> foundBatchPageJudge = batchService.getBatches(
-      sessionJudge, PAGEABLE);
+    List<Batch> foundBatchListJudge = batchService.getBatches(sessionJudge);
 
-    assertThat(foundBatchPageJudge.getContent()).isEmpty();
+    assertThat(foundBatchListJudge).isEmpty();
 
-    verify(batchRepository).findAllByDeletedFalse(PAGEABLE);
+    verify(batchRepository).findAllByDeletedFalse();
 
-    when(batchRepository.findAllByIdAndDeletedFalse(ID_1, PAGEABLE)).thenReturn(
-      batchPage);
+    when(batchRepository.findAllByIdAndDeletedFalse(ID_1)).thenReturn(batches);
 
     Session sessionStudent = Session.builder()
       .batchId(ID_1)
       .role(Role.STUDENT)
       .build();
-    Page<Batch> foundBatchPageStudent = batchService.getBatches(
-      sessionStudent, PAGEABLE);
+    List<Batch> foundBatchListStudent = batchService.getBatches(sessionStudent);
 
-    assertThat(foundBatchPageStudent.getContent()).isEmpty();
+    assertThat(foundBatchListStudent).isEmpty();
 
-    verify(batchRepository).findAllByIdAndDeletedFalse(ID_1, PAGEABLE);
+    verify(batchRepository).findAllByIdAndDeletedFalse(ID_1);
   }
 
   @Test

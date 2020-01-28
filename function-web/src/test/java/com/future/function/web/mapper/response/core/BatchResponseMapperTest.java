@@ -1,17 +1,11 @@
 package com.future.function.web.mapper.response.core;
 
 import com.future.function.model.entity.feature.core.Batch;
-import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.model.response.base.DataResponse;
-import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.feature.core.BatchWebResponse;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 
 import java.util.Arrays;
@@ -55,11 +49,6 @@ public class BatchResponseMapperTest {
   private static final List<Batch> BATCHES = Arrays.asList(
     BATCH_1, BATCH_2, BATCH_3);
 
-  private static final Pageable PAGEABLE = new PageRequest(0, 10);
-
-  private static final Page<Batch> BATCH_PAGE = new PageImpl<>(
-    BATCHES, PAGEABLE, BATCHES.size());
-
   private static final DataResponse<BatchWebResponse>
     CREATED_BATCH_DATA_RESPONSE = DataResponse.<BatchWebResponse>builder().code(
     HttpStatus.CREATED.value())
@@ -74,12 +63,11 @@ public class BatchResponseMapperTest {
       .data(BATCH_WEB_RESPONSE_1)
       .build();
 
-  private static final PagingResponse<BatchWebResponse>
-    BATCH_WEB_RESPONSE_PAGING_RESPONSE =
-    PagingResponse.<BatchWebResponse>builder().code(200)
+  private static final DataResponse<List<BatchWebResponse>>
+    BATCH_WEB_RESPONSE_DATA_RESPONSE_LIST =
+    DataResponse.<List<BatchWebResponse>>builder().code(200)
       .status("OK")
       .data(BATCH_WEB_RESPONSES)
-      .paging(PageHelper.toPaging(BATCH_PAGE))
       .build();
 
   @Before
@@ -111,11 +99,11 @@ public class BatchResponseMapperTest {
   @Test
   public void testGivenBatchesDataByMappingToPagingResponseReturnPagingResponseObject() {
 
-    PagingResponse<BatchWebResponse> pagingResponse =
-      BatchResponseMapper.toBatchesPagingResponse(BATCH_PAGE);
+    DataResponse<List<BatchWebResponse>> pagingResponse =
+      BatchResponseMapper.toBatchesDataResponse(BATCHES);
 
     assertThat(pagingResponse).isNotNull();
-    assertThat(pagingResponse).isEqualTo(BATCH_WEB_RESPONSE_PAGING_RESPONSE);
+    assertThat(pagingResponse).isEqualTo(BATCH_WEB_RESPONSE_DATA_RESPONSE_LIST);
   }
 
   @Test
