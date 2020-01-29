@@ -1,6 +1,7 @@
 package com.future.function.data.migration.change.log;
 
 import com.future.function.model.entity.feature.core.FileV2;
+import com.future.function.model.entity.feature.core.embedded.FilePath;
 import com.future.function.model.util.constant.DocumentName;
 import com.github.cloudyrock.mongock.ChangeLog;
 import com.github.cloudyrock.mongock.ChangeSet;
@@ -36,7 +37,11 @@ public class DataMigration_002 {
 
     FileV2 savedRootFolder = mongoTemplate.findById("root", FileV2.class);
 
-    savedRootFolder.setPaths(Collections.singletonList(rootFolder));
+    FilePath rootFolderPath = FilePath.builder()
+      .id(savedRootFolder.getId())
+      .name(savedRootFolder.getName())
+      .build();
+    savedRootFolder.setPaths(Collections.singletonList(rootFolderPath));
 
     mongoTemplate.save(savedRootFolder);
   }

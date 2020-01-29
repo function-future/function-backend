@@ -6,6 +6,7 @@ import com.future.function.common.exception.ForbiddenException;
 import com.future.function.common.exception.NotFoundException;
 import com.future.function.common.properties.core.FileProperties;
 import com.future.function.model.entity.feature.core.FileV2;
+import com.future.function.model.entity.feature.core.embedded.FilePath;
 import com.future.function.repository.feature.core.FileRepositoryV2;
 import com.future.function.service.api.feature.core.FileService;
 import com.future.function.service.api.feature.core.ResourceService;
@@ -89,7 +90,7 @@ public class FileServiceImpl implements FileService {
     return fileRepositoryV2.save(file);
   }
 
-  private List<FileV2> getPathsForFileOrFolder(FileV2 fileOrFolder) {
+  private List<FilePath> getPathsForFileOrFolder(FileV2 fileOrFolder) {
 
     if (Objects.isNull(fileOrFolder)) {
       return new LinkedList<>();
@@ -114,19 +115,28 @@ public class FileServiceImpl implements FileService {
       .build();
   }
 
-  private List<FileV2> getPathsForFileOrFolder(String fileFolderId) {
+  private List<FilePath> getPathsForFileOrFolder(String fileFolderId) {
 
-    FileV2 parentOfFileOrFolder = Optional.ofNullable(fileFolderId)
+    FileV2 fileOrFolder = Optional.ofNullable(fileFolderId)
       .flatMap(fileRepositoryV2::findByIdAndDeletedFalse)
       .orElse(null);
 
-    List<FileV2> pathsForFileOrFolder = this.getPathsForFileOrFolder(
-      parentOfFileOrFolder);
+    List<FilePath> pathsForFileOrFolder = this.getPathsForFileOrFolder(
+      fileOrFolder);
 
-    Optional.ofNullable(parentOfFileOrFolder)
+    Optional.ofNullable(fileOrFolder)
+      .map(this::toFilePath)
       .ifPresent(pathsForFileOrFolder::add);
 
     return pathsForFileOrFolder;
+  }
+
+  private FilePath toFilePath(FileV2 fileOrFolder) {
+
+    return FilePath.builder()
+      .id(fileOrFolder.getId())
+      .name(fileOrFolder.getName())
+      .build();
   }
 
   private List<String> getListOfIdToBeMarked(FileV2 file) {
@@ -163,11 +173,11 @@ public class FileServiceImpl implements FileService {
   }
 
   @Override
-  public Pair<List<FileV2>, Page<FileV2>> getFilesAndFolders(
+  public Pair<List<FilePath>, Page<FileV2>> getFilesAndFolders(
     String parentId, Pageable pageable
   ) {
 
-    List<FileV2> paths = this.getPathsForFileOrFolder(parentId);
+    List<FilePath> paths = this.getPathsForFileOrFolder(parentId);
 
     return Optional.ofNullable(parentId)
       .map(
