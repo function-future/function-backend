@@ -14,7 +14,7 @@ import java.util.Map;
 public class DataMigration_023 {
 
   @ChangeSet(author = "priagung",
-          id = "chatroomAccessListMigration",
+          id = "chatroomAccessListMigration2",
           order = "0001")
   public void insertChatroomAccessList(MongoTemplate mongoTemplate) {
 
