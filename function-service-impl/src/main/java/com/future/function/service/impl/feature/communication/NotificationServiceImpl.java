@@ -1,6 +1,7 @@
 package com.future.function.service.impl.feature.communication;
 
 import com.future.function.common.exception.NotFoundException;
+import com.future.function.common.properties.communication.MqProperties;
 import com.future.function.model.entity.feature.communication.reminder.Notification;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.repository.feature.communication.reminder.NotificationRepository;
@@ -10,7 +11,6 @@ import com.future.function.service.api.feature.core.UserService;
 import com.future.function.service.impl.helper.PageHelper;
 import com.future.function.session.model.Session;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -27,17 +27,17 @@ public class NotificationServiceImpl implements NotificationService {
 
   private final MessagePublisherService publisherService;
 
-  @Value("${function.mq.topic.notification}")
-  private String mqTopicNotification;
+  private final MqProperties mqProperties;
 
   @Autowired
   public NotificationServiceImpl(
           NotificationRepository notificationRepository, UserService userService,
-          MessagePublisherService publisherService) {
+          MessagePublisherService publisherService, MqProperties mqProperties) {
 
     this.notificationRepository = notificationRepository;
     this.userService = userService;
     this.publisherService = publisherService;
+    this.mqProperties = mqProperties;
   }
 
   @Override
@@ -79,7 +79,7 @@ public class NotificationServiceImpl implements NotificationService {
   }
 
   private void publishNotification(Notification notification) {
-    publisherService.publish(notification.getMember().getId(), mqTopicNotification);
+    publisherService.publish(notification.getMember().getId(), mqProperties.getTopic().get("notification"));
   }
 
   @Override

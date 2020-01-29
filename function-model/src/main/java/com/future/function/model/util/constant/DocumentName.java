@@ -88,4 +88,6 @@ public abstract class DocumentName {
 
   public static final String LOG_MESSAGE = "logger-message";
 
+  public static final String QUESTION_RESPONSE_QUEUE = "question-response-queue";
+
 }

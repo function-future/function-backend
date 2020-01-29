@@ -3,10 +3,7 @@ package com.future.function.web.controller.communication.questionnaire;
 import com.future.function.common.enumeration.communication.ParticipantType;
 import com.future.function.common.enumeration.core.Role;
 import com.future.function.common.properties.core.FileProperties;
-import com.future.function.model.entity.feature.communication.questionnaire.QuestionQuestionnaire;
-import com.future.function.model.entity.feature.communication.questionnaire.QuestionResponse;
-import com.future.function.model.entity.feature.communication.questionnaire.Questionnaire;
-import com.future.function.model.entity.feature.communication.questionnaire.QuestionnaireParticipant;
+import com.future.function.model.entity.feature.communication.questionnaire.*;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.User;
@@ -23,10 +20,7 @@ import com.future.function.web.model.request.communication.questionnaire.Questio
 import com.future.function.web.model.request.communication.questionnaire.QuestionnaireResponseRequest;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
-import com.future.function.web.model.response.feature.communication.questionnaire.AppraisalDataResponse;
-import com.future.function.web.model.response.feature.communication.questionnaire.AppraiseeResponse;
-import com.future.function.web.model.response.feature.communication.questionnaire.QuestionQuestionnaireResponse;
-import com.future.function.web.model.response.feature.communication.questionnaire.QuestionnaireDetailResponse;
+import com.future.function.web.model.response.feature.communication.questionnaire.*;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -45,10 +39,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -107,6 +98,8 @@ public class MyQuestionnaireControllerTest extends TestHelper {
   private static final String COMMENT = "comment";
 
   private static final String QUESTION_RESPONSE_ID = "questionResponseId";
+
+  private static final String QUESTION_RESPONSE_QUEUE_ID = "questionResponseQueueId";
 
   private static final Questionnaire QUESTIONNAIRE = Questionnaire.builder()
     .id(QUESTIONNAIRE_ID_1)
@@ -176,10 +169,31 @@ public class MyQuestionnaireControllerTest extends TestHelper {
       .id(QUESTION_RESPONSE_ID)
       .build();
 
+  private static final QuestionResponseQueue QUESTION_RESPONSE_QUEUE =
+    QuestionResponseQueue.builder()
+      .id(QUESTION_RESPONSE_QUEUE_ID)
+      .build();
+
+
   private final QuestionnaireResponseRequest
     QUESTIONNAIRE_RESPONSE_WEB_REQUEST = QuestionnaireResponseRequest.builder()
     .responses(Arrays.asList(QUESTION_RESPONSE_REQUEST))
     .build();
+
+  private static final String QUESTIONNNAIRE_RESPONSE_ID = "qr1";
+
+  private static final Answer SCORE = Answer.builder()
+    .minimum(0)
+    .maximum(6)
+    .average(3)
+    .build();
+
+  private static final QuestionnaireResponse QUESTIONNAIRE_RESPONSE =
+    QuestionnaireResponse.builder()
+      .id(QUESTIONNNAIRE_RESPONSE_ID)
+      .scoreSummary(SCORE)
+      .appraisee(MEMBER_1)
+      .build();
 
 
   @MockBean
@@ -272,6 +286,38 @@ public class MyQuestionnaireControllerTest extends TestHelper {
   }
 
   @Test
+  public void getListAprraiseeDone() throws Exception {
+
+    when(userService.getUser(any(String.class))).thenReturn(USER);
+    when(questionnaireService.getQuestionnaire(QUESTIONNAIRE_ID_1)).thenReturn(
+      QUESTIONNAIRE);
+    when(
+      myQuestionnaireService.getListAppraiseeDone(
+        QUESTIONNAIRE, USER)).thenReturn(Arrays.asList(QUESTIONNAIRE_RESPONSE));
+    when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
+
+    DataResponse<List<QuestionnaireDoneResponse>> response =
+      MyQuestionnaireResponseMapper.toDataResponseQuestionnaireDoneResponseList(
+        Arrays.asList(QUESTIONNAIRE_RESPONSE),
+        URL_PREFIX
+      );
+
+    mockMvc.perform(get(
+      "/api/communication/my-questionnaires/" + QUESTIONNAIRE_ID_1 +
+        "/appraisees-done").cookie(cookies))
+      .andExpect(status().isOk())
+      .andExpect(content().json(dataResponseJacksonTester.write(response)
+        .getJson()));
+
+    verify(userService).getUser(any(String.class));
+    verify(questionnaireService).getQuestionnaire(QUESTIONNAIRE_ID_1);
+    verify(
+      myQuestionnaireService).getListAppraiseeDone(
+      QUESTIONNAIRE, USER);
+    verify(fileProperties).getUrlPrefix();
+  }
+
+  @Test
   public void getQuestionnaireData() throws Exception {
 
     when(userService.getUser(MEMBER_ID_1)).thenReturn(MEMBER_1);
@@ -327,15 +373,15 @@ public class MyQuestionnaireControllerTest extends TestHelper {
     when(userService.getUser(any(String.class))).thenReturn(MEMBER_1);
     when(questionnaireService.getQuestionnaire(QUESTIONNAIRE_ID_1)).thenReturn(
       QUESTIONNAIRE);
-    when(myQuestionnaireRequestMapper.toListQuestionResponse(
+    when(myQuestionnaireRequestMapper.toListQuestionResponseQueue(
       Arrays.asList(QUESTION_RESPONSE_REQUEST), MEMBER_1, MEMBER_1)).thenReturn(
-      Arrays.asList(QUESTION_RESPONSE));
+      Arrays.asList(QUESTION_RESPONSE_QUEUE));
 
-    when(
-      myQuestionnaireService.createQuestionnaireResponseToAppraiseeFromMemberLoginAsAppraiser(
-        QUESTIONNAIRE, Arrays.asList(QUESTION_RESPONSE), MEMBER_1,
+    doNothing().when(myQuestionnaireService)
+      .createQuestionnaireResponseToAppraiseeFromMemberLoginAsAppraiser(
+        QUESTIONNAIRE, Arrays.asList(QUESTION_RESPONSE_QUEUE), MEMBER_1,
         MEMBER_1
-      )).thenReturn(null);
+      );
 
     mockMvc.perform(post(
       "/api/communication/my-questionnaires/" + QUESTIONNAIRE_ID_1 +
@@ -350,8 +396,8 @@ public class MyQuestionnaireControllerTest extends TestHelper {
     verify(userService, times(4)).getUser(any(String.class));
     verify(
       myQuestionnaireService).createQuestionnaireResponseToAppraiseeFromMemberLoginAsAppraiser(
-      QUESTIONNAIRE, Arrays.asList(QUESTION_RESPONSE), MEMBER_1, MEMBER_1);
-    verify(myQuestionnaireRequestMapper).toListQuestionResponse(
+      QUESTIONNAIRE, Arrays.asList(QUESTION_RESPONSE_QUEUE), MEMBER_1, MEMBER_1);
+    verify(myQuestionnaireRequestMapper).toListQuestionResponseQueue(
       Arrays.asList(QUESTION_RESPONSE_REQUEST), MEMBER_1, MEMBER_1);
   }
 

@@ -1,6 +1,7 @@
 package com.future.function.service.impl.feature.core;
 
 import com.future.function.common.enumeration.core.FileOrigin;
+import com.future.function.common.exception.ForbiddenException;
 import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.Course;
@@ -13,6 +14,7 @@ import com.future.function.service.api.feature.core.CourseService;
 import com.future.function.service.api.feature.core.DiscussionService;
 import com.future.function.service.api.feature.core.ResourceService;
 import com.future.function.service.impl.helper.PageHelper;
+import com.future.function.session.model.Session;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -47,6 +49,8 @@ public class SharedCourseServiceImplTest {
   private static final List<String> COURSE_IDS = Collections.singletonList(
     COURSE_ID);
 
+  private static final String BATCH_ID = "batch-id";
+
   private static final String BATCH_CODE = "batch-code";
 
   private static final String COURSE_TITLE = "course-title";
@@ -65,6 +69,7 @@ public class SharedCourseServiceImplTest {
   private static final String SHARED_COURSE_ID = "shared-course-id";
 
   private static final Batch BATCH = Batch.builder()
+    .id(BATCH_ID)
     .code(BATCH_CODE)
     .build();
 
@@ -130,7 +135,7 @@ public class SharedCourseServiceImplTest {
   }
 
   @Test
-  public void testGivenCourseIdAndBatchCodeByGettingCourseForBatchReturnCourseObject() {
+  public void testGivenCourseIdAndBatchCodeAndAdminSessionByGettingCourseForBatchReturnCourseObject() {
 
     when(batchService.getBatchByCode(BATCH_CODE)).thenReturn(BATCH);
     sharedCourse.setId(SHARED_COURSE_ID);
@@ -138,7 +143,7 @@ public class SharedCourseServiceImplTest {
       Optional.of(sharedCourse));
 
     Course foundCourse = sharedCourseService.getCourseByIdAndBatchCode(
-      COURSE_ID, BATCH_CODE);
+      new Session(), COURSE_ID, BATCH_CODE);
 
     assertThat(foundCourse).isNotNull();
     assertThat(foundCourse).isEqualTo(Course.builder()
@@ -154,15 +159,63 @@ public class SharedCourseServiceImplTest {
   }
 
   @Test
-  public void testGivenInvalidCourseIdAndBatchCodeByGettingCourseForBatchReturnNotFoundException() {
+  public void testGivenCourseIdAndBatchCodeAndStudentOfBatchSessionByGettingCourseForBatchReturnCourseObject() {
+
+    when(batchService.getBatchByCode(BATCH_CODE)).thenReturn(BATCH);
+    sharedCourse.setId(SHARED_COURSE_ID);
+    when(sharedCourseRepository.findByIdAndBatch(COURSE_ID, BATCH)).thenReturn(
+      Optional.of(sharedCourse));
+
+    Session studentOfBatchSession = Session.builder()
+      .batchId(BATCH_ID)
+      .build();
+    Course foundCourse = sharedCourseService.getCourseByIdAndBatchCode(
+      studentOfBatchSession, COURSE_ID, BATCH_CODE);
+
+    assertThat(foundCourse).isNotNull();
+    assertThat(foundCourse).isEqualTo(Course.builder()
+                                        .id(SHARED_COURSE_ID)
+                                        .title(COURSE_TITLE)
+                                        .description(COURSE_DESCRIPTION)
+                                        .file(FILE)
+                                        .build());
+
+    verify(batchService).getBatchByCode(BATCH_CODE);
+    verify(sharedCourseRepository).findByIdAndBatch(COURSE_ID, BATCH);
+    verifyZeroInteractions(resourceService, courseService, discussionService);
+  }
+
+  @Test
+  public void testGivenCourseIdAndBatchCodeAndNotStudentOfBatchSessionByGettingCourseForBatchReturnForbiddenException() {
+
+    when(batchService.getBatchByCode(BATCH_CODE)).thenReturn(BATCH);
+
+    Session studentNotOfBatchSession = Session.builder()
+      .batchId(BATCH_ID + "2")
+      .build();
+    catchException(() -> sharedCourseService.getCourseByIdAndBatchCode(
+      studentNotOfBatchSession, COURSE_ID, BATCH_CODE));
+
+    assertThat(caughtException().getClass()).isEqualTo(ForbiddenException.class);
+    assertThat(caughtException().getMessage()).isEqualTo(
+      "Invalid Student Batch for Accessing Shared Course");
+
+    verify(batchService).getBatchByCode(BATCH_CODE);
+    verifyZeroInteractions(resourceService, courseService,
+                           sharedCourseRepository, discussionService
+    );
+  }
+
+  @Test
+  public void testGivenInvalidCourseIdAndBatchCodeAndAdminSessionByGettingCourseForBatchReturnNotFoundException() {
 
     when(batchService.getBatchByCode(BATCH_CODE)).thenReturn(BATCH);
     when(sharedCourseRepository.findByIdAndBatch(COURSE_ID, BATCH)).thenReturn(
       Optional.empty());
 
     catchException(
-      () -> sharedCourseService.getCourseByIdAndBatchCode(COURSE_ID,
-                                                          BATCH_CODE
+      () -> sharedCourseService.getCourseByIdAndBatchCode(new Session(),
+                                                          COURSE_ID, BATCH_CODE
       ));
 
     assertThat(caughtException().getClass()).isEqualTo(NotFoundException.class);
@@ -175,7 +228,7 @@ public class SharedCourseServiceImplTest {
   }
 
   @Test
-  public void testGivenBatchCodeByGettingCoursesForBatchReturnPageOfCourse() {
+  public void testGivenBatchCodeAndAdminSessionByGettingCoursesForBatchReturnPageOfCourse() {
 
     when(batchService.getBatchByCode(BATCH_CODE)).thenReturn(BATCH);
 
@@ -196,7 +249,7 @@ public class SharedCourseServiceImplTest {
                                   .build()), PAGEABLE);
 
     Page<Course> coursePage = sharedCourseService.getCoursesByBatchCode(
-      BATCH_CODE, PAGEABLE);
+      new Session(), BATCH_CODE, PAGEABLE);
 
     assertThat(coursePage).isNotNull();
     assertThat(coursePage).isEqualTo(expectedCoursePage);
@@ -207,7 +260,7 @@ public class SharedCourseServiceImplTest {
   }
 
   @Test
-  public void testGivenBatchCodeWithNoSharedCoursesByGettingCoursesForBatchReturnEmptyPageOfCourse() {
+  public void testGivenBatchCodeWithNoSharedCoursesAndAdminSessionByGettingCoursesForBatchReturnEmptyPageOfCourse() {
 
     when(batchService.getBatchByCode(BATCH_CODE)).thenReturn(BATCH);
     Page<SharedCourse> sharedCoursePage = PageHelper.empty(PAGEABLE);
@@ -217,7 +270,7 @@ public class SharedCourseServiceImplTest {
     Page<Course> expectedCoursePage = PageHelper.empty(PAGEABLE);
 
     Page<Course> coursePage = sharedCourseService.getCoursesByBatchCode(
-      BATCH_CODE, PAGEABLE);
+      new Session(), BATCH_CODE, PAGEABLE);
 
     assertThat(coursePage).isNotNull();
     assertThat(coursePage).isEqualTo(expectedCoursePage);
@@ -225,6 +278,86 @@ public class SharedCourseServiceImplTest {
     verify(batchService).getBatchByCode(BATCH_CODE);
     verify(sharedCourseRepository).findAllByBatch(BATCH, PAGEABLE);
     verifyZeroInteractions(resourceService, courseService, discussionService);
+  }
+
+  @Test
+  public void testGivenBatchCodeAndStudentOfBatchSessionByGettingCoursesForBatchReturnPageOfCourse() {
+
+    when(batchService.getBatchByCode(BATCH_CODE)).thenReturn(BATCH);
+
+    sharedCourse.setId(SHARED_COURSE_ID);
+    List<SharedCourse> sharedCourseList = Collections.singletonList(
+      sharedCourse);
+    Page<SharedCourse> sharedCoursePage = PageHelper.toPage(
+      sharedCourseList, PAGEABLE);
+    when(sharedCourseRepository.findAllByBatch(BATCH, PAGEABLE)).thenReturn(
+      sharedCoursePage);
+
+    Page<Course> expectedCoursePage = PageHelper.toPage(
+      Collections.singletonList(Course.builder()
+                                  .id(SHARED_COURSE_ID)
+                                  .title(COURSE_TITLE)
+                                  .description(COURSE_DESCRIPTION)
+                                  .file(FILE)
+                                  .build()), PAGEABLE);
+
+    Session studentOfBatchSession = Session.builder()
+      .batchId(BATCH_ID)
+      .build();
+    Page<Course> coursePage = sharedCourseService.getCoursesByBatchCode(
+      studentOfBatchSession, BATCH_CODE, PAGEABLE);
+
+    assertThat(coursePage).isNotNull();
+    assertThat(coursePage).isEqualTo(expectedCoursePage);
+
+    verify(batchService).getBatchByCode(BATCH_CODE);
+    verify(sharedCourseRepository).findAllByBatch(BATCH, PAGEABLE);
+    verifyZeroInteractions(resourceService, courseService, discussionService);
+  }
+
+  @Test
+  public void testGivenBatchCodeWithNoSharedCoursesAndStudentOfBatchSessionByGettingCoursesForBatchReturnEmptyPageOfCourse() {
+
+    when(batchService.getBatchByCode(BATCH_CODE)).thenReturn(BATCH);
+    Page<SharedCourse> sharedCoursePage = PageHelper.empty(PAGEABLE);
+    when(sharedCourseRepository.findAllByBatch(BATCH, PAGEABLE)).thenReturn(
+      sharedCoursePage);
+
+    Page<Course> expectedCoursePage = PageHelper.empty(PAGEABLE);
+
+    Session studentOfBatchSession = Session.builder()
+      .batchId(BATCH_ID)
+      .build();
+    Page<Course> coursePage = sharedCourseService.getCoursesByBatchCode(
+      studentOfBatchSession, BATCH_CODE, PAGEABLE);
+
+    assertThat(coursePage).isNotNull();
+    assertThat(coursePage).isEqualTo(expectedCoursePage);
+
+    verify(batchService).getBatchByCode(BATCH_CODE);
+    verify(sharedCourseRepository).findAllByBatch(BATCH, PAGEABLE);
+    verifyZeroInteractions(resourceService, courseService, discussionService);
+  }
+
+  @Test
+  public void testGivenBatchCodeAndNotStudentOfBatchSessionByGettingCoursesForBatchReturnForbiddenException() {
+
+    when(batchService.getBatchByCode(BATCH_CODE)).thenReturn(BATCH);
+
+    Session studentNotOfBatchSession = Session.builder()
+      .batchId(BATCH_ID + "2")
+      .build();
+    catchException(() -> sharedCourseService.getCoursesByBatchCode(
+      studentNotOfBatchSession, BATCH_CODE, PAGEABLE));
+
+    assertThat(caughtException().getClass()).isEqualTo(ForbiddenException.class);
+    assertThat(caughtException().getMessage()).isEqualTo(
+      "Invalid Student Batch for Accessing Shared Course");
+
+    verify(batchService).getBatchByCode(BATCH_CODE);
+    verifyZeroInteractions(resourceService, courseService,
+                           sharedCourseRepository, discussionService
+    );
   }
 
   @Test
@@ -342,6 +475,38 @@ public class SharedCourseServiceImplTest {
   }
 
   @Test
+  public void testGivenCourseIdsAndNoMaterialCourseAndOriginBatchCodeAndTargetBatchCodeByCreatingCourseForBatchFromAnotherBatchReturnListOfCourse() {
+
+    String originBatchCode = "origin-batch-code";
+    Batch originBatch = Batch.builder()
+      .code(originBatchCode)
+      .build();
+    when(batchService.getBatchByCode(originBatchCode)).thenReturn(originBatch);
+    when(batchService.getBatchByCode(BATCH_CODE)).thenReturn(BATCH);
+    sharedCourse.getCourse().setFile(new FileV2());
+    when(sharedCourseRepository.findAllByBatch(originBatch)).thenReturn(
+      Stream.of(sharedCourse));
+
+    when(sharedCourseRepository.save(sharedCourse)).thenReturn(sharedCourse);
+
+    List<String> sharedCourseIds = Collections.singletonList(
+      sharedCourse.getId());
+    List<Course> createdCourseList = sharedCourseService.createCourseForBatch(
+      sharedCourseIds, originBatchCode, BATCH_CODE);
+
+    assertThat(createdCourseList).isNotEmpty();
+    assertThat(createdCourseList).isEqualTo(courseList);
+    assertThat(createdCourseList.get(0)
+                 .getFile()).isEqualTo(new FileV2());
+
+    verify(batchService).getBatchByCode(originBatchCode);
+    verify(batchService).getBatchByCode(BATCH_CODE);
+    verify(sharedCourseRepository).findAllByBatch(originBatch);
+    verify(sharedCourseRepository).save(sharedCourse);
+    verifyZeroInteractions(resourceService, discussionService);
+  }
+
+  @Test
   public void testGivenCourseIdsAndNullOriginBatchCodeAndTargetBatchCodeByCreatingCourseForBatchFromMasterDataReturnListOfCourse() {
 
     when(courseService.getCourse(COURSE_ID)).thenReturn(course);
@@ -400,7 +565,30 @@ public class SharedCourseServiceImplTest {
   }
 
   @Test
-  public void testGivenEmailAndCourseIdAndBatchCodeByGettingDiscussionsForSharedCourseReturnPageOfDiscussion() {
+  public void testGivenCourseIdsAndNoMaterialCourseAndEmptyOriginBatchCodeAndTargetBatchCodeByCreatingCourseForBatchFromMasterDataReturnListOfCourse() {
+
+    course.setFile(new FileV2());
+    when(courseService.getCourse(COURSE_ID)).thenReturn(course);
+    when(batchService.getBatchByCode(BATCH_CODE)).thenReturn(BATCH);
+
+    when(sharedCourseRepository.save(sharedCourse)).thenReturn(sharedCourse);
+
+    List<Course> createdCourseList = sharedCourseService.createCourseForBatch(
+      COURSE_IDS, "", BATCH_CODE);
+
+    assertThat(createdCourseList).isNotEmpty();
+    assertThat(createdCourseList).isEqualTo(courseList);
+    assertThat(createdCourseList.get(0)
+                 .getFile()).isEqualTo(new FileV2());
+
+    verify(courseService).getCourse(COURSE_ID);
+    verify(batchService).getBatchByCode(BATCH_CODE);
+    verify(sharedCourseRepository).save(sharedCourse);
+    verifyZeroInteractions(resourceService, discussionService);
+  }
+
+  @Test
+  public void testGivenEmailAndCourseIdAndBatchCodeAndAdminSessionByGettingDiscussionsForSharedCourseReturnPageOfDiscussion() {
 
     when(batchService.getBatchByCode(BATCH_CODE)).thenReturn(BATCH);
     when(sharedCourseRepository.findByIdAndBatch(COURSE_ID, BATCH)).thenReturn(
@@ -413,11 +601,11 @@ public class SharedCourseServiceImplTest {
     Page<Discussion> expectedDiscussions = new PageImpl<>(
       Collections.singletonList(discussion), PAGEABLE, 1);
 
-    Page<Discussion> discussions = sharedCourseService.getDiscussions(EMAIL,
-                                                                      COURSE_ID,
-                                                                      BATCH_CODE,
-                                                                      PAGEABLE
-    );
+    Session adminSession = Session.builder()
+      .email(EMAIL)
+      .build();
+    Page<Discussion> discussions = sharedCourseService.getDiscussions(
+      adminSession, COURSE_ID, BATCH_CODE, PAGEABLE);
 
     assertThat(discussions).isNotNull();
     assertThat(discussions).isEqualTo(expectedDiscussions);
@@ -432,7 +620,7 @@ public class SharedCourseServiceImplTest {
   }
 
   @Test
-  public void testGivenDiscussionByCreatingDiscussionReturnCreatedDiscussion() {
+  public void testGivenDiscussionAndAdminSessionByCreatingDiscussionReturnCreatedDiscussion() {
 
     when(batchService.getBatchByCode(BATCH_CODE)).thenReturn(BATCH);
     when(sharedCourseRepository.findByIdAndBatch(COURSE_ID, BATCH)).thenReturn(
@@ -445,8 +633,11 @@ public class SharedCourseServiceImplTest {
     when(discussionService.createDiscussion(discussionRequest)).thenReturn(
       discussion);
 
+    Session adminSession = Session.builder()
+      .email(EMAIL)
+      .build();
     Discussion discussion = sharedCourseService.createDiscussion(
-      discussionRequest);
+      adminSession, discussionRequest);
 
     assertThat(discussion).isNotNull();
     assertThat(discussion).isEqualTo(this.discussion);

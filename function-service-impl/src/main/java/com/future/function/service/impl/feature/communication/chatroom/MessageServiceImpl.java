@@ -126,8 +126,7 @@ public class MessageServiceImpl implements MessageService {
 
     Chatroom chatroom = chatroomService.getChatroom(message.getChatroom()
                                                       .getId(), userId);
-    chatroom.setUpdatedAt(new Date().getTime());
-    message.setChatroom(chatroomService.updateChatroom(chatroom, userId));
+    message.setChatroom(chatroomService.updateDate(chatroom));
     return message;
   }
 

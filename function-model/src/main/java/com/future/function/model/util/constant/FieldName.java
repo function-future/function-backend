@@ -144,6 +144,7 @@ public interface FieldName {
 
     public static final String COMMENT = "comment";
 
+    public static final String IS_UPDATE = "isUpdate";
   }
 
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -223,6 +224,8 @@ public interface FieldName {
     public static final String CHATROOM_TITLE = "chatroomTitle";
 
     public static final String TYPE = "type";
+
+    public static final String CHATROOM_PICTURE = "picture";
 
   }
 
@@ -537,4 +540,8 @@ public interface FieldName {
 
   }
 
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  abstract class QuestionResponseQueue {
+
+  }
 }

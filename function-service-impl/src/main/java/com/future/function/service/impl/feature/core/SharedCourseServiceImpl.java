@@ -1,6 +1,7 @@
 package com.future.function.service.impl.feature.core;
 
 import com.future.function.common.enumeration.core.FileOrigin;
+import com.future.function.common.exception.ForbiddenException;
 import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.Course;
@@ -15,6 +16,7 @@ import com.future.function.service.api.feature.core.ResourceService;
 import com.future.function.service.api.feature.core.SharedCourseService;
 import com.future.function.service.impl.helper.CopyHelper;
 import com.future.function.service.impl.helper.PageHelper;
+import com.future.function.session.model.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,7 +26,6 @@ import org.springframework.util.StringUtils;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -76,9 +77,12 @@ public class SharedCourseServiceImpl implements SharedCourseService {
   }
 
   @Override
-  public Course getCourseByIdAndBatchCode(String courseId, String batchCode) {
+  public Course getCourseByIdAndBatchCode(
+    Session session, String courseId, String batchCode
+  ) {
 
     return this.getBatch(batchCode)
+      .filter(batch -> this.isUserAccessingProperSharedCourse(session, batch))
       .flatMap(
         batch -> sharedCourseRepository.findByIdAndBatch(courseId, batch))
       .map(this::setCourseId)
@@ -94,13 +98,37 @@ public class SharedCourseServiceImpl implements SharedCourseService {
 
   @Override
   public Page<Course> getCoursesByBatchCode(
-    String batchCode, Pageable pageable
+    Session session, String batchCode, Pageable pageable
   ) {
 
     return this.getBatch(batchCode)
+      .filter(batch -> this.isUserAccessingProperSharedCourse(session, batch))
       .map(batch -> sharedCourseRepository.findAllByBatch(batch, pageable))
       .map(sharedCourses -> this.toCoursePage(sharedCourses, pageable))
       .orElseGet(() -> PageHelper.empty(pageable));
+  }
+
+  private boolean isUserAccessingProperSharedCourse(
+    Session session, Batch batch
+  ) {
+
+    return Optional.of(session)
+      .map(Session::getBatchId)
+      .map(userBatchId -> this.isStudentAccessingProperSharedCourse(batch,
+                                                                    userBatchId
+      ))
+      .orElse(Boolean.TRUE);
+  }
+
+  private boolean isStudentAccessingProperSharedCourse(
+    Batch batch, String studentBatchId
+  ) {
+
+    return Optional.of(studentBatchId)
+      .map(batch.getId()::equals)
+      .filter(Boolean::booleanValue)
+      .orElseThrow(() -> new ForbiddenException(
+        "Invalid Student Batch for Accessing Shared Course"));
   }
 
   private Page<Course> toCoursePage(
@@ -186,7 +214,7 @@ public class SharedCourseServiceImpl implements SharedCourseService {
   private Course createCourseFileCopy(Course course) {
 
     Optional.of(course)
-      .filter(c -> Objects.nonNull(c.getFile()))
+      .filter(c -> !new FileV2().equals(c.getFile()))
       .ifPresent(c -> c.setFile(
         resourceService.createACopy(course.getFile(), FileOrigin.COURSE)));
 
@@ -234,23 +262,25 @@ public class SharedCourseServiceImpl implements SharedCourseService {
 
   @Override
   public Page<Discussion> getDiscussions(
-    String email, String courseId, String batchCode, Pageable pageable
+    Session session, String courseId, String batchCode, Pageable pageable
   ) {
 
-    Optional.of(email)
-      .ifPresent(
-        ignored -> this.getCourseByIdAndBatchCode(courseId, batchCode));
+    Optional.of(session.getEmail())
+      .ifPresent(ignored -> this.getCourseByIdAndBatchCode(session, courseId,
+                                                           batchCode
+      ));
 
     return discussionService.getDiscussions(
-      email, courseId, batchCode, pageable);
+      session.getEmail(), courseId, batchCode, pageable);
   }
 
   @Override
-  public Discussion createDiscussion(Discussion discussion) {
+  public Discussion createDiscussion(Session session, Discussion discussion) {
 
     Optional.of(discussion)
-      .ifPresent(
-        d -> this.getCourseByIdAndBatchCode(d.getCourseId(), d.getBatchCode()));
+      .ifPresent(d -> this.getCourseByIdAndBatchCode(session, d.getCourseId(),
+                                                     d.getBatchCode()
+      ));
 
     return discussionService.createDiscussion(discussion);
   }

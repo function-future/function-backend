@@ -1,9 +1,7 @@
 package com.future.function.web.mapper.response.communication.questionnaire;
 
 import com.future.function.common.enumeration.core.Role;
-import com.future.function.model.entity.feature.communication.questionnaire.QuestionQuestionnaire;
-import com.future.function.model.entity.feature.communication.questionnaire.Questionnaire;
-import com.future.function.model.entity.feature.communication.questionnaire.QuestionnaireParticipant;
+import com.future.function.model.entity.feature.communication.questionnaire.*;
 import com.future.function.model.entity.feature.core.Batch;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.User;
@@ -11,10 +9,12 @@ import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.feature.communication.questionnaire.AppraisalDataResponse;
 import com.future.function.web.model.response.feature.communication.questionnaire.AppraiseeResponse;
 import com.future.function.web.model.response.feature.communication.questionnaire.QuestionQuestionnaireResponse;
+import com.future.function.web.model.response.feature.communication.questionnaire.QuestionnaireDoneResponse;
 import com.future.function.web.model.response.feature.core.BatchWebResponse;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.http.HttpStatus;
 
 import java.util.Arrays;
 import java.util.List;
@@ -128,6 +128,20 @@ public class MyQuestionnaireResponseMapperTest {
       .description(QUESTION_DESCRIPTION)
       .build();
 
+  private static final String QUESTIONNNAIRE_RESPONSE_ID = "qr1";
+
+  private static final Answer SCORE = Answer.builder()
+    .minimum(0)
+    .maximum(6)
+    .average(3)
+    .build();
+
+  private static final QuestionnaireResponse QUESTIONNAIRE_RESPONSE =
+    QuestionnaireResponse.builder()
+      .id(QUESTIONNNAIRE_RESPONSE_ID)
+      .scoreSummary(SCORE)
+      .appraisee(MEMBER_1)
+      .build();
 
   @Before
   public void setUp() {
@@ -230,4 +244,18 @@ public class MyQuestionnaireResponseMapperTest {
                  .getDescription()).isEqualTo(QUESTION_DESCRIPTION);
   }
 
+
+  @Test
+  public void toDataResponseQuestionnaireDoneResponseList() {
+    DataResponse<List<QuestionnaireDoneResponse>> data =
+      MyQuestionnaireResponseMapper.toDataResponseQuestionnaireDoneResponseList(
+        Arrays.asList(QUESTIONNAIRE_RESPONSE), URL_PREFIX);
+
+    assertThat(data).isNotNull();
+    assertThat(data.getCode()).isEqualTo(200);
+    assertThat(data.getData()
+                  .get(0)
+                  .getAppraiseeResponse()
+                  .getId()).isEqualTo(MEMBER_1.getId());
+  }
 }

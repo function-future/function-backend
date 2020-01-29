@@ -8,10 +8,9 @@ import com.future.function.service.api.feature.core.BatchService;
 import com.future.function.service.impl.helper.CopyHelper;
 import com.future.function.session.model.Session;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -27,21 +26,17 @@ public class BatchServiceImpl implements BatchService {
   }
 
   @Override
-  public Page<Batch> getBatches(Session session, Pageable pageable) {
+  public List<Batch> getBatches(Session session) {
 
     return Optional.of(session)
       .filter(this::hasNonStudentRole)
-      .map(ignored -> batchRepository.findAllByDeletedFalse(pageable))
-      .orElseGet(
-        () -> batchRepository.findAllByIdAndDeletedFalse(session.getBatchId(),
-                                                         pageable
-        ));
+      .map(ignored -> batchRepository.findAllByDeletedFalse())
+      .orElseGet(() -> this.findStudentBatch(session.getBatchId()));
   }
 
-  private boolean hasNonStudentRole(Session session) {
+  private List<Batch> findStudentBatch(String batchId) {
 
-    return Stream.of(Role.ADMIN, Role.JUDGE, Role.MENTOR)
-      .anyMatch(role -> role.equals(session.getRole()));
+    return batchRepository.findAllByIdAndDeletedFalse(batchId);
   }
 
   @Override
@@ -97,6 +92,12 @@ public class BatchServiceImpl implements BatchService {
         batch.setDeleted(true);
         batchRepository.save(batch);
       });
+  }
+
+  private boolean hasNonStudentRole(Session session) {
+
+    return Stream.of(Role.ADMIN, Role.JUDGE, Role.MENTOR)
+      .anyMatch(role -> role.equals(session.getRole()));
   }
 
 }

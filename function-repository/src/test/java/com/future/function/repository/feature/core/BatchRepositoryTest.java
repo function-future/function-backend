@@ -9,14 +9,15 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -58,16 +59,14 @@ public class BatchRepositoryTest {
   }
 
   @Test
-  public void testGivenMethodCallByFindingBatchesReturnBatchObject() {
+  public void testGivenMethodCallByFindingBatchesReturnListOfBatchObjects() {
 
-    Page<Batch> foundBatches = batchRepository.findAllByDeletedFalse(PAGEABLE);
+    List<Batch> foundBatches = batchRepository.findAllByDeletedFalse();
+    List<String> foundBatchCodes = foundBatches.stream()
+      .map(Batch::getCode)
+      .collect(Collectors.toList());
 
-    assertThat(foundBatches.getContent()
-                 .get(0)
-                 .getCode()).isEqualTo(NUMBER_2);
-    assertThat(foundBatches.getContent()
-                 .get(1)
-                 .getCode()).isEqualTo(NUMBER_1);
+    assertThat(foundBatchCodes).contains(NUMBER_1, NUMBER_2);
   }
 
   @Test
@@ -93,13 +92,11 @@ public class BatchRepositoryTest {
   }
 
   @Test
-  public void testGivenBatchIdAndPageableByFindingBatchesReturnPageOfBatch() {
+  public void testGivenBatchIdByFindingBatchesReturnListOfBatch() {
 
-    Page<Batch> foundBatches = batchRepository.findAllByIdAndDeletedFalse(
-      ID_1, PAGEABLE);
+    List<Batch> foundBatches = batchRepository.findAllByIdAndDeletedFalse(ID_1);
 
-    assertThat(foundBatches.getContent()
-                 .get(0)
+    assertThat(foundBatches.get(0)
                  .getCode()).isEqualTo(NUMBER_1);
   }
 

@@ -3,17 +3,18 @@ package com.future.function.service.impl.feature.communication;
 import com.future.function.common.enumeration.communication.ChatroomType;
 import com.future.function.common.exception.ForbiddenException;
 import com.future.function.common.exception.NotFoundException;
+import com.future.function.common.properties.communication.MqProperties;
+import com.future.function.common.properties.communication.RedisProperties;
 import com.future.function.model.entity.feature.communication.chatting.Chatroom;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.repository.feature.communication.chatting.ChatroomRepository;
 import com.future.function.service.api.feature.communication.chatroom.MessageStatusService;
+import com.future.function.service.api.feature.communication.mq.MessagePublisherService;
+import com.future.function.service.api.feature.core.ResourceService;
 import com.future.function.service.api.feature.core.UserService;
 import com.future.function.service.impl.feature.communication.chatroom.ChatroomServiceImpl;
 import com.future.function.session.model.Session;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -23,15 +24,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.redis.core.ListOperations;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.SetOperations;
-import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.data.redis.core.*;
+import org.springframework.web.util.UriTemplate;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Optional;
+import java.util.*;
 
 import static com.googlecode.catchexception.CatchException.catchException;
 import static com.googlecode.catchexception.CatchException.caughtException;
@@ -102,6 +98,45 @@ public class ChatroomServiceImplTest {
   @Mock
   private MessageStatusService messageStatusService;
 
+  private static RedisProperties redisProperties;
+
+  @Mock
+  private MessagePublisherService messagePublisherService;
+
+  @Mock
+  private MqProperties mqProperties;
+
+  @Mock
+  private ResourceService resourceService;
+
+  private static RedisTemplate<String, Object> redisTemplate;
+
+  private static ValueOperations<String, Object> valueOperations;
+
+  private static RedisOperations<String, Object> redisOperations;
+
+  @BeforeClass
+  public static void setupClass() {
+    redisTemplate = mock(RedisTemplate.class);
+    valueOperations = mock(ValueOperations.class);
+    redisProperties = mock(RedisProperties.class);
+
+    when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+
+    Map<String, String> key = new HashMap<>();
+    key.put("limit-chatroom", "limit-chatroom");
+    when(redisProperties.getKey()).thenReturn(key);
+  }
+
+  @AfterClass
+  public static void tearDownClass() {
+
+    int numberOfTestMethodInClass = 15;
+
+    verify(redisTemplate, times(numberOfTestMethodInClass)).opsForValue();
+    verify(redisProperties, times(numberOfTestMethodInClass)).getKey();
+  }
+
   @InjectMocks
   private ChatroomServiceImpl chatroomService;
 
@@ -126,14 +161,14 @@ public class ChatroomServiceImplTest {
   public void testGivenTypeAndMemberByGettingChatroomByTypeAndMemberReturnPagedChatrooms() {
 
     when(userService.getUser(USER_ID_1)).thenReturn(MEMBER_1);
-    when(chatroomRepository.findAllByTypeAndMembersOrderByUpdatedAtDesc(TYPE,
+    when(chatroomRepository.findAllByMembersOrderByUpdatedAtDesc(
                                                                         MEMBER_1,
                                                                         PAGEABLE
     )).thenReturn(
       new PageImpl<>(Collections.singletonList(chatroom), PAGEABLE, 1));
 
     Page<Chatroom> chatroomPage = chatroomService.getChatrooms(
-      TYPE.name(), USER_ID_1, PAGEABLE);
+      USER_ID_1, PAGEABLE);
 
     assertThat(chatroomPage.getTotalElements()).isEqualTo(1);
     assertThat(chatroomPage.getContent()
@@ -159,8 +194,7 @@ public class ChatroomServiceImplTest {
                  .contains(MEMBER_2)).isTrue();
 
     verify(userService).getUser(USER_ID_1);
-    verify(chatroomRepository).findAllByTypeAndMembersOrderByUpdatedAtDesc(
-      TYPE, MEMBER_1, PAGEABLE);
+    verify(chatroomRepository).findAllByMembersOrderByUpdatedAtDesc(MEMBER_1, PAGEABLE);
   }
 
   @Test
@@ -345,5 +379,70 @@ public class ChatroomServiceImplTest {
 
     verify(chatroomRepository).findOne(CHATROOM_ID);
     verify(userService).getUser(USER_ID_1);
+  }
+
+  @Test
+  public void testGivenUserIdByCallingSyncChatroomListReturnVoid() {
+    Map<String, String> topic = new HashMap<>();
+    topic.put("chatroom", "chatroom");
+    when(mqProperties.getTopic()).thenReturn(topic);
+    doNothing().when(messagePublisherService).publish(USER_ID_1, "chatroom");
+
+    chatroomService.syncChatroomList(USER_ID_1);
+
+    verify(mqProperties).getTopic();
+    verify(messagePublisherService).publish(USER_ID_1, "chatroom");
+  }
+
+  @Test
+  public void testGivenUserIdAndLimitByCallingSetLimitChatroomsReturnVoid() {
+    Map<String, String> topic = new HashMap<>();
+    topic.put("chatroom", "chatroom");
+
+    when(mqProperties.getTopic()).thenReturn(topic);
+    doNothing().when(messagePublisherService).publish(USER_ID_1, "chatroom");
+    chatroomService.setLimitChatrooms(USER_ID_1, 2);
+
+    verify(mqProperties).getTopic();
+    verify(messagePublisherService).publish(USER_ID_1, "chatroom");
+  }
+
+  @Test
+  public void testGivenUserIdAndLimitByCallingUnsetLimitChatroomsReturnVoid() {
+    Map<String, String> key = new HashMap<>();
+    key.put("limit-chatroom", "limit-chatroom");
+
+    redisOperations = mock(RedisOperations.class);
+    when(valueOperations.getOperations()).thenReturn(redisOperations);
+    doNothing().when(redisOperations).delete(USER_ID_1);
+
+    chatroomService.unsetLimitChatrooms(USER_ID_1);
+
+    verify(valueOperations).getOperations();
+    verify(redisOperations).delete(key.get("limit-chatroom"));
+  }
+
+  @Test
+  public void testGivenChatroomByCallingSyncChatroomListReturnChatroom() {
+    Map<String, String> topic = new HashMap<>();
+    topic.put("chatroom", "chatroom");
+    when(mqProperties.getTopic()).thenReturn(topic);
+    doNothing().when(messagePublisherService).publish(USER_ID_1, "chatroom");
+    doNothing().when(messagePublisherService).publish(USER_ID_2, "chatroom");
+
+    chatroomService.syncChatroomList(chatroom);
+
+    verify(mqProperties, times(2)).getTopic();
+    verify(messagePublisherService).publish(USER_ID_1, "chatroom");
+    verify(messagePublisherService).publish(USER_ID_2, "chatroom");
+  }
+
+  @Test
+  public void testGivenChatroomByCallingUpdateDateReturnChatroom() {
+    when(chatroomRepository.save(chatroom)).thenReturn(chatroom);
+
+    chatroomService.updateDate(chatroom);
+
+    verify(chatroomRepository).save(chatroom);
   }
 }

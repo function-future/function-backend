@@ -12,7 +12,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
@@ -41,15 +43,19 @@ public class ReminderSchedulerTest {
   private static final String REMINDER_ID_1 = "reminderId1";
 
   private static final String REMINDER_ID_2 = "reminderId2";
+  
+  private static final LocalDateTime localDateTime = Instant.now()
+          .atZone(ZoneId.of("Asia/Jakarta"))
+          .toLocalDateTime();
 
   private Reminder REMINDER_1 = Reminder.builder()
     .id(REMINDER_ID_1)
     .isRepeatedMonthly(true)
-    .hour(LocalDateTime.now()
+    .hour(localDateTime
             .getHour())
-    .monthlyDate(LocalDateTime.now()
+    .monthlyDate(localDateTime
                    .getDayOfMonth())
-    .minute(LocalDateTime.now()
+    .minute(localDateTime
               .getMinute())
     .members(Arrays.asList(USER_1, USER_2))
     .build();
@@ -57,11 +63,11 @@ public class ReminderSchedulerTest {
   private Reminder REMINDER_2 = Reminder.builder()
     .id(REMINDER_ID_2)
     .isRepeatedMonthly(false)
-    .hour(LocalDateTime.now()
+    .hour(localDateTime
             .getHour())
-    .minute(LocalDateTime.now()
+    .minute(localDateTime
               .getMinute())
-    .days(Collections.singletonList(LocalDateTime.now()
+    .days(Collections.singletonList(localDateTime
                                       .getDayOfWeek()))
     .members(Arrays.asList(USER_1, USER_2))
     .build();
@@ -70,11 +76,11 @@ public class ReminderSchedulerTest {
     .id(REMINDER_ID_2)
     .isRepeatedMonthly(true)
     .lastReminderSent(getOneMonthBeforeNow())
-    .hour(LocalDateTime.now()
+    .hour(localDateTime
             .getHour())
-    .minute(LocalDateTime.now()
+    .minute(localDateTime
               .getMinute())
-    .monthlyDate(LocalDateTime.now()
+    .monthlyDate(localDateTime
                    .getDayOfMonth())
     .members(Arrays.asList(USER_1, USER_2))
     .build();
@@ -83,11 +89,11 @@ public class ReminderSchedulerTest {
     .id(REMINDER_ID_2)
     .isRepeatedMonthly(false)
     .lastReminderSent(getOneMonthBeforeNow())
-    .hour(LocalDateTime.now()
+    .hour(localDateTime
             .getHour())
-    .minute(LocalDateTime.now()
+    .minute(localDateTime
               .getMinute())
-    .days(Collections.singletonList(LocalDateTime.now()
+    .days(Collections.singletonList(localDateTime
                                       .getDayOfWeek()))
     .members(Arrays.asList(USER_1, USER_2))
     .build();

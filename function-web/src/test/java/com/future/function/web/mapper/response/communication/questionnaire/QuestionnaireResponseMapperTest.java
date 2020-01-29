@@ -2,17 +2,20 @@ package com.future.function.web.mapper.response.communication.questionnaire;
 
 import com.future.function.model.entity.feature.communication.questionnaire.Answer;
 import com.future.function.model.entity.feature.communication.questionnaire.Questionnaire;
+import com.future.function.model.entity.feature.communication.questionnaire.QuestionnaireResponse;
 import com.future.function.model.entity.feature.communication.questionnaire.QuestionnaireResponseSummary;
 import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.model.response.base.DataResponse;
 import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.feature.communication.questionnaire.QuestionnaireDetailResponse;
+import com.future.function.web.model.response.feature.communication.questionnaire.QuestionnaireDoneResponse;
 import com.future.function.web.model.response.feature.communication.questionnaire.QuestionnaireSimpleSummaryResponse;
 import org.junit.Test;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpStatus;
 
 import java.util.Arrays;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

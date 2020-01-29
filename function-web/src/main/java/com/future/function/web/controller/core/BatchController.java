@@ -4,18 +4,18 @@ import com.future.function.common.enumeration.core.Role;
 import com.future.function.service.api.feature.core.BatchService;
 import com.future.function.session.annotation.WithAnyRole;
 import com.future.function.session.model.Session;
-import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
 import com.future.function.web.mapper.request.core.BatchRequestMapper;
 import com.future.function.web.mapper.response.core.BatchResponseMapper;
 import com.future.function.web.model.request.core.BatchWebRequest;
 import com.future.function.web.model.response.base.BaseResponse;
 import com.future.function.web.model.response.base.DataResponse;
-import com.future.function.web.model.response.base.PagingResponse;
 import com.future.function.web.model.response.feature.core.BatchWebResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping(value = "/api/core/batches")
@@ -36,19 +36,13 @@ public class BatchController {
 
   @ResponseStatus(HttpStatus.OK)
   @GetMapping
-  public PagingResponse<BatchWebResponse> getBatches(
+  public DataResponse<List<BatchWebResponse>> getBatches(
     @WithAnyRole(roles = { Role.ADMIN, Role.JUDGE, Role.MENTOR, Role.STUDENT })
-      Session session,
-    @RequestParam(required = false,
-                  defaultValue = "1")
-      int page,
-    @RequestParam(required = false,
-                  defaultValue = "10")
-      int size
+      Session session
   ) {
 
-    return BatchResponseMapper.toBatchesPagingResponse(
-      batchService.getBatches(session, PageHelper.toPageable(page, size)));
+    return BatchResponseMapper.toBatchesDataResponse(
+      batchService.getBatches(session));
   }
 
   @ResponseStatus(HttpStatus.CREATED)

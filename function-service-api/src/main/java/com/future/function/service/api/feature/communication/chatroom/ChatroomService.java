@@ -6,7 +6,7 @@ import org.springframework.data.domain.Pageable;
 
 public interface ChatroomService {
 
-  Page<Chatroom> getChatrooms(String type, String userId, Pageable pageable);
+  Page<Chatroom> getChatrooms(String userId, Pageable pageable);
 
   Page<Chatroom> getChatroomsWithKeyword(
     String keyword, String userId, Pageable pageable
@@ -22,4 +22,13 @@ public interface ChatroomService {
 
   void authorizeSubscription(String userId, String chatroomId);
 
+  void setLimitChatrooms(String userId, long limit);
+
+  void unsetLimitChatrooms(String userId);
+
+  void syncChatroomList(String userId);
+
+  Chatroom syncChatroomList(Chatroom chatroom);
+
+  Chatroom updateDate(Chatroom chatroom);
 }

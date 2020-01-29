@@ -34,12 +34,7 @@ Accessible for admin, judge, and mentor. Get list of batches available in databa
                     "code": "1",
                     "name": "Batch Name"
                 }
-            ],
-            "paging": {
-                "page": 0,
-                "size": 5,
-                "totalRecords": 3
-            }
+            ]
         }
 
 + Response 401 (application/json)

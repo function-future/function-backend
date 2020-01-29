@@ -74,7 +74,7 @@ public class ChatRedisListener implements BaseListener {
             messageRequestMapper.toMessage(messageRequest, userId, chatroomId), userId);
     this.publishMessageToWebsocket(ChatroomResponseMapper.toMessageResponse(chatMessage, fileProperties.getUrlPrefix()), chatroomId);
     this.generateMessageStatus(chatroomId, userId, chatMessage);
-
+    chatroomService.syncChatroomList(chatroomService.getChatroom(chatroomId, userId));
   }
 
   private void publishMessageToWebsocket(MessageResponse message, String chatroomId) {
