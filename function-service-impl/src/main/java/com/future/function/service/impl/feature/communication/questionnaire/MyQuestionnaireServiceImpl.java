@@ -5,7 +5,6 @@ import com.future.function.model.entity.feature.communication.questionnaire.*;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.repository.feature.communication.questionnaire.*;
 import com.future.function.service.api.feature.communication.questionnaire.MyQuestionnaireService;
-import com.future.function.service.api.feature.core.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -184,9 +183,7 @@ public class MyQuestionnaireServiceImpl implements MyQuestionnaireService {
 
     Float avarageScore = new Float(0.0);
 
-//    System.out.println(questionResponses.size());
     for (QuestionResponse questionResponse : questionResponses) {
-//      System.out.println(questionResponse);
       this.questionResponseRepository.save(questionResponse);
       updateQuestionResponseSummary(questionnaire, questionResponse);
       scoreSummary.setMaximum(
@@ -201,10 +198,16 @@ public class MyQuestionnaireServiceImpl implements MyQuestionnaireService {
     avarageScore = avarageScore / questionResponses.size();
     scoreSummary.setAverage(avarageScore);
 
-    QuestionnaireResponse questionnaireResponse = questionnaireResponseRepository
-      .findByQuestionnaireAndAppraiseeAndAppraiserAndDeletedFalse(
-        questionnaire, appraisee, memberLogin
-      ).get();
+    Optional<QuestionnaireResponse> questionnaireResponseTemp =
+      questionnaireResponseRepository
+        .findByQuestionnaireAndAppraiseeAndAppraiserAndDeletedFalse(
+          questionnaire, appraisee, memberLogin
+        );
+
+    QuestionnaireResponse questionnaireResponse = QuestionnaireResponse.builder().build();;
+    if(questionnaireResponseTemp.isPresent()) {
+      questionnaireResponse = questionnaireResponseTemp.get();
+    }
 
     questionnaireResponse.setDetails(questionResponses);
     questionnaireResponse.setScoreSummary(scoreSummary);
@@ -232,7 +235,7 @@ public class MyQuestionnaireServiceImpl implements MyQuestionnaireService {
       Questionnaire questionnaireTemp = questionResponse.getQuestion().getQuestionnaire();
       User appraiseeTemp = questionResponse.getAppraisee();
       User appraiserTemp = questionResponse.getAppraiser();
-      List<QuestionResponse> questionResponses = new ArrayList<QuestionResponse>();
+      List<QuestionResponse> questionResponses = new ArrayList<>();
 
       for (QuestionResponseQueue q: questionResponseQueues) {
         if (questionnaireTemp.getId().equals(q.getQuestion().getQuestionnaire().getId()) &&
