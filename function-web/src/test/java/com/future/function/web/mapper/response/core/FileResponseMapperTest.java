@@ -2,6 +2,7 @@ package com.future.function.web.mapper.response.core;
 
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.User;
+import com.future.function.model.entity.feature.core.embedded.FilePath;
 import com.future.function.model.entity.feature.core.embedded.Version;
 import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.response.core.embedded.AuthorWebResponseMapper;
@@ -61,8 +62,8 @@ public class FileResponseMapperTest {
   private static final List<PathWebResponse> PATH_WEB_RESPONSES =
     Collections.singletonList(PATH_WEB_RESPONSE);
 
-  private static final List<FileV2> PATHS = Collections.singletonList(
-    FileV2.builder()
+  private static final List<FilePath> PATHS = Collections.singletonList(
+    FilePath.builder()
       .id(PARENT_ID)
       .build());
 
