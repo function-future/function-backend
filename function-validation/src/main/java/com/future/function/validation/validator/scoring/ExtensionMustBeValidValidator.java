@@ -11,9 +11,7 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
-@Component
 public class ExtensionMustBeValidValidator implements ConstraintValidator<ExtensionMustBeValid, List<String>> {
 
   @Autowired
@@ -28,13 +26,16 @@ public class ExtensionMustBeValidValidator implements ConstraintValidator<Extens
 
   @Override
   public boolean isValid(List<String> value, ConstraintValidatorContext context) {
+    List<String> extensionList = Arrays.asList(extensions);
     if(Objects.isNull(value) || value.isEmpty()) return true;
-    return Optional.ofNullable(value)
-      .map(list -> list.get(0))
-      .map(fileRepositoryV2::findOne)
-      .map(FileV2::getFilePath)
-      .map(FilenameUtils::getExtension)
-      .map(extension -> Arrays.asList(extensions).contains(extension))
-      .orElse(false);
+    return value.stream()
+        .allMatch(fileId -> {
+          FileV2 fileV2 = fileRepositoryV2.findOne(fileId);
+          if(Objects.nonNull(fileV2)) {
+            String extension = FilenameUtils.getExtension(fileV2.getFilePath());
+            return extensionList.contains(extension);
+          }
+          return Boolean.FALSE;
+        });
   }
 }
