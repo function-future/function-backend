@@ -9,8 +9,8 @@ import com.mongodb.client.model.Indexes;
 
 import static com.future.function.data.migration.constant.IndexName.*;
 
-@ChangeLog(order = "023")
-public class DataMigration_023 {
+@ChangeLog(order = "026")
+public class DataMigration_026 {
 
   @ChangeSet(author = "jonathan",
              id = "changeIndexCardinalityOrder",
