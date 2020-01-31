@@ -2,6 +2,7 @@ package com.future.function.web.model.request.scoring;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.future.function.validation.annotation.core.FileMustExist;
+import com.future.function.validation.annotation.scoring.ExtensionMustBeValid;
 import com.future.function.validation.annotation.scoring.DateNotPassed;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -30,6 +31,7 @@ public class AssignmentWebRequest {
   @NotNull(message = "NotNull")
   private Long deadline;
 
+  @ExtensionMustBeValid(extensions = {"docx", "pdf", "doc"})
   @FileMustExist
   @Size(max = 1,
         message = "Size")
