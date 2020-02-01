@@ -126,6 +126,12 @@ public enum IndexName {
                                       .concat("$")
                                       .concat(FieldName.BaseEntity.ID),
                                     FieldName.BaseEntity.DELETED
+  ),
+  USER_NAME_ROLE_DELETED(FieldName.User.NAME,FieldName.User.ROLE,
+                         FieldName.BaseEntity.DELETED
+  ),
+  USER_BATCH_ROLE_DELETED(FieldName.User.BATCH,FieldName.User.ROLE,
+                          FieldName.BaseEntity.DELETED
   );
 
 

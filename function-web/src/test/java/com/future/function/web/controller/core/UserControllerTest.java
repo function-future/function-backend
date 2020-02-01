@@ -147,7 +147,7 @@ public class UserControllerTest extends TestHelper {
 
     when(fileProperties.getUrlPrefix()).thenReturn(URL_PREFIX);
 
-    when(userService.getUsers(Role.STUDENT, "", PAGEABLE)).thenReturn(
+    when(userService.getUsers(Role.STUDENT, "", "", PAGEABLE)).thenReturn(
       new PageImpl<>(STUDENTS_LIST, PAGEABLE, STUDENTS_LIST.size()));
 
     mockMvc.perform(get("/api/core/users").cookie(cookies)
@@ -157,7 +157,7 @@ public class UserControllerTest extends TestHelper {
         pagingResponseJacksonTester.write(PAGING_RESPONSE)
           .getJson()));
     verify(fileProperties).getUrlPrefix();
-    verify(userService).getUsers(Role.STUDENT, "", PAGEABLE);
+    verify(userService).getUsers(Role.STUDENT, "", "", PAGEABLE);
     verifyZeroInteractions(userRequestMapper);
   }
 

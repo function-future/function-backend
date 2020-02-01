@@ -18,6 +18,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.Collections;
 import java.util.List;
@@ -69,10 +70,29 @@ public class UserServiceImpl extends Observable implements UserService {
   }
 
   @Override
-  public Page<User> getUsers(Role role, String name, Pageable pageable) {
+  public Page<User> getUsers(
+    Role role, String batchCode, String name, Pageable pageable
+  ) {
 
-    return userRepository.findAllByRoleAndNameContainsIgnoreCaseAndDeletedFalse(
-      role, name, pageable);
+    return Optional.ofNullable(batchCode)
+      .filter(StringUtils::isEmpty)
+      .map(
+        ignored -> userRepository.findAllByNameContainsIgnoreCaseAndRoleAndDeletedFalse(
+          name, role, pageable))
+      .orElseGet(
+        () -> this.getStudentsOfBatchAndWithNamePart(batchCode, name, pageable));
+  }
+
+  private Page<User> getStudentsOfBatchAndWithNamePart(
+    String batchCode, String name, Pageable pageable
+  ) {
+
+    return Optional.ofNullable(batchCode)
+      .map(batchService::getBatchByCode)
+      .map(
+        batch -> userRepository.findAllByBatchAndRoleAndNameContainsIgnoreCaseAndDeletedFalse(
+          batch, Role.STUDENT, name, pageable))
+      .orElseGet(() -> PageHelper.empty(pageable));
   }
 
   @Override
@@ -163,8 +183,8 @@ public class UserServiceImpl extends Observable implements UserService {
 
     return Optional.ofNullable(batchCode)
       .map(batchService::getBatchByCode)
-      .map(batch -> userRepository.findAllByRoleAndBatchAndDeletedFalse(
-        Role.STUDENT, batch))
+      .map(batch -> userRepository.findAllByBatchAndRoleAndDeletedFalse(
+        batch, Role.STUDENT))
       .orElseGet(Collections::emptyList);
   }
 
