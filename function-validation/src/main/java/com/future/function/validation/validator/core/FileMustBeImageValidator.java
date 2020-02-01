@@ -46,7 +46,7 @@ public class FileMustBeImageValidator
 
     return retrievedFile.map(this::getFileExtension)
       .map(ext -> fileProperties.getImageExtensions()
-        .contains(DOT + ext))
+        .contains(DOT + ext.toLowerCase()))
       .orElse(Boolean.FALSE);
   }
 
