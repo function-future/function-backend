@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -24,7 +25,8 @@ public class FileProperties {
 
   private String urlPrefix = "";
 
-  private List<String> imageExtensions = Arrays.asList(".jpg", ".jpeg", ".png");
+  private List<String> imageExtensions = new ArrayList<>(
+    Arrays.asList(".jpg", ".jpeg", ".png", ".gif", ".svg", ".webp"));
 
   private String rootId = "root";
 
