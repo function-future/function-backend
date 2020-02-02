@@ -106,7 +106,7 @@ public class QuestionnaireController {
       questionnaireRequest.getDueDate())
     ){
       return ResponseHelper.toDataResponse(
-        HttpStatus.NOT_MODIFIED,
+        HttpStatus.FORBIDDEN,
         QuestionnaireDetailResponse.builder().build()
         );
     }
@@ -146,13 +146,13 @@ public class QuestionnaireController {
       QuestionnaireRequest questionnaireRequest
   ) {
 
-    if(!!questionnaireService.validateQuestionnaire(
+    if(!questionnaireService.validateQuestionnaire(
       questionnaireId,
       questionnaireRequest.getStartDate(),
       questionnaireRequest.getDueDate())
     ){
       return ResponseHelper.toDataResponse(
-        HttpStatus.NOT_MODIFIED,
+        HttpStatus.FORBIDDEN,
         QuestionnaireDetailResponse.builder().build()
       );
     }
@@ -207,7 +207,7 @@ public class QuestionnaireController {
       questionnaire.getDueDate())
     ){
       return ResponseHelper.toDataResponse(
-        HttpStatus.NOT_MODIFIED,
+        HttpStatus.FORBIDDEN,
         QuestionQuestionnaireResponse.builder().build()
       );
     }
@@ -239,7 +239,7 @@ public class QuestionnaireController {
       questionnaire.getDueDate())
     ){
       return ResponseHelper.toDataResponse(
-        HttpStatus.NOT_MODIFIED,
+        HttpStatus.FORBIDDEN,
         QuestionQuestionnaireResponse.builder().build()
       );
     }
@@ -304,7 +304,7 @@ public class QuestionnaireController {
       questionnaire.getDueDate())
     ){
       return ResponseHelper.toDataResponse(
-        HttpStatus.NOT_MODIFIED,
+        HttpStatus.FORBIDDEN,
         QuestionnaireParticipantResponse.builder().build()
       );
     }
@@ -333,7 +333,7 @@ public class QuestionnaireController {
       questionnaire.getDueDate())
     ){
       return ResponseHelper.toBaseResponse(
-        HttpStatus.NOT_MODIFIED
+        HttpStatus.FORBIDDEN
       );
     }
 
@@ -382,7 +382,7 @@ public class QuestionnaireController {
       questionnaire.getDueDate())
     ){
       return ResponseHelper.toDataResponse(
-        HttpStatus.NOT_MODIFIED,
+        HttpStatus.FORBIDDEN,
         QuestionnaireParticipantResponse.builder().build()
       );
     }
@@ -409,7 +409,7 @@ public class QuestionnaireController {
       questionnaire.getDueDate())
     ){
       return ResponseHelper.toBaseResponse(
-        HttpStatus.NOT_MODIFIED
+        HttpStatus.FORBIDDEN
       );
     }
     questionnaireService.deleteQuestionnaireAppraiseeFromQuestionnaire(
