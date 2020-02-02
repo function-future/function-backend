@@ -3,6 +3,7 @@ package com.future.function.web.controller.core;
 import com.future.function.common.enumeration.core.Role;
 import com.future.function.common.properties.core.FileProperties;
 import com.future.function.model.entity.feature.core.FileV2;
+import com.future.function.model.entity.feature.core.embedded.FilePath;
 import com.future.function.service.api.feature.core.FileService;
 import com.future.function.web.TestHelper;
 import com.future.function.web.TestSecurityConfiguration;
@@ -62,14 +63,8 @@ public class FileControllerTest extends TestHelper {
 
   private static final String URL_PREFIX = "url-prefix/";
 
-  private static final PathWebResponse PATH_WEB_RESPONSE =
-    PathWebResponse.builder()
-      .id(PARENT_ID)
-      .name(null)
-      .build();
-
-  private static final List<FileV2> PATHS = Collections.singletonList(
-    FileV2.builder()
+  private static final List<FilePath> PATHS = Collections.singletonList(
+    FilePath.builder()
       .id(PARENT_ID)
       .build());
 

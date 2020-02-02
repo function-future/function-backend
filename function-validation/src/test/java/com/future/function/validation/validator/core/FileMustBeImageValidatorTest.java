@@ -29,7 +29,7 @@ public class FileMustBeImageValidatorTest {
   private static final List<String> IMAGE_EXTENSIONS = Arrays.asList(
     ".png", ".jpg", ".jpeg");
 
-  private static final String IMAGE_FILE_PATH = "C:\\file.png";
+  private static final String IMAGE_FILE_PATH = "C:\\file.PNG";
 
   private static final String TEXT_FILE_PATH = "C:\\file.txt";
 

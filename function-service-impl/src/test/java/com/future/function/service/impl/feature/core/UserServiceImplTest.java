@@ -35,13 +35,7 @@ import java.util.Optional;
 import static com.googlecode.catchexception.CatchException.catchException;
 import static com.googlecode.catchexception.CatchException.caughtException;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.anyString;
-import static org.mockito.Mockito.eq;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class UserServiceImplTest {
@@ -213,20 +207,57 @@ public class UserServiceImplTest {
 
     List<User> studentsList = Arrays.asList(userStudent, additionalUser);
 
-    when(userRepository.findAllByRoleAndNameContainsIgnoreCaseAndDeletedFalse(
-      Role.STUDENT, "", PAGEABLE)).thenReturn(
+    when(userRepository.findAllByNameContainsIgnoreCaseAndRoleAndDeletedFalse(
+      "", Role.STUDENT, PAGEABLE)).thenReturn(
       PageHelper.toPage(studentsList, PAGEABLE));
 
     Page<User> foundUserStudentsPage = userService.getUsers(
-      Role.STUDENT, "", PAGEABLE);
+      Role.STUDENT, "", "", PAGEABLE);
 
     assertThat(foundUserStudentsPage).isNotNull();
     assertThat(foundUserStudentsPage.getContent()).isEqualTo(studentsList);
 
     verify(
-      userRepository).findAllByRoleAndNameContainsIgnoreCaseAndDeletedFalse(
-      Role.STUDENT, "", PAGEABLE);
+      userRepository).findAllByNameContainsIgnoreCaseAndRoleAndDeletedFalse(
+      "", Role.STUDENT, PAGEABLE);
     verifyZeroInteractions(batchService, resourceService, encoder, mailService, functionProperties);
+  }
+
+  @Test
+  public void testGivenRoleStudentAndBatchCodeByGettingUsersReturnStudentsPage() {
+
+    User additionalUser = User.builder()
+      .role(Role.STUDENT)
+      .email(EMAIL_STUDENT)
+      .name(NAME_STUDENT)
+      .password(PASSWORD)
+      .phone(PHONE)
+      .address(ADDRESS)
+      .pictureV2(PICTURE)
+      .batch(BATCH)
+      .university(UNIVERSITY)
+      .build();
+    additionalUser.setDeleted(false);
+
+    List<User> studentsList = Arrays.asList(userStudent, additionalUser);
+
+    when(batchService.getBatchByCode(NUMBER)).thenReturn(BATCH);
+    when(
+      userRepository.findAllByBatchAndRoleAndNameContainsIgnoreCaseAndDeletedFalse(
+        BATCH, Role.STUDENT, "", PAGEABLE)).thenReturn(
+      PageHelper.toPage(studentsList, PAGEABLE));
+
+    Page<User> foundUserStudentsPage = userService.getUsers(
+      Role.STUDENT, NUMBER, "", PAGEABLE);
+
+    assertThat(foundUserStudentsPage).isNotNull();
+    assertThat(foundUserStudentsPage.getContent()).isEqualTo(studentsList);
+
+    verify(batchService).getBatchByCode(NUMBER);
+    verify(
+      userRepository).findAllByBatchAndRoleAndNameContainsIgnoreCaseAndDeletedFalse(
+      BATCH, Role.STUDENT, "", PAGEABLE);
+    verifyZeroInteractions(resourceService, encoder, mailService, functionProperties);
   }
 
   @Test
@@ -296,19 +327,19 @@ public class UserServiceImplTest {
     List<User> mentorsList = Arrays.asList(userMentor, additionalUser);
 
     String name = "MENT";
-    when(userRepository.findAllByRoleAndNameContainsIgnoreCaseAndDeletedFalse(
-      Role.MENTOR, name, PAGEABLE)).thenReturn(
+    when(userRepository.findAllByNameContainsIgnoreCaseAndRoleAndDeletedFalse(
+      name, Role.MENTOR, PAGEABLE)).thenReturn(
       PageHelper.toPage(mentorsList, PAGEABLE));
 
     Page<User> foundUserMentorsPage = userService.getUsers(
-      Role.MENTOR, name, PAGEABLE);
+      Role.MENTOR, "", name, PAGEABLE);
 
     assertThat(foundUserMentorsPage).isNotNull();
     assertThat(foundUserMentorsPage.getContent()).isEqualTo(mentorsList);
 
     verify(
-      userRepository).findAllByRoleAndNameContainsIgnoreCaseAndDeletedFalse(
-      Role.MENTOR, name, PAGEABLE);
+      userRepository).findAllByNameContainsIgnoreCaseAndRoleAndDeletedFalse(
+      name, Role.MENTOR, PAGEABLE);
     verifyZeroInteractions(batchService, resourceService, encoder, mailService, functionProperties);
   }
 
@@ -545,8 +576,8 @@ public class UserServiceImplTest {
   public void testGivenBatchCodeByGettingStudentsByBatchCodeReturnListOfStudents() {
 
     when(batchService.getBatchByCode(NUMBER)).thenReturn(BATCH);
-    when(userRepository.findAllByRoleAndBatchAndDeletedFalse(Role.STUDENT,
-                                                             BATCH
+    when(userRepository.findAllByBatchAndRoleAndDeletedFalse(BATCH,
+                                                             Role.STUDENT
     )).thenReturn(Collections.singletonList(userStudent));
 
     List<User> foundStudents = userService.getStudentsByBatchCode(NUMBER);
@@ -557,8 +588,8 @@ public class UserServiceImplTest {
     assertThat(foundStudents.get(0)).isEqualTo(userStudent);
 
     verify(batchService).getBatchByCode(NUMBER);
-    verify(userRepository).findAllByRoleAndBatchAndDeletedFalse(
-      Role.STUDENT, BATCH);
+    verify(userRepository).findAllByBatchAndRoleAndDeletedFalse(
+      BATCH, Role.STUDENT);
     verifyZeroInteractions(resourceService, encoder, mailService, functionProperties);
   }
 
@@ -592,8 +623,7 @@ public class UserServiceImplTest {
   public void testGivenBatchCodeWithNoStudentRegisteredForThatCodeByGettingStudentsByBatchCodeReturnEmptyList() {
 
     when(batchService.getBatchByCode(NUMBER)).thenReturn(BATCH);
-    when(userRepository.findAllByRoleAndBatchAndDeletedFalse(Role.STUDENT,
-                                                             BATCH
+    when(userRepository.findAllByBatchAndRoleAndDeletedFalse(BATCH, Role.STUDENT
     )).thenReturn(Collections.emptyList());
 
     List<User> foundStudents = userService.getStudentsByBatchCode(NUMBER);
@@ -602,8 +632,8 @@ public class UserServiceImplTest {
     assertThat(foundStudents).isEmpty();
 
     verify(batchService).getBatchByCode(NUMBER);
-    verify(userRepository).findAllByRoleAndBatchAndDeletedFalse(
-      Role.STUDENT, BATCH);
+    verify(userRepository).findAllByBatchAndRoleAndDeletedFalse(
+      BATCH, Role.STUDENT);
     verifyZeroInteractions(resourceService, encoder, mailService, functionProperties);
   }
 

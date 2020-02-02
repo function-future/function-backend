@@ -1,6 +1,7 @@
 package com.future.function.model.entity.feature.core;
 
 import com.future.function.model.entity.base.BaseEntity;
+import com.future.function.model.entity.feature.core.embedded.FilePath;
 import com.future.function.model.entity.feature.core.embedded.Version;
 import com.future.function.model.util.constant.DocumentName;
 import com.future.function.model.util.constant.FieldName;
@@ -68,6 +69,6 @@ public class FileV2 extends BaseEntity {
   private User user;
 
   @Field(FieldName.File.PATHS)
-  private List<FileV2> paths;
+  private List<FilePath> paths;
 
 }

@@ -62,7 +62,7 @@ public class BatchMongoEventListener extends AbstractMongoEventListener<Batch> {
 
   private void markDeletedAllStudentOfBatch(Batch batch) {
 
-    userRepository.findAllByRoleAndBatchAndDeletedFalse(Role.STUDENT, batch)
+    userRepository.findAllByBatchAndRoleAndDeletedFalse(batch, Role.STUDENT)
       .forEach(student -> {
         student.setDeleted(true);
         userRepository.save(student);
