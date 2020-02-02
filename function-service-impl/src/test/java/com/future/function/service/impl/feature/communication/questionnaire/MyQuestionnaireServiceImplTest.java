@@ -244,7 +244,7 @@ public class MyQuestionnaireServiceImplTest {
 
     Page<Questionnaire> questionnairePage =
       myQuestionnaireService.getQuestionnairesByMemberLoginAsAppraiser(
-        user1, PAGEABLE);
+        user1,"", PAGEABLE);
 
     assertThat(questionnairePage.getTotalElements()).isEqualTo(1);
     assertThat(questionnairePage.getContent()
