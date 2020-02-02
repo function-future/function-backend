@@ -73,4 +73,5 @@ public interface QuestionnaireService {
     String questionnaireParticipantId
   );
 
+  Boolean validateQuestionnaire(String questionnaireId, Long newStartDate, Long newDueDate);
 }

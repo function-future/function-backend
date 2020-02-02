@@ -16,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -240,6 +241,18 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
       .map(questionnaireParticipantRepository::findOne)
       .ifPresent(this::softDeletedHelperQuestionnaireParticipant);
   }
+
+  @Override
+  public Boolean validateQuestionnaire(String questionnaireId, Long newStartDate, Long newDueDate) {
+    Long serverTime = new Date().getTime();
+
+    if (questionnaireId != null) {
+      Questionnaire questionnaire = this.getQuestionnaire(questionnaireId);
+      return !(serverTime >= questionnaire.getDueDate());
+    }
+    return !(serverTime >= newStartDate || newStartDate >= newDueDate);
+  }
+
 
   private void softDeletedHelperQuestionQuestionnaire(
     QuestionQuestionnaire questionQuestionnaire
