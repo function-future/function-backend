@@ -10,15 +10,15 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import java.util.HashMap;
 import java.util.Map;
 
-@ChangeLog(order = "023")
-public class DataMigration_023 {
+@ChangeLog(order = "024")
+public class DataMigration_024 {
 
   @ChangeSet(author = "priagung",
-          id = "chatroomAccessListMigration2",
+          id = "peerAppraisalsAccessList",
           order = "0001")
-  public void insertChatroomAccessList(MongoTemplate mongoTemplate) {
+  public void insertPeerAppraisalsAccessList(MongoTemplate mongoTemplate) {
 
-    String urlRegex = "^(\\/m)?\\/chatrooms(\\/(\\w+)?)?$";
+    String urlRegex = "^\\/peer-appraisal(\\/)?$";
 
     Map<String, Object> nonGuestComponent = new HashMap<>();
     nonGuestComponent.put("add", true);
@@ -68,4 +68,5 @@ public class DataMigration_023 {
     mongoTemplate.insert(studentAccess, DocumentName.ACCESS);
     mongoTemplate.insert(guestAccess, DocumentName.ACCESS);
   }
+
 }

@@ -2,6 +2,7 @@ package com.future.function.service.impl.feature.core.scheduler;
 
 import com.future.function.common.properties.core.FileProperties;
 import com.future.function.model.entity.feature.core.FileV2;
+import com.future.function.model.entity.feature.core.embedded.Version;
 import com.future.function.repository.feature.core.FileRepositoryV2;
 import org.junit.After;
 import org.junit.Before;
@@ -16,6 +17,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.util.FileSystemUtils;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.stream.Stream;
 
 @RunWith(PowerMockRunner.class)
@@ -143,6 +145,47 @@ public class FileDeleteSchedulerTest {
       .getMinimumFileCreatedPeriod();
 
     PowerMockito.verifyZeroInteractions(File.class, FileSystemUtils.class);
+  }
+
+  @Test
+  public void testGivenMethodCallAndExistingVersionsByDeletingUnusedFileReturnSuccessfulDeletion()
+    throws Exception {
+
+    file.setCreatedAt(System.currentTimeMillis() - MINIMUM_CREATED_PERIOD * 2);
+
+    Version version = new Version(file.getCreatedAt(), FILE_PATH, "");
+    file.setVersions(Collections.singletonMap(1L, version));
+
+    Mockito.when(fileRepository.findAllByUsedFalse())
+      .thenReturn(Stream.of(file));
+    Mockito.when(fileProperties.getMinimumFileCreatedPeriod())
+      .thenReturn(MINIMUM_CREATED_PERIOD);
+
+    PowerMockito.mockStatic(File.class);
+    File fileMock = PowerMockito.mock(File.class);
+
+    PowerMockito.whenNew(File.class)
+      .withArguments(TRIMMED_PATH)
+      .thenReturn(fileMock);
+
+    PowerMockito.mockStatic(FileSystemUtils.class);
+    PowerMockito.when(FileSystemUtils.deleteRecursively(fileMock))
+      .thenReturn(true);
+
+    fileDeleteScheduler.deleteFileOnSchedule();
+
+    Mockito.verify(fileRepository)
+      .findAllByUsedFalse();
+    Mockito.verify(fileProperties)
+      .getMinimumFileCreatedPeriod();
+    Mockito.verify(fileRepository)
+      .delete(file);
+
+    PowerMockito.verifyNew(File.class)
+      .withArguments(TRIMMED_PATH);
+
+    PowerMockito.verifyStatic(FileSystemUtils.class);
+    FileSystemUtils.deleteRecursively(fileMock);
   }
 
 }
