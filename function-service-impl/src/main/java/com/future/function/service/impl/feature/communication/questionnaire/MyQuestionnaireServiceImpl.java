@@ -70,16 +70,38 @@ public class MyQuestionnaireServiceImpl implements MyQuestionnaireService {
 
   @Override
   public Page<Questionnaire> getQuestionnairesByMemberLoginAsAppraiser(
-    User memberLogin, Pageable pageable
+    User memberLogin, String search, Pageable pageable
   ) {
     Page<QuestionnaireParticipant> results =
       questionnaireParticipantRepository.findAllByMemberAndParticipantTypeAndDeletedFalseOrderByCreatedAtDesc(
         memberLogin, ParticipantType.APPRAISER, pageable);
+
     List<Questionnaire> questionnaires = new ArrayList<>();
-    for (QuestionnaireParticipant result : results) {
-      questionnaires.add(result.getQuestionnaire());
+    if (search != null) {
+      List<List<QuestionnaireParticipant>> qp = new ArrayList<>();
+      qp.add(results.getContent());
+      while(pageable.getPageNumber() < results.getTotalPages()) {
+        pageable = pageable.next();
+        results = questionnaireParticipantRepository.findAllByMemberAndParticipantTypeAndDeletedFalseOrderByCreatedAtDesc(
+          memberLogin, ParticipantType.APPRAISER, pageable);
+        qp.add(results.getContent());
+      }
+      for (List<QuestionnaireParticipant> li : qp) {
+        for (QuestionnaireParticipant result : li) {
+          if(result.getQuestionnaire().getTitle().contains(search)){
+            questionnaires.add(result.getQuestionnaire());
+          }
+        }
+      }
+      int size = questionnaires.size() == 0 ? 1 : questionnaires.size();
+      return new PageImpl<>(questionnaires, new PageRequest(0, size), size);
+
+    } else {
+      for (QuestionnaireParticipant result : results) {
+        questionnaires.add(result.getQuestionnaire());
+      }
+      return new PageImpl<>(questionnaires, pageable, questionnaires.size());
     }
-    return new PageImpl<>(questionnaires, pageable, questionnaires.size());
   }
 
   @Override
