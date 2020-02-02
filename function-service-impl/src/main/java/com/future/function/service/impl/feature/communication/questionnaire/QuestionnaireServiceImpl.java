@@ -248,7 +248,7 @@ public class QuestionnaireServiceImpl implements QuestionnaireService {
 
     if (questionnaireId != null) {
       Questionnaire questionnaire = this.getQuestionnaire(questionnaireId);
-      return !(serverTime >= questionnaire.getDueDate());
+      return !(serverTime >= questionnaire.getStartDate() || serverTime >= questionnaire.getDueDate());
     }
     return !(serverTime >= newStartDate || newStartDate >= newDueDate);
   }
