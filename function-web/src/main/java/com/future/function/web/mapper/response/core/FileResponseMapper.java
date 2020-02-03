@@ -2,6 +2,7 @@ package com.future.function.web.mapper.response.core;
 
 import com.future.function.common.enumeration.core.FileType;
 import com.future.function.model.entity.feature.core.FileV2;
+import com.future.function.model.entity.feature.core.embedded.FilePath;
 import com.future.function.model.entity.feature.core.embedded.Version;
 import com.future.function.web.mapper.helper.PageHelper;
 import com.future.function.web.mapper.helper.ResponseHelper;
@@ -116,23 +117,23 @@ public final class FileResponseMapper {
       .orElse(null);
   }
 
-  private static List<PathWebResponse> toPathWebResponses(List<FileV2> paths) {
+  private static List<PathWebResponse> toPathWebResponses(List<FilePath> paths) {
 
     return paths.stream()
       .map(FileResponseMapper::buildPathWebResponse)
       .collect(Collectors.toList());
   }
 
-  private static PathWebResponse buildPathWebResponse(FileV2 file) {
+  private static PathWebResponse buildPathWebResponse(FilePath path) {
 
     return PathWebResponse.builder()
-      .id(file.getId())
-      .name(file.getName())
+      .id(path.getId())
+      .name(path.getName())
       .build();
   }
 
   public static DataPageResponse<FileWebResponse<List<FileContentWebResponse>>> toMultipleFileDataResponse(
-    Pair<List<FileV2>, Page<FileV2>> data, String urlPrefix
+    Pair<List<FilePath>, Page<FileV2>> data, String urlPrefix
   ) {
 
     return DataPageResponse.<FileWebResponse<List<FileContentWebResponse>>>builder().code(
@@ -146,7 +147,7 @@ public final class FileResponseMapper {
   }
 
   private static FileWebResponse<List<FileContentWebResponse>> buildFileWebResponse(
-    List<FileV2> paths, Page<FileV2> data, String urlPrefix
+    List<FilePath> paths, Page<FileV2> data, String urlPrefix
   ) {
 
     return FileWebResponse.<List<FileContentWebResponse>>builder().paths(

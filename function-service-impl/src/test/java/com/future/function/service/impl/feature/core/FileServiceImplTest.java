@@ -7,6 +7,7 @@ import com.future.function.common.exception.NotFoundException;
 import com.future.function.common.properties.core.FileProperties;
 import com.future.function.model.entity.feature.core.FileV2;
 import com.future.function.model.entity.feature.core.User;
+import com.future.function.model.entity.feature.core.embedded.FilePath;
 import com.future.function.repository.feature.core.FileRepositoryV2;
 import com.future.function.service.api.feature.core.ResourceService;
 import com.future.function.service.api.feature.core.UserService;
@@ -140,13 +141,18 @@ public class FileServiceImplTest {
     when(fileRepository.findByIdAndDeletedFalse(PARENT_ID)).thenReturn(
       Optional.of(parentObject));
 
-    Pair<List<FileV2>, Page<FileV2>> pathsAndFilesOrFolders =
+    Pair<List<FilePath>, Page<FileV2>> pathsAndFilesOrFolders =
       fileService.getFilesAndFolders(PARENT_ID, PAGEABLE);
 
-    List<FileV2> paths = pathsAndFilesOrFolders.getFirst();
+    List<FilePath> paths = pathsAndFilesOrFolders.getFirst();
 
     assertThat(paths).isNotNull();
-    assertThat(paths).isEqualTo(Collections.singletonList(parentObject));
+
+    FilePath parentObjectPath = FilePath.builder()
+      .id(parentObject.getId())
+      .name(parentObject.getName())
+      .build();
+    assertThat(paths).isEqualTo(Collections.singletonList(parentObjectPath));
 
     Page<FileV2> page = pathsAndFilesOrFolders.getSecond();
 
@@ -325,8 +331,13 @@ public class FileServiceImplTest {
     assertThat(createdFile.isUsed()).isTrue();
     assertThat(createdFile.isMarkFolder()).isFalse();
     assertThat(createdFile.getUser()).isNotNull();
+
+    FilePath savedFilePath = FilePath.builder()
+      .id(savedFile.getId())
+      .name(savedFile.getName())
+      .build();
     assertThat(createdFile.getPaths()).isEqualTo(
-      Collections.singletonList(savedFile));
+      Collections.singletonList(savedFilePath));
 
     verify(resourceService).storeFile(
       null, PARENT_ID, NAME, NAME, NAME.getBytes(), FileOrigin.FILE);
@@ -370,8 +381,13 @@ public class FileServiceImplTest {
     assertThat(createdFolder.isUsed()).isTrue();
     assertThat(createdFolder.isMarkFolder()).isTrue();
     assertThat(createdFolder.getUser()).isNotNull();
+
+    FilePath returnedFilePath = FilePath.builder()
+      .id(returnedFolder.getId())
+      .name(returnedFolder.getName())
+      .build();
     assertThat(createdFolder.getPaths()).isEqualTo(
-      Collections.singletonList(returnedFolder));
+      Collections.singletonList(returnedFilePath));
 
     verify(userService).getUser(userId);
     verify(fileRepository).findByIdAndDeletedFalse(PARENT_ID);

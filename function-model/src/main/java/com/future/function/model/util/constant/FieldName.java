@@ -543,5 +543,15 @@ public interface FieldName {
   @NoArgsConstructor(access = AccessLevel.PRIVATE)
   abstract class QuestionResponseQueue {
 
+    public static final String APRAISEE = "apraisee";
+
+    public static final String QUESTION = "question";
+
+    public static final String COMMENT = "comment";
+
+    public static final String APRAISER = "apraiser";
+
+    public static final String SCORE = "score";
+
   }
 }

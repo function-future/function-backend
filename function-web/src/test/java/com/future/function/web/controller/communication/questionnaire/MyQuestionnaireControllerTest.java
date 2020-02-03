@@ -235,7 +235,7 @@ public class MyQuestionnaireControllerTest extends TestHelper {
   public void getMyQuestionnaires() throws Exception {
 
     when(userService.getUser(any(String.class))).thenReturn(USER);
-    when(myQuestionnaireService.getQuestionnairesByMemberLoginAsAppraiser(USER,
+    when(myQuestionnaireService.getQuestionnairesByMemberLoginAsAppraiser(USER,null,
                                                                           PAGEABLE
     )).thenReturn(QUESTIONNAIRE_PAGE);
     PagingResponse<QuestionnaireDetailResponse> response =
@@ -249,7 +249,7 @@ public class MyQuestionnaireControllerTest extends TestHelper {
 
     verify(userService).getUser(any(String.class));
     verify(myQuestionnaireService).getQuestionnairesByMemberLoginAsAppraiser(
-      USER, PAGEABLE);
+      USER,null, PAGEABLE);
   }
 
   @Test
