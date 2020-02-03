@@ -154,12 +154,10 @@ public class MyQuestionnaireServiceImpl implements MyQuestionnaireService {
       .orElse(null);
   }
 
-
   @Override
   public List<QuestionQuestionnaire> getQuestionsFromQuestionnaire(
     Questionnaire questionnaire
   ) {
-
     return questionQuestionnaireRepository.findAllByQuestionnaire(
       questionnaire);
   }

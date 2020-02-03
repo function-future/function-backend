@@ -108,7 +108,7 @@ public class QuestionnaireController {
       return ResponseHelper.toDataResponse(
         HttpStatus.FORBIDDEN,
         QuestionnaireDetailResponse.builder().build()
-        );
+      );
     }
     Questionnaire newQuestionnaire = Questionnaire.builder()
       .title(questionnaireRequest.getTitle())
@@ -216,7 +216,7 @@ public class QuestionnaireController {
       questionnaireService.createQuestionQuestionnaire(
         questionQuestionnaireRequestMapper.toQuestionQuestionnaire(
           questionQuestionnaireRequest, null,
-          questionnaireService.getQuestionnaire(questionnaireId)
+          questionnaire
         )), HttpStatus.CREATED);
   }
 
@@ -248,7 +248,7 @@ public class QuestionnaireController {
       questionnaireService.updateQuestionQuestionnaire(
         questionQuestionnaireRequestMapper.toQuestionQuestionnaire(
           questionQuestionnaireRequest, questionId,
-          questionnaireService.getQuestionnaire(questionnaireId)
+          questionnaire
         )), HttpStatus.OK);
   }
 

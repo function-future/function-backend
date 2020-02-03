@@ -39,6 +39,8 @@ public class MyQuestionnaireServiceImplTest {
 
   private static final String QUESTIONNAIRE_ID_1 = "questionnaireId1";
 
+  private static final String TITLE_QUESTIONNAIRE = "titlequestionnaire";
+
   private static final String QUESTIONNAIRE_RESPONSE_ID_1 =
     "questionnaireResponseId1";
 
@@ -142,6 +144,7 @@ public class MyQuestionnaireServiceImplTest {
 
     questionnaire1 = Questionnaire.builder()
       .id(QUESTIONNAIRE_ID_1)
+      .title(TITLE_QUESTIONNAIRE)
       .build();
 
     questionnaireParticipant1 = QuestionnaireParticipant.builder()
@@ -220,7 +223,6 @@ public class MyQuestionnaireServiceImplTest {
 
   @After
   public void tearDown() {
-
     verifyNoMoreInteractions(questionnaireParticipantRepository,
                              questionQuestionnaireRepository,
                              questionResponseRepository,
@@ -244,7 +246,7 @@ public class MyQuestionnaireServiceImplTest {
 
     Page<Questionnaire> questionnairePage =
       myQuestionnaireService.getQuestionnairesByMemberLoginAsAppraiser(
-        user1,"", PAGEABLE);
+        user1,null, PAGEABLE);
 
     assertThat(questionnairePage.getTotalElements()).isEqualTo(1);
     assertThat(questionnairePage.getContent()
@@ -254,6 +256,41 @@ public class MyQuestionnaireServiceImplTest {
     verify(
       questionnaireParticipantRepository).findAllByMemberAndParticipantTypeAndDeletedFalseOrderByCreatedAtDesc(
       user1, ParticipantType.APPRAISER, PAGEABLE);
+  }
+
+  @Test
+  public void getQuestionnairesByMemberLoginAsAppraiserWithKeyword() {
+
+    when(
+      questionnaireParticipantRepository.findAllByMemberAndParticipantTypeAndDeletedFalseOrderByCreatedAtDesc(
+        user1, ParticipantType.APPRAISER, PAGEABLE)).thenReturn(
+      new PageImpl<>(Collections.singletonList(questionnaireParticipant1),
+        PAGEABLE, 1
+      ));
+
+    when(
+      questionnaireParticipantRepository.findAllByMemberAndParticipantTypeAndDeletedFalseOrderByCreatedAtDesc(
+        user1, ParticipantType.APPRAISER, new PageRequest(1, 10))).thenReturn(
+      new PageImpl<>(Collections.singletonList(questionnaireParticipant1),
+        PAGEABLE, 1
+      ));
+
+    Page<Questionnaire> questionnairePage =
+      myQuestionnaireService.getQuestionnairesByMemberLoginAsAppraiser(
+        user1,TITLE_QUESTIONNAIRE, PAGEABLE);
+
+    assertThat(questionnairePage.getTotalElements()).isEqualTo(2);
+    assertThat(questionnairePage.getContent()
+      .get(0)
+      .getId()).isEqualTo(QUESTIONNAIRE_ID_1);
+
+    verify(
+      questionnaireParticipantRepository).findAllByMemberAndParticipantTypeAndDeletedFalseOrderByCreatedAtDesc(
+      user1, ParticipantType.APPRAISER, PAGEABLE);
+
+    verify(
+      questionnaireParticipantRepository).findAllByMemberAndParticipantTypeAndDeletedFalseOrderByCreatedAtDesc(
+      user1, ParticipantType.APPRAISER, new PageRequest(1, 10));
   }
 
   @Test
@@ -389,7 +426,6 @@ public class MyQuestionnaireServiceImplTest {
 
     verify(userQuestionnaireSummaryRepository).save(userQuestionnaireSummary);
   }
-
 
   public void updateUserSummaryForFirstTime() {
 
