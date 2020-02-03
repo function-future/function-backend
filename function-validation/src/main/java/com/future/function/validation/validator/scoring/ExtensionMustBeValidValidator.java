@@ -33,7 +33,7 @@ public class ExtensionMustBeValidValidator implements ConstraintValidator<Extens
           FileV2 fileV2 = fileRepositoryV2.findOne(fileId);
           if(Objects.nonNull(fileV2)) {
             String extension = FilenameUtils.getExtension(fileV2.getFilePath());
-            return extensionList.contains(extension);
+            return extensionList.contains(extension.toLowerCase());
           }
           return Boolean.FALSE;
         });
