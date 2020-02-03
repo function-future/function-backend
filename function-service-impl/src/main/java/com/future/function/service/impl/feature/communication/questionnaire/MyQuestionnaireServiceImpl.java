@@ -5,7 +5,6 @@ import com.future.function.model.entity.feature.communication.questionnaire.*;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.repository.feature.communication.questionnaire.*;
 import com.future.function.service.api.feature.communication.questionnaire.MyQuestionnaireService;
-import com.future.function.service.api.feature.core.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -71,16 +70,38 @@ public class MyQuestionnaireServiceImpl implements MyQuestionnaireService {
 
   @Override
   public Page<Questionnaire> getQuestionnairesByMemberLoginAsAppraiser(
-    User memberLogin, Pageable pageable
+    User memberLogin, String search, Pageable pageable
   ) {
     Page<QuestionnaireParticipant> results =
       questionnaireParticipantRepository.findAllByMemberAndParticipantTypeAndDeletedFalseOrderByCreatedAtDesc(
         memberLogin, ParticipantType.APPRAISER, pageable);
+
     List<Questionnaire> questionnaires = new ArrayList<>();
-    for (QuestionnaireParticipant result : results) {
-      questionnaires.add(result.getQuestionnaire());
+    if (search != null) {
+      List<List<QuestionnaireParticipant>> qp = new ArrayList<>();
+      qp.add(results.getContent());
+      while(pageable.getPageNumber() < results.getTotalPages()) {
+        pageable = pageable.next();
+        results = questionnaireParticipantRepository.findAllByMemberAndParticipantTypeAndDeletedFalseOrderByCreatedAtDesc(
+          memberLogin, ParticipantType.APPRAISER, pageable);
+        qp.add(results.getContent());
+      }
+      for (List<QuestionnaireParticipant> li : qp) {
+        for (QuestionnaireParticipant result : li) {
+          if(result.getQuestionnaire().getTitle().contains(search)){
+            questionnaires.add(result.getQuestionnaire());
+          }
+        }
+      }
+      int size = questionnaires.size() == 0 ? 1 : questionnaires.size();
+      return new PageImpl<>(questionnaires, new PageRequest(0, size), size);
+
+    } else {
+      for (QuestionnaireParticipant result : results) {
+        questionnaires.add(result.getQuestionnaire());
+      }
+      return new PageImpl<>(questionnaires, pageable, questionnaires.size());
     }
-    return new PageImpl<>(questionnaires, pageable, questionnaires.size());
   }
 
   @Override
@@ -133,12 +154,10 @@ public class MyQuestionnaireServiceImpl implements MyQuestionnaireService {
       .orElse(null);
   }
 
-
   @Override
   public List<QuestionQuestionnaire> getQuestionsFromQuestionnaire(
     Questionnaire questionnaire
   ) {
-
     return questionQuestionnaireRepository.findAllByQuestionnaire(
       questionnaire);
   }
@@ -184,9 +203,7 @@ public class MyQuestionnaireServiceImpl implements MyQuestionnaireService {
 
     Float avarageScore = new Float(0.0);
 
-//    System.out.println(questionResponses.size());
     for (QuestionResponse questionResponse : questionResponses) {
-//      System.out.println(questionResponse);
       this.questionResponseRepository.save(questionResponse);
       updateQuestionResponseSummary(questionnaire, questionResponse);
       scoreSummary.setMaximum(
@@ -201,10 +218,16 @@ public class MyQuestionnaireServiceImpl implements MyQuestionnaireService {
     avarageScore = avarageScore / questionResponses.size();
     scoreSummary.setAverage(avarageScore);
 
-    QuestionnaireResponse questionnaireResponse = questionnaireResponseRepository
-      .findByQuestionnaireAndAppraiseeAndAppraiserAndDeletedFalse(
-        questionnaire, appraisee, memberLogin
-      ).get();
+    Optional<QuestionnaireResponse> questionnaireResponseTemp =
+      questionnaireResponseRepository
+        .findByQuestionnaireAndAppraiseeAndAppraiserAndDeletedFalse(
+          questionnaire, appraisee, memberLogin
+        );
+
+    QuestionnaireResponse questionnaireResponse = QuestionnaireResponse.builder().build();;
+    if(questionnaireResponseTemp.isPresent()) {
+      questionnaireResponse = questionnaireResponseTemp.get();
+    }
 
     questionnaireResponse.setDetails(questionResponses);
     questionnaireResponse.setScoreSummary(scoreSummary);
@@ -232,7 +255,7 @@ public class MyQuestionnaireServiceImpl implements MyQuestionnaireService {
       Questionnaire questionnaireTemp = questionResponse.getQuestion().getQuestionnaire();
       User appraiseeTemp = questionResponse.getAppraisee();
       User appraiserTemp = questionResponse.getAppraiser();
-      List<QuestionResponse> questionResponses = new ArrayList<QuestionResponse>();
+      List<QuestionResponse> questionResponses = new ArrayList<>();
 
       for (QuestionResponseQueue q: questionResponseQueues) {
         if (questionnaireTemp.getId().equals(q.getQuestion().getQuestionnaire().getId()) &&

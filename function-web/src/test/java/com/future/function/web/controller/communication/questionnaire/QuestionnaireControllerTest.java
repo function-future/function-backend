@@ -49,6 +49,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -122,6 +123,9 @@ public class QuestionnaireControllerTest extends TestHelper {
 
   private static final BaseResponse BASE_RESPONSE =
     ResponseHelper.toBaseResponse(HttpStatus.OK);
+
+  private static final BaseResponse FORBIDDEN_RESPONSE =
+    ResponseHelper.toBaseResponse(HttpStatus.FORBIDDEN);
 
   private static final QuestionQuestionnaire QUESTION_QUESTIONNAIRE =
     QuestionQuestionnaire.builder()
@@ -236,11 +240,15 @@ public class QuestionnaireControllerTest extends TestHelper {
   }
 
   @Test
-  public void createQuestionnaires() throws Exception {
+  public void createQuestionnairesSuccess() throws Exception {
 
-    when(questionnaireService.createQuestionnaire(any(Questionnaire.class),
-                                                  any(User.class)
-    )).thenReturn(QUESTIONNAIRE);
+    when(questionnaireService.validateQuestionnaire(
+      any(), any(Long.class), any(Long.class))
+    ).thenReturn(true);
+    when(questionnaireService.createQuestionnaire(
+      any(Questionnaire.class),
+      any(User.class))
+    ).thenReturn(QUESTIONNAIRE);
 
     when(userService.getUser(any(String.class))).thenReturn(MEMBER_1);
 
@@ -257,11 +265,42 @@ public class QuestionnaireControllerTest extends TestHelper {
       .andExpect(content().json(dataResponseJacksonTester.write(response)
                                   .getJson()));
 
-    verify(questionnaireService).createQuestionnaire(any(Questionnaire.class),
-                                                     any(User.class)
+    verify(questionnaireService).validateQuestionnaire(
+      any(), any(Long.class), any(Long.class));
+
+    verify(questionnaireService).createQuestionnaire(
+      any(Questionnaire.class),
+      any(User.class)
     );
 
     verify(userService).getUser(any(String.class));
+  }
+
+  @Test
+  public void createQuestionnairesFailed() throws Exception {
+
+    when(questionnaireService.validateQuestionnaire(
+      any(), any(Long.class), any(Long.class))
+    ).thenReturn(false);
+
+    DataResponse<QuestionnaireDetailResponse> response =
+      ResponseHelper.toDataResponse(
+        HttpStatus.FORBIDDEN,
+        QuestionnaireDetailResponse.builder().build()
+      );
+
+    mockMvc.perform(post("/api/communication/questionnaires").cookie(cookies)
+      .contentType(MediaType.APPLICATION_JSON_VALUE)
+      .content(questionnaireRequestJacksonTester.write(
+        QUESTIONNAIRE_REQUEST)
+        .getJson()))
+      .andExpect(status().isCreated())
+      .andExpect(content().json(dataResponseJacksonTester.write(response)
+        .getJson()));
+
+    verify(questionnaireService).validateQuestionnaire(
+      any(), any(Long.class), any(Long.class));
+
   }
 
   @Test
@@ -286,6 +325,10 @@ public class QuestionnaireControllerTest extends TestHelper {
 
   @Test
   public void updateQuestionnaire() throws Exception {
+
+    when(questionnaireService.validateQuestionnaire(
+      any(), any(Long.class), any(Long.class))
+    ).thenReturn(true);
 
     when(questionnaireRequestMapper.toQuestionnaire(QUESTIONNAIRE_REQUEST,
                                                     QUESTIONNAIRE_ID_1
@@ -312,6 +355,39 @@ public class QuestionnaireControllerTest extends TestHelper {
       QUESTIONNAIRE_REQUEST, QUESTIONNAIRE_ID_1);
 
     verify(questionnaireService).updateQuestionnaire(QUESTIONNAIRE);
+
+    verify(questionnaireService).validateQuestionnaire(
+      any(), any(Long.class), any(Long.class));
+
+  }
+
+  @Test
+  public void updateQuestionnaireFailed() throws Exception {
+
+    when(questionnaireService.validateQuestionnaire(
+      any(), any(Long.class), any(Long.class))
+    ).thenReturn(false);
+
+    DataResponse<QuestionnaireDetailResponse> response =
+      ResponseHelper.toDataResponse(
+        HttpStatus.FORBIDDEN,
+        QuestionnaireDetailResponse.builder().build()
+      );
+
+    mockMvc.perform(put(
+      "/api/communication/questionnaires/" + QUESTIONNAIRE_ID_1).cookie(cookies)
+      .contentType(MediaType.APPLICATION_JSON_VALUE)
+      .content(questionnaireRequestJacksonTester.write(
+        QUESTIONNAIRE_REQUEST)
+        .getJson()))
+      .andExpect(status().isOk())
+      .andExpect(content().json(dataResponseJacksonTester.write(response)
+        .getJson()));
+
+
+    verify(questionnaireService).validateQuestionnaire(
+      any(), any(Long.class), any(Long.class));
+
   }
 
   @Test
@@ -354,8 +430,13 @@ public class QuestionnaireControllerTest extends TestHelper {
   @Test
   public void createQuestionQuestionnaire() throws Exception {
 
+
     when(questionnaireService.getQuestionnaire(QUESTIONNAIRE_ID_1)).thenReturn(
       QUESTIONNAIRE);
+
+    when(questionnaireService.validateQuestionnaire(
+      any(), any(Long.class), any(Long.class))
+    ).thenReturn(true);
 
     when(questionQuestionnaireRequestMapper.toQuestionQuestionnaire(
       any(QuestionQuestionnaireRequest.class), any(),
@@ -386,6 +467,40 @@ public class QuestionnaireControllerTest extends TestHelper {
 
     verify(questionnaireService).createQuestionQuestionnaire(
       QUESTION_QUESTIONNAIRE);
+    verify(questionnaireService).validateQuestionnaire(any(), any(Long.class), any(Long.class));
+  }
+
+  @Test
+  public void createQuestionQuestionnaireFailed() throws Exception {
+
+
+    when(questionnaireService.getQuestionnaire(QUESTIONNAIRE_ID_1)).thenReturn(
+      QUESTIONNAIRE);
+
+    when(questionnaireService.validateQuestionnaire(
+      any(), any(Long.class), any(Long.class))
+    ).thenReturn(false);
+
+
+    DataResponse<QuestionQuestionnaireResponse> response =
+      ResponseHelper.toDataResponse(
+        HttpStatus.FORBIDDEN,
+        QuestionQuestionnaireResponse.builder().build()
+      );
+
+    mockMvc.perform(post(
+      "/api/communication/questionnaires/" + QUESTIONNAIRE_ID_1 +
+        "/questions").cookie(cookies)
+      .contentType(MediaType.APPLICATION_JSON_VALUE)
+      .content(questionQuestionnaireRequestJacksonTester.write(
+        QUESTION_QUESTIONNAIRE_REQUEST)
+        .getJson()))
+      .andExpect(status().isCreated())
+      .andExpect(content().json(dataResponseJacksonTester.write(response)
+        .getJson()));
+
+    verify(questionnaireService).getQuestionnaire(QUESTIONNAIRE_ID_1);
+    verify(questionnaireService).validateQuestionnaire(any(), any(Long.class), any(Long.class));
   }
 
   @Test
@@ -393,6 +508,8 @@ public class QuestionnaireControllerTest extends TestHelper {
 
     when(questionnaireService.getQuestionnaire(QUESTIONNAIRE_ID_1)).thenReturn(
       QUESTIONNAIRE);
+    when(questionnaireService.validateQuestionnaire(any(), any(Long.class), any(Long.class)))
+      .thenReturn(true);
     when(questionQuestionnaireRequestMapper.toQuestionQuestionnaire(
       QUESTION_QUESTIONNAIRE_REQUEST, QUESTION_ID, QUESTIONNAIRE)).thenReturn(
       QUESTION_QUESTIONNAIRE);
@@ -420,6 +537,42 @@ public class QuestionnaireControllerTest extends TestHelper {
       QUESTION_QUESTIONNAIRE_REQUEST, QUESTION_ID, QUESTIONNAIRE);
     verify(questionnaireService).updateQuestionQuestionnaire(
       QUESTION_QUESTIONNAIRE);
+    verify(questionnaireService).validateQuestionnaire(
+      any(), any(Long.class), any(Long.class)
+    );
+  }
+
+  @Test
+  public void updateQuestionQuestionnaireFailed() throws Exception {
+
+    when(questionnaireService.getQuestionnaire(QUESTIONNAIRE_ID_1)).thenReturn(
+      QUESTIONNAIRE);
+
+    when(questionnaireService.validateQuestionnaire(any(), any(Long.class), any(Long.class)))
+      .thenReturn(false);
+
+    DataResponse<QuestionQuestionnaireResponse> response =
+      ResponseHelper.toDataResponse(
+        HttpStatus.FORBIDDEN,
+        QuestionQuestionnaireResponse.builder().build()
+      );
+
+    mockMvc.perform(put(
+      "/api/communication/questionnaires/" + QUESTIONNAIRE_ID_1 +
+        "/questions/" + QUESTION_ID).cookie(cookies)
+      .contentType(MediaType.APPLICATION_JSON_VALUE)
+      .content(questionQuestionnaireRequestJacksonTester.write(
+        QUESTION_QUESTIONNAIRE_REQUEST)
+        .getJson()))
+      .andExpect(status().isOk())
+      .andExpect(content().json(dataResponseJacksonTester.write(response)
+        .getJson()));
+
+    verify(questionnaireService).getQuestionnaire(QUESTIONNAIRE_ID_1);
+
+    verify(questionnaireService).validateQuestionnaire(
+      any(), any(Long.class), any(Long.class)
+    );
   }
 
   @Test
@@ -468,6 +621,13 @@ public class QuestionnaireControllerTest extends TestHelper {
   @Test
   public void addAppraiser() throws Exception {
 
+    when(questionnaireService.getQuestionnaire(QUESTIONNAIRE_ID_1))
+      .thenReturn(QUESTIONNAIRE);
+
+    when(questionnaireService.validateQuestionnaire(
+      any(), any(Long.class), any(Long.class))
+    ).thenReturn(true);
+
     when(questionnaireService.addQuestionnaireAppraiserToQuestionnaire(
       QUESTIONNAIRE_ID_1, MEMBER_ID_1)).thenReturn(QUESTIONNAIRE_PARTICIPANT);
 
@@ -477,22 +637,68 @@ public class QuestionnaireControllerTest extends TestHelper {
 
     mockMvc.perform(post(
       "/api/communication/questionnaires/" + QUESTIONNAIRE_ID_1 +
-      "/appraiser").cookie(cookies)
-                      .contentType(MediaType.APPLICATION_JSON_VALUE)
-                      .content(
-                        questionnaireParticipantRequestJacksonTester.write(
-                          QUESTIONNAIRE_PARTICIPANT_REQUEST)
-                          .getJson()))
+        "/appraiser").cookie(cookies)
+      .contentType(MediaType.APPLICATION_JSON_VALUE)
+      .content(
+        questionnaireParticipantRequestJacksonTester.write(
+          QUESTIONNAIRE_PARTICIPANT_REQUEST)
+          .getJson()))
       .andExpect(status().isOk())
       .andExpect(content().json(dataResponseJacksonTester.write(response)
-                                  .getJson()));
+        .getJson()));
 
     verify(questionnaireService).addQuestionnaireAppraiserToQuestionnaire(
       QUESTIONNAIRE_ID_1, MEMBER_ID_1);
+
+    verify(questionnaireService).validateQuestionnaire(
+      any(), any(Long.class), any(Long.class));
+
+    verify(questionnaireService).getQuestionnaire(QUESTIONNAIRE_ID_1);
+  }
+
+  @Test
+  public void addAppraiserFailed() throws Exception {
+
+    when(questionnaireService.getQuestionnaire(QUESTIONNAIRE_ID_1))
+      .thenReturn(QUESTIONNAIRE);
+
+    when(questionnaireService.validateQuestionnaire(
+      any(), any(Long.class), any(Long.class))
+    ).thenReturn(false);
+
+    DataResponse<QuestionnaireParticipantResponse> response =
+      ResponseHelper.toDataResponse(
+        HttpStatus.FORBIDDEN,
+        QuestionnaireParticipantResponse.builder().build()
+      );
+
+    mockMvc.perform(post(
+      "/api/communication/questionnaires/" + QUESTIONNAIRE_ID_1 +
+        "/appraiser").cookie(cookies)
+      .contentType(MediaType.APPLICATION_JSON_VALUE)
+      .content(
+        questionnaireParticipantRequestJacksonTester.write(
+          QUESTIONNAIRE_PARTICIPANT_REQUEST)
+          .getJson()))
+      .andExpect(status().isOk())
+      .andExpect(content().json(dataResponseJacksonTester.write(response)
+        .getJson()));
+
+    verify(questionnaireService).validateQuestionnaire(
+      any(), any(Long.class), any(Long.class));
+
+    verify(questionnaireService).getQuestionnaire(QUESTIONNAIRE_ID_1);
   }
 
   @Test
   public void deleteAppraiser() throws Exception {
+
+    when(questionnaireService.getQuestionnaire(QUESTIONNAIRE_ID_1))
+      .thenReturn(QUESTIONNAIRE);
+
+    when(questionnaireService.validateQuestionnaire(
+      any(), anyLong(), anyLong()))
+      .thenReturn(true);
 
     doNothing().when(questionnaireService)
       .deleteQuestionnaireAppraiserFromQuestionnaire(
@@ -507,6 +713,32 @@ public class QuestionnaireControllerTest extends TestHelper {
       .getResponse();
     verify(questionnaireService).deleteQuestionnaireAppraiserFromQuestionnaire(
       QUESTIONNAIRE_PARTICIPANT_ID);
+
+    verify(questionnaireService).getQuestionnaire(QUESTIONNAIRE_ID_1);
+    verify(questionnaireService).validateQuestionnaire(any(), anyLong(), anyLong());
+  }
+
+  @Test
+  public void deleteAppraiserFailed() throws Exception {
+
+    when(questionnaireService.getQuestionnaire(QUESTIONNAIRE_ID_1))
+      .thenReturn(QUESTIONNAIRE);
+
+    when(questionnaireService.validateQuestionnaire(
+      any(), anyLong(), anyLong()))
+      .thenReturn(false);
+
+    mockMvc.perform(delete(
+      "/api/communication/questionnaires/" + QUESTIONNAIRE_ID_1 +
+        "/appraiser/" + QUESTIONNAIRE_PARTICIPANT_ID))
+      .andExpect(status().isOk())
+      .andExpect(content().json(baseResponseJacksonTester.write(FORBIDDEN_RESPONSE)
+        .getJson()))
+      .andReturn()
+      .getResponse();
+
+    verify(questionnaireService).getQuestionnaire(QUESTIONNAIRE_ID_1);
+    verify(questionnaireService).validateQuestionnaire(any(), anyLong(), anyLong());
   }
 
   @Test
@@ -542,6 +774,13 @@ public class QuestionnaireControllerTest extends TestHelper {
   @Test
   public void addAppraisee() throws Exception {
 
+    when(questionnaireService.getQuestionnaire(QUESTIONNAIRE_ID_1))
+      .thenReturn(QUESTIONNAIRE);
+
+    when(questionnaireService.validateQuestionnaire(
+      any(), any(Long.class), any(Long.class))
+    ).thenReturn(true);
+
     when(questionnaireService.addQuestionnaireAppraiseeToQuestionnaire(
       QUESTIONNAIRE_ID_1, MEMBER_ID_1)).thenReturn(QUESTIONNAIRE_PARTICIPANT);
 
@@ -551,36 +790,108 @@ public class QuestionnaireControllerTest extends TestHelper {
 
     mockMvc.perform(post(
       "/api/communication/questionnaires/" + QUESTIONNAIRE_ID_1 +
-      "/appraisee").cookie(cookies)
-                      .contentType(MediaType.APPLICATION_JSON_VALUE)
-                      .content(
-                        questionnaireParticipantRequestJacksonTester.write(
-                          QUESTIONNAIRE_PARTICIPANT_REQUEST)
-                          .getJson()))
+        "/appraisee").cookie(cookies)
+      .contentType(MediaType.APPLICATION_JSON_VALUE)
+      .content(
+        questionnaireParticipantRequestJacksonTester.write(
+          QUESTIONNAIRE_PARTICIPANT_REQUEST)
+          .getJson()))
       .andExpect(status().isOk())
       .andExpect(content().json(dataResponseJacksonTester.write(response)
-                                  .getJson()));
+        .getJson()));
 
     verify(questionnaireService).addQuestionnaireAppraiseeToQuestionnaire(
       QUESTIONNAIRE_ID_1, MEMBER_ID_1);
+
+    verify(questionnaireService).validateQuestionnaire(
+      any(), any(Long.class), any(Long.class));
+
+    verify(questionnaireService).getQuestionnaire(QUESTIONNAIRE_ID_1);
+  }
+
+  @Test
+  public void addAppraiseeFailed() throws Exception {
+
+    when(questionnaireService.getQuestionnaire(QUESTIONNAIRE_ID_1))
+      .thenReturn(QUESTIONNAIRE);
+
+    when(questionnaireService.validateQuestionnaire(
+      any(), any(Long.class), any(Long.class))
+    ).thenReturn(false);
+
+    DataResponse<QuestionnaireParticipantResponse> response =
+      ResponseHelper.toDataResponse(
+        HttpStatus.FORBIDDEN,
+        QuestionnaireParticipantResponse.builder().build()
+      );
+
+    mockMvc.perform(post(
+      "/api/communication/questionnaires/" + QUESTIONNAIRE_ID_1 +
+        "/appraisee").cookie(cookies)
+      .contentType(MediaType.APPLICATION_JSON_VALUE)
+      .content(
+        questionnaireParticipantRequestJacksonTester.write(
+          QUESTIONNAIRE_PARTICIPANT_REQUEST)
+          .getJson()))
+      .andExpect(status().isOk())
+      .andExpect(content().json(dataResponseJacksonTester.write(response)
+        .getJson()));
+
+
+    verify(questionnaireService).validateQuestionnaire(
+      any(), any(Long.class), any(Long.class));
+
+    verify(questionnaireService).getQuestionnaire(QUESTIONNAIRE_ID_1);
   }
 
   @Test
   public void deleteAppraisee() throws Exception {
+
+    when(questionnaireService.getQuestionnaire(QUESTIONNAIRE_ID_1))
+      .thenReturn(QUESTIONNAIRE);
+
+    when(questionnaireService.validateQuestionnaire(
+      any(), anyLong(), anyLong()))
+      .thenReturn(true);
 
     doNothing().when(questionnaireService)
       .deleteQuestionnaireAppraiseeFromQuestionnaire(
         QUESTIONNAIRE_PARTICIPANT_ID);
     mockMvc.perform(delete(
       "/api/communication/questionnaires/" + QUESTIONNAIRE_ID_1 +
-      "/appraisee/" + QUESTIONNAIRE_PARTICIPANT_ID))
+        "/appraisee/" + QUESTIONNAIRE_PARTICIPANT_ID))
       .andExpect(status().isOk())
       .andExpect(content().json(baseResponseJacksonTester.write(BASE_RESPONSE)
-                                  .getJson()))
+        .getJson()))
       .andReturn()
       .getResponse();
     verify(questionnaireService).deleteQuestionnaireAppraiseeFromQuestionnaire(
       QUESTIONNAIRE_PARTICIPANT_ID);
+
+    verify(questionnaireService).getQuestionnaire(QUESTIONNAIRE_ID_1);
+    verify(questionnaireService).validateQuestionnaire(any(), anyLong(), anyLong());
   }
 
+  @Test
+  public void deleteAppraiseeFailed() throws Exception {
+
+    when(questionnaireService.getQuestionnaire(QUESTIONNAIRE_ID_1))
+      .thenReturn(QUESTIONNAIRE);
+
+    when(questionnaireService.validateQuestionnaire(
+      any(), anyLong(), anyLong()))
+      .thenReturn(false);
+
+    mockMvc.perform(delete(
+      "/api/communication/questionnaires/" + QUESTIONNAIRE_ID_1 +
+        "/appraisee/" + QUESTIONNAIRE_PARTICIPANT_ID))
+      .andExpect(status().isOk())
+      .andExpect(content().json(baseResponseJacksonTester.write(FORBIDDEN_RESPONSE)
+        .getJson()))
+      .andReturn()
+      .getResponse();
+
+    verify(questionnaireService).getQuestionnaire(QUESTIONNAIRE_ID_1);
+    verify(questionnaireService).validateQuestionnaire(any(), anyLong(), anyLong());
+  }
 }

@@ -69,12 +69,16 @@ public class MyQuestionnaireController {
       int page,
     @RequestParam(required = false,
                   defaultValue = "10")
-      int size, Session session
+      int size,
+    @RequestParam(required = false)
+      String search,
+      Session session
   ) {
 
     return QuestionnaireResponseMapper.toPagingQuestionnaireDetailResponse(
       myQuestionnaireService.getQuestionnairesByMemberLoginAsAppraiser(
         userService.getUser(session.getUserId()),
+        search,
         PageHelper.toPageable(page, size)
       ));
   }

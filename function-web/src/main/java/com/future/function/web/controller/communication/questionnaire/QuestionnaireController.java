@@ -4,6 +4,7 @@ package com.future.function.web.controller.communication.questionnaire;
 import com.future.function.common.enumeration.core.Role;
 import com.future.function.common.properties.core.FileProperties;
 import com.future.function.model.entity.feature.communication.questionnaire.Questionnaire;
+import com.future.function.model.entity.feature.communication.questionnaire.QuestionnaireParticipant;
 import com.future.function.service.api.feature.communication.questionnaire.QuestionnaireService;
 import com.future.function.service.api.feature.core.UserService;
 import com.future.function.session.annotation.WithAnyRole;
@@ -30,6 +31,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -98,6 +100,16 @@ public class QuestionnaireController {
       QuestionnaireRequest questionnaireRequest, Session session
   ) {
 
+  if(!questionnaireService.validateQuestionnaire(
+      null,
+      questionnaireRequest.getStartDate(),
+      questionnaireRequest.getDueDate())
+    ){
+      return ResponseHelper.toDataResponse(
+        HttpStatus.FORBIDDEN,
+        QuestionnaireDetailResponse.builder().build()
+      );
+    }
     Questionnaire newQuestionnaire = Questionnaire.builder()
       .title(questionnaireRequest.getTitle())
       .description(questionnaireRequest.getDesc())
@@ -133,6 +145,17 @@ public class QuestionnaireController {
     @RequestBody
       QuestionnaireRequest questionnaireRequest
   ) {
+
+    if(!questionnaireService.validateQuestionnaire(
+      questionnaireId,
+      questionnaireRequest.getStartDate(),
+      questionnaireRequest.getDueDate())
+    ){
+      return ResponseHelper.toDataResponse(
+        HttpStatus.FORBIDDEN,
+        QuestionnaireDetailResponse.builder().build()
+      );
+    }
 
     return QuestionnaireResponseMapper.toDataResponseQuestionnaireDetailResponse(
       questionnaireService.updateQuestionnaire(
@@ -177,12 +200,23 @@ public class QuestionnaireController {
     @RequestBody
       QuestionQuestionnaireRequest questionQuestionnaireRequest
   ) {
+    Questionnaire questionnaire = questionnaireService.getQuestionnaire(questionnaireId);
+    if(!questionnaireService.validateQuestionnaire(
+      questionnaireId,
+      questionnaire.getStartDate(),
+      questionnaire.getDueDate())
+    ){
+      return ResponseHelper.toDataResponse(
+        HttpStatus.FORBIDDEN,
+        QuestionQuestionnaireResponse.builder().build()
+      );
+    }
 
     return QuestionQuestionnaireResponseMapper.toDataResponseQuestionQuestionnaireResponse(
       questionnaireService.createQuestionQuestionnaire(
         questionQuestionnaireRequestMapper.toQuestionQuestionnaire(
           questionQuestionnaireRequest, null,
-          questionnaireService.getQuestionnaire(questionnaireId)
+          questionnaire
         )), HttpStatus.CREATED);
   }
 
@@ -198,12 +232,23 @@ public class QuestionnaireController {
     @RequestBody
       QuestionQuestionnaireRequest questionQuestionnaireRequest
   ) {
+    Questionnaire questionnaire = questionnaireService.getQuestionnaire(questionnaireId);
+    if(!questionnaireService.validateQuestionnaire(
+      questionnaireId,
+      questionnaire.getStartDate(),
+      questionnaire.getDueDate())
+    ){
+      return ResponseHelper.toDataResponse(
+        HttpStatus.FORBIDDEN,
+        QuestionQuestionnaireResponse.builder().build()
+      );
+    }
 
     return QuestionQuestionnaireResponseMapper.toDataResponseQuestionQuestionnaireResponse(
       questionnaireService.updateQuestionQuestionnaire(
         questionQuestionnaireRequestMapper.toQuestionQuestionnaire(
           questionQuestionnaireRequest, questionId,
-          questionnaireService.getQuestionnaire(questionnaireId)
+          questionnaire
         )), HttpStatus.OK);
   }
 
@@ -252,6 +297,18 @@ public class QuestionnaireController {
       QuestionnaireParticipantRequest questionnaireParticipant
   ) {
 
+    Questionnaire questionnaire = questionnaireService.getQuestionnaire(questionnaireId);
+    if(!questionnaireService.validateQuestionnaire(
+      questionnaireId,
+      questionnaire.getStartDate(),
+      questionnaire.getDueDate())
+    ){
+      return ResponseHelper.toDataResponse(
+        HttpStatus.FORBIDDEN,
+        QuestionnaireParticipantResponse.builder().build()
+      );
+    }
+
     return QuestionnaireParticipantResponseMapper.toDataResponseQuestionnaireParticipantResponse(
       questionnaireService.addQuestionnaireAppraiserToQuestionnaire(
         questionnaireId, questionnaireParticipant.getIdParticipant()),
@@ -269,6 +326,16 @@ public class QuestionnaireController {
       String questionnaireParticipantId
 
   ) {
+    Questionnaire questionnaire = questionnaireService.getQuestionnaire(questionnaireId);
+    if(!questionnaireService.validateQuestionnaire(
+      questionnaireId,
+      questionnaire.getStartDate(),
+      questionnaire.getDueDate())
+    ){
+      return ResponseHelper.toBaseResponse(
+        HttpStatus.FORBIDDEN
+      );
+    }
 
     questionnaireService.deleteQuestionnaireAppraiserFromQuestionnaire(
       questionnaireParticipantId);
@@ -308,7 +375,17 @@ public class QuestionnaireController {
     @RequestBody
       QuestionnaireParticipantRequest questionnaireParticipant
   ) {
-
+    Questionnaire questionnaire = questionnaireService.getQuestionnaire(questionnaireId);
+    if(!questionnaireService.validateQuestionnaire(
+      questionnaireId,
+      questionnaire.getStartDate(),
+      questionnaire.getDueDate())
+    ){
+      return ResponseHelper.toDataResponse(
+        HttpStatus.FORBIDDEN,
+        QuestionnaireParticipantResponse.builder().build()
+      );
+    }
     return QuestionnaireParticipantResponseMapper.toDataResponseQuestionnaireParticipantResponse(
       questionnaireService.addQuestionnaireAppraiseeToQuestionnaire(
         questionnaireId, questionnaireParticipant.getIdParticipant()),
@@ -325,10 +402,18 @@ public class QuestionnaireController {
     @PathVariable
       String questionnaireParticipantId
   ) {
-
+    Questionnaire questionnaire = questionnaireService.getQuestionnaire(questionnaireId);
+    if(!questionnaireService.validateQuestionnaire(
+      questionnaireId,
+      questionnaire.getStartDate(),
+      questionnaire.getDueDate())
+    ){
+      return ResponseHelper.toBaseResponse(
+        HttpStatus.FORBIDDEN
+      );
+    }
     questionnaireService.deleteQuestionnaireAppraiseeFromQuestionnaire(
       questionnaireParticipantId);
     return ResponseHelper.toBaseResponse(HttpStatus.OK);
   }
-
 }
