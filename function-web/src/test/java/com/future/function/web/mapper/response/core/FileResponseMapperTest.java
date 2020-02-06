@@ -119,7 +119,7 @@ public class FileResponseMapperTest {
   private static final FileContentWebResponse FILE_CONTENT_WEB_RESPONSE =
     FileContentWebResponse.builder()
       .id(FILE_ID)
-      .file(URL_PREFIX + THUMBNAIL_URL)
+      .file(URL_PREFIX + FILE_URL)
       .type("FILE")
       .name(NAME)
       .parentId(PARENT_ID)
