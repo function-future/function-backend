@@ -81,15 +81,16 @@ public class ResourceController {
       Long version
   ) {
 
+    Pair<String, byte[]> fileData = resourceService.getFileAsByteArray(
+      session.getRole(), fileName, FileOrigin.toFileOrigin(origin), version);
+
     return ResponseEntity.ok()
       .contentType(resourceRequestMapper.getMediaType(fileName, servletRequest))
-      .header(HttpHeaders.CONTENT_DISPOSITION,
-              String.format("attachment; filename=\"%s\"", fileName)
+      .header(
+        HttpHeaders.CONTENT_DISPOSITION,
+        String.format("attachment; filename=\"%s\"", fileData.getFirst())
       )
-      .body(resourceService.getFileAsByteArray(session.getRole(), fileName,
-                                               FileOrigin.toFileOrigin(origin),
-                                               version
-      ));
+      .body(fileData.getSecond());
   }
 
 }
