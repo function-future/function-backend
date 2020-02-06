@@ -17,7 +17,7 @@ public interface AssignmentRepository
       Batch batch, Long deadline, Pageable pageable
   );
 
-  Page<Assignment> findAllByBatchAndDeadlineGreaterThanOrderByDeadlineDesc(
+  Page<Assignment> findAllByBatchAndDeletedFalseAndDeadlineGreaterThanOrderByDeadlineDesc(
       Batch batch, Long deadline, Pageable pageable
   );
 
