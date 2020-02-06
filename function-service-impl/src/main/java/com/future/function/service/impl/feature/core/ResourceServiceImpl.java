@@ -11,6 +11,7 @@ import com.future.function.service.api.feature.core.ResourceService;
 import com.future.function.service.impl.helper.FileHelper;
 import com.google.common.collect.Lists;
 import org.apache.commons.io.FilenameUtils;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -139,7 +140,7 @@ public class ResourceServiceImpl implements ResourceService {
   }
 
   @Override
-  public byte[] getFileAsByteArray(
+  public Pair<String, byte[]> getFileAsByteArray(
     Role role, String fileName, FileOrigin fileOrigin, Long version
   ) {
 
@@ -147,9 +148,57 @@ public class ResourceServiceImpl implements ResourceService {
       .map(origin -> checkIsValidForGettingData(role, origin))
       .flatMap(origin -> fileRepositoryV2.findByIdAndAsResource(
         this.getFileId(fileName), origin.isAsResource()))
-      .map(file -> this.getFileOrThumbnail(file, fileName, version))
-      .map(FileHelper::toByteArray)
+      .map(file -> Pair.of(
+        this.getDownloadName(file, version),
+        this.getFileOrThumbnail(file, fileName, version)
+      ))
+      .map(pair -> Pair.of(pair.getFirst(),
+                           FileHelper.toByteArray(pair.getSecond())
+      ))
       .orElseThrow(() -> new NotFoundException("Get File Not Found"));
+  }
+
+  private String getDownloadName(FileV2 file, Long version) {
+
+    Pair<String, String> downloadFileNameAndExtension =
+      this.getDownloadFileNameAndExtension(
+        version, this.getFileNameAndExtension(file));
+
+    return this.appendExtensionToFileName(downloadFileNameAndExtension);
+  }
+
+  private Pair<String, String> getDownloadFileNameAndExtension(
+    Long version, Pair<String, String> originalFileNameAndExtension
+  ) {
+
+    return Optional.ofNullable(version)
+      .map(ver -> Pair.of(
+        originalFileNameAndExtension.getFirst()
+          .concat("-v" + ver),
+        originalFileNameAndExtension.getSecond()
+      ))
+      .orElse(originalFileNameAndExtension);
+  }
+
+  private String appendExtensionToFileName(
+    Pair<String, String> fileNameAndExtension
+  ) {
+
+    return fileNameAndExtension.getFirst()
+      .concat(".")
+      .concat(fileNameAndExtension.getSecond());
+  }
+
+  private Pair<String, String> getFileNameAndExtension(FileV2 fileObject) {
+
+    String baseNameExtractionTarget = Optional.of(fileObject)
+      .map(FileV2::getName)
+      .orElse(fileObject.getFilePath());
+
+    return Pair.of(
+      FilenameUtils.getBaseName(baseNameExtractionTarget),
+      FilenameUtils.getExtension(fileObject.getFilePath())
+    );
   }
 
   private FileOrigin checkIsValidForGettingData(

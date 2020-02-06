@@ -20,6 +20,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import org.springframework.data.util.Pair;
 
 import java.io.File;
 import java.util.Arrays;
@@ -374,10 +375,10 @@ public class ResourceServiceImplTest {
     String fileName = fileId + ".png";
     doReturn(false).when(FileHelper.class, "isThumbnailName", fileName);
 
-    byte[] bytes = resourceService.getFileAsByteArray(
+    Pair<String, byte[]> downloadNameAndContent = resourceService.getFileAsByteArray(
       Role.UNKNOWN, fileName, FileOrigin.BLOG, null);
 
-    assertThat(bytes).isEqualTo(BYTES);
+    assertThat(downloadNameAndContent.getSecond()).isEqualTo(BYTES);
 
     verify(fileRepositoryV2).findByIdAndAsResource(fileId,
                                                    FileOrigin.BLOG.isAsResource()
@@ -406,10 +407,10 @@ public class ResourceServiceImplTest {
     String fileName = fileId + ".png";
     doReturn(false).when(FileHelper.class, "isThumbnailName", fileName);
 
-    byte[] bytes = resourceService.getFileAsByteArray(
+    Pair<String, byte[]> downloadNameAndContent = resourceService.getFileAsByteArray(
       Role.UNKNOWN, fileName, FileOrigin.ANNOUNCEMENT, 1L);
 
-    assertThat(bytes).isEqualTo(BYTES);
+    assertThat(downloadNameAndContent.getSecond()).isEqualTo(BYTES);
 
     verify(fileRepositoryV2).findByIdAndAsResource(
       fileId, FileOrigin.ANNOUNCEMENT.isAsResource());
@@ -437,10 +438,10 @@ public class ResourceServiceImplTest {
     String fileName = fileId + THUMBNAIL_SUFFIX + ".png";
     doReturn(true).when(FileHelper.class, "isThumbnailName", fileName);
 
-    byte[] bytes = resourceService.getFileAsByteArray(
+    Pair<String, byte[]> downloadNameAndContent = resourceService.getFileAsByteArray(
       Role.ADMIN, fileName, FileOrigin.COURSE, null);
 
-    assertThat(bytes).isEqualTo(BYTES);
+    assertThat(downloadNameAndContent.getSecond()).isEqualTo(BYTES);
 
     verify(fileRepositoryV2).findByIdAndAsResource(
       fileId, FileOrigin.COURSE.isAsResource());

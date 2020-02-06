@@ -180,17 +180,9 @@ public final class FileResponseMapper {
       .versions(FileResponseMapper.toFileWebResponseVersions(file.getVersions(),
                                                              urlPrefix
       ))
-      .file(FileResponseMapper.getThumbnailUrl(file, urlPrefix))
+      .file(FileResponseMapper.getFileUrl(file, urlPrefix))
       .author(FileResponseMapper.toAuthorWebResponse(file))
       .build();
-  }
-
-  private static String getThumbnailUrl(FileV2 file, String urlPrefix) {
-
-    return Optional.of(file)
-      .map(FileV2::getThumbnailUrl)
-      .map(urlPrefix::concat)
-      .orElseGet(() -> FileResponseMapper.getFileUrl(file, urlPrefix));
   }
 
 }

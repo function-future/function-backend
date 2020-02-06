@@ -133,7 +133,7 @@ public class ResourceControllerTest extends TestHelper {
     )).thenReturn(MediaType.TEXT_PLAIN);
     when(resourceService.getFileAsByteArray(Role.UNKNOWN, ORIGINAL_NAME,
                                             FileOrigin.ANNOUNCEMENT, null
-    )).thenReturn(BYTES);
+    )).thenReturn(Pair.of(ORIGINAL_NAME, BYTES));
 
     mockMvc.perform(get("/api/core/resources/" + ORIGIN + "/" + ORIGINAL_NAME))
       .andExpect(status().isOk())

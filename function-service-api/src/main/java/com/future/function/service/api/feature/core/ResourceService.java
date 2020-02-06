@@ -3,6 +3,7 @@ package com.future.function.service.api.feature.core;
 import com.future.function.common.enumeration.core.FileOrigin;
 import com.future.function.common.enumeration.core.Role;
 import com.future.function.model.entity.feature.core.FileV2;
+import org.springframework.data.util.Pair;
 
 import java.util.List;
 
@@ -23,7 +24,7 @@ public interface ResourceService {
 
   boolean markFilesUsed(List<String> fileIds, boolean used);
 
-  byte[] getFileAsByteArray(
+  Pair<String, byte[]> getFileAsByteArray(
     Role role, String fileName, FileOrigin fileOrigin, Long version
   );
 
