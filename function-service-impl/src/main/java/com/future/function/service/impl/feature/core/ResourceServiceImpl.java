@@ -174,7 +174,7 @@ public class ResourceServiceImpl implements ResourceService {
     return Optional.ofNullable(version)
       .map(ver -> Pair.of(
         originalFileNameAndExtension.getFirst()
-          .concat("-v" + String.valueOf(ver)),
+          .concat("-v" + ver),
         originalFileNameAndExtension.getSecond()
       ))
       .orElse(originalFileNameAndExtension);
