@@ -10,7 +10,7 @@ import java.util.List;
 public interface MyQuestionnaireService {
 
   Page<Questionnaire> getQuestionnairesByMemberLoginAsAppraiser(
-    User memberLogin, Pageable pageable
+    User memberLogin, String search, Pageable pageable
   );
 
   List<QuestionnaireParticipant> getListAppraisedByQuestionnaireAndMemberLoginAsAppraiser(

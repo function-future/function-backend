@@ -25,22 +25,22 @@ public class QuestionResponseQueue extends BaseEntity {
   @Id
   private String id;
 
-  @Field(FieldName.QuestionResponse.QUESTION)
+  @Field(FieldName.QuestionResponseQueue.QUESTION)
   @DBRef(lazy = true)
   private QuestionQuestionnaire question;
 
-  @Field(FieldName.QuestionResponse.APRAISER)
+  @Field(FieldName.QuestionResponseQueue.APRAISER)
   @DBRef(lazy = true)
   private User appraiser;
 
-  @Field(FieldName.QuestionResponse.APRAISEE)
+  @Field(FieldName.QuestionResponseQueue.APRAISEE)
   @DBRef(lazy = true)
   private User appraisee;
 
-  @Field(FieldName.QuestionResponse.SCORE)
+  @Field(FieldName.QuestionResponseQueue.SCORE)
   private Float score;
 
-  @Field(FieldName.QuestionResponse.COMMENT)
+  @Field(FieldName.QuestionResponseQueue.COMMENT)
   private String comment;
 
 }

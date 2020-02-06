@@ -1,6 +1,5 @@
 package com.future.function.web.mapper.request.communication.questionnaire;
 
-import com.future.function.model.entity.feature.communication.questionnaire.QuestionResponse;
 import com.future.function.model.entity.feature.communication.questionnaire.QuestionResponseQueue;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.service.api.feature.communication.questionnaire.QuestionnaireService;
