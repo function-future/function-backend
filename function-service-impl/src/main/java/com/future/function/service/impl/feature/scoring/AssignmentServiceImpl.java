@@ -69,7 +69,7 @@ public class AssignmentServiceImpl extends Observable implements AssignmentServi
         .map(currentBatch -> assignmentRepository
             .findAllByBatchAndDeletedFalseAndDeadlineLessThanOrderByDeadlineAsc(currentBatch, getDateInLong(), pageable))
           .orElseGet(() -> assignmentRepository
-              .findAllByBatchAndDeadlineGreaterThanOrderByDeadlineDesc(batch, getDateInLong(), pageable));
+              .findAllByBatchAndDeletedFalseAndDeadlineGreaterThanOrderByDeadlineDesc(batch, getDateInLong(), pageable));
   }
 
   private Batch validateStudentBatch(Batch batch, Role role, String sessionBatchId) {

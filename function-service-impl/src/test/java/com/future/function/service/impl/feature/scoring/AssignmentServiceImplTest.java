@@ -143,7 +143,7 @@ public class AssignmentServiceImplTest {
     when(
       assignmentRepository.findByIdAndDeletedFalse(ASSIGNMENT_ID)).thenReturn(
       Optional.of(assignment));
-    when(assignmentRepository.findAllByBatchAndDeadlineGreaterThanOrderByDeadlineDesc(batch, DATE_NOW, pageable))
+    when(assignmentRepository.findAllByBatchAndDeletedFalseAndDeadlineGreaterThanOrderByDeadlineDesc(batch, DATE_NOW, pageable))
         .thenReturn(assignmentPage);
     when(assignmentRepository.findAllByBatchAndDeletedFalseAndDeadlineLessThanOrderByDeadlineAsc(batch, DATE_NOW, pageable))
         .thenReturn(assignmentPage);
@@ -189,7 +189,7 @@ public class AssignmentServiceImplTest {
         .size()).isEqualTo(2);
     assertThat(result.getContent()).isEqualTo(assignmentList);
     verify(batchService).getBatchByCode(BATCH_CODE);
-    verify(assignmentRepository).findAllByBatchAndDeadlineGreaterThanOrderByDeadlineDesc(batch, DATE_NOW, pageable);
+    verify(assignmentRepository).findAllByBatchAndDeletedFalseAndDeadlineGreaterThanOrderByDeadlineDesc(batch, DATE_NOW, pageable);
   }
 
   @Test
