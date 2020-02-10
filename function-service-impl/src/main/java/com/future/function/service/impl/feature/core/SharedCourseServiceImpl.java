@@ -103,7 +103,7 @@ public class SharedCourseServiceImpl implements SharedCourseService {
 
     return this.getBatch(batchCode)
       .filter(batch -> this.isUserAccessingProperSharedCourse(session, batch))
-      .map(batch -> sharedCourseRepository.findAllByBatch(batch, pageable))
+      .map(batch -> sharedCourseRepository.findAllByBatchOrderByUpdatedAtDesc(batch, pageable))
       .map(sharedCourses -> this.toCoursePage(sharedCourses, pageable))
       .orElseGet(() -> PageHelper.empty(pageable));
   }

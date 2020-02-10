@@ -19,7 +19,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -108,18 +108,23 @@ public class SharedCourseRepositoryTest {
     String code = "2L";
     batchRepository.save(buildBatch(code));
 
-    SharedCourse sharedCourse = buildSharedCourse(courseId, code);
-    sharedCourseRepository.save(sharedCourse);
+    SharedCourse sharedCourse1 = buildSharedCourse(courseId, code);
+    sharedCourse1.setUpdatedAt(1L);
+    sharedCourseRepository.save(sharedCourse1);
+
+    SharedCourse sharedCourse2 = buildSharedCourse(courseId, code);
+    sharedCourse2.setUpdatedAt(2L);
+    sharedCourseRepository.save(sharedCourse2);
 
     Batch foundBatch = getBatch(code);
 
     Pageable pageable = new PageRequest(0, 2);
 
     Page<SharedCourse> foundSharedCoursePage =
-      sharedCourseRepository.findAllByBatch(foundBatch, pageable);
+      sharedCourseRepository.findAllByBatchOrderByUpdatedAtDesc(foundBatch, pageable);
 
     Page<SharedCourse> sharedCoursePage = new PageImpl<>(
-      Collections.singletonList(sharedCourse), pageable, 1);
+      Arrays.asList(sharedCourse2, sharedCourse1), pageable, 1);
 
     assertThat(foundSharedCoursePage).isNotNull();
     assertThat(foundSharedCoursePage).isEqualTo(sharedCoursePage);
