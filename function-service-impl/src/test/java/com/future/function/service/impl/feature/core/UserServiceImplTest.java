@@ -207,7 +207,7 @@ public class UserServiceImplTest {
 
     List<User> studentsList = Arrays.asList(userStudent, additionalUser);
 
-    when(userRepository.findAllByNameContainsIgnoreCaseAndRoleAndDeletedFalse(
+    when(userRepository.findAllByNameContainsIgnoreCaseAndRoleAndDeletedFalseOrderByNameAsc(
       "", Role.STUDENT, PAGEABLE)).thenReturn(
       PageHelper.toPage(studentsList, PAGEABLE));
 
@@ -218,7 +218,7 @@ public class UserServiceImplTest {
     assertThat(foundUserStudentsPage.getContent()).isEqualTo(studentsList);
 
     verify(
-      userRepository).findAllByNameContainsIgnoreCaseAndRoleAndDeletedFalse(
+      userRepository).findAllByNameContainsIgnoreCaseAndRoleAndDeletedFalseOrderByNameAsc(
       "", Role.STUDENT, PAGEABLE);
     verifyZeroInteractions(batchService, resourceService, encoder, mailService, functionProperties);
   }
@@ -243,7 +243,7 @@ public class UserServiceImplTest {
 
     when(batchService.getBatchByCode(NUMBER)).thenReturn(BATCH);
     when(
-      userRepository.findAllByBatchAndRoleAndNameContainsIgnoreCaseAndDeletedFalse(
+      userRepository.findAllByBatchAndRoleAndNameContainsIgnoreCaseAndDeletedFalseOrderByNameAsc(
         BATCH, Role.STUDENT, "", PAGEABLE)).thenReturn(
       PageHelper.toPage(studentsList, PAGEABLE));
 
@@ -255,7 +255,7 @@ public class UserServiceImplTest {
 
     verify(batchService).getBatchByCode(NUMBER);
     verify(
-      userRepository).findAllByBatchAndRoleAndNameContainsIgnoreCaseAndDeletedFalse(
+      userRepository).findAllByBatchAndRoleAndNameContainsIgnoreCaseAndDeletedFalseOrderByNameAsc(
       BATCH, Role.STUDENT, "", PAGEABLE);
     verifyZeroInteractions(resourceService, encoder, mailService, functionProperties);
   }
@@ -327,7 +327,7 @@ public class UserServiceImplTest {
     List<User> mentorsList = Arrays.asList(userMentor, additionalUser);
 
     String name = "MENT";
-    when(userRepository.findAllByNameContainsIgnoreCaseAndRoleAndDeletedFalse(
+    when(userRepository.findAllByNameContainsIgnoreCaseAndRoleAndDeletedFalseOrderByNameAsc(
       name, Role.MENTOR, PAGEABLE)).thenReturn(
       PageHelper.toPage(mentorsList, PAGEABLE));
 
@@ -338,7 +338,7 @@ public class UserServiceImplTest {
     assertThat(foundUserMentorsPage.getContent()).isEqualTo(mentorsList);
 
     verify(
-      userRepository).findAllByNameContainsIgnoreCaseAndRoleAndDeletedFalse(
+      userRepository).findAllByNameContainsIgnoreCaseAndRoleAndDeletedFalseOrderByNameAsc(
       name, Role.MENTOR, PAGEABLE);
     verifyZeroInteractions(batchService, resourceService, encoder, mailService, functionProperties);
   }
@@ -760,8 +760,8 @@ public class UserServiceImplTest {
 
     String namePart = "AM";
     List<User> users = Arrays.asList(userStudent, userMentor);
-    when(userRepository.findAllByNameContainsIgnoreCaseAndDeletedFalse(namePart,
-                                                                       PAGEABLE
+    when(userRepository.findAllByNameContainsIgnoreCaseAndDeletedFalseOrderByNameAsc(namePart,
+                                                                                     PAGEABLE
     )).thenReturn(new PageImpl<>(users, PAGEABLE, users.size()));
 
     Page<User> retrievedUsers = userService.getUsersByNameContainsIgnoreCase(
@@ -770,7 +770,7 @@ public class UserServiceImplTest {
     assertThat(retrievedUsers.getContent()).isNotEmpty();
     assertThat(retrievedUsers.getContent()).isEqualTo(users);
 
-    verify(userRepository).findAllByNameContainsIgnoreCaseAndDeletedFalse(
+    verify(userRepository).findAllByNameContainsIgnoreCaseAndDeletedFalseOrderByNameAsc(
       namePart, PAGEABLE);
     verifyZeroInteractions(resourceService, encoder, mailService, functionProperties);
   }

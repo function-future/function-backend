@@ -14,7 +14,7 @@ public interface UserRepository extends MongoRepository<User, String> {
 
   Optional<User> findByEmailAndDeletedFalse(String email);
 
-  Page<User> findAllByNameContainsIgnoreCaseAndRoleAndDeletedFalse(
+  Page<User> findAllByNameContainsIgnoreCaseAndRoleAndDeletedFalseOrderByNameAsc(
     String name, Role role, Pageable pageable
   );
 
@@ -22,13 +22,13 @@ public interface UserRepository extends MongoRepository<User, String> {
     Batch batch, Role role, Pageable pageable
   );
 
-  Page<User> findAllByBatchAndRoleAndNameContainsIgnoreCaseAndDeletedFalse(
+  Page<User> findAllByBatchAndRoleAndNameContainsIgnoreCaseAndDeletedFalseOrderByNameAsc(
     Batch batch, Role role, String name, Pageable pageable
   );
 
   List<User> findAllByBatchAndRoleAndDeletedFalse(Batch batch, Role role);
 
-  Page<User> findAllByNameContainsIgnoreCaseAndDeletedFalse(
+  Page<User> findAllByNameContainsIgnoreCaseAndDeletedFalseOrderByNameAsc(
     String name, Pageable pageable
   );
 
