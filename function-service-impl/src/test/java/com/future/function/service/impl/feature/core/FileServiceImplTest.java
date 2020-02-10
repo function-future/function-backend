@@ -132,7 +132,7 @@ public class FileServiceImplTest {
       Collections.singletonList(file), PAGEABLE, 1);
 
     when(
-      fileRepository.findAllByParentIdAndAsResourceFalseAndDeletedFalseOrderByMarkFolderDesc(
+      fileRepository.findAllByParentIdAndAsResourceFalseAndDeletedFalseOrderByMarkFolderDescNameAsc(
         PARENT_ID, PAGEABLE)).thenReturn(returnedPage);
 
     FileV2 parentObject = FileV2.builder()
@@ -161,7 +161,7 @@ public class FileServiceImplTest {
       new PageImpl<>(Collections.singletonList(file), PAGEABLE, 1));
 
     verify(
-      fileRepository).findAllByParentIdAndAsResourceFalseAndDeletedFalseOrderByMarkFolderDesc(
+      fileRepository).findAllByParentIdAndAsResourceFalseAndDeletedFalseOrderByMarkFolderDescNameAsc(
       PARENT_ID, PAGEABLE);
     verify(fileRepository).findByIdAndDeletedFalse(PARENT_ID);
     verifyZeroInteractions(resourceService, fileProperties, userService);

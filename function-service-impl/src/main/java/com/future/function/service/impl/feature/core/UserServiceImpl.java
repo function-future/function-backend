@@ -77,7 +77,7 @@ public class UserServiceImpl extends Observable implements UserService {
     return Optional.ofNullable(batchCode)
       .filter(StringUtils::isEmpty)
       .map(
-        ignored -> userRepository.findAllByNameContainsIgnoreCaseAndRoleAndDeletedFalse(
+        ignored -> userRepository.findAllByNameContainsIgnoreCaseAndRoleAndDeletedFalseOrderByNameAsc(
           name, role, pageable))
       .orElseGet(
         () -> this.getStudentsOfBatchAndWithNamePart(batchCode, name, pageable));
@@ -90,7 +90,7 @@ public class UserServiceImpl extends Observable implements UserService {
     return Optional.ofNullable(batchCode)
       .map(batchService::getBatchByCode)
       .map(
-        batch -> userRepository.findAllByBatchAndRoleAndNameContainsIgnoreCaseAndDeletedFalse(
+        batch -> userRepository.findAllByBatchAndRoleAndNameContainsIgnoreCaseAndDeletedFalseOrderByNameAsc(
           batch, Role.STUDENT, name, pageable))
       .orElseGet(() -> PageHelper.empty(pageable));
   }
@@ -222,9 +222,8 @@ public class UserServiceImpl extends Observable implements UserService {
     String name, Pageable pageable
   ) {
 
-    return userRepository.findAllByNameContainsIgnoreCaseAndDeletedFalse(name,
-                                                                         pageable
-    );
+    return userRepository.findAllByNameContainsIgnoreCaseAndDeletedFalseOrderByNameAsc(
+      name, pageable);
   }
 
   private void markDeletedAndNotifyObserver(User user) {

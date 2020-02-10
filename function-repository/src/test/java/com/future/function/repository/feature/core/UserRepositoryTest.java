@@ -126,8 +126,8 @@ public class UserRepositoryTest {
   public void testGivenNameByFindingUsersByNameContainsIgnoreCaseReturnListOfUsers() {
 
     Page<User> foundUsers =
-      userRepository.findAllByNameContainsIgnoreCaseAndDeletedFalse("E-1",
-                                                                    new PageRequest(
+      userRepository.findAllByNameContainsIgnoreCaseAndDeletedFalseOrderByNameAsc("E-1",
+                                                                                  new PageRequest(
                                                                       0, 10)
       );
 
@@ -140,7 +140,7 @@ public class UserRepositoryTest {
   public void testGivenRoleAndNameByFindingUsersByRoleAndNameContainsIgnoreCaseReturnPageOfUsers() {
 
     Page<User> foundUsers =
-      userRepository.findAllByNameContainsIgnoreCaseAndRoleAndDeletedFalse(
+      userRepository.findAllByNameContainsIgnoreCaseAndRoleAndDeletedFalseOrderByNameAsc(
         "E-1", Role.ADMIN, new PageRequest(0, 10));
 
     assertThat(foundUsers.getContent()).isNotEmpty();
@@ -152,7 +152,7 @@ public class UserRepositoryTest {
   public void testGivenBatchAndRoleAndNameByFindingUsersByBatchAndRoleAndNameContainsIgnoreCaseReturnPageOfUsers() {
 
     Page<User> foundUsers =
-      userRepository.findAllByBatchAndRoleAndNameContainsIgnoreCaseAndDeletedFalse(
+      userRepository.findAllByBatchAndRoleAndNameContainsIgnoreCaseAndDeletedFalseOrderByNameAsc(
         batch, Role.STUDENT, "E-2", new PageRequest(0, 10));
 
     assertThat(foundUsers.getContent()).isNotEmpty();

@@ -81,25 +81,37 @@ public class FileRepositoryV2Test {
       .parentId(PARENT_ID)
       .build();
 
-    FileV2 folder = FileV2.builder()
-      .id(FILE_ID + "FOLDER")
+    FileV2 folder1 = FileV2.builder()
+      .id(FILE_ID + "FOLDER1")
       .filePath(FILE_PATH)
       .fileUrl(FILE_URL)
       .asResource(false)
       .markFolder(true)
       .parentId(PARENT_ID)
+      .name("folder1")
+      .build();
+
+    FileV2 folder2 = FileV2.builder()
+      .id(FILE_ID + "FOLDER2")
+      .filePath(FILE_PATH)
+      .fileUrl(FILE_URL)
+      .asResource(false)
+      .markFolder(true)
+      .parentId(PARENT_ID)
+      .name("folder2")
       .build();
 
     fileRepositoryV2.save(file1);
-    fileRepositoryV2.save(folder);
+    fileRepositoryV2.save(folder1);
+    fileRepositoryV2.save(folder2);
 
     Page<FileV2> foundFileV2s =
-      fileRepositoryV2.findAllByParentIdAndAsResourceFalseAndDeletedFalseOrderByMarkFolderDesc(
+      fileRepositoryV2.findAllByParentIdAndAsResourceFalseAndDeletedFalseOrderByMarkFolderDescNameAsc(
         PARENT_ID, new PageRequest(0, 10));
 
     assertThat(foundFileV2s).isNotNull();
     assertThat(foundFileV2s.getContent()).isEqualTo(
-      Arrays.asList(folder, file1));
+      Arrays.asList(folder1, folder2, file1));
 
     fileRepositoryV2.delete(FILE_ID + "FILE");
     fileRepositoryV2.delete(FILE_ID + "FOLDER");

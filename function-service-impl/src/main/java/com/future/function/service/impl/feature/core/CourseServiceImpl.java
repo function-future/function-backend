@@ -102,7 +102,7 @@ public class CourseServiceImpl implements CourseService {
   @Override
   public Page<Course> getCourses(Pageable pageable) {
 
-    return courseRepository.findAll(pageable);
+    return courseRepository.findAllByOrderByUpdatedAtDesc(pageable);
   }
 
   @Override

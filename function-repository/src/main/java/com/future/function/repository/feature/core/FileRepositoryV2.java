@@ -13,7 +13,7 @@ public interface FileRepositoryV2 extends MongoRepository<FileV2, String> {
 
   Optional<FileV2> findByIdAndAsResource(String id, boolean asResource);
 
-  Page<FileV2> findAllByParentIdAndAsResourceFalseAndDeletedFalseOrderByMarkFolderDesc(
+  Page<FileV2> findAllByParentIdAndAsResourceFalseAndDeletedFalseOrderByMarkFolderDescNameAsc(
     String parentId, Pageable pageable
   );
 

@@ -237,7 +237,7 @@ public class SharedCourseServiceImplTest {
       sharedCourse);
     Page<SharedCourse> sharedCoursePage = PageHelper.toPage(
       sharedCourseList, PAGEABLE);
-    when(sharedCourseRepository.findAllByBatch(BATCH, PAGEABLE)).thenReturn(
+    when(sharedCourseRepository.findAllByBatchOrderByUpdatedAtDesc(BATCH, PAGEABLE)).thenReturn(
       sharedCoursePage);
 
     Page<Course> expectedCoursePage = PageHelper.toPage(
@@ -255,7 +255,7 @@ public class SharedCourseServiceImplTest {
     assertThat(coursePage).isEqualTo(expectedCoursePage);
 
     verify(batchService).getBatchByCode(BATCH_CODE);
-    verify(sharedCourseRepository).findAllByBatch(BATCH, PAGEABLE);
+    verify(sharedCourseRepository).findAllByBatchOrderByUpdatedAtDesc(BATCH, PAGEABLE);
     verifyZeroInteractions(resourceService, courseService, discussionService);
   }
 
@@ -264,7 +264,7 @@ public class SharedCourseServiceImplTest {
 
     when(batchService.getBatchByCode(BATCH_CODE)).thenReturn(BATCH);
     Page<SharedCourse> sharedCoursePage = PageHelper.empty(PAGEABLE);
-    when(sharedCourseRepository.findAllByBatch(BATCH, PAGEABLE)).thenReturn(
+    when(sharedCourseRepository.findAllByBatchOrderByUpdatedAtDesc(BATCH, PAGEABLE)).thenReturn(
       sharedCoursePage);
 
     Page<Course> expectedCoursePage = PageHelper.empty(PAGEABLE);
@@ -276,7 +276,7 @@ public class SharedCourseServiceImplTest {
     assertThat(coursePage).isEqualTo(expectedCoursePage);
 
     verify(batchService).getBatchByCode(BATCH_CODE);
-    verify(sharedCourseRepository).findAllByBatch(BATCH, PAGEABLE);
+    verify(sharedCourseRepository).findAllByBatchOrderByUpdatedAtDesc(BATCH, PAGEABLE);
     verifyZeroInteractions(resourceService, courseService, discussionService);
   }
 
@@ -290,7 +290,7 @@ public class SharedCourseServiceImplTest {
       sharedCourse);
     Page<SharedCourse> sharedCoursePage = PageHelper.toPage(
       sharedCourseList, PAGEABLE);
-    when(sharedCourseRepository.findAllByBatch(BATCH, PAGEABLE)).thenReturn(
+    when(sharedCourseRepository.findAllByBatchOrderByUpdatedAtDesc(BATCH, PAGEABLE)).thenReturn(
       sharedCoursePage);
 
     Page<Course> expectedCoursePage = PageHelper.toPage(
@@ -311,7 +311,7 @@ public class SharedCourseServiceImplTest {
     assertThat(coursePage).isEqualTo(expectedCoursePage);
 
     verify(batchService).getBatchByCode(BATCH_CODE);
-    verify(sharedCourseRepository).findAllByBatch(BATCH, PAGEABLE);
+    verify(sharedCourseRepository).findAllByBatchOrderByUpdatedAtDesc(BATCH, PAGEABLE);
     verifyZeroInteractions(resourceService, courseService, discussionService);
   }
 
@@ -320,7 +320,7 @@ public class SharedCourseServiceImplTest {
 
     when(batchService.getBatchByCode(BATCH_CODE)).thenReturn(BATCH);
     Page<SharedCourse> sharedCoursePage = PageHelper.empty(PAGEABLE);
-    when(sharedCourseRepository.findAllByBatch(BATCH, PAGEABLE)).thenReturn(
+    when(sharedCourseRepository.findAllByBatchOrderByUpdatedAtDesc(BATCH, PAGEABLE)).thenReturn(
       sharedCoursePage);
 
     Page<Course> expectedCoursePage = PageHelper.empty(PAGEABLE);
@@ -335,7 +335,7 @@ public class SharedCourseServiceImplTest {
     assertThat(coursePage).isEqualTo(expectedCoursePage);
 
     verify(batchService).getBatchByCode(BATCH_CODE);
-    verify(sharedCourseRepository).findAllByBatch(BATCH, PAGEABLE);
+    verify(sharedCourseRepository).findAllByBatchOrderByUpdatedAtDesc(BATCH, PAGEABLE);
     verifyZeroInteractions(resourceService, courseService, discussionService);
   }
 

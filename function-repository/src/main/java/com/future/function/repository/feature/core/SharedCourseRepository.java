@@ -14,7 +14,7 @@ public interface SharedCourseRepository
 
   Optional<SharedCourse> findByIdAndBatch(String courseId, Batch batch);
 
-  Page<SharedCourse> findAllByBatch(Batch batch, Pageable pageable);
+  Page<SharedCourse> findAllByBatchOrderByUpdatedAtDesc(Batch batch, Pageable pageable);
 
   Stream<SharedCourse> findAllByBatch(Batch batch);
 
