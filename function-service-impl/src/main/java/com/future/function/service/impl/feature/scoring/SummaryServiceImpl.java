@@ -15,6 +15,7 @@ import com.future.function.service.api.feature.scoring.StudentQuizService;
 import com.future.function.service.api.feature.scoring.SummaryService;
 import com.future.function.service.impl.helper.AuthorizationHelper;
 import com.future.function.service.impl.helper.PageHelper;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -60,7 +61,7 @@ public class SummaryServiceImpl implements SummaryService {
         ))
       .map(ignored -> studentId)
       .map(userService::getUser)
-      .map(user -> this.getAllSummaryBasedOnType(user, pageable, type))
+      .map(student -> this.getAllSummaryBasedOnType(student, pageable, type))
       .map(this::mapToStudentSummaryDTO)
       .orElseThrow(() -> new NotFoundException(
         "Failed at #findAllPointSummaryByStudentId #SummaryService"));
@@ -104,41 +105,30 @@ public class SummaryServiceImpl implements SummaryService {
   }
 
   private Pair<User, Page<SummaryVO>> getAllSummaryBasedOnType(
-    User user, Pageable pageable, String type
+    User student, Pageable pageable, String type
   ) {
-    Pair<User, Page<SummaryVO>> emptyPage = Pair.of(user, PageHelper.empty(pageable));
+    Page<SummaryVO> summaryPage = PageHelper.empty(pageable);
 
     if(type.toUpperCase().equals(ScoringType.QUIZ.name())) {
 
-      return Optional.of(user)
-          .map(summaryDTOList -> getStudentQuizzes(user, pageable))
-          .map(summaryDTOList -> Pair.of(user, summaryDTOList))
-          .orElse(emptyPage);
+      summaryPage = getStudentQuizzes(student, pageable);
 
     } else if(type.toUpperCase().equals(ScoringType.ASSIGNMENT.name())) {
 
-      return Optional.of(user)
-          .map(currentUser -> getStudentRooms(currentUser, pageable))
-          .map(summaryList -> Pair.of(user, summaryList))
-          .orElse(emptyPage);
-    } else {
-
-      return emptyPage;
+      summaryPage = getStudentRooms(student, pageable);
     }
+    return Pair.of(student, summaryPage);
   }
 
   private Page<SummaryVO> getStudentQuizzes(
     User user, Pageable pageable
   ) {
-    List<SummaryVO> resultList = new ArrayList<>();
-    Page<StudentQuizDetail> studentQuizDetailPage = studentQuizService.findAllQuizByStudentId(user.getId(), pageable);
-    studentQuizDetailPage.getContent()
+    List<SummaryVO> resultList = studentQuizService.findAllQuizByStudentId(user.getId(), pageable)
+      .getContent()
       .stream()
       .map(this::mapQuizToSummaryDTO)
-      .forEach(resultList::add);
-    long totalRecords = studentQuizDetailPage.getTotalElements();
-    PageRequest actualPageable = new PageRequest(pageable.getPageNumber(), pageable.getPageSize());
-    return new PageImpl<>(resultList, actualPageable, totalRecords);
+      .collect(Collectors.toList());
+    return PageHelper.toPage(resultList, pageable);
   }
 
   private SummaryVO mapQuizToSummaryDTO(StudentQuizDetail studentQuizDetail) {
@@ -155,12 +145,11 @@ public class SummaryServiceImpl implements SummaryService {
   private Page<SummaryVO> getStudentRooms(
     User user, Pageable pageable
   ) {
-    List<SummaryVO> resultList = new ArrayList<>();
-    Page<Room> roomPage = roomService.findAllByStudentId(user.getId(), pageable);
-      roomPage.getContent().stream()
+    List<SummaryVO> resultList = roomService.findAllByStudentId(user.getId(), pageable)
+      .getContent().stream()
       .map(this::mapRoomToSummaryDTO)
-      .forEach(resultList::add);
-    return new PageImpl<>(resultList, pageable, roomPage.getTotalElements());
+      .collect(Collectors.toList());
+    return PageHelper.toPage(resultList, pageable);
   }
 
   private SummaryVO mapRoomToSummaryDTO(Room room) {

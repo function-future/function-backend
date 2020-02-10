@@ -1,6 +1,7 @@
 package com.future.function.repository.feature.scoring;
 
 import com.future.function.model.entity.feature.scoring.StudentQuizDetail;
+import java.util.List;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.Optional;
@@ -14,4 +15,5 @@ public interface StudentQuizDetailRepository
     String studentQuizId
   );
 
+  List<StudentQuizDetail> findAllByStudentQuizIdAndDeletedFalse(String studentQuizId);
 }
