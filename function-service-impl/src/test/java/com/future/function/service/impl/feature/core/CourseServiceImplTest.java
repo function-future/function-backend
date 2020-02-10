@@ -160,13 +160,13 @@ public class CourseServiceImplTest {
     Pageable pageable = new PageRequest(0, 5);
     Page<Course> coursePage = PageHelper.toPage(
       Collections.singletonList(course), pageable);
-    when(courseRepository.findAll(pageable)).thenReturn(coursePage);
+    when(courseRepository.findAllByOrderByUpdatedAtDesc(pageable)).thenReturn(coursePage);
 
     Page<Course> retrievedCourses = courseService.getCourses(pageable);
 
     assertThat(retrievedCourses).isEqualTo(coursePage);
 
-    verify(courseRepository).findAll(pageable);
+    verify(courseRepository).findAllByOrderByUpdatedAtDesc(pageable);
     verifyZeroInteractions(resourceService);
   }
 
