@@ -211,11 +211,12 @@ public class StudentQuizDetailServiceImplTest {
 
   @Test
   public void deleteByStudentQuiz() {
-
+    when(studentQuizDetailRepository.findAllByStudentQuizIdAndDeletedFalse(STUDENT_QUIZ_ID))
+        .thenReturn(Collections.singletonList(studentQuizDetail));
     studentQuizDetailService.deleteByStudentQuiz(studentQuiz);
     studentQuizDetail.setDeleted(true);
     verify(
-      studentQuizDetailRepository).findTopByStudentQuizIdAndDeletedFalseOrderByCreatedAtDesc(
+      studentQuizDetailRepository).findAllByStudentQuizIdAndDeletedFalse(
       STUDENT_QUIZ_ID);
     verify(studentQuizDetailRepository).save(studentQuizDetail);
     verify(studentQuestionService).deleteAllByStudentQuizDetailId(

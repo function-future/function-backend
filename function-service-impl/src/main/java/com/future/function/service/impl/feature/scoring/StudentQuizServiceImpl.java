@@ -64,12 +64,12 @@ public class StudentQuizServiceImpl implements StudentQuizService, Observer {
 
     return Optional.ofNullable(studentId)
       .map(userId -> studentQuizRepository.findAllByStudentIdAndDeletedFalse(userId, pageable))
-      .map(this::mapToDetailList)
+      .map(this::toStudentQuizDetails)
       .map(list -> PageHelper.toPage(list, pageable))
       .orElseGet(() -> PageHelper.empty(pageable));
   }
 
-  private List<StudentQuizDetail> mapToDetailList(
+  private List<StudentQuizDetail> toStudentQuizDetails(
     Page<StudentQuiz> studentQuizPage
   ) {
 
@@ -84,15 +84,14 @@ public class StudentQuizServiceImpl implements StudentQuizService, Observer {
 
     return Optional.ofNullable(studentId)
       .flatMap(id -> studentQuizRepository.findByStudentIdAndQuizIdAndDeletedFalse(id, quizId))
-      .filter(Objects::nonNull)
       .orElseGet(() -> this.createStudentQuiz(studentId, quizId));
   }
 
   private StudentQuiz createStudentQuiz(String studentId, String quizId) {
-    Quiz quiz = quizService.findById(quizId, Role.ADMIN, null);
     User student = userService.getUser(studentId);
-    return Optional.ofNullable(quiz)
-        .map(quizObj -> toStudentQuiz(student, quizObj))
+    return Optional.ofNullable(student)
+        .map(currentStudent -> quizService.findById(quizId, currentStudent.getRole(), currentStudent.getBatch().getId()))
+        .map(quiz -> toStudentQuiz(student, quiz))
         .map(studentQuizRepository::save)
         .orElseThrow(() -> new UnsupportedOperationException(
             "Failed at #createStudentQuizAndSave #StudentQuizService"));
@@ -125,7 +124,6 @@ public class StudentQuizServiceImpl implements StudentQuizService, Observer {
   ) {
 
     return Optional.ofNullable(studentQuiz)
-      .filter(Objects::nonNull)
       .filter(this::validateTrials)
       .map(this::addTrials)
       .map(studentQuizRepository::save)
@@ -147,9 +145,8 @@ public class StudentQuizServiceImpl implements StudentQuizService, Observer {
     String studentId, String quizId, List<StudentQuestion> answers
   ) {
 
-    return Optional.of(studentId)
+    return Optional.ofNullable(studentId)
       .flatMap(id -> studentQuizRepository.findByStudentIdAndQuizIdAndDeletedFalse(id, quizId))
-      .filter(Objects::nonNull)
       .map(StudentQuiz::getId)
       .map(studentQuizId -> studentQuizDetailService.answerStudentQuiz(studentQuizId, answers))
       .orElseThrow(() -> new UnsupportedOperationException(

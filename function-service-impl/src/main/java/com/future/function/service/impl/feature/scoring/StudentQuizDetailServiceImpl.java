@@ -40,10 +40,8 @@ public class StudentQuizDetailServiceImpl implements StudentQuizDetailService {
   public StudentQuizDetail findLatestByStudentQuizId(String studentQuizId) {
 
     return Optional.ofNullable(studentQuizId)
-      .flatMap(
-        studentQuizDetailRepository::findTopByStudentQuizIdAndDeletedFalseOrderByCreatedAtDesc)
-      .orElseThrow(() -> new NotFoundException(
-        "Failed at #findLatestByStudentQuizId #StudentQuizDetailService"));
+      .flatMap(studentQuizDetailRepository::findTopByStudentQuizIdAndDeletedFalseOrderByCreatedAtDesc)
+      .orElseThrow(() -> new NotFoundException("NOT_FOUND"));
   }
 
   @Override
@@ -85,12 +83,12 @@ public class StudentQuizDetailServiceImpl implements StudentQuizDetailService {
   private StudentQuizDetail createDetail(StudentQuiz studentQuiz) {
 
     return Optional.ofNullable(studentQuiz)
-      .map(this::toDetail)
+      .map(this::toNewStudentQuizDetail)
       .map(studentQuizDetailRepository::save)
       .orElse(null);
   }
 
-  private StudentQuizDetail toDetail(
+  private StudentQuizDetail toNewStudentQuizDetail(
     StudentQuiz studentQuiz
   ) {
 
@@ -146,11 +144,15 @@ public class StudentQuizDetailServiceImpl implements StudentQuizDetailService {
 
     Optional.ofNullable(studentQuiz)
       .map(StudentQuiz::getId)
-      .map(this::findLatestByStudentQuizId)
-      .ifPresent(detail -> {
-        studentQuestionService.deleteAllByStudentQuizDetailId(detail.getId());
-        detail.setDeleted(true);
-        studentQuizDetailRepository.save(detail);
-      });
+      .map(studentQuizDetailRepository::findAllByStudentQuizIdAndDeletedFalse)
+      .ifPresent(this::deleteEachStudentQuizDetail);
+  }
+
+  private void deleteEachStudentQuizDetail(List<StudentQuizDetail> list) {
+    list.forEach(detail -> {
+          studentQuestionService.deleteAllByStudentQuizDetailId(detail.getId());
+          detail.setDeleted(true);
+          studentQuizDetailRepository.save(detail);
+        });
   }
 }
