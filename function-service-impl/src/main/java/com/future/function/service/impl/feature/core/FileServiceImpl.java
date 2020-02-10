@@ -181,7 +181,7 @@ public class FileServiceImpl implements FileService {
 
     return Optional.ofNullable(parentId)
       .map(
-        id -> fileRepositoryV2.findAllByParentIdAndAsResourceFalseAndDeletedFalseOrderByMarkFolderDesc(
+        id -> fileRepositoryV2.findAllByParentIdAndAsResourceFalseAndDeletedFalseOrderByMarkFolderDescNameAsc(
           id, pageable))
       .map(data -> Pair.of(paths, data))
       .orElseGet(() -> Pair.of(paths, PageHelper.empty(pageable)));
