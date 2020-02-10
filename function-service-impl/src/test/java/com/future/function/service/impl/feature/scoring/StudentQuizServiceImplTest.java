@@ -51,6 +51,8 @@ public class StudentQuizServiceImplTest {
 
   private static final String STUDENT_QUIZ_ID = "student-quiz-id";
 
+  private static final String BATCH_ID = "batch-id";
+
   private static final String BATCH_CODE = "batch-code";
 
   private static final String TARGET_BATCH = "target-batch";
@@ -121,15 +123,16 @@ public class StudentQuizServiceImplTest {
       .question(question)
       .build();
 
+    batch = Batch.builder()
+        .id(BATCH_ID)
+        .code(BATCH_CODE)
+        .build();
+
     student = User.builder()
       .id(USER_ID)
       .name(USER_NAME)
       .role(Role.STUDENT)
       .batch(batch)
-      .build();
-
-    batch = Batch.builder()
-      .code(BATCH_CODE)
       .build();
 
     quiz = Quiz.builder()
@@ -193,7 +196,7 @@ public class StudentQuizServiceImplTest {
     )).thenReturn(studentQuizDetail);
     when(studentQuizDetailService.findLatestByStudentQuizId(
       STUDENT_QUIZ_ID)).thenReturn(studentQuizDetail);
-    when(quizService.findById(QUIZ_ID, Role.ADMIN, null)).thenReturn(quiz);
+    when(quizService.findById(QUIZ_ID, Role.STUDENT, BATCH_ID)).thenReturn(quiz);
     verify(quizService).addObserver(studentQuizService);
   }
 
@@ -259,7 +262,7 @@ public class StudentQuizServiceImplTest {
     StudentQuiz studentQuiz = studentQuizService.findOrCreateByStudentIdAndQuizId(USER_ID, QUIZ_ID);
     assertThat(studentQuiz.getId()).isEqualTo(STUDENT_QUIZ_ID);
     assertThat(studentQuiz.getTrials()).isEqualTo(QUIZ_TRIALS);
-    verify(quizService).findById(QUIZ_ID, Role.ADMIN, null);
+    verify(quizService).findById(QUIZ_ID, Role.STUDENT, BATCH_ID);
     verify(userService).getUser(USER_ID);
     verify(studentQuizRepository).findByStudentIdAndQuizIdAndDeletedFalse(USER_ID, QUIZ_ID);
     verify(studentQuizRepository).save(any(StudentQuiz.class));
