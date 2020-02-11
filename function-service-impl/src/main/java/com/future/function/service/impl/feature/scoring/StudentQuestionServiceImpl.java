@@ -132,20 +132,23 @@ public class StudentQuestionServiceImpl implements StudentQuestionService {
   ) {
 
     Long correctQuestionsCount = questionList.stream()
-      .filter(question -> checkRequestedOptionCorrect(answers, question))
-      .map(this::setQuestionCorrect)
+      .map(question -> checkAndSetCorrectStatus(answers, question))
       .map(studentQuestionRepository::save)
+      .filter(StudentQuestion::isCorrect)
       .count();
     return Pair.of(questionList.size(), correctQuestionsCount);
   }
 
-  private boolean checkRequestedOptionCorrect(
+  private StudentQuestion checkAndSetCorrectStatus(
       List<StudentQuestion> answers, StudentQuestion question
   ) {
 
-    return question.getOption()
+    boolean correct = question.getOption()
         .getId()
         .equals(getAnswerIdFromAnswerList(answers, question));
+
+    question.setCorrect(correct);
+    return question;
   }
 
   private String getAnswerIdFromAnswerList(
@@ -153,14 +156,6 @@ public class StudentQuestionServiceImpl implements StudentQuestionService {
   ) {
 
     return answers.get(question.getNumber() - 1).getOption().getId();
-  }
-
-  private StudentQuestion setQuestionCorrect(
-    StudentQuestion question
-  ) {
-
-    question.setCorrect(true);
-    return question;
   }
 
   private int getTotalPoint(
