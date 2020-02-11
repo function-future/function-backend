@@ -1,6 +1,5 @@
 package com.future.function.service.impl.feature.scoring;
 
-import com.future.function.common.enumeration.core.Role;
 import com.future.function.common.exception.NotFoundException;
 import com.future.function.model.entity.feature.core.User;
 import com.future.function.model.entity.feature.scoring.Quiz;
@@ -13,18 +12,13 @@ import com.future.function.service.api.feature.scoring.QuizService;
 import com.future.function.service.api.feature.scoring.StudentQuizDetailService;
 import com.future.function.service.api.feature.scoring.StudentQuizService;
 import com.future.function.service.impl.helper.PageHelper;
-import java.util.Objects;
-import java.util.Observable;
-import java.util.Observer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -74,9 +68,16 @@ public class StudentQuizServiceImpl implements StudentQuizService, Observer {
   ) {
 
     return studentQuizPage.getContent().stream()
-      .map(StudentQuiz::getId)
-      .map(studentQuizDetailService::findLatestByStudentQuizId)
+      .map(this::findLatest)
       .collect(Collectors.toList());
+  }
+
+  private StudentQuizDetail findLatest(StudentQuiz studentQuiz) {
+    try {
+      return studentQuizDetailService.findLatestByStudentQuizId(studentQuiz.getId());
+    } catch (NotFoundException e) {
+      return StudentQuizDetail.builder().studentQuiz(studentQuiz).build();
+    }
   }
 
   @Override
