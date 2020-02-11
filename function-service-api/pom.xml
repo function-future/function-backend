@@ -6,7 +6,7 @@
   <parent>
     <groupId>com.future.function</groupId>
     <artifactId>function</artifactId>
-      <version>1.0.1-1-SNAPSHOT</version>
+    <version>1.1.0-1-SNAPSHOT</version>
   </parent>
 
   <artifactId>function-service-api</artifactId>
@@ -40,13 +40,13 @@
 
     <dependency>
       <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-web</artifactId>
+      <artifactId>spring-boot-starter-mail</artifactId>
       <optional>true</optional>
     </dependency>
 
     <dependency>
       <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-mail</artifactId>
+      <artifactId>spring-boot-starter-web</artifactId>
       <optional>true</optional>
     </dependency>
     <dependency>
