@@ -244,7 +244,7 @@ public class AssignmentServiceImpl extends Observable implements AssignmentServi
       .flatMap(assignmentRepository::findByIdAndDeletedFalse)
       .ifPresent(assignment -> {
         this.setChanged();
-        this.notifyObservers(assignment.getId());
+        this.notifyObservers(assignment);
         markAssignmentFileAsNotUsed(assignment);
         assignment.setDeleted(true);
         assignmentRepository.save(assignment);
