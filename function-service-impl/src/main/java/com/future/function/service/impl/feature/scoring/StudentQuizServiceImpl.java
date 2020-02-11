@@ -175,7 +175,6 @@ public class StudentQuizServiceImpl implements StudentQuizService, Observer {
 
     userService.getStudentsByBatchCode(quiz.getBatch()
                                          .getCode())
-      .parallelStream()
       .forEach(user -> findAndDelete(user, quiz));
   }
 
