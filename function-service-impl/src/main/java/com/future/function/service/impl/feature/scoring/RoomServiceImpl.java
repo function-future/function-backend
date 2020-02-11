@@ -187,7 +187,7 @@ public class RoomServiceImpl implements RoomService, Observer {
 
   private void setEveryRoomAsDeleted(List<Room> list) {
 
-    list.parallelStream().forEach(this::setDeleteAsTrueAndSave);
+    list.forEach(this::setDeleteAsTrueAndSave);
   }
 
   private void setDeleteAsTrueAndSave(Room room) {
